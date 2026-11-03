@@ -522,15 +522,25 @@ function build() {
   // Scenario meta.
   const scenario = read(SCENARIO);
   const meta = scenario.meta;
+  // The runtime reads the P2b calibration of these tables (D-135), built from the P2
+  // outputs by scripts/p2b/build-money-calibration.mjs, and the 1900-world definitions.
   meta.files = {
-    countries: "historical/p2/countries_1900.json",
-    provinces: "historical/p2/provinces_1900.json",
-    markets: "historical/p2/markets_1900.json",
-    tradeRoutes: "historical/p2/trade_routes_1900.json",
-    populations: "historical/p2/pops_1900.json",
-    buildings: "historical/p2/buildings_1900.json",
-    employment: "historical/p2/employment_1900.json",
-    calibration: "historical/m11/calibration_targets_1900.json",
+    countries: "historical/p2b/countries_1900.json",
+    provinces: "historical/p2b/provinces_1900.json",
+    markets: "historical/p2b/markets_1900.json",
+    tradeRoutes: "historical/p2b/trade_routes_1900.json",
+    populations: "historical/p2b/pops_1900.json",
+    buildings: "historical/p2b/buildings_1900.json",
+    employment: "historical/p2b/employment_1900.json",
+    calibration: "historical/p2b/calibration_targets_1900.json",
+    moneyCoefficients: "historical/p2b/money_coefficients_1900.json",
+  };
+  meta.definitions = {
+    ...meta.definitions,
+    goods: "historical_1900_goods.json",
+    professions: "historical_1900_professions.json",
+    buildings: "historical_1900_buildings.json",
+    needs: "historical_1900_needs.json",
   };
   meta.countryMeta = meta.countryMeta.map((entry) => {
     const out = {};
@@ -576,6 +586,14 @@ function build() {
         accessDate: "2026-11-02",
         license: "Project authored",
         notes: "Provisional distribution rules of D-131; generated, not observed.",
+      },
+      {
+        id: "p2b-money-calibration",
+        title: "P2b historical money and productivity calibration (scripts/p2b/build-money-calibration.mjs)",
+        url: "packages/data/data/historical/p2b/sources_1900.json",
+        accessDate: "2026-11-03",
+        license: "Project authored from cited sources",
+        notes: "Wages, prices, budgets, techniques and levels re-derived from the cited 1900 sources in sources_1900.json and converted with the Minneapolis Fed CPI (15.704 RUSD per 1900 dollar); trace in calibration_1900.json (D-135).",
       },
       {
         id: "goa-census-1900",

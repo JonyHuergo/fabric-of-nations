@@ -64,7 +64,10 @@ const SEED = 20_261_023;
 // P2 re-pins it: schema 28 (D-134) encodes province economies and ownership instead
 // of regions, and D-133 pairs market reservations and employment sequentially, which
 // changes floating summation order and job pairings by design.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "c353751e30c61230";
+// P2b re-pins it: schema 29 (D-135) encodes province wage tables, building technique
+// and money coefficients, and D-136 changes the price rule's sellable supply, which
+// moves this M5-sample trajectory by design.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "8c9635f488c07ffe";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

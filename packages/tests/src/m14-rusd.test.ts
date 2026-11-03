@@ -103,15 +103,18 @@ describe("M14 monetary equivalence and determinism", () => {
   // save was retired with the designer's approval: the save predates D-128/D-129, and the
   // P2 schema break (D-120) makes it incompatible.
   // Re-pinned for P2: the 1900 world is the province world (D-131, D-132, schema 28).
+  // Re-pinned for P2b: the 1900 world's money values, wages, techniques and levels are
+  // re-derived from sources (D-135, schema 29).
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("d722fa8d0b3525eb");
+    expect(hashWorld(world)).toBe("62e80932e1b0d0d4");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {
     const save = serializeWorld(world);
     const envelope = JSON.parse(save) as { format: string; schemaVersion: number; payload: unknown };
     expect(envelope.format).toBe("century-save");
-    expect(envelope.schemaVersion).toBe(28);
+    // P2b (D-135): schema 29 adds province wages, building technique and money coefficients.
+    expect(envelope.schemaVersion).toBe(29);
     expect(hasLegacyMonetaryKey(envelope.payload)).toBe(false);
     expect(save).toContain("balanceRUSD");
     expect(save).not.toMatch(/SUSD|Susd|susd/);

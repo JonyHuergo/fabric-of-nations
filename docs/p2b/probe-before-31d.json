@@ -1,0 +1,2193 @@
+{
+ "days": 31,
+ "seed": 20261023,
+ "elapsedMs": 104492.02859999999,
+ "countries": [
+  {
+   "tag": "USA",
+   "population": 84659676,
+   "populationByProfession": {
+    "laborers": 31614171,
+    "peasants": 25286414,
+    "academics": 3469886,
+    "capitalists": 8096402,
+    "clerks": 16192803
+   },
+   "employedByProfession": {
+    "peasants": 8260025,
+    "laborers": 3874298,
+    "clerks": 269295
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.000000000001606,
+    "laborers": 42.36775695622584,
+    "clerks": 3.102409647680443
+   },
+   "valueAddedPerYear": 1257420581.7607522,
+   "valueAddedPerHead": 14.852650531768539,
+   "wagesPerYear": 659905398.99083,
+   "wageObligationPerYear": 1064950000.0000187,
+   "upkeepPerYear": 3526135.4838709678,
+   "householdPurchasesPerYear": 1257358525.231837,
+   "incomeTaxPerYear": 30109091.91821453,
+   "welfarePerYear": 0,
+   "administrationPerYear": 50796.99999999997,
+   "treasuryCashStart": 338648,
+   "treasuryCashEnd": 2889027.5903141093,
+   "householdCashStart": 1547577028,
+   "householdCashEnd": 1545642649.5458145,
+   "buildingCashStart": 2650000,
+   "buildingCashEnd": 1795764.0251750036
+  },
+  {
+   "tag": "GBR",
+   "population": 380380000,
+   "populationByProfession": {
+    "academics": 1876668,
+    "capitalists": 4378892,
+    "clerks": 8757784,
+    "laborers": 77944956,
+    "peasants": 287421700
+   },
+   "employedByProfession": {
+    "laborers": 2284116,
+    "peasants": 37811885,
+    "clerks": 147322
+   },
+   "wagePerWorkerYear": {
+    "laborers": 51.35792030896745,
+    "peasants": 59.999999999997414,
+    "clerks": 15.420173177245127
+   },
+   "valueAddedPerYear": 4852506153.698109,
+   "valueAddedPerHead": 12.756996040007646,
+   "wagesPerYear": 2387437770.499697,
+   "wageObligationPerYear": 2601100000.0000014,
+   "upkeepPerYear": 14697173.09974497,
+   "householdPurchasesPerYear": 4892243392.718785,
+   "incomeTaxPerYear": 73493408.8780906,
+   "welfarePerYear": 0,
+   "administrationPerYear": 228227.99999999985,
+   "treasuryCashStart": 1521520,
+   "treasuryCashEnd": 7732735.025262503,
+   "householdCashStart": 1871775000,
+   "householdCashEnd": 1862145365.7799854,
+   "buildingCashStart": 5950000,
+   "buildingCashEnd": 4813522.512152357
+  },
+  {
+   "tag": "DEU",
+   "population": 67165500,
+   "populationByProfession": {
+    "academics": 2570335,
+    "capitalists": 5997449,
+    "clerks": 11994898,
+    "laborers": 24219968,
+    "peasants": 22382850
+   },
+   "employedByProfession": {
+    "laborers": 2872853,
+    "peasants": 6705068,
+    "clerks": 198185
+   },
+   "wagePerWorkerYear": {
+    "laborers": 42.38208366095635,
+    "peasants": 60.00000000000036,
+    "clerks": 4.656869101724732
+   },
+   "valueAddedPerYear": 997479524.575158,
+   "valueAddedPerHead": 14.851069739303036,
+   "wagesPerYear": 524397979.01729584,
+   "wageObligationPerYear": 824150000.0000252,
+   "upkeepPerYear": 2854241.129032258,
+   "householdPurchasesPerYear": 1003962033.7291602,
+   "incomeTaxPerYear": 23578975.23921536,
+   "welfarePerYear": 0,
+   "administrationPerYear": 40299.999999999985,
+   "treasuryCashStart": 268668,
+   "treasuryCashEnd": 2265846.587440207,
+   "householdCashStart": 1159735500,
+   "householdCashEnd": 1157836859.5162828,
+   "buildingCashStart": 3100000,
+   "buildingCashEnd": 2257074.391071827
+  },
+  {
+   "tag": "FRA",
+   "population": 77650000,
+   "populationByProfession": {
+    "academics": 1773840,
+    "capitalists": 4138960,
+    "clerks": 8277920,
+    "laborers": 22348280,
+    "peasants": 41111000
+   },
+   "employedByProfession": {
+    "laborers": 1983139,
+    "peasants": 7617980,
+    "clerks": 137195
+   },
+   "wagePerWorkerYear": {
+    "laborers": 44.98738542299268,
+    "peasants": 59.99999999999858,
+    "clerks": 7.225180448776151
+   },
+   "valueAddedPerYear": 1164071348.089439,
+   "valueAddedPerHead": 14.991260117056521,
+   "wagesPerYear": 546753833.3274394,
+   "wageObligationPerYear": 748200000.0000485,
+   "upkeepPerYear": 3184742.7419354836,
+   "householdPurchasesPerYear": 1168889696.738346,
+   "incomeTaxPerYear": 19687543.103040844,
+   "welfarePerYear": 0,
+   "administrationPerYear": 46590.00000000002,
+   "treasuryCashStart": 310600,
+   "treasuryCashEnd": 1976427.4745048361,
+   "householdCashStart": 894250000,
+   "householdCashEnd": 892784671.0683113,
+   "buildingCashStart": 3850000,
+   "buildingCashEnd": 3013830.0000000023
+  },
+  {
+   "tag": "RUS",
+   "population": 138800000,
+   "populationByProfession": {
+    "laborers": 49647900,
+    "peasants": 49562000,
+    "academics": 4398900,
+    "capitalists": 10557360,
+    "clerks": 24633840
+   },
+   "employedByProfession": {
+    "peasants": 13322755,
+    "laborers": 6795780
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.000000000000774,
+    "laborers": 42.445174090726304
+   },
+   "valueAddedPerYear": 2059956754.148268,
+   "valueAddedPerHead": 14.841186989540835,
+   "wagesPerYear": 1087139165.417453,
+   "wageObligationPerYear": 1682050000.0000017,
+   "upkeepPerYear": 5758287.096774193,
+   "householdPurchasesPerYear": 2057396977.8654397,
+   "incomeTaxPerYear": 40091209.27992145,
+   "welfarePerYear": 0,
+   "administrationPerYear": 83280.00000000003,
+   "treasuryCashStart": 555200,
+   "treasuryCashEnd": 3950776.0210344205,
+   "householdCashStart": 1096400000,
+   "householdCashEnd": 1093696710.930585,
+   "buildingCashStart": 2050000,
+   "buildingCashEnd": 1139517.3595724667
+  },
+  {
+   "tag": "JPN",
+   "population": 47103000,
+   "populationByProfession": {
+    "academics": 1455399,
+    "capitalists": 3492958,
+    "clerks": 8150234,
+    "laborers": 16549389,
+    "peasants": 17455020
+   },
+   "employedByProfession": {
+    "laborers": 2261942,
+    "peasants": 4520106,
+    "clerks": 157144
+   },
+   "wagePerWorkerYear": {
+    "laborers": 44.136426831636264,
+    "peasants": 60.00000000000036,
+    "clerks": 6.017232107267184
+   },
+   "valueAddedPerYear": 699587127.2750401,
+   "valueAddedPerHead": 14.852283873108723,
+   "wagesPerYear": 371729795.5216401,
+   "wageObligationPerYear": 603750000.0000052,
+   "upkeepPerYear": 2041409.6774193547,
+   "householdPurchasesPerYear": 698968356.8206699,
+   "incomeTaxPerYear": 14041596.181697426,
+   "welfarePerYear": 0,
+   "administrationPerYear": 28262.000000000015,
+   "treasuryCashStart": 188412,
+   "treasuryCashEnd": 1377785.448308548,
+   "householdCashStart": 361824000,
+   "householdCashEnd": 361364696.90099937,
+   "buildingCashStart": 1750000,
+   "buildingCashEnd": 920395.7127250119
+  },
+  {
+   "tag": "ITA",
+   "population": 33175000,
+   "populationByProfession": {
+    "academics": 1071675,
+    "capitalists": 2572020,
+    "clerks": 6001380,
+    "laborers": 11914425,
+    "peasants": 11615500
+   },
+   "employedByProfession": {
+    "laborers": 1641350,
+    "peasants": 3220055,
+    "clerks": 111585
+   },
+   "wagePerWorkerYear": {
+    "laborers": 44.69790301403592,
+    "peasants": 59.999999999999915,
+    "clerks": 7.893010547774658
+   },
+   "valueAddedPerYear": 492955662.89294463,
+   "valueAddedPerHead": 14.85925133060873,
+   "wagesPerYear": 267164620.2229633,
+   "wageObligationPerYear": 433900000.0000093,
+   "upkeepPerYear": 1476248.387096774,
+   "householdPurchasesPerYear": 491909934.3000042,
+   "incomeTaxPerYear": 9899320.470543174,
+   "welfarePerYear": 0,
+   "administrationPerYear": 19904.99999999999,
+   "treasuryCashStart": 132700,
+   "treasuryCashEnd": 971210.1221557227,
+   "householdCashStart": 261900000,
+   "householdCashEnd": 261859266.19504753,
+   "buildingCashStart": 1900000,
+   "buildingCashEnd": 1088807.8699546265
+  },
+  {
+   "tag": "ESP",
+   "population": 18800000,
+   "populationByProfession": {
+    "academics": 613800,
+    "capitalists": 1473120,
+    "clerks": 3437280,
+    "laborers": 6787800,
+    "peasants": 6488000
+   },
+   "employedByProfession": {
+    "peasants": 1902519,
+    "laborers": 960742
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.99999999999951,
+    "laborers": 72.54213700804178
+   },
+   "valueAddedPerYear": 333622384.1128793,
+   "valueAddedPerHead": 17.74587149536592,
+   "wagesPerYear": 183749891.98714176,
+   "wageObligationPerYear": 238949999.9999969,
+   "upkeepPerYear": 1074866.129032258,
+   "householdPurchasesPerYear": 332412343.8759957,
+   "incomeTaxPerYear": 7080354.006584279,
+   "welfarePerYear": 0,
+   "administrationPerYear": 11280.000000000002,
+   "treasuryCashStart": 75200,
+   "treasuryCashEnd": 675267.7649427742,
+   "householdCashStart": 149400000,
+   "householdCashEnd": 149296203.08188686,
+   "buildingCashStart": 1900000,
+   "buildingCashEnd": 1422500.0057036397
+  },
+  {
+   "tag": "PRT",
+   "population": 13355513,
+   "populationByProfession": {
+    "academics": 178200,
+    "capitalists": 427680,
+    "clerks": 997920,
+    "laborers": 3421326,
+    "peasants": 8330387
+   },
+   "employedByProfession": {
+    "peasants": 1627590,
+    "laborers": 430072
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000001,
+    "laborers": 94.0293656304018
+   },
+   "valueAddedPerYear": 230528869.60170993,
+   "valueAddedPerHead": 17.260952057903722,
+   "wagesPerYear": 138080532.9689224,
+   "wageObligationPerYear": 153549999.9999978,
+   "upkeepPerYear": 778509.6774193548,
+   "householdPurchasesPerYear": 233331869.2624529,
+   "incomeTaxPerYear": 3896709.277083229,
+   "welfarePerYear": 0,
+   "administrationPerYear": 7727.999999999997,
+   "treasuryCashStart": 51520,
+   "treasuryCashEnd": 381598.2564098082,
+   "householdCashStart": 68524291,
+   "householdCashEnd": 68701021.96982506,
+   "buildingCashStart": 3150000,
+   "buildingCashEnd": 2339067.462618489
+  },
+  {
+   "tag": "NLD",
+   "population": 47230000,
+   "populationByProfession": {
+    "academics": 232560,
+    "capitalists": 542640,
+    "clerks": 1085280,
+    "laborers": 9598920,
+    "peasants": 35770600
+   },
+   "employedByProfession": {
+    "peasants": 4768040,
+    "clerks": 20285,
+    "laborers": 250277
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.0000000000003,
+    "clerks": 32.781059123539436,
+    "laborers": 78.11721864698836
+   },
+   "valueAddedPerYear": 631736067.7141407,
+   "valueAddedPerHead": 13.375737194879116,
+   "wagesPerYear": 306210873.4170599,
+   "wageObligationPerYear": 323550000.00000113,
+   "upkeepPerYear": 1911128.2258064514,
+   "householdPurchasesPerYear": 631747329.9327103,
+   "incomeTaxPerYear": 9625703.638879685,
+   "welfarePerYear": 0,
+   "administrationPerYear": 28337.999999999996,
+   "treasuryCashStart": 188920,
+   "treasuryCashEnd": 1002634.7227541653,
+   "householdCashStart": 228390000,
+   "householdCashEnd": 227896166.90912905,
+   "buildingCashStart": 2500000,
+   "buildingCashEnd": 2023870.3428158257
+  },
+  {
+   "tag": "BEL",
+   "population": 15700000,
+   "populationByProfession": {
+    "academics": 305520,
+    "capitalists": 712880,
+    "clerks": 1425760,
+    "laborers": 4267840,
+    "peasants": 8988000
+   },
+   "employedByProfession": {
+    "laborers": 350326,
+    "peasants": 1542610,
+    "clerks": 25377
+   },
+   "wagePerWorkerYear": {
+    "laborers": 78.23021184267029,
+    "peasants": 59.999999999999886,
+    "clerks": 24.854536493426764
+   },
+   "valueAddedPerYear": 265579618.3859699,
+   "valueAddedPerHead": 16.91589926025286,
+   "wagesPerYear": 120519452.29334582,
+   "wageObligationPerYear": 144299999.99999812,
+   "upkeepPerYear": 714693.5483870967,
+   "householdPurchasesPerYear": 265579618.38596976,
+   "incomeTaxPerYear": 4273559.383580514,
+   "welfarePerYear": 0,
+   "administrationPerYear": 9419.999999999993,
+   "treasuryCashStart": 62800,
+   "treasuryCashEnd": 424493.0846328659,
+   "householdCashStart": 161000000,
+   "householdCashEnd": 161027063.53103018,
+   "buildingCashStart": 2200000,
+   "buildingCashEnd": 1756824.7889138223
+  },
+  {
+   "tag": "CHE",
+   "population": 3300000,
+   "populationByProfession": {
+    "academics": 150480,
+    "capitalists": 351120,
+    "clerks": 702240,
+    "laborers": 1304160,
+    "peasants": 792000
+   },
+   "employedByProfession": {
+    "peasants": 269798.48387096776,
+    "laborers": 160176,
+    "clerks": 10186
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.99999999999993,
+    "laborers": 46.513713015617604,
+    "clerks": 25.036890686516017
+   },
+   "valueAddedPerYear": 49171181.04505985,
+   "valueAddedPerHead": 14.90035789244238,
+   "wagesPerYear": 23858484.779148206,
+   "wageObligationPerYear": 39487909.0322582,
+   "upkeepPerYear": 172256.45161290324,
+   "householdPurchasesPerYear": 49259842.95711544,
+   "incomeTaxPerYear": 1122226.9672548564,
+   "welfarePerYear": 0,
+   "administrationPerYear": 1979.999999999999,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 120046.16708191948,
+   "householdCashStart": 66000000,
+   "householdCashEnd": 66037921.85147394,
+   "buildingCashStart": 400000,
+   "buildingCashEnd": 247360.44068999984
+  },
+  {
+   "tag": "SWE",
+   "population": 5100000,
+   "populationByProfession": {
+    "academics": 168300,
+    "capitalists": 403920,
+    "clerks": 942480,
+    "laborers": 1851300,
+    "peasants": 1734000
+   },
+   "employedByProfession": {
+    "peasants": 507504,
+    "laborers": 250223,
+    "clerks": 20246
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000001,
+    "laborers": 82.48190566932685,
+    "clerks": 45.50433733312347
+   },
+   "valueAddedPerYear": 94512580.51596576,
+   "valueAddedPerHead": 18.531878532542304,
+   "wagesPerYear": 51964975.783265956,
+   "wageObligationPerYear": 67949999.99999967,
+   "upkeepPerYear": 302655.6451612903,
+   "householdPurchasesPerYear": 91417991.66623527,
+   "incomeTaxPerYear": 2001166.3553264744,
+   "welfarePerYear": 0,
+   "administrationPerYear": 3059.9999999999986,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 194615.55346608433,
+   "householdCashStart": 40800000,
+   "householdCashEnd": 41274464.697587594,
+   "buildingCashStart": 1600000,
+   "buildingCashEnd": 1194389.7488000009
+  },
+  {
+   "tag": "NOR",
+   "population": 2200000,
+   "populationByProfession": {
+    "academics": 72600,
+    "capitalists": 174240,
+    "clerks": 406560,
+    "laborers": 798600,
+    "peasants": 748000
+   },
+   "employedByProfession": {
+    "peasants": 202500,
+    "laborers": 100109,
+    "clerks": 5111
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000022,
+    "laborers": 67.756125868015,
+    "clerks": 33.06450848520466
+   },
+   "valueAddedPerYear": 32224404.639931772,
+   "valueAddedPerHead": 14.647456654514441,
+   "wagesPerYear": 19080423.79032261,
+   "wageObligationPerYear": 26400000.000000007,
+   "upkeepPerYear": 108263.70967741935,
+   "householdPurchasesPerYear": 32310895.14981808,
+   "incomeTaxPerYear": 734973.5430148976,
+   "welfarePerYear": 0,
+   "administrationPerYear": 1319.999999999999,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 87267.83516016939,
+   "householdCashStart": 17600000,
+   "householdCashEnd": 17683411.6674529,
+   "buildingCashStart": 400000,
+   "buildingCashEnd": 239333.23989365803
+  },
+  {
+   "tag": "DNK",
+   "population": 2537000,
+   "populationByProfession": {
+    "academics": 79200,
+    "capitalists": 190080,
+    "clerks": 443520,
+    "laborers": 895860,
+    "peasants": 928340
+   },
+   "employedByProfession": {
+    "peasants": 316016.3548387097,
+    "clerks": 10116,
+    "laborers": 110121
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000007,
+    "clerks": 17.52843045498274,
+    "laborers": 72.63743634540131
+   },
+   "valueAddedPerYear": 42493717.64717784,
+   "valueAddedPerHead": 16.74959308126836,
+   "wagesPerYear": 27113824.81483489,
+   "wageObligationPerYear": 35760981.29032263,
+   "upkeepPerYear": 223003.2258064516,
+   "householdPurchasesPerYear": 43791944.53464562,
+   "incomeTaxPerYear": 1009904.0663829567,
+   "welfarePerYear": 0,
+   "administrationPerYear": 1522,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 110600.34810375814,
+   "householdCashStart": 19611000,
+   "householdCashEnd": 19550975.08714864,
+   "buildingCashStart": 1000000,
+   "buildingCashEnd": 846483.2507506721
+  },
+  {
+   "tag": "GRC",
+   "population": 2400000,
+   "populationByProfession": {
+    "laborers": 432000,
+    "peasants": 1968000
+   },
+   "employedByProfession": {
+    "peasants": 240031,
+    "laborers": 126
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000031,
+    "laborers": 127.17515556285149
+   },
+   "valueAddedPerYear": 28848628.438437495,
+   "valueAddedPerHead": 12.020261849348957,
+   "wagesPerYear": 14400000.000000026,
+   "wageObligationPerYear": 14400000.000000026,
+   "upkeepPerYear": 91250,
+   "householdPurchasesPerYear": 28848628.438437484,
+   "incomeTaxPerYear": 335227.79462847585,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 53471.40173556921,
+   "householdCashStart": 7200000,
+   "householdCashEnd": 7166847.519244235,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 148449.99999999965
+  },
+  {
+   "tag": "SRB",
+   "population": 2500000,
+   "populationByProfession": {
+    "laborers": 450000,
+    "peasants": 2050000
+   },
+   "employedByProfession": {
+    "peasants": 240034,
+    "laborers": 132
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.999999999999964,
+    "laborers": 127.20066701762902
+   },
+   "valueAddedPerYear": 30050658.323750015,
+   "valueAddedPerHead": 12.020263329500006,
+   "wagesPerYear": 14400000.00000002,
+   "wageObligationPerYear": 14400000.00000002,
+   "upkeepPerYear": 91250,
+   "householdPurchasesPerYear": 30973013.93785357,
+   "incomeTaxPerYear": 325682.95331113704,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 52660.74397984999,
+   "householdCashStart": 7500000,
+   "householdCashEnd": 7389401.505587888,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 148449.99999999988
+  },
+  {
+   "tag": "MNT",
+   "population": 300000,
+   "populationByProfession": {
+    "laborers": 54000,
+    "peasants": 246000
+   },
+   "employedByProfession": {
+    "peasants": 65001,
+    "laborers": 16
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000006,
+    "laborers": 126.92073371939192
+   },
+   "valueAddedPerYear": 3606079.184999999,
+   "valueAddedPerHead": 12.020263949999997,
+   "wagesPerYear": 3900000.000000001,
+   "wageObligationPerYear": 3900000.000000001,
+   "upkeepPerYear": 25550,
+   "householdPurchasesPerYear": 4164224.007472993,
+   "incomeTaxPerYear": 95945.76422242072,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 33148.8183312193,
+   "householdCashStart": 900000,
+   "householdCashEnd": 869587.8075653894,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 122866.86228767122
+  },
+  {
+   "tag": "ROM",
+   "population": 6000000,
+   "populationByProfession": {
+    "laborers": 1080000,
+    "peasants": 4920000
+   },
+   "employedByProfession": {
+    "peasants": 580080,
+    "laborers": 319
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000007,
+    "laborers": 127.18008801426151
+   },
+   "valueAddedPerYear": 72121580.59750001,
+   "valueAddedPerHead": 12.020263432916668,
+   "wagesPerYear": 34799999.999999985,
+   "wageObligationPerYear": 34799999.999999985,
+   "upkeepPerYear": 219000,
+   "householdPurchasesPerYear": 73722677.84465964,
+   "incomeTaxPerYear": 767792.7156397492,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 90209.79228721156,
+   "householdCashStart": 18000000,
+   "householdCashEnd": 17787779.98642083,
+   "buildingCashStart": 600000,
+   "buildingCashEnd": 596279.9999999987
+  },
+  {
+   "tag": "BGR",
+   "population": 3700000,
+   "populationByProfession": {
+    "laborers": 666000,
+    "peasants": 3034000
+   },
+   "employedByProfession": {
+    "peasants": 340050,
+    "laborers": 196
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000003,
+    "laborers": 127.18467082915815
+   },
+   "valueAddedPerYear": 44474970.0221875,
+   "valueAddedPerHead": 12.020262168158784,
+   "wagesPerYear": 20400000.000000037,
+   "wageObligationPerYear": 20400000.000000037,
+   "upkeepPerYear": 127749.99999999999,
+   "householdPurchasesPerYear": 44474970.02218749,
+   "incomeTaxPerYear": 441203.91310610424,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 62472.113167915726,
+   "householdCashStart": 11100000,
+   "householdCashEnd": 11056219.870557979,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 147830.00000000081
+  },
+  {
+   "tag": "OTT",
+   "population": 33700000,
+   "populationByProfession": {
+    "academics": 345600,
+    "capitalists": 1728000,
+    "clerks": 3456000,
+    "laborers": 7736400,
+    "peasants": 20434000
+   },
+   "employedByProfession": {
+    "peasants": 3835230,
+    "laborers": 221995
+   },
+   "wagePerWorkerYear": {
+    "peasants": 57.94099071149638,
+    "laborers": 15.201326648236506
+   },
+   "valueAddedPerYear": 505757318.32196414,
+   "valueAddedPerHead": 15.007635558515256,
+   "wagesPerYear": 225360416.9354822,
+   "wageObligationPerYear": 258700000.0000024,
+   "upkeepPerYear": 1565362.0967741932,
+   "householdPurchasesPerYear": 506505683.5025883,
+   "incomeTaxPerYear": 5467513.417243075,
+   "welfarePerYear": 0,
+   "administrationPerYear": 20219.99999999999,
+   "treasuryCashStart": 134800,
+   "treasuryCashEnd": 597217.8628343431,
+   "householdCashStart": 101100000,
+   "householdCashEnd": 100881482.2828867,
+   "buildingCashStart": 2000000,
+   "buildingCashEnd": 1579230.0000000005
+  },
+  {
+   "tag": "LUX",
+   "population": 240000,
+   "populationByProfession": {
+    "academics": 7920,
+    "capitalists": 19008,
+    "clerks": 44352,
+    "laborers": 87120,
+    "peasants": 81600
+   },
+   "employedByProfession": {
+    "laborers": 19788.967741935485,
+    "peasants": 27804.516129032258,
+    "clerks": 5009
+   },
+   "wagePerWorkerYear": {
+    "laborers": 110.0603426581458,
+    "peasants": 59.99999999999993,
+    "clerks": 65.38994479767041
+   },
+   "valueAddedPerYear": 7510495.13023769,
+   "valueAddedPerHead": 31.29372970932371,
+   "wagesPerYear": 4173230.5348706623,
+   "wageObligationPerYear": 5490836.774193539,
+   "upkeepPerYear": 75119.35483870967,
+   "householdPurchasesPerYear": 3587424.6322661266,
+   "incomeTaxPerYear": 191424.60719720088,
+   "welfarePerYear": 0,
+   "administrationPerYear": 999.9999999999993,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 41130.58307702258,
+   "householdCashStart": 1920000,
+   "householdCashEnd": 2342054.0093470938,
+   "buildingCashStart": 400000,
+   "buildingCashEnd": 288666.9060547286
+  },
+  {
+   "tag": "MCO",
+   "population": 15000,
+   "populationByProfession": {
+    "academics": 495,
+    "capitalists": 1188,
+    "clerks": 2772,
+    "laborers": 5445,
+    "peasants": 5100
+   },
+   "employedByProfession": {
+    "laborers": 1237,
+    "peasants": 1737,
+    "clerks": 866
+   },
+   "wagePerWorkerYear": {
+    "laborers": 129.99999999999991,
+    "peasants": 60.00000000000003,
+    "clerks": 250
+   },
+   "valueAddedPerYear": 610556.5992853777,
+   "valueAddedPerHead": 40.703773285691845,
+   "wagesPerYear": 481530.00000000023,
+   "wageObligationPerYear": 481530.00000000023,
+   "upkeepPerYear": 91250,
+   "householdPurchasesPerYear": 225801.26888936022,
+   "incomeTaxPerYear": 22142.550322200008,
+   "welfarePerYear": 0,
+   "administrationPerYear": 999.9999999999993,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 26753.202904077298,
+   "householdCashStart": 120000,
+   "householdCashEnd": 175682.80768380227,
+   "buildingCashStart": 400000,
+   "buildingCashEnd": 367491.8393909603
+  },
+  {
+   "tag": "SMR",
+   "population": 11000,
+   "populationByProfession": {
+    "laborers": 1980,
+    "peasants": 9020
+   },
+   "employedByProfession": {
+    "peasants": 3073
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.999999999999986
+   },
+   "valueAddedPerYear": 369972.52773286885,
+   "valueAddedPerHead": 33.63386615753353,
+   "wagesPerYear": 184379.99999999997,
+   "wageObligationPerYear": 184379.99999999997,
+   "upkeepPerYear": 25550,
+   "householdPurchasesPerYear": 163096.71228551978,
+   "incomeTaxPerYear": 4652.95194243871,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 25395.18221976876,
+   "householdCashStart": 33000,
+   "householdCashEnd": 48315.09251685546,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149689.99999999985
+  },
+  {
+   "tag": "AND",
+   "population": 5000,
+   "populationByProfession": {
+    "laborers": 900,
+    "peasants": 4100
+   },
+   "employedByProfession": {
+    "peasants": 1396
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.99999999999994
+   },
+   "valueAddedPerYear": 60100.466562500034,
+   "valueAddedPerHead": 12.020093312500007,
+   "wagesPerYear": 83759.99999999993,
+   "wageObligationPerYear": 83759.99999999993,
+   "upkeepPerYear": 25550,
+   "householdPurchasesPerYear": 66534.57949092743,
+   "incomeTaxPerYear": 2028.58344,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 25172.290648328766,
+   "householdCashStart": 15000,
+   "householdCashEnd": 16290.690271619867,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 145820.56017380138
+  },
+  {
+   "tag": "LIE",
+   "population": 7500,
+   "populationByProfession": {
+    "academics": 247,
+    "capitalists": 594,
+    "clerks": 1386,
+    "laborers": 2723,
+    "peasants": 2550
+   },
+   "employedByProfession": {
+    "laborers": 618,
+    "peasants": 869,
+    "clerks": 432
+   },
+   "wagePerWorkerYear": {
+    "laborers": 130.00000000000006,
+    "peasants": 60.00000000000005,
+    "clerks": 249.99999999999986
+   },
+   "valueAddedPerYear": 214050.4350386267,
+   "valueAddedPerHead": 28.540058005150225,
+   "wagesPerYear": 240479.99999999997,
+   "wageObligationPerYear": 240479.99999999997,
+   "upkeepPerYear": 91250,
+   "householdPurchasesPerYear": 110957.11411120887,
+   "incomeTaxPerYear": 11058.164985600004,
+   "welfarePerYear": 0,
+   "administrationPerYear": 999.9999999999993,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 25811.78935494137,
+   "householdCashStart": 60000,
+   "householdCashEnd": 78295.51302334788,
+   "buildingCashStart": 400000,
+   "buildingCashEnd": 381886.4092366876
+  },
+  {
+   "tag": "CHN",
+   "population": 401200000,
+   "populationByProfession": {
+    "academics": 5760000,
+    "capitalists": 28800000,
+    "clerks": 57600000,
+    "laborers": 100056000,
+    "peasants": 208984000
+   },
+   "employedByProfession": {
+    "peasants": 47716713,
+    "laborers": 3824485
+   },
+   "wagePerWorkerYear": {
+    "peasants": 56.553719840460865,
+    "laborers": 4.920671714589362
+   },
+   "valueAddedPerYear": 5951573423.206314,
+   "valueAddedPerHead": 14.834430267214143,
+   "wagesPerYear": 2714825088.709675,
+   "wageObligationPerYear": 3356899999.999999,
+   "upkeepPerYear": 18449337.09677419,
+   "householdPurchasesPerYear": 5935424747.43743,
+   "incomeTaxPerYear": 75065011.95797738,
+   "welfarePerYear": 0,
+   "administrationPerYear": 240720,
+   "treasuryCashStart": 1604800,
+   "treasuryCashEnd": 7957013.903280269,
+   "householdCashStart": 1203600000,
+   "householdCashEnd": 1197869715.7374551,
+   "buildingCashStart": 1550000,
+   "buildingCashEnd": 921255.9514799212
+  },
+  {
+   "tag": "KOR",
+   "population": 17000000,
+   "populationByProfession": {
+    "laborers": 3060000,
+    "peasants": 13940000
+   },
+   "employedByProfession": {
+    "peasants": 1680225,
+    "laborers": 902
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.999999999999936,
+    "laborers": 52.62703028472318
+   },
+   "valueAddedPerYear": 204344477.45468742,
+   "valueAddedPerHead": 12.020263379687496,
+   "wagesPerYear": 100800000.00000004,
+   "wageObligationPerYear": 100800000.00000004,
+   "upkeepPerYear": 635100,
+   "householdPurchasesPerYear": 208264492.52314124,
+   "incomeTaxPerYear": 2090756.1311545891,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 68000,
+   "treasuryCashEnd": 245571.0686734035,
+   "householdCashStart": 51000000,
+   "householdCashEnd": 50451274.383104,
+   "buildingCashStart": 600000,
+   "buildingCashEnd": 589459.9999999969
+  },
+  {
+   "tag": "PER",
+   "population": 9900000,
+   "populationByProfession": {
+    "academics": 142560,
+    "capitalists": 712800,
+    "clerks": 1425600,
+    "laborers": 2471040,
+    "peasants": 5148000
+   },
+   "employedByProfession": {
+    "peasants": 1167544
+   },
+   "wagePerWorkerYear": {
+    "peasants": 58.37444269559041
+   },
+   "valueAddedPerYear": 147487744.68700424,
+   "valueAddedPerHead": 14.897751988586286,
+   "wagesPerYear": 68152090.32258035,
+   "wageObligationPerYear": 70049999.99999976,
+   "upkeepPerYear": 581998.3870967742,
+   "householdPurchasesPerYear": 146468401.6226811,
+   "incomeTaxPerYear": 2023970.4769568834,
+   "welfarePerYear": 0,
+   "administrationPerYear": 5939.999999999997,
+   "treasuryCashStart": 39600,
+   "treasuryCashEnd": 210927.10352236568,
+   "householdCashStart": 29700000,
+   "householdCashEnd": 29772241.45810507,
+   "buildingCashStart": 1400000,
+   "buildingCashEnd": 1193263.8152500007
+  },
+  {
+   "tag": "AFG",
+   "population": 4500000,
+   "populationByProfession": {
+    "laborers": 810000,
+    "peasants": 3690000
+   },
+   "employedByProfession": {
+    "peasants": 455058
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.000000000000036
+   },
+   "valueAddedPerYear": 54091182.34562498,
+   "valueAddedPerHead": 12.020262743472218,
+   "wagesPerYear": 27300000.000000007,
+   "wageObligationPerYear": 27300000.000000007,
+   "upkeepPerYear": 171550,
+   "householdPurchasesPerYear": 56497340.68332526,
+   "incomeTaxPerYear": 606858.6914482531,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 76541.42310930368,
+   "householdCashStart": 13500000,
+   "householdCashEnd": 13232615.485195616,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 147210
+  },
+  {
+   "tag": "NPL",
+   "population": 5000000,
+   "populationByProfession": {
+    "laborers": 900000,
+    "peasants": 4100000
+   },
+   "employedByProfession": {
+    "peasants": 480067
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.000000000000014
+   },
+   "valueAddedPerYear": 60101317.03531252,
+   "valueAddedPerHead": 12.020263407062505,
+   "wagesPerYear": 28799999.999999996,
+   "wageObligationPerYear": 28799999.999999996,
+   "upkeepPerYear": 182500,
+   "householdPurchasesPerYear": 61929589.66941848,
+   "incomeTaxPerYear": 630998.6685793318,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 78591.66774235423,
+   "householdCashStart": 15000000,
+   "householdCashEnd": 14779071.807169177,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 146899.99999999919
+  },
+  {
+   "tag": "THA",
+   "population": 7300000,
+   "populationByProfession": {
+    "laborers": 1314000,
+    "peasants": 5986000
+   },
+   "employedByProfession": {
+    "peasants": 720097,
+    "laborers": 388
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.9999999999998,
+    "laborers": 127.20643883821135
+   },
+   "valueAddedPerYear": 87747924.12031253,
+   "valueAddedPerHead": 12.020263578125004,
+   "wagesPerYear": 43199999.99999984,
+   "wageObligationPerYear": 43199999.99999984,
+   "upkeepPerYear": 273750,
+   "householdPurchasesPerYear": 87747924.12031253,
+   "incomeTaxPerYear": 947757.8544177074,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 29200,
+   "treasuryCashEnd": 109694.50270396966,
+   "householdCashStart": 21900000,
+   "householdCashEnd": 21805591.68646409,
+   "buildingCashStart": 600000,
+   "buildingCashEnd": 595349.9999999998
+  },
+  {
+   "tag": "OMN",
+   "population": 500000,
+   "populationByProfession": {
+    "laborers": 90000,
+    "peasants": 410000
+   },
+   "employedByProfession": {
+    "peasants": 90003
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60
+   },
+   "valueAddedPerYear": 6010125.769999999,
+   "valueAddedPerHead": 12.020251539999997,
+   "wagesPerYear": 5400000.000000005,
+   "wageObligationPerYear": 5400000.000000005,
+   "upkeepPerYear": 32850,
+   "householdPurchasesPerYear": 6010125.770000007,
+   "incomeTaxPerYear": 127820.04408740909,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 35855.948949889505,
+   "householdCashStart": 1500000,
+   "householdCashEnd": 1486679.3387213403,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149690.0000000004
+  },
+  {
+   "tag": "ETH",
+   "population": 11000000,
+   "populationByProfession": {
+    "academics": 158400,
+    "capitalists": 792000,
+    "clerks": 1584000,
+    "laborers": 2745600,
+    "peasants": 5720000
+   },
+   "employedByProfession": {
+    "peasants": 1305046
+   },
+   "wagePerWorkerYear": {
+    "peasants": 58.08596043555588
+   },
+   "valueAddedPerYear": 169345207.4758915,
+   "valueAddedPerHead": 15.395018861444681,
+   "wagesPerYear": 75802090.3225804,
+   "wageObligationPerYear": 78299999.99999979,
+   "upkeepPerYear": 638573.3870967742,
+   "householdPurchasesPerYear": 162701443.97963738,
+   "incomeTaxPerYear": 2076196.1410216,
+   "welfarePerYear": 0,
+   "administrationPerYear": 6600.000000000001,
+   "treasuryCashStart": 44000,
+   "treasuryCashEnd": 219699.17910046494,
+   "householdCashStart": 33000000,
+   "householdCashEnd": 33541385.076745786,
+   "buildingCashStart": 1400000,
+   "buildingCashEnd": 1190490.9035000012
+  },
+  {
+   "tag": "LBR",
+   "population": 600000,
+   "populationByProfession": {
+    "laborers": 108000,
+    "peasants": 492000
+   },
+   "employedByProfession": {
+    "peasants": 90007,
+    "laborers": 33
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.99999999999998,
+    "laborers": 52.72111891911946
+   },
+   "valueAddedPerYear": 7212167.677499998,
+   "valueAddedPerHead": 12.020279462499998,
+   "wagesPerYear": 5399999.999999996,
+   "wageObligationPerYear": 5399999.999999996,
+   "upkeepPerYear": 32850,
+   "householdPurchasesPerYear": 7212167.677499996,
+   "incomeTaxPerYear": 120901.11170009714,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 35268.31359644661,
+   "householdCashStart": 1800000,
+   "householdCashEnd": 1787435.121210826,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149690.00000000035
+  },
+  {
+   "tag": "MAR",
+   "population": 5000000,
+   "populationByProfession": {
+    "laborers": 900000,
+    "peasants": 4100000
+   },
+   "employedByProfession": {
+    "peasants": 480067
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000011
+   },
+   "valueAddedPerYear": 60101312.769375,
+   "valueAddedPerHead": 12.020262553875,
+   "wagesPerYear": 28800000,
+   "wageObligationPerYear": 28800000,
+   "upkeepPerYear": 182500,
+   "householdPurchasesPerYear": 60157210.056308635,
+   "incomeTaxPerYear": 649421.9873699693,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 80156.38796840837,
+   "householdCashStart": 15000000,
+   "householdCashEnd": 14928037.595881054,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 146900.00000000073
+  },
+  {
+   "tag": "ZAR",
+   "population": 1200000,
+   "populationByProfession": {
+    "academics": 17280,
+    "capitalists": 86400,
+    "clerks": 172800,
+    "laborers": 299520,
+    "peasants": 624000
+   },
+   "employedByProfession": {
+    "peasants": 177502,
+    "laborers": 20061
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000012,
+    "laborers": 129.76468396730226
+   },
+   "valueAddedPerYear": 31496980.338743553,
+   "valueAddedPerHead": 26.247483615619625,
+   "wagesPerYear": 13250000.000000002,
+   "wageObligationPerYear": 13250000.000000002,
+   "upkeepPerYear": 98550,
+   "householdPurchasesPerYear": 23916748.032194618,
+   "incomeTaxPerYear": 264971.2950635137,
+   "welfarePerYear": 0,
+   "administrationPerYear": 999.9999999999993,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 47377.01410128477,
+   "householdCashStart": 3600000,
+   "householdCashEnd": 4255755.206666189,
+   "buildingCashStart": 350000,
+   "buildingCashEnd": 303688.04115666106
+  },
+  {
+   "tag": "ORF",
+   "population": 300000,
+   "populationByProfession": {
+    "laborers": 54000,
+    "peasants": 246000
+   },
+   "employedByProfession": {
+    "peasants": 65001,
+    "laborers": 16
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000001,
+    "laborers": 52.655363793944794
+   },
+   "valueAddedPerYear": 3606077.6337499996,
+   "valueAddedPerHead": 12.020258779166666,
+   "wagesPerYear": 3900000.000000001,
+   "wageObligationPerYear": 3900000.000000001,
+   "upkeepPerYear": 25550,
+   "householdPurchasesPerYear": 3606077.633750002,
+   "incomeTaxPerYear": 95444.37972972056,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 33106.234990743396,
+   "householdCashStart": 900000,
+   "householdCashEnd": 916933.6839522488,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 122866.73053767122
+  },
+  {
+   "tag": "MEX",
+   "population": 13600000,
+   "populationByProfession": {
+    "laborers": 2448000,
+    "peasants": 11152000
+   },
+   "employedByProfession": {
+    "peasants": 1365176,
+    "laborers": 724
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.999999999999986,
+    "laborers": 126.87943439343748
+   },
+   "valueAddedPerYear": 163475597.86406228,
+   "valueAddedPerHead": 12.02026454882811,
+   "wagesPerYear": 81900000.00000009,
+   "wageObligationPerYear": 81900000.00000009,
+   "upkeepPerYear": 514649.99999999994,
+   "householdPurchasesPerYear": 163782856.28013474,
+   "incomeTaxPerYear": 1786029.2401578175,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 54400,
+   "treasuryCashEnd": 206090.15464354068,
+   "householdCashStart": 40800000,
+   "householdCashEnd": 40595572.6703627,
+   "buildingCashStart": 600000,
+   "buildingCashEnd": 591629.9999999988
+  },
+  {
+   "tag": "GUA",
+   "population": 1400000,
+   "populationByProfession": {
+    "laborers": 252000,
+    "peasants": 1148000
+   },
+   "employedByProfession": {
+    "peasants": 165017,
+    "laborers": 76
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.000000000000774,
+    "laborers": 126.82521915040184
+   },
+   "valueAddedPerYear": 16828366.427500002,
+   "valueAddedPerHead": 12.020261733928573,
+   "wagesPerYear": 9900000.000000015,
+   "wageObligationPerYear": 9900000.000000015,
+   "upkeepPerYear": 62050,
+   "householdPurchasesPerYear": 16828366.42750003,
+   "incomeTaxPerYear": 213547.1187797187,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 43136.878581291196,
+   "householdCashStart": 4200000,
+   "householdCashEnd": 4178428.382285334,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149070.00000000017
+  },
+  {
+   "tag": "HON",
+   "population": 500000,
+   "populationByProfession": {
+    "laborers": 90000,
+    "peasants": 410000
+   },
+   "employedByProfession": {
+    "peasants": 90001,
+    "laborers": 29
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.999999999999886,
+    "laborers": 127.16359704659493
+   },
+   "valueAddedPerYear": 6010124.21875,
+   "valueAddedPerHead": 12.0202484375,
+   "wagesPerYear": 5399999.999999996,
+   "wageObligationPerYear": 5399999.999999996,
+   "upkeepPerYear": 32850,
+   "householdPurchasesPerYear": 6010124.218750009,
+   "incomeTaxPerYear": 126428.78921282703,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 35737.78757697985,
+   "householdCashStart": 1500000,
+   "householdCashEnd": 1487100.513994924,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149690.0000000003
+  },
+  {
+   "tag": "SAL",
+   "population": 900000,
+   "populationByProfession": {
+    "laborers": 162000,
+    "peasants": 738000
+   },
+   "employedByProfession": {
+    "peasants": 115011,
+    "laborers": 47
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000015,
+    "laborers": 127.08313171458418
+   },
+   "valueAddedPerYear": 10818240.657499993,
+   "valueAddedPerHead": 12.020267397222215,
+   "wagesPerYear": 6899999.999999996,
+   "wageObligationPerYear": 6899999.999999996,
+   "upkeepPerYear": 43800,
+   "householdPurchasesPerYear": 10818240.657499999,
+   "incomeTaxPerYear": 149617.9852630556,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 37707.28094014991,
+   "householdCashStart": 2700000,
+   "householdCashEnd": 2684756.061862338,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149380.00000000006
+  },
+  {
+   "tag": "NIC",
+   "population": 400000,
+   "populationByProfession": {
+    "laborers": 72000,
+    "peasants": 328000
+   },
+   "employedByProfession": {
+    "peasants": 65000,
+    "laborers": 21
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.999999999999936,
+    "laborers": 126.60532090973483
+   },
+   "valueAddedPerYear": 4808108.6825,
+   "valueAddedPerHead": 12.02027170625,
+   "wagesPerYear": 3900000.000000001,
+   "wageObligationPerYear": 3900000.000000001,
+   "upkeepPerYear": 25550,
+   "householdPurchasesPerYear": 4808108.682499997,
+   "incomeTaxPerYear": 98278.77301891102,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 33346.9642837979,
+   "householdCashStart": 1200000,
+   "householdCashEnd": 1190018.8441104824,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149690.0000000002
+  },
+  {
+   "tag": "COS",
+   "population": 300000,
+   "populationByProfession": {
+    "laborers": 54000,
+    "peasants": 246000
+   },
+   "employedByProfession": {
+    "peasants": 65000,
+    "laborers": 16
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.99999999999987,
+    "laborers": 126.91541178817342
+   },
+   "valueAddedPerYear": 3606080.7362500005,
+   "valueAddedPerHead": 12.020269120833335,
+   "wagesPerYear": 3900000.000000001,
+   "wageObligationPerYear": 3900000.000000001,
+   "upkeepPerYear": 25550,
+   "householdPurchasesPerYear": 3606080.736250004,
+   "incomeTaxPerYear": 97737.35088798402,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 33300.98048637671,
+   "householdCashStart": 900000,
+   "householdCashEnd": 916834.4913506024,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 122866.99403767122
+  },
+  {
+   "tag": "COL",
+   "population": 4000000,
+   "populationByProfession": {
+    "laborers": 720000,
+    "peasants": 3280000
+   },
+   "employedByProfession": {
+    "peasants": 405053,
+    "laborers": 215
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000015,
+    "laborers": 126.91381768573953
+   },
+   "valueAddedPerYear": 48081044.55343742,
+   "valueAddedPerHead": 12.020261138359356,
+   "wagesPerYear": 24300000.0000001,
+   "wageObligationPerYear": 24300000.0000001,
+   "upkeepPerYear": 153300,
+   "householdPurchasesPerYear": 48081044.55343741,
+   "incomeTaxPerYear": 540441.3315304961,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 70900.49665053531,
+   "householdCashStart": 12000000,
+   "householdCashEnd": 11946147.066623097,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 147519.9999999994
+  },
+  {
+   "tag": "VEN",
+   "population": 2400000,
+   "populationByProfession": {
+    "laborers": 432000,
+    "peasants": 1968000
+   },
+   "employedByProfession": {
+    "peasants": 240032,
+    "laborers": 125
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000043,
+    "laborers": 126.84138167109029
+   },
+   "valueAddedPerYear": 28848623.009062506,
+   "valueAddedPerHead": 12.020259587109377,
+   "wagesPerYear": 14400000.000000048,
+   "wageObligationPerYear": 14400000.000000048,
+   "upkeepPerYear": 91250,
+   "householdPurchasesPerYear": 28848623.00906253,
+   "incomeTaxPerYear": 314022.05507425364,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 51670.36632137498,
+   "householdCashStart": 7200000,
+   "householdCashEnd": 7168639.305881297,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 148450.00000000012
+  },
+  {
+   "tag": "ECU",
+   "population": 1400000,
+   "populationByProfession": {
+    "laborers": 252000,
+    "peasants": 1148000
+   },
+   "employedByProfession": {
+    "peasants": 165014,
+    "laborers": 76
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000034,
+    "laborers": 126.82521915040208
+   },
+   "valueAddedPerYear": 16828376.122812476,
+   "valueAddedPerHead": 12.02026865915177,
+   "wagesPerYear": 9900000.000000015,
+   "wageObligationPerYear": 9900000.000000015,
+   "upkeepPerYear": 62050,
+   "householdPurchasesPerYear": 16828376.12281255,
+   "incomeTaxPerYear": 214598.22118157032,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 43226.15029213333,
+   "householdCashStart": 4200000,
+   "householdCashEnd": 4178323.822903256,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149069.99999999994
+  },
+  {
+   "tag": "PRU",
+   "population": 3700000,
+   "populationByProfession": {
+    "laborers": 666000,
+    "peasants": 3034000
+   },
+   "employedByProfession": {
+    "peasants": 340051,
+    "laborers": 192
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000022,
+    "laborers": 126.8868507862127
+   },
+   "valueAddedPerYear": 44474973.124687426,
+   "valueAddedPerHead": 12.020263006672277,
+   "wagesPerYear": 20400000.000000097,
+   "wageObligationPerYear": 20400000.000000097,
+   "upkeepPerYear": 127749.99999999999,
+   "householdPurchasesPerYear": 50499525.69467147,
+   "incomeTaxPerYear": 431730.20105028164,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 61667.49652755818,
+   "householdCashStart": 11100000,
+   "householdCashEnd": 10545307.19077758,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 147829.99999999977
+  },
+  {
+   "tag": "BOL",
+   "population": 1800000,
+   "populationByProfession": {
+    "laborers": 324000,
+    "peasants": 1476000
+   },
+   "employedByProfession": {
+    "peasants": 190024,
+    "laborers": 96
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.000000000000384,
+    "laborers": 126.8582897842515
+   },
+   "valueAddedPerYear": 21636473.170937467,
+   "valueAddedPerHead": 12.020262872743038,
+   "wagesPerYear": 11400000.000000013,
+   "wageObligationPerYear": 11400000.000000013,
+   "upkeepPerYear": 73000,
+   "householdPurchasesPerYear": 23328481.979195368,
+   "incomeTaxPerYear": 236363.86816047924,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 45074.73948760237,
+   "householdCashStart": 5400000,
+   "householdCashEnd": 5232417.033702543,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 148760.00000000006
+  },
+  {
+   "tag": "CHL",
+   "population": 3000000,
+   "populationByProfession": {
+    "academics": 99000,
+    "capitalists": 237600,
+    "clerks": 554400,
+    "laborers": 1089000,
+    "peasants": 1020000
+   },
+   "employedByProfession": {
+    "peasants": 305001,
+    "laborers": 140136
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000011,
+    "laborers": 49.67373124052961
+   },
+   "valueAddedPerYear": 50599951.06392651,
+   "valueAddedPerHead": 16.86665035464217,
+   "wagesPerYear": 25243820.246975813,
+   "wageObligationPerYear": 36499999.99999987,
+   "upkeepPerYear": 160129.03225806452,
+   "householdPurchasesPerYear": 44273660.45437508,
+   "incomeTaxPerYear": 932077.3864012694,
+   "welfarePerYear": 0,
+   "administrationPerYear": 1800.0000000000002,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 103958.9013107927,
+   "householdCashStart": 24000000,
+   "householdCashEnd": 24602641.9804429,
+   "buildingCashStart": 400000,
+   "buildingCashEnd": 240945.484487133
+  },
+  {
+   "tag": "ARG",
+   "population": 4700000,
+   "populationByProfession": {
+    "academics": 155100,
+    "capitalists": 372240,
+    "clerks": 868560,
+    "laborers": 1706100,
+    "peasants": 1598000
+   },
+   "employedByProfession": {
+    "laborers": 240190,
+    "peasants": 430007
+   },
+   "wagePerWorkerYear": {
+    "laborers": 52.29810474945835,
+    "peasants": 59.999999999999886
+   },
+   "valueAddedPerYear": 69364810.04908884,
+   "valueAddedPerHead": 14.75847022321039,
+   "wagesPerYear": 38464304.4444912,
+   "wageObligationPerYear": 60749999.99999983,
+   "upkeepPerYear": 220766.12903225806,
+   "householdPurchasesPerYear": 76400126.06811176,
+   "incomeTaxPerYear": 1431240.3573113463,
+   "welfarePerYear": 0,
+   "administrationPerYear": 2820.0000000000005,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 146238.05774425124,
+   "householdCashStart": 37600000,
+   "householdCashEnd": 37018017.986143745,
+   "buildingCashStart": 400000,
+   "buildingCashEnd": 234882.1875603049
+  },
+  {
+   "tag": "URY",
+   "population": 900000,
+   "populationByProfession": {
+    "academics": 29700,
+    "capitalists": 71280,
+    "clerks": 166320,
+    "laborers": 326700,
+    "peasants": 306000
+   },
+   "employedByProfession": {
+    "peasants": 102500,
+    "laborers": 74204.48387096774
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.0000000000001,
+    "laborers": 107.44388225121529
+   },
+   "valueAddedPerYear": 28752848.873141833,
+   "valueAddedPerHead": 31.94760985904648,
+   "wagesPerYear": 18143001.390967093,
+   "wageObligationPerYear": 20398242.903225817,
+   "upkeepPerYear": 95959.67741935494,
+   "householdPurchasesPerYear": 18923915.10138463,
+   "incomeTaxPerYear": 557453.6056379826,
+   "welfarePerYear": 0,
+   "administrationPerYear": 999.9999999999993,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 72217.97746514378,
+   "householdCashStart": 7200000,
+   "householdCashEnd": 7765183.840327439,
+   "buildingCashStart": 400000,
+   "buildingCashEnd": 267717.3995625449
+  },
+  {
+   "tag": "PRY",
+   "population": 600000,
+   "populationByProfession": {
+    "laborers": 108000,
+    "peasants": 492000
+   },
+   "employedByProfession": {
+    "laborers": 31,
+    "peasants": 90004
+   },
+   "wagePerWorkerYear": {
+    "laborers": 126.81590894262979,
+    "peasants": 60.00000000000013
+   },
+   "valueAddedPerYear": 7212161.472499996,
+   "valueAddedPerHead": 12.020269120833328,
+   "wagesPerYear": 5399999.999999996,
+   "wageObligationPerYear": 5399999.999999996,
+   "upkeepPerYear": 32850,
+   "householdPurchasesPerYear": 8354431.704122002,
+   "incomeTaxPerYear": 127745.40434709522,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 35849.609684273855,
+   "householdCashStart": 1800000,
+   "householdCashEnd": 1690009.9325300038,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149690.0000000003
+  },
+  {
+   "tag": "BRA",
+   "population": 17600000,
+   "populationByProfession": {
+    "laborers": 3168000,
+    "peasants": 14432000
+   },
+   "employedByProfession": {
+    "laborers": 935,
+    "peasants": 1730233
+   },
+   "wagePerWorkerYear": {
+    "laborers": 126.87985563172121,
+    "peasants": 60.00000000000023
+   },
+   "valueAddedPerYear": 211556632.3343747,
+   "valueAddedPerHead": 12.020263200816744,
+   "wagesPerYear": 103800000.00000018,
+   "wageObligationPerYear": 103800000.00000018,
+   "upkeepPerYear": 653350,
+   "householdPurchasesPerYear": 211817709.08679688,
+   "incomeTaxPerYear": 2230136.086387467,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 70400,
+   "treasuryCashEnd": 259808.81829592184,
+   "householdCashStart": 52800000,
+   "householdCashEnd": 52555040.53318463,
+   "buildingCashStart": 600000,
+   "buildingCashEnd": 589149.9999999987
+  },
+  {
+   "tag": "HTI",
+   "population": 1500000,
+   "populationByProfession": {
+    "laborers": 270000,
+    "peasants": 1230000
+   },
+   "employedByProfession": {
+    "laborers": 79,
+    "peasants": 165019
+   },
+   "wagePerWorkerYear": {
+    "laborers": 126.87636636777061,
+    "peasants": 60.00000000000028
+   },
+   "valueAddedPerYear": 18030394.373750005,
+   "valueAddedPerHead": 12.020262915833337,
+   "wagesPerYear": 9900000.000000004,
+   "wageObligationPerYear": 9900000.000000004,
+   "upkeepPerYear": 62050,
+   "householdPurchasesPerYear": 18303562.989264127,
+   "incomeTaxPerYear": 208509.68151874543,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 42709.0414440578,
+   "householdCashStart": 4500000,
+   "householdCashEnd": 4455698.446611546,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149070.0000000004
+  },
+  {
+   "tag": "DOM",
+   "population": 600000,
+   "populationByProfession": {
+    "laborers": 108000,
+    "peasants": 492000
+   },
+   "employedByProfession": {
+    "laborers": 33,
+    "peasants": 90006
+   },
+   "wagePerWorkerYear": {
+    "laborers": 126.8427110559086,
+    "peasants": 59.99999999999989
+   },
+   "valueAddedPerYear": 7212155.655312499,
+   "valueAddedPerHead": 12.020259425520832,
+   "wagesPerYear": 5399999.999999996,
+   "wageObligationPerYear": 5399999.999999996,
+   "upkeepPerYear": 32850,
+   "householdPurchasesPerYear": 7479258.84802367,
+   "incomeTaxPerYear": 121518.12944034823,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 35320.71784287891,
+   "householdCashStart": 1800000,
+   "householdCashEnd": 1764899.887963596,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149690.00000000047
+  },
+  {
+   "tag": "CAN",
+   "population": 5180000,
+   "populationByProfession": {
+    "academics": 170940,
+    "capitalists": 410256,
+    "clerks": 957264,
+    "laborers": 1880340,
+    "peasants": 1761200
+   },
+   "employedByProfession": {
+    "laborers": 250228,
+    "peasants": 507506,
+    "clerks": 20249
+   },
+   "wagePerWorkerYear": {
+    "laborers": 75.58166598299577,
+    "peasants": 59.999999999999844,
+    "clerks": 32.70500003537151
+   },
+   "valueAddedPerYear": 94098352.38366486,
+   "valueAddedPerHead": 18.165705093371596,
+   "wagesPerYear": 49978883.28854196,
+   "wageObligationPerYear": 67949999.99999984,
+   "upkeepPerYear": 293707.2580645161,
+   "householdPurchasesPerYear": 92188882.83578373,
+   "incomeTaxPerYear": 1920156.2915860086,
+   "welfarePerYear": 0,
+   "administrationPerYear": 3108.000000000001,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 187729.81106620916,
+   "householdCashStart": 41440000,
+   "householdCashEnd": 41821537.53561901,
+   "buildingCashStart": 1600000,
+   "buildingCashEnd": 1194992.032025001
+  },
+  {
+   "tag": "AUS",
+   "population": 3800000,
+   "populationByProfession": {
+    "academics": 125400,
+    "capitalists": 300960,
+    "clerks": 702240,
+    "laborers": 1379400,
+    "peasants": 1292000
+   },
+   "employedByProfession": {
+    "clerks": 15180,
+    "laborers": 170185,
+    "peasants": 355006
+   },
+   "wagePerWorkerYear": {
+    "clerks": 16.738222336698055,
+    "laborers": 39.176731501454924,
+    "peasants": 59.99999999999993
+   },
+   "valueAddedPerYear": 57164637.3087798,
+   "valueAddedPerHead": 15.043325607573632,
+   "wagesPerYear": 28185753.324262876,
+   "wageObligationPerYear": 47150000.00000012,
+   "upkeepPerYear": 179203.2258064516,
+   "householdPurchasesPerYear": 56183566.81015264,
+   "incomeTaxPerYear": 1012490.9841050371,
+   "welfarePerYear": 0,
+   "administrationPerYear": 2279.999999999998,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 110734.19317056502,
+   "householdCashStart": 30400000,
+   "householdCashEnd": 30537368.257898852,
+   "buildingCashStart": 400000,
+   "buildingCashEnd": 246586.3461875008
+  },
+  {
+   "tag": "NZL",
+   "population": 800000,
+   "populationByProfession": {
+    "academics": 26400,
+    "capitalists": 63360,
+    "clerks": 147840,
+    "laborers": 290400,
+    "peasants": 272000
+   },
+   "employedByProfession": {
+    "clerks": 5034,
+    "peasants": 92684.35483870968,
+    "laborers": 65966.3870967742
+   },
+   "wagePerWorkerYear": {
+    "clerks": 238.23012522126632,
+    "peasants": 59.999999999999986,
+    "laborers": 103.77015316297714
+   },
+   "valueAddedPerYear": 31876050.195314374,
+   "valueAddedPerHead": 39.845062744142965,
+   "wagesPerYear": 17723433.036890876,
+   "wageObligationPerYear": 20398931.612903234,
+   "upkeepPerYear": 90779.03225806529,
+   "householdPurchasesPerYear": 16696079.81855976,
+   "incomeTaxPerYear": 527916.7839699913,
+   "welfarePerYear": 0,
+   "administrationPerYear": 999.9999999999993,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 69709.37069334177,
+   "householdCashStart": 6400000,
+   "householdCashEnd": 7437566.514700937,
+   "buildingCashStart": 400000,
+   "buildingCashEnd": 243763.84970000046
+  },
+  {
+   "tag": "CUB",
+   "population": 1600000,
+   "populationByProfession": {
+    "laborers": 288000,
+    "peasants": 1312000
+   },
+   "employedByProfession": {
+    "laborers": 85,
+    "peasants": 165021
+   },
+   "wagePerWorkerYear": {
+    "laborers": 126.90331536381383,
+    "peasants": 60.00000000000007
+   },
+   "valueAddedPerYear": 19232419.993125003,
+   "valueAddedPerHead": 12.020262495703127,
+   "wagesPerYear": 9900000.000000015,
+   "wageObligationPerYear": 9900000.000000015,
+   "upkeepPerYear": 62050,
+   "householdPurchasesPerYear": 19506378.065335482,
+   "incomeTaxPerYear": 220601.77319361732,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 43736.041010964786,
+   "householdCashStart": 4800000,
+   "householdCashEnd": 4754679.438434127,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149070.00000000006
+  },
+  {
+   "tag": "AUT",
+   "population": 51000000,
+   "populationByProfession": {
+    "academics": 1683000,
+    "capitalists": 4039200,
+    "clerks": 9424800,
+    "laborers": 18513000,
+    "peasants": 17340000
+   },
+   "employedByProfession": {
+    "laborers": 2602082,
+    "peasants": 4890076,
+    "clerks": 177481
+   },
+   "wagePerWorkerYear": {
+    "laborers": 44.332663010899545,
+    "peasants": 59.999999999999986,
+    "clerks": 5.144837234509835
+   },
+   "valueAddedPerYear": 759913515.7792952,
+   "valueAddedPerHead": 14.900265015280299,
+   "wagesPerYear": 409234765.58505666,
+   "wageObligationPerYear": 675150000.000026,
+   "upkeepPerYear": 2213666.129032258,
+   "householdPurchasesPerYear": 754507239.5009257,
+   "incomeTaxPerYear": 16154046.47263806,
+   "welfarePerYear": 0,
+   "administrationPerYear": 30600.000000000025,
+   "treasuryCashStart": 204000,
+   "treasuryCashEnd": 1572522.3031555628,
+   "householdCashStart": 408000000,
+   "householdCashEnd": 407761863.99254,
+   "buildingCashStart": 1600000,
+   "buildingCashEnd": 773948.2177682882
+  },
+  {
+   "tag": "TON",
+   "population": 20000,
+   "populationByProfession": {
+    "academics": 288,
+    "capitalists": 1440,
+    "clerks": 2880,
+    "laborers": 4992,
+    "peasants": 10400
+   },
+   "employedByProfession": {
+    "peasants": 3544,
+    "laborers": 1133,
+    "clerks": 900
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60,
+    "laborers": 129.99999999999997,
+    "clerks": 250.0000000000002
+   },
+   "valueAddedPerYear": 841049.8146096301,
+   "valueAddedPerHead": 42.05249073048151,
+   "wagesPerYear": 584930.0000000002,
+   "wageObligationPerYear": 584930.0000000002,
+   "upkeepPerYear": 73000,
+   "householdPurchasesPerYear": 424640.4491941365,
+   "incomeTaxPerYear": 14673.4135968,
+   "welfarePerYear": 0,
+   "administrationPerYear": 999.9999999999993,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 26118.83786712548,
+   "householdCashStart": 60000,
+   "householdCashEnd": 114031.0797747436,
+   "buildingCashStart": 350000,
+   "buildingCashEnd": 323809.1811402857
+  },
+  {
+   "tag": "SOK",
+   "population": 10000000,
+   "populationByProfession": {
+    "laborers": 1800000,
+    "peasants": 8200000
+   },
+   "employedByProfession": {
+    "peasants": 985132
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.000000000000085
+   },
+   "valueAddedPerYear": 120202642.6024999,
+   "valueAddedPerHead": 12.02026426024999,
+   "wagesPerYear": 59099999.99999995,
+   "wageObligationPerYear": 59099999.99999995,
+   "upkeepPerYear": 372300,
+   "householdPurchasesPerYear": 120202642.60250004,
+   "incomeTaxPerYear": 1219242.6861275139,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 40000,
+   "treasuryCashEnd": 143552.1185478162,
+   "householdCashStart": 30000000,
+   "householdCashEnd": 29871700.538986403,
+   "buildingCashStart": 600000,
+   "buildingCashEnd": 593799.999999999
+  },
+  {
+   "tag": "WAD",
+   "population": 1000000,
+   "populationByProfession": {
+    "laborers": 180000,
+    "peasants": 820000
+   },
+   "employedByProfession": {
+    "peasants": 140010
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.000000000000014
+   },
+   "valueAddedPerYear": 12020266.276875,
+   "valueAddedPerHead": 12.020266276875,
+   "wagesPerYear": 8400000.000000006,
+   "wageObligationPerYear": 8400000.000000006,
+   "upkeepPerYear": 51100,
+   "householdPurchasesPerYear": 12020266.276875,
+   "incomeTaxPerYear": 198192.85404712256,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 41832.81774098847,
+   "householdCashStart": 3000000,
+   "householdCashEnd": 2979498.141163113,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149380.00000000047
+  },
+  {
+   "tag": "DAR",
+   "population": 600000,
+   "populationByProfession": {
+    "laborers": 108000,
+    "peasants": 492000
+   },
+   "employedByProfession": {
+    "peasants": 90005
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.999999999999915
+   },
+   "valueAddedPerYear": 7212151.389374996,
+   "valueAddedPerHead": 12.020252315624992,
+   "wagesPerYear": 5399999.999999996,
+   "wageObligationPerYear": 5399999.999999996,
+   "upkeepPerYear": 32850,
+   "householdPurchasesPerYear": 7212151.389375,
+   "incomeTaxPerYear": 133589.33035265811,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 36345.94312584218,
+   "householdCashStart": 1800000,
+   "householdCashEnd": 1786199.5363262126,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149690.00000000035
+  },
+  {
+   "tag": "SHM",
+   "population": 1000000,
+   "populationByProfession": {
+    "laborers": 180000,
+    "peasants": 820000
+   },
+   "employedByProfession": {
+    "peasants": 115011
+   },
+   "wagePerWorkerYear": {
+    "peasants": 59.999999999999986
+   },
+   "valueAddedPerYear": 12020263.174374998,
+   "valueAddedPerHead": 12.020263174374998,
+   "wagesPerYear": 6900000.000000002,
+   "wageObligationPerYear": 6900000.000000002,
+   "upkeepPerYear": 43800,
+   "householdPurchasesPerYear": 12020263.174375001,
+   "incomeTaxPerYear": 156049.5583292981,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 38253.524132077364,
+   "householdCashStart": 3000000,
+   "householdCashEnd": 2983702.5306624407,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 149380.00000000003
+  },
+  {
+   "tag": "CRT",
+   "population": 300000,
+   "populationByProfession": {
+    "laborers": 54000,
+    "peasants": 246000
+   },
+   "employedByProfession": {
+    "peasants": 65001,
+    "laborers": 16
+   },
+   "wagePerWorkerYear": {
+    "peasants": 60.00000000000001,
+    "laborers": 127.22866034745257
+   },
+   "valueAddedPerYear": 3606077.6337499996,
+   "valueAddedPerHead": 12.020258779166666,
+   "wagesPerYear": 3900000.000000001,
+   "wageObligationPerYear": 3900000.000000001,
+   "upkeepPerYear": 25550,
+   "householdPurchasesPerYear": 3606077.633750002,
+   "incomeTaxPerYear": 96191.07786312561,
+   "welfarePerYear": 0,
+   "administrationPerYear": 0,
+   "treasuryCashStart": 25000,
+   "treasuryCashEnd": 33169.65318837506,
+   "householdCashStart": 900000,
+   "householdCashEnd": 916971.6037137692,
+   "buildingCashStart": 150000,
+   "buildingCashEnd": 122866.73053767122
+  }
+ ]
+}

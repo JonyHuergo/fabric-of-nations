@@ -95,9 +95,17 @@ export function constructionWorkingCapital(definition: BuildingDef): number {
   return definition.dailyUpkeepRUSDAtLevelOne * CONSTRUCTION_WORKING_CAPITAL_DAYS;
 }
 
-/** Daily base wage in RUSD for a profession and civil year. */
-export function constructionDailyWage(profession: ProfessionDef, yearDays: number): number {
-  return profession.baseWage1900RUSDPerYear / yearDays;
+/**
+ * Daily base wage in RUSD for a profession and civil year. P2b: the worker's province
+ * wage table applies when given (D-135); otherwise the profession's reference wage.
+ */
+export function constructionDailyWage(
+  profession: ProfessionDef,
+  yearDays: number,
+  provinceWages?: readonly number[],
+): number {
+  const annual = provinceWages?.[profession.id] ?? profession.baseWage1900RUSDPerYear;
+  return annual / yearDays;
 }
 
 /**

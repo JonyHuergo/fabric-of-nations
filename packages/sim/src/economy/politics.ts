@@ -16,6 +16,7 @@ import {
   isTerminalDayIndex,
 } from "../calendar.js";
 import { populationTotal } from "../population/state.js";
+import { localWageIndex } from "./localWages.js";
 import type { PopulationDefinitions } from "../population/types.js";
 import type { Day, Id, Month, Rate } from "../types.js";
 import {
@@ -27,7 +28,6 @@ import {
 } from "../validation.js";
 import type { World } from "../world.js";
 import {
-  ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD,
   ADMIN_TARGET_CLERK_SHARE,
   CONSTRUCTION_MIN_FACTOR,
   CONSTRUCTION_OVERLOAD_PENALTY,
@@ -1121,7 +1121,11 @@ export function refreshInstitution(
   const infrastructure = provinceCount > 0 ? infrastructureWeighted / provinceCount : DEFAULT_INFRASTRUCTURE;
   const clerkShare = population > 0 ? staff / population : 0;
   const staffingRatio = clamp(clerkShare / ADMIN_TARGET_CLERK_SHARE, 0, 1);
-  const fundingBenchmark = population * ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD;
+  // P2b: administration is staffed at the country's own clerk wages (D-135).
+  const fundingBenchmark =
+    population *
+    world.moneyCoefficients.adminFundingPerCapitaPerYearRUSD *
+    localWageIndex(world, countryBlocks(world, country), definitions, adminKeys);
   const fundingRatio =
     fundingBenchmark > 0
       ? clamp(country.institutions.fundedAnnualRUSD / fundingBenchmark, 0, 1)

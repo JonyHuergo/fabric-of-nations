@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { deserializeWorld } from "@century/sim";
+import { WORLD_SCHEMA_VERSION, deserializeWorld } from "@century/sim";
 import { decompressSaveFromStorage, readSaveMetadata } from "@century/sim-worker/persistence";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -84,6 +84,9 @@ describe("M13 save compatibility", () => {
 
     // P2 (schema 28, D-134): the envelope and metadata stay readable, so the game can
     // list the save with its reason, but the world is never migrated.
-    expect(() => deserializeWorld(canonical)).toThrow(/schema 27 is incompatible with this build \(28\)/u);
+    // The current schema moves with later breaks (P2b: 29); a schema-27 save stays incompatible.
+    expect(() => deserializeWorld(canonical)).toThrow(
+      new RegExp(`schema 27 is incompatible with this build \\(${String(WORLD_SCHEMA_VERSION)}\\)`, "u"),
+    );
   }, 60_000);
 });

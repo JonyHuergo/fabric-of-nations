@@ -1,0 +1,84 @@
+{
+ "soldierDailyPayRUSD": {
+  "valueRUSD": 18.79,
+  "rowIds": [
+   "us-wage-production-hourly-1900",
+   "standard-hours-per-week",
+   "weeks-per-year",
+   "cpi-1990",
+   "cpi-1900"
+  ],
+  "formula": "US laborer wage / 365 (a soldier is paid as an unskilled worker)",
+  "status": "provisional"
+ },
+ "recruitmentCostPerSoldierRUSD": {
+  "valueRUSD": 563.8,
+  "rowIds": [
+   "us-wage-production-hourly-1900",
+   "military-recruitment-days"
+  ],
+  "formula": "30 days of soldier pay",
+  "status": "provisional"
+ },
+ "equipmentPriceRUSD": {
+  "valueRUSD": 28581.29,
+  "rowIds": [
+   "us-wage-production-hourly-1900",
+   "military-equipment-months"
+  ],
+  "formula": "50 soldiers x one month of a US laborer's wage",
+  "status": "provisional"
+ },
+ "equipmentDailyUpkeepRUSD": {
+  "valueRUSD": 7.83,
+  "rowIds": [
+   "military-equipment-depreciation",
+   "military-equipment-months",
+   "us-wage-production-hourly-1900"
+  ],
+  "formula": "equipment price x 10% / 365",
+  "status": "provisional"
+ },
+ "garrisonCostPerSoldierPerDayRUSD": {
+  "valueRUSD": 0.34,
+  "rowIds": [
+   "price-wheat-1900",
+   "price-cattle-1900",
+   "price-flour-1900",
+   "fish-price-to-livestock"
+  ],
+  "formula": "subsistence basket per person per day at base prices",
+  "status": "derived"
+ },
+ "adminFundingPerCapitaPerYearRUSD": {
+  "valueRUSD": 59.81,
+  "rowIds": [
+   "us-gov-revenue-share-1902",
+   "us-school-revenue-1900",
+   "us-gdp-1900",
+   "administration-share-of-noneducation-revenue"
+  ],
+  "formula": "US administration budget per inhabitant (adequacy 1 at the start)",
+  "status": "derived"
+ },
+ "educationFundingPerStaffPerYearRUSD": {
+  "valueRUSD": 5103.8,
+  "rowIds": [
+   "us-teacher-salary-1900",
+   "cpi-1990",
+   "cpi-1900"
+  ],
+  "formula": "NCES 1899-1900 teacher salary x RUSD",
+  "status": "sourced"
+ },
+ "trainingInstructorCostPerYearRUSD": {
+  "valueRUSD": 5103.8,
+  "rowIds": [
+   "us-teacher-salary-1900",
+   "cpi-1990",
+   "cpi-1900"
+  ],
+  "formula": "NCES 1899-1900 teacher salary x RUSD",
+  "status": "sourced"
+ }
+}

@@ -589,6 +589,12 @@ function dispatchTrade(
           if (quantityCeiling - shippedQuantity <= QUANTITY_TOLERANCE * Math.max(1, quantityCeiling)) {
             break;
           }
+          // Each lot becomes its own consignment, so the in-transit cap is checked per lot
+          // (P2b regression: a route serving many seller lots overran the cap and threw).
+          if (inTransitCapReached(world, shipments.length)) {
+            noteBlock(origin.id, destination.id, goodId, "capacity");
+            break;
+          }
           const building = buildingById.get(lot.ownerBuildingId);
           if (building === undefined || !building.operational) continue;
           const countryId = provinceOwner.get(building.provinceId) ?? null;

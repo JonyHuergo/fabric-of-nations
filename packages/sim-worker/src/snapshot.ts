@@ -459,13 +459,16 @@ function constructionLaborSnapshot(
   );
   let workers = 0;
   let weightedWage = 0;
+  const wagesByProvince = new Map(
+    world.provinceEconomies.map((province) => [province.id, province.wageRUSDPerYearByProfession]),
+  );
   for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
     const count = idle.get(block.id) ?? 0;
     if (count <= 0) continue;
     const profession = professions.get(block.professionId);
     if (profession === undefined) continue;
     workers += count;
-    weightedWage += count * constructionDailyWage(profession, yearDays);
+    weightedWage += count * constructionDailyWage(profession, yearDays, wagesByProvince.get(block.provinceId));
   }
   return {
     idleWorkers: workers,

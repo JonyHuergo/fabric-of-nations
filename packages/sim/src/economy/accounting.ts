@@ -237,13 +237,19 @@ function assertBalanceConstraints(
   }
 }
 
-function assertCashConservation(kind: TransactionKind, cashDelta: number): void {
+/**
+ * A cash-neutral posting may leave a floating residual in the designated-cash total.
+ * The tolerance is relative to the posting's gross amount (its debits), the scale of
+ * the summation error: at 1900 money scales a single posting reaches 1e9-1e10 RUSD
+ * (D-135), where an absolute 1e-6 bound is below double-precision resolution.
+ */
+function assertCashConservation(kind: TransactionKind, cashDelta: number, grossRUSD: number): void {
   if (transactionKindChangesCash(kind)) {
     throw new RangeError(
       `transactionKind ${JSON.stringify(kind)} changes aggregate cash and is not implemented in M4a-1`,
     );
   }
-  if (Math.abs(cashDelta) > toleranceMoney(cashDelta)) {
+  if (Math.abs(cashDelta) > toleranceMoney(cashDelta, grossRUSD)) {
     throw new RangeError(
       `cash-neutral posting ${JSON.stringify(kind)} would change aggregate designated cash by ${String(cashDelta)}`,
     );
@@ -268,7 +274,7 @@ export function postJournalEntry(
   const accounts = accountMap(finance);
   const validated = validatePostingLines(lines, accounts, transactionKind);
   assertBalanceConstraints(accounts, validated.deltas);
-  assertCashConservation(transactionKind, validated.cashDelta);
+  assertCashConservation(transactionKind, validated.cashDelta, validated.debits);
 
   // Apply only after every line, balance, and invariant has been validated.
   for (const [accountId, delta] of validated.deltas) {
@@ -374,7 +380,7 @@ export function postJournalBatch(
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
     assertPublicTransactionKind(entry.transactionKind);
     const validated = validatePostingLines(entry.lines, accounts, entry.transactionKind);
-    assertCashConservation(entry.transactionKind, validated.cashDelta);
+    assertCashConservation(entry.transactionKind, validated.cashDelta, validated.debits);
     for (const [accountId, delta] of validated.deltas) {
       aggregate.set(accountId, (aggregate.get(accountId) ?? 0) + delta);
     }

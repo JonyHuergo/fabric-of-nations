@@ -57,7 +57,9 @@ describe("M3a schema-25 serialization", () => {
     // intentionally re-pinned; the fixture still has trade disabled. M11 (simulation 0.27.0, data m3-economy-v12) changes the encoded version metadata, so the digest is re-pinned again without changing the fixture's behaviour.
     // P2 schema 28 (D-134): province economy record, land fields and the removed
     // market region list change the encoding, not the fixture's behaviour.
-    expect(hashWorld(cloneWorld())).toBe("7d2bb34588596f03");
+    // P2b schema 29 (D-135): wage tables, technique and money coefficients change the
+    // encoding, not the fixture's behaviour.
+    expect(hashWorld(cloneWorld())).toBe("62dc585879bbc7fe");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

@@ -2260,6 +2260,10 @@ A provisional update structure is:
 
 `newPrice = clamp(oldPrice * (1 + dailyChange), lowerBound, upperBound)`
 
+> **P2b (D-136):** `sellableSupply` is the opening stock plus same-day output less the
+> producers' funded input demand. Producers buy inputs only from the opening stock, so one
+> day of input demand must carry over; a balanced market then holds its price.
+
 The parameters `kappa`, `maxDailyChange`, `epsilon`, and price bounds are provisional and must be calibrated. Bounds should scale with the relevant nominal price-level/inflation index and a documented minimum/maximum relative to the base price. Do not use unnormalized demand-minus-supply divided by stock without guarding zero-stock cases.
 
 Test that prices respond in the expected direction to sustained shortages and surpluses, remain finite and positive, and do not oscillate wildly under stable conditions. A temporary shortage should not force the price to a hard bound in one day.
@@ -6629,6 +6633,8 @@ land-layer rendering bug and raises the maximum zoom.
 
 **Status:** P0 (design) approved 2026-11-02. P2 (provinces, customs territories, schema
 28) is implemented for review, with the money calibration moved to P2b (D-130 to D-134).
+P2b (historical money and productivity, schema 29) is implemented for review on
+2026-11-03 under the designer's basis decisions (D-135) and the price-rule amendment (D-136).
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair

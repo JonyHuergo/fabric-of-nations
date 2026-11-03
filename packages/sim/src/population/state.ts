@@ -22,6 +22,7 @@ import {
 } from "../validation.js";
 import type { World, CreateWorldOptions } from "../world.js";
 import { emptyProvinceState } from "../provinces/state.js";
+import { DEFAULT_MONEY_COEFFICIENTS } from "../economy/constants.js";
 import {
   ADULT_LITERACY_MIN_AGE,
   AGE_BAND_WIDTH,
@@ -112,6 +113,11 @@ export function assertValidProvinceEconomy(province: ProvinceEconomy): void {
     if (rate < 0 || rate > 1) {
       throw new RangeError(`province.${field} must be in 0..1`);
     }
+  }
+  const wages = requireArray(record.wageRUSDPerYearByProfession, "province.wageRUSDPerYearByProfession");
+  for (let index = 0; index < wages.length; index += 1) {
+    const wage = requireFiniteNumber(wages[index], `province.wageRUSDPerYearByProfession[${String(index)}]`);
+    if (!(wage > 0)) throw new RangeError("province.wageRUSDPerYearByProfession entries must be positive");
   }
 }
 
@@ -622,6 +628,7 @@ export function createPopulationWorld(
       arableLandHa: province.arableLandHa ?? 0,
       pastureHa: province.pastureHa ?? 0,
       urbanShare: province.urbanShare ?? 0,
+      wageRUSDPerYearByProfession: [...(province.wageRUSDPerYearByProfession ?? [])],
     }));
 
   const world: World = {
@@ -670,6 +677,7 @@ export function createPopulationWorld(
       nextBuildingId: 1,
     },
     playerCountryId: null,
+    moneyCoefficients: { ...DEFAULT_MONEY_COEFFICIENTS },
     politics: {
       enabled: false,
       eventQueue: [],

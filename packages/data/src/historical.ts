@@ -33,6 +33,7 @@ import {
   MAX_DEBT_PRINCIPAL_RUSD,
   MAX_DEBT_TERM_DAYS,
   MAX_FISCAL_BUDGET_RUSD_PER_YEAR,
+  MONEY_COEFFICIENT_KEYS,
   asRusdPerCurrencyUnit,
   assertValidEconomyDefinitions,
   assertValidPoliticsDefinitions,
@@ -53,6 +54,7 @@ import {
   type GoodDef,
   type MarketInitialDef,
   type MarketMetaDef,
+  type MoneyCoefficients,
   type NeedTierDef,
   type PoliticsDefinitions,
   type PopulationDefinitions,
@@ -109,6 +111,8 @@ export interface HistoricalScenarioFiles {
   readonly buildings: string;
   readonly employment: string;
   readonly calibration: string;
+  /** P2b money coefficients file (D-135); optional for the pre-P2b scenarios. */
+  readonly moneyCoefficients?: string;
 }
 
 export interface HistoricalScenarioDefinitions {
@@ -149,6 +153,8 @@ export interface HistoricalScenarioMeta {
   readonly marketMeta?: readonly MarketMetaDef[];
   /** P2 dependent-territory metadata (D-118 §3). */
   readonly territoryMeta?: readonly TerritoryMetaDef[];
+  /** P2b sourced money coefficients (D-135); omitted means the simulation defaults. */
+  readonly moneyCoefficients?: MoneyCoefficients;
 }
 
 export interface HistoricalCurrencyInput {
@@ -209,6 +215,8 @@ export interface HistoricalProvinceInput {
   readonly pastureHa?: number;
   /** P2 HYDE 3.3 urban share of the 1900 population, 0..1. */
   readonly urbanShare?: number;
+  /** P2b annual wage per worker by profession key, RUSD (D-135). */
+  readonly wageRUSDPerYearByProfession?: Readonly<Record<string, number>>;
   readonly sourceIds: readonly string[];
   readonly calibrationStatus: "source-backed" | "provisional";
 }
@@ -269,6 +277,8 @@ export interface HistoricalBuildingInput {
   readonly level: number;
   readonly ownerProfessionKey: string;
   readonly operatingCashRUSD: number;
+  /** P2b technique factor (D-135); defaults to 1. */
+  readonly technique?: number;
   readonly status: "provisional" | "calibrated";
 }
 
@@ -661,6 +671,9 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
       buildings: stringField(files, "buildings", "meta.files", errors),
       employment: stringField(files, "employment", "meta.files", errors),
       calibration: stringField(files, "calibration", "meta.files", errors),
+      ...(files.moneyCoefficients === undefined
+        ? {}
+        : { moneyCoefficients: stringField(files, "moneyCoefficients", "meta.files", errors) }),
     },
     definitions: {
       goods: stringField(definitions, "goods", "meta.definitions", errors),
@@ -681,7 +694,23 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
     ...(record.territoryMeta === undefined
       ? {}
       : { territoryMeta: readTerritoryMeta(record.territoryMeta, errors) }),
+    ...(record.moneyCoefficients === undefined
+      ? {}
+      : { moneyCoefficients: readMoneyCoefficients(record.moneyCoefficients, errors) }),
   };
+}
+
+/** P2b money coefficients: one `{ valueRUSD, rowIds, formula, status }` record per coefficient. */
+function readMoneyCoefficients(value: unknown, errors: string[]): MoneyCoefficients {
+  const record = assertRecord(value, "meta.moneyCoefficients", errors);
+  const result = {} as MoneyCoefficients;
+  for (const key of MONEY_COEFFICIENT_KEYS) {
+    const entry = assertRecord(record[key], `meta.moneyCoefficients.${key}`, errors);
+    const amount = numberField(entry, "valueRUSD", `meta.moneyCoefficients.${key}`, errors);
+    if (!(amount > 0)) errors.push(`meta.moneyCoefficients.${key}.valueRUSD must be positive`);
+    result[key] = amount;
+  }
+  return result;
 }
 
 /** Load the raw historical tables for one scenario file from the data package. */
@@ -691,7 +720,14 @@ export function loadHistoricalData(
   const rawScenario = readJson<unknown>(scenarioFile);
   const errors: string[] = [];
   const metaRecord = assertRecord(rawScenario, "scenario", errors);
-  const meta = readMeta(metaRecord.meta, errors);
+  const parsedMeta = readMeta(metaRecord.meta, errors);
+  const meta: HistoricalScenarioMeta =
+    parsedMeta.files.moneyCoefficients === undefined
+      ? parsedMeta
+      : {
+          ...parsedMeta,
+          moneyCoefficients: readMoneyCoefficients(readJson<unknown>(parsedMeta.files.moneyCoefficients), errors),
+        };
   if (errors.length > 0) throw new HistoricalDataError(errors.sort());
 
   const countries = readJson<unknown>(meta.files.countries);
@@ -1003,6 +1039,16 @@ function parseProvinces(value: unknown, errors: string[]): HistoricalProvinceInp
       record.infrastructure === undefined
         ? undefined
         : numberField(record, "infrastructure", path, errors);
+    let wages: Record<string, number> | undefined;
+    if (record.wageRUSDPerYearByProfession !== undefined) {
+      const wageRecord = assertRecord(record.wageRUSDPerYearByProfession, `${path}.wageRUSDPerYearByProfession`, errors);
+      wages = {};
+      for (const key of Object.keys(wageRecord)) {
+        const wage = numberField(wageRecord, key, `${path}.wageRUSDPerYearByProfession`, errors);
+        if (!(wage > 0)) errors.push(`${path}.wageRUSDPerYearByProfession.${key} must be positive`);
+        wages[key] = wage;
+      }
+    }
     return {
       id: numberField(record, "id", path, errors),
       key: stringField(record, "key", path, errors),
@@ -1011,6 +1057,7 @@ function parseProvinces(value: unknown, errors: string[]): HistoricalProvinceInp
       ...(arableLandHa === undefined ? {} : { arableLandHa }),
       ...(pastureHa === undefined ? {} : { pastureHa }),
       ...(urbanShare === undefined ? {} : { urbanShare }),
+      ...(wages === undefined ? {} : { wageRUSDPerYearByProfession: wages }),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       calibrationStatus: status === "source-backed" ? "source-backed" : "provisional",
     };
@@ -1127,6 +1174,13 @@ function parseBuildings(value: unknown, errors: string[]): HistoricalBuildingInp
       level: numberField(record, "level", path, errors),
       ownerProfessionKey: stringField(record, "ownerProfessionKey", path, errors),
       operatingCashRUSD: numberField(record, "operatingCashRUSD", path, errors),
+      ...(record.technique === undefined
+        ? {}
+        : (() => {
+            const technique = numberField(record, "technique", path, errors);
+            if (!(technique > 0)) errors.push(`${path}.technique must be positive`);
+            return { technique };
+          })()),
       status: status === "calibrated" ? "calibrated" : "provisional",
     };
   });
@@ -2168,6 +2222,19 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       ...(province.arableLandHa === undefined ? {} : { arableLandHa: province.arableLandHa }),
       ...(province.pastureHa === undefined ? {} : { pastureHa: province.pastureHa }),
       ...(province.urbanShare === undefined ? {} : { urbanShare: province.urbanShare }),
+      ...(province.wageRUSDPerYearByProfession === undefined
+        ? {}
+        : {
+            wageRUSDPerYearByProfession: professions.map((profession) => {
+              const wage = province.wageRUSDPerYearByProfession?.[profession.key];
+              if (wage === undefined) {
+                throw new HistoricalDataError([
+                  `province ${province.key} has no wage for profession ${profession.key}`,
+                ]);
+              }
+              return wage;
+            }),
+          }),
     }));
 
   const sortedMarkets = [...data.markets].sort((left, right) => left.id - right.id);
@@ -2208,6 +2275,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
         operational: true,
         operatingCashAccountId: HISTORICAL_BUILDING_ACCOUNT_BASE + index,
         initialOperatingCashRUSD: building.operatingCashRUSD,
+        ...(building.technique === undefined ? {} : { technique: building.technique }),
       };
     },
   );
@@ -2396,6 +2464,9 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     ...(data.meta.countryMeta === undefined ? {} : { countryMeta: [...data.meta.countryMeta] }),
     ...(data.meta.marketMeta === undefined ? {} : { marketMeta: [...data.meta.marketMeta] }),
     ...(data.meta.territoryMeta === undefined ? {} : { territoryMeta: [...data.meta.territoryMeta] }),
+    ...(data.meta.moneyCoefficients === undefined
+      ? {}
+      : { moneyCoefficients: { ...data.meta.moneyCoefficients } }),
   };
 }
 

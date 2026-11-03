@@ -1,0 +1,50 @@
+{
+ "generator": "scripts/p2b/build-money-calibration.mjs",
+ "decision": "D-135",
+ "inputs": {
+  "sources": "3f8f0205a661cbf08d72e0629bbdec080255d753d269d70079adabb43bb6d937",
+  "provinces": "d1d804aea8bc320d4e579cb379631ad3493d31817f7946537b7a2597938f9e4e",
+  "pops": "da3b1f18dd0bbb46d9a4760fda31b68ce4102b489984c91b1cba5d48bde55fc4",
+  "buildings": "3484835ba701364f8bf1ceb64fbd0257f14b0fb8954bfdd4d068ddf6775a5a8f",
+  "countries": "8f2bbdb5198548e98594e8776244b29a3e8ba820f6ccd2886912a21542a37321",
+  "markets": "1e6678cbc151f770834c70e06d1023f0cbab34c39bd309a56d81eefb6b1f64ae",
+  "routes": "fb85918752232256560502ab0012c9512bdf392be92c944affec0619bc9b4dcc",
+  "territories": "c2058b13e6cbd3241d7c3b3fa8f76230405b386feca7e34dcfd18fc0f7d7d82a",
+  "calibrationTargets": "8140fdd8680f6ff51317560d1e0406b72d663c3ef8d61cb77325e1619cc10aba",
+  "goods": "9c9a4ab6b0116c9196441609c8fa8aaf56a81f8ab997ae4e950fe019ca604d62",
+  "buildingDefinitions": "30b978c0628c2be08a06ff2f898e684f7faa1156753dd214ee1ef2bad5f06fde",
+  "professions": "da52e8a5b74b1b0e08547f0359e609d00ffb0a53ea5c265d7db8b31c7510a71f",
+  "needs": "e6ccbfe89d66b3884e785bcf63008c65d8ddb5c5e1f288a104a848a99e6b3751",
+  "technology": "6696af111e671d05a14cb5f747f190d98a22bb88421e4a03949e44dbe0be0ac6",
+  "scenario": "cb1c405b77bf27dc057fbb6c0d1c10b8b5a59c676cc3ef0e6769d427fe4def28"
+ },
+ "outputs": {
+  "calibration_targets_1900.json": "70006392f0e4d005b9f6957c0b790a8aa8fb3f8129ed2db3dabdb53e765539aa",
+  "provinces_1900.json": "65cf3bca7b91ec2673aec928aad23f0893a2cae27e6ef6993499b9cc531e69f1",
+  "pops_1900.json": "7cc73f5e8b945d27f1b6195c6db18042da1213bb2cd2c3a168c1df397a0fcf62",
+  "buildings_1900.json": "f1d97a7acc5105f0b97a41790a5d4c085101c26ed8581763016a10a6a1e26362",
+  "countries_1900.json": "ee8b3fe36d5a0462a3e3cabdf7f0bc7e9d2365d261fd0093bd880c066b2e224a",
+  "markets_1900.json": "7234302629c724679b9d024cdae4a8190aef073f29bfc01683729ca7f788805e",
+  "trade_routes_1900.json": "c188850e2fa9bdacd8987648c19c6eaa436a60c1470db37c7e24099dea897295",
+  "employment_1900.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+  "money_coefficients_1900.json": "a2232c0a1e3009436d76728104a016a06a1b31afe8061346ff6ed33f69cf9778",
+  "calibration_1900.json": "5905a508c60c03359120f6a57311739d2d79abf6c90c9bcbc39f2f5cc97f0f0e",
+  "historical_1900_goods.json": "8cab27a9a9b2690ff3474695c7760b1927cf6a7eb38f25349c3fdb26f397242a",
+  "historical_1900_buildings.json": "5e62b41ef5937491165a68a29176dc61fe8f270644a2c1dbd337f0d529be3ae1",
+  "historical_1900_professions.json": "516bf9f8b0b9809bb3e3a8aca41309d3b34df876662b925a0444c74ff7496d49",
+  "historical_1900_needs.json": "5849dd4764a59a6b5e69173cee57ab826d75f98001b9d96236858c60c054e56c"
+ },
+ "counts": {
+  "sourceRows": 137,
+  "sourcedRows": 90,
+  "secondaryRows": 8,
+  "provisionalRows": 39,
+  "buildings": 3276,
+  "buildingsAdded": 181,
+  "buildingsDropped": 630,
+  "buildingLevels": 222920,
+  "populationBlocks": 5687,
+  "population": 1584134189,
+  "marketsClamped": 8
+ }
+}

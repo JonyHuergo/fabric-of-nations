@@ -285,6 +285,32 @@ function procureProjectMaterials(
   return { cash: remainingCash, spentRUSD, blockedReason };
 }
 
+/**
+ * P2b technique of a newly completed building (D-135): the level-weighted mean
+ * technique of the country's existing buildings of the same definition, else of all
+ * its buildings, else 1. A new plant uses the methods already practised in the
+ * country; it neither jumps to another country's technique nor falls to the
+ * reference. Provisional until P10 makes technique an investment choice.
+ */
+export function inheritedTechnique(world: World, countryId: Id, definitionId: Id): number {
+  let sameWeight = 0;
+  let sameSum = 0;
+  let allWeight = 0;
+  let allSum = 0;
+  for (const building of world.buildings) {
+    if (provinceOwner(world, building.provinceId) !== countryId) continue;
+    allWeight += building.level;
+    allSum += building.level * building.technique;
+    if (building.definitionId === definitionId) {
+      sameWeight += building.level;
+      sameSum += building.level * building.technique;
+    }
+  }
+  if (sameWeight > 0) return sameSum / sameWeight;
+  if (allWeight > 0) return allSum / allWeight;
+  return 1;
+}
+
 function createCompletedBuilding(
   world: World,
   definitionId: Id,
@@ -334,6 +360,7 @@ function createCompletedBuilding(
     builtOnDay: dayIndex,
     operational: true,
     operatingCashAccountId: operatingCash.id,
+    technique: inheritedTechnique(world, countryId, definitionId),
   };
   world.buildings.push(building);
   world.buildings.sort((left, right) => left.id - right.id);
@@ -567,6 +594,9 @@ export function runConstructionPhase(
     const blocks = [...staged.popBlocks]
       .filter((block) => ownedProvinces.has(block.provinceId))
       .sort((left, right) => left.id - right.id);
+    const wagesByProvince = new Map(
+      staged.provinceEconomies.map((province) => [province.id, province.wageRUSDPerYearByProfession]),
+    );
     const groupGross = new Map<Id, number>();
     const groupWorkers = new Map<Id, number>();
     let hired = 0;
@@ -581,7 +611,7 @@ export function runConstructionPhase(
       if (hired >= crewCap) break;
       const profession = professionById.get(block.professionId);
       if (profession === undefined) continue;
-      const wage = constructionDailyWage(profession, yearDays);
+      const wage = constructionDailyWage(profession, yearDays, wagesByProvince.get(block.provinceId));
       if (!(wage > 0)) continue;
       minimumWage = Math.min(minimumWage, wage);
       const totalIdle = idle.get(block.id) ?? 0;

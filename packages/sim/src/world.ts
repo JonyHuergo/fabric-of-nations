@@ -22,6 +22,8 @@ import {
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
 import { assertValidEconomyState } from "./economy/validation.js";
+import { DEFAULT_MONEY_COEFFICIENTS, MONEY_COEFFICIENT_KEYS } from "./economy/constants.js";
+import type { MoneyCoefficients } from "./economy/types.js";
 import { assertValidTechnologyState } from "./economy/technology.js";
 import type { EconomyValidationOptions } from "./economy/validation.js";
 import { assertValidCountryAIPolicy, assertValidCountryAIStates } from "./economy/aiState.js";
@@ -147,7 +149,24 @@ export interface World {
    * country; player actions still use the shared validator/application path.
    */
   playerCountryId: Id | null;
+  /** P2b scenario money coefficients (D-135); defaults to the pre-P2b constants. */
+  moneyCoefficients: MoneyCoefficients;
   diagnostics: SimulationDiagnostics;
+}
+
+/** Validate the P2b money coefficients: every listed coefficient is a positive finite RUSD amount. */
+export function assertValidMoneyCoefficients(value: MoneyCoefficients, path: string): void {
+  if (value === null || typeof value !== "object") throw new TypeError(`${path} must be an object`);
+  const keys = Object.keys(value);
+  if (keys.length !== MONEY_COEFFICIENT_KEYS.length) {
+    throw new RangeError(`${path} must have exactly the ${String(MONEY_COEFFICIENT_KEYS.length)} money coefficients`);
+  }
+  for (const key of MONEY_COEFFICIENT_KEYS) {
+    const amount = value[key];
+    if (typeof amount !== "number" || !Number.isFinite(amount) || !(amount > 0)) {
+      throw new RangeError(`${path}.${key} must be a positive finite RUSD amount`);
+    }
+  }
 }
 
 /** Options accepted by `createInitialWorld` and `createPopulationWorld`. */
@@ -265,6 +284,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     military: emptyMilitaryState(),
     provinces: emptyProvinceState(),
     playerCountryId: null,
+    moneyCoefficients: { ...DEFAULT_MONEY_COEFFICIENTS },
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
@@ -334,6 +354,7 @@ export function assertValidWorld(
   assertValidProfitDistributionPolicy(world.profitDistribution, "world.profitDistribution");
   assertValidCountryAIPolicy(world.countryAI, "world.countryAI");
   assertValidCountryAIStates(world.countries);
+  assertValidMoneyCoefficients(world.moneyCoefficients, "world.moneyCoefficients");
   if (world.playerCountryId !== null) {
     const playerCountryId = requireUint32(world.playerCountryId, "world.playerCountryId");
     if (!world.countries.some((country) => country.id === playerCountryId)) {

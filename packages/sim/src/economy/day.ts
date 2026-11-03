@@ -212,6 +212,7 @@ export function cloneWorld(
       ...province,
       popBlockIds: [...province.popBlockIds],
       buildingInstanceIds: [...province.buildingInstanceIds],
+      wageRUSDPerYearByProfession: [...province.wageRUSDPerYearByProfession],
     })),
     countries: source.countries.map(copyCountry),
     currencies: source.currencies.map(copyCurrency),

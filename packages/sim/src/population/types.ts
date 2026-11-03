@@ -49,6 +49,12 @@ export interface ProvinceEconomy {
   pastureHa: number;
   /** P2 urban share of the 1900 population (HYDE 3.3), 0..1; static until P4/P7. */
   urbanShare: Rate;
+  /**
+   * P2b annual wage in RUSD per worker, indexed by profession id (D-135). Empty means
+   * the profession's `baseWage1900RUSDPerYear` applies (legacy fixtures). Authored from
+   * the sourced 1900 wage table and read-only until the P7 labour market adjusts it.
+   */
+  wageRUSDPerYearByProfession: number[];
 }
 
 /** Authoritative population block state. */
@@ -174,6 +180,8 @@ export interface ProvinceEconomyInitialDef {
   pastureHa?: number;
   /** Urban share of the population, 0..1; defaults to 0. */
   urbanShare?: Rate;
+  /** P2b annual wage per worker by profession id, RUSD; defaults to empty (profession wages). */
+  wageRUSDPerYearByProfession?: readonly number[];
 }
 
 export interface PopulationScenarioDef {

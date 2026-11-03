@@ -458,6 +458,21 @@ interface WageLookup {
   readonly assignmentsByBuilding: ReadonlyMap<Id, readonly EmploymentAssignment[]>;
   readonly blockById: ReadonlyMap<Id, World["popBlocks"][number]>;
   readonly ownerByProvince: ReadonlyMap<Id, World["countries"][number]>;
+  /** P2b province wage tables by profession id; absent or empty means profession wages. */
+  readonly wagesByProvince: ReadonlyMap<Id, readonly number[]>;
+}
+
+/**
+ * P2b (D-135): the annual wage of one worker of a profession in a province. The
+ * province's sourced wage table applies when it has an entry for the profession;
+ * otherwise the profession's world reference wage (legacy fixtures).
+ */
+export function provinceWageRUSDPerYear(
+  wages: readonly number[] | undefined,
+  profession: ProfessionDef,
+): number {
+  const wage = wages?.[profession.id];
+  return wage === undefined ? profession.baseWage1900RUSDPerYear : wage;
 }
 
 function buildWageLookup(world: World): WageLookup {
@@ -477,7 +492,13 @@ function buildWageLookup(world: World): WageLookup {
     const country = countryById.get(countryId);
     if (country !== undefined) ownerByProvince.set(provinceId, country);
   }
-  return { assignmentsByBuilding, blockById, ownerByProvince };
+  const wagesByProvince = new Map<Id, readonly number[]>();
+  for (const province of world.provinceEconomies) {
+    if (province.wageRUSDPerYearByProfession.length > 0) {
+      wagesByProvince.set(province.id, province.wageRUSDPerYearByProfession);
+    }
+  }
+  return { assignmentsByBuilding, blockById, ownerByProvince, wagesByProvince };
 }
 
 function buildWageGroups(
@@ -502,7 +523,7 @@ function buildWageGroups(
     // vocational qualification adds a premium. All three are real labor-market
     // channels, not display modifiers.
     const annualBase = Math.max(
-      profession.baseWage1900RUSDPerYear,
+      provinceWageRUSDPerYear(lookup.wagesByProvince.get(block.provinceId), profession),
       laborStandards.minimumWageRUSDPerYear,
     );
     const dailyWage =

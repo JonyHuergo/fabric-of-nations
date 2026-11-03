@@ -51,15 +51,10 @@ import {
   M10_CASUALTY_STRENGTH_SCALE,
   M10_DEATH_SHARE,
   M10_DEPLOYMENT_DAYS,
-  M10_EQUIPMENT_DAILY_UPKEEP_RUSD,
-  M10_EQUIPMENT_PRICE_RUSD,
   M10_MAX_CASUALTY_FRACTION,
   M10_MIN_ORGANIZATION,
-  M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_RUSD,
   M10_OCCUPATION_UNREST_PER_DAY,
   M10_PEACE_RELATION_SCORE,
-  M10_RECRUITMENT_COST_PER_SOLDIER_RUSD,
-  M10_SOLDIER_DAILY_PAY_RUSD,
   M10_SOLDIERS_PER_EQUIPMENT_UNIT,
   M10_SUPPLY_LOSS_PER_DAY,
   M10_SUPPLY_RECOVERY_PER_DAY,
@@ -1063,8 +1058,8 @@ export function validateRecruitArmy(world: World, input: RecruitArmyInput): Mili
     }
     if (errors.length === 0) {
       const cost =
-        input.personnel * M10_RECRUITMENT_COST_PER_SOLDIER_RUSD +
-        equipment * M10_EQUIPMENT_PRICE_RUSD;
+        input.personnel * world.moneyCoefficients.recruitmentCostPerSoldierRUSD +
+        equipment * world.moneyCoefficients.equipmentPriceRUSD;
       if (cost > treasuryCash(world, country.id) + 1e-9) {
         fail(errors, "the treasury cannot fund recruitment and equipment");
       }
@@ -1515,8 +1510,8 @@ function executeMilitaryAction(
       const equipmentUnits =
         action.equipmentUnits ??
         Math.ceil(action.personnel / M10_SOLDIERS_PER_EQUIPMENT_UNIT);
-      const recruitmentCost = action.personnel * M10_RECRUITMENT_COST_PER_SOLDIER_RUSD;
-      const equipmentCost = equipmentUnits * M10_EQUIPMENT_PRICE_RUSD;
+      const recruitmentCost = action.personnel * world.moneyCoefficients.recruitmentCostPerSoldierRUSD;
+      const equipmentCost = equipmentUnits * world.moneyCoefficients.equipmentPriceRUSD;
       const province = provinceById(world, action.provinceId);
       if (province === undefined) throw new RangeError("missing recruitment province");
       const removals = removePeople(world, province.id, action.personnel, dayIndex);
@@ -1530,7 +1525,7 @@ function executeMilitaryAction(
         if (recruits <= 0) continue;
         signingShares.push({
           popBlockId: removal.popBlockId,
-          amountRUSD: recruits * M10_RECRUITMENT_COST_PER_SOLDIER_RUSD,
+          amountRUSD: recruits * world.moneyCoefficients.recruitmentCostPerSoldierRUSD,
         });
       }
       postMilitaryPay(world, dayIndex, action.countryId, signingShares);
@@ -1770,8 +1765,8 @@ function payUpkeep(
   army: Army,
   dayIndex: Day,
 ): { paid: number; shortfall: number } {
-  const payRequired = army.personnel * M10_SOLDIER_DAILY_PAY_RUSD;
-  const equipmentRequired = army.equipmentUnits * M10_EQUIPMENT_DAILY_UPKEEP_RUSD;
+  const payRequired = army.personnel * world.moneyCoefficients.soldierDailyPayRUSD;
+  const equipmentRequired = army.equipmentUnits * world.moneyCoefficients.equipmentDailyUpkeepRUSD;
   const required = payRequired + equipmentRequired;
   if (!(required > 0)) return { paid: 0, shortfall: 0 };
   const recipients = payRecipients(world, army.provinceId, dayIndex);
@@ -1962,7 +1957,7 @@ export function runMilitaryPhase(
       .filter((army) => army.countryId === controller)
       .sort((left, right) => left.id - right.id)[0];
     if (occupier === undefined) continue;
-    const requested = occupier.personnel * M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_RUSD;
+    const requested = occupier.personnel * world.moneyCoefficients.garrisonCostPerSoldierPerDayRUSD;
     const recipients = payRecipients(world, province.id, dayIndex);
     if (recipients.length === 0) {
       // No occupied-province household can receive the payment, so no treasury

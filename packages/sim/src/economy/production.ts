@@ -321,6 +321,8 @@ export function computeBuildingCapacity(
     definition.referenceThroughputPerDayAtLevelOne *
     building.level *
     building.condition *
+    // P2b (D-135): the plant's technique scales output per staffed throughput unit.
+    building.technique *
     staffingRatio *
     productivityFactor *
     e5LaborFactor *
@@ -563,6 +565,12 @@ export function runProductionPhase(
   const reservedByBuyerGood = new Map<string, number>();
   const reservationsByBuyerGood = new Map<string, InputReservation[]>();
   const reservationKeys = new Set<string>();
+  // D-136: reservations are differences of cumulative interval ends (D-133), so the
+  // lot checks' tolerance scales with the good's reserved total.
+  const reservedByGood = new Map<number, number>();
+  for (const reservation of reservations) {
+    reservedByGood.set(reservation.goodId, (reservedByGood.get(reservation.goodId) ?? 0) + reservation.quantity);
+  }
 
   for (let index = 0; index < reservations.length; index += 1) {
     const reservation = reservations[index];
@@ -621,7 +629,7 @@ export function runProductionPhase(
     }
     reservationKeys.add(duplicateKey);
     const reserved = (reservedByLot.get(sellerLotKey) ?? 0) + reservation.quantity;
-    if (reserved > lotQuantity + tolerance(lotQuantity, reserved)) {
+    if (reserved > lotQuantity + tolerance(lotQuantity, reserved, reservedByGood.get(reservation.goodId) ?? 0)) {
       throw new RangeError(`${path} over-reserves seller lot ${sellerLotKey}`);
     }
     reservedByLot.set(sellerLotKey, reserved);
@@ -702,7 +710,7 @@ export function runProductionPhase(
           const current = nextLots.get(sellerKey);
           if (current === undefined) throw new RangeError(`missing seller lot ${sellerKey}`);
           const remaining = current - reservationUsed;
-          if (remaining < -tolerance(current, reservationUsed)) {
+          if (remaining < -tolerance(current, reservationUsed, reservedByGood.get(reservation.goodId) ?? 0)) {
             throw new RangeError(`seller lot ${sellerKey} would become negative`);
           }
           if (remaining <= 0) nextLots.delete(sellerKey);

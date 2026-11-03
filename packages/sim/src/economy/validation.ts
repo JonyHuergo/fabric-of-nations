@@ -1223,6 +1223,8 @@ function assertValidBuilding(building: BuildingInstance): void {
   if (typeof record.operational !== "boolean") {
     throw new TypeError("world.buildings[].operational must be a boolean");
   }
+  const technique = requireFiniteNumber(record.technique, "world.buildings[].technique");
+  if (!(technique > 0)) throw new RangeError("world.buildings[].technique must be positive");
   requireInteger(
     record.operatingCashAccountId,
     "world.buildings[].operatingCashAccountId",

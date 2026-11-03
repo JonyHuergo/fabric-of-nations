@@ -19,6 +19,7 @@
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD, RATE_DECIMAL_PLACES } from "../population/constants.js";
 import { populationTotal, workingAgePopulation } from "../population/state.js";
+import { localWageIndex } from "./localWages.js";
 import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
 import {
   requireFiniteNumber,
@@ -30,7 +31,6 @@ import { buildFinanceIndex, cloneFinanceState } from "./accounts.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { accumulateBudgetMemo } from "./budget.js";
 import {
-  ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD,
   E5_RATE_DECIMALS,
   HEALTH_MAX_MORTALITY_REDUCTION,
   HEALTH_QUALITY_FUNDING_WEIGHT,
@@ -50,7 +50,6 @@ import {
   QUALIFICATION_WAGE_PREMIUM,
   TRAINEES_PER_INSTRUCTOR,
   TRAINING_DAILY_QUALIFICATION_GAIN,
-  TRAINING_INSTRUCTOR_COST_PER_YEAR_RUSD,
   TRAINING_MAX_PARTICIPATION,
   TRAINING_MIN_LITERACY,
   TRAINING_QUALITY_FUNDING_WEIGHT,
@@ -319,7 +318,11 @@ export function deriveHealth(
     population > 0
       ? clamp(healthStaff / population / HEALTH_TARGET_STAFF_PER_CAPITA, 0, 1)
       : 0;
-  const fundingBenchmark = population * ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD;
+  // P2b: administration is staffed at the country's own clerk wages (D-135).
+  const fundingBenchmark =
+    population *
+    world.moneyCoefficients.adminFundingPerCapitaPerYearRUSD *
+    localWageIndex(world, countryBlocks(world, country), definitions, keys);
   const fundingRatio =
     fundingBenchmark > 0
       ? clamp(country.institutions.fundedAnnualRUSD / fundingBenchmark, 0, 1)
@@ -513,6 +516,7 @@ export function runTrainingPhase(
     stipendPaid: number;
     quality: number;
     eligible: TrainingEligibleBlock[];
+    instructorCost: number;
   }[] = [];
   const academicProfessionKeys = new Set(
     definitions.technology?.academicProfessionKeys ?? [],
@@ -628,8 +632,11 @@ export function runTrainingPhase(
       trainingRequestedRUSD: requested,
       trainingShortfallRUSD: shortfall,
     });
-    const instructorBenchmark =
-      derived.instructors * TRAINING_INSTRUCTOR_COST_PER_YEAR_RUSD;
+    // P2b: instructors are paid at the country's own academic wages (D-135).
+    const instructorCost =
+      world.moneyCoefficients.trainingInstructorCostPerYearRUSD *
+      localWageIndex(world, countryBlocks(world, country), definitions, academicProfessionKeys);
+    const instructorBenchmark = derived.instructors * instructorCost;
     const fundingAdequacy =
       instructorBenchmark > 0 ? clamp(payrollPaid / instructorBenchmark, 0, 1) : 0;
     const quality = clamp(
@@ -648,6 +655,7 @@ export function runTrainingPhase(
       stipendPaid,
       quality,
       eligible,
+      instructorCost,
     });
   }
   postJournalBatch(stagedFinance, day, entries);
@@ -668,7 +676,7 @@ export function runTrainingPhase(
           draft.quality *
           // Funding adequacy gates the service: a nominally staffed but unfunded
           // program cannot produce qualification gains.
-          (draft.payrollPaid / Math.max(1e-12, draft.derived.instructors * TRAINING_INSTRUCTOR_COST_PER_YEAR_RUSD)) *
+          (draft.payrollPaid / Math.max(1e-12, draft.derived.instructors * draft.instructorCost)) *
           gap;
         if (gain <= 0) continue;
         block.qualification = roundTo(

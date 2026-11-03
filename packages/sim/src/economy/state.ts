@@ -16,6 +16,7 @@ import {
 import { createPopulationWorld } from "../population/state.js";
 import type { Day, Id } from "../types.js";
 import { requireFiniteNumber, requireInteger } from "../validation.js";
+import { assertValidMoneyCoefficients } from "../world.js";
 import { assertValidWorld, type World } from "../world.js";
 import {
   assertValidProvinceScenario,
@@ -279,6 +280,10 @@ function assertBuildingInstances(scenario: EconomyScenarioDef, accountIds: Reado
     assertValidDayIndex(instance.builtOnDay);
     if (typeof instance.operational !== "boolean") {
       throw new TypeError(`${path}.operational must be a boolean`);
+    }
+    if (instance.technique !== undefined) {
+      const technique = requireFiniteNumber(instance.technique, `${path}.technique`);
+      if (!(technique > 0)) throw new RangeError(`${path}.technique must be positive`);
     }
     if (!accountIds.has(instance.operatingCashAccountId)) {
       throw new RangeError(`${path}.operatingCashAccountId references unknown account`);
@@ -895,6 +900,10 @@ export function createEconomyWorld(
   const countryAI = createCountryAIPolicy(scenario.countryAI);
   world.countryAI = countryAI;
   world.playerCountryId = scenario.playerCountryId ?? null;
+  if (scenario.moneyCoefficients !== undefined) {
+    assertValidMoneyCoefficients(scenario.moneyCoefficients, "scenario.moneyCoefficients");
+    world.moneyCoefficients = { ...scenario.moneyCoefficients };
+  }
   world.technology = { enabled: scenario.definitions.technology !== undefined };
   world.trade = createTradeState(scenario.tradeRoutes);
   const customsCountryByMarket = resolveMarketCustomsCountries(scenario);
@@ -1351,6 +1360,7 @@ export function createEconomyWorld(
       builtOnDay: instance.builtOnDay,
       operational: instance.operational,
       operatingCashAccountId: instance.operatingCashAccountId,
+      technique: instance.technique ?? 1,
     });
   }
   world.finance.nextAccountId = nextAccountId;

@@ -1,0 +1,2658 @@
+{
+ "description": "P2b (D-135) source table for the 1900 world's money values. Every RUSD value in historical/p2b traces to these rows through scripts/p2b/build-money-calibration.mjs. Status: sourced (read from the cited source), secondary (from a reprint), provisional (no historical counterpart yet; reasoning in note).",
+ "sources": [
+  {
+   "id": "mpls-fed-cpi",
+   "title": "Consumer Price Index, 1800-",
+   "author": "Federal Reserve Bank of Minneapolis",
+   "url": "https://www.minneapolisfed.org/about-us/monetary-policy/inflation-calculator/consumer-price-index-1800-",
+   "accessDate": "2026-11-03",
+   "license": "Public information; figures cited",
+   "notes": "Annual averages, 1967 = 100. Pre-1913 values are the Bank's spliced estimates."
+  },
+  {
+   "id": "mw-usgdp",
+   "title": "What Was the U.S. GDP Then?",
+   "author": "Samuel H. Williamson (MeasuringWorth; series of Johnston and Williamson)",
+   "url": "https://www.measuringworth.com/datasets/usgdp/",
+   "accessDate": "2026-11-03",
+   "license": "MeasuringWorth: non-profit educational use with credit; single values cited",
+   "notes": "Nominal GDP in millions of current dollars and population."
+  },
+  {
+   "id": "mw-ukgdp",
+   "title": "What Was the Consistent U.K. GDP Then?",
+   "author": "Ryland Thomas and Samuel H. Williamson (MeasuringWorth)",
+   "url": "https://www.measuringworth.com/datasets/ukgdp/",
+   "accessDate": "2026-11-03",
+   "license": "MeasuringWorth: non-profit educational use with credit; single values cited",
+   "notes": "Nominal GDP per capita in current pounds on the consistent (post-1922 territory) basis."
+  },
+  {
+   "id": "mw-ukearn",
+   "title": "What Were the UK Earnings and Prices Then?",
+   "author": "Gregory Clark (MeasuringWorth)",
+   "url": "https://www.measuringworth.com/datasets/ukearncpi/",
+   "accessDate": "2026-11-03",
+   "license": "MeasuringWorth: non-profit educational use with credit; single values cited",
+   "notes": "Average annual nominal earnings, pounds."
+  },
+  {
+   "id": "mw-audata",
+   "title": "What Was the Australian GDP or CPI Then?",
+   "author": "Diane Hutchinson, Florian Ploeckl, Ben Hogewood and Samuel H. Williamson (MeasuringWorth)",
+   "url": "https://www.measuringworth.com/datasets/australiadata/",
+   "accessDate": "2026-11-03",
+   "license": "MeasuringWorth: non-profit educational use with credit; single values cited",
+   "notes": "Nominal GDP in millions of pounds and population."
+  },
+  {
+   "id": "mw-uswage",
+   "title": "Annual Wages in the United States, 1774-Present",
+   "author": "Lawrence H. Officer and Samuel H. Williamson (MeasuringWorth)",
+   "url": "https://www.measuringworth.com/datasets/uswage/",
+   "accessDate": "2026-11-03",
+   "license": "MeasuringWorth: non-profit educational use with credit; single values cited",
+   "notes": "Production workers' hourly compensation, nominal dollars, two decimals."
+  },
+  {
+   "id": "mpd-2023",
+   "title": "Maddison Project Database 2023 (GDP per capita, 2011 international dollars), via Our World in Data",
+   "author": "Jutta Bolt and Jan Luiten van Zanden; Our World in Data",
+   "url": "https://ourworldindata.org/grapher/gdp-per-capita-maddison-project-database",
+   "accessDate": "2026-11-03",
+   "license": "CC BY 4.0",
+   "notes": "Used only for each country's ratio to the United States (D-135 A1, A8)."
+  },
+  {
+   "id": "owid-population-1900",
+   "title": "Population (historical), Our World in Data",
+   "author": "Our World in Data (HYDE, Gapminder, UN WPP)",
+   "url": "https://ourworldindata.org/grapher/population",
+   "accessDate": "2026-11-03",
+   "license": "CC BY 4.0",
+   "notes": "Japan's 1900 population for the yen GNP per head."
+  },
+  {
+   "id": "mint-1901",
+   "title": "Annual Report of the Director of the Mint for the Fiscal Year Ended June 30, 1901: Values of Foreign Coins, January 1, 1901",
+   "author": "U.S. Treasury, Bureau of the Mint",
+   "url": "https://archive.org/details/annualreportofdi1901unit_h3l5",
+   "accessDate": "2026-11-03",
+   "license": "Public domain (U.S. government work, 1901)",
+   "notes": "Values of monetary units in U.S. gold dollars proclaimed under section 25 of the act of August 28, 1894 (pp. 56-57 of the report). Silver-standard units are valued at the silver price of the preceding quarter."
+  },
+  {
+   "id": "imes-2002",
+   "title": "Economic Developments and Monetary Policy Responses in Interwar Japan: Evaluation Based on the Taylor Rule, Table 1",
+   "author": "Masato Shizume, Bank of Japan IMES, Monetary and Economic Studies 20(3), October 2002",
+   "url": "https://www.imes.boj.or.jp/research/papers/english/me20-3-3.pdf",
+   "accessDate": "2026-11-03",
+   "license": "Figure cited",
+   "notes": "Nominal GNP in millions of yen from Ohkawa, Takamatsu and Yamamoto (1974), LTES vol. 1. The table row is labelled 1896-1900; the level is read as the 1900 value (conflict note in the plan)."
+  },
+  {
+   "id": "nber-macrohistory-04",
+   "title": "NBER Macrohistory Database, Chapter IV: Prices",
+   "author": "National Bureau of Economic Research",
+   "url": "https://www.nber.org/research/data/nber-macrohistory-iv-prices",
+   "accessDate": "2026-11-03",
+   "license": "Public research data; figures cited",
+   "notes": "Monthly wholesale prices; the 1900 value is the mean of the twelve monthly observations listed in each row."
+  },
+  {
+   "id": "bls-991",
+   "title": "100 Years of U.S. Consumer Spending: Data for the Nation, New York City, and Boston (Report 991), Tables 1, 2 and 5",
+   "author": "U.S. Bureau of Labor Statistics, May 2006",
+   "url": "https://www.bls.gov/opub/100-years-of-u-s-consumer-spending.pdf",
+   "accessDate": "2026-11-03",
+   "license": "Public domain (U.S. government work)",
+   "notes": "1901 Consumer Expenditure Survey of wage-earner families: average family income $750, expenditure $769, of which food $327 and apparel $108; the families had nearly five people."
+  },
+  {
+   "id": "nces-1993",
+   "title": "120 Years of American Education: A Statistical Portrait, Table 8",
+   "author": "Thomas D. Snyder (ed.), National Center for Education Statistics, January 1993",
+   "url": "https://nces.ed.gov/pubs93/93442.pdf",
+   "accessDate": "2026-11-03",
+   "license": "Public domain (U.S. government work)",
+   "notes": "Public elementary and secondary schools, 1899-1900."
+  },
+  {
+   "id": "wallis-2000",
+   "title": "American Government Finance in the Long Run: 1790 to 1990, Tables 1 and 2",
+   "author": "John Joseph Wallis, Journal of Economic Perspectives 14(1), 2000",
+   "url": "https://www.econ.umd.edu/sites/www.econ.umd.edu/files/pubs/Wallis_GovtFinance_JEP_2000.pdf",
+   "accessDate": "2026-11-03",
+   "license": "Figures cited",
+   "notes": "Government revenue by level as a percent of GNP and government debt by level, 1902 (Census of Wealth, Debt and Taxation)."
+  },
+  {
+   "id": "census-1900-sciam",
+   "title": "Scientific American Reference Book (Hopkins and Bond), reprinting the Twelfth Census of the United States, 1900",
+   "author": "Albert A. Hopkins and A. Russell Bond (eds.)",
+   "url": "https://chestofbooks.com/crafts/scientific-american/Scientific-American-Reference-Book/",
+   "accessDate": "2026-11-03",
+   "license": "Public domain text; figures cited",
+   "notes": "Secondary reprint of the 1900 census: gainful occupations by group, and the summary of manufactures. To be verified against the Census volumes."
+  },
+  {
+   "id": "p2b-provisional",
+   "title": "P2b provisional coefficients and definitions",
+   "author": "Fabric of Nations project (D-135)",
+   "url": "packages/data/data/historical/p2b/sources_1900.json",
+   "accessDate": "2026-11-03",
+   "license": "Project authored",
+   "notes": "Each provisional row states its reasoning; none is a historical observation. Unit definitions are marked sourced."
+  }
+ ],
+ "rows": [
+  {
+   "id": "cpi-1900",
+   "sourceId": "mpls-fed-cpi",
+   "locator": "annual average 1900",
+   "subject": "United States",
+   "measure": "CPI (1967 = 100)",
+   "unit": "index",
+   "value": 25,
+   "status": "sourced"
+  },
+  {
+   "id": "cpi-1990",
+   "sourceId": "mpls-fed-cpi",
+   "locator": "annual average 1990",
+   "subject": "United States",
+   "measure": "CPI (1967 = 100)",
+   "unit": "index",
+   "value": 392.6,
+   "status": "sourced"
+  },
+  {
+   "id": "us-gdp-1900",
+   "sourceId": "mw-usgdp",
+   "locator": "1900 row",
+   "subject": "United States",
+   "measure": "nominal GDP",
+   "unit": "million USD",
+   "value": 21197,
+   "status": "sourced"
+  },
+  {
+   "id": "us-pop-1900",
+   "sourceId": "mw-usgdp",
+   "locator": "1900 row",
+   "subject": "United States",
+   "measure": "population",
+   "unit": "people",
+   "value": 76094000,
+   "status": "sourced"
+  },
+  {
+   "id": "us-gdp-1902",
+   "sourceId": "mw-usgdp",
+   "locator": "1902 row",
+   "subject": "United States",
+   "measure": "nominal GDP",
+   "unit": "million USD",
+   "value": 24754,
+   "status": "sourced"
+  },
+  {
+   "id": "uk-gdppc-1900",
+   "sourceId": "mw-ukgdp",
+   "locator": "1900 row, nominal GDP per capita",
+   "subject": "United Kingdom",
+   "measure": "nominal GDP per head",
+   "unit": "GBP",
+   "value": 49.72,
+   "status": "sourced",
+   "note": "Consistent-territory series (excludes the later Irish Free State); applied to the whole 1900 United Kingdom home territory."
+  },
+  {
+   "id": "au-gdp-1900",
+   "sourceId": "mw-audata",
+   "locator": "1900 row",
+   "subject": "Australia",
+   "measure": "nominal GDP",
+   "unit": "million GBP",
+   "value": 246.21,
+   "status": "sourced"
+  },
+  {
+   "id": "au-pop-1900",
+   "sourceId": "mw-audata",
+   "locator": "1900 row",
+   "subject": "Australia",
+   "measure": "population",
+   "unit": "people",
+   "value": 3765339,
+   "status": "sourced"
+  },
+  {
+   "id": "jp-gnp-1900",
+   "sourceId": "imes-2002",
+   "locator": "Table 1, row 1896-1900, nominal GNP",
+   "subject": "Japan",
+   "measure": "nominal GNP",
+   "unit": "million JPY",
+   "value": 2414,
+   "status": "sourced",
+   "note": "Row labelled 1896-1900; read as the 1900 level (the 1885 row is a single year and growth is over five years)."
+  },
+  {
+   "id": "jp-pop-1900",
+   "sourceId": "owid-population-1900",
+   "locator": "Japan, 1900",
+   "subject": "Japan",
+   "measure": "population",
+   "unit": "people",
+   "value": 44416502,
+   "status": "sourced"
+  },
+  {
+   "id": "parity-gbp",
+   "sourceId": "mint-1901",
+   "locator": "Values of Foreign Coins, January 1, 1901",
+   "subject": "Great Britain: pound sterling",
+   "measure": "value in U.S. gold dollars",
+   "unit": "USD per GBP",
+   "value": 4.8665,
+   "status": "sourced"
+  },
+  {
+   "id": "parity-jpy",
+   "sourceId": "mint-1901",
+   "locator": "Values of Foreign Coins, January 1, 1901",
+   "subject": "Japan: yen",
+   "measure": "value in U.S. gold dollars",
+   "unit": "USD per JPY",
+   "value": 0.498,
+   "status": "sourced"
+  },
+  {
+   "id": "parity-inr",
+   "sourceId": "mint-1901",
+   "locator": "Values of Foreign Coins, January 1, 1901",
+   "subject": "India: rupee",
+   "measure": "value in U.S. gold dollars",
+   "unit": "USD per INR",
+   "value": 0.324,
+   "status": "sourced"
+  },
+  {
+   "id": "parity-frf",
+   "sourceId": "mint-1901",
+   "locator": "Values of Foreign Coins, January 1, 1901",
+   "subject": "France: franc",
+   "measure": "value in U.S. gold dollars",
+   "unit": "USD per FRF",
+   "value": 0.193,
+   "status": "sourced"
+  },
+  {
+   "id": "parity-dem",
+   "sourceId": "mint-1901",
+   "locator": "Values of Foreign Coins, January 1, 1901",
+   "subject": "German Empire: mark",
+   "measure": "value in U.S. gold dollars",
+   "unit": "USD per DEM",
+   "value": 0.238,
+   "status": "sourced"
+  },
+  {
+   "id": "parity-ath",
+   "sourceId": "mint-1901",
+   "locator": "Values of Foreign Coins, January 1, 1901",
+   "subject": "Austria-Hungary: crown",
+   "measure": "value in U.S. gold dollars",
+   "unit": "USD per crown",
+   "value": 0.203,
+   "status": "sourced"
+  },
+  {
+   "id": "parity-rub",
+   "sourceId": "mint-1901",
+   "locator": "Values of Foreign Coins, January 1, 1901",
+   "subject": "Russia: ruble",
+   "measure": "value in U.S. gold dollars",
+   "unit": "USD per RUB",
+   "value": 0.515,
+   "status": "sourced"
+  },
+  {
+   "id": "parity-nlg",
+   "sourceId": "mint-1901",
+   "locator": "Values of Foreign Coins, January 1, 1901",
+   "subject": "Netherlands: florin",
+   "measure": "value in U.S. gold dollars",
+   "unit": "USD per NLG",
+   "value": 0.402,
+   "status": "sourced"
+  },
+  {
+   "id": "parity-itl",
+   "sourceId": "mint-1901",
+   "locator": "Values of Foreign Coins, January 1, 1901",
+   "subject": "Italy: lira",
+   "measure": "value in U.S. gold dollars",
+   "unit": "USD per ITL",
+   "value": 0.193,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-USA",
+   "sourceId": "mpd-2023",
+   "locator": "United States, 1900",
+   "subject": "United States",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 8037.5713,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-GBR",
+   "sourceId": "mpd-2023",
+   "locator": "United Kingdom, 1900",
+   "subject": "United Kingdom",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 7594,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-DEU",
+   "sourceId": "mpd-2023",
+   "locator": "Germany, 1900",
+   "subject": "Germany",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 4758,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-FRA",
+   "sourceId": "mpd-2023",
+   "locator": "France, 1900",
+   "subject": "France",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 4584,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-RUS",
+   "sourceId": "mpd-2023",
+   "locator": "Russia, 1900",
+   "subject": "Russia",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1049.1808,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-JPN",
+   "sourceId": "mpd-2023",
+   "locator": "Japan, 1900",
+   "subject": "Japan",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 2123.2505,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-ITA",
+   "sourceId": "mpd-2023",
+   "locator": "Italy, 1900",
+   "subject": "Italy",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 3264,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-ESP",
+   "sourceId": "mpd-2023",
+   "locator": "Spain, 1900",
+   "subject": "Spain",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 2672.3906,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-PRT",
+   "sourceId": "mpd-2023",
+   "locator": "Portugal, 1900",
+   "subject": "Portugal",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 2075,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-NLD",
+   "sourceId": "mpd-2023",
+   "locator": "Netherlands, 1900",
+   "subject": "Netherlands",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 5306,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-BEL",
+   "sourceId": "mpd-2023",
+   "locator": "Belgium, 1900",
+   "subject": "Belgium",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 5947,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-CHE",
+   "sourceId": "mpd-2023",
+   "locator": "Switzerland, 1900",
+   "subject": "Switzerland",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 6611.7783,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-SWE",
+   "sourceId": "mpd-2023",
+   "locator": "Sweden, 1900",
+   "subject": "Sweden",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 3320,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-NOR",
+   "sourceId": "mpd-2023",
+   "locator": "Norway, 1900",
+   "subject": "Norway",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 3249,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-DNK",
+   "sourceId": "mpd-2023",
+   "locator": "Denmark, 1900",
+   "subject": "Denmark",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 4809,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-GRC",
+   "sourceId": "mpd-2023",
+   "locator": "Greece, 1900",
+   "subject": "Greece",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1972,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-ROU",
+   "sourceId": "mpd-2023",
+   "locator": "Romania, 1900",
+   "subject": "Romania",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1406.8207,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-CHN",
+   "sourceId": "mpd-2023",
+   "locator": "China, 1900",
+   "subject": "China",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 972,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-LBR",
+   "sourceId": "mpd-2023",
+   "locator": "Liberia, 1900",
+   "subject": "Liberia",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1401.0905,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-MEX",
+   "sourceId": "mpd-2023",
+   "locator": "Mexico, 1900",
+   "subject": "Mexico",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1822,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-COL",
+   "sourceId": "mpd-2023",
+   "locator": "Colombia, 1900",
+   "subject": "Colombia",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1089,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-VEN",
+   "sourceId": "mpd-2023",
+   "locator": "Venezuela, 1900",
+   "subject": "Venezuela",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1846,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-ECU",
+   "sourceId": "mpd-2023",
+   "locator": "Ecuador, 1900",
+   "subject": "Ecuador",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1098,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-PER",
+   "sourceId": "mpd-2023",
+   "locator": "Peru, 1900",
+   "subject": "Peru",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1084,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-BOL",
+   "sourceId": "mpd-2023",
+   "locator": "Bolivia, 1900",
+   "subject": "Bolivia",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1462,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-CHL",
+   "sourceId": "mpd-2023",
+   "locator": "Chile, 1900",
+   "subject": "Chile",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 3386,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-ARG",
+   "sourceId": "mpd-2023",
+   "locator": "Argentina, 1900",
+   "subject": "Argentina",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 4583,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-URY",
+   "sourceId": "mpd-2023",
+   "locator": "Uruguay, 1900",
+   "subject": "Uruguay",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 3387,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-BRA",
+   "sourceId": "mpd-2023",
+   "locator": "Brazil, 1900",
+   "subject": "Brazil",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 874,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-CAN",
+   "sourceId": "mpd-2023",
+   "locator": "Canada, 1900",
+   "subject": "Canada",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 4640,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-AUS",
+   "sourceId": "mpd-2023",
+   "locator": "Australia, 1900",
+   "subject": "Australia",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 6397,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-NZL",
+   "sourceId": "mpd-2023",
+   "locator": "New Zealand, 1900",
+   "subject": "New Zealand",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 6851,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-AUT",
+   "sourceId": "mpd-2023",
+   "locator": "Austria, 1900",
+   "subject": "Austria",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 4594,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-HUN",
+   "sourceId": "mpd-2023",
+   "locator": "Hungary, 1900",
+   "subject": "Hungary",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 2681,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-OWID_CZS",
+   "sourceId": "mpd-2023",
+   "locator": "Czechoslovakia, 1900",
+   "subject": "Czechoslovakia",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 2756,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-IND",
+   "sourceId": "mpd-2023",
+   "locator": "India, 1900",
+   "subject": "India",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 955,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-LKA",
+   "sourceId": "mpd-2023",
+   "locator": "Sri Lanka, 1900",
+   "subject": "Sri Lanka",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 2056,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-MYS",
+   "sourceId": "mpd-2023",
+   "locator": "Malaysia, 1900",
+   "subject": "Malaysia",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 817.74304,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-SGP",
+   "sourceId": "mpd-2023",
+   "locator": "Singapore, 1900",
+   "subject": "Singapore",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 2206,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-IDN",
+   "sourceId": "mpd-2023",
+   "locator": "Indonesia, 1900",
+   "subject": "Indonesia",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1151,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-FIN",
+   "sourceId": "mpd-2023",
+   "locator": "Finland, 1900",
+   "subject": "Finland",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 2659,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-ISL",
+   "sourceId": "mpd-2023",
+   "locator": "Iceland, 1900",
+   "subject": "Iceland",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 2289.4734,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-GHA",
+   "sourceId": "mpd-2023",
+   "locator": "Ghana, 1900",
+   "subject": "Ghana",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1126.6631,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-NGA",
+   "sourceId": "mpd-2023",
+   "locator": "Nigeria, 1900",
+   "subject": "Nigeria",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1024.7012,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-ZAF",
+   "sourceId": "mpd-2023",
+   "locator": "South Africa, 1900",
+   "subject": "South Africa",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1494,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-JAM",
+   "sourceId": "mpd-2023",
+   "locator": "Jamaica, 1900",
+   "subject": "Jamaica",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 926,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-ALB",
+   "sourceId": "mpd-2023",
+   "locator": "Albania, 1900",
+   "subject": "Albania",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1092,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-OWID_YGS",
+   "sourceId": "mpd-2023",
+   "locator": "Yugoslavia, 1900",
+   "subject": "Yugoslavia",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1323,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-region-east-asia",
+   "sourceId": "mpd-2023",
+   "locator": "East Asia (Maddison), 1900",
+   "subject": "East Asia (Maddison)",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1086.2826,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-region-south-asia",
+   "sourceId": "mpd-2023",
+   "locator": "South and South East Asia (Maddison), 1900",
+   "subject": "South and South East Asia (Maddison)",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 997.5472,
+   "status": "sourced"
+  },
+  {
+   "id": "mpd-region-latin-america",
+   "sourceId": "mpd-2023",
+   "locator": "Latin America (Maddison), 1900",
+   "subject": "Latin America (Maddison)",
+   "measure": "GDP per head",
+   "unit": "2011 international USD",
+   "value": 1713.7573,
+   "status": "sourced"
+  },
+  {
+   "id": "us-wage-production-hourly-1900",
+   "sourceId": "mw-uswage",
+   "locator": "1900 row, production workers hourly compensation",
+   "subject": "United States",
+   "measure": "production workers' hourly compensation",
+   "unit": "USD per hour",
+   "value": 0.14,
+   "status": "sourced",
+   "note": "Published to two decimals. Conflicts with BLS Report 991 Table 1 (manufacturing $0.23 an hour in 1901); see the plan."
+  },
+  {
+   "id": "uk-earnings-1900",
+   "sourceId": "mw-ukearn",
+   "locator": "1900 row",
+   "subject": "United Kingdom",
+   "measure": "average annual nominal earnings",
+   "unit": "GBP per year",
+   "value": 67.96,
+   "status": "sourced"
+  },
+  {
+   "id": "us-teacher-salary-1900",
+   "sourceId": "nces-1993",
+   "locator": "Table 8, 1899-1900, annual salary of instructional staff",
+   "subject": "United States",
+   "measure": "average annual salary of public school instructional staff",
+   "unit": "USD per year",
+   "value": 325,
+   "status": "sourced"
+  },
+  {
+   "id": "us-manuf-salaried-number-1900",
+   "sourceId": "census-1900-sciam",
+   "locator": "Summary for all establishments, 1900: salaried officials, clerks, etc., number",
+   "subject": "United States",
+   "measure": "salaried officials and clerks in manufacturing",
+   "unit": "people",
+   "value": 397092,
+   "status": "secondary"
+  },
+  {
+   "id": "us-manuf-salaries-1900",
+   "sourceId": "census-1900-sciam",
+   "locator": "Summary for all establishments, 1900: salaries",
+   "subject": "United States",
+   "measure": "salaries of officials and clerks in manufacturing",
+   "unit": "million USD",
+   "value": 404,
+   "status": "secondary",
+   "note": "About $404 million per the reprint as summarised by search; the exact figure is still to be read from Census 1900 vol. VII."
+  },
+  {
+   "id": "bls-1901-manufacturing-hourly",
+   "sourceId": "bls-991",
+   "locator": "Table 1, 1901, manufacturing",
+   "subject": "United States",
+   "measure": "hourly wage, manufacturing",
+   "unit": "USD per hour",
+   "value": 0.23,
+   "status": "sourced",
+   "note": "Recorded as the conflicting series; not used."
+  },
+  {
+   "id": "bls-1901-food",
+   "sourceId": "bls-991",
+   "locator": "Table 5, United States, food",
+   "subject": "United States wage-earner families",
+   "measure": "annual food expenditure per family",
+   "unit": "USD per year",
+   "value": 327,
+   "status": "sourced"
+  },
+  {
+   "id": "bls-1901-apparel",
+   "sourceId": "bls-991",
+   "locator": "Table 5, United States, apparel and services",
+   "subject": "United States wage-earner families",
+   "measure": "annual apparel expenditure per family",
+   "unit": "USD per year",
+   "value": 108,
+   "status": "sourced"
+  },
+  {
+   "id": "bls-1901-family-size",
+   "sourceId": "bls-991",
+   "locator": "text: the average family included nearly five people",
+   "subject": "United States wage-earner families",
+   "measure": "persons per family",
+   "unit": "people",
+   "value": 4.9,
+   "status": "provisional",
+   "note": "The report says 'nearly five'; 4.9 is used until the survey's own average is sourced."
+  },
+  {
+   "id": "us-gov-revenue-share-1902",
+   "sourceId": "wallis-2000",
+   "locator": "Table 1, as percent of GNP, 1902, total",
+   "subject": "United States, all governments",
+   "measure": "government revenue as a share of GNP",
+   "unit": "share",
+   "value": 0.078,
+   "status": "sourced",
+   "note": "National 3.0%, state 0.8%, local 4.0%."
+  },
+  {
+   "id": "us-gov-debt-1902",
+   "sourceId": "wallis-2000",
+   "locator": "Table 2, 1902: state 230, local 1877, national 1178",
+   "subject": "United States, all governments",
+   "measure": "government debt",
+   "unit": "million USD",
+   "value": 3285,
+   "status": "sourced"
+  },
+  {
+   "id": "us-school-revenue-1900",
+   "sourceId": "nces-1993",
+   "locator": "Table 8, 1899-1900, total revenue receipts",
+   "subject": "United States public schools",
+   "measure": "public school revenue receipts",
+   "unit": "million USD",
+   "value": 220,
+   "status": "sourced"
+  },
+  {
+   "id": "us-occ-total-1900",
+   "sourceId": "census-1900-sciam",
+   "locator": "Population at least 10 years of age engaged in gainful occupations, 1900: all occupations",
+   "subject": "United States",
+   "measure": "gainful workers, all occupations",
+   "unit": "people",
+   "value": 29074117,
+   "status": "secondary"
+  },
+  {
+   "id": "us-occ-agriculture-1900",
+   "sourceId": "census-1900-sciam",
+   "locator": "Population at least 10 years of age engaged in gainful occupations, 1900: agricultural pursuits",
+   "subject": "United States",
+   "measure": "gainful workers, agricultural pursuits",
+   "unit": "people",
+   "value": 10381765,
+   "status": "secondary"
+  },
+  {
+   "id": "us-occ-professional-1900",
+   "sourceId": "census-1900-sciam",
+   "locator": "Population at least 10 years of age engaged in gainful occupations, 1900: professional service",
+   "subject": "United States",
+   "measure": "gainful workers, professional service",
+   "unit": "people",
+   "value": 1258739,
+   "status": "secondary"
+  },
+  {
+   "id": "us-occ-domestic-1900",
+   "sourceId": "census-1900-sciam",
+   "locator": "Population at least 10 years of age engaged in gainful occupations, 1900: domestic and personal service",
+   "subject": "United States",
+   "measure": "gainful workers, domestic and personal service",
+   "unit": "people",
+   "value": 5580657,
+   "status": "secondary"
+  },
+  {
+   "id": "us-occ-trade-1900",
+   "sourceId": "census-1900-sciam",
+   "locator": "Population at least 10 years of age engaged in gainful occupations, 1900: trade and transportation",
+   "subject": "United States",
+   "measure": "gainful workers, trade and transportation",
+   "unit": "people",
+   "value": 4766964,
+   "status": "secondary"
+  },
+  {
+   "id": "us-occ-manufacturing-1900",
+   "sourceId": "census-1900-sciam",
+   "locator": "Population at least 10 years of age engaged in gainful occupations, 1900: manufacturing and mechanical pursuits",
+   "subject": "United States",
+   "measure": "gainful workers, manufacturing and mechanical pursuits",
+   "unit": "people",
+   "value": 7085992,
+   "status": "secondary"
+  },
+  {
+   "id": "price-wheat-1900",
+   "sourceId": "nber-macrohistory-04",
+   "locator": "series m04001a, 1900 monthly",
+   "subject": "Wheat, Chicago (six markets)",
+   "measure": "wholesale price, 1900 mean of monthly observations",
+   "unit": "US cents per bushel",
+   "observations": [
+    64.5,
+    65.9,
+    65.6,
+    65.9,
+    65.5,
+    74.9,
+    77.2,
+    74.4,
+    75.6,
+    74.1,
+    71.3,
+    70.3
+   ],
+   "value": 70.43333333333332,
+   "status": "sourced"
+  },
+  {
+   "id": "price-corn-1900",
+   "sourceId": "nber-macrohistory-04",
+   "locator": "series m04005, 1900 monthly",
+   "subject": "Corn, Chicago",
+   "measure": "wholesale price, 1900 mean of monthly observations",
+   "unit": "USD per bushel",
+   "observations": [
+    0.31,
+    0.33,
+    0.36,
+    0.4,
+    0.38,
+    0.4,
+    0.42,
+    0.39,
+    0.41,
+    0.39,
+    0.42,
+    0.38
+   ],
+   "value": 0.3825,
+   "status": "sourced"
+  },
+  {
+   "id": "price-cotton-1900",
+   "sourceId": "nber-macrohistory-04",
+   "locator": "series m04006a, 1900 monthly",
+   "subject": "Cotton, New York (ten markets)",
+   "measure": "wholesale price, 1900 mean of monthly observations",
+   "unit": "US cents per pound",
+   "observations": [
+    7.8,
+    8.8,
+    9.8,
+    9.8,
+    9.6,
+    9.2,
+    10.1,
+    9.8,
+    10.6,
+    10.2,
+    9.9,
+    10.1
+   ],
+   "value": 9.641666666666666,
+   "status": "sourced"
+  },
+  {
+   "id": "price-cattle-1900",
+   "sourceId": "nber-macrohistory-04",
+   "locator": "series m04007, 1900 monthly",
+   "subject": "Cattle, Chicago",
+   "measure": "wholesale price, 1900 mean of monthly observations",
+   "unit": "USD per 100 pounds",
+   "observations": [
+    5.2,
+    4.85,
+    4.85,
+    4.95,
+    5.1,
+    5.2,
+    5.25,
+    5.4,
+    5.35,
+    5.25,
+    5.15,
+    5
+   ],
+   "value": 5.129166666666667,
+   "status": "sourced"
+  },
+  {
+   "id": "price-hogs-1900",
+   "sourceId": "nber-macrohistory-04",
+   "locator": "series m04008, 1900 monthly",
+   "subject": "Hogs, Chicago",
+   "measure": "wholesale price, 1900 mean of monthly observations",
+   "unit": "USD per 100 pounds",
+   "observations": [
+    4.55,
+    4.9,
+    5,
+    5.55,
+    5.3,
+    5.2,
+    5.25,
+    5.2,
+    5.25,
+    4.8,
+    4.8,
+    4.75
+   ],
+   "value": 5.045833333333333,
+   "status": "sourced"
+  },
+  {
+   "id": "price-flour-1900",
+   "sourceId": "nber-macrohistory-04",
+   "locator": "series m04019a, 1900 monthly",
+   "subject": "Wheat flour (BLS)",
+   "measure": "wholesale price, 1900 mean of monthly observations",
+   "unit": "USD per barrel",
+   "observations": [
+    3.66,
+    3.68,
+    3.57,
+    3.59,
+    3.52,
+    3.98,
+    4.26,
+    3.93,
+    4.01,
+    4.03,
+    3.98,
+    3.89
+   ],
+   "value": 3.8416666666666663,
+   "status": "sourced"
+  },
+  {
+   "id": "price-print-cloth-1900",
+   "sourceId": "nber-macrohistory-04",
+   "locator": "series m04086a, 1900 monthly",
+   "subject": "Print cloth, 28-inch 64x64, mills (BLS)",
+   "measure": "wholesale price, 1900 mean of monthly observations",
+   "unit": "US cents per yard",
+   "observations": [
+    3.21,
+    3.2,
+    3.37,
+    3.28,
+    3.09,
+    2.89,
+    2.77,
+    2.84,
+    2.99,
+    3.15,
+    3.1,
+    3.09
+   ],
+   "value": 3.081666666666667,
+   "status": "sourced"
+  },
+  {
+   "id": "price-wool-1900",
+   "sourceId": "nber-macrohistory-04",
+   "locator": "series m04087a, 1900 monthly",
+   "subject": "Wool, eastern markets, Boston (BLS)",
+   "measure": "wholesale price, 1900 mean of monthly observations",
+   "unit": "US cents per pound",
+   "observations": [
+    76.1,
+    76.1,
+    75,
+    70.6,
+    68.5,
+    66.3,
+    62,
+    62,
+    59.8,
+    58.7,
+    57.6,
+    58.7
+   ],
+   "value": 65.95,
+   "status": "sourced"
+  },
+  {
+   "id": "kg-per-lb",
+   "sourceId": "p2b-provisional",
+   "locator": "definition",
+   "subject": "coefficient",
+   "measure": "kilograms per avoirdupois pound",
+   "unit": "ratio",
+   "value": 0.45359237,
+   "status": "sourced",
+   "note": "Definition of the pound (equal to the 1900 US pound to six figures)."
+  },
+  {
+   "id": "lb-per-bushel-wheat",
+   "sourceId": "p2b-provisional",
+   "locator": "definition",
+   "subject": "coefficient",
+   "measure": "pounds per bushel of wheat",
+   "unit": "ratio",
+   "value": 60,
+   "status": "sourced",
+   "note": "US standard bushel weight for wheat."
+  },
+  {
+   "id": "lb-per-barrel-flour",
+   "sourceId": "p2b-provisional",
+   "locator": "definition",
+   "subject": "coefficient",
+   "measure": "pounds per barrel of flour",
+   "unit": "ratio",
+   "value": 196,
+   "status": "sourced",
+   "note": "US standard barrel of flour."
+  },
+  {
+   "id": "yards-per-lb-print-cloth",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "yards per pound of 28-inch 64x64 print cloth",
+   "unit": "ratio",
+   "value": 7,
+   "status": "provisional",
+   "note": "Trade designation of standard Fall River print cloth ('7-yard goods'); provisional until a sourced weight is found."
+  },
+  {
+   "id": "standard-hours-per-week",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "hours per working week, 1900",
+   "unit": "ratio",
+   "value": 60,
+   "status": "provisional",
+   "note": "LABOR_STANDARD_HOURS_PER_WEEK in the constants module."
+  },
+  {
+   "id": "weeks-per-year",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "paid weeks per year",
+   "unit": "ratio",
+   "value": 52,
+   "status": "provisional",
+   "note": "Full-year employment; the hourly series has no unemployment adjustment."
+  },
+  {
+   "id": "peasant-to-laborer-wage",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "farm labour income relative to the production-worker wage",
+   "unit": "ratio",
+   "value": 0.5,
+   "status": "provisional",
+   "note": "USDA Bulletin 94 Table 12 has the 1899 farm wage rates but its scanned text could not be read reliably; 0.5 is provisional pending that table."
+  },
+  {
+   "id": "capitalist-to-clerk-wage",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "capitalist reference wage relative to salaried officials and clerks",
+   "unit": "ratio",
+   "value": 1,
+   "status": "provisional",
+   "note": "No 1900 building employs capitalists; the reference wage only prices construction labour."
+  },
+  {
+   "id": "labour-share-agriculture",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "labour share of farm value added",
+   "unit": "ratio",
+   "value": 0.5,
+   "status": "provisional",
+   "note": "Owner-operated farms: the rest of value added is the owner's return to land and capital, paid out as profit to the owning household."
+  },
+  {
+   "id": "labour-share-manufacturing",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "labour share of manufacturing value added",
+   "unit": "ratio",
+   "value": 0.58,
+   "status": "provisional",
+   "note": "Census 1900 manufactures (reprint): wages about $2.32 bn and salaries about $0.40 bn over products $13.06 bn less materials $7.36 bn and miscellaneous expenses $1.03 bn."
+  },
+  {
+   "id": "capital-per-job-years",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "construction cost of one level, in years of its wage bill at reference wages",
+   "unit": "ratio",
+   "value": 1,
+   "status": "provisional",
+   "note": "Order of magnitude of 1900 capital per worker relative to annual pay; no sourced capital stock per building type yet."
+  },
+  {
+   "id": "depreciation-rate",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "annual upkeep as a share of construction cost",
+   "unit": "ratio",
+   "value": 0.03,
+   "status": "provisional",
+   "note": "Provisional depreciation of structures and equipment."
+  },
+  {
+   "id": "working-capital-days",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "days of wages, inputs and upkeep held as operating cash",
+   "unit": "ratio",
+   "value": 30,
+   "status": "provisional",
+   "note": "CONSTRUCTION_WORKING_CAPITAL_DAYS in the constants module."
+  },
+  {
+   "id": "opening-stock-days",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "days of producers' input demand held as opening stock",
+   "unit": "ratio",
+   "value": 1,
+   "status": "provisional",
+   "note": "Producers buy inputs only from the opening stock, households can buy the day's output (M3d Pass B), so a market opens with one day of its input demand (D-136); replaces the M11 authored stock lots."
+  },
+  {
+   "id": "household-cash-months",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "months of household income held as cash",
+   "unit": "ratio",
+   "value": 2,
+   "status": "provisional",
+   "note": "No cross-country 1900 household money holdings sourced."
+  },
+  {
+   "id": "treasury-cash-months",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "months of government revenue held as treasury cash",
+   "unit": "ratio",
+   "value": 3,
+   "status": "provisional",
+   "note": "No cross-country 1900 treasury balances sourced."
+  },
+  {
+   "id": "administration-share-of-noneducation-revenue",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "share of non-education revenue funding civil administration",
+   "unit": "ratio",
+   "value": 0.5,
+   "status": "provisional",
+   "note": "The rest is military, pensions, interest and public works, which the sim funds through its own channels."
+  },
+  {
+   "id": "route-capacity-share",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "daily route capacity as a share of the smaller market's covered value added per day",
+   "unit": "ratio",
+   "value": 0.05,
+   "status": "provisional",
+   "note": "Until bilateral 1900 trade (RICardo, Federico-Tena) is sourced."
+  },
+  {
+   "id": "textile-fibre-per-cloth",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "kilograms of fibre per kilogram of cloth",
+   "unit": "ratio",
+   "value": 1.15,
+   "status": "provisional",
+   "note": "Spinning and weaving waste of about 13%."
+  },
+  {
+   "id": "flour-wheat-per-flour",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "kilograms of wheat per kilogram of flour",
+   "unit": "ratio",
+   "value": 1.4286,
+   "status": "provisional",
+   "note": "4 2/3 bushels (280 lb) of wheat per 196-lb barrel of flour; milling rule of thumb."
+  },
+  {
+   "id": "garment-markup-over-cloth",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "garment price relative to its cloth content",
+   "unit": "ratio",
+   "value": 2,
+   "status": "provisional",
+   "note": "No 1900 garment price series sourced."
+  },
+  {
+   "id": "capitalist-population-share",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "capitalist households as a share of the US population",
+   "unit": "ratio",
+   "value": 0.01,
+   "status": "provisional",
+   "note": "The 1900 census has no capitalist class."
+  },
+  {
+   "id": "jobs-per-level",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "jobs in one building level of the 1900 definitions",
+   "unit": "ratio",
+   "value": 1000,
+   "status": "provisional",
+   "note": "Finer levels than the M11 definitions (25,000 jobs) so small territories can be calibrated."
+  },
+  {
+   "id": "comfort-share-of-extra",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "share of the food and apparel budget above the subsistence and basic tiers spent in the comfort tier",
+   "unit": "ratio",
+   "value": 0.5,
+   "status": "provisional",
+   "note": "Split between the comfort and luxury tiers."
+  },
+  {
+   "id": "military-equipment-months",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "months of a laborer's wage per soldier's equipment",
+   "unit": "ratio",
+   "value": 1,
+   "status": "provisional",
+   "note": "A service rifle cost about a month's pay."
+  },
+  {
+   "id": "military-equipment-depreciation",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "annual equipment upkeep as a share of its price",
+   "unit": "ratio",
+   "value": 0.1,
+   "status": "provisional",
+   "note": "Provisional."
+  },
+  {
+   "id": "military-recruitment-days",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "days of soldier pay per recruitment",
+   "unit": "ratio",
+   "value": 30,
+   "status": "provisional",
+   "note": "Provisional signing cost."
+  },
+  {
+   "id": "max-initial-employment-share",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "largest share of a territory's workforce of a profession employed at the 1900 start",
+   "unit": "ratio",
+   "value": 0.95,
+   "status": "provisional",
+   "note": "Where the food and apparel budget needs more workers than the authored occupation mix provides, technique is raised instead (owners keep the extra value added); leaves room for the employment refresh."
+  },
+  {
+   "id": "wool-cloth-markup-rule",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "woollen cloth priced with the cotton print cloth markup over its fibre",
+   "unit": "ratio",
+   "value": 1,
+   "status": "provisional",
+   "note": "No 1900 woollen cloth price series sourced; the sim's textiles are a cotton-wool composite."
+  },
+  {
+   "id": "warehouse-capacity-per-level",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "storage per warehouse level and good, kilograms",
+   "unit": "ratio",
+   "value": 27215542,
+   "status": "provisional",
+   "note": "One million bushels of wheat (60 lb), the order of a large 1900 terminal grain elevator; not sourced."
+  },
+  {
+   "id": "storage-headroom-days",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "market storage in days of its largest good's daily output",
+   "unit": "ratio",
+   "value": 5,
+   "status": "provisional",
+   "note": "Room for five days of unsold output before overflow."
+  },
+  {
+   "id": "fish-price-to-livestock",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "fish price relative to the cattle price per kilogram",
+   "unit": "ratio",
+   "value": 1,
+   "status": "provisional",
+   "note": "No 1900 fish price series sourced."
+  },
+  {
+   "id": "freight-share-per-distance-unit",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "freight per 1,000 km as a share of a good's base price",
+   "unit": "ratio",
+   "value": 0.005,
+   "status": "provisional",
+   "note": "The M11 rule, kept: near ocean rates and far below 1900 rail rates; to be sourced by mode in P8."
+  },
+  {
+   "id": "comfort-food-mix-food-products",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "comfort-tier food budget share: processed food",
+   "unit": "ratio",
+   "value": 0.5,
+   "status": "provisional",
+   "note": "Provisional split by value."
+  },
+  {
+   "id": "comfort-food-mix-livestock",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "comfort-tier food budget share: meat",
+   "unit": "ratio",
+   "value": 0.4,
+   "status": "provisional",
+   "note": "Provisional split by value."
+  },
+  {
+   "id": "comfort-food-mix-fish",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "comfort-tier food budget share: fish",
+   "unit": "ratio",
+   "value": 0.1,
+   "status": "provisional",
+   "note": "Provisional split by value."
+  },
+  {
+   "id": "luxury-food-mix-livestock",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "luxury-tier food budget share: meat",
+   "unit": "ratio",
+   "value": 0.7,
+   "status": "provisional",
+   "note": "Provisional split by value."
+  },
+  {
+   "id": "luxury-food-mix-food-products",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "luxury-tier food budget share: processed food",
+   "unit": "ratio",
+   "value": 0.3,
+   "status": "provisional",
+   "note": "Provisional split by value."
+  },
+  {
+   "id": "comfort-apparel-mix-clothing",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "comfort-tier apparel budget share: garments",
+   "unit": "ratio",
+   "value": 1,
+   "status": "provisional",
+   "note": "Provisional split by value."
+  },
+  {
+   "id": "luxury-apparel-mix-textiles",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "luxury-tier apparel budget share: cloth",
+   "unit": "ratio",
+   "value": 0.5,
+   "status": "provisional",
+   "note": "Provisional split by value."
+  },
+  {
+   "id": "luxury-apparel-mix-clothing",
+   "sourceId": "p2b-provisional",
+   "locator": "provisional coefficient",
+   "subject": "coefficient",
+   "measure": "luxury-tier apparel budget share: garments",
+   "unit": "ratio",
+   "value": 0.5,
+   "status": "provisional",
+   "note": "Provisional split by value."
+  }
+ ],
+ "territoryBenchmarks": {
+  "usa-home": {
+   "mpdRowIds": [
+    "mpd-USA"
+   ],
+   "method": "direct"
+  },
+  "gbr-home": {
+   "mpdRowIds": [
+    "mpd-GBR"
+   ],
+   "method": "direct"
+  },
+  "deu-home": {
+   "mpdRowIds": [
+    "mpd-DEU"
+   ],
+   "method": "direct"
+  },
+  "fra-home": {
+   "mpdRowIds": [
+    "mpd-FRA"
+   ],
+   "method": "direct"
+  },
+  "rus-home": {
+   "mpdRowIds": [
+    "mpd-RUS"
+   ],
+   "method": "direct"
+  },
+  "jpn-home": {
+   "mpdRowIds": [
+    "mpd-JPN"
+   ],
+   "method": "direct"
+  },
+  "ita-home": {
+   "mpdRowIds": [
+    "mpd-ITA"
+   ],
+   "method": "direct"
+  },
+  "esp-home": {
+   "mpdRowIds": [
+    "mpd-ESP"
+   ],
+   "method": "direct"
+  },
+  "prt-home": {
+   "mpdRowIds": [
+    "mpd-PRT"
+   ],
+   "method": "direct"
+  },
+  "nld-home": {
+   "mpdRowIds": [
+    "mpd-NLD"
+   ],
+   "method": "direct"
+  },
+  "bel-home": {
+   "mpdRowIds": [
+    "mpd-BEL"
+   ],
+   "method": "direct"
+  },
+  "che-home": {
+   "mpdRowIds": [
+    "mpd-CHE"
+   ],
+   "method": "direct"
+  },
+  "swe-home": {
+   "mpdRowIds": [
+    "mpd-SWE"
+   ],
+   "method": "direct"
+  },
+  "nor-home": {
+   "mpdRowIds": [
+    "mpd-NOR"
+   ],
+   "method": "direct"
+  },
+  "dnk-home": {
+   "mpdRowIds": [
+    "mpd-DNK"
+   ],
+   "method": "direct"
+  },
+  "grc-home": {
+   "mpdRowIds": [
+    "mpd-GRC"
+   ],
+   "method": "direct"
+  },
+  "srb-home": {
+   "mpdRowIds": [
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "Serbia: Yugoslavia aggregate."
+  },
+  "mnt-home": {
+   "mpdRowIds": [
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "Montenegro: Yugoslavia aggregate."
+  },
+  "rom-home": {
+   "mpdRowIds": [
+    "mpd-ROU"
+   ],
+   "method": "direct"
+  },
+  "bgr-home": {
+   "mpdRowIds": [
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "Bulgaria: no MPD 2023 1900 value; Yugoslavia aggregate (neighbouring Balkan economy)."
+  },
+  "ott-home": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "lux-home": {
+   "mpdRowIds": [
+    "mpd-BEL"
+   ],
+   "method": "proxy",
+   "reason": "Luxembourg: Belgium."
+  },
+  "mco-home": {
+   "mpdRowIds": [
+    "mpd-FRA"
+   ],
+   "method": "proxy",
+   "reason": "Monaco: France."
+  },
+  "smr-home": {
+   "mpdRowIds": [
+    "mpd-ITA"
+   ],
+   "method": "proxy",
+   "reason": "San Marino: Italy."
+  },
+  "and-home": {
+   "mpdRowIds": [
+    "mpd-ESP"
+   ],
+   "method": "proxy",
+   "reason": "Andorra: Spain."
+  },
+  "lie-home": {
+   "mpdRowIds": [
+    "mpd-AUT"
+   ],
+   "method": "proxy",
+   "reason": "Liechtenstein: Austria."
+  },
+  "chn-home": {
+   "mpdRowIds": [
+    "mpd-CHN"
+   ],
+   "method": "direct"
+  },
+  "kor-home": {
+   "mpdRowIds": [
+    "mpd-region-east-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 East Asia regional value."
+  },
+  "per-home": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "afg-home": {
+   "mpdRowIds": [
+    "mpd-IND"
+   ],
+   "method": "proxy",
+   "reason": "Himalayan and Afghan states: India, the neighbouring MPD 2023 value."
+  },
+  "npl-home": {
+   "mpdRowIds": [
+    "mpd-IND"
+   ],
+   "method": "proxy",
+   "reason": "Himalayan and Afghan states: India, the neighbouring MPD 2023 value."
+  },
+  "tha-home": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "omn-home": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "eth-home": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "lbr-home": {
+   "mpdRowIds": [
+    "mpd-LBR"
+   ],
+   "method": "direct"
+  },
+  "mar-home": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "zar-home": {
+   "mpdRowIds": [
+    "mpd-ZAF"
+   ],
+   "method": "proxy",
+   "reason": "Southern Africa: South Africa."
+  },
+  "orf-home": {
+   "mpdRowIds": [
+    "mpd-ZAF"
+   ],
+   "method": "proxy",
+   "reason": "Southern Africa: South Africa."
+  },
+  "mex-home": {
+   "mpdRowIds": [
+    "mpd-MEX"
+   ],
+   "method": "direct"
+  },
+  "gua-home": {
+   "mpdRowIds": [
+    "mpd-COL"
+   ],
+   "method": "proxy",
+   "reason": "Central America: Colombia, the nearest MPD 2023 1900 value."
+  },
+  "hon-home": {
+   "mpdRowIds": [
+    "mpd-COL"
+   ],
+   "method": "proxy",
+   "reason": "Central America: Colombia, the nearest MPD 2023 1900 value."
+  },
+  "sal-home": {
+   "mpdRowIds": [
+    "mpd-COL"
+   ],
+   "method": "proxy",
+   "reason": "Central America: Colombia, the nearest MPD 2023 1900 value."
+  },
+  "nic-home": {
+   "mpdRowIds": [
+    "mpd-COL"
+   ],
+   "method": "proxy",
+   "reason": "Central America: Colombia, the nearest MPD 2023 1900 value."
+  },
+  "cos-home": {
+   "mpdRowIds": [
+    "mpd-COL"
+   ],
+   "method": "proxy",
+   "reason": "Central America: Colombia, the nearest MPD 2023 1900 value."
+  },
+  "col-home": {
+   "mpdRowIds": [
+    "mpd-COL"
+   ],
+   "method": "direct"
+  },
+  "ven-home": {
+   "mpdRowIds": [
+    "mpd-VEN"
+   ],
+   "method": "direct"
+  },
+  "ecu-home": {
+   "mpdRowIds": [
+    "mpd-ECU"
+   ],
+   "method": "direct"
+  },
+  "pru-home": {
+   "mpdRowIds": [
+    "mpd-PER"
+   ],
+   "method": "direct"
+  },
+  "bol-home": {
+   "mpdRowIds": [
+    "mpd-BOL"
+   ],
+   "method": "direct"
+  },
+  "chl-home": {
+   "mpdRowIds": [
+    "mpd-CHL"
+   ],
+   "method": "direct"
+  },
+  "arg-home": {
+   "mpdRowIds": [
+    "mpd-ARG"
+   ],
+   "method": "direct"
+  },
+  "ury-home": {
+   "mpdRowIds": [
+    "mpd-URY"
+   ],
+   "method": "direct"
+  },
+  "pry-home": {
+   "mpdRowIds": [
+    "mpd-BOL"
+   ],
+   "method": "proxy",
+   "reason": "Paraguay: Bolivia, the nearest landlocked South American MPD value."
+  },
+  "bra-home": {
+   "mpdRowIds": [
+    "mpd-BRA"
+   ],
+   "method": "direct"
+  },
+  "hti-home": {
+   "mpdRowIds": [
+    "mpd-JAM"
+   ],
+   "method": "proxy",
+   "reason": "Caribbean: Jamaica, the only Caribbean MPD 2023 1900 value."
+  },
+  "dom-home": {
+   "mpdRowIds": [
+    "mpd-JAM"
+   ],
+   "method": "proxy",
+   "reason": "Caribbean: Jamaica, the only Caribbean MPD 2023 1900 value."
+  },
+  "can-home": {
+   "mpdRowIds": [
+    "mpd-CAN"
+   ],
+   "method": "direct"
+  },
+  "aus-home": {
+   "mpdRowIds": [
+    "mpd-AUS"
+   ],
+   "method": "direct"
+  },
+  "nzl-home": {
+   "mpdRowIds": [
+    "mpd-NZL"
+   ],
+   "method": "direct"
+  },
+  "cub-home": {
+   "mpdRowIds": [
+    "mpd-region-latin-america"
+   ],
+   "method": "proxy",
+   "reason": "Cuba: MPD 2023 Latin America regional value."
+  },
+  "aut-home": {
+   "mpdRowIds": [
+    "mpd-AUT",
+    "mpd-HUN",
+    "mpd-OWID_CZS"
+   ],
+   "method": "proxy",
+   "reason": "Austria-Hungary: mean of Austria, Hungary and Czechoslovakia."
+  },
+  "ton-home": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "sok-home": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "wad-home": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "dar-home": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "shm-home": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "crt-home": {
+   "mpdRowIds": [
+    "mpd-GRC"
+   ],
+   "method": "proxy",
+   "reason": "Crete: Greece."
+  },
+  "bin": {
+   "mpdRowIds": [
+    "mpd-IND"
+   ],
+   "method": "direct"
+  },
+  "cey": {
+   "mpdRowIds": [
+    "mpd-LKA"
+   ],
+   "method": "direct"
+  },
+  "mal": {
+   "mpdRowIds": [
+    "mpd-MYS"
+   ],
+   "method": "direct"
+  },
+  "hkg": {
+   "mpdRowIds": [
+    "mpd-SGP"
+   ],
+   "method": "proxy",
+   "reason": "Hong Kong: Singapore (entrepot)."
+  },
+  "kuw": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "tru": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "cyp": {
+   "mpdRowIds": [
+    "mpd-GRC"
+   ],
+   "method": "proxy",
+   "reason": "Cyprus: Greece."
+  },
+  "mlt": {
+   "mpdRowIds": [
+    "mpd-ITA"
+   ],
+   "method": "proxy",
+   "reason": "Malta: Italy."
+  },
+  "bwi": {
+   "mpdRowIds": [
+    "mpd-JAM"
+   ],
+   "method": "proxy",
+   "reason": "Caribbean: Jamaica, the only Caribbean MPD 2023 1900 value."
+  },
+  "bsa": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "bwa": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "bea": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "sud": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "bso": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "cra": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "hct": {
+   "mpdRowIds": [
+    "mpd-ZAF"
+   ],
+   "method": "proxy",
+   "reason": "Southern Africa: South Africa."
+  },
+  "fji": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "bpo": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "cap": {
+   "mpdRowIds": [
+    "mpd-ZAF"
+   ],
+   "method": "proxy",
+   "reason": "Southern Africa: South Africa."
+  },
+  "nat": {
+   "mpdRowIds": [
+    "mpd-ZAF"
+   ],
+   "method": "proxy",
+   "reason": "Southern Africa: South Africa."
+  },
+  "nfd": {
+   "mpdRowIds": [
+    "mpd-CAN"
+   ],
+   "method": "proxy",
+   "reason": "Newfoundland: Canada."
+  },
+  "alg": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "tun": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "fwa": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "fea": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "fic": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "mad": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "fso": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "fca": {
+   "mpdRowIds": [
+    "mpd-JAM"
+   ],
+   "method": "proxy",
+   "reason": "Caribbean: Jamaica, the only Caribbean MPD 2023 1900 value."
+  },
+  "fpo": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "gea": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "gsw": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "kam": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "tog": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "gng": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "gsa": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "gpn": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "cfs": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "ang": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "moz": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "pai": {
+   "mpdRowIds": [
+    "mpd-PRT"
+   ],
+   "method": "proxy",
+   "reason": "Azores and Madeira: Portugal."
+  },
+  "ptm": {
+   "mpdRowIds": [
+    "mpd-IDN"
+   ],
+   "method": "proxy",
+   "reason": "Timor: Indonesia."
+  },
+  "mac": {
+   "mpdRowIds": [
+    "mpd-CHN"
+   ],
+   "method": "proxy",
+   "reason": "Macao: China."
+  },
+  "eri": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "its": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "dei": {
+   "mpdRowIds": [
+    "mpd-IDN"
+   ],
+   "method": "direct"
+  },
+  "sur": {
+   "mpdRowIds": [
+    "mpd-JAM"
+   ],
+   "method": "proxy",
+   "reason": "Caribbean: Jamaica, the only Caribbean MPD 2023 1900 value."
+  },
+  "dgc": {
+   "mpdRowIds": [
+    "mpd-JAM"
+   ],
+   "method": "proxy",
+   "reason": "Caribbean: Jamaica, the only Caribbean MPD 2023 1900 value."
+  },
+  "sah": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "sgg": {
+   "mpdRowIds": [
+    "mpd-GHA",
+    "mpd-NGA"
+   ],
+   "method": "proxy",
+   "reason": "Tropical Africa: mean of Ghana and Nigeria, the MPD 2023 1900 values for West Africa."
+  },
+  "phl": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "pri": {
+   "mpdRowIds": [
+    "mpd-JAM"
+   ],
+   "method": "proxy",
+   "reason": "Caribbean: Jamaica, the only Caribbean MPD 2023 1900 value."
+  },
+  "gum": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "asm": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "isl": {
+   "mpdRowIds": [
+    "mpd-ISL"
+   ],
+   "method": "direct"
+  },
+  "grl": {
+   "mpdRowIds": [
+    "mpd-ISL"
+   ],
+   "method": "proxy",
+   "reason": "Greenland: Iceland."
+  },
+  "fro": {
+   "mpdRowIds": [
+    "mpd-ISL"
+   ],
+   "method": "proxy",
+   "reason": "Faroe Islands: Iceland."
+  },
+  "dwi": {
+   "mpdRowIds": [
+    "mpd-JAM"
+   ],
+   "method": "proxy",
+   "reason": "Caribbean: Jamaica, the only Caribbean MPD 2023 1900 value."
+  },
+  "egy": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "bhu": {
+   "mpdRowIds": [
+    "mpd-IND"
+   ],
+   "method": "proxy",
+   "reason": "Himalayan and Afghan states: India, the neighbouring MPD 2023 value."
+  },
+  "fin": {
+   "mpdRowIds": [
+    "mpd-FIN"
+   ],
+   "method": "direct"
+  },
+  "twn": {
+   "mpdRowIds": [
+    "mpd-region-east-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 East Asia regional value."
+  },
+  "tib": {
+   "mpdRowIds": [
+    "mpd-IND"
+   ],
+   "method": "proxy",
+   "reason": "Himalayan and Afghan states: India, the neighbouring MPD 2023 value."
+  },
+  "khi": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "buk": {
+   "mpdRowIds": [
+    "mpd-GRC",
+    "mpd-ALB",
+    "mpd-OWID_YGS"
+   ],
+   "method": "proxy",
+   "reason": "No MPD 2023 1900 value for the Ottoman Empire, Egypt, Persia, Arabia or the Maghreb; mean of Greece, Albania and Yugoslavia (former Ottoman Balkans)."
+  },
+  "sar": {
+   "mpdRowIds": [
+    "mpd-region-south-asia"
+   ],
+   "method": "proxy",
+   "reason": "MPD 2023 South and South East Asia regional value."
+  },
+  "goa": {
+   "mpdRowIds": [
+    "mpd-IND"
+   ],
+   "method": "proxy",
+   "reason": "Portuguese India: India."
+  }
+ },
+ "sourcedNominalGdpPerHead": {
+  "gbr-home": {
+   "rowIds": [
+    "uk-gdppc-1900",
+    "parity-gbp"
+   ],
+   "formula": "uk-gdppc-1900 x parity-gbp"
+  },
+  "aus-home": {
+   "rowIds": [
+    "au-gdp-1900",
+    "au-pop-1900",
+    "parity-gbp"
+   ],
+   "formula": "au-gdp-1900 x 1e6 / au-pop-1900 x parity-gbp"
+  },
+  "jpn-home": {
+   "rowIds": [
+    "jp-gnp-1900",
+    "jp-pop-1900",
+    "parity-jpy"
+   ],
+   "formula": "jp-gnp-1900 x 1e6 / jp-pop-1900 x parity-jpy"
+  }
+ }
+}

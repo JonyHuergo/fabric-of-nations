@@ -1,9 +1,11 @@
 # P2b — Historical money and productivity calibration: inventory, sources and open decisions
 
-Date: 2026-11-03. Base: `main` at `82cbfd9`. Status: **groundwork; implementation of the
-affected parts waits for the designer's decisions in §6** (task instruction: report
-conflicting sources and material ambiguities before implementing affected parts).
-Decision record: D-135 (proposed). Stage definition: GDD §17J.3, D-130,
+Date: 2026-11-03. Base: `main` at `82cbfd9`. Status: **decided and implemented for
+review.** The designer chose on 2026-11-03: A1 exchange-rate basis (not the recommended
+purchasing-power basis), A2 covered sectors, A3 per-building technique, A4 surplus kept as
+saving, A5 general government, A6 separate 1900 files, A7 census mix where it exists, A8
+derived price level; and, for the price-rule defect found during implementation, to count
+opening stock only (D-136). Decision records: D-135, D-136. Results: `P2B_COMPLETION_REPORT.md`. Stage definition: GDD §17J.3, D-130,
 `docs/PROSPERITY_PROGRAM.md` §P2b.
 
 ## 1. What P2b must deliver
@@ -110,7 +112,7 @@ generated **sea** routes — Afghanistan–Oman, Andorra (3), Switzerland–Fran
 Wadai–Ottoman, Nepal–Russia, Serbia–Bulgaria and –Montenegro, Paraguay–Uruguay
 (river navigation, arguably correct). The coast test probably counts lake or river shores.
 
-## 6. Material ambiguities — designer decisions needed
+## 6. Material ambiguities (decided 2026-11-03; see the status above)
 
 **A1. Conversion basis outside the United States.** RUSD is defined as the purchasing
 power of a 1990 US dollar (D-122). (a) *Purchasing power:* real quantities (GDP per head,

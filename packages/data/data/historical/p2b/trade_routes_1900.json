@@ -1,0 +1,2018 @@
+[
+ {
+  "marketAKey": "customs-afg",
+  "marketBKey": "customs-omn",
+  "kind": "sea",
+  "distanceUnits": 0.9,
+  "baseCapacityRUSDPerDay": 7910.88,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-arg",
+  "marketBKey": "customs-bra",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 121616.21,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-arg",
+  "marketBKey": "customs-pry",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 9538.04,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-arg",
+  "marketBKey": "customs-ury",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 90150.81,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-aus",
+  "marketBKey": "customs-nzl",
+  "kind": "sea",
+  "distanceUnits": 0.7,
+  "baseCapacityRUSDPerDay": 140813.02,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-bgr",
+  "marketBKey": "customs-crt",
+  "kind": "sea",
+  "distanceUnits": 0.7,
+  "baseCapacityRUSDPerDay": 17923.68,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-bgr",
+  "marketBKey": "customs-ott",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 29411.51,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-bol",
+  "marketBKey": "customs-arg",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 28230.25,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-bol",
+  "marketBKey": "customs-bra",
+  "kind": "land",
+  "distanceUnits": 0.7,
+  "baseCapacityRUSDPerDay": 28230.25,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-bol",
+  "marketBKey": "customs-chl",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 28230.25,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-bol",
+  "marketBKey": "customs-pry",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 9538.04,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-che",
+  "marketBKey": "customs-aut",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 573812.15,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-chl",
+  "marketBKey": "customs-arg",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 296914.83,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-chn",
+  "marketBKey": "customs-afg",
+  "kind": "land",
+  "distanceUnits": 3.8,
+  "baseCapacityRUSDPerDay": 31133.1,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-chn",
+  "marketBKey": "customs-kor",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 119184.1,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-chn",
+  "marketBKey": "customs-npl",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 34560.59,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-col",
+  "marketBKey": "customs-bra",
+  "kind": "land",
+  "distanceUnits": 0.8,
+  "baseCapacityRUSDPerDay": 28066.49,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-col",
+  "marketBKey": "customs-ecu",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 10052.95,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-col",
+  "marketBKey": "customs-pru",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 25765.12,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-col",
+  "marketBKey": "customs-ven",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 28066.49,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-cos",
+  "marketBKey": "customs-col",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 2325.91,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-aut",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 5016467.48,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-bel",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 1004399.75,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-dnk",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 318255.25,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-esp",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 1563307.51,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-fra",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 4170688.51,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-nld",
+  "kind": "land",
+  "distanceUnits": 0.7,
+  "baseCapacityRUSDPerDay": 860754.44,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-nzl",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 140813.02,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-prt",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 382632.23,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-rus",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 2169374.99,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-sok",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 69551.47,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-deu",
+  "marketBKey": "customs-ton",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 508.68,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ecu",
+  "marketBKey": "customs-pru",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 10052.95,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-esp",
+  "marketBKey": "customs-and",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 1429.94,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-esp",
+  "marketBKey": "customs-mar",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 77406.75,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-esp",
+  "marketBKey": "customs-prt",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 382632.23,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-and",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 1429.94,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-bel",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 1004399.75,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-bra",
+  "kind": "land",
+  "distanceUnits": 0.6,
+  "baseCapacityRUSDPerDay": 121616.21,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-can",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 677849.03,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-che",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 573812.15,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-chn",
+  "kind": "land",
+  "distanceUnits": 2.4,
+  "baseCapacityRUSDPerDay": 4170688.51,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-dar",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 4341.35,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-esp",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 1563307.51,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-eth",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 150096.09,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-ita",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 3112083.06,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-lbr",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 5313.4,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-mar",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 77406.75,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-nld",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 860754.44,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-nzl",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 140813.02,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-ott",
+  "kind": "land",
+  "distanceUnits": 0.6,
+  "baseCapacityRUSDPerDay": 798226.45,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-prt",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 382632.23,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-sok",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 69551.47,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-tha",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 50395.03,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-ton",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 508.68,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-fra",
+  "marketBKey": "customs-wad",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 7125.01,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-afg",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 31133.1,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-bel",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 1004399.75,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-bra",
+  "kind": "land",
+  "distanceUnits": 1,
+  "baseCapacityRUSDPerDay": 121616.21,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-can",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 677849.03,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-chn",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 5436415.29,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-cub",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 27756.77,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-dar",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 4341.35,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-deu",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 7061375.45,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-dnk",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 318255.25,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-dom",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 4353.5,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-eth",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 150096.09,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-fra",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 4170688.51,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-gua",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 9959.04,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-hti",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 10492.09,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-ita",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 3112083.06,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-lbr",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 5313.4,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-mex",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 244880.92,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-nld",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 860754.44,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-npl",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 34560.59,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-nzl",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 140813.02,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-omn",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 7910.88,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-orf",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 4939.26,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-ott",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 798226.45,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-per",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 267362.22,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-prt",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 382632.23,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-shm",
+  "kind": "sea",
+  "distanceUnits": 0.6,
+  "baseCapacityRUSDPerDay": 15858.14,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-sok",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 69551.47,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-tha",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 50395.03,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-ton",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 508.68,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-ven",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 43464.18,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gbr",
+  "marketBKey": "customs-zar",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 33266.44,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-grc",
+  "marketBKey": "customs-bgr",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 29411.51,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-grc",
+  "marketBKey": "customs-crt",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 17923.68,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-grc",
+  "marketBKey": "customs-ott",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 138110.44,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gua",
+  "marketBKey": "customs-hon",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 3737.08,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-gua",
+  "marketBKey": "customs-sal",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 6515.11,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-hon",
+  "marketBKey": "customs-cos",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 2325.91,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-hon",
+  "marketBKey": "customs-nic",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 3035.67,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-hon",
+  "marketBKey": "customs-sal",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 3737.08,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-hti",
+  "marketBKey": "customs-cub",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 10492.09,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-hti",
+  "marketBKey": "customs-dom",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 4353.5,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ita",
+  "marketBKey": "customs-and",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 1429.94,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ita",
+  "marketBKey": "customs-aut",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 3112083.06,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ita",
+  "marketBKey": "customs-che",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 573812.15,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ita",
+  "marketBKey": "customs-eth",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 150096.09,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-jpn",
+  "marketBKey": "customs-chn",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 2430282.15,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-jpn",
+  "marketBKey": "customs-kor",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 119184.1,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-mex",
+  "marketBKey": "customs-gua",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 9959.04,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-mex",
+  "marketBKey": "customs-hon",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 3737.08,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-mnt",
+  "marketBKey": "customs-aut",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 2610.65,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-mnt",
+  "marketBKey": "customs-ott",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 2610.65,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-nic",
+  "marketBKey": "customs-cos",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 2325.91,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-nld",
+  "marketBKey": "customs-aus",
+  "kind": "sea",
+  "distanceUnits": 1.1,
+  "baseCapacityRUSDPerDay": 860754.44,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-nld",
+  "marketBKey": "customs-bel",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 860754.44,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-nld",
+  "marketBKey": "customs-bra",
+  "kind": "land",
+  "distanceUnits": 0.8,
+  "baseCapacityRUSDPerDay": 121616.21,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-nld",
+  "marketBKey": "customs-tha",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 50395.03,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-nld",
+  "marketBKey": "customs-ven",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 43464.18,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-nor",
+  "marketBKey": "customs-dnk",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 212681,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ott",
+  "marketBKey": "customs-aut",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 798226.45,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ott",
+  "marketBKey": "customs-crt",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 17923.68,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ott",
+  "marketBKey": "customs-omn",
+  "kind": "land",
+  "distanceUnits": 4.1,
+  "baseCapacityRUSDPerDay": 7910.88,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ott",
+  "marketBKey": "customs-per",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 267362.22,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ott",
+  "marketBKey": "customs-shm",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 15858.14,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ott",
+  "marketBKey": "customs-wad",
+  "kind": "sea",
+  "distanceUnits": 0.9,
+  "baseCapacityRUSDPerDay": 7125.01,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-per",
+  "marketBKey": "customs-afg",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 31133.1,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-per",
+  "marketBKey": "customs-omn",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 7910.88,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-per",
+  "marketBKey": "customs-shm",
+  "kind": "sea",
+  "distanceUnits": 0.9,
+  "baseCapacityRUSDPerDay": 15858.14,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-prt",
+  "marketBKey": "customs-aus",
+  "kind": "sea",
+  "distanceUnits": 1,
+  "baseCapacityRUSDPerDay": 382632.23,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-prt",
+  "marketBKey": "customs-bel",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 382632.23,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-prt",
+  "marketBKey": "customs-chn",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 382632.23,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-prt",
+  "marketBKey": "customs-lbr",
+  "kind": "sea",
+  "distanceUnits": 0.7,
+  "baseCapacityRUSDPerDay": 5313.4,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-prt",
+  "marketBKey": "customs-mar",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 77406.75,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-prt",
+  "marketBKey": "customs-orf",
+  "kind": "sea",
+  "distanceUnits": 0.6,
+  "baseCapacityRUSDPerDay": 4939.26,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-prt",
+  "marketBKey": "customs-zar",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 33266.44,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-pru",
+  "marketBKey": "customs-bol",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 25765.12,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-pru",
+  "marketBKey": "customs-bra",
+  "kind": "land",
+  "distanceUnits": 1,
+  "baseCapacityRUSDPerDay": 25765.12,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-pru",
+  "marketBKey": "customs-chl",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 25765.12,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-pry",
+  "marketBKey": "customs-bra",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 9538.04,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rom",
+  "marketBKey": "customs-aut",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 49965.49,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rom",
+  "marketBKey": "customs-bgr",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 29411.51,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-afg",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 31133.1,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-aut",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 2169374.99,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-chn",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 2169374.99,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-jpn",
+  "kind": "sea",
+  "distanceUnits": 0.7,
+  "baseCapacityRUSDPerDay": 2169374.99,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-kor",
+  "kind": "sea",
+  "distanceUnits": 0.7,
+  "baseCapacityRUSDPerDay": 119184.1,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-nor",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 212681,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-npl",
+  "kind": "sea",
+  "distanceUnits": 1.3,
+  "baseCapacityRUSDPerDay": 34560.59,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-ott",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 798226.45,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-per",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 267362.22,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-rom",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 49965.49,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-rus",
+  "marketBKey": "customs-swe",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 499187.09,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-sal",
+  "marketBKey": "customs-nic",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 3035.67,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-srb",
+  "marketBKey": "customs-aut",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 19854.52,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-srb",
+  "marketBKey": "customs-bgr",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 19854.52,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-srb",
+  "marketBKey": "customs-mnt",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 2610.65,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-srb",
+  "marketBKey": "customs-ott",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 19854.52,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-srb",
+  "marketBKey": "customs-rom",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 19854.52,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-swe",
+  "marketBKey": "customs-dnk",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 318255.25,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-swe",
+  "marketBKey": "customs-nor",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 212681,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ury",
+  "marketBKey": "customs-bra",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 90150.81,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ury",
+  "marketBKey": "customs-pry",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 9538.04,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-usa",
+  "marketBKey": "customs-can",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 677849.03,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-usa",
+  "marketBKey": "customs-cub",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 27756.77,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-usa",
+  "marketBKey": "customs-deu",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 7290739.93,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-usa",
+  "marketBKey": "customs-dnk",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 318255.25,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-usa",
+  "marketBKey": "customs-dom",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 4353.5,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-usa",
+  "marketBKey": "customs-hti",
+  "kind": "sea",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 10492.09,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-usa",
+  "marketBKey": "customs-mex",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 244880.92,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ven",
+  "marketBKey": "customs-bra",
+  "kind": "land",
+  "distanceUnits": 0.8,
+  "baseCapacityRUSDPerDay": 43464.18,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-ven",
+  "marketBKey": "customs-ecu",
+  "kind": "sea",
+  "distanceUnits": 1,
+  "baseCapacityRUSDPerDay": 10052.95,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-wad",
+  "marketBKey": "customs-dar",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 4341.35,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ },
+ {
+  "marketAKey": "customs-zar",
+  "marketBKey": "customs-orf",
+  "kind": "land",
+  "distanceUnits": 0.5,
+  "baseCapacityRUSDPerDay": 4939.26,
+  "status": "provisional",
+  "sourceIds": [
+   "project-authored-p2",
+   "p2b-money-calibration"
+  ]
+ }
+]

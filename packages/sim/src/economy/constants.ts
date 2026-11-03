@@ -316,8 +316,10 @@ export const CONSTRUCTION_WORKING_CAPITAL_DAYS = 30;
  * E4 numeric-safety bound for one discretionary public-enterprise capital
  * contribution. This is a structural bound, not a budget target or calibrated
  * policy value; actual affordability remains the country treasury cash balance.
+ * P2b (D-136): raised from 1e9 to the general budget bound, because 1900 treasuries
+ * reach several billion RUSD and the app offers up to the whole treasury.
  */
-export const MAX_PUBLIC_ENTERPRISE_SUPPORT_RUSD = 1_000_000_000;
+export const MAX_PUBLIC_ENTERPRISE_SUPPORT_RUSD = MAX_FISCAL_BUDGET_RUSD_PER_YEAR;
 
 /**
  * M6 country-AI v1 constants. PROVISIONAL policy rules, not calibrated
@@ -596,3 +598,40 @@ export const HEALTH_MAX_MORTALITY_REDUCTION = 0.25;
 export const MIN_COMBINED_MORTALITY_FACTOR = 0.25;
 /** Rate precision for E5 derived values. */
 export const E5_RATE_DECIMALS = 6;
+
+/**
+ * P2b (D-135): money coefficients of a scenario that authors none. They are the
+ * pre-P2b constants, so legacy fixtures (the M5 sample, test worlds) keep their
+ * synthetic scale; the 1900 world authors its own sourced values.
+ */
+export const DEFAULT_MONEY_COEFFICIENTS: Readonly<{
+  recruitmentCostPerSoldierRUSD: number;
+  equipmentPriceRUSD: number;
+  soldierDailyPayRUSD: number;
+  equipmentDailyUpkeepRUSD: number;
+  garrisonCostPerSoldierPerDayRUSD: number;
+  adminFundingPerCapitaPerYearRUSD: number;
+  educationFundingPerStaffPerYearRUSD: number;
+  trainingInstructorCostPerYearRUSD: number;
+}> = {
+  recruitmentCostPerSoldierRUSD: M10_RECRUITMENT_COST_PER_SOLDIER_RUSD,
+  equipmentPriceRUSD: M10_EQUIPMENT_PRICE_RUSD,
+  soldierDailyPayRUSD: M10_SOLDIER_DAILY_PAY_RUSD,
+  equipmentDailyUpkeepRUSD: M10_EQUIPMENT_DAILY_UPKEEP_RUSD,
+  garrisonCostPerSoldierPerDayRUSD: M10_OCCUPATION_GARRISON_COST_PER_SOLDIER_RUSD,
+  adminFundingPerCapitaPerYearRUSD: ADMIN_FUNDING_PER_CAPITA_PER_YEAR_RUSD,
+  educationFundingPerStaffPerYearRUSD: EDUCATION_FUNDING_PER_STAFF_PER_YEAR_RUSD,
+  trainingInstructorCostPerYearRUSD: TRAINING_INSTRUCTOR_COST_PER_YEAR_RUSD,
+};
+
+/** Keys of the money coefficients, in their canonical order. */
+export const MONEY_COEFFICIENT_KEYS = [
+  "recruitmentCostPerSoldierRUSD",
+  "equipmentPriceRUSD",
+  "soldierDailyPayRUSD",
+  "equipmentDailyUpkeepRUSD",
+  "garrisonCostPerSoldierPerDayRUSD",
+  "adminFundingPerCapitaPerYearRUSD",
+  "educationFundingPerStaffPerYearRUSD",
+  "trainingInstructorCostPerYearRUSD",
+] as const;

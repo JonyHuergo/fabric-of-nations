@@ -17,6 +17,7 @@
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
 import { RATE_DECIMAL_PLACES } from "../population/constants.js";
 import { populationTotal, syncBlockLiteracy, workingAgePopulation } from "../population/state.js";
+import { localWageIndex } from "./localWages.js";
 import type { Day, Id, Rate } from "../types.js";
 import {
   requireArray,
@@ -33,7 +34,6 @@ import {
   EDUCATION_ATTENDANCE_BASE,
   EDUCATION_ATTENDANCE_WEALTH_WEIGHT,
   EDUCATION_DAILY_LITERACY_GAIN,
-  EDUCATION_FUNDING_PER_STAFF_PER_YEAR_RUSD,
   EDUCATION_QUALITY_COVERAGE_WEIGHT,
   EDUCATION_QUALITY_LITERACY_WEIGHT,
   EDUCATION_SCHOOL_AGE_MAX,
@@ -795,8 +795,11 @@ export function deriveEducation(
     enrolledStudents += schoolAge * Math.min(accessRatio, familyAttendance);
   }
   const attendanceRate = schoolAgePopulation > 0 ? enrolledStudents / schoolAgePopulation : 0;
+  // P2b: teachers are paid at the country's own academic wages (D-135).
   const fundingBenchmark =
-    availableAcademicWorkers * EDUCATION_FUNDING_PER_STAFF_PER_YEAR_RUSD;
+    availableAcademicWorkers *
+    world.moneyCoefficients.educationFundingPerStaffPerYearRUSD *
+    localWageIndex(world, blocks, definitions, new Set(content.academicProfessionKeys));
   const fundingAdequacy =
     fundingBenchmark > 0
       ? clamp(country.education.fundedAnnualRUSD / fundingBenchmark, 0, 1)

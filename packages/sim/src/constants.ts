@@ -62,8 +62,13 @@ export const SIM_VERSION = "0.28.0";
  * urban share), blocks, buildings, projects and armies reference provinces,
  * countries and markets no longer store territory, and occupation lives only on
  * province control. Older saves are reported as incompatible, never migrated.
+ * P2b (schema 29, D-135) adds the province wage table
+ * (`ProvinceEconomy.wageRUSDPerYearByProfession`), the building technique factor
+ * (`BuildingInstance.technique`) and the scenario money coefficients
+ * (`World.moneyCoefficients`). Schema-28 worlds carry the pre-P2b money scale and
+ * are reported as incompatible (D-120).
  */
-export const WORLD_SCHEMA_VERSION = 28;
+export const WORLD_SCHEMA_VERSION = 29;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 1;

@@ -40,7 +40,9 @@ describe("determinism", () => {
     // re-pinned. M11 (simulation 0.27.0, data m3-economy-v12) changes the version metadata encoded in the world, so the digest is re-pinned again; the empty world's behaviour is unchanged. A change here requires an intentional simulation-version decision.
     // P2 schema 28 (D-134) renames the encoded region collection to province
     // economies; the empty world's behaviour is unchanged, so the digest is re-pinned.
-    expect(hashWorld(world)).toBe("9af02a22c624eb8c");
+    // P2b schema 29 (D-135) adds province wage tables, building technique and money
+    // coefficients to the encoding; the empty world's behaviour is unchanged.
+    expect(hashWorld(world)).toBe("a0a3104134e6ba67");
   });
 
   test("a one-year economic simulation is deterministic and save/resume safe", () => {

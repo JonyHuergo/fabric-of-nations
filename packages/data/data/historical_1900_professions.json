@@ -1,0 +1,62 @@
+[
+ {
+  "id": 0,
+  "key": "peasants",
+  "name": "Peasants",
+  "stratum": "lower",
+  "participationRate": 0.6,
+  "qualificationLiteracy": 0,
+  "qualificationWealthLevel": 0,
+  "baseWage1900RUSDPerYear": 3429.75,
+  "trainingCostRUSD": 0,
+  "laborProductivityModifier": 1
+ },
+ {
+  "id": 1,
+  "key": "laborers",
+  "name": "Laborers",
+  "stratum": "lower",
+  "participationRate": 0.4,
+  "qualificationLiteracy": 0.1,
+  "qualificationWealthLevel": 0,
+  "baseWage1900RUSDPerYear": 6859.51,
+  "trainingCostRUSD": 0,
+  "laborProductivityModifier": 1
+ },
+ {
+  "id": 2,
+  "key": "clerks",
+  "name": "Clerks",
+  "stratum": "middle",
+  "participationRate": 0.55,
+  "qualificationLiteracy": 0.7,
+  "qualificationWealthLevel": 20,
+  "baseWage1900RUSDPerYear": 15977.19,
+  "trainingCostRUSD": 0,
+  "laborProductivityModifier": 1.1
+ },
+ {
+  "id": 3,
+  "key": "capitalists",
+  "name": "Capitalists",
+  "stratum": "upper",
+  "participationRate": 0.4,
+  "qualificationLiteracy": 0.8,
+  "qualificationWealthLevel": 50,
+  "baseWage1900RUSDPerYear": 15977.19,
+  "trainingCostRUSD": 0,
+  "laborProductivityModifier": 1
+ },
+ {
+  "id": 4,
+  "key": "academics",
+  "name": "Academics",
+  "stratum": "middle",
+  "participationRate": 0.6,
+  "qualificationLiteracy": 0.85,
+  "qualificationWealthLevel": 40,
+  "baseWage1900RUSDPerYear": 5103.8,
+  "trainingCostRUSD": 0,
+  "laborProductivityModifier": 1.15
+ }
+]

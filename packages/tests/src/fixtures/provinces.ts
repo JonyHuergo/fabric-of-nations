@@ -64,6 +64,7 @@ export function politicalGeographyWorld(scenario: EconomyScenarioDef, seed: numb
       arableLandHa: province.arableLandHa ?? 0,
       pastureHa: province.pastureHa ?? 0,
       urbanShare: province.urbanShare ?? 0,
+      wageRUSDPerYearByProfession: [],
     }));
   assertValidWorld(world);
   return world;

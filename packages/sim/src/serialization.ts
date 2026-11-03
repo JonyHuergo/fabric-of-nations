@@ -33,6 +33,8 @@ import {
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
 import { checksumOfJson, stableStringify } from "./hash.js";
+import { MONEY_COEFFICIENT_KEYS } from "./economy/constants.js";
+import type { MoneyCoefficients } from "./economy/types.js";
 import { canonicalizeStockLots } from "./economy/inventory.js";
 import { CASUS_BELLI, PEACE_TERMS } from "./economy/types.js";
 import type {
@@ -198,7 +200,7 @@ export type SerializedDiagnostics = {
   readonly recentWarnings: readonly string[];
 };
 
-/** Encoded province economy (schema 28). */
+/** Encoded province economy (schema 29). */
 export type SerializedProvinceEconomy = {
   readonly id: number;
   readonly key: string;
@@ -211,6 +213,7 @@ export type SerializedProvinceEconomy = {
   readonly arableLandHa: number;
   readonly pastureHa: number;
   readonly urbanShare: number;
+  readonly wageRUSDPerYearByProfession: readonly number[];
 };
 
 /** Encoded financial account. */
@@ -880,6 +883,7 @@ export type SerializedBuilding = {
   readonly builtOnDay: number;
   readonly operational: boolean;
   readonly operatingCashAccountId: number;
+  readonly technique: number;
 };
 
 /** Encoded employment assignment. */
@@ -980,6 +984,7 @@ export type SerializedWorld = {
   /** M12a provincial ownership/control state; definitions and geometry are static. */
   readonly provinces: SerializedProvinceState;
   readonly playerCountryId: number | null;
+  readonly moneyCoefficients: MoneyCoefficients;
   readonly diagnostics: SerializedDiagnostics;
 };
 
@@ -1292,6 +1297,7 @@ export function encodeWorld(world: World): SerializedWorld {
       arableLandHa: province.arableLandHa,
       pastureHa: province.pastureHa,
       urbanShare: province.urbanShare,
+      wageRUSDPerYearByProfession: [...province.wageRUSDPerYearByProfession],
     })),
     countries: [...world.countries]
       .sort((left, right) => left.id - right.id)
@@ -1465,6 +1471,7 @@ export function encodeWorld(world: World): SerializedWorld {
         builtOnDay: building.builtOnDay,
         operational: building.operational,
         operatingCashAccountId: building.operatingCashAccountId,
+        technique: building.technique,
       })),
     employment: [...world.employment]
       .sort((left, right) => left.id - right.id)
@@ -1828,6 +1835,7 @@ export function encodeWorld(world: World): SerializedWorld {
       nextTransferId: world.provinces.nextTransferId,
     },
     playerCountryId: world.playerCountryId,
+    moneyCoefficients: { ...world.moneyCoefficients },
     diagnostics: {
       invariantFailureCount: world.diagnostics.invariantFailureCount,
       invalidActionCount: world.diagnostics.invalidActionCount,
@@ -1853,6 +1861,16 @@ function decodeProvinceEconomy(value: unknown, path: string): ProvinceEconomy {
   }
   const marketId =
     record.marketId === null ? null : requireUint32(record.marketId, `${path}.marketId`);
+  const wageValues = requireArray(
+    record.wageRUSDPerYearByProfession,
+    `${path}.wageRUSDPerYearByProfession`,
+  );
+  const wages: number[] = [];
+  for (let index = 0; index < wageValues.length; index += 1) {
+    wages.push(
+      requireFiniteNumber(wageValues[index], `${path}.wageRUSDPerYearByProfession[${String(index)}]`),
+    );
+  }
   return {
     id: requireUint32(record.id, `${path}.id`),
     key: requireString(record.key, `${path}.key`, { minLength: 1 }),
@@ -1865,6 +1883,7 @@ function decodeProvinceEconomy(value: unknown, path: string): ProvinceEconomy {
     arableLandHa: requireFiniteNumber(record.arableLandHa, `${path}.arableLandHa`),
     pastureHa: requireFiniteNumber(record.pastureHa, `${path}.pastureHa`),
     urbanShare: requireFiniteNumber(record.urbanShare, `${path}.urbanShare`),
+    wageRUSDPerYearByProfession: wages,
   };
 }
 
@@ -3632,6 +3651,7 @@ function decodeBuilding(value: unknown, path: string): BuildingInstance {
       record.operatingCashAccountId,
       `${path}.operatingCashAccountId`,
     ),
+    technique: requireFiniteNumber(record.technique, `${path}.technique`),
   };
 }
 
@@ -4148,6 +4168,11 @@ function decodeWorldPayload(value: unknown): World {
     payload.playerCountryId === null
       ? null
       : requireUint32(payload.playerCountryId, "save payload.playerCountryId");
+  const moneyRecord = requireRecord(payload.moneyCoefficients, "save payload.moneyCoefficients");
+  const moneyCoefficients = {} as MoneyCoefficients;
+  for (const key of MONEY_COEFFICIENT_KEYS) {
+    moneyCoefficients[key] = requireFiniteNumber(moneyRecord[key], `save payload.moneyCoefficients.${key}`);
+  }
 
   const world: World = {
     schemaVersion,
@@ -4178,6 +4203,7 @@ function decodeWorldPayload(value: unknown): World {
     military,
     provinces,
     playerCountryId,
+    moneyCoefficients,
     diagnostics: {
       invariantFailureCount,
       invalidActionCount,

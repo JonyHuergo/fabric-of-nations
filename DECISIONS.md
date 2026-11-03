@@ -7325,33 +7325,125 @@ accounts and per-entity rescans did the rest.
    world creation builds ownership before interest groups, institutions and initial
    armies read country territory.
 
-## D-135 — Proposed: P2b calibration basis (awaiting the designer)
+## D-135 — P2b: historical money and productivity calibration of the 1900 world
 
-**Status:** proposed on 2026-11-03; no simulation value has changed. Details, inventory,
-baseline measurements, sources and conflicts: `docs/P2B_CALIBRATION_PLAN.md`.
+**Status:** basis decided by the designer on 2026-11-03 (A1-A8 below); implemented the same
+day for review. **Amends:** D-122 §5 and implements D-130. Details, inventory, sources and
+conflicts: `docs/P2B_CALIBRATION_PLAN.md`; results: `P2B_COMPLETION_REPORT.md`.
 
 ### Context
 
-Measured on the current 1900 world (31 days): value added is 14.2 RUSD per head
-world-wide and 14.9 in the United States, against 4,375 RUSD from MeasuringWorth nominal
-GDP ($21,197 M ÷ 76,094,000 people) × the Minneapolis Fed CPI factor 15.704; 34 of 67
-countries sit at the same 12.0 RUSD per head; 23% of wage obligations go unpaid. The
-current values cannot be rescaled; they must be rebuilt from sources (D-130).
+Measured on the P2 world (31 days): value added was 14.2 RUSD per head world-wide and
+14.9 in the United States, against 4,375 RUSD from MeasuringWorth nominal GDP ($21,197 M /
+76,094,000 people) x the Minneapolis Fed CPI factor 15.704; 34 of 67 countries sat at the
+same 12.0 RUSD per head; 23% of wage obligations went unpaid. The values could not be
+rescaled; they were rebuilt from sources (D-130).
 
-### Proposed resolutions (each needs the designer's decision)
+### Decision (designer's choices)
 
-1. **A1** Values outside the United States in purchasing-power terms: MPD 2023 ratios to
-   the United States for GDP per head; local-money values at the 1900 parity scaled by
-   the country's price level.
-2. **A2** Represented sectors calibrated to their own sourced value added; GDP per head
-   reported as covered vs uncovered until P6.
-3. **A3** A per-building technique factor (initial state, documented as unmodelled land,
-   capital and technique) instead of a country scalar.
-4. **A4** Need quantities scaled to sourced food and clothing spending; the rest of the
-   budget reported as provisional saving until P6.
-5. **A5** The country treasury is general government (central plus local).
-6. **A6** The 1900 world gets its own calibrated definition files; the M5 sample keeps
-   the old scale and hashes.
-7. **A7** Occupation shares re-sourced where census tables exist; elsewhere reported.
-8. **A8** Countries without MPD 2023 values use country studies, else MPD regional
-   benchmarks, marked provisional.
+1. **A1 Exchange-rate basis.** Local values are converted at the 1900 parities (Director
+   of the Mint, Values of Foreign Coins, 1 January 1901) and the CPI, not at purchasing-
+   power parity. Countries without a sourced nominal GDP get GDP per head = r x US x PL,
+   where r is the MPD 2023 ratio to the United States and PL = r^b, b = 0.686 fitted on the
+   sourced nominal GDPs of the United Kingdom, Australia and Japan (A8, derived price level).
+2. **A2 Covered sectors.** The represented sectors (farms, ranches, fisheries, food
+   processing, textiles, garments) are calibrated to their own value added; GDP per head is
+   reported as covered vs total.
+3. **A3 Per-building technique.** `BuildingInstance.technique` scales output per staffed
+   throughput unit; it is solved per building so that value added per level equals the
+   wage bill / labour share + upkeep at the market's prices. New buildings inherit the
+   country's level-weighted technique for the definition.
+4. **A4 Budget.** Comfort and luxury need quantities are scaled to the BLS 1901 food and
+   apparel budget per person (base prices); income above it stays as household cash.
+5. **A5 General government.** Income-tax rate = US general-government revenue share of GNP
+   (Wallis 1902, 7.8%); education = US school revenue share x covered value added;
+   administration = half the rest; treasury = 3 months of revenue; debt ceiling = US 1902
+   debt / GDP x covered value added.
+6. **A6 Separate files.** The 1900 world reads `historical_1900_*.json` definitions and
+   `historical/p2b/` tables; the M5 sample keeps the M11 definitions and the default money
+   coefficients.
+7. **A7 Occupations.** The US home territory takes the 1900 census mix (gainful workers by
+   group / participation), fitted to the P2 province totals by iterative proportional
+   fitting; other territories keep the P2 mix (reported).
+8. **A8 Missing benchmarks.** Territories without an MPD 2023 value use a recorded proxy
+   (neighbour or MPD regional value).
+
+### Implementation choices (provisional, recorded)
+
+- **State (schema 29):** `ProvinceEconomy.wageRUSDPerYearByProfession` (indexed by
+  profession id; empty = profession reference wage), `BuildingInstance.technique`,
+  `World.moneyCoefficients` (military costs and service benchmarks; defaults = the pre-P2b
+  constants). Settlement and construction pay the province wage. Education, training and
+  administration benchmarks scale with the country's local wage of the staffing professions
+  (`localWageIndex`), so a teacher in Bengal costs a Bengali salary.
+- **Prices:** NBER Macrohistory 1900 means (wheat, cattle, cotton, wool, flour, print cloth);
+  textiles are the mill recipe's cotton-wool composite with woollen cloth at the cotton cloth
+  markup; garments are cloth x 2. Market opening prices = base x population-weighted PL of
+  the market's territories, clamped to 0.25..4 (8 markets clamped, including the British
+  customs territory whose India-weighted PL is 0.31).
+- **1900 definitions:** 1,000 jobs per level; food processing uses 1.43 kg wheat per kg
+  flour and textile mills 1.15 kg fibre per kg cloth (mass balance); construction cost = one
+  year of a level's reference wage bill, upkeep = 3% a year; warehouses hold about one
+  million bushels per level and are sized to 5 days of the largest good's output.
+- **Workforce cap:** where the budget-driven demand needs more workers of a profession than
+  95% of a territory's workforce (about 35 territories, e.g. Japan x3.9), the
+  territory's technique is raised and levels lowered; owners keep the extra value added.
+- **Producers first for their own territory:** each territory's buildings meet its own
+  demand; only demand without a local producer is pooled over the market.
+- **Missing producers:** 181 basic buildings (ranch, fishery, food processing, peasant
+  workshop, textile mill, farm) are added where a market's households demand a good that no
+  building in the market makes; the M11 tables gave 41 of 63 markets farms only, and under
+  P2 they lived on authored opening stock at the price floor.
+- **Opening stock:** one day of the market's producer input demand (D-136); replaces the M11
+  stock lots.
+
+### Consequences
+
+- 137 source rows: 90 sourced, 8 secondary (1900 census reprints), 39 provisional with
+  reasons. Every generated money value carries its rows and formula in
+  `historical/p2b/calibration_1900.json`; test `p2b-money` recomputes the sourced values.
+- Known distortions: the BLS retail budget overstates farm-gate demand, so peasants
+  need more workers than the authored mixes provide (the workforce cap); the British, French
+  and Dutch customs territories share one price level with their colonies; joint products
+  (cotton with grain, wool with meat) do not balance; capitalists, most clerks and academics
+  have no covered jobs (uncovered sectors).
+
+## D-136 — Market price rule counts opening stock; tolerances at 1900 money scale
+
+**Status:** price rule decided by the designer on 2026-11-03 ("count opening stock only");
+the three fixes below found during P2b and implemented for review. **Amends:** D-040
+(price formula, `sellableSupply`).
+
+### Decision
+
+1. **Sellable supply = opening stock + same-day output - funded input demand** (D-040
+   counted opening stock plus same-day output). Producers buy inputs only from the opening
+   stock, so a market must carry one day of input demand into the next day; D-040 counted
+   that carry as supply, so every balanced market with intermediate goods read as a glut
+   and drifted to the floor. The P2 world never showed it because it opened at the floor.
+   **Deviation from the approved wording:** the designer approved "count opening stock
+   only", on my description that households also buy only from the opening stock. The full
+   suite then showed that households buy the day's output in Pass B (M5 sample: 3.53 M kg of
+   meat bought against an opening stock of 18 k), so "opening stock only" read every final
+   good as a permanent shortage, prices rose 5% a day and 40% of the M5 population went
+   short of subsistence within a month (test `m5-feasibility`). The rule above keeps the
+   approved intent (a balanced market holds its price) for both final and intermediate
+   goods; it is recorded for the designer's review.
+2. **Cash-neutral postings** compare the designated-cash residual with a tolerance relative
+   to the posting's gross amount (its debits) rather than to the residual itself; at 1900
+   scale one posting reaches 1e9-1e10 RUSD and the absolute 1e-6 bound was below double
+   precision.
+3. **Market lot pairing (D-133):** the lot-overrun checks (reservation vs lot in the
+   pairing, Pass-B availability, final household consumption, producer input use) use a
+   tolerance relative to the good's reserved total, since each reservation is a difference
+   of cumulative interval ends; relative to the lot alone, a small lot in a 1e8-unit market
+   overran by about 1e-8 and aborted the day.
+4. **Trade dispatch** checks the in-transit consignment cap (512) per seller lot; the check
+   per route and good let one route exceed the cap and abort the day.
+5. **Public-enterprise support bound** rises from 1e9 to the general budget bound (1e15
+   RUSD): 1900 treasuries reach several billion RUSD and the app offers up to the treasury.
+
+### Consequences
+
+- Trajectories change in every economic fixture (1); (2)-(4) only remove failures. Known
+  answers are re-pinned with this decision as the reason.

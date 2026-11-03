@@ -184,6 +184,13 @@ Acceptance: every money value traces to a source-table row and its conversion (t
 1900 world initialises for all selectable countries; a before/after report compares GDP per
 head, wage levels, fiscal stocks and flows with their sources.
 
+**Status (2026-11-03).** Implemented for review (D-135, D-136; plan
+`docs/P2B_CALIBRATION_PLAN.md`, report `P2B_COMPLETION_REPORT.md`). Source table
+`historical/p2b/sources_1900.json` (137 rows), builder `scripts/p2b/build-money-calibration.mjs`
+(`--check`), province wage tables, building technique and scenario money coefficients
+(schema 29), 1900-world definitions, census occupation mix for the United States, and the
+D-040 price rule amended to count opening stock only.
+
 ### P3 — Local-currency display
 
 RUSD stays the simulation unit; the player sees money in the country's currency (D-122).

@@ -506,10 +506,14 @@ function allocateTierGood(
     const reservedFromLot = reservedByLot[lotIndex] ?? 0;
     actualFulfilled += reservedFromLot;
     const remaining = lot.quantity - reservedFromLot;
-    if (remaining < -tolerance(lot.quantity, reservedFromLot)) {
+    // A lot's reservation is the difference of two cumulative interval ends, so its
+    // rounding error scales with the cumulative total, not with the lot (P2b
+    // regression: a small lot in a 1e8-unit market overran by 1e-8 and threw).
+    const lotTolerance = tolerance(lot.quantity, reservedFromLot, fulfilledTotal);
+    if (remaining < -lotTolerance) {
       throw new RangeError(`market reservation exceeds seller lot ${lot.key}`);
     }
-    if (remaining <= tolerance(lot.quantity, reservedFromLot)) remainingByLot.delete(lot.key);
+    if (remaining <= lotTolerance) remainingByLot.delete(lot.key);
     else remainingByLot.set(lot.key, remaining);
   }
   if (Math.abs(actualFulfilled - fulfilledTotal) > tolerance(actualFulfilled, fulfilledTotal)) {
@@ -695,11 +699,16 @@ export function runMarketDay(
     );
 
     const householdReservedByLot = new Map<string, number>();
+    const householdPassAByGood = new Map<number, number>();
     for (const reservation of householdPassA) {
       const key = `${String(reservation.goodId)}:${String(reservation.sellerBuildingId)}`;
       householdReservedByLot.set(
         key,
         (householdReservedByLot.get(key) ?? 0) + reservation.quantity,
+      );
+      householdPassAByGood.set(
+        reservation.goodId,
+        (householdPassAByGood.get(reservation.goodId) ?? 0) + reservation.quantity,
       );
     }
     // `market.stockLots` already includes M3c output and excludes actual input
@@ -709,7 +718,10 @@ export function runMarketDay(
     for (const lot of market.stockLots) {
       const key = `${String(lot.goodId)}:${String(lot.ownerBuildingId)}`;
       const available = lot.quantity - (householdReservedByLot.get(key) ?? 0);
-      if (available < -tolerance(lot.quantity, householdReservedByLot.get(key) ?? 0)) {
+      if (
+        available <
+        -tolerance(lot.quantity, householdReservedByLot.get(key) ?? 0, householdPassAByGood.get(lot.goodId) ?? 0)
+      ) {
         throw new RangeError(`household reservation exceeds current seller lot ${key}`);
       }
       if (available > 0) passBLots.set(key, available);
@@ -782,16 +794,20 @@ export function runMarketDay(
       (reservation) => reservation.buyerKind === "household",
     );
     const householdByLot = new Map<string, number>();
+    const householdByGood = new Map<number, number>();
     for (const reservation of householdReservations) {
       const key = `${String(reservation.goodId)}:${String(reservation.sellerBuildingId)}`;
       householdByLot.set(key, (householdByLot.get(key) ?? 0) + reservation.quantity);
+      householdByGood.set(reservation.goodId, (householdByGood.get(reservation.goodId) ?? 0) + reservation.quantity);
     }
     const finalLots = new Map<string, number>();
     for (const lot of market.stockLots) {
       const key = `${String(lot.goodId)}:${String(lot.ownerBuildingId)}`;
       const consumed = householdByLot.get(key) ?? 0;
       const remaining = lot.quantity - consumed;
-      if (remaining < -tolerance(lot.quantity, consumed)) {
+      // D-136: reservations are differences of cumulative interval ends, so the
+      // rounding error scales with the good's household total, not with one lot.
+      if (remaining < -tolerance(lot.quantity, consumed, householdByGood.get(lot.goodId) ?? 0)) {
         throw new RangeError(`fulfilled household demand exceeds seller lot ${key}`);
       }
       if (remaining > 0) finalLots.set(key, remaining);
@@ -939,9 +955,23 @@ export function runMarketDay(
       return left.sellerBuildingId - right.sellerBuildingId;
     });
 
+    // D-136 (amends D-040): sellable supply is the opening stock plus same-day output,
+    // less the funded input demand of producers. Households may buy the day's output
+    // (Pass B), but producers buy only from the opening stock, so a market must carry
+    // one day of input demand into the next day; counting that carry as supply made
+    // every balanced market with intermediate goods read as a glut and drift to the floor.
+    const inputFundedByGood = new Array<number>(definitions.goods.length).fill(0);
+    for (const demand of demands) {
+      if (demand.kind === "building" && demand.eligible) {
+        inputFundedByGood[demand.goodId] = (inputFundedByGood[demand.goodId] ?? 0) + demand.funded;
+      }
+    }
     const sellableSupplyByGood = definitions.goods.map((good) => {
       const intermediate = production.inventory.find((flow) => flow.goodId === good.id);
-      return (intermediate?.openingStock ?? 0) + (intermediate?.production ?? 0);
+      return Math.max(
+        0,
+        (intermediate?.openingStock ?? 0) + (intermediate?.production ?? 0) - (inputFundedByGood[good.id] ?? 0),
+      );
     });
     const priceUpdates = updateMarketPrices(
       market,

@@ -158,6 +158,40 @@ export interface BuildingInstance {
   builtOnDay: Day;
   operational: boolean;
   operatingCashAccountId: Id;
+  /**
+   * P2b technique factor (D-135): output per staffed throughput unit relative to the
+   * definition, dimensionless and positive. It stands for the land, capital and
+   * method embodied in this plant that the model does not yet represent (P5 land,
+   * P10 investment replace it); 1 is the definition's reference technique. Fixed for
+   * the life of the building.
+   */
+  technique: number;
+}
+
+/**
+ * P2b (D-135) scenario money coefficients: the RUSD amounts that have no per-entity
+ * home in the data (military costs and the per-unit funding benchmarks). They belong
+ * to the scenario's money scale, so each scenario authors them with its sources; a
+ * scenario without them uses DEFAULT_MONEY_COEFFICIENTS (the pre-P2b constants).
+ * All values are RUSD and strictly positive.
+ */
+export interface MoneyCoefficients {
+  /** M10 signing cost per recruited soldier, paid to the soldiers' households. */
+  recruitmentCostPerSoldierRUSD: number;
+  /** M10 price of one equipment unit (equips M10_SOLDIERS_PER_EQUIPMENT_UNIT soldiers). */
+  equipmentPriceRUSD: number;
+  /** M10 daily pay per soldier. */
+  soldierDailyPayRUSD: number;
+  /** M10 daily upkeep per equipment unit. */
+  equipmentDailyUpkeepRUSD: number;
+  /** M10 daily garrison procurement per occupying soldier. */
+  garrisonCostPerSoldierPerDayRUSD: number;
+  /** M8/E5 administration funding benchmark per inhabitant per year. */
+  adminFundingPerCapitaPerYearRUSD: number;
+  /** M9 education funding benchmark per academic staff member per year. */
+  educationFundingPerStaffPerYearRUSD: number;
+  /** E5 provider cost per academic instructor per year. */
+  trainingInstructorCostPerYearRUSD: number;
 }
 
 export interface EmploymentAssignment {
@@ -1748,6 +1782,8 @@ export interface BuildingInstanceInitialDef {  id: Id;
   operational: boolean;
   operatingCashAccountId: Id;
   initialOperatingCashRUSD: MoneyRUSD;
+  /** P2b technique factor; defaults to 1 (the definition's reference technique). */
+  technique?: number;
 }
 
 export interface MarketInitialDef {
@@ -2020,4 +2056,6 @@ export interface EconomyScenarioDef {
    * fixtures), and every country remains AI-eligible when the AI is enabled.
    */
   playerCountryId?: Id | null;
+  /** P2b money coefficients (D-135); omitted means DEFAULT_MONEY_COEFFICIENTS. */
+  moneyCoefficients?: MoneyCoefficients;
 }

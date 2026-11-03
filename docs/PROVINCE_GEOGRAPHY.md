@@ -113,7 +113,10 @@ reconciliation (Egypt, Newfoundland, Tokelau, the New Guinea residual, Goa) in D
 3. `sync-app-provinces.mjs` (also deletes the M12 `simulationRegionId` field, D-134);
 4. `build-province-geography.mjs`;
 5. `build-province-scenario.mjs`;
-6. `pnpm map:build`, `pnpm map:atlas`, `pnpm -F @century/sim-worker scenario:build`,
+6. `node scripts/p2b/build-money-calibration.mjs` (P2b, D-135: money values, wages,
+   technique and levels from `historical/p2b/sources_1900.json`; the scenario reads its
+   outputs);
+7. `pnpm map:build`, `pnpm map:atlas`, `pnpm -F @century/sim-worker scenario:build`,
    `pnpm -F @century/app build:worker`.
 
 `convert-territory-inputs.mjs` (region tables to territory tables) and

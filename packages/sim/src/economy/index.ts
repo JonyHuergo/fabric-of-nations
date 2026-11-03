@@ -20,6 +20,7 @@ export * from "./ai.js";
 export * from "./day.js";
 export * from "./technology.js";
 export * from "./labor.js";
+export * from "./localWages.js";
 export {
   assertValidTradePolicyState,
   assertValidTradeState,
@@ -162,6 +163,7 @@ export {
 } from "./politicsActions.js";
 export {
   cancelConstruction,
+  inheritedTechnique,
   runConstructionPhase,
   setConstructionPaused,
   startConstruction,

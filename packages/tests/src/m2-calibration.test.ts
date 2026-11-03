@@ -106,9 +106,11 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // M11 (simulation 0.27.0, data m3-economy-v12) changes the version metadata encoded in the world. The M2 population behavior is unchanged, so it is intentionally re-pinned.
     // P2 schema 28 (D-134) encodes the province economy record instead of the region;
     // the population trajectory is unchanged, so the digest is re-pinned.
-    expect(hashWorld(world)).toBe("43e9bc9c08b8ce3a");
+    // P2b schema 29 (D-135) adds wage tables, technique and money coefficients to the
+    // encoding; the population trajectory is unchanged, so the digest is re-pinned.
+    expect(hashWorld(world)).toBe("e41ed8edbb1e8b6b");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("43e9bc9c08b8ce3a");
+    expect(hashWorld(restored)).toBe("e41ed8edbb1e8b6b");
     expect(tick(restored).advanced).toBe(false);
   });
 
@@ -313,7 +315,8 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // schema-24 trade/customs fields; population flows are unchanged and remain
     // validated by the ratio checks above.
     // Re-pinned for the P2 schema-28 province record (D-134); flows unchanged.
-    expect(hashWorld(world)).toBe("f3bb9fc4c630e282");
+    // P2b schema 29 (D-135): encoding only; population flows are unchanged.
+    expect(hashWorld(world)).toBe("01aab8a1d157e54f");
   });
 });
 
