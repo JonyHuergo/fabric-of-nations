@@ -35,7 +35,10 @@ describe("D-139 new-game reuse of the startup world", () => {
   test("the first campaign equals a fresh construction with the player", () => {
     const events: WorkerEvent[] = [];
     const host = newHost(events);
+    const startup = hostWorld(host);
     host.handleCommand(command("CREATE_GAME", { playerCountryId }));
+    // The startup world itself became the campaign: it was not rebuilt.
+    expect(hostWorld(host)).toBe(startup);
     const result = events.find((event) => event.type === "NEW_GAME_RESULT");
     expect(result).toMatchObject({ accepted: true });
     expect(hostWorld(host).playerCountryId).toBe(playerCountryId);
@@ -45,9 +48,11 @@ describe("D-139 new-game reuse of the startup world", () => {
   test("a campaign after the startup world advanced is built afresh", () => {
     const events: WorkerEvent[] = [];
     const host = newHost(events);
+    const startup = hostWorld(host);
     host.handleCommand(command("STEP", { ticks: 1 }));
     expect(hostWorld(host).dayIndex).toBe(1);
     host.handleCommand(command("CREATE_GAME", { playerCountryId }));
+    expect(hostWorld(host)).not.toBe(startup);
     expect(hostWorld(host).dayIndex).toBe(0);
     expect(hashWorld(hostWorld(host))).toBe(expected);
   }, 120_000);

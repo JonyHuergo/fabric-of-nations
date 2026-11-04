@@ -2305,17 +2305,22 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
       ? new Array<FinancialAccount | undefined>(maxId + 1).fill(undefined)
       : null;
   if (dense !== null) for (const account of accounts) dense[account.id] = account;
-  const positions = new Map<Id, number>();
-  const densePositions =
-    dense !== null ? new Int32Array(maxId + 1).fill(-1) : null;
-  for (let position = 0; position < accounts.length; position += 1) {
-    const account = accounts[position] as FinancialAccount;
-    if (densePositions !== null) {
-      if (densePositions[account.id] === -1) densePositions[account.id] = position;
-    } else if (!positions.has(account.id)) {
-      positions.set(account.id, position);
+  // Positions by account id, built on first use (D-139): an index rebuilt after every
+  // account creation (migration) must not pay for tables nobody reads.
+  let positions: Map<Id, number> | null = null;
+  let densePositions: Int32Array | null = null;
+  const buildPositions = (): void => {
+    positions = new Map<Id, number>();
+    if (dense !== null) densePositions = new Int32Array(maxId + 1).fill(-1);
+    for (let position = 0; position < accounts.length; position += 1) {
+      const account = accounts[position] as FinancialAccount;
+      if (densePositions !== null) {
+        if (densePositions[account.id] === -1) densePositions[account.id] = position;
+      } else if (!positions.has(account.id)) {
+        positions.set(account.id, position);
+      }
     }
-  }
+  };
   // D-139: account id by owner id for every (owner kind, subtype), built together in
   // one pass on first use. Equal to `byOwner` for non-negative integer owner ids
   // (the external-counterparty duplicates are excluded from both).
@@ -2366,7 +2371,16 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
     ownerId: Id | null,
     subtype: AccountSubtype,
   ): FinancialAccount | undefined => {
-    if (dense !== null && ownerId !== null && Number.isInteger(ownerId) && ownerId >= 0 && SUBTYPE_CODES.has(subtype)) {
+    // Owner tables once built (by a bulk reader); otherwise the owner-key map, so a
+    // freshly rebuilt index answers single lookups without building every table.
+    if (
+      ownerTables !== null &&
+      dense !== null &&
+      ownerId !== null &&
+      Number.isInteger(ownerId) &&
+      ownerId >= 0 &&
+      SUBTYPE_CODES.has(subtype)
+    ) {
       const table = tableFor(ownerKind, subtype);
       if (ownerId >= table.length) return undefined;
       const id = table[ownerId] ?? -1;
@@ -2378,10 +2392,11 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
     accounts,
     byId,
     position(id) {
+      if (positions === null) buildPositions();
       if (densePositions !== null) {
         return Number.isInteger(id) && id >= 0 && id < densePositions.length ? (densePositions[id] ?? -1) : -1;
       }
-      return positions.get(id) ?? -1;
+      return positions?.get(id) ?? -1;
     },
     ownerAccountIds(ownerKind, subtype) {
       if (!SUBTYPE_CODES.has(subtype)) return emptyTable;

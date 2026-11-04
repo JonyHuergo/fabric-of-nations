@@ -197,6 +197,10 @@ interface NewGameResult {
   readonly firstCheckpointMs: number;
   readonly createPlusCheckpointMs: number;
   readonly createGameCommandMs: number;
+  /** First CREATE_GAME on a fresh host (reuses the startup world, D-139). */
+  readonly firstCreateGameCommandMs: number;
+  /** Host construction, which builds the startup world. */
+  readonly hostStartMs: number;
 }
 
 function measureNewGame(scenario: EconomyScenarioDef): NewGameResult {
@@ -222,11 +226,28 @@ function measureNewGame(scenario: EconomyScenarioDef): NewGameResult {
     commandMs.push(performance.now() - start);
     assertAccepted(lastEvent(recorder, "NEW_GAME_RESULT"));
   }
+  // D-139: the first campaign from the menus reuses the untouched startup world, so it
+  // is measured on a fresh host each time; host construction (which builds that world
+  // at worker start, behind the title screen) is reported separately.
+  const firstCommandMs: number[] = [];
+  const hostStartMs: number[] = [];
+  for (let index = 0; index < REPEATS; index += 1) {
+    const fresh: Recorder = { events: [], stateAt: 0, snapshotAt: 0, encodeMs: 0, snapshotBytes: 0 };
+    const startHost = performance.now();
+    const freshHost = makeHost(scenario, fresh);
+    hostStartMs.push(performance.now() - startHost);
+    const start = performance.now();
+    freshHost.handleCommand(command("CREATE_GAME", { playerCountryId: PLAYER_COUNTRY_ID }));
+    firstCommandMs.push(performance.now() - start);
+    assertAccepted(lastEvent(fresh, "NEW_GAME_RESULT"));
+  }
   return {
     createWorldMs: median(create),
     firstCheckpointMs: median(checkpoint),
     createPlusCheckpointMs: median(both),
     createGameCommandMs: median(commandMs),
+    firstCreateGameCommandMs: median(firstCommandMs),
+    hostStartMs: median(hostStartMs),
   };
 }
 
@@ -469,7 +490,8 @@ async function main(): Promise<void> {
   const newGame = measureNewGame(scenario);
   console.log(
     `new game: create world ${fmt(newGame.createWorldMs)} ms + first checkpoint ${fmt(newGame.firstCheckpointMs)} ms = ` +
-      `${fmt(newGame.createPlusCheckpointMs)} ms; CREATE_GAME command ${fmt(newGame.createGameCommandMs)} ms`,
+      `${fmt(newGame.createPlusCheckpointMs)} ms; CREATE_GAME command ${fmt(newGame.createGameCommandMs)} ms; ` +
+      `first CREATE_GAME on a fresh host ${fmt(newGame.firstCreateGameCommandMs)} ms (host start ${fmt(newGame.hostStartMs)} ms)`,
   );
 
   start = performance.now();

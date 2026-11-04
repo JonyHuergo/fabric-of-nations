@@ -78,9 +78,53 @@ export interface JournalEntryInput {
  */
 interface BatchDeltas {
   readonly positionOf: (id: number) => number;
-  readonly delta: Float64Array;
-  readonly seen: Uint8Array;
+  /** Typed scratch over all account positions, for large batches. */
+  readonly delta: Float64Array | null;
+  readonly seen: Uint8Array | null;
+  /** Map by position for small batches (no 100k-account scratch per call). */
+  readonly small: Map<number, number> | null;
   readonly touched: number[];
+}
+
+/** Lines at or above which a batch uses typed scratch over every account. */
+const TYPED_BATCH_LINES = 4096;
+
+function createBatchDeltas(positionOf: (id: number) => number, accountCount: number, lineCount: number): BatchDeltas {
+  const typed = lineCount >= TYPED_BATCH_LINES;
+  return {
+    positionOf,
+    delta: typed ? new Float64Array(accountCount) : null,
+    seen: typed ? new Uint8Array(accountCount) : null,
+    small: typed ? null : new Map<number, number>(),
+    touched: [],
+  };
+}
+
+/** Add one signed line amount; the first amount is taken as `0 + signed` either way. */
+function addBatchDelta(batch: BatchDeltas, position: number, signed: number): void {
+  if (batch.small !== null) {
+    const current = batch.small.get(position);
+    if (current === undefined) {
+      batch.small.set(position, 0 + signed);
+      batch.touched.push(position);
+    } else {
+      batch.small.set(position, current + signed);
+    }
+    return;
+  }
+  const seen = batch.seen as Uint8Array;
+  const delta = batch.delta as Float64Array;
+  if (seen[position] === 0) {
+    seen[position] = 1;
+    delta[position] = 0 + signed;
+    batch.touched.push(position);
+  } else {
+    delta[position] = (delta[position] ?? 0) + signed;
+  }
+}
+
+function batchDelta(batch: BatchDeltas, position: number): number {
+  return batch.small !== null ? (batch.small.get(position) ?? 0) : ((batch.delta as Float64Array)[position] ?? 0);
 }
 
 interface ValidatedLines {
@@ -189,14 +233,7 @@ function validatePostingLines(
     if (deltas !== null) {
       deltas.set(accountId, (deltas.get(accountId) ?? 0) + signed);
     } else if (batch !== undefined) {
-      const position = batch.positionOf(accountId);
-      if (batch.seen[position] === 0) {
-        batch.seen[position] = 1;
-        batch.delta[position] = 0 + signed;
-        batch.touched.push(position);
-      } else {
-        batch.delta[position] = (batch.delta[position] ?? 0) + signed;
-      }
+      addBatchDelta(batch, batch.positionOf(accountId), signed);
     }
     if (isCashAccount(account)) cashDelta += signed;
   }
@@ -433,12 +470,9 @@ export function postJournalBatch(
   // the buffer keeps 256.
   const retainedStart = Math.max(0, entries.length - MAX_AUDIT_POSTINGS);
   const accountList = finance.accounts;
-  const batch: BatchDeltas = {
-    positionOf: (id) => financeIndex.position(id),
-    delta: new Float64Array(accountList.length),
-    seen: new Uint8Array(accountList.length),
-    touched: [],
-  };
+  let lineCount = 0;
+  for (const entry of entries) lineCount += entry?.lines.length ?? 0;
+  const batch = createBatchDeltas((id) => financeIndex.position(id), accountList.length, lineCount);
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
@@ -456,7 +490,7 @@ export function postJournalBatch(
   // `assertBalanceConstraints` over the batch, in first-touch order (D-139).
   for (const position of batch.touched) {
     const account = accountList[position] as FinancialAccount;
-    const delta = batch.delta[position] ?? 0;
+    const delta = batchDelta(batch, position);
     const next = account.balanceRUSD + delta;
     if (!Number.isFinite(next)) {
       throw new RangeError(`posting would make account ${String(account.id)} non-finite`);
@@ -470,7 +504,7 @@ export function postJournalBatch(
 
   for (const position of batch.touched) {
     const account = accountList[position] as FinancialAccount;
-    account.balanceRUSD += batch.delta[position] ?? 0;
+    account.balanceRUSD += batchDelta(batch, position);
   }
 
   // Materialise postings only after every entry is validated and affordable, so a
@@ -634,12 +668,7 @@ export function postJournalColumns(
     throw new RangeError("finance posting id overflow");
   }
   const accountList = finance.accounts;
-  const batch: BatchDeltas = {
-    positionOf: (id) => financeIndex.position(id),
-    delta: new Float64Array(accountList.length),
-    seen: new Uint8Array(accountList.length),
-    touched: [],
-  };
+  const batch = createBatchDeltas((id) => financeIndex.position(id), accountList.length, lines.accountId.length);
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
@@ -692,14 +721,7 @@ export function postJournalColumns(
       const signed = side === accountNormalSide(account.category) ? amount : -amount;
       if (debit === 1) debits += amount;
       else credits += amount;
-      const position = batch.positionOf(accountId);
-      if (batch.seen[position] === 0) {
-        batch.seen[position] = 1;
-        batch.delta[position] = 0 + signed;
-        batch.touched.push(position);
-      } else {
-        batch.delta[position] = (batch.delta[position] ?? 0) + signed;
-      }
+      addBatchDelta(batch, batch.positionOf(accountId), signed);
       if (isCashAccount(account)) cashDelta += signed;
     }
     if (Math.abs(debits - credits) > MONEY_TOLERANCE_RUSD) {
@@ -711,7 +733,7 @@ export function postJournalColumns(
   }
   for (const position of batch.touched) {
     const account = accountList[position] as FinancialAccount;
-    const delta = batch.delta[position] ?? 0;
+    const delta = batchDelta(batch, position);
     const next = account.balanceRUSD + delta;
     if (!Number.isFinite(next)) {
       throw new RangeError(`posting would make account ${String(account.id)} non-finite`);
@@ -724,7 +746,7 @@ export function postJournalColumns(
   }
   for (const position of batch.touched) {
     const account = accountList[position] as FinancialAccount;
-    account.balanceRUSD += batch.delta[position] ?? 0;
+    account.balanceRUSD += batchDelta(batch, position);
   }
   finance.nextPostingId = nextId + entries.length;
   return deferred(entries.length);

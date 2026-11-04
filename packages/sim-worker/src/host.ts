@@ -450,11 +450,7 @@ export class SimulationHost {
     let world: World;
     try {
       scenario = { ...this.baseScenario, playerCountryId };
-      if (
-        this.pristine &&
-        this.world.playerCountryId === null &&
-        this.world.dayIndex === this.world.startDayIndex
-      ) {
+      if (this.pristine && this.world.dayIndex === this.world.startDayIndex) {
         // D-139: the startup world is `createEconomyWorld(baseScenario, seed)` and has
         // not changed; the same call with a player country differs only in
         // `playerCountryId`, which is set here (the country was checked above). The

@@ -7635,3 +7635,64 @@ against the same label-ink test before it is added.
 4. **Working copies are LF.** `.gitattributes` pins `eol=lf`. The two `m11-flags` checks
    failed only because `core.autocrlf` checked LF files out as CRLF while the generator
    emits LF; no generated content was stale.
+
+### Second performance stage (2026-11-04): what changed
+
+Every change below keeps the world outcome **bit-identical** to the D-137 baseline: the
+64-day reference trace (`docs/perf/trace-baseline.txt`) is reproduced line for line in
+full and in summary result detail. Bit identity was kept deliberately as the oracle for a
+large internal rewrite; save compatibility was not needed and was not broken.
+
+1. **Columnar market core.** Market clearing, production and storage overflow work on a
+   per-market lot table (`LotTable`: a dense `(good, owner)` table replacing string-keyed
+   and nested lot maps) and typed demand and reservation columns. `runProductionPhase`
+   and the market day share one production core (`runProductionCore`), so there is still
+   one implementation. Allocation, eligibility and every sum keep their operands and
+   order.
+2. **Columns between phases.** Household demand is built as columns and passed to the
+   market as `MarketDayInput.householdColumns` (validated with the record checks and
+   messages). The market returns transaction and fulfilment columns as a non-enumerable
+   companion of its result (`MarketDayResult.columns`); settlement and the needs phase
+   read them, and a result whose `pendingTransactions` list was replaced (as tests do to
+   build malformed results) is settled from its objects. Record objects are built only
+   for `detail: "full"`.
+3. **Settlement.** Transactions are ordered by a stable LSD radix sort over decimal-text
+   ranks, which reproduces the canonical `transactionKey` order without string keys; market
+   postings are aggregated with typed scratch in the same summation order and applied
+   from line columns (`postJournalColumns`, the checks and per-account summation order of
+   `postJournalBatch`). Their audit copies are materialised only if they can still be among
+   the newest 256 postings once the day's wage and upkeep postings are known
+   (`retainDeferredPostings`); the buffer ends exactly as eager posting would leave it.
+   The integrated day passes `atomic: false`, because the rollback runner (phase mode) or
+   the staged copy (staged mode) already owns atomicity; direct callers keep the
+   100k-account rollback copy.
+4. **Finance index.** Owner/subtype lookups resolve through owner tables built in one pass
+   (`FinanceIndex.ownerAccountIds`, `position`); journal batches accumulate deltas in a
+   typed array over account positions in first-touch order instead of a map.
+5. **Allocation discipline.** Hot `for...of` loops became indexed loops (iterator results
+   were about a fifth of the bytes allocated per day); the 16 rest-parameter tolerance
+   helpers became fixed-arity; semantic-rule checks use a precomputed table; phases the
+   integrated day calls skip re-validating the economy definitions it validated at its
+   start (the existing staged-mode pattern of the production phase).
+6. **Demography.** Effective mortality rates are formed per age band and fertility rates
+   per day, with the same expressions.
+7. **First new game.** The worker host builds `createEconomyWorld(baseScenario, seed)` at
+   startup for the menus. While that world is untouched, the first `CREATE_GAME` sets
+   `playerCountryId` on it instead of rebuilding and revalidating the 1900 world (the
+   construction differs only in that field); any tick, action or load ends the reuse, and
+   later games are built afresh. `d139-new-game-reuse.test.ts` pins the equality. The
+   construction cost moves to worker startup, behind the title screen.
+
+New probes in `packages/bench`: `perfPhases` (per-phase day), `perfGc` (GC per day),
+`perfAlloc` (sampled allocation), `perfHost` (STEP profile), `perfSave` (save/load stages).
+
+### Second performance stage: status (2026-11-04)
+
+**10× is not yet reached.** Measured on the 92-day acceptance run: host day mean 356 ms
+(6.6×) and p50 303 ms (7.2×); save 1,094 ms (4.9×); load 1,173 ms (4.4×); first new
+campaign 63 ms (15.7×, the world is built at worker start); month starts 3.08–3.53× the
+ordinary p50 (the ≤ 3× criterion, met after stage 1, is not met now because ordinary days
+improved more). Determinism, bit identity, staged = phase and the save round trip pass;
+1,337 tests pass. Details, the measured remaining costs and the proposed next steps are in
+`PERF_STAGE2_REPORT.md`. Per item 2 above, P3 stays blocked until 10× is reached or the
+designer accepts an exception.
