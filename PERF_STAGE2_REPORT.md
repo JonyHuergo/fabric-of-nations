@@ -6,6 +6,10 @@ continues `PERF_COMPLETION_REPORT.md` (stage 1, D-137).
 
 ## 1. Outcome
 
+**Accepted as complete by the designer on 2026-11-04** (D-139): the 10× precondition
+for P3 is lifted; the unmet targets below remain open performance work.
+
+
 **10× is not reached yet.** The host day is now 6.6× (mean) and 7.2× (p50) faster than
 the baseline, the first new campaign is 15.7× faster, and save and load are about 5× and
 4.4× faster (unchanged in this stage). Every simulation change in this stage is

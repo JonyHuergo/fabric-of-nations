@@ -1,6 +1,7 @@
 # Prosperity Program — peacetime economy and demography
 
-**Status:** P0 (design) approved by the designer on 2026-11-02; P1 onward planned.\
+**Status:** P0–P2b accepted; the performance stages (D-137, D-139) accepted as complete on
+2026-11-04. **P3 is next.**\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\
 **Goal:** a country that never goes to war and never engages in diplomacy must still be
@@ -189,7 +190,15 @@ head, wage levels, fiscal stocks and flows with their sources.
 `historical/p2b/sources_1900.json` (137 rows), builder `scripts/p2b/build-money-calibration.mjs`
 (`--check`), province wage tables, building technique and scenario money coefficients
 (schema 29), 1900-world definitions, census occupation mix for the United States, and the
-D-040 price rule amended to count opening stock only.
+D-040 price rule amended to count opening stock only. **Accepted by the designer on
+2026-11-04 (D-139)**, including the implemented price rule and the listed open items.
+
+**Performance stages (D-137, D-139).** Two bit-identical performance stages followed P2b
+(`PERF_COMPLETION_REPORT.md`, `PERF_STAGE2_REPORT.md`). Against the D-137 baseline the
+host day is 6.6× (mean) / 7.2× (p50) faster, save 4.9×, load 4.4×, the first campaign
+15.7×. The 10× target was not fully met; the designer accepted the result as complete on
+2026-11-04 and lifted it as a precondition for P3. The open measurements and proposed next
+steps stay in `PERF_STAGE2_REPORT.md`.
 
 ### P3 — Local-currency display
 

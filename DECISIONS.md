@@ -7696,3 +7696,12 @@ improved more). Determinism, bit identity, staged = phase and the save round tri
 1,337 tests pass. Details, the measured remaining costs and the proposed next steps are in
 `PERF_STAGE2_REPORT.md`. Per item 2 above, P3 stays blocked until 10× is reached or the
 designer accepts an exception.
+
+### Designer decision (2026-11-04): performance stage accepted as complete
+
+The designer accepted the second performance stage as complete for now and **lifted the
+10× precondition of item 2 above**: P3 and the later Prosperity stages may start on the
+measured result (host day 6.6× mean / 7.2× p50, save 4.9×, load 4.4×, first campaign
+15.7×, month starts 3.08–3.53× the ordinary day; see `PERF_STAGE2_REPORT.md`). The
+unmet targets and the proposed next steps stay recorded there as open performance work;
+new stages should not make the measured costs worse without saying so in their reports.
