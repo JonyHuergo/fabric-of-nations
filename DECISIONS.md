@@ -7614,3 +7614,24 @@ against the same label-ink test before it is added.
   shows in faint paper there; after the fix it was rechecked at 844 × 390 in the desktop
   app's built-in browser, where Vaduz and the Bosnian province names draw in the dark ink.
   Device behaviour remains the designer's test.
+
+## D-139 — P2b and the first performance stage accepted; 10× is mandatory before P3
+
+**Status:** decided by the designer on 2026-11-04.
+
+### Decision
+
+1. **P2b is accepted as delivered** (D-135, D-136), including the price rule as
+   implemented (opening stock plus same-day output less producers' funded input demand)
+   rather than the earlier "opening stock only" wording, and its listed open items.
+2. **The first performance stage (D-137) is accepted as an interim result.** Its 10×
+   target is not waived: the stage continues, and **10× against the D-137 baseline is a
+   precondition for P3 and every later Prosperity stage.** The baseline is
+   `docs/perf/baseline.json` (host day mean 2,356 ms, p50 2,190 ms; save 5,364 ms; load
+   5,107 ms; new game 990 ms, 5× target).
+3. **Architecture may be rethought** to reach it, and **save compatibility may be broken**
+   without migration: the game is in development. Determinism, conservation, validation
+   of authoritative state and the No-Mana doctrine are not relaxed.
+4. **Working copies are LF.** `.gitattributes` pins `eol=lf`. The two `m11-flags` checks
+   failed only because `core.autocrlf` checked LF files out as CRLF while the generator
+   emits LF; no generated content was stale.
