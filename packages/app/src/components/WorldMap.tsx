@@ -27,7 +27,16 @@ import Svg, {
 
 import type { SimulationSnapshot } from "@century/sim-worker";
 
-import { ERA_THEMES, FONTS, MAP_LABELS, desaturate, labelBudget, type EraId } from "../design/tokens";
+import {
+  ERA_THEMES,
+  FONTS,
+  MAP_LABELS,
+  desaturate,
+  hexToRgb,
+  labelBudget,
+  mapLabelInk,
+  type EraId,
+} from "../design/tokens";
 import { AtlasMap, type AtlasMapHandle, type MapPress } from "../map/host/AtlasMap";
 import type { ReservedBox } from "../map/labels";
 import { dataLensFill, marketColor, type MapModeId } from "../map/mapModes";
@@ -798,6 +807,10 @@ function SvgWorldMap({
    */
   const screenScale = Math.max(viewScale * scale, 0.0001);
   const labelLayout = useMemo(() => {
+    // The fallback labels follow the same ink rule as the WebGL painter, so a
+    // near-white country keeps a readable dark name here too.
+    const labelPaper: Rgb = hexToRgb(colors.paper);
+    const labelInk: Rgb = hexToRgb(colors.background);
     const visible = {
       left: -translate.x / scale + insetLeft / screenScale,
       right: (MAP_WIDTH - translate.x) / scale - insetRight / screenScale,
@@ -820,6 +833,7 @@ function SvgWorldMap({
       readonly y: number;
       readonly fontSize: number;
       readonly selected: boolean;
+      readonly ink: string;
     }[] = [];
     const boxes: { left: number; right: number; top: number; bottom: number }[] = reserved.map(toMapBox);
     const candidates = polities.filter((polity) => {
@@ -898,12 +912,30 @@ function SvgWorldMap({
         continue;
       }
       boxes.push(box);
-      placed.push({ tag: polity.tag, name, x, y, fontSize, selected });
+      const fill =
+        layer === "political"
+          ? desaturate(politicalColor(polity.tag, entryByTag), landSaturation)
+          : null;
+      placed.push({
+        tag: polity.tag,
+        name,
+        x,
+        y,
+        fontSize,
+        selected,
+        ink: fill === null ? colors.mapLabel : rgbToCss(mapLabelInk(labelPaper, labelInk, fill)),
+      });
     }
     return placed;
   }, [
+    colors.background,
+    colors.mapLabel,
+    colors.paper,
+    entryByTag,
     insetLeft,
     insetRight,
+    landSaturation,
+    layer,
     playerTag,
     polities,
     reserved,
@@ -1197,7 +1229,7 @@ function SvgWorldMap({
                   <SvgText
                     x={label.x}
                     y={label.y}
-                    fill={colors.mapLabel}
+                    fill={label.ink}
                     fontFamily={label.selected ? FONTS.sansSemiBold : FONTS.sansMedium}
                     fontSize={label.fontSize}
                     textAnchor="middle"

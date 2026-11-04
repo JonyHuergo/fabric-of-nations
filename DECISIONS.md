@@ -7560,3 +7560,57 @@ faster, determinism, and identical outcomes where possible. The baseline is
   pass would remove.
 - The worker bundle is 4,833 KiB (the generated 1900 scenario module dominates); this is
   recorded, not changed, in this stage.
+
+## D-138 — Austria-Hungary white and Venezuela vinotinto on the political map
+
+**Status:** implemented on 2026-11-03 at the designer's request.
+
+### Context
+
+The designer asked for Austria-Hungary to read as white and Venezuela to take its
+vinotinto wine red on the map, pointing to the political colours of Victoria 3. The
+palette had been deliberately matte and dark so paper-coloured labels and province lines
+would read on every fill (D-112), and its contrast test assumed paper labels throughout.
+
+### Decision
+
+1. **Austria-Hungary is the one light fill.** `AUT` uses `#d3dcf0`, the Victoria 3 default
+   Austrian colour: a cool near-white rather than pure white, so it still reads as a
+   country rather than a hole in the paper. It remains authored per tag like every other
+   colour, so no other polity's colour changes.
+2. **Venezuela is vinotinto.** `VEN` uses `#7c2529`, a dark wine red in the matte band.
+   It passes the unchanged neighbour-separation test under normal and simulated
+   deuteranopic vision.
+3. **Labels choose their ink from the fill.** `mapLabelInk` in `design/tokens.ts` keeps the
+   paper label while it reaches the 2:1 floor and takes the dark chrome ink otherwise.
+   The WebGL painter asks the engine for the fill under each label's text, sampled from the
+   active style table so map modes and dimming are respected. A capital's name sits beside
+   its dot, so it is sampled at the centre of the name, not the dot: Vaduz's dot is in
+   Liechtenstein but its name lies on Austria-Hungary, and it takes the dark ink there.
+   The SVG fallback makes the same choice in political mode. Sea labels stay paper. This keeps the original legibility
+   floor rather than exempting Austria-Hungary from it.
+4. **The atlas was regenerated** with `pnpm map:atlas`, because the runtime and the
+   `tokensSha256` manifest changed.
+
+### Assumptions and provisional values
+
+The shades are display-only and provisional. The near-white is a deliberate exception to
+the matte band, not a new rule for other countries; a second light fill should be checked
+against the same label-ink test before it is added.
+
+### Consequences
+
+- The political map now matches the requested reference: a pale Habsburg white in central
+  Europe and a vinotinto Venezuela in northern South America.
+- Province and national lines remain paper. They are faint on the white but visible, and
+  the dark country and province labels carry the legibility. D-112's label floor is now
+  tested against the ink actually used, for every fill and era, and
+  `m16-map-label-ink.test.ts` drives the painter to check the ink each glyph is drawn in.
+- A name that straddles a border still takes one ink, chosen from the fill at its centre;
+  its ends may sit on the other fill. This is accepted for short capital names.
+- The 844 × 390 atlas was checked in desktop Chrome on an NVIDIA GTX 750 Ti; the two
+  requested countries render as intended (`docs/images/living-atlas/palette-austria-hungary.png`
+  and `palette-venezuela.png`). Those captures predate the text-centre sampling, so Vaduz
+  shows in faint paper there; after the fix it was rechecked at 844 × 390 in the desktop
+  app's built-in browser, where Vaduz and the Bosnian province names draw in the dark ink.
+  Device behaviour remains the designer's test.

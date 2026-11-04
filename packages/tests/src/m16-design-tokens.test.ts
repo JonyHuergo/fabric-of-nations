@@ -26,6 +26,7 @@ import {
   eraForYear,
   hexToRgb,
   labelBudget,
+  mapLabelInk,
   parseRgba,
   resolveEra,
   shellMetrics,
@@ -195,7 +196,8 @@ describe("one palette", () => {
       OTT: "#9a7550",
       LUX: "#66a0a3",
       PER: "#8f9658",
-      AUT: "#ad9650",
+      AUT: "#d3dcf0",
+      VEN: "#7c2529",
     });
   });
 
@@ -211,16 +213,20 @@ describe("one palette", () => {
     for (const tag of Object.keys(FUTURE_COLORS)) expect(STATE_COLORS[tag]).toBeUndefined();
   });
 
-  test("paper labels are legible on the matte fills, and the land only gets quieter", () => {
+  test("labels keep a legible ink on every fill, including Austria-Hungary's white", () => {
     const entryByTag = new Map(WORLD_CATALOG.entries.map((entry) => [entry.tag, entry] as const));
     for (const id of ERA_ORDER) {
       const era = ERA_THEMES[id];
+      const { map } = resolveEra(era);
       const paper: Rgb = hexToRgb(era.paper);
       for (const entry of WORLD_CATALOG.entries) {
         const fill = desaturate(politicalColor(entry.tag, entryByTag), era.landSaturation);
-        // The label also carries a thin dark shadow, so 2:1 is the floor for the fill alone.
-        expect(contrastRatio(paper, fill)).toBeGreaterThanOrEqual(2);
+        // Paper is normal; a light fill takes the dark chrome ink, as on a Victoria 3 map.
+        const ink = mapLabelInk(paper, map.labelBack, fill);
+        expect(contrastRatio(ink, fill)).toBeGreaterThanOrEqual(2);
       }
+      const austria = desaturate(politicalColor("AUT", entryByTag), era.landSaturation);
+      expect(mapLabelInk(paper, map.labelBack, austria)).toBe(map.labelBack);
     }
   });
 

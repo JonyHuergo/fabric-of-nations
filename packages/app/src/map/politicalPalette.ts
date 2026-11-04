@@ -1,14 +1,17 @@
 /**
  * Political colours of the Living Atlas.
  *
- * Colours are matte and dark, so paper-coloured borders and labels read on them,
- * and they are authored per polity tag: never derived from array order or from a
- * runtime random source, so adding a polity cannot change any other colour. The
- * great powers keep period atlas conventions (British red, French blue, German
- * grey, Russian green, Habsburg yellow); the rest were chosen so that neighbours
- * differ in lightness as well as hue, which keeps them apart for red-green colour
- * blind players. `m15-map-style.test.ts` measures neighbouring polities under
- * normal and simulated deuteranopic vision.
+ * Colours are matte, and almost all are dark, so paper-coloured borders and labels
+ * read on them. Austria-Hungary is the deliberate exception: a near-white in the
+ * manner of period atlases and Victoria 3, which is legible because map labels
+ * choose dark ink over a light fill (`mapLabelInk` in the design tokens). Colours
+ * are authored per polity tag: never derived from array order or from a runtime
+ * random source, so adding a polity cannot change any other colour. The great
+ * powers keep period atlas conventions (British red, French blue, German grey,
+ * Russian green, Habsburg white); the rest were chosen so that neighbours differ
+ * in lightness as well as hue, which keeps them apart for red-green colour blind
+ * players. `m15-map-style.test.ts` measures neighbouring polities under normal and
+ * simulated deuteranopic vision.
  *
  * A dependent territory takes its sovereign's hue lifted toward paper by status,
  * so an empire reads as one family across continents. The era themes then take
@@ -29,7 +32,8 @@ export const STATE_COLORS: Readonly<Record<string, string>> = {
   FRA: "#4a6c9c",
   RUS: "#56775f",
   JPN: "#a35877",
-  AUT: "#ad9650",
+  // Habsburg white: the Victoria 3 default, kept as the one light fill on the map.
+  AUT: "#d3dcf0",
   ITA: "#4b8a76",
   OTT: "#9a7550",
   CHN: "#a38c4e",
@@ -83,7 +87,8 @@ export const STATE_COLORS: Readonly<Record<string, string>> = {
   NIC: "#82769d",
   COS: "#6f956b",
   COL: "#a48b49",
-  VEN: "#637ca2",
+  // Vinotinto, the wine-red of the Venezuelan national colours.
+  VEN: "#7c2529",
   ECU: "#899e6c",
   PRU: "#a16e64",
   BOL: "#80a18a",

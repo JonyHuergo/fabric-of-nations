@@ -61,7 +61,7 @@ import {
 } from "./mapModes";
 import { paintLabels } from "./labelPainter";
 import { levelOfDetail, mapPalette } from "./mapStyle";
-import { politicalColor, type Rgb } from "./politicalPalette";
+import { mixRgb, politicalColor, type Rgb } from "./politicalPalette";
 import { buildUnitLabels, neighbourPairs } from "./unitLabels";
 import { MAP_HEIGHT, MAP_WIDTH, projectLat, projectLon, unprojectX, unprojectY } from "./projection";
 import type { RenderBundle } from "./renderBundle";
@@ -684,7 +684,16 @@ export class MapEngine {
     this.placedCamera = this.camera;
     this.labelsDirty = false;
     this.labelPlacements += 1;
-    paintLabels(context, this.placed, this.markers, this.camera, this.viewport, this.dpr, this.tokens);
+    paintLabels(
+      context,
+      this.placed,
+      this.markers,
+      this.camera,
+      this.viewport,
+      this.dpr,
+      this.tokens,
+      (x, y) => this.fillAtScreen(x, y),
+    );
   }
 
   private applyTokens(tokens: MapTokens): void {
@@ -1101,6 +1110,28 @@ export class MapEngine {
   private pinchMiddle(): { x: number; y: number } {
     const [a, b] = [...this.pointers.values()];
     return a === undefined || b === undefined ? { x: 0, y: 0 } : { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  }
+
+  /**
+   * The fill drawn under a screen point, for choosing label ink. The style table
+   * holds the mode's colour; a dimmed province is mixed toward the sea exactly as
+   * the fragment shader does, so a dimmed white country takes paper labels again.
+   */
+  private fillAtScreen(screenX: number, screenY: number): Rgb | null {
+    const { hitIndex, styleTable } = this;
+    if (hitIndex === null || styleTable === null) return null;
+    const world = screenToWorld(this.camera, this.viewport, screenX, screenY);
+    const index = hitIndex.pickNear(wrapX(world.x), world.y, 1 / this.camera.scale);
+    if (index < 0) return null;
+    const at = (index + 1) * 4;
+    const fill: Rgb = [
+      styleTable.data[at] ?? 0,
+      styleTable.data[at + 1] ?? 0,
+      styleTable.data[at + 2] ?? 0,
+    ];
+    return ((styleTable.data[at + 3] ?? 0) & STYLE_FLAG_DIMMED) !== 0
+      ? mixRgb(fill, this.tokens.seaDeep, 0.72)
+      : fill;
   }
 
   private pick(screenX: number, screenY: number, radiusPx?: number): number {

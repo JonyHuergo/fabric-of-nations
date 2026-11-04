@@ -186,12 +186,14 @@ renderer changes. A mode must use real data: a province with no value takes `NO_
 
 ## 5. Colour
 
-`STATE_COLORS` and `FUTURE_COLORS` are authored by tag, matte and dark so paper-coloured
-borders and labels read on them. The great powers follow period atlas convention; a dependent
-territory lifts its sovereign's colour toward paper by status, so an empire reads as one
-family. Colours depend only on the tag, so adding a polity changes no other colour. Every
-polity that can appear has an authored colour, and a test keeps it so; an unknown tag draws a
-stable data-error tone.
+`STATE_COLORS` and `FUTURE_COLORS` are authored by tag, matte and almost all dark so
+paper-coloured borders and labels read on them. Austria-Hungary is the designed exception, a
+Victoria 3-style near-white; map labels take the dark chrome ink when paper would fall below
+the 2:1 floor, sampled from the fill actually drawn under them. The great powers follow period
+atlas convention; a dependent territory lifts its sovereign's colour toward paper by status,
+so an empire reads as one family. Colours depend only on the tag, so adding a polity changes
+no other colour. Every polity that can appear has an authored colour, and a test keeps it so;
+an unknown tag draws a stable data-error tone.
 
 The era takes saturation from the land as a whole, in the shader on the WebGL path and in
 `desaturate` on the SVG path, so a tag's colour never changes with the date.
@@ -233,8 +235,10 @@ of usual English names. Fonts are in `docs/FONT_PROVENANCE.md`.
   about 10 km, so where two provinces meet at the sea the colour change can step slightly
   at very high zoom.
 - **Labels.** One label per political unit, on its largest landmass, so an archipelago is
-  named on one island. Sea names use usual English forms, not period-specific ones such as
-  "German Ocean".
+  named on one island. Labels are paper on matte fills and dark on a light fill such as
+  Austria-Hungary's white, chosen from the fill under the centre of the name (for a
+  capital, the name beside the dot, not the dot itself). Sea names use usual English
+  forms, not period-specific ones such as "German Ocean".
 - **Devices.** Automated checks run in desktop Chrome with emulated touch, including the page
   from a `file://` origin with a native-bridge shim. The designer reports that the game runs on
   their mobile device; no frame-rate or memory figures exist.

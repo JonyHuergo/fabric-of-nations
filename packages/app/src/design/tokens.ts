@@ -163,6 +163,20 @@ export function contrastRatio(a: Rgb, b: Rgb): number {
   return ((light ?? 0) + 0.05) / ((dark ?? 0) + 0.05);
 }
 
+/** Floor a map label keeps against the fill it sits on, as in D-112. */
+export const MAP_LABEL_MIN_CONTRAST = 2;
+
+/**
+ * Ink for a map label over a fill. Paper is the normal ink; a light fill such as
+ * Austria-Hungary's white takes the dark chrome ink instead, the way Victoria 3
+ * sets dark names on light countries. `fill` is null where there is no province
+ * under the label (open sea), which keeps paper.
+ */
+export function mapLabelInk(paper: Rgb, ink: Rgb, fill: Rgb | null): Rgb {
+  if (fill === null) return paper;
+  return contrastRatio(paper, fill) >= MAP_LABEL_MIN_CONTRAST ? paper : ink;
+}
+
 // ---- resolved theme ---------------------------------------------------------
 
 /** Every colour the interface may use. Screens read these names, never literals. */
