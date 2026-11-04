@@ -21,19 +21,26 @@ export function assertDailyWorldInvariants(world: World): void {
   if (!Number.isInteger(world.dayIndex) || world.dayIndex < 0) {
     throw new RangeError(`invalid dayIndex ${String(world.dayIndex)}`);
   }
-  for (const account of world.finance.accounts) {
+  // Indexed loops (D-139): the same order, without iterator allocation.
+  const accounts = world.finance.accounts;
+  for (let index = 0; index < accounts.length; index += 1) {
+    const account = accounts[index] as World["finance"]["accounts"][number];
     if (!Number.isFinite(account.balanceRUSD)) {
       throw new RangeError(`account ${String(account.id)} has a non-finite balance`);
     }
   }
   assertAccountingIdentity(world.finance);
   for (const market of world.markets) {
-    for (const price of market.priceRUSD) {
+    const priceList = market.priceRUSD;
+    for (let index = 0; index < priceList.length; index += 1) {
+      const price = priceList[index] as number;
       if (!Number.isFinite(price) || price <= 0) {
         throw new RangeError(`market ${String(market.id)} has an invalid price`);
       }
     }
-    for (const lot of market.stockLots) {
+    const lots = market.stockLots;
+    for (let index = 0; index < lots.length; index += 1) {
+      const lot = lots[index] as (typeof lots)[number];
       if (!Number.isFinite(lot.quantity) || lot.quantity < 0) {
         throw new RangeError(
           `market ${String(market.id)} has an invalid lot for good ${String(lot.goodId)}`,
@@ -41,7 +48,9 @@ export function assertDailyWorldInvariants(world: World): void {
       }
     }
   }
-  for (const block of world.popBlocks) {
+  const blocks = world.popBlocks;
+  for (let index = 0; index < blocks.length; index += 1) {
+    const block = blocks[index] as World["popBlocks"][number];
     if (!Number.isFinite(block.wealthLevel) || !Number.isFinite(block.militancy)) {
       throw new RangeError(`popBlock ${String(block.id)} has non-finite state`);
     }
@@ -54,18 +63,28 @@ export function assertDailyWorldInvariants(world: World): void {
  * consistency check for replay, not a substitute for `hashWorld`.
  */
 export function worldDayFingerprint(world: World): string {
+  // Indexed loops (D-139): the same summation order, without iterator allocation.
   let population = 0;
-  for (const block of world.popBlocks) {
-    for (const value of block.maleByAge) population += value;
-    for (const value of block.femaleByAge) population += value;
+  const blocks = world.popBlocks;
+  for (let index = 0; index < blocks.length; index += 1) {
+    const block = blocks[index] as World["popBlocks"][number];
+    const male = block.maleByAge;
+    for (let age = 0; age < male.length; age += 1) population += male[age] as number;
+    const female = block.femaleByAge;
+    for (let age = 0; age < female.length; age += 1) population += female[age] as number;
   }
   let balances = 0;
-  for (const account of world.finance.accounts) balances += account.balanceRUSD;
+  const accounts = world.finance.accounts;
+  for (let index = 0; index < accounts.length; index += 1) {
+    balances += (accounts[index] as World["finance"]["accounts"][number]).balanceRUSD;
+  }
   let stock = 0;
   let prices = 0;
   for (const market of world.markets) {
-    for (const lot of market.stockLots) stock += lot.quantity;
-    for (const price of market.priceRUSD) prices += price;
+    const lots = market.stockLots;
+    for (let index = 0; index < lots.length; index += 1) stock += (lots[index] as (typeof lots)[number]).quantity;
+    const priceList = market.priceRUSD;
+    for (let index = 0; index < priceList.length; index += 1) prices += priceList[index] as number;
   }
   const parts = [
     world.dayIndex,

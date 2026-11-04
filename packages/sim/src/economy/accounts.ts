@@ -1783,6 +1783,24 @@ export function assertSemanticJournalLine(
 }
 
 /**
+ * `SEMANTIC_LINE_RULES[kind].some(rule => rule.subtype === subtype && rule.side === side)`
+ * through a per-kind table of allowed sides by subtype, built once (D-139).
+ */
+const SEMANTIC_SIDES = new Map<string, Map<string, number>>();
+for (const [kind, rules] of Object.entries(SEMANTIC_LINE_RULES) as [string, readonly SemanticLineRule[]][]) {
+  const bySubtype = new Map<string, number>();
+  for (const rule of rules) {
+    bySubtype.set(rule.subtype, (bySubtype.get(rule.subtype) ?? 0) | (rule.side === "debit" ? 1 : 2));
+  }
+  SEMANTIC_SIDES.set(kind, bySubtype);
+}
+
+function semanticRuleAllows(kind: TransactionKind, subtype: AccountSubtype, side: JournalSide): boolean {
+  const mask = SEMANTIC_SIDES.get(kind)?.get(subtype) ?? 0;
+  return (mask & (side === "debit" ? 1 : 2)) !== 0;
+}
+
+/**
  * The D-047 semantic-matrix violation of one line, or null when the line is allowed.
  * Separate from `assertSemanticJournalLine` so the posting hot path builds the line
  * path only for a failing line (D-137).
@@ -1806,8 +1824,7 @@ export function semanticJournalLineViolation(
     }
     return null;
   }
-  const rules = SEMANTIC_LINE_RULES[kind];
-  if (!rules.some((rule) => rule.subtype === account.subtype && rule.side === side)) {
+  if (!semanticRuleAllows(kind, account.subtype, side)) {
     return `transactionKind ${JSON.stringify(kind)} may not ${side} ${account.category} account ${String(account.id)} (${account.subtype}) under the M4b semantic matrix`;
   }
   return null;
@@ -2022,8 +2039,8 @@ export function accountingTotals(finance: FinanceState): AccountingTotals {
   let equity = 0;
   let revenues = 0;
   let expenses = 0;
-  for (const value of accounts) {
-    const account = value as FinancialAccount;
+  for (let index = 0; index < accounts.length; index += 1) {
+    const account = accounts[index] as FinancialAccount;
     const balance = account.balanceRUSD;
     // `requireFiniteNumber`'s check and message, built only on failure (D-137).
     if (typeof balance !== "number" || !Number.isFinite(balance)) {
@@ -2076,7 +2093,9 @@ export function designatedCashTotal(finance: FinanceState): MoneyRUSD {
   let total = 0;
   // D-137: the cached designated-cash accounts, in array order (the order the scan
   // of every account summed them in).
-  for (const account of accountLookup(accounts).cash) {
+  const cash = accountLookup(accounts).cash;
+  for (let index = 0; index < cash.length; index += 1) {
+    const account = cash[index] as FinancialAccount;
     const balance = account.balanceRUSD;
     // `requireFiniteNumber`'s check and message, built only on failure (D-137).
     if (typeof balance !== "number" || !Number.isFinite(balance)) {

@@ -53,6 +53,7 @@ import {
   type FinancialAccount,
   type JournalLine,
   type JournalPosting,
+  type JournalSide,
   type PublicTransactionKind,
   type TransactionKind,
 } from "./types.js";
@@ -395,6 +396,14 @@ export function postJournalBatch(
   finance: FinanceState,
   dayIndex: Day,
   entries: readonly JournalEntryInput[],
+  options: {
+    /**
+     * The caller built each entry's line array and line objects for this call and
+     * keeps no reference to them (D-139), so retained postings adopt the lines
+     * instead of copying them. Defaults to copying.
+     */
+    readonly adoptLines?: boolean;
+  } = {},
 ): JournalPosting[] {
   assertValidDayIndex(dayIndex);
   const accounts = accountMap(finance);
@@ -473,7 +482,10 @@ export function postJournalBatch(
       id: postingId,
       dayIndex,
       transactionKind: entry.transactionKind,
-      lines: retained ? entry.lines.map((line) => ({ ...line })) : [...entry.lines],
+      lines:
+        retained && options.adoptLines !== true
+          ? entry.lines.map((line) => ({ ...line }))
+          : (entry.lines as JournalLine[]),
       sourceEntityId: entry.sourceEntityId ?? null,
       targetEntityId: entry.targetEntityId ?? null,
     };
@@ -524,4 +536,208 @@ export function postCashTransfer(
     sourceEntityId,
     targetEntityId,
   );
+}
+
+/**
+ * Journal lines of several entries in columns (D-139). Entry `e` owns lines
+ * `[entryStart[e], entryStart[e + 1])`; `debit` is 1 for a debit line, 0 for a credit.
+ */
+export interface JournalLineColumns {
+  readonly accountId: number[];
+  readonly debit: number[];
+  readonly amount: number[];
+}
+
+export interface JournalColumnEntry {
+  readonly transactionKind: PublicTransactionKind;
+  readonly start: number;
+  readonly end: number;
+  readonly sourceEntityId: Id | null;
+  readonly targetEntityId: Id | null;
+}
+
+/** Postings applied by `postJournalColumns`, materialised on demand. */
+export interface DeferredPostings {
+  readonly firstId: number;
+  readonly count: number;
+  /** Posting objects of entries `from..count - 1` (lines materialised). */
+  materialize(from: number): JournalPosting[];
+}
+
+/** Kinds whose structure checks read whole line objects; none is a market kind. */
+function needsLineObjects(kind: TransactionKind): boolean {
+  return !(kind === "goods-purchase" || kind === "input-purchase" || kind === "wages" || kind === "upkeep");
+}
+
+/**
+ * `postJournalBatch` for entries whose lines are columns (D-139). Every check, its
+ * order and message, the batch affordability rule and each account's summation order
+ * are those of `postJournalBatch`. The postings get their ids and the balances change,
+ * but nothing is added to the audit buffer: the caller materialises the postings that
+ * can still be among the newest `MAX_AUDIT_POSTINGS` once it knows how many postings
+ * follow them (see `retainDeferredPostings`).
+ */
+export function postJournalColumns(
+  finance: FinanceState,
+  dayIndex: Day,
+  entries: readonly JournalColumnEntry[],
+  lines: JournalLineColumns,
+): DeferredPostings {
+  assertValidDayIndex(dayIndex);
+  const accounts = accountMap(finance);
+  const financeIndex = buildFinanceIndex(finance);
+  const accountOf = (id: number): FinancialAccount | undefined => financeIndex.account(id);
+  const nextId = requireInteger(
+    finance.nextPostingId,
+    "finance.nextPostingId",
+    1,
+    Number.MAX_SAFE_INTEGER,
+  );
+  const lineObjects = (entry: JournalColumnEntry): JournalLine[] => {
+    const objects: JournalLine[] = [];
+    for (let line = entry.start; line < entry.end; line += 1) {
+      objects.push({
+        accountId: lines.accountId[line] ?? 0,
+        side: lines.debit[line] === 1 ? "debit" : "credit",
+        amountRUSD: lines.amount[line] ?? 0,
+      });
+    }
+    return objects;
+  };
+  const deferred = (count: number): DeferredPostings => ({
+    firstId: nextId,
+    count,
+    materialize(from) {
+      const postings: JournalPosting[] = [];
+      for (let index = Math.max(0, from); index < count; index += 1) {
+        const entry = entries[index] as JournalColumnEntry;
+        postings.push({
+          id: nextId + index,
+          dayIndex,
+          transactionKind: entry.transactionKind,
+          lines: lineObjects(entry),
+          sourceEntityId: entry.sourceEntityId,
+          targetEntityId: entry.targetEntityId,
+        });
+      }
+      return postings;
+    },
+  });
+  if (entries.length === 0) return deferred(0);
+  if (nextId + entries.length > Number.MAX_SAFE_INTEGER) {
+    throw new RangeError("finance posting id overflow");
+  }
+  const accountList = finance.accounts;
+  const batch: BatchDeltas = {
+    positionOf: (id) => financeIndex.position(id),
+    delta: new Float64Array(accountList.length),
+    seen: new Uint8Array(accountList.length),
+    touched: [],
+  };
+  for (let index = 0; index < entries.length; index += 1) {
+    const entry = entries[index];
+    if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
+    assertPublicTransactionKind(entry.transactionKind);
+    if (needsLineObjects(entry.transactionKind)) {
+      const validated = validatePostingLines(
+        lineObjects(entry),
+        accounts,
+        entry.transactionKind,
+        accountOf,
+        undefined,
+        batch,
+      );
+      assertCashConservation(entry.transactionKind, validated.cashDelta, validated.debits);
+      continue;
+    }
+    if (entry.end <= entry.start) throw new RangeError("journal posting must contain at least one line");
+    let debits = 0;
+    let credits = 0;
+    let cashDelta = 0;
+    for (let line = entry.start; line < entry.end; line += 1) {
+      const index_ = line - entry.start;
+      const accountId = lines.accountId[line];
+      if (typeof accountId !== "number" || !Number.isInteger(accountId)) {
+        throw new TypeError(`journal line ${String(index_)}.accountId must be an integer`);
+      }
+      if (accountId < 0 || accountId > 0xffff_ffff) {
+        throw new RangeError(
+          `journal line ${String(index_)}.accountId must be in 0..${String(0xffff_ffff)}, received ${String(accountId)}`,
+        );
+      }
+      const account = accountOf(accountId);
+      if (account === undefined) {
+        throw new RangeError(`journal line ${String(index_)} references unknown account ${String(accountId)}`);
+      }
+      const debit = lines.debit[line];
+      if (debit !== 0 && debit !== 1) {
+        throw new RangeError(`journal line ${String(index_)}.side must be debit or credit`);
+      }
+      const side: JournalSide = debit === 1 ? "debit" : "credit";
+      const amount = lines.amount[line];
+      if (typeof amount !== "number" || !Number.isFinite(amount)) {
+        throw new TypeError(`journal line ${String(index_)}.amountRUSD must be a finite number`);
+      }
+      if (!(amount > 0)) {
+        throw new RangeError(`journal line ${String(index_)}.amountRUSD must be strictly positive`);
+      }
+      const violation = semanticJournalLineViolation(entry.transactionKind, account, side);
+      if (violation !== null) throw new RangeError(`journal line ${String(index_)}: ${violation}`);
+      const signed = side === accountNormalSide(account.category) ? amount : -amount;
+      if (debit === 1) debits += amount;
+      else credits += amount;
+      const position = batch.positionOf(accountId);
+      if (batch.seen[position] === 0) {
+        batch.seen[position] = 1;
+        batch.delta[position] = 0 + signed;
+        batch.touched.push(position);
+      } else {
+        batch.delta[position] = (batch.delta[position] ?? 0) + signed;
+      }
+      if (isCashAccount(account)) cashDelta += signed;
+    }
+    if (Math.abs(debits - credits) > MONEY_TOLERANCE_RUSD) {
+      throw new RangeError(
+        `journal posting is unbalanced: debits ${String(debits)} != credits ${String(credits)}`,
+      );
+    }
+    assertCashConservation(entry.transactionKind, cashDelta, debits);
+  }
+  for (const position of batch.touched) {
+    const account = accountList[position] as FinancialAccount;
+    const delta = batch.delta[position] ?? 0;
+    const next = account.balanceRUSD + delta;
+    if (!Number.isFinite(next)) {
+      throw new RangeError(`posting would make account ${String(account.id)} non-finite`);
+    }
+    if (!categoryAllowsNegativeBalance(account.category) && next < 0) {
+      throw new RangeError(
+        `insufficient funds; posting would make ${account.category} account ${String(account.id)} negative: ${String(account.balanceRUSD)} + ${String(delta)} < 0`,
+      );
+    }
+  }
+  for (const position of batch.touched) {
+    const account = accountList[position] as FinancialAccount;
+    account.balanceRUSD += batch.delta[position] ?? 0;
+  }
+  finance.nextPostingId = nextId + entries.length;
+  return deferred(entries.length);
+}
+
+/**
+ * Add the deferred postings that are still among the newest `MAX_AUDIT_POSTINGS`
+ * to the audit buffer (D-139). `laterPostings` is the number of postings applied
+ * after them. The buffer then holds exactly what posting them eagerly would have
+ * left: the newest postings by id.
+ */
+export function retainDeferredPostings(
+  finance: FinanceState,
+  deferredPostings: DeferredPostings,
+  laterPostings: number,
+): void {
+  const survivors = Math.max(0, MAX_AUDIT_POSTINGS - laterPostings);
+  if (survivors === 0 || deferredPostings.count === 0) return;
+  const retained = deferredPostings.materialize(deferredPostings.count - survivors);
+  const merged = [...finance.postings, ...retained].sort((left, right) => left.id - right.id);
+  finance.postings = merged.length > MAX_AUDIT_POSTINGS ? merged.slice(merged.length - MAX_AUDIT_POSTINGS) : merged;
 }

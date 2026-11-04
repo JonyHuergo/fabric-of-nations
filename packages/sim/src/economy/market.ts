@@ -81,6 +81,21 @@ export interface MarketDayInput {
   readonly needs: readonly NeedTierDef[];
   readonly householdDemands: readonly HouseholdDemandRecord[];
   readonly productionDemands: readonly ProductionDemandRecord[];
+  /**
+   * Household demand in columns (D-139), used by the integrated day instead of one
+   * record object per row. When present, `householdDemands` must be empty; the rows
+   * are validated exactly as records are, with the same paths and messages.
+   */
+  readonly householdColumns?: HouseholdDemandColumns;
+}
+
+/** Household demand records in columns, row `i` being record `i` (D-139). */
+export interface HouseholdDemandColumns {
+  readonly popBlockId: readonly number[];
+  readonly tier: readonly HouseholdTier[];
+  readonly goodId: readonly number[];
+  readonly desired: readonly number[];
+  readonly funded: readonly number[];
 }
 
 export interface HouseholdDemandResult {
@@ -247,6 +262,8 @@ function productionInputTier(
  * passes none gets the same lookups built for its single call.
  */
 export interface MarketDayLookups {
+  /** The definitions the lookups were built for (D-139 validation memo key). */
+  readonly definitions?: EconomyDefinitions;
   readonly blockById: ReadonlyMap<number, World["popBlocks"][number]>;
   /** Buildings, province membership and production capacities (shared with M3c). */
   readonly production: ProductionLookups;
@@ -257,7 +274,7 @@ export function buildMarketDayLookups(world: World, definitions: EconomyDefiniti
   for (const block of world.popBlocks) {
     if (!blockById.has(block.id)) blockById.set(block.id, block);
   }
-  return { blockById, production: buildProductionLookups(world, definitions) };
+  return { definitions, blockById, production: buildProductionLookups(world, definitions) };
 }
 
 export interface MarketDayOptions extends PhaseValidationOptions {
@@ -269,6 +286,62 @@ export interface MarketDayOptions extends PhaseValidationOptions {
    * transactions by their full canonical key). Defaults to `full`.
    */
   readonly detail?: "full" | "summary";
+}
+
+/**
+ * Duplicate detection for numeric keys (D-139). Rows built by the integrated day
+ * arrive in strictly increasing key order, where no duplicate is possible; the set
+ * is built only if the order breaks. `add` returns false for a duplicate.
+ */
+function duplicateKeys(): { add(key: number): boolean } {
+  const keys: number[] = [];
+  let set: Set<number> | null = null;
+  return {
+    add(key) {
+      if (set === null) {
+        const last = keys[keys.length - 1];
+        if (last === undefined || key > last) {
+          keys.push(key);
+          return true;
+        }
+        set = new Set(keys);
+      }
+      if (set.has(key)) return false;
+      set.add(key);
+      return true;
+    },
+  };
+}
+
+interface ValidationMemo {
+  readonly goodIds: ReadonlySet<number>;
+  readonly buildingById: Map<number, BuildingDef>;
+  readonly criticalGoods: ReadonlySet<number>;
+}
+
+/** Per-day validation sets, keyed by the day lookups and the needs array (D-139). */
+const validationMemos = new WeakMap<MarketDayLookups, Map<readonly NeedTierDef[], ValidationMemo>>();
+
+function validationMemo(
+  lookups: MarketDayLookups,
+  definitions: EconomyDefinitions,
+  needs: readonly NeedTierDef[],
+): ValidationMemo {
+  let byNeeds = validationMemos.get(lookups);
+  if (byNeeds === undefined) {
+    byNeeds = new Map();
+    validationMemos.set(lookups, byNeeds);
+  }
+  let memo = byNeeds.get(needs);
+  if (memo === undefined || lookups.definitions !== definitions) {
+    memo = {
+      goodIds: new Set(definitions.goods.map((good) => good.id)),
+      buildingById: new Map(definitions.buildings.map((building) => [building.id, building])),
+      criticalGoods: criticalGoodIds(definitions, needs),
+    };
+    if (lookups.definitions === definitions) byNeeds.set(needs, memo);
+  }
+  return memo;
 }
 
 function validateMarketDayInput(
@@ -304,40 +377,64 @@ function validateMarketDayInput(
   const lookups = options.lookups ?? buildMarketDayLookups(world, definitions);
   const marketProvinceIdSet: ReadonlySet<number> =
     lookups.production.provinceIdsByMarket.get(market.id) ?? new Set(marketProvinceIds(world, market.id));
-  const goodIds = new Set(definitions.goods.map((good) => good.id));
+  // D-139: definition-derived sets once per day (memoised on the day lookups).
+  const memo = validationMemo(lookups, definitions, input.needs);
+  const goodIds = memo.goodIds;
   const blockById = lookups.blockById;
-  const buildingById = new Map(definitions.buildings.map((building) => [building.id, building]));
-  const criticalGoods = criticalGoodIds(definitions, input.needs);
+  const buildingById = memo.buildingById;
+  const criticalGoods = memo.criticalGoods;
   // Good ids equal their definition index (validated), so these numeric keys are
   // collision-free for uint32 buyer ids.
   const goodCount = definitions.goods.length;
-  const householdKeys = new Set<number>();
-  for (let index = 0; index < input.householdDemands.length; index += 1) {
-    const demand = input.householdDemands[index];
-    if (demand === undefined) throw new RangeError("missing household demand");
-    const path = `householdDemands[${String(index)}]`;
-    if (!blockById.has(demand.popBlockId)) {
-      throw new RangeError(`${path}.popBlockId references an unknown pop block`);
+  const householdKeys = duplicateKeys();
+  const columns = input.householdColumns;
+  if (columns !== undefined && input.householdDemands.length > 0) {
+    throw new RangeError("market-day input must not carry both household records and columns");
+  }
+  const householdRows = columns !== undefined ? columns.popBlockId.length : input.householdDemands.length;
+  for (let index = 0; index < householdRows; index += 1) {
+    let popBlockId: number;
+    let tier: number;
+    let goodId: number;
+    let desiredValue: unknown;
+    let fundedValue: unknown;
+    if (columns !== undefined) {
+      popBlockId = columns.popBlockId[index] ?? Number.NaN;
+      tier = columns.tier[index] ?? 0;
+      goodId = columns.goodId[index] ?? Number.NaN;
+      desiredValue = columns.desired[index];
+      fundedValue = columns.funded[index];
+    } else {
+      const demand = input.householdDemands[index];
+      if (demand === undefined) throw new RangeError("missing household demand");
+      popBlockId = demand.popBlockId;
+      tier = demand.tier;
+      goodId = demand.goodId;
+      desiredValue = demand.desiredQuantity;
+      fundedValue = demand.fundedQuantity;
     }
-    const block = blockById.get(demand.popBlockId);
-    if (block !== undefined && !marketProvinceIdSet.has(block.provinceId)) {
-      throw new RangeError(`${path}.popBlockId is outside market ${String(market.id)}`);
+    const path = (): string => `householdDemands[${String(index)}]`;
+    const block = blockById.get(popBlockId);
+    if (block === undefined) {
+      throw new RangeError(`${path()}.popBlockId references an unknown pop block`);
     }
-    if (!isHouseholdTier(demand.tier)) {
-      throw new RangeError(`${path}.tier must be 1, 3, or 6`);
+    if (!marketProvinceIdSet.has(block.provinceId)) {
+      throw new RangeError(`${path()}.popBlockId is outside market ${String(market.id)}`);
     }
-    if (!goodIds.has(demand.goodId)) throw new RangeError(`${path}.goodId is unknown`);
-    const desired = assertQuantity(demand.desiredQuantity, `${path}.desiredQuantity`);
-    const funded = assertQuantity(demand.fundedQuantity, `${path}.fundedQuantity`);
+    if (!isHouseholdTier(tier)) {
+      throw new RangeError(`${path()}.tier must be 1, 3, or 6`);
+    }
+    if (!goodIds.has(goodId)) throw new RangeError(`${path()}.goodId is unknown`);
+    const desired = assertQuantity(desiredValue, `${path()}.desiredQuantity`);
+    const funded = assertQuantity(fundedValue, `${path()}.fundedQuantity`);
     if (funded > desired + tolerance(desired, funded)) {
-      throw new RangeError(`${path}.fundedQuantity cannot exceed desiredQuantity`);
+      throw new RangeError(`${path()}.fundedQuantity cannot exceed desiredQuantity`);
     }
-    const key = (demand.popBlockId * 8 + demand.tier) * goodCount + demand.goodId;
-    if (householdKeys.has(key)) throw new RangeError(`${path} duplicates a household demand`);
-    householdKeys.add(key);
+    const key = (popBlockId * 8 + tier) * goodCount + goodId;
+    if (!householdKeys.add(key)) throw new RangeError(`${path()} duplicates a household demand`);
   }
 
-  const productionKeys = new Set<number>();
+  const productionKeys = duplicateKeys();
   for (let index = 0; index < input.productionDemands.length; index += 1) {
     const demand = input.productionDemands[index];
     if (demand === undefined) throw new RangeError("missing production demand");
@@ -375,8 +472,7 @@ function validateMarketDayInput(
       throw new RangeError(`${path}.fundedQuantity cannot exceed desiredQuantity`);
     }
     const key = demand.buyerBuildingId * goodCount + demand.goodId;
-    if (productionKeys.has(key)) throw new RangeError(`${path} duplicates a production demand`);
-    productionKeys.add(key);
+    if (!productionKeys.add(key)) throw new RangeError(`${path} duplicates a production demand`);
   }
 
   return { marketId: market.id, criticalGoods, buildingById };
@@ -503,7 +599,9 @@ export function runMarketDay(
   const detail = options.detail ?? "full";
 
   // Demand columns: household records first, then production records (input order).
-  const householdCount = input.householdDemands.length;
+  const householdColumns = input.householdColumns;
+  const householdCount =
+    householdColumns !== undefined ? householdColumns.popBlockId.length : input.householdDemands.length;
   const demandCount = householdCount + input.productionDemands.length;
   const kind = new Uint8Array(demandCount);
   const buyer = new Float64Array(demandCount);
@@ -515,13 +613,23 @@ export function runMarketDay(
   const passA = new Float64Array(demandCount);
   const passB = new Float64Array(demandCount);
   const fulfilled = new Float64Array(demandCount);
-  for (let index = 0; index < householdCount; index += 1) {
-    const demand = input.householdDemands[index] as HouseholdDemandRecord;
-    buyer[index] = demand.popBlockId;
-    tierOf[index] = demand.tier;
-    goodOf[index] = demand.goodId;
-    desired[index] = demand.desiredQuantity;
-    funded[index] = demand.fundedQuantity;
+  if (householdColumns !== undefined) {
+    for (let index = 0; index < householdCount; index += 1) {
+      buyer[index] = householdColumns.popBlockId[index] ?? 0;
+      tierOf[index] = householdColumns.tier[index] ?? 0;
+      goodOf[index] = householdColumns.goodId[index] ?? 0;
+      desired[index] = householdColumns.desired[index] ?? 0;
+      funded[index] = householdColumns.funded[index] ?? 0;
+    }
+  } else {
+    for (let index = 0; index < householdCount; index += 1) {
+      const demand = input.householdDemands[index] as HouseholdDemandRecord;
+      buyer[index] = demand.popBlockId;
+      tierOf[index] = demand.tier;
+      goodOf[index] = demand.goodId;
+      desired[index] = demand.desiredQuantity;
+      funded[index] = demand.fundedQuantity;
+    }
   }
   for (let index = householdCount; index < demandCount; index += 1) {
     const demand = input.productionDemands[index - householdCount] as ProductionDemandRecord;
@@ -607,10 +715,13 @@ export function runMarketDay(
     phase: 0 | 1,
   ): { readonly totalFunded: number; readonly fulfilled: number } => {
     relevant.length = 0;
-    for (const index of candidates) if (fundedOf(index) > 0) relevant.push(index);
+    for (let item = 0; item < candidates.length; item += 1) {
+      const index = candidates[item] as number;
+      if (fundedOf(index) > 0) relevant.push(index);
+    }
     allocationOrderSorted(relevant, kind, buyer, tierOf);
     let totalFunded = 0;
-    for (const index of relevant) totalFunded += fundedOf(index);
+    for (let item = 0; item < relevant.length; item += 1) totalFunded += fundedOf(relevant[item] as number);
     if (totalFunded <= tolerance(totalFunded)) return { totalFunded: 0, fulfilled: 0 };
 
     const ownerCount = lots.owners.length;
@@ -630,7 +741,8 @@ export function runMarketDay(
     const scale = fulfilledTotal / totalFunded;
     plannedQuantity.length = 0;
     let plannedTotal = 0;
-    for (const index of relevant) {
+    for (let item = 0; item < relevant.length; item += 1) {
+      const index = relevant[item] as number;
       const quantity = totalFunded <= available ? fundedOf(index) : fundedOf(index) * scale;
       plannedQuantity.push(quantity);
       plannedTotal += quantity;
@@ -642,15 +754,16 @@ export function runMarketDay(
     // D-133 sequential pairing over the cumulative lot and buyer intervals.
     lotEnd.length = 0;
     let cumulative = 0;
-    for (const slot of lotSlots) {
+    for (let item = 0; item < lotSlots.length; item += 1) {
+      const slot = lotSlots[item] as number;
       cumulative += ((lots.quantity[base + slot] ?? 0) / available) * fulfilledTotal;
       lotEnd.push(cumulative);
     }
     lotEnd[lotEnd.length - 1] = fulfilledTotal;
     buyerEnd.length = 0;
     cumulative = 0;
-    for (const quantity of plannedQuantity) {
-      cumulative += quantity;
+    for (let item = 0; item < plannedQuantity.length; item += 1) {
+      cumulative += plannedQuantity[item] as number;
       buyerEnd.push(cumulative);
     }
     if (buyerEnd.length > 0) buyerEnd[buyerEnd.length - 1] = fulfilledTotal;

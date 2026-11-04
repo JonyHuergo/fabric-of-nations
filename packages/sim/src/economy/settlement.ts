@@ -32,7 +32,12 @@ import type { DayIndex, Id, Seed } from "../types.js";
 import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
 import {
   postJournalBatch,
+  postJournalColumns,
+  retainDeferredPostings,
+  type DeferredPostings,
+  type JournalColumnEntry,
   type JournalEntryInput,
+  type JournalLineColumns,
 } from "./accounting.js";
 import {
   buildFinanceIndex,
@@ -525,23 +530,75 @@ function prepareTransactions(
   let position = 0;
   for (const chunk of chunks) {
     if (chunk.columns !== undefined) {
+      // D-139: market-day columns, checked inline with `recordRow`'s checks, order and
+      // messages (their kind and phase are codes, so those two checks cannot fail).
       const columns = chunk.columns;
       for (let row = 0; row < columns.kind.length; row += 1) {
-        const household = columns.kind[row] === 0;
-        const buyerValue = columns.buyer[row] ?? 0;
-        recordRow(
-          position,
-          household ? "household-purchase" : "input-purchase",
-          household ? buyerValue : null,
-          household ? null : buyerValue,
-          columns.seller[row] ?? 0,
-          columns.good[row] ?? 0,
-          columns.quantity[row] ?? 0,
-          columns.unitPrice[row] ?? 0,
-          columns.total[row] ?? 0,
-          columns.tier[row] ?? 0,
-          columns.phase[row] === 0 ? "A" : "B",
-        );
+        const quantity = columns.quantity[row] ?? Number.NaN;
+        const unitPriceRUSD = columns.unitPrice[row] ?? Number.NaN;
+        const totalRUSD = columns.total[row] ?? Number.NaN;
+        assertTransactionAmount(quantity, unitPriceRUSD, totalRUSD, position);
+        const goodId = columns.good[row] ?? Number.NaN;
+        if (!(Number.isInteger(goodId) && goodId >= 0 && goodId < goodKnown.length && goodKnown[goodId] === 1)) {
+          throw new RangeError(`pendingTransactions[${String(position)}].goodId is unknown`);
+        }
+        const sellerId = columns.seller[row] ?? Number.NaN;
+        if (stateOf(sellerId) === 0) {
+          throw new RangeError(`pendingTransactions[${String(position)}].sellerBuildingId is unknown`);
+        }
+        const sellerCashId = tableAccount(operatingIds, sellerId);
+        if (sellerCashId < 0) throw new RangeError(`building ${String(sellerId)} has no valid operating account`);
+        const sellerRevenueId = tableAccount(revenueIds, sellerId);
+        if (sellerRevenueId < 0) {
+          throw new RangeError(`missing sales-revenue account for building ${String(sellerId)}`);
+        }
+        const buyerId = columns.buyer[row] ?? Number.NaN;
+        const kindCode = columns.kind[row] ?? -1;
+        let buyerCashId: number;
+        let buyerExpenseId: number;
+        if (kindCode === 0) {
+          buyerCashId = tableAccount(householdIds, buyerId);
+          if (buyerCashId < 0) throw new RangeError(`popBlock ${String(buyerId)} has no valid household account`);
+          buyerExpenseId = tableAccount(consumptionIds, buyerId);
+          if (buyerExpenseId < 0) {
+            throw new RangeError(`missing consumption-expense account for popBlock ${String(buyerId)}`);
+          }
+        } else if (kindCode === 1) {
+          if (stateOf(buyerId) !== 2) {
+            throw new RangeError(
+              `pendingTransactions[${String(position)}].buyerBuildingId must reference an operational building`,
+            );
+          }
+          buyerCashId = tableAccount(operatingIds, buyerId);
+          if (buyerCashId < 0) throw new RangeError(`building ${String(buyerId)} has no valid operating account`);
+          buyerExpenseId = tableAccount(inputExpenseIds, buyerId);
+          if (buyerExpenseId < 0) {
+            throw new RangeError(`missing input-expense account for building ${String(buyerId)}`);
+          }
+        } else {
+          throw new RangeError(`pendingTransactions[${String(position)}].kind is invalid`);
+        }
+        const tierValue = columns.tier[row] ?? 0;
+        if (!MARKET_TRANSACTION_TIERS.has(tierValue)) {
+          throw new RangeError(`pendingTransactions[${String(position)}].tier is invalid`);
+        }
+        const phaseCode = columns.phase[row] ?? -1;
+        if (phaseCode !== 0 && phaseCode !== 1) {
+          throw new RangeError(`pendingTransactions[${String(position)}].phase must be A or B`);
+        }
+        prepared.kind[position] = kindCode;
+        prepared.buyer[position] = buyerId;
+        prepared.seller[position] = sellerId;
+        prepared.good[position] = goodId;
+        prepared.tier[position] = tierValue;
+        prepared.phase[position] = phaseCode;
+        prepared.quantity[position] = quantity;
+        prepared.unitPrice[position] = unitPriceRUSD;
+        prepared.total[position] = totalRUSD;
+        prepared.buyerCash[position] = buyerCashId;
+        prepared.buyerExpense[position] = buyerExpenseId;
+        prepared.sellerCash[position] = sellerCashId;
+        prepared.sellerRevenue[position] = sellerRevenueId;
         position += 1;
       }
     } else {
@@ -639,7 +696,10 @@ function settledTransactions(prepared: PreparedColumns): SettledMarketTransactio
  * sellers use a slot map. Each sum adds the same amounts in the same order as the
  * former per-group maps, and lines follow ascending account id as before.
  */
-function aggregatedMarketEntries(prepared: PreparedColumns, goodCount: number): JournalEntryInput[] {
+function aggregatedMarketEntries(
+  prepared: PreparedColumns,
+  goodCount: number,
+): { readonly entries: JournalColumnEntry[]; readonly lines: JournalLineColumns } {
   const { count, order, kind, good, total } = prepared;
   const groupCount = 2 * goodCount;
   interface GroupLists {
@@ -687,8 +747,16 @@ function aggregatedMarketEntries(prepared: PreparedColumns, goodCount: number): 
     }
     runLength = 0;
   };
-  // Seller slot per (group, seller account).
-  const sellerSlot = new Map<number, number>();
+  // Seller slot per (group, seller building): a seller building has one cash account.
+  let maxSeller = 0;
+  for (let index = 0; index < count; index += 1) {
+    const sellerId = prepared.seller[index] ?? 0;
+    if (sellerId > maxSeller) maxSeller = sellerId;
+  }
+  const sellerStride = maxSeller + 1;
+  const sellerSlot =
+    groupCount * sellerStride <= 8_000_000 ? new Int32Array(groupCount * sellerStride).fill(-1) : null;
+  const sellerSlotMap = sellerSlot === null ? new Map<number, number>() : null;
   for (let index = 0; index < count; index += 1) {
     const position = order[index] ?? 0;
     const transactionKind = kind[position] ?? 0;
@@ -712,11 +780,13 @@ function aggregatedMarketEntries(prepared: PreparedColumns, goodCount: number): 
     }
     const group = transactionKind * goodCount + goodId;
     const sellerAccountId = prepared.sellerCash[position] ?? 0;
-    const slotKey = sellerAccountId * groupCount + group;
-    const slot = sellerSlot.get(slotKey);
+    const slotKey = group * sellerStride + (prepared.seller[position] ?? 0);
+    const found = sellerSlot !== null ? (sellerSlot[slotKey] ?? -1) : (sellerSlotMap?.get(slotKey) ?? -1);
+    const slot = found < 0 ? undefined : found;
     const lists = listOf(group);
     if (slot === undefined) {
-      sellerSlot.set(slotKey, lists.sellerAccount.length);
+      if (sellerSlot !== null) sellerSlot[slotKey] = lists.sellerAccount.length;
+      else sellerSlotMap?.set(slotKey, lists.sellerAccount.length);
       lists.sellerAccount.push(sellerAccountId);
       lists.sellerRevenue.push(prepared.sellerRevenue[position] ?? 0);
       lists.sellerAmount.push(amount);
@@ -735,7 +805,13 @@ function aggregatedMarketEntries(prepared: PreparedColumns, goodCount: number): 
     for (let item = 0; item < accounts.length; item += 1) sorted[item] = (keys[item] ?? 0) % 2 ** 20;
     return sorted;
   };
-  const entries: JournalEntryInput[] = [];
+  const entries: JournalColumnEntry[] = [];
+  const lines: JournalLineColumns = { accountId: [], debit: [], amount: [] };
+  const pushLine = (accountId: number, debit: number, amount: number): void => {
+    lines.accountId.push(accountId);
+    lines.debit.push(debit);
+    lines.amount.push(amount);
+  };
   for (let transactionKind = 0; transactionKind < 2; transactionKind += 1) {
     for (let goodId = 0; goodId < goodCount; goodId += 1) {
       const lists = groups[transactionKind * goodCount + goodId];
@@ -743,30 +819,32 @@ function aggregatedMarketEntries(prepared: PreparedColumns, goodCount: number): 
       if (lists.buyerAccount.length >= 2 ** 20 || lists.sellerAccount.length >= 2 ** 20) {
         throw new RangeError("market posting group is too large");
       }
-      const lines: JournalLine[] = [];
+      const start = lines.accountId.length;
       for (const item of byAccount(lists.buyerAccount)) {
         const amount = lists.buyerAmount[item] ?? 0;
         if (!(amount > 0)) continue;
-        lines.push({ accountId: lists.buyerExpense[item] ?? 0, side: "debit", amountRUSD: amount });
-        lines.push({ accountId: lists.buyerAccount[item] ?? 0, side: "credit", amountRUSD: amount });
+        pushLine(lists.buyerExpense[item] ?? 0, 1, amount);
+        pushLine(lists.buyerAccount[item] ?? 0, 0, amount);
       }
       for (const item of byAccount(lists.sellerAccount)) {
         const amount = lists.sellerAmount[item] ?? 0;
         if (!(amount > 0)) continue;
-        lines.push({ accountId: lists.sellerAccount[item] ?? 0, side: "debit", amountRUSD: amount });
-        lines.push({ accountId: lists.sellerRevenue[item] ?? 0, side: "credit", amountRUSD: amount });
+        pushLine(lists.sellerAccount[item] ?? 0, 1, amount);
+        pushLine(lists.sellerRevenue[item] ?? 0, 0, amount);
       }
-      if (lines.length > 0) {
+      const end = lines.accountId.length;
+      if (end > start) {
         entries.push({
           transactionKind: transactionKind === 0 ? "goods-purchase" : "input-purchase",
-          lines,
+          start,
+          end,
           sourceEntityId: null,
           targetEntityId: null,
         });
       }
     }
   }
-  return entries;
+  return { entries, lines };
 }
 
 function allocateMoney(
@@ -1099,10 +1177,12 @@ function settleMarketDaysInternal(
   try {
     let goodCount = 0;
     for (const good of definitions.goods) if (good.id + 1 > goodCount) goodCount = good.id + 1;
+    // D-139: market postings with column lines; their audit copies are materialised
+    // below only if they can still be among the newest postings.
+    let marketPostings: DeferredPostings | null = null;
     if (transactions.count > 0) {
-      postings.push(
-        ...postJournalBatch(world.finance, dayIndex, aggregatedMarketEntries(transactions, goodCount)),
-      );
+      const market = aggregatedMarketEntries(transactions, goodCount);
+      marketPostings = postJournalColumns(world.finance, dayIndex, market.entries, market.lines);
     }
 
     const professions = new Map(definitions.professions.map((profession) => [profession.id, profession]));
@@ -1244,7 +1324,7 @@ function settleMarketDaysInternal(
       });
     }
     if (wageEntries.length > 0) {
-      postings.push(...postJournalBatch(world.finance, dayIndex, wageEntries));
+      postings.push(...postJournalBatch(world.finance, dayIndex, wageEntries, { adoptLines: true }));
     }
 
     const upkeepSettlements: UpkeepSettlement[] = [];
@@ -1306,7 +1386,10 @@ function settleMarketDaysInternal(
       unpaidUpkeepByBuilding.set(building.id, unpaid);
     }
     if (upkeepEntries.length > 0) {
-      postings.push(...postJournalBatch(world.finance, dayIndex, upkeepEntries));
+      postings.push(...postJournalBatch(world.finance, dayIndex, upkeepEntries, { adoptLines: true }));
+    }
+    if (marketPostings !== null) {
+      retainDeferredPostings(world.finance, marketPostings, wageEntries.length + upkeepEntries.length);
     }
 
     // D-139: per-owner sums in canonical transaction order, in id-indexed tables. A
@@ -1451,7 +1534,12 @@ function settleMarketDaysInternal(
       producers,
       households,
       totals,
-      postingIds: postings.map((posting) => posting.id),
+      postingIds: [
+        ...(marketPostings === null
+          ? []
+          : Array.from({ length: marketPostings.count }, (_, offset) => marketPostings.firstId + offset)),
+        ...postings.map((posting) => posting.id),
+      ],
     };
   } catch (error) {
     if (openingBalanceArray === null) throw error;

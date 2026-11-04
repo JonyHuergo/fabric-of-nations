@@ -60,6 +60,13 @@ function ageBandForAge(age: number): number {
   return Math.min(Math.floor(age / AGE_BAND_WIDTH), TERMINAL_AGE_INDEX);
 }
 
+/** `ageBandForAge` of every single-year age (D-139). */
+const BAND_OF_AGE: Uint8Array = (() => {
+  const table = new Uint8Array(SINGLE_AGE_COUNT);
+  for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) table[age] = ageBandForAge(age);
+  return table;
+})();
+
 interface DeathAllocation {
   readonly male: number;
   readonly female: number;
@@ -101,7 +108,7 @@ function allocateDeaths(
   bandAllocation.fill(0);
   bandRemainders.fill(-1);
   for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) {
-    const band = ageBandForAge(age);
+    const band = BAND_OF_AGE[age] ?? 0;
     bandExpected[band * 2] = (bandExpected[band * 2] ?? 0) + (expected[age] ?? 0);
     bandExpected[band * 2 + 1] =
       (bandExpected[band * 2 + 1] ?? 0) + (expected[SINGLE_AGE_COUNT + age] ?? 0);
@@ -208,6 +215,15 @@ export function applyDailyDemography(
     maleBandRates[band] = mortalityRatePer1000(definitions, year, band, "male");
     femaleBandRates[band] = mortalityRatePer1000(definitions, year, band, "female");
   }
+  // D-139: per-day fertility rates by maternal band and multipliers by profession;
+  // the same pure functions of (definitions, year), computed once instead of per block.
+  const fertilityByBand = new Float64Array(MATERNAL_AGE_GROUP_COUNT);
+  for (let band = 0; band < MATERNAL_AGE_GROUP_COUNT; band += 1) {
+    fertilityByBand[band] = ageSpecificFertilityRatePer1000(definitions, year, band);
+  }
+  const multiplierByProfession = new Map<Id, number>();
+  const maleEffectiveByBand = new Float64Array(17);
+  const femaleEffectiveByBand = new Float64Array(17);
   const deathScratch: DeathAllocationScratch = {
     bandExpected: new Float64Array(34),
     bandCounts: new Uint32Array(34),
@@ -237,25 +253,30 @@ export function applyDailyDemography(
     const mortalityMultiplier =
       needMortalityMultiplier(block) *
       (options.mortalityFactorByBlock?.get(block.id) ?? 1);
-    for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) {
-      const band = ageBandForAge(age);
-      const maleEffective = Math.min(
+    // The effective rate is a function of the band only, so it is formed once per
+    // band (D-139) with the same expression as before.
+    for (let band = 0; band < 17; band += 1) {
+      maleEffectiveByBand[band] = Math.min(
         1,
         ((maleBandRates[band] ?? 0) / 1000) * mortalityMultiplier,
       );
-      const femaleEffective = Math.min(
+      femaleEffectiveByBand[band] = Math.min(
         1,
         ((femaleBandRates[band] ?? 0) / 1000) * mortalityMultiplier,
       );
-      expectedDeaths[age] = ((male[age] ?? 0) * maleEffective) / days;
-      expectedDeaths[SINGLE_AGE_COUNT + age] = ((female[age] ?? 0) * femaleEffective) / days;
+    }
+    for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) {
+      const band = BAND_OF_AGE[age] ?? 0;
+      expectedDeaths[age] = ((male[age] ?? 0) * (maleEffectiveByBand[band] ?? 0)) / days;
+      expectedDeaths[SINGLE_AGE_COUNT + age] =
+        ((female[age] ?? 0) * (femaleEffectiveByBand[band] ?? 0)) / days;
     }
 
     // This is the exact same Float64Array traversal, initial value, and addition
     // order that allocateDeaths previously used for its largest-remainder
     // denominator. No expectedDeaths cell changes between this sum and the call.
     let totalExpectedDeaths = 0;
-    for (const value of expectedDeaths) totalExpectedDeaths += value;
+    for (let cell = 0; cell < expectedDeaths.length; cell += 1) totalExpectedDeaths += expectedDeaths[cell] ?? 0;
 
     let deaths = 0;
     if (totalExpectedDeaths > 0) {
@@ -270,14 +291,18 @@ export function applyDailyDemography(
       );
     }
 
-    const multiplier = fertilityMultiplier(definitions, block.professionId);
+    let multiplier = multiplierByProfession.get(block.professionId);
+    if (multiplier === undefined) {
+      multiplier = fertilityMultiplier(definitions, block.professionId);
+      multiplierByProfession.set(block.professionId, multiplier);
+    }
     let expectedBirths = 0;
     for (let age = REPRODUCTIVE_AGE_START; age <= REPRODUCTIVE_AGE_END; age += 1) {
       const maternalBand = Math.min(
         Math.floor((age - REPRODUCTIVE_AGE_START) / AGE_BAND_WIDTH),
         MATERNAL_AGE_GROUP_COUNT - 1,
       );
-      const rate = ageSpecificFertilityRatePer1000(definitions, year, maternalBand);
+      const rate = fertilityByBand[maternalBand] ?? 0;
       if (rate > 0) {
         expectedBirths += ((female[age] ?? 0) * (rate / 1000) * multiplier) / days;
       }
