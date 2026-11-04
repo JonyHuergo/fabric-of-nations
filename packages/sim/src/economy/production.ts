@@ -248,10 +248,16 @@ export function buildProductionLookups(
   };
 }
 
-function tolerance(...values: number[]): number {
-  let scale = 1;
-  for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return QUANTITY_TOLERANCE * scale;
+/**
+ * QUANTITY_TOLERANCE scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
+ * former rest parameter allocated an array on every call; a missing value is 0,
+ * which never raises the scale above 1, so the result is unchanged.
+ */
+function tolerance(a: number, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0): number {
+  return (
+    QUANTITY_TOLERANCE *
+    Math.max(1, Math.abs(a), Math.abs(b), Math.abs(c), Math.abs(d), Math.abs(e), Math.abs(f), Math.abs(g), Math.abs(h))
+  );
 }
 
 

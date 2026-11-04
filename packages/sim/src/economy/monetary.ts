@@ -454,7 +454,8 @@ export function runMonetaryPhase(
   options: PhaseValidationOptions = {},
 ): MonetaryPhaseResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
-  assertValidEconomyDefinitions(economyDefinitions);
+  // Staged mode: the integrated day validated the definitions once at its start.
+  if (options.validateWorld !== false) assertValidEconomyDefinitions(economyDefinitions);
   const empty: MonetaryPhaseResult = {
     dayIndex,
     managedCurrenciesUpdated: [],

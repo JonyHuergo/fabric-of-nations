@@ -44,10 +44,16 @@ import type { BuildingDef, EconomyDefinitions } from "./types.js";
 import { BUILDING_SECTORS } from "./types.js";
 import { buildProvinceOwnerMap } from "./country.js";
 
-function toleranceMoney(...values: number[]): number {
-  let scale = 1;
-  for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_RUSD * scale;
+/**
+ * MONEY_TOLERANCE_RUSD scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
+ * former rest parameter allocated an array on every call; a missing value is 0,
+ * which never raises the scale above 1, so the result is unchanged.
+ */
+function toleranceMoney(a: number, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0): number {
+  return (
+    MONEY_TOLERANCE_RUSD *
+    Math.max(1, Math.abs(a), Math.abs(b), Math.abs(c), Math.abs(d), Math.abs(e), Math.abs(f), Math.abs(g), Math.abs(h))
+  );
 }
 
 export interface IndustrialSubsidyBuildingResult {
@@ -113,7 +119,8 @@ export function runIndustrialSubsidyPhase(
   ) {
     throw new RangeError("industrial definitions do not match the world identity");
   }
-  assertValidEconomyDefinitions(definitions);
+  // Staged mode: the integrated day validated the definitions once at its start.
+  if (options.validateWorld !== false) assertValidEconomyDefinitions(definitions);
   if (options.validateWorld !== false) assertValidWorldForTick(world);
   if (
     !world.countries.some((country) =>

@@ -202,10 +202,16 @@ interface WageGroup {
   readonly obligationRUSD: number;
 }
 
-function toleranceMoney(...values: number[]): number {
-  let scale = 1;
-  for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_RUSD * scale;
+/**
+ * MONEY_TOLERANCE_RUSD scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
+ * former rest parameter allocated an array on every call; a missing value is 0,
+ * which never raises the scale above 1, so the result is unchanged.
+ */
+function toleranceMoney(a: number, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0): number {
+  return (
+    MONEY_TOLERANCE_RUSD *
+    Math.max(1, Math.abs(a), Math.abs(b), Math.abs(c), Math.abs(d), Math.abs(e), Math.abs(f), Math.abs(g), Math.abs(h))
+  );
 }
 
 function householdCash(index: FinanceIndex, popBlockId: Id): FinancialAccount {
@@ -332,13 +338,33 @@ function decimalRanks(
   values: Float64Array,
   count: number,
 ): { readonly rank: (value: number) => number; readonly size: number } {
+  // Distinct values in first-seen order; a stamp table when the values are small
+  // non-negative integers (always, for validated ids), else a set (D-139).
   const distinct: number[] = [];
-  const seen = new Set<number>();
+  let maxValue = 0;
+  let integral = true;
   for (let index = 0; index < count; index += 1) {
     const value = values[index] ?? 0;
-    if (!seen.has(value)) {
-      seen.add(value);
-      distinct.push(value);
+    if (!(Number.isInteger(value) && value >= 0)) integral = false;
+    else if (value > maxValue) maxValue = value;
+  }
+  if (integral && maxValue <= count * 8 + 4096) {
+    const seenTable = new Uint8Array(maxValue + 1);
+    for (let index = 0; index < count; index += 1) {
+      const value = values[index] ?? 0;
+      if (seenTable[value] === 0) {
+        seenTable[value] = 1;
+        distinct.push(value);
+      }
+    }
+  } else {
+    const seen = new Set<number>();
+    for (let index = 0; index < count; index += 1) {
+      const value = values[index] ?? 0;
+      if (!seen.has(value)) {
+        seen.add(value);
+        distinct.push(value);
+      }
     }
   }
   if (distinct.every((value) => value < 10_000_000)) {
@@ -1057,7 +1083,8 @@ export function settleMarketDays(
   } = {},
 ): MarketSettlementResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
-  assertValidEconomyDefinitions(definitions);
+  // Staged mode: the integrated day validated the definitions once at its start.
+  if (options.validateWorld !== false) assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");
   }

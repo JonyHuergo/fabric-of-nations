@@ -203,10 +203,16 @@ export interface MarketDayResult {
   settled: boolean;
 }
 
-function tolerance(...values: number[]): number {
-  let scale = 1;
-  for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return QUANTITY_TOLERANCE * scale;
+/**
+ * QUANTITY_TOLERANCE scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
+ * former rest parameter allocated an array on every call; a missing value is 0,
+ * which never raises the scale above 1, so the result is unchanged.
+ */
+function tolerance(a: number, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0): number {
+  return (
+    QUANTITY_TOLERANCE *
+    Math.max(1, Math.abs(a), Math.abs(b), Math.abs(c), Math.abs(d), Math.abs(e), Math.abs(f), Math.abs(g), Math.abs(h))
+  );
 }
 
 function assertQuantity(value: unknown, path: string): number {
@@ -425,8 +431,15 @@ function validateMarketDayInput(
       throw new RangeError(`${path()}.tier must be 1, 3, or 6`);
     }
     if (!goodIds.has(goodId)) throw new RangeError(`${path()}.goodId is unknown`);
-    const desired = assertQuantity(desiredValue, `${path()}.desiredQuantity`);
-    const funded = assertQuantity(fundedValue, `${path()}.fundedQuantity`);
+    // `assertQuantity`'s check and message; the path is built only on failure (D-139).
+    if (typeof desiredValue !== "number" || !Number.isFinite(desiredValue) || desiredValue < 0) {
+      throw new RangeError(`${path()}.desiredQuantity must be a finite non-negative number`);
+    }
+    if (typeof fundedValue !== "number" || !Number.isFinite(fundedValue) || fundedValue < 0) {
+      throw new RangeError(`${path()}.fundedQuantity must be a finite non-negative number`);
+    }
+    const desired = desiredValue;
+    const funded = fundedValue;
     if (funded > desired + tolerance(desired, funded)) {
       throw new RangeError(`${path()}.fundedQuantity cannot exceed desiredQuantity`);
     }
@@ -660,20 +673,26 @@ export function runMarketDay(
   const slotOfDemand = new Int32Array(householdCount).fill(-1);
   for (let index = 0; index < householdCount; index += 1) slotOfDemand[index] = blockSlot.get(buyer[index] ?? 0) ?? -1;
   // `householdTierTotals` over the current fulfilment, summed in demand order.
+  // D-139: desired totals never change; fulfilled totals are re-summed (in the same
+  // demand order, from zero) only after an allocation changed a tier-1/3 household
+  // fulfilment, which is when the former per-pass recomputation could differ.
+  for (let item = 0; item < tierOneThree.length; item += 1) {
+    const index = tierOneThree[item] as number;
+    const slot = slotOfDemand[index] ?? 0;
+    if (tierOf[index] === 1) desired1[slot] = (desired1[slot] ?? 0) + (desired[index] ?? 0);
+    else desired3[slot] = (desired3[slot] ?? 0) + (desired[index] ?? 0);
+  }
+  let totalsStale = true;
   const refreshTotals = (): void => {
-    desired1.fill(0);
+    if (!totalsStale) return;
+    totalsStale = false;
     fulfilled1.fill(0);
-    desired3.fill(0);
     fulfilled3.fill(0);
-    for (const index of tierOneThree) {
+    for (let item = 0; item < tierOneThree.length; item += 1) {
+      const index = tierOneThree[item] as number;
       const slot = slotOfDemand[index] ?? 0;
-      if (tierOf[index] === 1) {
-        desired1[slot] = (desired1[slot] ?? 0) + (desired[index] ?? 0);
-        fulfilled1[slot] = (fulfilled1[slot] ?? 0) + (fulfilled[index] ?? 0);
-      } else {
-        desired3[slot] = (desired3[slot] ?? 0) + (desired[index] ?? 0);
-        fulfilled3[slot] = (fulfilled3[slot] ?? 0) + (fulfilled[index] ?? 0);
-      }
+      if (tierOf[index] === 1) fulfilled1[slot] = (fulfilled1[slot] ?? 0) + (fulfilled[index] ?? 0);
+      else fulfilled3[slot] = (fulfilled3[slot] ?? 0) + (fulfilled[index] ?? 0);
     }
   };
   const isEligible = (index: number): boolean => {
@@ -698,6 +717,8 @@ export function runMarketDay(
   const resTier: number[] = [];
   const resGood: number[] = [];
   const resSeller: number[] = [];
+  /** Lot-table slot of each reservation's seller (same slots in every table). */
+  const resSellerSlot: number[] = [];
   const resQuantity: number[] = [];
   const resPhase: number[] = [];
 
@@ -780,6 +801,7 @@ export function runMarketDay(
         if (quantity > 0) {
           const demand = relevant[buyerIndex] ?? 0;
           fulfilled[demand] = (fulfilled[demand] ?? 0) + quantity;
+          if (kind[demand] === 0 && (tierOf[demand] === 1 || tierOf[demand] === 3)) totalsStale = true;
           if (phase === 0) passA[demand] = (passA[demand] ?? 0) + quantity;
           else passB[demand] = (passB[demand] ?? 0) + quantity;
           resKind.push(kind[demand] ?? 0);
@@ -787,6 +809,7 @@ export function runMarketDay(
           resTier.push(tierOf[demand] ?? 0);
           resGood.push(goodId);
           resSeller.push(sellerId);
+          resSellerSlot.push(lotSlots[lotIndex] ?? 0);
           resQuantity.push(quantity);
           resPhase.push(phase);
           reservedByLot[lotIndex] = (reservedByLot[lotIndex] ?? 0) + quantity;
@@ -903,7 +926,7 @@ export function runMarketDay(
     for (let index = 0; index < primaryCount; index += 1) {
       if (resKind[index] !== 0) continue;
       const goodId = resGood[index] ?? 0;
-      const cell = goodId * ownerCount + (opening.slotOf.get(resSeller[index] ?? 0) ?? 0);
+      const cell = goodId * ownerCount + (resSellerSlot[index] ?? 0);
       householdReservedByLot[cell] = (householdReservedByLot[cell] ?? 0) + (resQuantity[index] ?? 0);
       householdPassAByGood[goodId] = (householdPassAByGood[goodId] ?? 0) + (resQuantity[index] ?? 0);
     }
@@ -996,7 +1019,7 @@ export function runMarketDay(
     for (let index = 0; index < resKind.length; index += 1) {
       if (resKind[index] !== 0) continue;
       const goodId = resGood[index] ?? 0;
-      const cell = goodId * ownerCount + (opening.slotOf.get(resSeller[index] ?? 0) ?? 0);
+      const cell = goodId * ownerCount + (resSellerSlot[index] ?? 0);
       householdByLot[cell] = (householdByLot[cell] ?? 0) + (resQuantity[index] ?? 0);
       householdByGood[goodId] = (householdByGood[goodId] ?? 0) + (resQuantity[index] ?? 0);
     }

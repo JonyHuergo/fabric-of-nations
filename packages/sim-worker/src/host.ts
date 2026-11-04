@@ -94,6 +94,11 @@ export class SimulationHost {
    */
   private runner: RollbackRunner;
   private focusCountryId: number | null = null;
+  /**
+   * D-139: the world is still exactly `createEconomyWorld(baseScenario, seed)` as
+   * built at startup: never ticked, acted on, loaded or used for a campaign.
+   */
+  private pristine = false;
   private running = false;
   private speed: SpeedDaysPerSecond = DEFAULT_SPEED_DAYS_PER_SECOND;
   private sequence = 0;
@@ -125,6 +130,7 @@ export class SimulationHost {
     this.world = createEconomyWorld(options.scenario, { seed: options.seed });
     // `createEconomyWorld` validated the world (D-137: no second validation).
     this.runner = createRollbackRunner(this.world, { worldJustValidated: true });
+    this.pristine = true;
     this.lastClockMs = this.clock();
     this.lastSnapshotMs = this.lastClockMs;
     this.emitSnapshot("READY");
@@ -313,6 +319,7 @@ export class SimulationHost {
 
   /** Run exactly `count` complete ticks. Returns false after a fatal tick error. */
   private advanceTicks(count: number): boolean {
+    if (count > 0) this.pristine = false;
     for (let index = 0; index < count; index += 1) {
       if (isCampaignComplete(this.world)) {
         this.pause();
@@ -345,6 +352,7 @@ export class SimulationHost {
     actionId: string,
     action: CountryActionDto,
   ): void {
+    this.pristine = false;
     // The DTO union mirrors the validated action union; only the worker-stamped
     // day and source are added here. Narrowing by `kind` is preserved at runtime.
     const command = {
@@ -442,12 +450,26 @@ export class SimulationHost {
     let world: World;
     try {
       scenario = { ...this.baseScenario, playerCountryId };
-      world = createEconomyWorld(scenario, { seed: this.seed });
+      if (
+        this.pristine &&
+        this.world.playerCountryId === null &&
+        this.world.dayIndex === this.world.startDayIndex
+      ) {
+        // D-139: the startup world is `createEconomyWorld(baseScenario, seed)` and has
+        // not changed; the same call with a player country differs only in
+        // `playerCountryId`, which is set here (the country was checked above). The
+        // first campaign therefore does not rebuild and revalidate the 1900 world.
+        world = this.world;
+        world.playerCountryId = playerCountryId;
+      } else {
+        world = createEconomyWorld(scenario, { seed: this.seed });
+      }
     } catch (error) {
       reject([`new campaign could not be created: ${errorMessage(error)}`]);
       return;
     }
     this.pause();
+    this.pristine = false;
     this.scenario = scenario;
     this.world = world;
     this.runner = createRollbackRunner(world, { worldJustValidated: true });
@@ -535,6 +557,7 @@ export class SimulationHost {
   }
 
   private load(commandId: string, save: string): void {
+    this.pristine = false;
     let loaded: World;
     try {
       // `deserializeWorld` validates the whole world (D-137: not repeated here).

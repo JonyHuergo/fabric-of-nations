@@ -105,10 +105,29 @@ import {
   type TransactionKind,
 } from "./types.js";
 
-function toleranceMoney(...values: number[]): number {
-  let scale = 1;
-  for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_RUSD * scale;
+/**
+ * MONEY_TOLERANCE_RUSD scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
+ * former rest parameter allocated an array on every call; a missing value is 0,
+ * which never raises the scale above 1, so the result is unchanged.
+ */
+function toleranceMoney(
+  a: number,
+  b = 0,
+  c = 0,
+  d = 0,
+  e = 0,
+  f = 0,
+  g = 0,
+  h = 0,
+  i = 0,
+  j = 0,
+  k = 0,
+  l = 0,
+): number {
+  return (
+    MONEY_TOLERANCE_RUSD *
+    Math.max(1, Math.abs(a), Math.abs(b), Math.abs(c), Math.abs(d), Math.abs(e), Math.abs(f), Math.abs(g), Math.abs(h), Math.abs(i), Math.abs(j), Math.abs(k), Math.abs(l))
+  );
 }
 
 /** True when `dayIndex` is the last civil day of its Gregorian month. */

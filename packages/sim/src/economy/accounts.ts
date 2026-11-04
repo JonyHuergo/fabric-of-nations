@@ -2014,10 +2014,16 @@ export function assertOwnerEquityInvariant(finance: FinanceState): void {
   assertOwnerEquityTallies(tallies.values());
 }
 
-function toleranceMoney(...values: number[]): number {
-  let scale = 1;
-  for (const value of values) scale = Math.max(scale, Math.abs(value));
-  return MONEY_TOLERANCE_RUSD * scale;
+/**
+ * MONEY_TOLERANCE_RUSD scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
+ * former rest parameter allocated an array on every call; a missing value is 0,
+ * which never raises the scale above 1, so the result is unchanged.
+ */
+function toleranceMoney(a: number, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0): number {
+  return (
+    MONEY_TOLERANCE_RUSD *
+    Math.max(1, Math.abs(a), Math.abs(b), Math.abs(c), Math.abs(d), Math.abs(e), Math.abs(f), Math.abs(g), Math.abs(h))
+  );
 }
 
 /** Totals derived from authoritative account balances. */
@@ -2319,12 +2325,20 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
   const buildOwnerTables = (): (Int32Array | undefined)[] => {
     const codeCount = 4 * (SUBTYPE_CODES.size + 1);
     const maxOwner = new Float64Array(codeCount).fill(-1);
+    // An account is its owner key's `byOwner` entry unless it is one of the
+    // per-country external-counterparty duplicates (keys are otherwise unique: the
+    // index build rejects duplicates), so membership needs no map lookup.
     const included = (account: FinancialAccount): boolean =>
       account.ownerId !== null &&
       Number.isInteger(account.ownerId) &&
       account.ownerId >= 0 &&
       account.ownerId < 2 ** 31 &&
-      byOwner.get(ownerKey(account.ownerKind, account.ownerId, account.subtype)) === account;
+      !(
+        account.ownerKind === "system" &&
+        (account.subtype === "external-cash" ||
+          account.subtype === "external-currency-holding" ||
+          account.subtype === "external-equity")
+      );
     for (const account of accounts) {
       if (!included(account)) continue;
       const code = tableCode(account.ownerKind, account.subtype);
