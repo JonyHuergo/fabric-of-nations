@@ -13,7 +13,13 @@
 import { QUANTITY_TOLERANCE } from "../population/constants.js";
 import { assertValidWorldForTick, type World } from "../world.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
-import { canonicalizeStockLots, deriveStockByGood } from "./inventory.js";
+import {
+  copyLotTable,
+  deriveStockByGood,
+  lotTableFromLots,
+  lotTableToLots,
+  type LotTable,
+} from "./inventory.js";
 import { productionStrikeFactor } from "./politics.js";
 import {
   laborHoursFactor,
@@ -152,6 +158,10 @@ export interface ProductionLookups {
   readonly capacityIndex: BuildingCapacityIndex;
   /** `computeBuildingCapacity` for the day's state, computed once per building. */
   readonly capacityOf: (buildingId: number) => BuildingCapacityResult;
+  /** Building definitions by id (D-139). */
+  readonly definitionById?: ReadonlyMap<number, BuildingDef>;
+  /** `deriveStorageCapacityByGood` of a market, computed once per market (D-139). */
+  readonly storageCapacityOf?: (marketId: number) => readonly number[];
 }
 
 export function buildProductionLookups(
@@ -185,7 +195,42 @@ export function buildProductionLookups(
   for (const list of buildingIdsByMarket.values()) list.sort((a, b) => a - b);
   const capacityIndex = buildBuildingCapacityIndex(world, definitions);
   const capacities = new Map<number, BuildingCapacityResult>();
+  // Storage: operational buildings bucketed by market in `world.buildings` order, the
+  // order `deriveStorageCapacityByGood` sums them in.
+  const storageBuildings = new Map<number, BuildingInstance[]>();
+  for (const building of world.buildings) {
+    if (!building.operational) continue;
+    const marketId = marketByProvince.get(building.provinceId);
+    if (marketId === undefined) continue;
+    const list = storageBuildings.get(marketId);
+    if (list === undefined) storageBuildings.set(marketId, [building]);
+    else list.push(building);
+  }
+  const storage = new Map<number, number[]>();
+  const definitionsById = capacityIndex.definitionById;
   return {
+    definitionById: definitionsById,
+    storageCapacityOf(marketId) {
+      let capacities_ = storage.get(marketId);
+      if (capacities_ === undefined) {
+        capacities_ = new Array<number>(definitions.goods.length).fill(0);
+        for (const building of storageBuildings.get(marketId) ?? []) {
+          const definition = definitionsById.get(building.definitionId);
+          if (definition === undefined) {
+            throw new RangeError(`building ${String(building.id)} has no definition`);
+          }
+          for (const item of definition.storageCapacityByGood) {
+            const quantity = item.quantity * building.level * building.condition;
+            if (!Number.isFinite(quantity) || quantity < 0) {
+              throw new RangeError(`building ${String(building.id)} has invalid storage capacity`);
+            }
+            capacities_[item.goodId] = (capacities_[item.goodId] ?? 0) + quantity;
+          }
+        }
+        storage.set(marketId, capacities_);
+      }
+      return capacities_;
+    },
     buildingById,
     provinceOwners: buildProvinceOwnerMap(world),
     countryById: new Map(world.countries.map((country) => [country.id, country])),
@@ -491,58 +536,86 @@ function assertReservationShape(
   }
 }
 
-function applyOverflowToLots(
-  lots: Map<string, number>,
+/**
+ * Storage overflow on a lot table (D-139; same arithmetic and order as the former
+ * map version). Per good, the positive lots in ascending owner order lose the
+ * overflow pro rata; the floating residual goes to the last lots with headroom.
+ */
+export function applyOverflowToTable(
+  table: LotTable,
   capacityByGood: readonly number[],
   goodCount: number,
 ): OverflowLoss[] {
   const overflowLosses: OverflowLoss[] = [];
-  for (let goodId = 0; goodId < goodCount; goodId += 1) {
-    const goodLots = [...lots.entries()]
-      .map(([key, quantity]) => {
-        const [goodText, ownerText] = key.split(":");
-        return { key, goodId: Number(goodText), ownerBuildingId: Number(ownerText), quantity };
-      })
-      .filter((lot) => lot.goodId === goodId && lot.quantity > 0)
-      .sort((left, right) => left.ownerBuildingId - right.ownerBuildingId);
-    const total = goodLots.reduce((sum, lot) => sum + lot.quantity, 0);
+  const ownerCount = table.owners.length;
+  const slots: number[] = [];
+  const amounts: number[] = [];
+  for (let goodId = 0; goodId < goodCount && goodId < table.goodCount; goodId += 1) {
+    const base = goodId * ownerCount;
+    slots.length = 0;
+    let total = 0;
+    for (let slot = 0; slot < ownerCount; slot += 1) {
+      const quantity = table.quantity[base + slot] ?? 0;
+      if (table.present[base + slot] === 1 && quantity > 0) {
+        slots.push(slot);
+        total += quantity;
+      }
+    }
     const capacity = capacityByGood[goodId] ?? 0;
     if (total <= capacity + tolerance(total, capacity)) continue;
     const overflow = total - capacity;
-    const losses = goodLots.map((lot) => ({
-      lot,
-      quantity: (lot.quantity * overflow) / total,
-    }));
-    const lost = losses.reduce((sum, loss) => sum + loss.quantity, 0);
+    amounts.length = 0;
+    let lost = 0;
+    for (const slot of slots) {
+      const amount = ((table.quantity[base + slot] ?? 0) * overflow) / total;
+      amounts.push(amount);
+      lost += amount;
+    }
     let residual = overflow - lost;
-    for (let index = losses.length - 1; index >= 0 && residual > tolerance(residual); index -= 1) {
-      const loss = losses[index];
-      if (loss === undefined) continue;
-      const headroom = loss.lot.quantity - loss.quantity;
+    for (let index = slots.length - 1; index >= 0 && residual > tolerance(residual); index -= 1) {
+      const quantity = table.quantity[base + (slots[index] ?? 0)] ?? 0;
+      const headroom = quantity - (amounts[index] ?? 0);
       if (headroom <= 0) continue;
       const amount = Math.min(headroom, residual);
-      loss.quantity += amount;
+      amounts[index] = (amounts[index] ?? 0) + amount;
       residual -= amount;
     }
     if (residual > tolerance(residual)) {
       throw new RangeError(`unable to allocate overflow loss for good ${String(goodId)}`);
     }
-    for (const loss of losses) {
-      if (!(loss.quantity > 0)) continue;
-      const remaining = loss.lot.quantity - loss.quantity;
-      if (remaining < -tolerance(loss.lot.quantity, loss.quantity)) {
-        throw new RangeError(`overflow loss makes lot ${loss.lot.key} negative`);
+    for (let index = 0; index < slots.length; index += 1) {
+      const amount = amounts[index] ?? 0;
+      if (!(amount > 0)) continue;
+      const slot = slots[index] ?? 0;
+      const cell = base + slot;
+      const quantity = table.quantity[cell] ?? 0;
+      const remaining = quantity - amount;
+      const owner = table.owners[slot] ?? 0;
+      if (remaining < -tolerance(quantity, amount)) {
+        throw new RangeError(`overflow loss makes lot ${lotKey(goodId, owner)} negative`);
       }
-      if (remaining <= 0) lots.delete(loss.lot.key);
-      else lots.set(loss.lot.key, remaining);
-      overflowLosses.push({
-        goodId,
-        ownerBuildingId: loss.lot.ownerBuildingId,
-        quantity: loss.quantity,
-      });
+      if (remaining <= 0) {
+        table.present[cell] = 0;
+        table.quantity[cell] = 0;
+      } else {
+        table.quantity[cell] = remaining;
+      }
+      overflowLosses.push({ goodId, ownerBuildingId: owner, quantity: amount });
     }
   }
   return overflowLosses;
+}
+
+/** Storage capacity of one market, from the day lookups when available (D-139). */
+export function storageCapacityOf(
+  world: World,
+  definitions: EconomyDefinitions,
+  marketId: number,
+  lookups: ProductionLookups | undefined,
+): readonly number[] {
+  return lookups?.storageCapacityOf !== undefined
+    ? lookups.storageCapacityOf(marketId)
+    : deriveStorageCapacityByGood(world, definitions, marketId);
 }
 
 /**
@@ -563,22 +636,10 @@ export function applyOverflowLosses(
       ? world.markets[0]
       : world.markets.find((candidate) => candidate.id === marketId);
   if (market === undefined) throw new RangeError("M3 overflow requires a market");
-  const lots = new Map<string, number>();
-  for (const lot of market.stockLots) {
-    lots.set(lotKey(lot.goodId, lot.ownerBuildingId), lot.quantity);
-  }
-  const capacityByGood = deriveStorageCapacityByGood(world, definitions, market.id);
-  const losses = applyOverflowToLots(lots, capacityByGood, definitions.goods.length);
-  const canonicalLots = canonicalizeStockLots(
-    [...lots.entries()].map(([key, quantity]) => {
-      const [goodText, ownerText] = key.split(":");
-      return {
-        goodId: Number(goodText),
-        ownerBuildingId: Number(ownerText),
-        quantity,
-      };
-    }),
-  );
+  const table = lotTableFromLots(market.stockLots, [], definitions.goods.length);
+  const capacityByGood = storageCapacityOf(world, definitions, market.id, options.lookups);
+  const losses = applyOverflowToTable(table, capacityByGood, definitions.goods.length);
+  const canonicalLots = lotTableToLots(table);
   if (options.validateWorld !== false) {
     const candidateWorld: World = {
       ...world,
@@ -589,11 +650,345 @@ export function applyOverflowLosses(
     assertValidWorldForTick(candidateWorld);
   }
   market.stockLots = canonicalLots;
-  losses.sort((left, right) => {
-    if (left.goodId !== right.goodId) return left.goodId - right.goodId;
-    return left.ownerBuildingId - right.ownerBuildingId;
-  });
+  // Already in (good, owner) order: goods ascending, owners ascending within a good.
   return losses;
+}
+
+/**
+ * Input reservations in columns (D-139), in reservation order. The market day hands
+ * these to production without building one object per reservation.
+ */
+export interface ReservationColumns {
+  readonly buyer: readonly number[];
+  readonly good: readonly number[];
+  readonly seller: readonly number[];
+  readonly quantity: readonly number[];
+}
+
+/** Reservation uses in columns, in (buyer, good, seller) order. */
+export interface ReservationUseColumns {
+  readonly buyer: number[];
+  readonly good: number[];
+  readonly seller: number[];
+  readonly reserved: number[];
+  readonly used: number[];
+}
+
+/** What `runProductionCore` returns besides the market's new lots. */
+export interface ProductionCoreResult {
+  readonly buildings: BuildingProductionResult[];
+  readonly uses: ReservationUseColumns;
+  readonly inventory: InventoryFlow[];
+  readonly overflowLosses: OverflowLoss[];
+  /** The market's lots after production (and overflow when applied). */
+  readonly lots: LotTable;
+}
+
+/**
+ * The M3c production phase on columns (D-139). The checks, their order and messages,
+ * and every floating operation are those of the former object/map implementation;
+ * `runProductionPhase` and the M3d market day both run it. `opening` is the market's
+ * opening lot table and is not changed.
+ */
+export function runProductionCore(
+  world: World,
+  definitions: EconomyDefinitions,
+  market: World["markets"][number],
+  lookups: ProductionLookups,
+  opening: LotTable,
+  reservations: ReservationColumns,
+  applyOverflow: boolean,
+): ProductionCoreResult {
+  const marketProvinceIdSet: ReadonlySet<number> =
+    lookups.provinceIdsByMarket.get(market.id) ?? new Set(marketProvinceIds(world, market.id));
+  const provinceOwners = lookups.provinceOwners;
+  const buildingById = lookups.buildingById;
+  const definitionsById = lookups.definitionById ?? definitionById(definitions);
+  const goods = definitions.goods;
+  const goodCount = goods.length;
+  const goodKnown = new Uint8Array(goodCount);
+  for (const good of goods) if (Number.isInteger(good.id) && good.id >= 0 && good.id < goodCount) goodKnown[good.id] = 1;
+  const openingByGood = deriveStockByGood(market, goodCount);
+  const ownerCount = opening.owners.length;
+  const buildingIds = lookups.buildingIdsByMarket.get(market.id) ?? [];
+  // Buyer slots: the market's buildings in ascending id order.
+  const buyerSlot = new Map<number, number>();
+  for (let slot = 0; slot < buildingIds.length; slot += 1) buyerSlot.set(buildingIds[slot] ?? 0, slot);
+
+  const count = reservations.buyer.length;
+  // D-136: reservations are differences of cumulative interval ends (D-133), so the
+  // lot checks' tolerance scales with the good's reserved total.
+  const reservedByGood = new Float64Array(goodCount);
+  for (let index = 0; index < count; index += 1) {
+    const goodId = reservations.good[index] ?? 0;
+    if (goodId >= 0 && goodId < goodCount) {
+      reservedByGood[goodId] = (reservedByGood[goodId] ?? 0) + (reservations.quantity[index] ?? 0);
+    }
+  }
+  const reservedByLot = new Float64Array(goodCount * ownerCount);
+  const reservedByBuyerGood = new Float64Array(buildingIds.length * goodCount);
+  // Reservations of each (buyer, good) as a linked list in reservation order.
+  const groupHead = new Int32Array(buildingIds.length * goodCount).fill(-1);
+  const groupTail = new Int32Array(buildingIds.length * goodCount).fill(-1);
+  const groupNext = new Int32Array(count).fill(-1);
+  const reservationKeys = new Set<number>();
+  for (let index = 0; index < count; index += 1) {
+    const path = (): string => `inputReservations[${String(index)}]`;
+    const buyerId = reservations.buyer[index] ?? 0;
+    const goodId = reservations.good[index] ?? 0;
+    const sellerId = reservations.seller[index] ?? 0;
+    const quantity = reservations.quantity[index] ?? 0;
+    if (!(goodId >= 0 && goodId < goodCount && goodKnown[goodId] === 1)) {
+      throw new RangeError(`${path()}.goodId references an unknown good`);
+    }
+    const buyer = buildingById.get(buyerId);
+    if (buyer === undefined) {
+      throw new RangeError(`${path()} references an unknown buyer building`);
+    }
+    if (!buyer.operational) {
+      throw new RangeError(`${path()} references a non-operational buyer building`);
+    }
+    const buyerDefinition = definitionsById.get(buyer.definitionId);
+    if (buyerDefinition === undefined) {
+      throw new RangeError(`${path()} buyer has no definition`);
+    }
+    if (buyerDefinition.outputs.length === 0) {
+      throw new RangeError(`${path()} buyer has no production recipe`);
+    }
+    if (inputQuantity(buyerDefinition, goodId) <= 0) {
+      throw new RangeError(`${path()}.goodId is not an input of the buyer recipe`);
+    }
+    if (!marketProvinceIdSet.has(buyer.provinceId)) {
+      throw new RangeError(`${path()} buyer building is outside the market`);
+    }
+    const seller = buildingById.get(sellerId);
+    if (seller === undefined) {
+      throw new RangeError(`${path()} references an unknown seller building`);
+    }
+    if (!marketProvinceIdSet.has(seller.provinceId)) {
+      // E6a: an imported lot is owned by a building in another market. The opening
+      // lot existence check below is the real guard; a foreign owner is legitimate
+      // only when trade is enabled (D-079 §8).
+      if (!world.trade.enabled) {
+        throw new RangeError(`${path()} seller building is outside the market`);
+      }
+      if (!seller.operational) {
+        throw new RangeError(`${path()} seller building is not operational`);
+      }
+    }
+    const sellerSlot = opening.slotOf.get(sellerId);
+    const cell = sellerSlot === undefined ? -1 : goodId * ownerCount + sellerSlot;
+    if (cell < 0 || opening.present[cell] !== 1) {
+      throw new RangeError(`${path()} references a seller lot that does not exist on opening inventory`);
+    }
+    const lotQuantity = opening.quantity[cell] ?? 0;
+    const slot = buyerSlot.get(buyerId) ?? -1;
+    if (slot < 0) throw new RangeError(`${path()} buyer building is outside the market`);
+    const duplicateKey = (slot * goodCount + goodId) * ownerCount + (sellerSlot ?? 0);
+    if (reservationKeys.has(duplicateKey)) {
+      throw new RangeError(`${path()} duplicates a buyer/good/seller reservation`);
+    }
+    reservationKeys.add(duplicateKey);
+    const reserved = (reservedByLot[cell] ?? 0) + quantity;
+    if (reserved > lotQuantity + tolerance(lotQuantity, reserved, reservedByGood[goodId] ?? 0)) {
+      throw new RangeError(`${path()} over-reserves seller lot ${lotKey(goodId, sellerId)}`);
+    }
+    reservedByLot[cell] = reserved;
+    const group = slot * goodCount + goodId;
+    reservedByBuyerGood[group] = (reservedByBuyerGood[group] ?? 0) + quantity;
+    if (groupHead[group] === -1) groupHead[group] = index;
+    else groupNext[groupTail[group] ?? 0] = index;
+    groupTail[group] = index;
+  }
+
+  const productionByGood = new Array<number>(goodCount).fill(0);
+  const usedByGood = new Array<number>(goodCount).fill(0);
+  const buildingResults: BuildingProductionResult[] = [];
+  const uses: ReservationUseColumns = { buyer: [], good: [], seller: [], reserved: [], used: [] };
+  const next = copyLotTable(opening);
+
+  for (let buyerIndex = 0; buyerIndex < buildingIds.length; buyerIndex += 1) {
+    const buildingId = buildingIds[buyerIndex] ?? 0;
+    const building = buildingById.get(buildingId);
+    if (building === undefined) throw new RangeError(`unknown building ${String(buildingId)}`);
+    const definition = definitionsById.get(building.definitionId);
+    if (definition === undefined) throw new RangeError(`building ${String(building.id)} has no definition`);
+    const capacity = lookups.capacityOf(building.id);
+    if (!capacity.isProductionBuilding) continue;
+
+    let executedTU = capacity.capacityTU;
+    const inputResults: BuildingProductionResult["inputs"][number][] = [];
+    const sortedInputs = sortedByGood(definition.inputs);
+    for (const input of sortedInputs) {
+      const reserved = reservedByBuyerGood[buyerIndex * goodCount + input.goodId] ?? 0;
+      const fromInput = reserved / input.quantityPerThroughputUnit;
+      if (fromInput < executedTU) executedTU = fromInput;
+    }
+    if (!Number.isFinite(executedTU) || executedTU < 0) {
+      throw new RangeError(`building ${String(building.id)} has invalid executed throughput`);
+    }
+
+    for (const input of sortedInputs) {
+      const group = buyerIndex * goodCount + input.goodId;
+      const reserved = reservedByBuyerGood[group] ?? 0;
+      let used = input.quantityPerThroughputUnit * executedTU;
+      if (used > reserved + tolerance(reserved, used)) {
+        throw new RangeError(`building ${String(building.id)} input use exceeds reservation`);
+      }
+      if (used > reserved) used = reserved;
+
+      let actualUsed = used;
+      const head = groupHead[group] ?? -1;
+      if (head >= 0) {
+        let totalReserved = 0;
+        for (let item = head; item >= 0; item = groupNext[item] ?? -1) totalReserved += reservations.quantity[item] ?? 0;
+        actualUsed = 0;
+        for (let item = head; item >= 0; item = groupNext[item] ?? -1) {
+          const quantity = reservations.quantity[item] ?? 0;
+          const sellerId = reservations.seller[item] ?? 0;
+          let reservationUsed: number;
+          if (used <= tolerance(totalReserved)) reservationUsed = 0;
+          else if (used >= totalReserved - tolerance(totalReserved, used)) reservationUsed = quantity;
+          else reservationUsed = (used * quantity) / totalReserved;
+          reservationUsed = Math.min(quantity, Math.max(0, reservationUsed));
+          actualUsed += reservationUsed;
+          uses.buyer.push(building.id);
+          uses.good.push(input.goodId);
+          uses.seller.push(sellerId);
+          uses.reserved.push(quantity);
+          uses.used.push(reservationUsed);
+          const cell = input.goodId * ownerCount + (next.slotOf.get(sellerId) ?? 0);
+          if (next.present[cell] !== 1) throw new RangeError(`missing seller lot ${lotKey(input.goodId, sellerId)}`);
+          const current = next.quantity[cell] ?? 0;
+          const remaining = current - reservationUsed;
+          if (remaining < -tolerance(current, reservationUsed, reservedByGood[input.goodId] ?? 0)) {
+            throw new RangeError(`seller lot ${lotKey(input.goodId, sellerId)} would become negative`);
+          }
+          if (remaining <= 0) {
+            next.present[cell] = 0;
+            next.quantity[cell] = 0;
+          } else {
+            next.quantity[cell] = remaining;
+          }
+        }
+        if (Math.abs(actualUsed - used) > tolerance(used, actualUsed)) {
+          throw new RangeError(`reservation use does not reconcile for ${String(building.id)}:${String(input.goodId)}`);
+        }
+      }
+      const actualReleased = Math.max(0, reserved - actualUsed);
+      inputResults.push({
+        goodId: input.goodId,
+        reserved,
+        used: actualUsed,
+        released: actualReleased,
+      });
+      usedByGood[input.goodId] = (usedByGood[input.goodId] ?? 0) + actualUsed;
+    }
+
+    const outputResults: BuildingProductionResult["outputs"][number][] = [];
+    const sortedOutputs = sortedByGood(definition.outputs);
+    // M9 technology: researched sector productivity increases physical output from
+    // the same executed throughput (and therefore the same inputs). It does not
+    // change capacity, prices, or the input recipe.
+    const ownerId = provinceOwners.get(building.provinceId);
+    const owner = ownerId === undefined ? undefined : lookups.countryById.get(ownerId);
+    const technologyFactor =
+      owner === undefined
+        ? 1
+        : technologyProductivityFactor(owner, definitions, definition.sector);
+    const producerSlot = next.slotOf.get(building.id) ?? -1;
+    for (const output of sortedOutputs) {
+      const quantity = output.quantityPerThroughputUnit * executedTU * technologyFactor;
+      if (!Number.isFinite(quantity) || quantity < 0) {
+        throw new RangeError(`building ${String(building.id)} produced an invalid output quantity`);
+      }
+      if (quantity > 0) {
+        outputResults.push({ goodId: output.goodId, quantity });
+        productionByGood[output.goodId] = (productionByGood[output.goodId] ?? 0) + quantity;
+        if (producerSlot < 0) throw new RangeError(`building ${String(building.id)} has no lot slot`);
+        const cell = output.goodId * ownerCount + producerSlot;
+        if (next.present[cell] === 1) {
+          next.quantity[cell] = (next.quantity[cell] ?? 0) + quantity;
+        } else {
+          next.present[cell] = 1;
+          next.quantity[cell] = 0 + quantity;
+        }
+      }
+    }
+
+    buildingResults.push({
+      buildingId: building.id,
+      capacityTU: capacity.capacityTU,
+      executedTU,
+      staffingRatio: capacity.staffingRatio,
+      productivityFactor: capacity.productivityFactor,
+      inputs: inputResults,
+      outputs: outputResults,
+    });
+  }
+
+  const capacityByGood = applyOverflow
+    ? storageCapacityOf(world, definitions, market.id, lookups)
+    : new Array<number>(goodCount).fill(0);
+  const overflowLosses = applyOverflow
+    ? applyOverflowToTable(next, capacityByGood, goodCount)
+    : [];
+  const lossByGood = new Array<number>(goodCount).fill(0);
+  for (const loss of overflowLosses) {
+    lossByGood[loss.goodId] = (lossByGood[loss.goodId] ?? 0) + loss.quantity;
+  }
+
+  const closingByGood = new Array<number>(goodCount).fill(0);
+  for (let goodId = 0; goodId < goodCount; goodId += 1) {
+    const base = goodId * ownerCount;
+    let closing = 0;
+    for (let slot = 0; slot < ownerCount; slot += 1) {
+      if (next.present[base + slot] === 1) closing += next.quantity[base + slot] ?? 0;
+    }
+    closingByGood[goodId] = closing;
+  }
+
+  const inventory: InventoryFlow[] = goods.map((good) => {
+    const goodId = good.id;
+    const openingStock = openingByGood[goodId] ?? 0;
+    const production = productionByGood[goodId] ?? 0;
+    const used = usedByGood[goodId] ?? 0;
+    const loss = lossByGood[goodId] ?? 0;
+    const closing = closingByGood[goodId] ?? 0;
+    const expected = openingStock + production - used - loss;
+    // Scale by the gross physical terms so large-population cancellation does not
+    // masquerade as a conservation failure.
+    if (
+      Math.abs(expected - closing) >
+      tolerance(openingStock, production, used, loss, expected, closing)
+    ) {
+      throw new RangeError(
+        `inventory conservation failed for good ${String(goodId)}: ${String(expected)} != ${String(closing)}`,
+      );
+    }
+    return {
+      goodId,
+      openingStock,
+      production,
+      usedAsInput: used,
+      recordedLoss: loss,
+      closingStock: closing,
+    };
+  });
+
+  return { buildings: buildingResults, uses, inventory, overflowLosses, lots: next };
+}
+
+/** A recipe's items in ascending good order, memoised per item array (D-139). */
+const sortedRecipeCache = new WeakMap<readonly GoodQuantityDef[], readonly GoodQuantityDef[]>();
+
+function sortedByGood(items: readonly GoodQuantityDef[]): readonly GoodQuantityDef[] {
+  let sorted = sortedRecipeCache.get(items);
+  if (sorted === undefined) {
+    sorted = [...items].sort((left, right) => left.goodId - right.goodId);
+    sortedRecipeCache.set(items, sorted);
+  }
+  return sorted;
 }
 
 /**
@@ -621,30 +1016,7 @@ export function runProductionPhase(
       : world.markets.find((candidate) => candidate.id === options.marketId);
   if (market === undefined) throw new RangeError("M3c production requires a market");
   const lookups = options.lookups ?? buildProductionLookups(world, definitions);
-  const marketProvinceIdSet: ReadonlySet<number> =
-    lookups.provinceIdsByMarket.get(market.id) ?? new Set(marketProvinceIds(world, market.id));
-  const provinceOwners = lookups.provinceOwners;
-  const buildingById = lookups.buildingById;
-  const definitionsById = definitionById(definitions);
-  const goods = definitions.goods;
-  const goodIds = new Set(goods.map((good) => good.id));
-  const openingByGood = deriveStockByGood(market, goods.length);
-  const openingLots = new Map<string, number>();
-  for (const lot of market.stockLots) {
-    openingLots.set(lotKey(lot.goodId, lot.ownerBuildingId), lot.quantity);
-  }
-
-  const reservedByLot = new Map<string, number>();
-  const reservedByBuyerGood = new Map<string, number>();
-  const reservationsByBuyerGood = new Map<string, InputReservation[]>();
-  const reservationKeys = new Set<string>();
-  // D-136: reservations are differences of cumulative interval ends (D-133), so the
-  // lot checks' tolerance scales with the good's reserved total.
-  const reservedByGood = new Map<number, number>();
-  for (const reservation of reservations) {
-    reservedByGood.set(reservation.goodId, (reservedByGood.get(reservation.goodId) ?? 0) + reservation.quantity);
-  }
-
+  const columns = { buyer: [] as number[], good: [] as number[], seller: [] as number[], quantity: [] as number[] };
   for (let index = 0; index < reservations.length; index += 1) {
     const reservation = reservations[index];
     if (reservation === undefined) throw new RangeError("missing reservation");
@@ -653,244 +1025,26 @@ export function runProductionPhase(
     if (reservation.marketId !== market.id) {
       throw new RangeError(`${path}.marketId does not match the M3 market`);
     }
-    if (!goodIds.has(reservation.goodId)) {
-      throw new RangeError(`${path}.goodId references an unknown good`);
-    }
-    const buyer = buildingById.get(reservation.buyerBuildingId);
-    if (buyer === undefined) {
-      throw new RangeError(`${path} references an unknown buyer building`);
-    }
-    if (!buyer.operational) {
-      throw new RangeError(`${path} references a non-operational buyer building`);
-    }
-    const buyerDefinition = definitionsById.get(buyer.definitionId);
-    if (buyerDefinition === undefined) {
-      throw new RangeError(`${path} buyer has no definition`);
-    }
-    if (buyerDefinition.outputs.length === 0) {
-      throw new RangeError(`${path} buyer has no production recipe`);
-    }
-    if (inputQuantity(buyerDefinition, reservation.goodId) <= 0) {
-      throw new RangeError(`${path}.goodId is not an input of the buyer recipe`);
-    }
-    if (!marketProvinceIdSet.has(buyer.provinceId)) {
-      throw new RangeError(`${path} buyer building is outside the market`);
-    }
-    const seller = buildingById.get(reservation.sellerBuildingId);
-    if (seller === undefined) {
-      throw new RangeError(`${path} references an unknown seller building`);
-    }
-    if (!marketProvinceIdSet.has(seller.provinceId)) {
-      // E6a: an imported lot is owned by a building in another market. The opening
-      // lot existence check below is the real guard; a foreign owner is legitimate
-      // only when trade is enabled (D-079 §8).
-      if (!world.trade.enabled) {
-        throw new RangeError(`${path} seller building is outside the market`);
-      }
-      if (!seller.operational) {
-        throw new RangeError(`${path} seller building is not operational`);
-      }
-    }
-    const sellerLotKey = lotKey(reservation.goodId, reservation.sellerBuildingId);
-    const lotQuantity = openingLots.get(sellerLotKey);
-    if (lotQuantity === undefined) {
-      throw new RangeError(`${path} references a seller lot that does not exist on opening inventory`);
-    }
-    const duplicateKey = `${String(reservation.buyerBuildingId)}:${String(reservation.goodId)}:${String(reservation.sellerBuildingId)}`;
-    if (reservationKeys.has(duplicateKey)) {
-      throw new RangeError(`${path} duplicates a buyer/good/seller reservation`);
-    }
-    reservationKeys.add(duplicateKey);
-    const reserved = (reservedByLot.get(sellerLotKey) ?? 0) + reservation.quantity;
-    if (reserved > lotQuantity + tolerance(lotQuantity, reserved, reservedByGood.get(reservation.goodId) ?? 0)) {
-      throw new RangeError(`${path} over-reserves seller lot ${sellerLotKey}`);
-    }
-    reservedByLot.set(sellerLotKey, reserved);
-    const buyerGoodKey = `${String(reservation.buyerBuildingId)}:${String(reservation.goodId)}`;
-    reservedByBuyerGood.set(
-      buyerGoodKey,
-      (reservedByBuyerGood.get(buyerGoodKey) ?? 0) + reservation.quantity,
-    );
-    const group = reservationsByBuyerGood.get(buyerGoodKey) ?? [];
-    group.push(reservation);
-    reservationsByBuyerGood.set(buyerGoodKey, group);
+    columns.buyer.push(reservation.buyerBuildingId);
+    columns.good.push(reservation.goodId);
+    columns.seller.push(reservation.sellerBuildingId);
+    columns.quantity.push(reservation.quantity);
   }
-
-  const productionByGood = new Array<number>(goods.length).fill(0);
-  const usedByGood = new Array<number>(goods.length).fill(0);
-  const buildingResults: BuildingProductionResult[] = [];
-  const reservationUses: ReservationUse[] = [];
-  const nextLots = new Map<string, number>(openingLots);
-
-  const buildingIds = lookups.buildingIdsByMarket.get(market.id) ?? [];
-  for (const buildingId of buildingIds) {
-    const building = buildingById.get(buildingId);
-    if (building === undefined) throw new RangeError(`unknown building ${String(buildingId)}`);
-    const definition = definitionsById.get(building.definitionId);
-    if (definition === undefined) throw new RangeError(`building ${String(building.id)} has no definition`);
-    const capacity = lookups.capacityOf(building.id);
-    if (!capacity.isProductionBuilding) continue;
-
-    let executedTU = capacity.capacityTU;
-    const inputResults: BuildingProductionResult["inputs"][number][] = [];
-    const sortedInputs = [...definition.inputs].sort((left, right) => left.goodId - right.goodId);
-    for (const input of sortedInputs) {
-      const buyerGoodKey = `${String(building.id)}:${String(input.goodId)}`;
-      const reserved = reservedByBuyerGood.get(buyerGoodKey) ?? 0;
-      const fromInput = reserved / input.quantityPerThroughputUnit;
-      if (fromInput < executedTU) executedTU = fromInput;
-    }
-    if (!Number.isFinite(executedTU) || executedTU < 0) {
-      throw new RangeError(`building ${String(building.id)} has invalid executed throughput`);
-    }
-
-    for (const input of sortedInputs) {
-      const buyerGoodKey = `${String(building.id)}:${String(input.goodId)}`;
-      const reserved = reservedByBuyerGood.get(buyerGoodKey) ?? 0;
-      let used = input.quantityPerThroughputUnit * executedTU;
-      if (used > reserved + tolerance(reserved, used)) {
-        throw new RangeError(`building ${String(building.id)} input use exceeds reservation`);
-      }
-      if (used > reserved) used = reserved;
-
-      const group = reservationsByBuyerGood.get(buyerGoodKey) ?? [];
-      let actualUsed = used;
-      if (group.length > 0) {
-        const totalReserved = group.reduce((total, reservation) => total + reservation.quantity, 0);
-        actualUsed = 0;
-        for (const reservation of group) {
-          let reservationUsed: number;
-          if (used <= tolerance(totalReserved)) reservationUsed = 0;
-          else if (used >= totalReserved - tolerance(totalReserved, used)) reservationUsed = reservation.quantity;
-          else reservationUsed = (used * reservation.quantity) / totalReserved;
-          reservationUsed = Math.min(reservation.quantity, Math.max(0, reservationUsed));
-          const reservationReleased = Math.max(0, reservation.quantity - reservationUsed);
-          actualUsed += reservationUsed;
-          reservationUses.push({
-            buyerBuildingId: reservation.buyerBuildingId,
-            marketId: reservation.marketId,
-            goodId: reservation.goodId,
-            sellerBuildingId: reservation.sellerBuildingId,
-            reservedQuantity: reservation.quantity,
-            usedQuantity: reservationUsed,
-            releasedQuantity: reservationReleased,
-          });
-          const sellerKey = lotKey(reservation.goodId, reservation.sellerBuildingId);
-          const current = nextLots.get(sellerKey);
-          if (current === undefined) throw new RangeError(`missing seller lot ${sellerKey}`);
-          const remaining = current - reservationUsed;
-          if (remaining < -tolerance(current, reservationUsed, reservedByGood.get(reservation.goodId) ?? 0)) {
-            throw new RangeError(`seller lot ${sellerKey} would become negative`);
-          }
-          if (remaining <= 0) nextLots.delete(sellerKey);
-          else nextLots.set(sellerKey, remaining);
-        }
-        if (Math.abs(actualUsed - used) > tolerance(used, actualUsed)) {
-          throw new RangeError(`reservation use does not reconcile for ${buyerGoodKey}`);
-        }
-      }
-      const actualReleased = Math.max(0, reserved - actualUsed);
-      inputResults.push({
-        goodId: input.goodId,
-        reserved,
-        used: actualUsed,
-        released: actualReleased,
-      });
-      usedByGood[input.goodId] = (usedByGood[input.goodId] ?? 0) + actualUsed;
-    }
-
-    const outputResults: BuildingProductionResult["outputs"][number][] = [];
-    const sortedOutputs = [...definition.outputs].sort((left, right) => left.goodId - right.goodId);
-    // M9 technology: researched sector productivity increases physical output from
-    // the same executed throughput (and therefore the same inputs). It does not
-    // change capacity, prices, or the input recipe.
-    const ownerId = provinceOwners.get(building.provinceId);
-    const owner = ownerId === undefined ? undefined : lookups.countryById.get(ownerId);
-    const technologyFactor =
-      owner === undefined
-        ? 1
-        : technologyProductivityFactor(owner, definitions, definition.sector);
-    for (const output of sortedOutputs) {
-      const quantity = output.quantityPerThroughputUnit * executedTU * technologyFactor;
-      if (!Number.isFinite(quantity) || quantity < 0) {
-        throw new RangeError(`building ${String(building.id)} produced an invalid output quantity`);
-      }
-      if (quantity > 0) {
-        outputResults.push({ goodId: output.goodId, quantity });
-        productionByGood[output.goodId] = (productionByGood[output.goodId] ?? 0) + quantity;
-        const producerKey = lotKey(output.goodId, building.id);
-        nextLots.set(producerKey, (nextLots.get(producerKey) ?? 0) + quantity);
-      }
-    }
-
-    buildingResults.push({
-      buildingId: building.id,
-      capacityTU: capacity.capacityTU,
-      executedTU,
-      staffingRatio: capacity.staffingRatio,
-      productivityFactor: capacity.productivityFactor,
-      inputs: inputResults,
-      outputs: outputResults,
-    });
-  }
-
-  const applyOverflow = options.applyOverflow !== false;
-  const capacityByGood = applyOverflow
-    ? deriveStorageCapacityByGood(world, definitions, market.id)
-    : new Array<number>(goods.length).fill(0);
-  const overflowLosses = applyOverflow
-    ? applyOverflowToLots(nextLots, capacityByGood, goods.length)
-    : [];
-  const lossByGood = new Array<number>(goods.length).fill(0);
-  for (const loss of overflowLosses) {
-    lossByGood[loss.goodId] = (lossByGood[loss.goodId] ?? 0) + loss.quantity;
-  }
-
-  const closingByGood = new Array<number>(goods.length).fill(0);
-  for (const [key, quantity] of nextLots) {
-    const [goodText] = key.split(":");
-    const goodId = Number(goodText);
-    closingByGood[goodId] = (closingByGood[goodId] ?? 0) + quantity;
-  }
-
-  const inventory: InventoryFlow[] = goods.map((good) => {
-    const goodId = good.id;
-    const opening = openingByGood[goodId] ?? 0;
-    const production = productionByGood[goodId] ?? 0;
-    const used = usedByGood[goodId] ?? 0;
-    const loss = lossByGood[goodId] ?? 0;
-    const closing = closingByGood[goodId] ?? 0;
-    const expected = opening + production - used - loss;
-    // Scale by the gross physical terms so large-population cancellation does not
-    // masquerade as a conservation failure.
-    if (
-      Math.abs(expected - closing) >
-      tolerance(opening, production, used, loss, expected, closing)
-    ) {
-      throw new RangeError(
-        `inventory conservation failed for good ${String(goodId)}: ${String(expected)} != ${String(closing)}`,
-      );
-    }
-    return {
-      goodId,
-      openingStock: opening,
-      production,
-      usedAsInput: used,
-      recordedLoss: loss,
-      closingStock: closing,
-    };
-  });
-
-  const canonicalLots = canonicalizeStockLots(
-    [...nextLots.entries()].map(([key, quantity]) => {
-      const [goodText, ownerText] = key.split(":");
-      return {
-        goodId: Number(goodText),
-        ownerBuildingId: Number(ownerText),
-        quantity,
-      };
-    }),
+  const opening = lotTableFromLots(
+    market.stockLots,
+    lookups.buildingIdsByMarket.get(market.id) ?? [],
+    definitions.goods.length,
   );
+  const core = runProductionCore(
+    world,
+    definitions,
+    market,
+    lookups,
+    opening,
+    columns,
+    options.applyOverflow !== false,
+  );
+  const canonicalLots = lotTableToLots(core.lots);
   if (options.validateWorld !== false) {
     const candidateWorld: World = {
       ...world,
@@ -901,26 +1055,39 @@ export function runProductionPhase(
     assertValidWorldForTick(candidateWorld);
   }
   market.stockLots = canonicalLots;
+  return {
+    marketId: market.id,
+    buildings: core.buildings,
+    reservationUses: reservationUseObjects(market.id, core.uses),
+    inventory: core.inventory,
+    overflowLosses: core.overflowLosses,
+  };
+}
 
-  reservationUses.sort((left, right) => {
+/** Reservation uses as objects in (buyer, good, seller) order. */
+export function reservationUseObjects(marketId: number, uses: ReservationUseColumns): ReservationUse[] {
+  const objects: ReservationUse[] = [];
+  for (let index = 0; index < uses.buyer.length; index += 1) {
+    const reserved = uses.reserved[index] ?? 0;
+    const used = uses.used[index] ?? 0;
+    objects.push({
+      buyerBuildingId: uses.buyer[index] ?? 0,
+      marketId,
+      goodId: uses.good[index] ?? 0,
+      sellerBuildingId: uses.seller[index] ?? 0,
+      reservedQuantity: reserved,
+      usedQuantity: used,
+      releasedQuantity: Math.max(0, reserved - used),
+    });
+  }
+  objects.sort((left, right) => {
     if (left.buyerBuildingId !== right.buyerBuildingId) {
       return left.buyerBuildingId - right.buyerBuildingId;
     }
     if (left.goodId !== right.goodId) return left.goodId - right.goodId;
     return left.sellerBuildingId - right.sellerBuildingId;
   });
-  overflowLosses.sort((left, right) => {
-    if (left.goodId !== right.goodId) return left.goodId - right.goodId;
-    return left.ownerBuildingId - right.ownerBuildingId;
-  });
-
-  return {
-    marketId: market.id,
-    buildings: buildingResults,
-    reservationUses,
-    inventory,
-    overflowLosses,
-  };
+  return objects;
 }
 
 /** Exposed for future market clearing; production itself never allocates stock. */

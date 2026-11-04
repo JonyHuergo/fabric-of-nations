@@ -2103,6 +2103,17 @@ export interface FinanceIndex {
   ): FinancialAccount | undefined;
   /** Designated-cash accounts in stable id order. */
   cash(): readonly FinancialAccount[];
+  /**
+   * Position of the account with this id in `accounts`, or -1 (D-139). Typed-array
+   * scratch over account positions replaces per-batch maps on the hot path.
+   */
+  position(id: Id): number;
+  /**
+   * Account id of `(ownerKind, ownerId, subtype)` for every owner id, -1 where the
+   * owner has no such account (D-139). Built once per index and subtype; ids, owners
+   * and subtypes never change after creation, so the table equals `find(...)?.id`.
+   */
+  ownerAccountIds(ownerKind: FinancialAccountOwnerKind, subtype: AccountSubtype): Int32Array;
 }
 
 const OWNER_KIND_CODES: Readonly<Record<FinancialAccountOwnerKind, number>> = {
@@ -2269,15 +2280,86 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
       ? new Array<FinancialAccount | undefined>(maxId + 1).fill(undefined)
       : null;
   if (dense !== null) for (const account of accounts) dense[account.id] = account;
+  const positions = new Map<Id, number>();
+  const densePositions =
+    dense !== null ? new Int32Array(maxId + 1).fill(-1) : null;
+  for (let position = 0; position < accounts.length; position += 1) {
+    const account = accounts[position] as FinancialAccount;
+    if (densePositions !== null) {
+      if (densePositions[account.id] === -1) densePositions[account.id] = position;
+    } else if (!positions.has(account.id)) {
+      positions.set(account.id, position);
+    }
+  }
+  // D-139: account id by owner id for every (owner kind, subtype), built together in
+  // one pass on first use. Equal to `byOwner` for non-negative integer owner ids
+  // (the external-counterparty duplicates are excluded from both).
+  let ownerTables: (Int32Array | undefined)[] | null = null;
+  const tableCode = (ownerKind: FinancialAccountOwnerKind, subtype: AccountSubtype): number =>
+    OWNER_KIND_CODES[ownerKind] * (SUBTYPE_CODES.size + 1) + (SUBTYPE_CODES.get(subtype) ?? SUBTYPE_CODES.size);
+  const buildOwnerTables = (): (Int32Array | undefined)[] => {
+    const codeCount = 4 * (SUBTYPE_CODES.size + 1);
+    const maxOwner = new Float64Array(codeCount).fill(-1);
+    const included = (account: FinancialAccount): boolean =>
+      account.ownerId !== null &&
+      Number.isInteger(account.ownerId) &&
+      account.ownerId >= 0 &&
+      account.ownerId < 2 ** 31 &&
+      byOwner.get(ownerKey(account.ownerKind, account.ownerId, account.subtype)) === account;
+    for (const account of accounts) {
+      if (!included(account)) continue;
+      const code = tableCode(account.ownerKind, account.subtype);
+      if ((account.ownerId as number) > (maxOwner[code] ?? -1)) maxOwner[code] = account.ownerId as number;
+    }
+    const tables: (Int32Array | undefined)[] = new Array<Int32Array | undefined>(codeCount);
+    for (let code = 0; code < tables.length; code += 1) {
+      const max = maxOwner[code] ?? -1;
+      tables[code] = max >= 0 ? new Int32Array(max + 1).fill(-1) : undefined;
+    }
+    for (const account of accounts) {
+      if (!included(account)) continue;
+      const table = tables[tableCode(account.ownerKind, account.subtype)];
+      if (table !== undefined) table[account.ownerId as number] = account.id;
+    }
+    return tables;
+  };
+  const emptyTable = new Int32Array(0);
+  const tableFor = (ownerKind: FinancialAccountOwnerKind, subtype: AccountSubtype): Int32Array => {
+    ownerTables ??= buildOwnerTables();
+    return ownerTables[tableCode(ownerKind, subtype)] ?? emptyTable;
+  };
+  const lookupOwner = (
+    ownerKind: FinancialAccountOwnerKind,
+    ownerId: Id | null,
+    subtype: AccountSubtype,
+  ): FinancialAccount | undefined => {
+    if (dense !== null && ownerId !== null && Number.isInteger(ownerId) && ownerId >= 0 && SUBTYPE_CODES.has(subtype)) {
+      const table = tableFor(ownerKind, subtype);
+      if (ownerId >= table.length) return undefined;
+      const id = table[ownerId] ?? -1;
+      return id < 0 ? undefined : dense[id];
+    }
+    return byOwner.get(ownerKey(ownerKind, ownerId, subtype));
+  };
   return {
     accounts,
     byId,
+    position(id) {
+      if (densePositions !== null) {
+        return Number.isInteger(id) && id >= 0 && id < densePositions.length ? (densePositions[id] ?? -1) : -1;
+      }
+      return positions.get(id) ?? -1;
+    },
+    ownerAccountIds(ownerKind, subtype) {
+      if (!SUBTYPE_CODES.has(subtype)) return emptyTable;
+      return tableFor(ownerKind, subtype);
+    },
     account(id) {
       if (dense !== null && Number.isInteger(id) && id >= 0 && id < dense.length) return dense[id];
       return byId.get(id);
     },
     get(ownerKind, ownerId, subtype) {
-      const account = byOwner.get(ownerKey(ownerKind, ownerId, subtype));
+      const account = lookupOwner(ownerKind, ownerId, subtype);
       if (account === undefined) {
         throw new RangeError(
           `missing ${subtype} account for ${ownerKind} ${String(ownerId)}`,
@@ -2286,7 +2368,7 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
       return account;
     },
     find(ownerKind, ownerId, subtype) {
-      return byOwner.get(ownerKey(ownerKind, ownerId, subtype));
+      return lookupOwner(ownerKind, ownerId, subtype);
     },
     cash() {
       return cash;

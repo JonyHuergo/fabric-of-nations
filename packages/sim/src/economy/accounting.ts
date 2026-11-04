@@ -70,8 +70,20 @@ export interface JournalEntryInput {
   readonly targetEntityId?: Id | null;
 }
 
+/**
+ * Batch delta accumulator over account positions (D-139). It replaces a map with one
+ * entry per touched account: `touched` keeps first-touch order, which is the order
+ * the map iterated, and each account's delta is summed in the same line order.
+ */
+interface BatchDeltas {
+  readonly positionOf: (id: number) => number;
+  readonly delta: Float64Array;
+  readonly seen: Uint8Array;
+  readonly touched: number[];
+}
+
 interface ValidatedLines {
-  readonly deltas: Map<number, number>;
+  readonly deltas: Map<number, number> | null;
   readonly debits: number;
   readonly credits: number;
   /** Signed change to the aggregate designated-cash total. */
@@ -124,9 +136,10 @@ function validatePostingLines(
    * remains for single postings and for callers that need it.
    */
   deltasOut?: Map<number, number>,
+  batch?: BatchDeltas,
 ): ValidatedLines {
   if (lines.length === 0) throw new RangeError("journal posting must contain at least one line");
-  const deltas = deltasOut ?? new Map<number, number>();
+  const deltas = batch !== undefined ? null : (deltasOut ?? new Map<number, number>());
   let debits = 0;
   let credits = 0;
   let cashDelta = 0;
@@ -166,7 +179,18 @@ function validatePostingLines(
     const signed = side === normalSide ? amount : -amount;
     if (side === "debit") debits += amount;
     else credits += amount;
-    deltas.set(accountId, (deltas.get(accountId) ?? 0) + signed);
+    if (deltas !== null) {
+      deltas.set(accountId, (deltas.get(accountId) ?? 0) + signed);
+    } else if (batch !== undefined) {
+      const position = batch.positionOf(accountId);
+      if (batch.seen[position] === 0) {
+        batch.seen[position] = 1;
+        batch.delta[position] = 0 + signed;
+        batch.touched.push(position);
+      } else {
+        batch.delta[position] = (batch.delta[position] ?? 0) + signed;
+      }
+    }
     if (isCashAccount(account)) cashDelta += signed;
   }
   if (Math.abs(debits - credits) > MONEY_TOLERANCE_RUSD) {
@@ -288,11 +312,12 @@ export function postJournalEntry(
   const nextId = requireInteger(finance.nextPostingId, "finance.nextPostingId", 1, Number.MAX_SAFE_INTEGER);
   const accounts = accountMap(finance);
   const validated = validatePostingLines(lines, accounts, transactionKind);
-  assertBalanceConstraints(accounts, validated.deltas);
+  const lineDeltas = validated.deltas ?? new Map<number, number>();
+  assertBalanceConstraints(accounts, lineDeltas);
   assertCashConservation(transactionKind, validated.cashDelta, validated.debits);
 
   // Apply only after every line, balance, and invariant has been validated.
-  for (const [accountId, delta] of validated.deltas) {
+  for (const [accountId, delta] of lineDeltas) {
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
     account.balanceRUSD += delta;
@@ -336,8 +361,9 @@ export function postCorrectionEntry(
   );
   const accounts = accountMap(finance);
   const validated = validatePostingLines(lines, accounts, "correction");
-  assertBalanceConstraints(accounts, validated.deltas);
-  for (const [accountId, delta] of validated.deltas) {
+  const lineDeltas = validated.deltas ?? new Map<number, number>();
+  assertBalanceConstraints(accounts, lineDeltas);
+  for (const [accountId, delta] of lineDeltas) {
     const account = accounts.get(accountId);
     if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
     account.balanceRUSD += delta;
@@ -391,7 +417,13 @@ export function postJournalBatch(
   // (D-137): a settlement batch creates thousands of wage/upkeep entries per day and
   // the buffer keeps 256.
   const retainedStart = Math.max(0, entries.length - MAX_AUDIT_POSTINGS);
-  const aggregate = new Map<number, number>();
+  const accountList = finance.accounts;
+  const batch: BatchDeltas = {
+    positionOf: (id) => financeIndex.position(id),
+    delta: new Float64Array(accountList.length),
+    seen: new Uint8Array(accountList.length),
+    touched: [],
+  };
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
@@ -401,16 +433,29 @@ export function postJournalBatch(
       accounts,
       entry.transactionKind,
       accountOf,
-      aggregate,
+      undefined,
+      batch,
     );
     assertCashConservation(entry.transactionKind, validated.cashDelta, validated.debits);
   }
-  assertBalanceConstraints(accounts, aggregate);
+  // `assertBalanceConstraints` over the batch, in first-touch order (D-139).
+  for (const position of batch.touched) {
+    const account = accountList[position] as FinancialAccount;
+    const delta = batch.delta[position] ?? 0;
+    const next = account.balanceRUSD + delta;
+    if (!Number.isFinite(next)) {
+      throw new RangeError(`posting would make account ${String(account.id)} non-finite`);
+    }
+    if (!categoryAllowsNegativeBalance(account.category) && next < 0) {
+      throw new RangeError(
+        `insufficient funds; posting would make ${account.category} account ${String(account.id)} negative: ${String(account.balanceRUSD)} + ${String(delta)} < 0`,
+      );
+    }
+  }
 
-  for (const [accountId, delta] of aggregate) {
-    const account = accounts.get(accountId);
-    if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
-    account.balanceRUSD += delta;
+  for (const position of batch.touched) {
+    const account = accountList[position] as FinancialAccount;
+    account.balanceRUSD += batch.delta[position] ?? 0;
   }
 
   // Materialise postings only after every entry is validated and affordable, so a

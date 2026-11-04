@@ -22,15 +22,26 @@ import {
   M3_PRICE_MIN_RATIO,
 } from "./constants.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
-import { deriveStockByGood } from "./inventory.js";
 import {
-  applyOverflowLosses,
+  copyLotTable,
+  deriveStockByGood,
+  lotTableFromLots,
+  lotTableToLots,
+  type LotTable,
+} from "./inventory.js";
+import {
+  applyOverflowToTable,
   buildProductionLookups,
-  runProductionPhase,
+  reservationUseObjects,
+  runProductionCore,
+  storageCapacityOf,
+  type InventoryFlow,
   type ProductionLookups,
-  type InputReservation,
   type OverflowLoss,
   type ProductionPhaseResult,
+  type ReservationColumns,
+  type ReservationUse,
+  type ReservationUseColumns,
 } from "./production.js";
 import type { BuildingDef, EconomyDefinitions } from "./types.js";
 import { marketProvinceIds } from "./country.js";
@@ -165,28 +176,16 @@ export interface MarketDayResult {
   readonly inventory: readonly MarketInventoryFlow[];
   readonly overflowLosses: readonly OverflowLoss[];
   /**
+   * Columnar companions used by settlement and the integrated day (D-139). Not
+   * authoritative and never saved; non-enumerable, and absent on results built or
+   * copied by hand.
+   */
+  readonly columns?: MarketDayColumns;
+  /**
    * Transient duplicate-settlement guard. M3e refuses to settle an already
    * settled result. This flag is not authoritative state and is never saved.
    */
   settled: boolean;
-}
-
-interface DemandState {
-  readonly kind: "household" | "building";
-  readonly buyerId: number;
-  readonly tier: MarketTier;
-  readonly goodId: number;
-  readonly desired: number;
-  readonly funded: number;
-  eligible: boolean;
-  passAFulfilled: number;
-  passBFulfilled: number;
-  fulfilled: number;
-}
-
-interface DemandAllocation {
-  readonly demand: DemandState;
-  readonly funded: number;
 }
 
 function tolerance(...values: number[]): number {
@@ -383,267 +382,8 @@ function validateMarketDayInput(
   return { marketId: market.id, criticalGoods, buildingById };
 }
 
-interface HouseholdTierTotals {
-  desired1: number;
-  fulfilled1: number;
-  desired3: number;
-  fulfilled3: number;
-}
-
-/**
- * Desired and fulfilled household quantities of tiers 1 and 3 per pop block, summed
- * in demand order. Computed once per eligibility pass instead of rescanning every
- * demand for every demand (P2 scale).
- */
-function householdTierTotals(demands: readonly DemandState[]): Map<number, HouseholdTierTotals> {
-  const totals = new Map<number, HouseholdTierTotals>();
-  for (const demand of demands) {
-    if (demand.kind !== "household" || (demand.tier !== 1 && demand.tier !== 3)) continue;
-    let entry = totals.get(demand.buyerId);
-    if (entry === undefined) {
-      entry = { desired1: 0, fulfilled1: 0, desired3: 0, fulfilled3: 0 };
-      totals.set(demand.buyerId, entry);
-    }
-    if (demand.tier === 1) {
-      entry.desired1 += demand.desired;
-      entry.fulfilled1 += demand.fulfilled;
-    } else {
-      entry.desired3 += demand.desired;
-      entry.fulfilled3 += demand.fulfilled;
-    }
-  }
-  return totals;
-}
-
 function tierMet(desired: number, fulfilled: number): boolean {
   return desired <= tolerance(desired) || fulfilled >= desired - tolerance(desired, fulfilled);
-}
-
-function householdTierEligible(
-  totals: ReadonlyMap<number, HouseholdTierTotals>,
-  demand: DemandState,
-): boolean {
-  if (demand.kind !== "household") return true;
-  if (demand.tier === 1) return true;
-  const entry = totals.get(demand.buyerId);
-  if (entry !== undefined && !tierMet(entry.desired1, entry.fulfilled1)) return false;
-  if (demand.tier === 3) return true;
-  return entry === undefined || tierMet(entry.desired3, entry.fulfilled3);
-}
-
-/**
- * Allocate funded demand for one market good and tier from remaining lots.
- * Returns the actual fulfilled quantity. Mutates demand fulfilled counters and
- * reservations/remaining lots.
- */
-/**
- * Remaining seller lots by good, then seller building id (D-137). Replaces one map of
- * `"good:owner"` strings that every allocation re-parsed and filtered; each
- * allocation still reads its good's positive lots in ascending seller order.
- */
-type LotBook = Map<number, Map<number, number>>;
-
-function lotBookSet(book: LotBook, goodId: number, sellerBuildingId: number, quantity: number): void {
-  let lots = book.get(goodId);
-  if (lots === undefined) {
-    lots = new Map<number, number>();
-    book.set(goodId, lots);
-  }
-  lots.set(sellerBuildingId, quantity);
-}
-
-function lotBookAdd(book: LotBook, goodId: number, sellerBuildingId: number, quantity: number): void {
-  let lots = book.get(goodId);
-  if (lots === undefined) {
-    lots = new Map<number, number>();
-    book.set(goodId, lots);
-  }
-  lots.set(sellerBuildingId, (lots.get(sellerBuildingId) ?? 0) + quantity);
-}
-
-function lotBookGet(book: LotBook, goodId: number, sellerBuildingId: number): number | undefined {
-  return book.get(goodId)?.get(sellerBuildingId);
-}
-
-function allocateTierGood(
-  demands: readonly DemandAllocation[],
-  goodId: number,
-  remainingByLot: LotBook,
-  reservations: MarketReservation[],
-  phase: "A" | "B",
-): { readonly totalFunded: number; readonly fulfilled: number } {
-  // Canonical buyer order (households before buildings, then id and tier), so the
-  // sequential pairing below never depends on the order demands arrive in (D-133).
-  const relevant = demands
-    .filter((demand) => demand.demand.goodId === goodId && demand.funded > 0)
-    .sort(
-      (left, right) =>
-        Number(left.demand.kind === "building") - Number(right.demand.kind === "building") ||
-        left.demand.buyerId - right.demand.buyerId ||
-        left.demand.tier - right.demand.tier,
-    );
-  let totalFunded = 0;
-  for (const demand of relevant) totalFunded += demand.funded;
-  if (totalFunded <= tolerance(totalFunded)) {
-    return { totalFunded: 0, fulfilled: 0 };
-  }
-
-  const goodLots = remainingByLot.get(goodId);
-  const lots: { readonly sellerBuildingId: number; readonly quantity: number }[] = [];
-  if (goodLots !== undefined) {
-    for (const [sellerBuildingId, quantity] of goodLots) {
-      if (quantity > 0) lots.push({ sellerBuildingId, quantity });
-    }
-  }
-  lots.sort((left, right) => left.sellerBuildingId - right.sellerBuildingId);
-  const available = lots.reduce((total, lot) => total + lot.quantity, 0);
-  if (available <= 0) return { totalFunded, fulfilled: 0 };
-
-  const fulfilledTotal = Math.min(totalFunded, available);
-  const scale = fulfilledTotal / totalFunded;
-  const planned = relevant.map((demand) =>
-    totalFunded <= available ? demand.funded : demand.funded * scale,
-  );
-  let plannedTotal = 0;
-  for (const quantity of planned) plannedTotal += quantity;
-  if (Math.abs(plannedTotal - fulfilledTotal) > tolerance(plannedTotal, fulfilledTotal)) {
-    throw new RangeError(`market allocation planned quantity does not reconcile for good ${String(goodId)}`);
-  }
-
-  // D-133 sequential pairing. Every lot sells its pro-rata share of the fulfilled
-  // quantity and every buyer receives its planned quantity, exactly as before; the
-  // pairs are formed by walking lots (ascending seller id) and buyers (demand
-  // order) together, so a day creates at most lots + buyers reservations instead of
-  // lots x buyers. Per-account payments and per-lot sales are unchanged because the
-  // aggregated postings (D-125) sum per account.
-  // Pairs are the overlaps of the cumulative lot intervals and the cumulative buyer
-  // intervals on [0, fulfilledTotal], so each lot and each buyer total telescopes
-  // to its share without any tolerance-based skipping.
-  const lotEnd: number[] = [];
-  let cumulative = 0;
-  for (const lot of lots) {
-    cumulative += (lot.quantity / available) * fulfilledTotal;
-    lotEnd.push(cumulative);
-  }
-  lotEnd[lotEnd.length - 1] = fulfilledTotal;
-  const buyerEnd: number[] = [];
-  cumulative = 0;
-  for (const quantity of planned) {
-    cumulative += quantity;
-    buyerEnd.push(cumulative);
-  }
-  if (buyerEnd.length > 0) buyerEnd[buyerEnd.length - 1] = fulfilledTotal;
-  const reservedByLot = new Array<number>(lots.length).fill(0);
-  let buyerIndex = 0;
-  let actualFulfilled = 0;
-  let lotStart = 0;
-  for (let lotIndex = 0; lotIndex < lots.length; lotIndex += 1) {
-    const lot = lots[lotIndex];
-    if (lot === undefined) continue;
-    const lotStop = lotEnd[lotIndex] ?? lotStart;
-    while (buyerIndex < relevant.length) {
-      const buyerStart = buyerIndex === 0 ? 0 : (buyerEnd[buyerIndex - 1] ?? 0);
-      const buyerStop = buyerEnd[buyerIndex] ?? buyerStart;
-      const quantity = Math.min(lotStop, buyerStop) - Math.max(lotStart, buyerStart);
-      if (quantity > 0) {
-        const demand = relevant[buyerIndex];
-        if (demand === undefined) throw new RangeError("missing allocation demand");
-        demand.demand.fulfilled += quantity;
-        if (phase === "A") demand.demand.passAFulfilled += quantity;
-        else demand.demand.passBFulfilled += quantity;
-        reservations.push({
-          buyerKind: demand.demand.kind,
-          buyerId: demand.demand.buyerId,
-          tier: demand.demand.tier,
-          goodId,
-          sellerBuildingId: lot.sellerBuildingId,
-          quantity,
-          phase,
-        });
-        reservedByLot[lotIndex] = (reservedByLot[lotIndex] ?? 0) + quantity;
-      }
-      if (buyerStop <= lotStop) buyerIndex += 1;
-      else break;
-    }
-    lotStart = lotStop;
-  }
-  for (let lotIndex = 0; lotIndex < lots.length; lotIndex += 1) {
-    const lot = lots[lotIndex];
-    if (lot === undefined) continue;
-    const reservedFromLot = reservedByLot[lotIndex] ?? 0;
-    actualFulfilled += reservedFromLot;
-    const remaining = lot.quantity - reservedFromLot;
-    // A lot's reservation is the difference of two cumulative interval ends, so its
-    // rounding error scales with the cumulative total, not with the lot (P2b
-    // regression: a small lot in a 1e8-unit market overran by 1e-8 and threw).
-    const lotTolerance = tolerance(lot.quantity, reservedFromLot, fulfilledTotal);
-    if (remaining < -lotTolerance) {
-      throw new RangeError(
-        `market reservation exceeds seller lot ${String(goodId)}:${String(lot.sellerBuildingId)}`,
-      );
-    }
-    if (remaining <= lotTolerance) goodLots?.delete(lot.sellerBuildingId);
-    else goodLots?.set(lot.sellerBuildingId, remaining);
-  }
-  if (Math.abs(actualFulfilled - fulfilledTotal) > tolerance(actualFulfilled, fulfilledTotal)) {
-    throw new RangeError(`market allocation does not reconcile for good ${String(goodId)}`);
-  }
-
-  return { totalFunded, fulfilled: actualFulfilled };
-}
-
-function demandStates(
-  input: MarketDayInput,
-): DemandState[] {
-  const states: DemandState[] = [];
-  for (const demand of input.householdDemands) {
-    states.push({
-      kind: "household",
-      buyerId: demand.popBlockId,
-      tier: demand.tier,
-      goodId: demand.goodId,
-      desired: demand.desiredQuantity,
-      funded: demand.fundedQuantity,
-      eligible: false,
-      passAFulfilled: 0,
-      passBFulfilled: 0,
-      fulfilled: 0,
-    });
-  }
-  for (const demand of input.productionDemands) {
-    states.push({
-      kind: "building",
-      buyerId: demand.buyerBuildingId,
-      tier: demand.tier,
-      goodId: demand.goodId,
-      desired: demand.desiredQuantity,
-      funded: demand.fundedQuantity,
-      eligible: false,
-      passAFulfilled: 0,
-      passBFulfilled: 0,
-      fulfilled: 0,
-    });
-  }
-  return states;
-}
-
-function openingLotBook(market: World["markets"][number]): LotBook {
-  const book: LotBook = new Map();
-  for (const lot of market.stockLots) {
-    lotBookSet(book, lot.goodId, lot.ownerBuildingId, lot.quantity);
-  }
-  return book;
-}
-
-/** Demands of one tier grouped by good, each group in demand order (D-137). */
-function demandsByGood(demands: readonly DemandState[]): Map<number, DemandState[]> {
-  const groups = new Map<number, DemandState[]>();
-  for (const demand of demands) {
-    const group = groups.get(demand.goodId);
-    if (group === undefined) groups.set(demand.goodId, [demand]);
-    else group.push(demand);
-  }
-  return groups;
 }
 
 /** Update all market prices once, after clearing, using bounded incremental rules. */
@@ -699,6 +439,53 @@ export function updateMarketPrices(
   return updates;
 }
 
+/**
+ * Market transactions of one or more market days in columns (D-139). Settlement reads
+ * these instead of one object per transaction. `forTransactions` is the exact
+ * `pendingTransactions` array they describe: a result whose list was replaced (for
+ * example by a test building a malformed result) is settled from its objects.
+ */
+export interface PendingColumns {
+  readonly forTransactions: readonly PendingTransaction[];
+  /** 0 = household-purchase, 1 = input-purchase. */
+  readonly kind: number[];
+  readonly buyer: number[];
+  readonly seller: number[];
+  readonly good: number[];
+  readonly tier: number[];
+  /** 0 = A, 1 = B. */
+  readonly phase: number[];
+  readonly quantity: number[];
+  readonly unitPrice: number[];
+  readonly total: number[];
+}
+
+/** Transient columnar companions of a market-day result (D-139). */
+export interface MarketDayColumns {
+  readonly transactions: PendingColumns;
+  /** Fulfilled quantity of each `input.householdDemands` record, in input order. */
+  readonly householdFulfilled: Float64Array;
+}
+
+/** Ascending (household before building, buyer id, tier), the allocation order (D-133). */
+function allocationOrderSorted(
+  indices: number[],
+  kind: Uint8Array,
+  buyer: Float64Array,
+  tier: Uint8Array,
+): void {
+  const before = (left: number, right: number): number =>
+    (kind[left] ?? 0) - (kind[right] ?? 0) ||
+    (buyer[left] ?? 0) - (buyer[right] ?? 0) ||
+    (tier[left] ?? 0) - (tier[right] ?? 0);
+  for (let index = 1; index < indices.length; index += 1) {
+    if (before(indices[index - 1] ?? 0, indices[index] ?? 0) > 0) {
+      indices.sort(before);
+      return;
+    }
+  }
+}
+
 /** Run one deterministic market-day clearing phase. Returns transient pending results. */
 export function runMarketDay(
   world: World,
@@ -709,353 +496,497 @@ export function runMarketDay(
   const validated = validateMarketDayInput(world, definitions, input, options);
   const market = world.markets.find((candidate) => candidate.id === validated.marketId);
   if (market === undefined) throw new RangeError("missing market");
-  const openingLots = market.stockLots.map((lot) => ({ ...lot }));
+  const openingLotArray = market.stockLots;
   const openingPrices = [...market.priceRUSD];
-  const demands = demandStates(input);
-  const reservations: MarketReservation[] = [];
-  const remainingByLot = openingLotBook(market);
-  const priceFundedByGood = new Array<number>(definitions.goods.length).fill(0);
-  const blockedGoods = new Set<number>();
+  const lookups = options.lookups ?? buildMarketDayLookups(world, definitions);
+  const goodCount = definitions.goods.length;
+  const detail = options.detail ?? "full";
+
+  // Demand columns: household records first, then production records (input order).
+  const householdCount = input.householdDemands.length;
+  const demandCount = householdCount + input.productionDemands.length;
+  const kind = new Uint8Array(demandCount);
+  const buyer = new Float64Array(demandCount);
+  const tierOf = new Uint8Array(demandCount);
+  const goodOf = new Int32Array(demandCount);
+  const desired = new Float64Array(demandCount);
+  const funded = new Float64Array(demandCount);
+  const eligible = new Uint8Array(demandCount);
+  const passA = new Float64Array(demandCount);
+  const passB = new Float64Array(demandCount);
+  const fulfilled = new Float64Array(demandCount);
+  for (let index = 0; index < householdCount; index += 1) {
+    const demand = input.householdDemands[index] as HouseholdDemandRecord;
+    buyer[index] = demand.popBlockId;
+    tierOf[index] = demand.tier;
+    goodOf[index] = demand.goodId;
+    desired[index] = demand.desiredQuantity;
+    funded[index] = demand.fundedQuantity;
+  }
+  for (let index = householdCount; index < demandCount; index += 1) {
+    const demand = input.productionDemands[index - householdCount] as ProductionDemandRecord;
+    kind[index] = 1;
+    buyer[index] = demand.buyerBuildingId;
+    tierOf[index] = demand.tier;
+    goodOf[index] = demand.goodId;
+    desired[index] = demand.desiredQuantity;
+    funded[index] = demand.fundedQuantity;
+  }
+  // Demand indices per tier, then per (tier, good), each in demand order.
+  const tierList = new Map<number, number[]>();
+  for (const tier of M3_MARKET_TIERS) tierList.set(tier, []);
+  for (let index = 0; index < demandCount; index += 1) tierList.get(tierOf[index] ?? 0)?.push(index);
+  // Household blocks with tier 1/3 demands get a slot for the eligibility totals.
+  const blockSlot = new Map<number, number>();
+  const tierOneThree: number[] = [];
+  for (let index = 0; index < householdCount; index += 1) {
+    const tier = tierOf[index];
+    if (tier !== 1 && tier !== 3) continue;
+    tierOneThree.push(index);
+    if (!blockSlot.has(buyer[index] ?? 0)) blockSlot.set(buyer[index] ?? 0, blockSlot.size);
+  }
+  const desired1 = new Float64Array(blockSlot.size);
+  const fulfilled1 = new Float64Array(blockSlot.size);
+  const desired3 = new Float64Array(blockSlot.size);
+  const fulfilled3 = new Float64Array(blockSlot.size);
+  const slotOfDemand = new Int32Array(householdCount).fill(-1);
+  for (let index = 0; index < householdCount; index += 1) slotOfDemand[index] = blockSlot.get(buyer[index] ?? 0) ?? -1;
+  // `householdTierTotals` over the current fulfilment, summed in demand order.
+  const refreshTotals = (): void => {
+    desired1.fill(0);
+    fulfilled1.fill(0);
+    desired3.fill(0);
+    fulfilled3.fill(0);
+    for (const index of tierOneThree) {
+      const slot = slotOfDemand[index] ?? 0;
+      if (tierOf[index] === 1) {
+        desired1[slot] = (desired1[slot] ?? 0) + (desired[index] ?? 0);
+        fulfilled1[slot] = (fulfilled1[slot] ?? 0) + (fulfilled[index] ?? 0);
+      } else {
+        desired3[slot] = (desired3[slot] ?? 0) + (desired[index] ?? 0);
+        fulfilled3[slot] = (fulfilled3[slot] ?? 0) + (fulfilled[index] ?? 0);
+      }
+    }
+  };
+  const isEligible = (index: number): boolean => {
+    if (kind[index] !== 0) return true;
+    const tier = tierOf[index];
+    if (tier === 1) return true;
+    const slot = slotOfDemand[index] ?? -1;
+    if (slot >= 0 && !tierMet(desired1[slot] ?? 0, fulfilled1[slot] ?? 0)) return false;
+    if (tier === 3) return true;
+    return slot < 0 || tierMet(desired3[slot] ?? 0, fulfilled3[slot] ?? 0);
+  };
+  const byGood = (indices: readonly number[]): number[][] => {
+    const groups: number[][] = [];
+    for (let goodId = 0; goodId < goodCount; goodId += 1) groups.push([]);
+    for (const index of indices) groups[goodOf[index] ?? 0]?.push(index);
+    return groups;
+  };
+
+  // Reservations in columns, in creation order.
+  const resKind: number[] = [];
+  const resBuyer: number[] = [];
+  const resTier: number[] = [];
+  const resGood: number[] = [];
+  const resSeller: number[] = [];
+  const resQuantity: number[] = [];
+  const resPhase: number[] = [];
+
+  // Allocation of one (tier, good) group from a lot table (`allocateTierGood`).
+  const relevant: number[] = [];
+  const plannedQuantity: number[] = [];
+  const buyerEnd: number[] = [];
+  const lotSlots: number[] = [];
+  const lotEnd: number[] = [];
+  const allocate = (
+    candidates: readonly number[],
+    fundedOf: (index: number) => number,
+    goodId: number,
+    lots: LotTable,
+    phase: 0 | 1,
+  ): { readonly totalFunded: number; readonly fulfilled: number } => {
+    relevant.length = 0;
+    for (const index of candidates) if (fundedOf(index) > 0) relevant.push(index);
+    allocationOrderSorted(relevant, kind, buyer, tierOf);
+    let totalFunded = 0;
+    for (const index of relevant) totalFunded += fundedOf(index);
+    if (totalFunded <= tolerance(totalFunded)) return { totalFunded: 0, fulfilled: 0 };
+
+    const ownerCount = lots.owners.length;
+    const base = goodId * ownerCount;
+    lotSlots.length = 0;
+    let available = 0;
+    for (let slot = 0; slot < ownerCount; slot += 1) {
+      const quantity = lots.quantity[base + slot] ?? 0;
+      if (lots.present[base + slot] === 1 && quantity > 0) {
+        lotSlots.push(slot);
+        available += quantity;
+      }
+    }
+    if (available <= 0) return { totalFunded, fulfilled: 0 };
+
+    const fulfilledTotal = Math.min(totalFunded, available);
+    const scale = fulfilledTotal / totalFunded;
+    plannedQuantity.length = 0;
+    let plannedTotal = 0;
+    for (const index of relevant) {
+      const quantity = totalFunded <= available ? fundedOf(index) : fundedOf(index) * scale;
+      plannedQuantity.push(quantity);
+      plannedTotal += quantity;
+    }
+    if (Math.abs(plannedTotal - fulfilledTotal) > tolerance(plannedTotal, fulfilledTotal)) {
+      throw new RangeError(`market allocation planned quantity does not reconcile for good ${String(goodId)}`);
+    }
+
+    // D-133 sequential pairing over the cumulative lot and buyer intervals.
+    lotEnd.length = 0;
+    let cumulative = 0;
+    for (const slot of lotSlots) {
+      cumulative += ((lots.quantity[base + slot] ?? 0) / available) * fulfilledTotal;
+      lotEnd.push(cumulative);
+    }
+    lotEnd[lotEnd.length - 1] = fulfilledTotal;
+    buyerEnd.length = 0;
+    cumulative = 0;
+    for (const quantity of plannedQuantity) {
+      cumulative += quantity;
+      buyerEnd.push(cumulative);
+    }
+    if (buyerEnd.length > 0) buyerEnd[buyerEnd.length - 1] = fulfilledTotal;
+    const reservedByLot = new Array<number>(lotSlots.length).fill(0);
+    let buyerIndex = 0;
+    let lotStart = 0;
+    for (let lotIndex = 0; lotIndex < lotSlots.length; lotIndex += 1) {
+      const lotStop = lotEnd[lotIndex] ?? lotStart;
+      const sellerId = lots.owners[lotSlots[lotIndex] ?? 0] ?? 0;
+      while (buyerIndex < relevant.length) {
+        const buyerStart = buyerIndex === 0 ? 0 : (buyerEnd[buyerIndex - 1] ?? 0);
+        const buyerStop = buyerEnd[buyerIndex] ?? buyerStart;
+        const quantity = Math.min(lotStop, buyerStop) - Math.max(lotStart, buyerStart);
+        if (quantity > 0) {
+          const demand = relevant[buyerIndex] ?? 0;
+          fulfilled[demand] = (fulfilled[demand] ?? 0) + quantity;
+          if (phase === 0) passA[demand] = (passA[demand] ?? 0) + quantity;
+          else passB[demand] = (passB[demand] ?? 0) + quantity;
+          resKind.push(kind[demand] ?? 0);
+          resBuyer.push(buyer[demand] ?? 0);
+          resTier.push(tierOf[demand] ?? 0);
+          resGood.push(goodId);
+          resSeller.push(sellerId);
+          resQuantity.push(quantity);
+          resPhase.push(phase);
+          reservedByLot[lotIndex] = (reservedByLot[lotIndex] ?? 0) + quantity;
+        }
+        if (buyerStop <= lotStop) buyerIndex += 1;
+        else break;
+      }
+      lotStart = lotStop;
+    }
+    let actualFulfilled = 0;
+    for (let lotIndex = 0; lotIndex < lotSlots.length; lotIndex += 1) {
+      const cell = base + (lotSlots[lotIndex] ?? 0);
+      const quantity = lots.quantity[cell] ?? 0;
+      const reservedFromLot = reservedByLot[lotIndex] ?? 0;
+      actualFulfilled += reservedFromLot;
+      const remaining = quantity - reservedFromLot;
+      // A lot's reservation is the difference of two cumulative interval ends, so its
+      // rounding error scales with the cumulative total, not with the lot (P2b).
+      const lotTolerance = tolerance(quantity, reservedFromLot, fulfilledTotal);
+      if (remaining < -lotTolerance) {
+        throw new RangeError(
+          `market reservation exceeds seller lot ${String(goodId)}:${String(lots.owners[lotSlots[lotIndex] ?? 0] ?? 0)}`,
+        );
+      }
+      if (remaining <= lotTolerance) {
+        lots.present[cell] = 0;
+        lots.quantity[cell] = 0;
+      } else {
+        lots.quantity[cell] = remaining;
+      }
+    }
+    if (Math.abs(actualFulfilled - fulfilledTotal) > tolerance(actualFulfilled, fulfilledTotal)) {
+      throw new RangeError(`market allocation does not reconcile for good ${String(goodId)}`);
+    }
+    return { totalFunded, fulfilled: actualFulfilled };
+  };
+
+  const priceFundedByGood = new Array<number>(goodCount).fill(0);
+  const buildingIds = lookups.production.buildingIdsByMarket.get(market.id) ?? [];
+  const opening = lotTableFromLots(market.stockLots, buildingIds, goodCount);
+  const ownerCount = opening.owners.length;
 
   try {
+    // Pass A: opening stock, tiers 1, 2, 3, 5, 6.
+    const remaining = copyLotTable(opening);
+    const blockedGoods = new Uint8Array(goodCount);
     for (const tier of M3_MARKET_TIERS) {
-      const tierDemands = demands.filter((demand) => demand.tier === tier);
-      const tierTotals = householdTierTotals(demands);
-      for (const demand of tierDemands) {
-        demand.eligible = householdTierEligible(tierTotals, demand);
-        if (demand.eligible) {
-          priceFundedByGood[demand.goodId] =
-            (priceFundedByGood[demand.goodId] ?? 0) + demand.funded;
+      const tierDemands = tierList.get(tier) ?? [];
+      refreshTotals();
+      for (const index of tierDemands) {
+        const isNow = isEligible(index);
+        eligible[index] = isNow ? 1 : 0;
+        if (isNow) {
+          const goodId = goodOf[index] ?? 0;
+          priceFundedByGood[goodId] = (priceFundedByGood[goodId] ?? 0) + (funded[index] ?? 0);
         }
       }
-      const tierByGood = demandsByGood(tierDemands);
-      for (let goodId = 0; goodId < definitions.goods.length; goodId += 1) {
-        if (blockedGoods.has(goodId)) continue;
-        const goodDemands = (tierByGood.get(goodId) ?? []).filter(
-          (demand) => demand.eligible && demand.funded > 0,
+      const tierByGood = byGood(tierDemands);
+      for (let goodId = 0; goodId < goodCount; goodId += 1) {
+        if (blockedGoods[goodId] === 1) continue;
+        const candidates = (tierByGood[goodId] ?? []).filter(
+          (index) => eligible[index] === 1 && (funded[index] ?? 0) > 0,
         );
-        const allocation = allocateTierGood(
-          goodDemands.map((demand) => ({ demand, funded: demand.funded })),
-          goodId,
-          remainingByLot,
-          reservations,
-          "A",
-        );
+        if (candidates.length === 0) continue;
+        const allocation = allocate(candidates, (index) => funded[index] ?? 0, goodId, remaining, 0);
         if (
           allocation.totalFunded - allocation.fulfilled >
           tolerance(allocation.totalFunded, allocation.fulfilled)
         ) {
-          blockedGoods.add(goodId);
+          blockedGoods[goodId] = 1;
         }
       }
     }
+    const primaryCount = resKind.length;
 
-    const primaryReservations = [...reservations];
-    const householdPassA = primaryReservations.filter(
-      (reservation) => reservation.buyerKind === "household",
-    );
-    const inputReservations: InputReservation[] = primaryReservations
-      .filter((reservation) => reservation.buyerKind === "building")
-      .map((reservation) => ({
-        buyerBuildingId: reservation.buyerId,
-        marketId: market.id,
-        goodId: reservation.goodId,
-        sellerBuildingId: reservation.sellerBuildingId,
-        quantity: reservation.quantity,
-      }));
-
-    const production = runProductionPhase(
+    // M3c production from the building reservations of Pass A.
+    const inputColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
+    for (let index = 0; index < primaryCount; index += 1) {
+      if (resKind[index] !== 1) continue;
+      (inputColumns.buyer as number[]).push(resBuyer[index] ?? 0);
+      (inputColumns.good as number[]).push(resGood[index] ?? 0);
+      (inputColumns.seller as number[]).push(resSeller[index] ?? 0);
+      (inputColumns.quantity as number[]).push(resQuantity[index] ?? 0);
+    }
+    if (options.validateWorld !== false) {
+      // `runProductionPhase` checks for direct callers (validated above as well).
+      if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
+        throw new RangeError("economy definitions do not match the world data/scenario identity");
+      }
+    }
+    const productionCore = runProductionCore(
       world,
       definitions,
-      inputReservations,
-      {
-        applyOverflow: false,
-        marketId: market.id,
-        ...(options.lookups === undefined ? {} : { lookups: options.lookups.production }),
-        ...(options.validateWorld === undefined
-          ? {}
-          : { validateWorld: options.validateWorld }),
-      },
+      market,
+      lookups.production,
+      opening,
+      inputColumns,
+      false,
     );
-
-    const householdReservedByLot: LotBook = new Map();
-    const householdPassAByGood = new Map<number, number>();
-    for (const reservation of householdPassA) {
-      lotBookAdd(householdReservedByLot, reservation.goodId, reservation.sellerBuildingId, reservation.quantity);
-      householdPassAByGood.set(
-        reservation.goodId,
-        (householdPassAByGood.get(reservation.goodId) ?? 0) + reservation.quantity,
-      );
+    const produced = productionCore.lots;
+    if (options.validateWorld !== false) {
+      const candidateLots = lotTableToLots(produced);
+      assertValidWorldForTick({
+        ...world,
+        markets: world.markets.map((candidate) =>
+          candidate.id === market.id ? { ...candidate, stockLots: candidateLots } : candidate,
+        ),
+      });
     }
-    // `market.stockLots` already includes M3c output and excludes actual input
-    // use. Do not add production again here; only remove outstanding household
-    // Pass-A reservations.
-    const passBLots: LotBook = new Map();
-    for (const lot of market.stockLots) {
-      const reserved = lotBookGet(householdReservedByLot, lot.goodId, lot.ownerBuildingId) ?? 0;
-      const available = lot.quantity - reserved;
-      if (
-        available <
-        -tolerance(lot.quantity, reserved, householdPassAByGood.get(lot.goodId) ?? 0)
-      ) {
+
+    // Pass B lots: the produced lots less outstanding household Pass-A reservations.
+    const householdReservedByLot = new Float64Array(goodCount * ownerCount);
+    const householdPassAByGood = new Float64Array(goodCount);
+    for (let index = 0; index < primaryCount; index += 1) {
+      if (resKind[index] !== 0) continue;
+      const goodId = resGood[index] ?? 0;
+      const cell = goodId * ownerCount + (opening.slotOf.get(resSeller[index] ?? 0) ?? 0);
+      householdReservedByLot[cell] = (householdReservedByLot[cell] ?? 0) + (resQuantity[index] ?? 0);
+      householdPassAByGood[goodId] = (householdPassAByGood[goodId] ?? 0) + (resQuantity[index] ?? 0);
+    }
+    const passBLots: LotTable = {
+      goodCount,
+      owners: opening.owners,
+      slotOf: opening.slotOf,
+      quantity: new Float64Array(goodCount * ownerCount),
+      present: new Uint8Array(goodCount * ownerCount),
+    };
+    for (let cell = 0; cell < goodCount * ownerCount; cell += 1) {
+      if (produced.present[cell] !== 1) continue;
+      const quantity = produced.quantity[cell] ?? 0;
+      const reserved = householdReservedByLot[cell] ?? 0;
+      const available = quantity - reserved;
+      const goodId = Math.floor(cell / ownerCount);
+      if (available < -tolerance(quantity, reserved, householdPassAByGood[goodId] ?? 0)) {
         throw new RangeError(
-          `household reservation exceeds current seller lot ${String(lot.goodId)}:${String(lot.ownerBuildingId)}`,
+          `household reservation exceeds current seller lot ${String(goodId)}:${String(opening.owners[cell % ownerCount] ?? 0)}`,
         );
       }
-      if (available > 0) lotBookSet(passBLots, lot.goodId, lot.ownerBuildingId, available);
+      if (available > 0) {
+        passBLots.present[cell] = 1;
+        passBLots.quantity[cell] = available;
+      }
     }
 
-    const inputCriticalUnmet = new Set<number>();
-    const inputRemainingUnmet = new Set<number>();
-    for (const demand of demands) {
-      if (demand.kind !== "building") continue;
-      if (demand.funded - demand.fulfilled <= tolerance(demand.funded, demand.fulfilled)) {
+    const inputCriticalUnmet = new Uint8Array(goodCount);
+    const inputRemainingUnmet = new Uint8Array(goodCount);
+    for (let index = householdCount; index < demandCount; index += 1) {
+      if ((funded[index] ?? 0) - (fulfilled[index] ?? 0) <= tolerance(funded[index] ?? 0, fulfilled[index] ?? 0)) {
         continue;
       }
-      if (demand.tier === 2) inputCriticalUnmet.add(demand.goodId);
-      else if (demand.tier === 5) inputRemainingUnmet.add(demand.goodId);
+      const goodId = goodOf[index] ?? 0;
+      if (tierOf[index] === 2) inputCriticalUnmet[goodId] = 1;
+      else if (tierOf[index] === 5) inputRemainingUnmet[goodId] = 1;
     }
 
-    const passBBlocked = new Set<number>();
+    // Pass B: households only, tiers 1, 3, 6, from same-day output.
+    const passBBlocked = new Uint8Array(goodCount);
     for (const tier of [1, 3, 6] as const) {
       // Pass A eligibility reflects opening stock only. Pass B may fill a lower
       // tier from same-day production, so recompute eligibility after each
       // completed tier and include newly unlocked funded demand in the price
       // signal (it was excluded from the Pass-A signal).
-      const tierTotals = householdTierTotals(demands);
-      for (const demand of demands) {
-        if (demand.kind !== "household" || demand.tier !== tier) continue;
-        const wasEligible = demand.eligible;
-        demand.eligible = householdTierEligible(tierTotals, demand);
-        if (!wasEligible && demand.eligible) {
-          priceFundedByGood[demand.goodId] =
-            (priceFundedByGood[demand.goodId] ?? 0) + demand.funded;
+      refreshTotals();
+      const tierDemands = tierList.get(tier) ?? [];
+      for (const index of tierDemands) {
+        if (kind[index] !== 0) continue;
+        const wasEligible = eligible[index] === 1;
+        const isNow = isEligible(index);
+        eligible[index] = isNow ? 1 : 0;
+        if (!wasEligible && isNow) {
+          const goodId = goodOf[index] ?? 0;
+          priceFundedByGood[goodId] = (priceFundedByGood[goodId] ?? 0) + (funded[index] ?? 0);
         }
       }
-      const tierDemands = demands.filter(
-        (demand) =>
-          demand.kind === "household" &&
-          demand.tier === tier &&
-          demand.eligible &&
-          demand.funded - demand.passAFulfilled > tolerance(demand.funded, demand.passAFulfilled),
+      const open = tierDemands.filter(
+        (index) =>
+          kind[index] === 0 &&
+          eligible[index] === 1 &&
+          (funded[index] ?? 0) - (passA[index] ?? 0) > tolerance(funded[index] ?? 0, passA[index] ?? 0),
       );
-      const tierByGood = demandsByGood(tierDemands);
-      for (let goodId = 0; goodId < definitions.goods.length; goodId += 1) {
-        if (passBBlocked.has(goodId)) continue;
-        if (tier === 3 && inputCriticalUnmet.has(goodId)) continue;
-        if (
-          tier === 6 &&
-          (inputCriticalUnmet.has(goodId) || inputRemainingUnmet.has(goodId))
-        ) {
-          continue;
-        }
-        const goodDemands = tierByGood.get(goodId) ?? [];
-        const allocation = allocateTierGood(
-          goodDemands.map((demand) => ({
-            demand,
-            funded: demand.funded - demand.passAFulfilled,
-          })),
+      const tierByGood = byGood(open);
+      for (let goodId = 0; goodId < goodCount; goodId += 1) {
+        if (passBBlocked[goodId] === 1) continue;
+        if (tier === 3 && inputCriticalUnmet[goodId] === 1) continue;
+        if (tier === 6 && (inputCriticalUnmet[goodId] === 1 || inputRemainingUnmet[goodId] === 1)) continue;
+        const candidates = tierByGood[goodId] ?? [];
+        if (candidates.length === 0) continue;
+        const allocation = allocate(
+          candidates,
+          (index) => (funded[index] ?? 0) - (passA[index] ?? 0),
           goodId,
           passBLots,
-          reservations,
-          "B",
+          1,
         );
         if (
           allocation.totalFunded - allocation.fulfilled >
           tolerance(allocation.totalFunded, allocation.fulfilled)
         ) {
-          passBBlocked.add(goodId);
+          passBBlocked[goodId] = 1;
         }
       }
     }
 
-    const householdReservations = reservations.filter(
-      (reservation) => reservation.buyerKind === "household",
-    );
-    const householdByLot: LotBook = new Map();
-    const householdByGood = new Map<number, number>();
-    for (const reservation of householdReservations) {
-      lotBookAdd(householdByLot, reservation.goodId, reservation.sellerBuildingId, reservation.quantity);
-      householdByGood.set(reservation.goodId, (householdByGood.get(reservation.goodId) ?? 0) + reservation.quantity);
+    // Final lots: the produced lots less every household reservation (A then B).
+    const householdByLot = new Float64Array(goodCount * ownerCount);
+    const householdByGood = new Float64Array(goodCount);
+    for (let index = 0; index < resKind.length; index += 1) {
+      if (resKind[index] !== 0) continue;
+      const goodId = resGood[index] ?? 0;
+      const cell = goodId * ownerCount + (opening.slotOf.get(resSeller[index] ?? 0) ?? 0);
+      householdByLot[cell] = (householdByLot[cell] ?? 0) + (resQuantity[index] ?? 0);
+      householdByGood[goodId] = (householdByGood[goodId] ?? 0) + (resQuantity[index] ?? 0);
     }
-    // `market.stockLots` holds one lot per (good, owner) (canonical after
-    // production), so the remaining lots keep its order.
-    const finalLots: World["markets"][number]["stockLots"] = [];
-    for (const lot of market.stockLots) {
-      const consumed = lotBookGet(householdByLot, lot.goodId, lot.ownerBuildingId) ?? 0;
-      const remaining = lot.quantity - consumed;
+    const finalLots: LotTable = {
+      goodCount,
+      owners: opening.owners,
+      slotOf: opening.slotOf,
+      quantity: new Float64Array(goodCount * ownerCount),
+      present: new Uint8Array(goodCount * ownerCount),
+    };
+    for (let cell = 0; cell < goodCount * ownerCount; cell += 1) {
+      if (produced.present[cell] !== 1) continue;
+      const quantity = produced.quantity[cell] ?? 0;
+      const consumed = householdByLot[cell] ?? 0;
+      const remainingQuantity = quantity - consumed;
+      const goodId = Math.floor(cell / ownerCount);
       // D-136: reservations are differences of cumulative interval ends, so the
       // rounding error scales with the good's household total, not with one lot.
-      if (remaining < -tolerance(lot.quantity, consumed, householdByGood.get(lot.goodId) ?? 0)) {
+      if (remainingQuantity < -tolerance(quantity, consumed, householdByGood[goodId] ?? 0)) {
         throw new RangeError(
-          `fulfilled household demand exceeds seller lot ${String(lot.goodId)}:${String(lot.ownerBuildingId)}`,
+          `fulfilled household demand exceeds seller lot ${String(goodId)}:${String(opening.owners[cell % ownerCount] ?? 0)}`,
         );
       }
-      if (remaining > 0) {
-        finalLots.push({ goodId: lot.goodId, ownerBuildingId: lot.ownerBuildingId, quantity: remaining });
+      if (remainingQuantity > 0) {
+        finalLots.present[cell] = 1;
+        finalLots.quantity[cell] = remainingQuantity;
       }
     }
-    market.stockLots = finalLots;
-    const overflowLosses = applyOverflowLosses(
-      world,
-      definitions,
-      market.id,
-      options.validateWorld === undefined ? {} : { validateWorld: options.validateWorld },
+    const overflowLosses = applyOverflowToTable(
+      finalLots,
+      storageCapacityOf(world, definitions, market.id, lookups.production),
+      goodCount,
     );
-
-    // Used input per (buyer, good), summed in `reservationUses` order (one use per
-    // buyer, good and seller), which is the order the per-demand scan summed it in.
-    const usedInputByDemand = new Map<number, Map<number, number>>();
-    for (const use of production.reservationUses) {
-      let byGood = usedInputByDemand.get(use.buyerBuildingId);
-      if (byGood === undefined) {
-        byGood = new Map<number, number>();
-        usedInputByDemand.set(use.buyerBuildingId, byGood);
-      }
-      byGood.set(use.goodId, (byGood.get(use.goodId) ?? 0) + use.usedQuantity);
-    }
-
-    const canonicalOrder = options.detail !== "summary";
-    const householdDemandResults: HouseholdDemandResult[] = demands
-      .filter((demand) => demand.kind === "household")
-      .map((demand) => ({
-        popBlockId: demand.buyerId,
-        tier: demand.tier as HouseholdTier,
-        goodId: demand.goodId,
-        desiredQuantity: demand.desired,
-        fundedQuantity: demand.funded,
-        passAFulfilled: demand.passAFulfilled,
-        passBFulfilled: demand.passBFulfilled,
-        fulfilledQuantity: demand.fulfilled,
-        unmetFunded: Math.max(0, demand.funded - demand.fulfilled),
-        unmetDesired: Math.max(0, demand.desired - demand.fulfilled),
-      }));
-    if (canonicalOrder) {
-      householdDemandResults.sort((left, right) =>
-        left.popBlockId !== right.popBlockId
-          ? left.popBlockId - right.popBlockId
-          : left.tier !== right.tier
-            ? left.tier - right.tier
-            : left.goodId - right.goodId,
-      );
-    }
-
-    const productionDemandResults: ProductionDemandResult[] = demands
-      .filter((demand) => demand.kind === "building")
-      .map((demand) => {
-        const reserved = demand.fulfilled;
-        const used = usedInputByDemand.get(demand.buyerId)?.get(demand.goodId) ?? 0;
-        return {
-          buyerBuildingId: demand.buyerId,
-          tier: demand.tier as ProductionInputTier,
-          goodId: demand.goodId,
-          desiredQuantity: demand.desired,
-          fundedQuantity: demand.funded,
-          reservedQuantity: reserved,
-          usedQuantity: used,
-          releasedQuantity: Math.max(0, reserved - used),
-        };
-      });
-    if (canonicalOrder) {
-      productionDemandResults.sort((left, right) =>
-        left.buyerBuildingId !== right.buyerBuildingId
-          ? left.buyerBuildingId - right.buyerBuildingId
-          : left.goodId - right.goodId,
-      );
-      reservations.sort((left, right) => {
-        if (left.phase !== right.phase) return left.phase < right.phase ? -1 : 1;
-        if (left.tier !== right.tier) return left.tier - right.tier;
-        if (left.buyerKind !== right.buyerKind) return left.buyerKind < right.buyerKind ? -1 : 1;
-        if (left.buyerId !== right.buyerId) return left.buyerId - right.buyerId;
-        if (left.goodId !== right.goodId) return left.goodId - right.goodId;
-        return left.sellerBuildingId - right.sellerBuildingId;
+    const closingLots = lotTableToLots(finalLots);
+    if (options.validateWorld !== false) {
+      assertValidWorldForTick({
+        ...world,
+        markets: world.markets.map((candidate) =>
+          candidate.id === market.id ? { ...candidate, stockLots: closingLots } : candidate,
+        ),
       });
     }
+    market.stockLots = closingLots;
 
-    const householdPurchases: HouseholdPurchase[] = householdReservations.map((reservation) => ({
-      popBlockId: reservation.buyerId,
-      tier: reservation.tier as HouseholdTier,
-      goodId: reservation.goodId,
-      sellerBuildingId: reservation.sellerBuildingId,
-      quantity: reservation.quantity,
-      unitPriceRUSD: openingPrices[reservation.goodId] ?? 0,
-      totalRUSD: reservation.quantity * (openingPrices[reservation.goodId] ?? 0),
-      phase: reservation.phase,
-    }));
-    if (canonicalOrder) {
-      householdPurchases.sort((left, right) => {
-        if (left.popBlockId !== right.popBlockId) return left.popBlockId - right.popBlockId;
-        if (left.tier !== right.tier) return left.tier - right.tier;
-        if (left.goodId !== right.goodId) return left.goodId - right.goodId;
-        return left.sellerBuildingId - right.sellerBuildingId;
-      });
-    }
-
-    // The phase-A building reservation of each (buyer, good, seller), the one
-    // `reservations.find` returned for each input use (production rejects a second
-    // reservation of the same buyer, good and seller, so it is unique).
-    const inputReservationByKey = new Map<number, Map<number, Map<number, MarketReservation>>>();
-    for (const reservation of reservations) {
-      if (reservation.buyerKind !== "building" || reservation.phase !== "A") continue;
-      let byGood = inputReservationByKey.get(reservation.buyerId);
-      if (byGood === undefined) {
-        byGood = new Map();
-        inputReservationByKey.set(reservation.buyerId, byGood);
-      }
-      let bySeller = byGood.get(reservation.goodId);
-      if (bySeller === undefined) {
-        bySeller = new Map();
-        byGood.set(reservation.goodId, bySeller);
-      }
-      if (!bySeller.has(reservation.sellerBuildingId)) bySeller.set(reservation.sellerBuildingId, reservation);
+    // Pending transactions: household reservations, then input uses.
+    const inputTier = new Map<number, number>();
+    for (let index = householdCount; index < demandCount; index += 1) {
+      inputTier.set((buyer[index] ?? 0) * goodCount + (goodOf[index] ?? 0), tierOf[index] ?? 0);
     }
     const pendingTransactions: PendingTransaction[] = [];
-    for (const purchase of householdPurchases) {
-      pendingTransactions.push({
-        kind: "household-purchase",
-        buyerPopBlockId: purchase.popBlockId,
-        buyerBuildingId: null,
-        sellerBuildingId: purchase.sellerBuildingId,
-        goodId: purchase.goodId,
-        quantity: purchase.quantity,
-        unitPriceRUSD: purchase.unitPriceRUSD,
-        totalRUSD: purchase.totalRUSD,
-        tier: purchase.tier,
-        phase: purchase.phase,
-      });
+    const transactions: PendingColumns = {
+      forTransactions: pendingTransactions,
+      kind: [],
+      buyer: [],
+      seller: [],
+      good: [],
+      tier: [],
+      phase: [],
+      quantity: [],
+      unitPrice: [],
+      total: [],
+    };
+    const pushTransaction = (
+      transactionKind: 0 | 1,
+      buyerId: number,
+      sellerId: number,
+      goodId: number,
+      tier: number,
+      phase: number,
+      quantity: number,
+    ): void => {
+      const unitPrice = openingPrices[goodId] ?? 0;
+      transactions.kind.push(transactionKind);
+      transactions.buyer.push(buyerId);
+      transactions.seller.push(sellerId);
+      transactions.good.push(goodId);
+      transactions.tier.push(tier);
+      transactions.phase.push(phase);
+      transactions.quantity.push(quantity);
+      transactions.unitPrice.push(unitPrice);
+      transactions.total.push(quantity * unitPrice);
+    };
+    for (let index = 0; index < resKind.length; index += 1) {
+      if (resKind[index] !== 0) continue;
+      pushTransaction(
+        0,
+        resBuyer[index] ?? 0,
+        resSeller[index] ?? 0,
+        resGood[index] ?? 0,
+        resTier[index] ?? 0,
+        resPhase[index] ?? 0,
+        resQuantity[index] ?? 0,
+      );
     }
-    for (const use of production.reservationUses) {
-      if (!(use.usedQuantity > 0)) continue;
-      const reservation = inputReservationByKey
-        .get(use.buyerBuildingId)
-        ?.get(use.goodId)
-        ?.get(use.sellerBuildingId);
-      if (reservation === undefined) {
-        throw new RangeError("production input use has no matching reservation");
-      }
-      const unitPrice = openingPrices[use.goodId] ?? 0;
-      pendingTransactions.push({
-        kind: "input-purchase",
-        buyerPopBlockId: null,
-        buyerBuildingId: use.buyerBuildingId,
-        sellerBuildingId: use.sellerBuildingId,
-        goodId: use.goodId,
-        quantity: use.usedQuantity,
-        unitPriceRUSD: unitPrice,
-        totalRUSD: use.usedQuantity * unitPrice,
-        tier: reservation.tier,
-        phase: "A",
-      });
-    }
-    if (canonicalOrder) {
-      pendingTransactions.sort((left, right) => {
-        if (left.kind !== right.kind) return left.kind < right.kind ? -1 : 1;
-        if (left.goodId !== right.goodId) return left.goodId - right.goodId;
-        const leftBuyer = left.buyerPopBlockId ?? left.buyerBuildingId ?? -1;
-        const rightBuyer = right.buyerPopBlockId ?? right.buyerBuildingId ?? -1;
-        if (leftBuyer !== rightBuyer) return leftBuyer - rightBuyer;
-        return left.sellerBuildingId - right.sellerBuildingId;
-      });
+    const uses = productionCore.uses;
+    for (let index = 0; index < uses.buyer.length; index += 1) {
+      const used = uses.used[index] ?? 0;
+      if (!(used > 0)) continue;
+      const buyerId = uses.buyer[index] ?? 0;
+      const goodId = uses.good[index] ?? 0;
+      const tier = inputTier.get(buyerId * goodCount + goodId);
+      if (tier === undefined) throw new RangeError("production input use has no matching reservation");
+      pushTransaction(1, buyerId, uses.seller[index] ?? 0, goodId, tier, 0, used);
     }
 
     // D-136 (amends D-040): sellable supply is the opening stock plus same-day output,
@@ -1063,14 +994,20 @@ export function runMarketDay(
     // (Pass B), but producers buy only from the opening stock, so a market must carry
     // one day of input demand into the next day; counting that carry as supply made
     // every balanced market with intermediate goods read as a glut and drift to the floor.
-    const inputFundedByGood = new Array<number>(definitions.goods.length).fill(0);
-    for (const demand of demands) {
-      if (demand.kind === "building" && demand.eligible) {
-        inputFundedByGood[demand.goodId] = (inputFundedByGood[demand.goodId] ?? 0) + demand.funded;
+    const inputFundedByGood = new Array<number>(goodCount).fill(0);
+    for (let index = householdCount; index < demandCount; index += 1) {
+      if (eligible[index] === 1) {
+        const goodId = goodOf[index] ?? 0;
+        inputFundedByGood[goodId] = (inputFundedByGood[goodId] ?? 0) + (funded[index] ?? 0);
       }
     }
+    const productionInventory = productionCore.inventory;
+    const flowOf = (goodId: number): InventoryFlow | undefined =>
+      productionInventory[goodId]?.goodId === goodId
+        ? productionInventory[goodId]
+        : productionInventory.find((flow) => flow.goodId === goodId);
     const sellableSupplyByGood = definitions.goods.map((good) => {
-      const intermediate = production.inventory.find((flow) => flow.goodId === good.id);
+      const intermediate = flowOf(good.id);
       return Math.max(
         0,
         (intermediate?.openingStock ?? 0) + (intermediate?.production ?? 0) - (inputFundedByGood[good.id] ?? 0),
@@ -1083,32 +1020,33 @@ export function runMarketDay(
       sellableSupplyByGood,
     );
 
-    const householdConsumptionByGood = new Array<number>(definitions.goods.length).fill(0);
-    for (const reservation of householdReservations) {
-      householdConsumptionByGood[reservation.goodId] =
-        (householdConsumptionByGood[reservation.goodId] ?? 0) + reservation.quantity;
+    const householdConsumptionByGood = new Array<number>(goodCount).fill(0);
+    for (let index = 0; index < resKind.length; index += 1) {
+      if (resKind[index] !== 0) continue;
+      const goodId = resGood[index] ?? 0;
+      householdConsumptionByGood[goodId] = (householdConsumptionByGood[goodId] ?? 0) + (resQuantity[index] ?? 0);
     }
-    const lossByGood = new Array<number>(definitions.goods.length).fill(0);
+    const lossByGood = new Array<number>(goodCount).fill(0);
     for (const loss of overflowLosses) {
       lossByGood[loss.goodId] = (lossByGood[loss.goodId] ?? 0) + loss.quantity;
     }
-    const finalStock = deriveStockByGood(market, definitions.goods.length);
+    const finalStock = deriveStockByGood(market, goodCount);
     const inventory: MarketInventoryFlow[] = definitions.goods.map((good) => {
       const goodId = good.id;
-      const intermediate = production.inventory.find((flow) => flow.goodId === goodId);
-      const opening = intermediate?.openingStock ?? 0;
-      const produced = intermediate?.production ?? 0;
+      const intermediate = flowOf(goodId);
+      const openingStock = intermediate?.openingStock ?? 0;
+      const producedQuantity = intermediate?.production ?? 0;
       const used = intermediate?.usedAsInput ?? 0;
       const household = householdConsumptionByGood[goodId] ?? 0;
       const loss = lossByGood[goodId] ?? 0;
       const closing = finalStock[goodId] ?? 0;
-      const expected = opening + produced - used - household - loss;
+      const expected = openingStock + producedQuantity - used - household - loss;
       // Scale the physical tolerance by the gross terms, not only by the
       // residual: with large populations the conservation identity subtracts
       // large nearly equal quantities and can leave a tiny non-zero residual.
       if (
         Math.abs(expected - closing) >
-        tolerance(opening, produced, used, household, loss, expected, closing)
+        tolerance(openingStock, producedQuantity, used, household, loss, expected, closing)
       ) {
         throw new RangeError(
           `final inventory conservation failed for good ${String(goodId)}: ${String(expected)} != ${String(closing)}`,
@@ -1116,8 +1054,8 @@ export function runMarketDay(
       }
       return {
         goodId,
-        openingStock: opening,
-        production: produced,
+        openingStock,
+        production: producedQuantity,
         usedAsInput: used,
         householdConsumption: household,
         recordedLoss: loss,
@@ -1125,15 +1063,23 @@ export function runMarketDay(
       };
     });
 
-    return {
+    const householdFulfilled = fulfilled.slice(0, householdCount);
+    const production: ProductionPhaseResult = {
+      marketId: market.id,
+      buildings: productionCore.buildings,
+      reservationUses: detail === "full" ? reservationUseObjects(market.id, uses) : [],
+      inventory: productionInventory,
+      overflowLosses: [],
+    };
+    const result: MarketDayResult = {
       marketId: market.id,
       dayIndex: input.dayIndex,
       openingPrices,
       updatedPrices: [...market.priceRUSD],
-      householdDemands: householdDemandResults,
-      productionDemands: productionDemandResults,
-      reservations,
-      householdPurchases,
+      householdDemands: [],
+      productionDemands: [],
+      reservations: [],
+      householdPurchases: [],
       pendingTransactions,
       production,
       priceUpdates,
@@ -1141,9 +1087,197 @@ export function runMarketDay(
       overflowLosses,
       settled: false,
     };
+    // Transient companions (D-139), non-enumerable: they are a cache of this result,
+    // not part of its public shape, so equality checks and copies (`{ ...result }`)
+    // see the same result as before and a copied result settles from its objects.
+    Object.defineProperty(result, "columns", {
+      value: { transactions, householdFulfilled } satisfies MarketDayColumns,
+      enumerable: false,
+      writable: false,
+    });
+    if (detail === "full") {
+      fillFullDetail(result, {
+        householdCount,
+        kind,
+        buyer,
+        tierOf,
+        goodOf,
+        desired,
+        funded,
+        passA,
+        passB,
+        fulfilled,
+        uses,
+        reservations: { resKind, resBuyer, resTier, resGood, resSeller, resQuantity, resPhase },
+      });
+    }
+    return result;
   } catch (error) {
-    market.stockLots = openingLots;
+    market.stockLots = openingLotArray;
     market.priceRUSD = openingPrices;
     throw error;
   }
+}
+
+/**
+ * The full-detail result lists (D-137 `detail: "full"`), built from the columns in
+ * the canonical orders of the former implementation. `pendingTransactions` is filled
+ * in place so the columns keep describing that exact array.
+ */
+function fillFullDetail(
+  result: MarketDayResult,
+  data: {
+    readonly householdCount: number;
+    readonly kind: Uint8Array;
+    readonly buyer: Float64Array;
+    readonly tierOf: Uint8Array;
+    readonly goodOf: Int32Array;
+    readonly desired: Float64Array;
+    readonly funded: Float64Array;
+    readonly passA: Float64Array;
+    readonly passB: Float64Array;
+    readonly fulfilled: Float64Array;
+    readonly uses: ReservationUseColumns;
+    readonly reservations: {
+      readonly resKind: readonly number[];
+      readonly resBuyer: readonly number[];
+      readonly resTier: readonly number[];
+      readonly resGood: readonly number[];
+      readonly resSeller: readonly number[];
+      readonly resQuantity: readonly number[];
+      readonly resPhase: readonly number[];
+    };
+  },
+): void {
+  const { householdCount, kind, buyer, tierOf, goodOf, desired, funded, passA, passB, fulfilled } = data;
+  const mutable = result as {
+    -readonly [K in keyof MarketDayResult]: MarketDayResult[K];
+  };
+  const householdDemandResults: HouseholdDemandResult[] = [];
+  const productionDemandResults: ProductionDemandResult[] = [];
+  const usedInputByDemand = new Map<number, number>();
+  const goodCount = result.openingPrices.length;
+  for (let index = 0; index < data.uses.buyer.length; index += 1) {
+    const key = (data.uses.buyer[index] ?? 0) * goodCount + (data.uses.good[index] ?? 0);
+    usedInputByDemand.set(key, (usedInputByDemand.get(key) ?? 0) + (data.uses.used[index] ?? 0));
+  }
+  for (let index = 0; index < kind.length; index += 1) {
+    if (kind[index] === 0) {
+      householdDemandResults.push({
+        popBlockId: buyer[index] ?? 0,
+        tier: (tierOf[index] ?? 1) as HouseholdTier,
+        goodId: goodOf[index] ?? 0,
+        desiredQuantity: desired[index] ?? 0,
+        fundedQuantity: funded[index] ?? 0,
+        passAFulfilled: passA[index] ?? 0,
+        passBFulfilled: passB[index] ?? 0,
+        fulfilledQuantity: fulfilled[index] ?? 0,
+        unmetFunded: Math.max(0, (funded[index] ?? 0) - (fulfilled[index] ?? 0)),
+        unmetDesired: Math.max(0, (desired[index] ?? 0) - (fulfilled[index] ?? 0)),
+      });
+    } else {
+      const reserved = fulfilled[index] ?? 0;
+      const used = usedInputByDemand.get((buyer[index] ?? 0) * goodCount + (goodOf[index] ?? 0)) ?? 0;
+      productionDemandResults.push({
+        buyerBuildingId: buyer[index] ?? 0,
+        tier: (tierOf[index] ?? 2) as ProductionInputTier,
+        goodId: goodOf[index] ?? 0,
+        desiredQuantity: desired[index] ?? 0,
+        fundedQuantity: funded[index] ?? 0,
+        reservedQuantity: reserved,
+        usedQuantity: used,
+        releasedQuantity: Math.max(0, reserved - used),
+      });
+    }
+  }
+  void householdCount;
+  householdDemandResults.sort((left, right) =>
+    left.popBlockId !== right.popBlockId
+      ? left.popBlockId - right.popBlockId
+      : left.tier !== right.tier
+        ? left.tier - right.tier
+        : left.goodId - right.goodId,
+  );
+  productionDemandResults.sort((left, right) =>
+    left.buyerBuildingId !== right.buyerBuildingId
+      ? left.buyerBuildingId - right.buyerBuildingId
+      : left.goodId - right.goodId,
+  );
+  const r = data.reservations;
+  const reservations: MarketReservation[] = [];
+  const householdPurchases: HouseholdPurchase[] = [];
+  for (let index = 0; index < r.resKind.length; index += 1) {
+    const reservation: MarketReservation = {
+      buyerKind: r.resKind[index] === 0 ? "household" : "building",
+      buyerId: r.resBuyer[index] ?? 0,
+      tier: (r.resTier[index] ?? 1) as MarketTier,
+      goodId: r.resGood[index] ?? 0,
+      sellerBuildingId: r.resSeller[index] ?? 0,
+      quantity: r.resQuantity[index] ?? 0,
+      phase: r.resPhase[index] === 0 ? "A" : "B",
+    };
+    reservations.push(reservation);
+    if (reservation.buyerKind === "household") {
+      const unitPrice = result.openingPrices[reservation.goodId] ?? 0;
+      householdPurchases.push({
+        popBlockId: reservation.buyerId,
+        tier: reservation.tier as HouseholdTier,
+        goodId: reservation.goodId,
+        sellerBuildingId: reservation.sellerBuildingId,
+        quantity: reservation.quantity,
+        unitPriceRUSD: unitPrice,
+        totalRUSD: reservation.quantity * unitPrice,
+        phase: reservation.phase,
+      });
+    }
+  }
+  reservations.sort((left, right) => {
+    if (left.phase !== right.phase) return left.phase < right.phase ? -1 : 1;
+    if (left.tier !== right.tier) return left.tier - right.tier;
+    if (left.buyerKind !== right.buyerKind) return left.buyerKind < right.buyerKind ? -1 : 1;
+    if (left.buyerId !== right.buyerId) return left.buyerId - right.buyerId;
+    if (left.goodId !== right.goodId) return left.goodId - right.goodId;
+    return left.sellerBuildingId - right.sellerBuildingId;
+  });
+  householdPurchases.sort((left, right) => {
+    if (left.popBlockId !== right.popBlockId) return left.popBlockId - right.popBlockId;
+    if (left.tier !== right.tier) return left.tier - right.tier;
+    if (left.goodId !== right.goodId) return left.goodId - right.goodId;
+    return left.sellerBuildingId - right.sellerBuildingId;
+  });
+  const columns = result.columns?.transactions;
+  const pending = result.pendingTransactions as PendingTransaction[];
+  if (columns !== undefined) {
+    for (let index = 0; index < columns.kind.length; index += 1) {
+      const household = columns.kind[index] === 0;
+      pending.push({
+        kind: household ? "household-purchase" : "input-purchase",
+        buyerPopBlockId: household ? (columns.buyer[index] ?? 0) : null,
+        buyerBuildingId: household ? null : (columns.buyer[index] ?? 0),
+        sellerBuildingId: columns.seller[index] ?? 0,
+        goodId: columns.good[index] ?? 0,
+        quantity: columns.quantity[index] ?? 0,
+        unitPriceRUSD: columns.unitPrice[index] ?? 0,
+        totalRUSD: columns.total[index] ?? 0,
+        tier: (columns.tier[index] ?? 1) as MarketTier,
+        phase: columns.phase[index] === 0 ? "A" : "B",
+      });
+    }
+  }
+  pending.sort((left, right) => {
+    if (left.kind !== right.kind) return left.kind < right.kind ? -1 : 1;
+    if (left.goodId !== right.goodId) return left.goodId - right.goodId;
+    const leftBuyer = left.buyerPopBlockId ?? left.buyerBuildingId ?? -1;
+    const rightBuyer = right.buyerPopBlockId ?? right.buyerBuildingId ?? -1;
+    if (leftBuyer !== rightBuyer) return leftBuyer - rightBuyer;
+    return left.sellerBuildingId - right.sellerBuildingId;
+  });
+  mutable.householdDemands = householdDemandResults;
+  mutable.productionDemands = productionDemandResults;
+  mutable.reservations = reservations;
+  mutable.householdPurchases = householdPurchases;
+  (mutable.production as { reservationUses: readonly ReservationUse[] }).reservationUses = reservationUseObjects(
+    result.marketId,
+    data.uses,
+  );
 }

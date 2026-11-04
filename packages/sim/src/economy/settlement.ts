@@ -50,6 +50,7 @@ import {
 import type {
   MarketDayResult,
   MarketTier,
+  PendingColumns,
   PendingTransaction,
 } from "./market.js";
 import type {
@@ -188,12 +189,6 @@ export interface MarketSettlementResult {
   readonly postingIds: readonly number[];
 }
 
-interface PreparedTransaction extends SettledMarketTransaction {
-  readonly transactionKind: "goods-purchase" | "input-purchase";
-  readonly buyerExpenseAccountId: Id;
-  readonly sellerRevenueAccountId: Id;
-}
-
 interface WageGroup {
   readonly popBlockId: Id;
   readonly professionId: Id;
@@ -224,23 +219,23 @@ function operatingCash(index: FinanceIndex, buildingId: Id): FinancialAccount {
   return account;
 }
 
-function assertTransactionAmount(transaction: PendingTransaction, index: number): void {
+function assertTransactionAmount(quantity: number, unitPriceRUSD: number, totalRUSD: number, index: number): void {
   // Same checks, order and messages as before; the path is built only on failure.
   const fail = (name: string): never => {
     throw new RangeError(`pendingTransactions[${String(index)}].${name} must be finite and strictly positive`);
   };
-  if (!Number.isFinite(transaction.quantity) || !(transaction.quantity > 0)) fail("quantity");
-  if (!Number.isFinite(transaction.unitPriceRUSD) || !(transaction.unitPriceRUSD > 0)) fail("unitPriceRUSD");
-  if (!Number.isFinite(transaction.totalRUSD) || !(transaction.totalRUSD > 0)) fail("totalRUSD");
-  const expected = transaction.quantity * transaction.unitPriceRUSD;
-  if (Math.abs(expected - transaction.totalRUSD) > toleranceMoney(expected, transaction.totalRUSD)) {
+  if (!Number.isFinite(quantity) || !(quantity > 0)) fail("quantity");
+  if (!Number.isFinite(unitPriceRUSD) || !(unitPriceRUSD > 0)) fail("unitPriceRUSD");
+  if (!Number.isFinite(totalRUSD) || !(totalRUSD > 0)) fail("totalRUSD");
+  const expected = quantity * unitPriceRUSD;
+  if (Math.abs(expected - totalRUSD) > toleranceMoney(expected, totalRUSD)) {
     throw new RangeError(
       `pendingTransactions[${String(index)}].totalRUSD does not reconcile with quantity × unit price`,
     );
   }
 }
 
-function transactionKey(transaction: PendingTransaction): string {
+function transactionKey(transaction: SettledMarketTransaction): string {
   const buyer =
     transaction.kind === "household-purchase"
       ? `household:${String(transaction.buyerPopBlockId)}`
@@ -251,15 +246,381 @@ function transactionKey(transaction: PendingTransaction): string {
 const MARKET_TRANSACTION_TIERS: ReadonlySet<number> = new Set([1, 2, 3, 5, 6]);
 
 /**
- * Rank of each value as its decimal text compares inside a `transactionKey`, where
- * every field is followed by `:` (D-137). No field contains `:`, so comparing two
- * keys equals comparing their fields in order as `text + ":"`; ranking each field's
- * distinct values once reproduces the string sort with numeric comparisons only.
+ * Validated market transactions in columns (D-139). Position `i` is the `i`-th
+ * transaction of the concatenated market days; `order` lists positions in the
+ * canonical `transactionKey` order. The columns replace one prepared object per
+ * transaction (about 40,000 a day in the 1900 world) and the object sort.
  */
-function keyFieldRanks(values: Iterable<number | null>): Map<number | null, number> {
-  const distinct = [...new Set(values)].map((value) => ({ value, text: `${String(value)}:` }));
-  distinct.sort((left, right) => (left.text < right.text ? -1 : left.text > right.text ? 1 : 0));
-  return new Map(distinct.map((entry, rank) => [entry.value, rank] as const));
+interface PreparedColumns {
+  readonly count: number;
+  /** 0 = household-purchase, 1 = input-purchase. */
+  readonly kind: Uint8Array;
+  readonly buyer: Float64Array;
+  readonly seller: Float64Array;
+  readonly good: Float64Array;
+  readonly tier: Float64Array;
+  /** 0 = A, 1 = B. */
+  readonly phase: Int32Array;
+  readonly quantity: Float64Array;
+  readonly unitPrice: Float64Array;
+  readonly total: Float64Array;
+  readonly buyerCash: Float64Array;
+  readonly buyerExpense: Float64Array;
+  readonly sellerCash: Float64Array;
+  readonly sellerRevenue: Float64Array;
+  readonly order: Int32Array;
+}
+
+/**
+ * One market day's transactions: its columns when they describe its
+ * `pendingTransactions` array exactly (D-139), otherwise its objects.
+ */
+type TransactionChunk =
+  | { readonly objects: readonly PendingTransaction[]; readonly columns?: undefined }
+  | { readonly columns: PendingColumns; readonly objects?: undefined };
+
+function transactionChunk(marketDay: MarketDayResult): TransactionChunk {
+  const columns = marketDay.columns?.transactions;
+  return columns !== undefined && columns.forTransactions === marketDay.pendingTransactions
+    ? { columns }
+    : { objects: marketDay.pendingTransactions };
+}
+
+/** Account id from an owner table, or -1 (non-integer or out-of-range owners have none). */
+function tableAccount(table: Int32Array, ownerId: number): number {
+  return Number.isInteger(ownerId) && ownerId >= 0 && ownerId < table.length ? (table[ownerId] ?? -1) : -1;
+}
+
+/**
+ * Sort key of `${value}:` compared as text, for 0 <= value < 10^7: the decimal digits
+ * then the ':' terminator (above every digit), in base 11 over eight places.
+ */
+function decimalTextKey(value: number): number {
+  let digits = 1;
+  let bound = 10;
+  while (value >= bound) {
+    digits += 1;
+    bound *= 10;
+  }
+  let key = 0;
+  let divisor = bound / 10;
+  for (let place = 0; place < 8; place += 1) {
+    let symbol = 0;
+    if (place < digits) {
+      symbol = Math.floor(value / divisor) % 10;
+      divisor /= 10;
+    } else if (place === digits) {
+      symbol = 10;
+    }
+    key = key * 11 + symbol;
+  }
+  return key;
+}
+
+/**
+ * Rank of each value as its decimal text compares inside a `transactionKey`, where
+ * every field is followed by `:` (D-137). No field contains `:`, so comparing two keys
+ * equals comparing their fields in order as `text + ":"`. Values are validated
+ * non-negative integers (D-139: typed rank tables instead of string maps).
+ */
+function decimalRanks(
+  values: Float64Array,
+  count: number,
+): { readonly rank: (value: number) => number; readonly size: number } {
+  const distinct: number[] = [];
+  const seen = new Set<number>();
+  for (let index = 0; index < count; index += 1) {
+    const value = values[index] ?? 0;
+    if (!seen.has(value)) {
+      seen.add(value);
+      distinct.push(value);
+    }
+  }
+  if (distinct.every((value) => value < 10_000_000)) {
+    const keys = new Float64Array(distinct.length);
+    for (let index = 0; index < distinct.length; index += 1) {
+      const value = distinct[index] ?? 0;
+      keys[index] = decimalTextKey(value) * 2 ** 24 + value;
+    }
+    keys.sort();
+    for (let index = 0; index < keys.length; index += 1) distinct[index] = (keys[index] ?? 0) % 2 ** 24;
+  } else {
+    const texts = new Map(distinct.map((value) => [value, `${String(value)}:`] as const));
+    distinct.sort((left, right) => {
+      const a = texts.get(left) ?? "";
+      const b = texts.get(right) ?? "";
+      return a < b ? -1 : a > b ? 1 : 0;
+    });
+  }
+  let max = 0;
+  for (const value of distinct) if (value > max) max = value;
+  if (max <= distinct.length * 8 + 4096) {
+    const table = new Int32Array(max + 1);
+    for (let rank = 0; rank < distinct.length; rank += 1) table[distinct[rank] ?? 0] = rank;
+    return { rank: (value) => table[value] ?? 0, size: distinct.length };
+  }
+  const map = new Map(distinct.map((value, rank) => [value, rank] as const));
+  return { rank: (value) => map.get(value) ?? 0, size: distinct.length };
+}
+
+/** One stable counting-sort pass of `order` by a per-position key in 0..range-1. */
+function countingSortPass(order: Int32Array, scratch: Int32Array, key: Int32Array, range: number): void {
+  const counts = new Int32Array(range + 1);
+  for (let index = 0; index < order.length; index += 1) {
+    const slot = (key[order[index] ?? 0] ?? 0) + 1;
+    counts[slot] = (counts[slot] ?? 0) + 1;
+  }
+  for (let slot = 1; slot <= range; slot += 1) counts[slot] = (counts[slot] ?? 0) + (counts[slot - 1] ?? 0);
+  for (let index = 0; index < order.length; index += 1) {
+    const position = order[index] ?? 0;
+    const slot = key[position] ?? 0;
+    const target = counts[slot] ?? 0;
+    scratch[target] = position;
+    counts[slot] = target + 1;
+  }
+  order.set(scratch);
+}
+
+/**
+ * Validate the market days' transactions and resolve their accounts (same checks,
+ * order and messages as the former per-object preparation, for objects and columns
+ * alike), then order them canonically: kind, buyer, seller, good, tier and phase, each
+ * compared as decimal text (D-137), by a stable LSD radix sort over field ranks
+ * (D-139). Duplicates are rejected.
+ */
+function prepareTransactions(
+  world: World,
+  definitions: EconomyDefinitions,
+  index: FinanceIndex,
+  chunks: readonly TransactionChunk[],
+): PreparedColumns {
+  let count = 0;
+  for (const chunk of chunks) count += chunk.columns !== undefined ? chunk.columns.kind.length : chunk.objects.length;
+  let maxGood = -1;
+  for (const good of definitions.goods) if (good.id > maxGood) maxGood = good.id;
+  const goodKnown = new Uint8Array(Math.max(0, maxGood + 1));
+  for (const good of definitions.goods) if (Number.isInteger(good.id) && good.id >= 0) goodKnown[good.id] = 1;
+  let maxBuilding = -1;
+  for (const building of world.buildings) if (building.id > maxBuilding) maxBuilding = building.id;
+  // 1 = exists, 2 = exists and operational (the first building of an id, as a map built in array order).
+  const buildingState = new Uint8Array(Math.max(0, maxBuilding + 1));
+  for (const building of world.buildings) {
+    if (Number.isInteger(building.id) && building.id >= 0 && buildingState[building.id] === 0) {
+      buildingState[building.id] = building.operational ? 2 : 1;
+    }
+  }
+  const stateOf = (id: number): number =>
+    Number.isInteger(id) && id >= 0 && id < buildingState.length ? (buildingState[id] ?? 0) : 0;
+  const operatingIds = index.ownerAccountIds("building", "operating-cash");
+  const revenueIds = index.ownerAccountIds("building", "sales-revenue");
+  const inputExpenseIds = index.ownerAccountIds("building", "input-expense");
+  const householdIds = index.ownerAccountIds("popBlock", "household-cash");
+  const consumptionIds = index.ownerAccountIds("popBlock", "consumption-expense");
+
+  const prepared: PreparedColumns = {
+    count,
+    kind: new Uint8Array(count),
+    buyer: new Float64Array(count),
+    seller: new Float64Array(count),
+    good: new Float64Array(count),
+    tier: new Float64Array(count),
+    phase: new Int32Array(count),
+    quantity: new Float64Array(count),
+    unitPrice: new Float64Array(count),
+    total: new Float64Array(count),
+    buyerCash: new Float64Array(count),
+    buyerExpense: new Float64Array(count),
+    sellerCash: new Float64Array(count),
+    sellerRevenue: new Float64Array(count),
+    order: new Int32Array(count),
+  };
+  // Validates one transaction from its field values and records it at `position`,
+  // its index in the concatenated object list.
+  const recordRow = (
+    position: number,
+    transactionKind: string,
+    buyerPopBlockId: number | null,
+    buyerBuildingId: number | null,
+    sellerId: number,
+    goodId: number,
+    quantity: number,
+    unitPriceRUSD: number,
+    totalRUSD: number,
+    tierValue: number,
+    phaseValue: string,
+  ): void => {
+    assertTransactionAmount(quantity, unitPriceRUSD, totalRUSD, position);
+    if (!(Number.isInteger(goodId) && goodId >= 0 && goodId < goodKnown.length && goodKnown[goodId] === 1)) {
+      throw new RangeError(`pendingTransactions[${String(position)}].goodId is unknown`);
+    }
+    if (stateOf(sellerId) === 0) {
+      throw new RangeError(`pendingTransactions[${String(position)}].sellerBuildingId is unknown`);
+    }
+    const sellerCashId = tableAccount(operatingIds, sellerId);
+    if (sellerCashId < 0) {
+      throw new RangeError(`building ${String(sellerId)} has no valid operating account`);
+    }
+    const sellerRevenueId = tableAccount(revenueIds, sellerId);
+    if (sellerRevenueId < 0) {
+      throw new RangeError(`missing sales-revenue account for building ${String(sellerId)}`);
+    }
+    let buyerId: number;
+    let buyerCashId: number;
+    let buyerExpenseId: number;
+    if (transactionKind === "household-purchase") {
+      if (buyerPopBlockId === null || buyerBuildingId !== null) {
+        throw new RangeError(`pendingTransactions[${String(position)}] must identify exactly one household buyer`);
+      }
+      buyerId = buyerPopBlockId;
+      buyerCashId = tableAccount(householdIds, buyerId);
+      if (buyerCashId < 0) {
+        throw new RangeError(`popBlock ${String(buyerId)} has no valid household account`);
+      }
+      buyerExpenseId = tableAccount(consumptionIds, buyerId);
+      if (buyerExpenseId < 0) {
+        throw new RangeError(`missing consumption-expense account for popBlock ${String(buyerId)}`);
+      }
+      prepared.kind[position] = 0;
+    } else if (transactionKind === "input-purchase") {
+      if (buyerBuildingId === null || buyerPopBlockId !== null) {
+        throw new RangeError(`pendingTransactions[${String(position)}] must identify exactly one building buyer`);
+      }
+      buyerId = buyerBuildingId;
+      if (stateOf(buyerId) !== 2) {
+        throw new RangeError(
+          `pendingTransactions[${String(position)}].buyerBuildingId must reference an operational building`,
+        );
+      }
+      buyerCashId = tableAccount(operatingIds, buyerId);
+      if (buyerCashId < 0) {
+        throw new RangeError(`building ${String(buyerId)} has no valid operating account`);
+      }
+      buyerExpenseId = tableAccount(inputExpenseIds, buyerId);
+      if (buyerExpenseId < 0) {
+        throw new RangeError(`missing input-expense account for building ${String(buyerId)}`);
+      }
+      prepared.kind[position] = 1;
+    } else {
+      throw new RangeError(`pendingTransactions[${String(position)}].kind is invalid`);
+    }
+    if (!MARKET_TRANSACTION_TIERS.has(tierValue)) {
+      throw new RangeError(`pendingTransactions[${String(position)}].tier is invalid`);
+    }
+    if (phaseValue !== "A" && phaseValue !== "B") {
+      throw new RangeError(`pendingTransactions[${String(position)}].phase must be A or B`);
+    }
+    prepared.buyer[position] = buyerId;
+    prepared.seller[position] = sellerId;
+    prepared.good[position] = goodId;
+    prepared.tier[position] = tierValue;
+    prepared.phase[position] = phaseValue === "A" ? 0 : 1;
+    prepared.quantity[position] = quantity;
+    prepared.unitPrice[position] = unitPriceRUSD;
+    prepared.total[position] = totalRUSD;
+    prepared.buyerCash[position] = buyerCashId;
+    prepared.buyerExpense[position] = buyerExpenseId;
+    prepared.sellerCash[position] = sellerCashId;
+    prepared.sellerRevenue[position] = sellerRevenueId;
+  };
+  let position = 0;
+  for (const chunk of chunks) {
+    if (chunk.columns !== undefined) {
+      const columns = chunk.columns;
+      for (let row = 0; row < columns.kind.length; row += 1) {
+        const household = columns.kind[row] === 0;
+        const buyerValue = columns.buyer[row] ?? 0;
+        recordRow(
+          position,
+          household ? "household-purchase" : "input-purchase",
+          household ? buyerValue : null,
+          household ? null : buyerValue,
+          columns.seller[row] ?? 0,
+          columns.good[row] ?? 0,
+          columns.quantity[row] ?? 0,
+          columns.unitPrice[row] ?? 0,
+          columns.total[row] ?? 0,
+          columns.tier[row] ?? 0,
+          columns.phase[row] === 0 ? "A" : "B",
+        );
+        position += 1;
+      }
+    } else {
+      for (let row = 0; row < chunk.objects.length; row += 1) {
+        const transaction = chunk.objects[row];
+        if (transaction === undefined) throw new RangeError(`pending transaction ${String(position)} is missing`);
+        recordRow(
+          position,
+          transaction.kind,
+          transaction.buyerPopBlockId,
+          transaction.buyerBuildingId,
+          transaction.sellerBuildingId,
+          transaction.goodId,
+          transaction.quantity,
+          transaction.unitPriceRUSD,
+          transaction.totalRUSD,
+          transaction.tier,
+          transaction.phase,
+        );
+        position += 1;
+      }
+    }
+  }
+
+  // Canonical order by an LSD radix sort, least significant field first.
+  const order = prepared.order;
+  for (let item = 0; item < count; item += 1) order[item] = item;
+  const scratch = new Int32Array(count);
+  const fieldKeys: { readonly key: Int32Array; readonly range: number }[] = [{ key: prepared.phase, range: 2 }];
+  for (const values of [prepared.tier, prepared.good, prepared.seller, prepared.buyer]) {
+    const ranks = decimalRanks(values, count);
+    const key = new Int32Array(count);
+    for (let item = 0; item < count; item += 1) key[item] = ranks.rank(values[item] ?? 0);
+    fieldKeys.push({ key, range: ranks.size });
+  }
+  fieldKeys.push({ key: Int32Array.from(prepared.kind), range: 2 });
+  if (count > 1) {
+    for (const field of fieldKeys) countingSortPass(order, scratch, field.key, field.range);
+  }
+  for (let item = 1; item < count; item += 1) {
+    const previous = order[item - 1] ?? 0;
+    const current = order[item] ?? 0;
+    let same = true;
+    for (let field = 0; field < fieldKeys.length && same; field += 1) {
+      const key = (fieldKeys[field] as { readonly key: Int32Array }).key;
+      same = key[previous] === key[current];
+    }
+    if (same) {
+      throw new RangeError(`duplicate pending transaction ${transactionKey(settledRow(prepared, current))}`);
+    }
+  }
+  return prepared;
+}
+
+/** One prepared transaction as a settled-transaction object. */
+function settledRow(prepared: PreparedColumns, position: number): SettledMarketTransaction {
+  const household = prepared.kind[position] === 0;
+  const buyerId = prepared.buyer[position] ?? 0;
+  return {
+    kind: household ? "household-purchase" : "input-purchase",
+    buyerPopBlockId: household ? buyerId : null,
+    buyerBuildingId: household ? null : buyerId,
+    sellerBuildingId: prepared.seller[position] ?? 0,
+    goodId: prepared.good[position] ?? 0,
+    quantity: prepared.quantity[position] ?? 0,
+    unitPriceRUSD: prepared.unitPrice[position] ?? 0,
+    totalRUSD: prepared.total[position] ?? 0,
+    tier: (prepared.tier[position] ?? 1) as MarketTier,
+    phase: prepared.phase[position] === 0 ? "A" : "B",
+    buyerAccountId: prepared.buyerCash[position] ?? 0,
+    sellerAccountId: prepared.sellerCash[position] ?? 0,
+  };
+}
+
+/** The settled transactions in canonical order, for full result detail. */
+function settledTransactions(prepared: PreparedColumns): SettledMarketTransaction[] {
+  const settled: SettledMarketTransaction[] = [];
+  for (let item = 0; item < prepared.count; item += 1) settled.push(settledRow(prepared, prepared.order[item] ?? 0));
+  return settled;
 }
 
 /**
@@ -272,217 +633,140 @@ function keyFieldRanks(values: Iterable<number | null>): Map<number | null, numb
  * the same sequence of amounts, so every entry balances exactly. Quantities,
  * allocations and each account's net cash change are those of the individual
  * transactions; only the posting count and floating summation order differ.
+ *
+ * D-139: built from the columns. A buyer's transactions are contiguous in canonical
+ * order (buyer is the second key), so per-good sums need only a per-good scratch;
+ * sellers use a slot map. Each sum adds the same amounts in the same order as the
+ * former per-group maps, and lines follow ascending account id as before.
  */
-function aggregatedMarketEntries(transactions: readonly PreparedTransaction[]): JournalEntryInput[] {
-  interface Group {
-    readonly transactionKind: PreparedTransaction["transactionKind"];
-    readonly goodId: number;
-    readonly buyers: Map<Id, { expenseAccountId: Id; amount: number }>;
-    readonly sellers: Map<Id, { revenueAccountId: Id; amount: number }>;
+function aggregatedMarketEntries(prepared: PreparedColumns, goodCount: number): JournalEntryInput[] {
+  const { count, order, kind, good, total } = prepared;
+  const groupCount = 2 * goodCount;
+  interface GroupLists {
+    readonly buyerAccount: number[];
+    readonly buyerExpense: number[];
+    readonly buyerAmount: number[];
+    readonly sellerAccount: number[];
+    readonly sellerRevenue: number[];
+    readonly sellerAmount: number[];
   }
-  // D-137: numeric (kind, good) group keys; groups are ordered explicitly below.
-  const groups = new Map<number, Group>();
-  for (const transaction of transactions) {
-    const key = (transaction.transactionKind === "goods-purchase" ? 0 : 2 ** 32) + transaction.goodId;
-    let group = groups.get(key);
-    if (group === undefined) {
-      group = {
-        transactionKind: transaction.transactionKind,
-        goodId: transaction.goodId,
-        buyers: new Map(),
-        sellers: new Map(),
+  const groups: (GroupLists | undefined)[] = new Array<GroupLists | undefined>(groupCount);
+  const listOf = (group: number): GroupLists => {
+    let lists = groups[group];
+    if (lists === undefined) {
+      lists = {
+        buyerAccount: [],
+        buyerExpense: [],
+        buyerAmount: [],
+        sellerAccount: [],
+        sellerRevenue: [],
+        sellerAmount: [],
       };
-      groups.set(key, group);
+      groups[group] = lists;
     }
-    const buyer = group.buyers.get(transaction.buyerAccountId);
-    if (buyer === undefined) {
-      group.buyers.set(transaction.buyerAccountId, {
-        expenseAccountId: transaction.buyerExpenseAccountId,
-        amount: transaction.totalRUSD,
-      });
-    } else {
-      buyer.amount += transaction.totalRUSD;
+    return lists;
+  };
+  // Buyer runs: per good, the first amount is taken as is and later amounts added,
+  // exactly as the per-group buyer map did.
+  const runAmount = new Float64Array(goodCount);
+  const runTouched = new Int32Array(goodCount);
+  const runSeen = new Uint8Array(goodCount);
+  let runLength = 0;
+  let runKind = -1;
+  let runBuyer = -1;
+  let runCash = -1;
+  let runExpense = -1;
+  const flushRun = (): void => {
+    for (let item = 0; item < runLength; item += 1) {
+      const goodId = runTouched[item] ?? 0;
+      const lists = listOf(runKind * goodCount + goodId);
+      lists.buyerAccount.push(runCash);
+      lists.buyerExpense.push(runExpense);
+      lists.buyerAmount.push(runAmount[goodId] ?? 0);
+      runSeen[goodId] = 0;
     }
-    const seller = group.sellers.get(transaction.sellerAccountId);
-    if (seller === undefined) {
-      group.sellers.set(transaction.sellerAccountId, {
-        revenueAccountId: transaction.sellerRevenueAccountId,
-        amount: transaction.totalRUSD,
-      });
+    runLength = 0;
+  };
+  // Seller slot per (group, seller account).
+  const sellerSlot = new Map<number, number>();
+  for (let index = 0; index < count; index += 1) {
+    const position = order[index] ?? 0;
+    const transactionKind = kind[position] ?? 0;
+    const buyerId = prepared.buyer[position] ?? 0;
+    if (transactionKind !== runKind || buyerId !== runBuyer) {
+      flushRun();
+      runKind = transactionKind;
+      runBuyer = buyerId;
+      runCash = prepared.buyerCash[position] ?? 0;
+      runExpense = prepared.buyerExpense[position] ?? 0;
+    }
+    const goodId = good[position] ?? 0;
+    const amount = total[position] ?? 0;
+    if (runSeen[goodId] === 0) {
+      runSeen[goodId] = 1;
+      runTouched[runLength] = goodId;
+      runLength += 1;
+      runAmount[goodId] = amount;
     } else {
-      seller.amount += transaction.totalRUSD;
+      runAmount[goodId] = (runAmount[goodId] ?? 0) + amount;
+    }
+    const group = transactionKind * goodCount + goodId;
+    const sellerAccountId = prepared.sellerCash[position] ?? 0;
+    const slotKey = sellerAccountId * groupCount + group;
+    const slot = sellerSlot.get(slotKey);
+    const lists = listOf(group);
+    if (slot === undefined) {
+      sellerSlot.set(slotKey, lists.sellerAccount.length);
+      lists.sellerAccount.push(sellerAccountId);
+      lists.sellerRevenue.push(prepared.sellerRevenue[position] ?? 0);
+      lists.sellerAmount.push(amount);
+    } else {
+      lists.sellerAmount[slot] = (lists.sellerAmount[slot] ?? 0) + amount;
     }
   }
-  const ordered = [...groups.values()].sort((left, right) =>
-    left.transactionKind === right.transactionKind
-      ? left.goodId - right.goodId
-      : left.transactionKind < right.transactionKind
-        ? -1
-        : 1,
-  );
+  flushRun();
+
+  // Items of one group in ascending account id (account ids are unique per group).
+  const byAccount = (accounts: readonly number[]): Int32Array => {
+    const keys = new Float64Array(accounts.length);
+    for (let item = 0; item < accounts.length; item += 1) keys[item] = (accounts[item] ?? 0) * 2 ** 20 + item;
+    keys.sort();
+    const sorted = new Int32Array(accounts.length);
+    for (let item = 0; item < accounts.length; item += 1) sorted[item] = (keys[item] ?? 0) % 2 ** 20;
+    return sorted;
+  };
   const entries: JournalEntryInput[] = [];
-  for (const group of ordered) {
-    const lines: JournalLine[] = [];
-    for (const [accountId, buyer] of [...group.buyers].sort((left, right) => left[0] - right[0])) {
-      if (!(buyer.amount > 0)) continue;
-      lines.push({ accountId: buyer.expenseAccountId, side: "debit", amountRUSD: buyer.amount });
-      lines.push({ accountId, side: "credit", amountRUSD: buyer.amount });
-    }
-    for (const [accountId, seller] of [...group.sellers].sort((left, right) => left[0] - right[0])) {
-      if (!(seller.amount > 0)) continue;
-      lines.push({ accountId, side: "debit", amountRUSD: seller.amount });
-      lines.push({ accountId: seller.revenueAccountId, side: "credit", amountRUSD: seller.amount });
-    }
-    if (lines.length > 0) {
-      entries.push({
-        transactionKind: group.transactionKind,
-        lines,
-        sourceEntityId: null,
-        targetEntityId: null,
-      });
+  for (let transactionKind = 0; transactionKind < 2; transactionKind += 1) {
+    for (let goodId = 0; goodId < goodCount; goodId += 1) {
+      const lists = groups[transactionKind * goodCount + goodId];
+      if (lists === undefined) continue;
+      if (lists.buyerAccount.length >= 2 ** 20 || lists.sellerAccount.length >= 2 ** 20) {
+        throw new RangeError("market posting group is too large");
+      }
+      const lines: JournalLine[] = [];
+      for (const item of byAccount(lists.buyerAccount)) {
+        const amount = lists.buyerAmount[item] ?? 0;
+        if (!(amount > 0)) continue;
+        lines.push({ accountId: lists.buyerExpense[item] ?? 0, side: "debit", amountRUSD: amount });
+        lines.push({ accountId: lists.buyerAccount[item] ?? 0, side: "credit", amountRUSD: amount });
+      }
+      for (const item of byAccount(lists.sellerAccount)) {
+        const amount = lists.sellerAmount[item] ?? 0;
+        if (!(amount > 0)) continue;
+        lines.push({ accountId: lists.sellerAccount[item] ?? 0, side: "debit", amountRUSD: amount });
+        lines.push({ accountId: lists.sellerRevenue[item] ?? 0, side: "credit", amountRUSD: amount });
+      }
+      if (lines.length > 0) {
+        entries.push({
+          transactionKind: transactionKind === 0 ? "goods-purchase" : "input-purchase",
+          lines,
+          sourceEntityId: null,
+          targetEntityId: null,
+        });
+      }
     }
   }
   return entries;
-}
-
-function prepareTransactions(
-  world: World,
-  definitions: EconomyDefinitions,
-  index: FinanceIndex,
-  transactions: readonly PendingTransaction[],
-): PreparedTransaction[] {
-  const goodIds = new Set(definitions.goods.map((good) => good.id));
-  const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
-  // Accounts per owner, looked up once (an owner appears in many transactions).
-  const sellerAccounts = new Map<Id, { readonly cash: FinancialAccount; readonly revenue: FinancialAccount }>();
-  const householdAccounts = new Map<Id, { readonly cash: FinancialAccount; readonly expense: FinancialAccount }>();
-  const buildingBuyerAccounts = new Map<Id, { readonly cash: FinancialAccount; readonly expense: FinancialAccount }>();
-  const prepared: PreparedTransaction[] = [];
-  for (let index_ = 0; index_ < transactions.length; index_ += 1) {
-    const transaction = transactions[index_];
-    if (transaction === undefined) throw new RangeError(`pending transaction ${String(index_)} is missing`);
-    assertTransactionAmount(transaction, index_);
-    if (!goodIds.has(transaction.goodId)) {
-      throw new RangeError(`pendingTransactions[${String(index_)}].goodId is unknown`);
-    }
-    if (!buildingById.has(transaction.sellerBuildingId)) {
-      throw new RangeError(`pendingTransactions[${String(index_)}].sellerBuildingId is unknown`);
-    }
-    let seller = sellerAccounts.get(transaction.sellerBuildingId);
-    if (seller === undefined) {
-      seller = {
-        cash: operatingCash(index, transaction.sellerBuildingId),
-        revenue: index.get("building", transaction.sellerBuildingId, "sales-revenue"),
-      };
-      sellerAccounts.set(transaction.sellerBuildingId, seller);
-    }
-    let buyer: { readonly cash: FinancialAccount; readonly expense: FinancialAccount };
-    if (transaction.kind === "household-purchase") {
-      if (transaction.buyerPopBlockId === null || transaction.buyerBuildingId !== null) {
-        throw new RangeError(`pendingTransactions[${String(index_)}] must identify exactly one household buyer`);
-      }
-      const cached = householdAccounts.get(transaction.buyerPopBlockId);
-      if (cached === undefined) {
-        buyer = {
-          cash: householdCash(index, transaction.buyerPopBlockId),
-          expense: index.get("popBlock", transaction.buyerPopBlockId, "consumption-expense"),
-        };
-        householdAccounts.set(transaction.buyerPopBlockId, buyer);
-      } else {
-        buyer = cached;
-      }
-    } else if (transaction.kind === "input-purchase") {
-      if (transaction.buyerBuildingId === null || transaction.buyerPopBlockId !== null) {
-        throw new RangeError(`pendingTransactions[${String(index_)}] must identify exactly one building buyer`);
-      }
-      const buyerBuilding = buildingById.get(transaction.buyerBuildingId);
-      if (buyerBuilding === undefined || !buyerBuilding.operational) {
-        throw new RangeError(
-          `pendingTransactions[${String(index_)}].buyerBuildingId must reference an operational building`,
-        );
-      }
-      const cached = buildingBuyerAccounts.get(transaction.buyerBuildingId);
-      if (cached === undefined) {
-        buyer = {
-          cash: operatingCash(index, transaction.buyerBuildingId),
-          expense: index.get("building", transaction.buyerBuildingId, "input-expense"),
-        };
-        buildingBuyerAccounts.set(transaction.buyerBuildingId, buyer);
-      } else {
-        buyer = cached;
-      }
-    } else {
-      throw new RangeError(`pendingTransactions[${String(index_)}].kind is invalid`);
-    }
-    if (!MARKET_TRANSACTION_TIERS.has(transaction.tier)) {
-      throw new RangeError(`pendingTransactions[${String(index_)}].tier is invalid`);
-    }
-    if (transaction.phase !== "A" && transaction.phase !== "B") {
-      throw new RangeError(`pendingTransactions[${String(index_)}].phase must be A or B`);
-    }
-    prepared.push({
-      kind: transaction.kind,
-      buyerPopBlockId: transaction.buyerPopBlockId,
-      buyerBuildingId: transaction.buyerBuildingId,
-      sellerBuildingId: transaction.sellerBuildingId,
-      goodId: transaction.goodId,
-      quantity: transaction.quantity,
-      unitPriceRUSD: transaction.unitPriceRUSD,
-      totalRUSD: transaction.totalRUSD,
-      tier: transaction.tier,
-      phase: transaction.phase,
-      buyerAccountId: buyer.cash.id,
-      sellerAccountId: seller.cash.id,
-      buyerExpenseAccountId: buyer.expense.id,
-      sellerRevenueAccountId: seller.revenue.id,
-      transactionKind:
-        transaction.kind === "household-purchase" ? "goods-purchase" : "input-purchase",
-    });
-  }
-  // Canonical `transactionKey` order (D-137: by field ranks, see `keyFieldRanks`).
-  // "household-purchase" sorts before "input-purchase", and the buyer word is fixed
-  // by the kind, so the buyer id is the next field that can differ.
-  const buyerRank = keyFieldRanks(
-    prepared.map((transaction) => transaction.buyerPopBlockId ?? transaction.buyerBuildingId),
-  );
-  const sellerRank = keyFieldRanks(prepared.map((transaction) => transaction.sellerBuildingId));
-  const goodRank = keyFieldRanks(prepared.map((transaction) => transaction.goodId));
-  const tierRank = keyFieldRanks(prepared.map((transaction) => transaction.tier));
-  const ranked = prepared.map((transaction) => ({
-    transaction,
-    kind: transaction.kind === "household-purchase" ? 0 : 1,
-    buyer: buyerRank.get(transaction.buyerPopBlockId ?? transaction.buyerBuildingId) ?? 0,
-    seller: sellerRank.get(transaction.sellerBuildingId) ?? 0,
-    good: goodRank.get(transaction.goodId) ?? 0,
-    tier: tierRank.get(transaction.tier) ?? 0,
-    phase: transaction.phase === "A" ? 0 : 1,
-  }));
-  ranked.sort(
-    (left, right) =>
-      left.kind - right.kind ||
-      left.buyer - right.buyer ||
-      left.seller - right.seller ||
-      left.good - right.good ||
-      left.tier - right.tier ||
-      left.phase - right.phase,
-  );
-  for (let position = 1; position < ranked.length; position += 1) {
-    const previous = ranked[position - 1];
-    const current = ranked[position];
-    if (
-      previous !== undefined &&
-      current !== undefined &&
-      previous.kind === current.kind &&
-      previous.buyer === current.buyer &&
-      previous.seller === current.seller &&
-      previous.good === current.good &&
-      previous.tier === current.tier &&
-      previous.phase === current.phase
-    ) {
-      throw new RangeError(`duplicate pending transaction ${transactionKey(current.transaction)}`);
-    }
-  }
-  return ranked.map((entry) => entry.transaction);
 }
 
 function allocateMoney(
@@ -687,6 +971,11 @@ export function settleMarketDays(
      * before (the integrated day does, after migration). Defaults to checking.
      */
     readonly validateEmployment?: boolean;
+    /**
+     * Restore balances and postings on failure (default). The integrated day passes
+     * false (D-139): its rollback runner or staged copy already owns atomicity.
+     */
+    readonly atomic?: boolean;
   } = {},
 ): MarketSettlementResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
@@ -725,7 +1014,13 @@ export function settleMarketDays(
   // callers keep the precondition check.
   if (options.validateEmployment !== false) assertValidEmploymentState(world, definitions);
   const sortedResults = [...marketDays].sort((left, right) => left.marketId - right.marketId);
-  const result = settleMarketDaysInternal(world, definitions, sortedResults, options.detail ?? "full");
+  const result = settleMarketDaysInternal(
+    world,
+    definitions,
+    sortedResults,
+    options.detail ?? "full",
+    options.atomic !== false,
+  );
   for (const marketDay of marketDays) marketDay.settled = true;
   return result;
 }
@@ -756,52 +1051,40 @@ function settleMarketDaysInternal(
   definitions: EconomyDefinitions,
   marketDays: readonly MarketDayResult[],
   detail: "full" | "summary",
+  atomic: boolean,
 ): MarketSettlementResult {
   const dayIndex = marketDays[0]?.dayIndex;
   if (dayIndex === undefined) throw new RangeError("settlement requires a market-day result");
   const marketIds = marketDays.map((marketDay) => marketDay.marketId);
   const marketId = marketIds[0];
   if (marketId === undefined) throw new RangeError("settlement requires a market-day result");
-  const pendingTransactions = marketDays.flatMap((marketDay) => marketDay.pendingTransactions);
   const index = buildFinanceIndex(world.finance);
-  const transactions = prepareTransactions(world, definitions, index, pendingTransactions);
+  const transactions = prepareTransactions(world, definitions, index, marketDays.map(transactionChunk));
 
-  // D-137: opening balances as one array in account order (restored on failure; no
-  // account is created during settlement), plus the opening cash of each producer
-  // and household and the opening designated-cash total, read before any posting.
-  // These are the values the former per-account map returned.
+  // Opening balances in account order, restored on failure when the call owns its
+  // atomicity (no account is created during settlement). D-139: the integrated day
+  // passes `atomic: false`: its runner (phase mode) or staged copy (staged mode) owns
+  // atomicity, so the 100k-account copy is skipped. The opening cash of each
+  // producer and household is read before any posting either way.
   const accounts = world.finance.accounts;
-  const openingBalanceArray = new Float64Array(accounts.length);
-  let maxAccountId = 0;
-  for (let position = 0; position < accounts.length; position += 1) {
-    const account = accounts[position] as FinancialAccount;
-    openingBalanceArray[position] = account.balanceRUSD;
-    if (account.id > maxAccountId) maxAccountId = account.id;
-  }
-  // D-137: opening cash by account id in a dense table when ids allow it (the
-  // common case: ids are allocated sequentially); the producer and household loops
-  // then read an array instead of building two maps per day.
-  const denseOpening =
-    Number.isSafeInteger(maxAccountId) && maxAccountId <= accounts.length * 4 + 1024;
-  const openingByAccountId = denseOpening ? new Float64Array(maxAccountId + 1) : null;
-  if (openingByAccountId !== null) {
-    for (const account of accounts) openingByAccountId[account.id] = account.balanceRUSD;
-  }
-  const openingProducerCash = new Map<Id, number>();
-  if (openingByAccountId === null) {
-    for (const building of world.buildings) {
-      openingProducerCash.set(
-        building.operatingCashAccountId,
-        index.byId.get(building.operatingCashAccountId)?.balanceRUSD ?? 0,
-      );
+  let openingBalanceArray: Float64Array | null = null;
+  if (atomic) {
+    openingBalanceArray = new Float64Array(accounts.length);
+    for (let position = 0; position < accounts.length; position += 1) {
+      openingBalanceArray[position] = (accounts[position] as FinancialAccount).balanceRUSD;
     }
   }
-  const openingHouseholdCash = new Map<Id, number>();
-  if (openingByAccountId === null) {
-    for (const block of world.popBlocks) {
-      const account = index.find("popBlock", block.id, "household-cash");
-      if (account !== undefined) openingHouseholdCash.set(account.id, account.balanceRUSD);
-    }
+  const openingCashByAccount = new Map<Id, number>();
+  for (const building of world.buildings) {
+    openingCashByAccount.set(
+      building.operatingCashAccountId,
+      index.account(building.operatingCashAccountId)?.balanceRUSD ?? 0,
+    );
+  }
+  const householdCashIds = index.ownerAccountIds("popBlock", "household-cash");
+  for (const block of world.popBlocks) {
+    const accountId = tableAccount(householdCashIds, block.id);
+    if (accountId >= 0) openingCashByAccount.set(accountId, index.account(accountId)?.balanceRUSD ?? 0);
   }
   const initialCash = designatedCashTotal(world.finance);
   const openingPostings = [...world.finance.postings];
@@ -814,9 +1097,11 @@ function settleMarketDaysInternal(
 
   const postings: JournalPosting[] = [];
   try {
-    if (transactions.length > 0) {
+    let goodCount = 0;
+    for (const good of definitions.goods) if (good.id + 1 > goodCount) goodCount = good.id + 1;
+    if (transactions.count > 0) {
       postings.push(
-        ...postJournalBatch(world.finance, dayIndex, aggregatedMarketEntries(transactions)),
+        ...postJournalBatch(world.finance, dayIndex, aggregatedMarketEntries(transactions, goodCount)),
       );
     }
 
@@ -1024,25 +1309,31 @@ function settleMarketDaysInternal(
       postings.push(...postJournalBatch(world.finance, dayIndex, upkeepEntries));
     }
 
-    const revenueByBuilding = new Map<Id, number>();
-    const inputCostsByBuilding = new Map<Id, number>();
-    const purchasesByBlock = new Map<Id, number>();
-    for (const transaction of transactions) {
-      revenueByBuilding.set(
-        transaction.sellerBuildingId,
-        (revenueByBuilding.get(transaction.sellerBuildingId) ?? 0) + transaction.totalRUSD,
-      );
-      if (transaction.kind === "input-purchase" && transaction.buyerBuildingId !== null) {
-        inputCostsByBuilding.set(
-          transaction.buyerBuildingId,
-          (inputCostsByBuilding.get(transaction.buyerBuildingId) ?? 0) + transaction.totalRUSD,
-        );
-      }
-      if (transaction.buyerPopBlockId !== null) {
-        purchasesByBlock.set(
-          transaction.buyerPopBlockId,
-          (purchasesByBlock.get(transaction.buyerPopBlockId) ?? 0) + transaction.totalRUSD,
-        );
+    // D-139: per-owner sums in canonical transaction order, in id-indexed tables. A
+    // table entry starts at 0 and adds each amount, as the former `get ?? 0` maps did.
+    let maxBuildingId = 0;
+    for (const building of world.buildings) if (building.id > maxBuildingId) maxBuildingId = building.id;
+    let maxBlockId = 0;
+    for (const block of world.popBlocks) if (block.id > maxBlockId) maxBlockId = block.id;
+    const revenueByBuilding = new Float64Array(maxBuildingId + 1);
+    const inputCostsByBuilding = new Float64Array(maxBuildingId + 1);
+    const purchasesByBlock = new Float64Array(maxBlockId + 1);
+    let marketPurchasesTotal = 0;
+    let householdPurchasesTotal = 0;
+    let inputPurchasesTotal = 0;
+    for (let item = 0; item < transactions.count; item += 1) {
+      const position = transactions.order[item] ?? 0;
+      const amount = transactions.total[position] ?? 0;
+      const sellerId = transactions.seller[position] ?? 0;
+      revenueByBuilding[sellerId] = (revenueByBuilding[sellerId] ?? 0) + amount;
+      marketPurchasesTotal += amount;
+      const buyerId = transactions.buyer[position] ?? 0;
+      if (transactions.kind[position] === 1) {
+        inputCostsByBuilding[buyerId] = (inputCostsByBuilding[buyerId] ?? 0) + amount;
+        inputPurchasesTotal += amount;
+      } else {
+        purchasesByBlock[buyerId] = (purchasesByBlock[buyerId] ?? 0) + amount;
+        householdPurchasesTotal += amount;
       }
     }
     const wagesByBuilding = new Map<Id, number>();
@@ -1064,12 +1355,10 @@ function settleMarketDaysInternal(
     const producers: ProducerSettlement[] = inIdOrder(world.buildings)
       .map((building) => {
         const initialCash =
-          openingByAccountId !== null
-            ? (openingByAccountId[building.operatingCashAccountId] ?? 0)
-            : (openingProducerCash.get(building.operatingCashAccountId) ?? 0);
+          openingCashByAccount.get(building.operatingCashAccountId) ?? 0;
         const current = operatingCash(index, building.id);
-        const revenue = revenueByBuilding.get(building.id) ?? 0;
-        const inputCosts = inputCostsByBuilding.get(building.id) ?? 0;
+        const revenue = revenueByBuilding[building.id] ?? 0;
+        const inputCosts = inputCostsByBuilding[building.id] ?? 0;
         const wagesPaid = wagesByBuilding.get(building.id) ?? 0;
         const upkeepPaid = upkeepPaidByBuilding.get(building.id) ?? 0;
         return {
@@ -1101,10 +1390,8 @@ function settleMarketDaysInternal(
       .map((block) => {
         const account = householdCash(index, block.id);
         const initialCash =
-          openingByAccountId !== null
-            ? (openingByAccountId[account.id] ?? 0)
-            : (openingHouseholdCash.get(account.id) ?? 0);
-        const purchases = purchasesByBlock.get(block.id) ?? 0;
+          openingCashByAccount.get(account.id) ?? 0;
+        const purchases = purchasesByBlock[block.id] ?? 0;
         const wages = wagesByBlock.get(block.id) ?? 0;
         const expected = initialCash - purchases + wages;
         if (Math.abs(expected - account.balanceRUSD) > toleranceMoney(expected, account.balanceRUSD)) {
@@ -1126,13 +1413,9 @@ function settleMarketDaysInternal(
     }
 
     const totals: SettlementTotals = {
-      marketPurchasesRUSD: transactions.reduce((total, transaction) => total + transaction.totalRUSD, 0),
-      householdPurchasesRUSD: transactions
-        .filter((transaction) => transaction.kind === "household-purchase")
-        .reduce((total, transaction) => total + transaction.totalRUSD, 0),
-      inputPurchasesRUSD: transactions
-        .filter((transaction) => transaction.kind === "input-purchase")
-        .reduce((total, transaction) => total + transaction.totalRUSD, 0),
+      marketPurchasesRUSD: marketPurchasesTotal,
+      householdPurchasesRUSD: householdPurchasesTotal,
+      inputPurchasesRUSD: inputPurchasesTotal,
       wageObligationRUSD: wageSettlements.reduce((total, settlement) => total + settlement.obligationRUSD, 0),
       wagesPaidRUSD: wageSettlements.reduce((total, settlement) => total + settlement.paidRUSD, 0),
       unpaidWagesRUSD: wageSettlements.reduce((total, settlement) => total + settlement.unpaidRUSD, 0),
@@ -1162,20 +1445,7 @@ function settleMarketDaysInternal(
       startDayIndex: world.startDayIndex,
       settlementNextPostingId: world.finance.nextPostingId,
       fiscalApplied: false,
-      transactions: (detail === "summary" ? [] : transactions).map((transaction) => ({
-        kind: transaction.kind,
-        buyerPopBlockId: transaction.buyerPopBlockId,
-        buyerBuildingId: transaction.buyerBuildingId,
-        sellerBuildingId: transaction.sellerBuildingId,
-        goodId: transaction.goodId,
-        quantity: transaction.quantity,
-        unitPriceRUSD: transaction.unitPriceRUSD,
-        totalRUSD: transaction.totalRUSD,
-        tier: transaction.tier,
-        phase: transaction.phase,
-        buyerAccountId: transaction.buyerAccountId,
-        sellerAccountId: transaction.sellerAccountId,
-      })),
+      transactions: detail === "summary" ? [] : settledTransactions(transactions),
       wages: wageSettlements,
       upkeep: upkeepSettlements,
       producers,
@@ -1184,6 +1454,7 @@ function settleMarketDaysInternal(
       postingIds: postings.map((posting) => posting.id),
     };
   } catch (error) {
+    if (openingBalanceArray === null) throw error;
     if (accounts.length !== openingBalanceArray.length) {
       throw new RangeError("settlement rollback found accounts created during settlement");
     }

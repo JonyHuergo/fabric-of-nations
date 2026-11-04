@@ -579,35 +579,28 @@ function buildNeedsResult(
   household: HouseholdDemandBuild,
   markets: readonly MarketDayResult[],
   settlement: MarketSettlementResult,
-  detail: DayResultDetail = "full",
+  detail: DayResultDetail,
+  /** Fulfilled quantity per `household.meta` index (D-139); NaN marks a missing result. */
+  fulfilledByRecord: Float64Array,
 ): PopulationNeedsDayResult {
-  // D-137: numeric (block, tier, good) keys; good ids equal their definition index.
-  const goodCount = definitions.goods.length;
-  const numericKey = (popBlockId: Id, tier: MarketTier, goodId: Id): number =>
-    (popBlockId * 8 + tier) * goodCount + goodId;
-  const resultByKey = new Map<number, MarketDayResult["householdDemands"][number]>();
-  for (const market of markets) {
-    for (const demand of market.householdDemands) {
-      resultByKey.set(numericKey(demand.popBlockId, demand.tier, demand.goodId), demand);
-    }
-  }
   const householdByName = new Map(
     settlement.households.map((entry) => [entry.popBlockId, entry]),
   );
   const pricesByMarket = new Map(markets.map((market) => [market.marketId, market.openingPrices]));
   const blocks: PopBlockNeedsResult[] = [];
-  // Each block's meta grouped by need tier, in meta order (the order the per-tier
-  // filter produced).
-  const metaByBlock = new Map<number, Map<NeedTier, (typeof household.meta)[number][]>>();
-  for (const item of household.meta) {
+  // Each block's meta indices grouped by need tier, in meta order (the order the
+  // per-tier filter produced).
+  const metaByBlock = new Map<number, Map<NeedTier, number[]>>();
+  for (let metaIndex = 0; metaIndex < household.meta.length; metaIndex += 1) {
+    const item = household.meta[metaIndex] as (typeof household.meta)[number];
     let byTier = metaByBlock.get(item.popBlockId);
     if (byTier === undefined) {
       byTier = new Map();
       metaByBlock.set(item.popBlockId, byTier);
     }
     const list = byTier.get(item.needTier);
-    if (list === undefined) byTier.set(item.needTier, [item]);
-    else list.push(item);
+    if (list === undefined) byTier.set(item.needTier, [metaIndex]);
+    else list.push(metaIndex);
   }
 
   for (const block of inIdOrder(world.popBlocks)) {
@@ -629,9 +622,11 @@ function buildNeedsResult(
       let spent = 0;
       let allMet = true;
       const goods: NeedGoodResult[] = [];
-      for (const item of tierMeta) {
-        const demand = resultByKey.get(numericKey(item.popBlockId, item.tier, item.goodId));
-        if (demand === undefined) throw new RangeError("missing market household demand result");
+      for (const metaIndex of tierMeta) {
+        const item = household.meta[metaIndex] as (typeof household.meta)[number];
+        const fulfilledQuantity = fulfilledByRecord[metaIndex] ?? Number.NaN;
+        if (Number.isNaN(fulfilledQuantity)) throw new RangeError("missing market household demand result");
+        const demand = { fulfilledQuantity };
         const marketOpeningPrices = pricesByMarket.get(item.marketId);
         if (marketOpeningPrices === undefined) {
           throw new RangeError(`missing market ${String(item.marketId)} for household demand`);
@@ -876,6 +871,8 @@ interface MarketAttempt {
   readonly cappedBuildings: number;
   readonly markets: readonly MarketDayResult[];
   readonly settlement: MarketSettlementResult;
+  /** Fulfilled quantity of each `household.records` entry (D-139); NaN where unmarketed. */
+  readonly fulfilledByRecord: Float64Array;
 }
 
 function runMarketAttempt(
@@ -921,12 +918,21 @@ function runMarketAttempt(
     if (marketId !== undefined && !buildingMarket.has(building.id)) buildingMarket.set(building.id, marketId);
   }
   const householdByMarket = new Map<Id, HouseholdDemandRecord[]>();
-  for (const record of household.records) {
+  // D-139: the global record index of each market's records, to map the market's
+  // fulfilment column back to `household.records` (and its parallel `meta`).
+  const recordIndexByMarket = new Map<Id, number[]>();
+  for (let recordIndex = 0; recordIndex < household.records.length; recordIndex += 1) {
+    const record = household.records[recordIndex] as HouseholdDemandRecord;
     const marketId = household.marketByPopBlock.get(record.popBlockId);
     if (marketId === undefined) continue;
     const list = householdByMarket.get(marketId);
-    if (list === undefined) householdByMarket.set(marketId, [record]);
-    else list.push(record);
+    if (list === undefined) {
+      householdByMarket.set(marketId, [record]);
+      recordIndexByMarket.set(marketId, [recordIndex]);
+    } else {
+      list.push(record);
+      recordIndexByMarket.get(marketId)?.push(recordIndex);
+    }
   }
   const productionByMarket = new Map<Id, ProductionDemandRecord[]>();
   for (const record of production) {
@@ -937,21 +943,29 @@ function runMarketAttempt(
     else list.push(record);
   }
   const results: MarketDayResult[] = [];
+  const fulfilledByRecord = new Float64Array(household.records.length).fill(Number.NaN);
   for (const market of [...world.markets].sort((left, right) => left.id - right.id)) {
-    results.push(
-      runMarketDay(
-        world,
-        definitions,
-        makeMarketInput(
-          populationDefinitions,
-          dayIndex,
-          market.id,
-          householdByMarket.get(market.id) ?? [],
-          productionByMarket.get(market.id) ?? [],
-        ),
-        { validateWorld: false, lookups, detail },
+    const result = runMarketDay(
+      world,
+      definitions,
+      makeMarketInput(
+        populationDefinitions,
+        dayIndex,
+        market.id,
+        householdByMarket.get(market.id) ?? [],
+        productionByMarket.get(market.id) ?? [],
       ),
+      { validateWorld: false, lookups, detail },
     );
+    const fulfilled = result.columns?.householdFulfilled;
+    const recordIndices = recordIndexByMarket.get(market.id) ?? [];
+    if (fulfilled === undefined || fulfilled.length !== recordIndices.length) {
+      throw new RangeError(`market ${String(market.id)} returned no household fulfilment`);
+    }
+    for (let local = 0; local < recordIndices.length; local += 1) {
+      fulfilledByRecord[recordIndices[local] ?? 0] = fulfilled[local] ?? 0;
+    }
+    results.push(result);
   }
   observe?.("settlement");
   // The integrated day validated employment after migration and before the market
@@ -959,6 +973,7 @@ function runMarketAttempt(
   const settlement = settleMarketDays(world, definitions, results, {
     validateWorld: false,
     validateEmployment: false,
+    atomic: false,
     detail,
   });
   return {
@@ -967,6 +982,7 @@ function runMarketAttempt(
     cappedBuildings: cap.cappedBuildings,
     markets: results,
     settlement,
+    fulfilledByRecord,
   };
 }
 
@@ -1253,6 +1269,7 @@ export function runEconomicDay(
     marketResults,
     settlement,
     options.detail ?? "full",
+    attempt.fulfilledByRecord,
   );
   updateNeedsCounters(world, needs);
   updateDailyMilitancy(world, needs);
