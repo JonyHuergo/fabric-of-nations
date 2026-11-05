@@ -60,6 +60,7 @@ import {
   type AnnualFinanceSummary,
   type FinancePeriodBudgetTotals,
   type FinancePeriodFiscalTotals,
+  type ClosingCurrencyValuation,
   type FinancePeriodSummary,
   type FinanceState,
   type FinancialAccount,
@@ -302,6 +303,9 @@ export function compactFinanceHistory(finance: FinanceState): number {
           { ...budget },
         ]),
       ),
+      ...(summary.closingValuations === undefined
+        ? {}
+        : { closingValuations: summary.closingValuations.map((entry) => ({ ...entry })) }),
     };
     compacted += 1;
   }
@@ -942,6 +946,21 @@ function buildAnnualSummary(
 }
 
 /**
+ * P3 (D-141): the specified valuations at a close, ascending currency id. Input: the
+ * world's authoritative valuations; unavailable currencies are omitted. Monthly cadence;
+ * read only by the display.
+ */
+function closingValuationsOf(world: World): ClosingCurrencyValuation[] {
+  const result: ClosingCurrencyValuation[] = [];
+  for (const valuation of world.currencyValuations) {
+    if (valuation.status === "specified") {
+      result.push({ currencyId: valuation.currencyId, rusdPerUnit: valuation.rusdPerUnit });
+    }
+  }
+  return result.sort((left, right) => left.currencyId - right.currencyId);
+}
+
+/**
  * Close the current month on a staged world.
  *
  * Inputs: an authoritative world whose `dayIndex` is a civil month-end.
@@ -979,7 +998,12 @@ export function closeFinancePeriod(
   const staged = phaseFinance(world.finance, options.financeInPlace);
   if (!inDay) assertValidFinanceState(staged);
 
-  const summary = capturePeriodSummary(staged, bounds);
+  // A world without specified valuations records none (the field is omitted).
+  const closingValuations = closingValuationsOf(world);
+  const summary: FinancePeriodSummary = {
+    ...capturePeriodSummary(staged, bounds),
+    ...(closingValuations.length === 0 ? {} : { closingValuations }),
+  };
   assertSummaryTrialBalance(staged, summary);
 
   const entries = buildClosingEntries(staged);

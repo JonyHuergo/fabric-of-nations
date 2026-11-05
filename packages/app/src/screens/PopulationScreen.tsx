@@ -4,13 +4,13 @@ import {
   countryById,
   formatCount,
   formatRate,
-  formatRUSD,
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
 import { Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { provinceEconomyRows } from "@century/sim-worker";
+import { useMoney } from "../format/useMoney";
 
 export function PopulationScreen({
   snapshot,
@@ -21,6 +21,7 @@ export function PopulationScreen({
   readonly countryId: number | null;
   readonly onSelectCountry: (countryId: number) => void;
 }) {
+  const money = useMoney();
   const country = countryById(snapshot, countryId);
   return (
     <View>
@@ -53,12 +54,12 @@ export function PopulationScreen({
           />
           <StatRow
             label="Household cash"
-            value={formatRUSD(country.householdCashRUSD)}
+            value={money.format(country.householdCashRUSD)}
             detail="Sum of household cash accounts; stock."
           />
           <StatRow
             label="Estimated daily wage base"
-            value={formatRUSD(country.estimatedDailyWageBaseRUSD)}
+            value={money.format(country.estimatedDailyWageBaseRUSD)}
             detail="Current employment × base wages ÷ civil year days; current-base estimate, not realized wages."
           />
           <StatRow label="Literacy" value={formatRate(country.literacy)} detail="population-weighted, 0–100%" />

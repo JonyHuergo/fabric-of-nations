@@ -471,6 +471,20 @@ export interface FinancePeriodSummary {
    * retained on both detailed and compacted summaries.
    */
   countryBudgetTotals: Record<Id, FinancePeriodBudgetTotals>;
+  /**
+   * P3 (D-141): every specified currency valuation at the close, ascending currency id.
+   * Reporting-only: the display converts the period's RUSD figures at these valuations;
+   * no simulation decision reads them. Absent on summaries built without a world
+   * (fixtures); retained through compaction.
+   */
+  closingValuations?: ClosingCurrencyValuation[];
+}
+
+/** P3 (D-141): one currency's RUSD valuation at a finance-period close. */
+export interface ClosingCurrencyValuation {
+  readonly currencyId: Id;
+  /** RUSD per one currency unit at the period end. */
+  readonly rusdPerUnit: RusdPerCurrencyUnit;
 }
 
 /** Exact per-country fiscal totals retained in a period summary (D-047, E2). */

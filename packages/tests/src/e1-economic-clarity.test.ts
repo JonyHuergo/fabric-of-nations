@@ -17,6 +17,7 @@ import {
   MAX_PLAYER_ACTION_HISTORY,
   PROTOCOL_VERSION,
   appendPlayerAction,
+  RUSD_MONEY_TEXT,
   buildEconomicExplanations,
   buildMonthlyReports,
   latestMonthlyReport,
@@ -187,7 +188,7 @@ describe("E1 economic clarity", () => {
     for (const market of synthetic.markets) {
       for (const price of market.prices) price.stockQuantity = 0;
     }
-    const explanations = buildEconomicExplanations(synthetic, country);
+    const explanations = buildEconomicExplanations(synthetic, country, RUSD_MONEY_TEXT);
     expect(explanations.length).toBeGreaterThan(0);
     const subsistence = explanations.find((entry) => entry.id === "subsistence-unmet");
     expect(subsistence).toBeDefined();

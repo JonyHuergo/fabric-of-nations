@@ -9,4 +9,5 @@
 export * from "./version.js";
 export * from "./load.js";
 export * from "./historical.js";
+export * from "./currencies.js";
 export * from "./provinces.js";

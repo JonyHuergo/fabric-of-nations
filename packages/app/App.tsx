@@ -20,6 +20,7 @@ import { Dialog } from "./src/components/Dialog";
 import { Vignette } from "./src/components/Vignette";
 import { EntryPanel, useEntryPanelWidth } from "./src/components/EntryPanel";
 import { FONT_ASSETS } from "./src/design/fontAssets";
+import { DisplayCurrencyProvider } from "./src/format/DisplayCurrency";
 import { ERA_THEMES, eraForDate, type EraId } from "./src/design/tokens";
 import { useEraTheme } from "./src/design/useEraTheme";
 import { BRIEFING_FLAG_POLITIES } from "./src/flags/flagRegistry";
@@ -39,10 +40,12 @@ export default function App() {
   const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
   return (
     <SafeAreaProvider>
-      <SimulationProvider>
-        <StatusBar style="light" hidden />
-        {fontsLoaded || fontError !== null ? <CenturyRoot /> : null}
-      </SimulationProvider>
+      <DisplayCurrencyProvider>
+        <SimulationProvider>
+          <StatusBar style="light" hidden />
+          {fontsLoaded || fontError !== null ? <CenturyRoot /> : null}
+        </SimulationProvider>
+      </DisplayCurrencyProvider>
     </SafeAreaProvider>
   );
 }

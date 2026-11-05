@@ -6635,6 +6635,9 @@ land-layer rendering bug and raises the maximum zoom.
 28) is implemented for review, with the money calibration moved to P2b (D-130 to D-134).
 P2b (historical money and productivity, schema 29) is implemented for review on
 2026-11-03 under the designer's basis decisions (D-135) and the price-rule amendment (D-136).
+P3 (local-currency display, schema 30) is implemented for review on 2026-11-04 (D-141);
+the designer's requirements for metal and paper money and for changing a currency
+arrangement are recorded as proposed decision D-140, not yet assigned to a stage.
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair

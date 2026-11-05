@@ -10,6 +10,8 @@
 
 import type { SimulationSnapshot } from "@century/sim-worker";
 
+import { RUSD_FORMAT, type MoneyFormat } from "../format/money";
+
 export type DispatchKind =
   | "war"
   | "peace"
@@ -25,7 +27,22 @@ export interface Dispatch {
   readonly id: string;
   readonly kind: DispatchKind;
   readonly dateLabel: string;
+  /** The headline in RUSD; `dispatchHeadline` renders it in the display currency. */
   readonly headline: string;
+  /**
+   * P3 (D-141): an amount the headline names, kept in RUSD with the closed month it belongs
+   * to, so the display formats it when shown (`{amount}` in `template`).
+   */
+  readonly amount?: { readonly rusd: number; readonly periodEndDay: number; readonly template: string };
+}
+
+/** The headline in the display currency (P3): amounts are formatted when shown. */
+export function dispatchHeadline(dispatch: Dispatch, money: MoneyFormat): string {
+  if (dispatch.amount === undefined) return dispatch.headline;
+  return dispatch.amount.template.replace(
+    "{amount}",
+    money.atPeriod(dispatch.amount.periodEndDay).format(Math.abs(dispatch.amount.rusd)),
+  );
 }
 
 /** The parts of a snapshot dispatches are derived from. */
@@ -51,13 +68,6 @@ function countryName(snapshot: DispatchSource, countryId: number): string {
   return snapshot.countrySummaries.find((country) => country.id === countryId)?.name ?? `Country ${String(countryId)}`;
 }
 
-function formatMoney(value: number): string {
-  const absolute = Math.abs(value);
-  if (absolute >= 1_000_000_000) return `${(absolute / 1_000_000_000).toFixed(2)} bn RUSD`;
-  if (absolute >= 1_000_000) return `${(absolute / 1_000_000).toFixed(1)} M RUSD`;
-  if (absolute >= 1_000) return `${(absolute / 1_000).toFixed(0)} k RUSD`;
-  return `${absolute.toFixed(0)} RUSD`;
-}
 
 /**
  * What happened between two snapshots, oldest first. The first snapshot of a
@@ -71,8 +81,8 @@ export function deriveDispatches(
   if (previous === null || current.dayIndex <= previous.dayIndex) return [];
   const dateLabel = current.date.label;
   const dispatches: Dispatch[] = [];
-  const push = (id: string, kind: DispatchKind, headline: string): void => {
-    dispatches.push({ id, kind, dateLabel, headline });
+  const push = (id: string, kind: DispatchKind, headline: string, amount?: Dispatch["amount"]): void => {
+    dispatches.push({ id, kind, dateLabel, headline, ...(amount === undefined ? {} : { amount }) });
   };
 
   const warsBefore = new Map(previous.military.wars.map((war) => [war.id, war] as const));
@@ -151,12 +161,16 @@ export function deriveDispatches(
       const closedBefore = playerBefore.financeHistory[playerBefore.financeHistory.length - 1];
       if (closed !== undefined && closed.periodEndDay !== closedBefore?.periodEndDay) {
         const result = closed.netFiscalResultRUSD;
+        const template =
+          result >= 0
+            ? "Treasury closes the month {amount} in surplus"
+            : "Treasury closes the month {amount} in deficit";
+        const amount = { rusd: result, periodEndDay: closed.periodEndDay, template };
         push(
           `month-${String(closed.periodEndDay)}`,
           "treasury",
-          result >= 0
-            ? `Treasury closes the month ${formatMoney(result)} in surplus`
-            : `Treasury closes the month ${formatMoney(result)} in deficit`,
+          dispatchHeadline({ id: "", kind: "treasury", dateLabel, headline: "", amount }, RUSD_FORMAT),
+          amount,
         );
       }
     }

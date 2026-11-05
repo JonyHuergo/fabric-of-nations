@@ -7705,3 +7705,147 @@ measured result (host day 6.6× mean / 7.2× p50, save 4.9×, load 4.4×, first 
 15.7×, month starts 3.08–3.53× the ordinary day; see `PERF_STAGE2_REPORT.md`). The
 unmet targets and the proposed next steps stay recorded there as open performance work;
 new stages should not make the measured costs worse without saying so in their reports.
+
+## D-140 — Proposed: money as metal and paper, currency value changes, currency switching
+
+**Status:** recorded at the designer's instruction on 2026-11-04 during P3; **proposed, not
+assigned**. The mechanics below belong to later stages and are not implemented by P3.
+**Amends (when accepted):** `docs/PROSPERITY_PROGRAM.md` P5 (deposits), P6 (goods
+catalogue) and P11 (banks and credit); GDD §17J.3.
+
+### Designer's requirements (2026-11-04)
+
+1. Gold and silver are goods: they are mined, traded and can change price.
+2. The value of every currency fluctuates (inflation and deflation); RUSD alone is
+   constant by design (D-122).
+3. Each polity may give up its independent currency, and an independent country without
+   one may create one.
+
+### Proposed model
+
+- **Metal goods (P5/P6).** `gold` and `silver` join the goods catalogue with mass units
+  (fine kilograms); gold and silver deposits join P5's deposit list (USGS MRDS plus authored
+  historical fields, D-121), with depletion conserved. Industrial use and hoarding are
+  demand; mints and monetary authorities are buyers and sellers.
+- **Metal standards.** A gold- or silver-standard currency is defined by its legal fine
+  content per unit. Its RUSD value is fine content × the metal's market price, held near the
+  mint parity by coinage and melting (the gold and silver points as explicit arbitrage
+  flows, not a clamp). Monetary reserves are held as metal stock as well as RUSD.
+- **Paper.** An inconvertible currency's value follows issuance against reserves and money
+  demand (with P11's banks and credit); a convertible paper currency is held at its metal
+  parity while reserves last, and is suspended when they do not.
+- **Switching.** Player and AI actions: an `own` country may adopt another currency
+  (redeeming its circulation at the current valuation into the adopted currency, with the
+  conversion posted through the existing accounts); an independent country with an
+  `adopted` arrangement may establish its own currency (a new `Currency` record, an
+  authority and an opening issue against reserves). Colonies and dependencies follow their
+  overlord's arrangement.
+- **No-Mana.** Every valuation change is caused by metal prices, issuance, reserves or
+  policy; nothing accumulates unconditionally.
+
+### What P3 already provides for it (D-141)
+
+- Each 1900 currency is recorded with its standard, metal and fine content per unit
+  (`historical/p3/currencies_1900.json`); its opening `rusdPerUnit` is derived from them.
+- Countries that used another state's coin in 1900 start with an `adopted` arrangement;
+  the Maria Theresa thaler is a foreign-issued currency.
+- The display reads valuations and arrangements from every snapshot, so it follows value
+  changes and arrangement changes without assuming a fixed rate; history figures convert
+  at the valuation of their own month.
+
+## D-141 — P3: 1900 currency parities, arrangements and local-currency display
+
+**Status:** implemented for review on 2026-11-04 under the designer's resolutions given in
+the P3 session (metal and paper money as data, adopted arrangements, paper at the 1900
+circulating rate, history at its own rate; the money mechanics themselves are D-140).
+**Implements:** D-122 §3 and §4, GDD §17J.2 (6), `docs/PROSPERITY_PROGRAM.md` §4 P3.
+
+### Decision
+
+1. **Data, not logic.** `packages/data/data/historical/p3/currencies_1900.json` records,
+   for every country of the 1900 world, its arrangement (own or adopted) and for each own
+   currency its standard (`gold`, `silver`, `paper`), the metal of its legal unit, how its
+   value is derived and its sources. `packages/data/src/currencies.ts` validates the file
+   and derives the fine content, the 1900 circulating value in US gold dollars and
+   `rusdPerUnit = value × CPI(1990)/CPI(1900)` (15.704, the D-130 deflator). The scenario
+   file names it as `meta.files.currencies`; it supersedes the currency blocks of the
+   generated `historical/p2b/countries_1900.json` for the 1900 world only. The M5 sample
+   keeps its unavailable valuations (D-080).
+2. **Sources.** Director of the Mint, *Values of Foreign Coins, January 1, 1901* (pp. 56–57,
+   read from the page scans) for the legal value of each unit; the same report's foreign
+   answers on actual currency, premium on gold and exchange on London in 1900 for paper
+   currencies; its monetary-systems chapter for the Latin Union pars and the Siamese
+   tical (5 ticals = 3 Mexican dollars); the Gold Standard Act of 1900 for the gold price
+   (1.504632 g fine per dollar). Silver is priced at the Mint's own October–December 1900
+   valuation (Mexican dollar 0.509 / 24.4388 g fine = 0.6478 USD per troy ounce).
+3. **Paper at its 1900 circulating rate.** Where the Mint report gives a 1900 premium on
+   gold or a London quotation the currency opens at `legal value / (1 + premium)` (or the
+   pence quotation): Argentina 130.95 %, Spain 32.53 % (mean monthly exchange premium),
+   Portugal 37.96 d per 1,000 reis, Greece 58 %, Serbia 11 % (midpoint 8–14 %), Liberia 25 %,
+   Austria-Hungary 0.775 %, Paraguay 694 % (midpoint); Guatemala 510 %, Salvador 137 %,
+   Nicaragua 180 % and Haiti 112 % against the US gold dollar. This replaces the proposed
+   "Mint parity everywhere" (R1a): currencies fluctuate from the start (D-140).
+4. **Adopted arrangements.** Countries that used another state's coin in 1900 adopt it:
+   Montenegro and Liechtenstein the Austro-Hungarian crown; Andorra and Monaco the franc;
+   San Marino the lira; the Australian colonies, New Zealand, Tonga and the Orange Free
+   State sterling; Ethiopia, Oman, Wadai, Darfur, Ha'il and Sokoto the Maria Theresa thaler,
+   a foreign-issued currency (`issuer.kind = "foreign"`, id `FOREIGN_CURRENCY_ID_BASE` =
+   1000). 52 own currencies and the thaler remain (53). Own currencies keep the country id.
+   Adopted countries have no monetary authority (E6b), so 90 monetary accounts fewer are
+   allocated and later account ids shift; balances are identical (item 8).
+5. **Names.** Anachronistic names are corrected (keys unchanged): Honduran, Nicaraguan,
+   Salvadoran and Paraguayan peso, Nepalese mohar, Kabuli rupee, Siamese tical, Persian
+   kran, Haikwan tael; placeholder currencies of the adopting states are removed.
+6. **Month-end valuations (schema 30).** Every finance-period close records the specified
+   valuations (`FinancePeriodSummary.closingValuations`, ascending currency id, validated,
+   serialized, kept through compaction). Reporting-only: no simulation decision reads them.
+   The snapshot carries them for the ledger window and the mean of each reported year
+   (`SimulationSnapshot.valuationHistory`, protocol 19), with `CountrySnapshot.currencyId`
+   and `monetaryArrangement`.
+7. **One formatter.** `packages/app/src/format/money.ts` converts RUSD to the display
+   currency at display time (`display = rusd / rusdPerUnit`); history converts at its
+   month's closing valuation or its year's mean, falling back to the current valuation
+   when none was recorded. Every money label in the app uses it (`useMoney()`); the
+   sim-worker display helpers (explanations, action descriptions, debt and construction
+   previews, route description) take a required `MoneyText` and print no unit of their own.
+   Money sliders show and edit display units with a 1-2-5 step and report RUSD; typed
+   amounts are converted to RUSD at the command boundary, so commands stay RUSD. Rates
+   (valuations, parities) stay in RUSD per unit. Dispatch headlines keep the amount and
+   format it when shown.
+8. **No feedback.** The display preference ("own", "rusd" or `currency:<key>`) is a
+   per-device AsyncStorage value, never in a save or the world; the worker protocol has no
+   display command. `node packages/bench/dist/p3Equivalence.js 35` shows, for 35 days of the
+   1900 world including the first month close: with the same arrangements, the world with
+   parities equals the world without valuations bit for bit once the valuation fields are
+   copied across; against the pre-P3 world, every simulated quantity (balances by owner and
+   subtype, population, buildings, markets, prices, trade, construction, politics,
+   technology, military, period totals) is identical.
+9. **Settings.** A Settings panel in the campaign sheet and a Settings entry on the title
+   screen hold the display-currency selector: the player's own currency (default), RUSD,
+   and every valued registered currency; rows are ≥ 44 pt, token-styled, without hover.
+
+### Provisional values and missing sources
+
+- **Paper discount not sourced (metal parity stands):** Italy, Chile, Brazil (answer: rate
+  not at hand), Colombia (paper money, discount not given), Bulgaria, Ecuador (ambiguous
+  answer "108, 105, 107 average").
+- **No 1900 value of the own unit:** Afghanistan and Nepal valued at the Indian rupee;
+  the Dominican Republic at the Central American silver peso; Korea at par with the yen
+  (Mint report: Japanese money circulates, exchange with Japan at ½ %); Luxembourg at the
+  franc; Paraguay's gold reference at the Argentine gold peso.
+- **Adoption choices:** Andorra (franc chosen over the peseta), Oman (thaler over the
+  Indian rupee), Sokoto, Wadai, Darfur and Ha'il (thaler; cowries are not representable).
+  The thaler's fine content (23.389 g) is the convention standard (secondary source).
+- **OCR-read answers:** Spain, Guatemala, Nicaragua, Salvador, Haiti, Liberia, Serbia,
+  Paraguay and Austria-Hungary were read from the archive.org OCR text; Argentina, Greece,
+  Portugal and the coin tables from the page scans.
+- **Colonial currencies** (Indian rupee, Straits dollar, Dutch Indies guilder, colonial
+  francs) are not registered: a colony is part of its overlord's country and shows the
+  overlord's currency. Per-province currencies are out of scope.
+
+### Consequences
+
+- The 1900 world hash changes once (valuations, arrangements, names, closing valuations);
+  schema 29 saves are incompatible (D-120, D-139 §3).
+- Silver currencies keep their opening RUSD value until D-140's metal prices exist; a
+  player can now establish a monetary authority at the sourced parity (E6b).

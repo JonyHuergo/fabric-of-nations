@@ -71,10 +71,10 @@ export function previewMonetaryPolicy(
     errors.push("The parity must be a positive RUSD-per-unit value or unchanged.");
   }
   if (!finite(proposed.reserveTransferRUSD)) {
-    errors.push("The reserve transfer must be a finite RUSD amount.");
+    errors.push("The reserve transfer must be a finite amount.");
   }
   if (!finite(proposed.currencyConversionRUSD)) {
-    errors.push("The currency conversion must be a finite RUSD amount.");
+    errors.push("The currency conversion must be a finite amount.");
   }
   if (proposed.regime === "managed" && proposed.parityRusdPerUnit !== null) {
     errors.push("A managed regime's rate is rule-driven; a parity may only be set under a peg.");

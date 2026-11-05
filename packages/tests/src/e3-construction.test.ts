@@ -34,6 +34,7 @@ import { loadM3SmallEconomy } from "@century/data";
 import {
   PROTOCOL_VERSION,
   parseWorkerEvent,
+  RUSD_MONEY_TEXT,
   previewConstruction,
 } from "@century/sim-worker";
 import { buildSimulationSnapshot } from "@century/sim-worker/snapshot";
@@ -606,7 +607,7 @@ describe("E3 cancellation, suspension, and reporting", () => {
     expect(country.constructionInProgressRUSD).toBeGreaterThan(0);
     expect(country.budgetMonthToDate.constructionSpentRUSD).toBeGreaterThan(0);
 
-    const preview = previewConstruction(snapshot, country, FARM, REGION);
+    const preview = previewConstruction(snapshot, country, FARM, REGION, RUSD_MONEY_TEXT);
     expect(preview.valid).toBe(true);
     expect(preview.upfrontRequirementRUSD).toBeGreaterThan(preview.costRUSD);
     expect(preview.estimatedDays).not.toBeNull();

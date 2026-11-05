@@ -2,7 +2,6 @@ import { StyleSheet, Text, View } from "react-native";
 
 import {
   essentialGoodIds,
-  formatPrice,
   formatQuantity,
   marketForCountry,
   sortedMarkets,
@@ -12,6 +11,7 @@ import {
 import { Badge, Button, DataRow, Disclosure, Divider, Headline, Notice, Panel } from "../components/ui";
 import { colors, radii, spacing, themedSheet, type } from "../theme";
 import { provinceEconomyRows } from "@century/sim-worker";
+import { useMoney } from "../format/useMoney";
 
 function marketKindLabel(kind: string): string {
   switch (kind) {
@@ -35,6 +35,7 @@ export function MarketsScreen({
   readonly countryId: number | null;
   readonly onShowOnMap?: (marketId: number) => void;
 }) {
+  const money = useMoney();
   const country = snapshot.countrySummaries.find((entry) => entry.id === countryId) ?? null;
   const homeMarket = marketForCountry(snapshot, country);
   const essential = new Set(essentialGoodIds(snapshot));
@@ -175,7 +176,7 @@ export function MarketsScreen({
                 <DataRow
                   key={price.goodId}
                   title={`${price.goodName}${essential.has(price.goodId) ? " · essential" : ""}`}
-                  value={`${formatPrice(price.priceRUSD)} RUSD`}
+                  value={money.price(price.priceRUSD)}
                   valueTone="accent"
                   note={`per ${price.unitLabel} · stock ${formatQuantity(price.stockQuantity)} · capacity/day ${formatQuantity(price.dailyProductionCapacity)}`}
                 />

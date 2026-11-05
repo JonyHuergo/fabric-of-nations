@@ -61,6 +61,7 @@ import {
   assertValidPoliticsState,
   assertValidRegimeState,
 } from "./politics.js";
+import { assertValidRusdPerCurrencyUnit } from "./currency.js";
 import { assertValidLaborPolicyState } from "./labor.js";
 import { assertValidTradePolicyState } from "./tradeState.js";
 import { assertValidConstructionState } from "./constructionModel.js";
@@ -876,6 +877,25 @@ function parseAccountTotalKey(key: string, path: string): Id {
  * nonnegative. Cross-period properties (contiguity, month boundaries, ordering)
  * are checked by `assertValidPeriodSummaries`.
  */
+/**
+ * P3 (D-141): closing valuations are an array of `{ currencyId, rusdPerUnit }` records,
+ * strictly ascending by currency id, each a valid RUSD-per-unit value.
+ */
+export function assertValidClosingValuations(value: unknown, path: string): void {
+  const entries = requireArray(value, path);
+  let previous = -1;
+  for (let index = 0; index < entries.length; index += 1) {
+    const entryPath = `${path}[${String(index)}]`;
+    const entry = requireRecord(entries[index], entryPath);
+    const currencyId = requireInteger(entry.currencyId, `${entryPath}.currencyId`, 0, Number.MAX_SAFE_INTEGER);
+    if (currencyId <= previous) {
+      throw new RangeError(`${path} must be strictly ascending by currencyId`);
+    }
+    previous = currencyId;
+    assertValidRusdPerCurrencyUnit(entry.rusdPerUnit, `${entryPath}.rusdPerUnit`);
+  }
+}
+
 export function assertValidFinancePeriodSummary(
   summary: FinancePeriodSummary,
   accounts: ReadonlyMap<number, FinancialAccount>,
@@ -899,6 +919,10 @@ export function assertValidFinancePeriodSummary(
   }
   if (!isCivilMonthEnd(end)) {
     throw new RangeError(`${path}.periodEndDay ${String(end)} is not a civil month-end`);
+  }
+
+  if (record.closingValuations !== undefined) {
+    assertValidClosingValuations(record.closingValuations, `${path}.closingValuations`);
   }
 
   const totals = requireRecord(record.accountTotals, `${path}.accountTotals`);

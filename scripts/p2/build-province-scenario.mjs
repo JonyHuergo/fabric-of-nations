@@ -534,6 +534,8 @@ function build() {
     employment: "historical/p2b/employment_1900.json",
     calibration: "historical/p2b/calibration_targets_1900.json",
     moneyCoefficients: "historical/p2b/money_coefficients_1900.json",
+    // P3 (D-141): currencies, arrangements and sourced 1900 parities.
+    currencies: "historical/p3/currencies_1900.json",
   };
   meta.definitions = {
     ...meta.definitions,

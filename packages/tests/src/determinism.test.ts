@@ -42,7 +42,9 @@ describe("determinism", () => {
     // economies; the empty world's behaviour is unchanged, so the digest is re-pinned.
     // P2b schema 29 (D-135) adds province wage tables, building technique and money
     // coefficients to the encoding; the empty world's behaviour is unchanged.
-    expect(hashWorld(world)).toBe("a0a3104134e6ba67");
+    // P3 schema 30 (D-141): the schema number only; verified by running this test with the
+    // constant set to 29, which reproduces the previous digest.
+    expect(hashWorld(world)).toBe("f4a2b473a9d60631");
   });
 
   test("a one-year economic simulation is deterministic and save/resume safe", () => {

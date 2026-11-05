@@ -108,9 +108,10 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // the population trajectory is unchanged, so the digest is re-pinned.
     // P2b schema 29 (D-135) adds wage tables, technique and money coefficients to the
     // encoding; the population trajectory is unchanged, so the digest is re-pinned.
-    expect(hashWorld(world)).toBe("e41ed8edbb1e8b6b");
+    // P3 schema 30 (D-141): the schema number in the encoding only; re-pinned.
+    expect(hashWorld(world)).toBe("56c788bb18d62ec1");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("e41ed8edbb1e8b6b");
+    expect(hashWorld(restored)).toBe("56c788bb18d62ec1");
     expect(tick(restored).advanced).toBe(false);
   });
 
@@ -316,7 +317,8 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // validated by the ratio checks above.
     // Re-pinned for the P2 schema-28 province record (D-134); flows unchanged.
     // P2b schema 29 (D-135): encoding only; population flows are unchanged.
-    expect(hashWorld(world)).toBe("01aab8a1d157e54f");
+    // P3 schema 30 (D-141): encoding only (schema number); re-pinned.
+    expect(hashWorld(world)).toBe("c8315c370816ec2d");
   });
 });
 

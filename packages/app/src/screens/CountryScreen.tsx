@@ -7,7 +7,6 @@ import {
   formatCount,
   formatQuantity,
   formatRate,
-  formatRUSD,
   latestMonthlyReport,
   marketsForCountry,
   productionCapacityForGood,
@@ -18,6 +17,7 @@ import { Badge, Headline, Notice, Section, StatRow } from "../components/ui";
 import { CountryFlag } from "../components/CountryFlag";
 import { colors, fonts, radii, spacing, themedSheet, type } from "../theme";
 import { statusLabel } from "../components/WorldMap";
+import { useMoney } from "../format/useMoney";
 
 export function CountryScreen({
   snapshot,
@@ -26,6 +26,7 @@ export function CountryScreen({
   readonly snapshot: SimulationSnapshot;
   readonly countryId: number | null;
 }) {
+  const money = useMoney();
   const country = countryById(snapshot, countryId);
   if (country === null) {
     return (
@@ -36,7 +37,9 @@ export function CountryScreen({
   }
   const isPlayerCountry = snapshot.playerCountryId === country.id;
   const latest = latestMonthlyReport(country);
-  const explanations = buildEconomicExplanations(snapshot, country);
+  // P3: the closed month converts at its own closing valuation.
+  const latestMoney = latest === null ? money : money.atPeriod(latest.periodEndDay);
+  const explanations = buildEconomicExplanations(snapshot, country, money);
   const markets = marketsForCountry(snapshot, country);
   const essentialGoods = essentialGoodIds(snapshot);
   const capacity = [...country.productionCapacityByGood]
@@ -76,7 +79,7 @@ export function CountryScreen({
 
       <Headline
         label="Treasury"
-        value={formatRUSD(country.treasuryCashRUSD)}
+        value={money.format(country.treasuryCashRUSD)}
         tone={country.treasuryCashRUSD >= 0 ? "default" : "negative"}
         trend={country.financeHistory.map((period) => period.netFiscalResultRUSD)}
         detail={`${formatCount(country.population)} people · hardship ${(country.hardshipPopulationShare * 100).toFixed(1)}%`}
@@ -114,13 +117,13 @@ export function CountryScreen({
         />
         <StatRow
           label="Treasury cash"
-          value={formatRUSD(country.treasuryCashRUSD)}
+          value={money.format(country.treasuryCashRUSD)}
           detail="Country treasury asset balance; stock."
         />
         <StatRow
           label="Public debt"
-          value={formatRUSD(country.debtOutstandingPrincipalRUSD)}
-          detail={`Principal outstanding. Interest payable ${formatRUSD(country.debtInterestPayableRUSD)}.`}
+          value={money.format(country.debtOutstandingPrincipalRUSD)}
+          detail={`Principal outstanding. Interest payable ${money.format(country.debtInterestPayableRUSD)}.`}
         />
       </Section>
 
@@ -245,8 +248,8 @@ export function CountryScreen({
               minPrice === null || maxPrice === null
                 ? "no market price"
                 : minPrice === maxPrice
-                  ? `${minPrice.toFixed(4)} RUSD`
-                  : `${minPrice.toFixed(4)}–${maxPrice.toFixed(4)} RUSD`;
+                  ? money.price(minPrice)
+                  : `${money.price(minPrice)}–${money.price(maxPrice)}`;
             return (
               <View key={goodId} style={styles.goodRow}>
                 <View style={styles.goodMain}>
@@ -275,20 +278,20 @@ export function CountryScreen({
           <Text style={styles.empty}>Advance to the end of the first civil month.</Text>
         ) : (
           <>
-            <StatRow label="Income tax" value={formatRUSD(latest.incomeTaxRUSD)} detail="flow" />
+            <StatRow label="Income tax" value={latestMoney.format(latest.incomeTaxRUSD)} detail="flow" />
             <StatRow
               label="Welfare expense"
-              value={formatRUSD(latest.welfareExpenseRUSD)}
+              value={latestMoney.format(latest.welfareExpenseRUSD)}
               detail="flow"
             />
             <StatRow
               label="Interest expense"
-              value={formatRUSD(latest.interestExpenseRUSD)}
+              value={latestMoney.format(latest.interestExpenseRUSD)}
               detail="flow; distinct from principal"
             />
             <StatRow
               label="Net fiscal result"
-              value={formatRUSD(latest.netFiscalResultRUSD)}
+              value={latestMoney.format(latest.netFiscalResultRUSD)}
               detail="revenue minus expense for the closed month"
             />
             <StatRow
@@ -296,13 +299,13 @@ export function CountryScreen({
               value={
                 latest.treasuryCash?.endRUSD === undefined
                   ? "Not retained"
-                  : formatRUSD(latest.treasuryCash.endRUSD)
+                  : latestMoney.format(latest.treasuryCash.endRUSD)
               }
               detail={
                 latest.treasuryCash?.changeRUSD === undefined ||
                 latest.treasuryCash?.changeRUSD === null
                   ? "Balance change not derivable from the retained window"
-                  : `Change ${formatRUSD(latest.treasuryCash.changeRUSD)} vs prior close`
+                  : `Change ${latestMoney.format(latest.treasuryCash.changeRUSD)} vs prior close`
               }
             />
             <Text style={styles.note}>

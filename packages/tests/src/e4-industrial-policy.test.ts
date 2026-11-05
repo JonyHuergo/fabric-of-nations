@@ -28,6 +28,7 @@ import { loadM3SmallEconomy } from "@century/data";
 import {
   PROTOCOL_VERSION,
   parseWorkerEvent,
+  RUSD_MONEY_TEXT,
   previewConstruction,
   previewIndustrialPolicy,
   previewPublicEnterpriseSupport,
@@ -471,7 +472,7 @@ describe("E4 integration, snapshots, and persistence", () => {
     runToCompletion(f, projectId);
     const snapshot = snapshotOf(f);
     const country = snapshot.countries[COUNTRY]!;
-    const preview = previewConstruction(snapshot, country, FARM, REGION);
+    const preview = previewConstruction(snapshot, country, FARM, REGION, RUSD_MONEY_TEXT);
     expect(preview.materials.length).toBeGreaterThan(0);
     expect(preview.estimatedMaterialsCostRUSD).toBeGreaterThan(0);
     expect(preview.totalInvestmentRUSD).toBeGreaterThan(preview.upfrontRequirementRUSD);

@@ -41,7 +41,15 @@ import { useSimulation } from "../worker/SimulationProvider";
 import { BudgetScreen } from "./BudgetScreen";
 import { ConstructionScreen } from "./ConstructionScreen";
 import { CountryScreen } from "./CountryScreen";
-import { appendDispatches, deriveDispatches, type Dispatch, type DispatchSource } from "./dispatches";
+import {
+  appendDispatches,
+  deriveDispatches,
+  dispatchHeadline,
+  type Dispatch,
+  type DispatchSource,
+} from "./dispatches";
+import { useMoney } from "../format/useMoney";
+import { DisplayCurrencySettings } from "../components/DisplayCurrencySettings";
 import { IndustryScreen } from "./IndustryScreen";
 import { LaborScreen } from "./LaborScreen";
 import { LedgerScreen } from "./LedgerScreen";
@@ -84,13 +92,6 @@ const DISPATCH_NAMES = {
     ENTRY_BY_ID.get(polityId)?.commonName ?? FUTURE_BY_ID.get(polityId)?.commonName ?? `Polity ${String(polityId)}`,
 };
 
-function formatRusd(value: number): string {
-  const absolute = Math.abs(value);
-  if (absolute >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)} bn`;
-  if (absolute >= 1_000_000) return `${(value / 1_000_000).toFixed(2)} M`;
-  if (absolute >= 1_000) return `${(value / 1_000).toFixed(1)} k`;
-  return value.toFixed(0);
-}
 function formatPeople(value: number): string {
   if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)} bn`;
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)} M`;
@@ -108,13 +109,17 @@ function displayDate(date: { readonly year: number; readonly month: number; read
  * The player's last closed month. Read from the player's own history because a
  * country summary's result stays null until the worker compacts that month.
  */
-function latestClosedResult(snapshot: SimulationSnapshot | null): number | null {
+function latestClosedResult(
+  snapshot: SimulationSnapshot | null,
+): { readonly rusd: number; readonly periodEndDay: number } | null {
   const player = snapshot?.countries.find((country) => country.id === snapshot.playerCountryId);
   const history = player?.financeHistory ?? [];
-  return history[history.length - 1]?.netFiscalResultRUSD ?? null;
+  const latest = history[history.length - 1];
+  return latest === undefined ? null : { rusd: latest.netFiscalResultRUSD, periodEndDay: latest.periodEndDay };
 }
 
 export function GameShell() {
+  const money = useMoney();
   const {
     snapshot,
     connection,
@@ -403,7 +408,7 @@ export function GameShell() {
           </Text>
           {sheetOpen && metrics.compact ? null : (
             <>
-              <Readout label="Treasury" value={formatRusd(playerSummary?.treasuryCashRUSD ?? 0)} />
+              <Readout label="Treasury" value={money.format(playerSummary?.treasuryCashRUSD ?? 0)} />
               <Readout label="People" value={formatPeople(playerSummary?.population ?? 0)} />
               <Readout
                 label="Hardship"
@@ -419,7 +424,7 @@ export function GameShell() {
           <DispatchStrip
             medium={getActiveTheme().dispatchMedium}
             dateLabel={shownDispatch.dateLabel}
-            headline={shownDispatch.headline}
+            headline={dispatchHeadline(shownDispatch, money)}
           />
         )}
       </View>
@@ -981,7 +986,7 @@ function CampaignPanel({
   readonly status: string | null;
   readonly capital: string;
   readonly scenarioLine: string;
-  readonly netResult: number | null;
+  readonly netResult: { readonly rusd: number; readonly periodEndDay: number } | null;
   readonly speedLine: string;
   readonly saveStatus: string | null;
   readonly dispatches: readonly Dispatch[];
@@ -993,6 +998,7 @@ function CampaignPanel({
   readonly onLoad: () => void;
   readonly onRestart: () => void;
 }) {
+  const money = useMoney();
   return (
     <>
       <Panel
@@ -1008,13 +1014,16 @@ function CampaignPanel({
         {netResult === null ? null : (
           <Metric
             label="Last month"
-            value={`${netResult >= 0 ? "+" : ""}${formatRusd(netResult)} RUSD`}
-            tone={netResult >= 0 ? "positive" : "negative"}
+            value={money.atPeriod(netResult.periodEndDay).signed(netResult.rusd)}
+            tone={netResult.rusd >= 0 ? "positive" : "negative"}
           />
         )}
         <Text style={styles.panelEmpty}>{scenarioLine}</Text>
         <Text style={styles.panelEmpty}>{speedLine}</Text>
         {saveStatus === null ? null : <Text style={styles.statusText}>{saveStatus}</Text>}
+      </Panel>
+      <Panel title="Settings" subtitle="Display currency">
+        <DisplayCurrencySettings />
       </Panel>
       <Panel title="Saved game">
         <View style={styles.panelActions}>
@@ -1029,7 +1038,13 @@ function CampaignPanel({
           <Text style={styles.panelEmpty}>Nothing has been reported yet.</Text>
         ) : (
           [...dispatches].reverse().map((dispatch) => (
-            <StatRow key={dispatch.id} label={dispatch.headline} value="" detail={dispatch.dateLabel} mono={false} />
+            <StatRow
+              key={dispatch.id}
+              label={dispatchHeadline(dispatch, money)}
+              value=""
+              detail={dispatch.dateLabel}
+              mono={false}
+            />
           ))
         )}
       </Panel>
@@ -1258,6 +1273,7 @@ function SelectedPolityPanel({
   readonly onOpenOverview: () => void;
   readonly onShowMarket: (marketId: number) => void;
 }) {
+  const money = useMoney();
   const { snapshot } = useSimulation();
   if (entry === null) {
     return (
@@ -1329,7 +1345,7 @@ function SelectedPolityPanel({
           </Text>
           <Text style={styles.provinceLine}>
             Population {formatPeople(countrySummary.population)} · Treasury{" "}
-            {formatRusd(countrySummary.treasuryCashRUSD)} RUSD · Hardship{" "}
+            {money.format(countrySummary.treasuryCashRUSD)} · Hardship{" "}
             {(countrySummary.hardshipPopulationShare * 100).toFixed(1)}%
           </Text>
           <Text style={styles.provinceLine}>

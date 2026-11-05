@@ -37,6 +37,8 @@ const LEGACY_COMPATIBILITY_FILES = new Set([
   "packages/sim/src/constants.ts",
   "packages/sim/src/economy/country.ts",
   "packages/data/src/historical.ts",
+  // P3 (D-141): the currency-table loader rejects the reserved legacy key too.
+  "packages/data/src/currencies.ts",
   "packages/tests/src/m14-rusd.test.ts",
   "packages/tests/src/m4a2-country-currency.test.ts",
   "scripts/m14/monetary-terminology-audit.mjs",
@@ -229,8 +231,9 @@ requireIncludes("legacy opening checksum", accounts, "balanceSUSD: entry.balance
 requireIncludes("save format unchanged", serialization, 'format: "century-save"');
 requireIncludes("save format version unchanged", serialization, "formatVersion: SAVE_FORMAT_VERSION");
 const protocol = readFileSync(join(ROOT, "packages/sim-worker/src/protocol.ts"), "utf8");
-// 18: D-137 stored save form on SAVE_RESULT/LOAD (the m14 test pins the value).
-requireIncludes("worker protocol version", protocol, "PROTOCOL_VERSION = 18");
+// 18: D-137 stored save form on SAVE_RESULT/LOAD; 19: P3 (D-141) currency link and
+// valuation history in the snapshot (the m14 test pins the value).
+requireIncludes("worker protocol version", protocol, "PROTOCOL_VERSION = 19");
 if (!existsSync(join(ROOT, "docs/M14_RUSD_RENAMING_REPORT.md"))) {
   errors.push("the M14 renaming report is missing");
 }

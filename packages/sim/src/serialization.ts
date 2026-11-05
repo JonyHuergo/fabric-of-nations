@@ -108,6 +108,7 @@ import {
   assertValidCountryAIState,
 } from "./economy/aiState.js";
 import { asRusdPerCurrencyUnit } from "./economy/currency.js";
+import { assertValidClosingValuations } from "./economy/validation.js";
 import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
 import { assertValidProvinceState } from "./provinces/state.js";
 import type {
@@ -398,6 +399,8 @@ export type SerializedFinancePeriodSummary = {
   readonly countryFiscalTotals?: Readonly<Record<string, SerializedCountryFiscalTotals>>;
   /** E2 budget decomposition per country; present on every summary. */
   readonly countryBudgetTotals: Readonly<Record<string, SerializedFinanceBudgetTotals>>;
+  /** P3 (D-141) specified valuations at the close, ascending currency id. */
+  readonly closingValuations?: readonly { readonly currencyId: number; readonly rusdPerUnit: number }[];
 };
 
 /** Encoded annual finance summary. No account-level trial balance is stored. */
@@ -1262,6 +1265,15 @@ function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePe
     flowTotalsByKind[kind] = summary.flowTotalsByKind[kind];
   }
   const countryBudgetTotals = encodeBudgetTotals(summary.countryBudgetTotals);
+  const closingValuations =
+    summary.closingValuations === undefined
+      ? {}
+      : {
+          closingValuations: summary.closingValuations.map((entry) => ({
+            currencyId: entry.currencyId,
+            rusdPerUnit: entry.rusdPerUnit,
+          })),
+        };
   if (summary.countryFiscalTotals === undefined) {
     return {
       periodStartDay: summary.periodStartDay,
@@ -1269,6 +1281,7 @@ function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePe
       accountTotals,
       flowTotalsByKind,
       countryBudgetTotals,
+      ...closingValuations,
     };
   }
   return {
@@ -1278,6 +1291,7 @@ function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePe
     flowTotalsByKind,
     countryFiscalTotals: encodeCountryFiscalTotals(summary.countryFiscalTotals),
     countryBudgetTotals,
+    ...closingValuations,
   };
 }
 
@@ -3433,6 +3447,17 @@ function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary
     record.countryBudgetTotals,
     `${path}.countryBudgetTotals`,
   );
+  let closingValuations: FinancePeriodSummary["closingValuations"];
+  if (record.closingValuations !== undefined) {
+    try {
+      assertValidClosingValuations(record.closingValuations, `${path}.closingValuations`);
+    } catch (error) {
+      throw new SaveFormatError(errorMessage(error));
+    }
+    closingValuations = (record.closingValuations as { currencyId: number; rusdPerUnit: number }[]).map(
+      (entry) => ({ currencyId: entry.currencyId, rusdPerUnit: asRusdPerCurrencyUnit(entry.rusdPerUnit) }),
+    );
+  }
   return {
     periodStartDay: requireInteger(
       record.periodStartDay,
@@ -3450,6 +3475,7 @@ function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary
     flowTotalsByKind,
     ...(countryFiscalTotals === undefined ? {} : { countryFiscalTotals }),
     countryBudgetTotals,
+    ...(closingValuations === undefined ? {} : { closingValuations }),
   };
 }
 

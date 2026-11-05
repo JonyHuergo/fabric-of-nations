@@ -67,7 +67,9 @@ const SEED = 20_261_023;
 // P2b re-pins it: schema 29 (D-135) encodes province wage tables, building technique
 // and money coefficients, and D-136 changes the price rule's sellable supply, which
 // moves this M5-sample trajectory by design.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "8c9635f488c07ffe";
+// P3 re-pins it for schema 30 (D-141) only: with the schema constant set to 29 this
+// test reproduces "8c9635f488c07ffe"; the M5 sample's trajectory is unchanged.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "35edddfe03e983b8";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

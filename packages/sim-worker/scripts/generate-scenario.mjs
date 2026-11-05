@@ -34,7 +34,9 @@ const source = `/**
  */
 import type { EconomyScenarioDef } from "@century/sim";
 
-export const WORLD_SCENARIO = (${JSON.stringify(scenario)}) as EconomyScenarioDef;
+// Currency valuations are branded numbers (D-044) that a JSON literal cannot carry;
+// createEconomyWorld validates every valuation when the worker builds the world (D-141).
+export const WORLD_SCENARIO = (${JSON.stringify(scenario)}) as unknown as EconomyScenarioDef;
 `;
 
 if (checkOnly) {

@@ -4,7 +4,6 @@ import { Text, TextInput, View } from "react-native";
 import {
   RUSD_UNIT_NAME,
   countryById,
-  formatRUSD,
   previewMonetaryPolicy,
   type SimulationSnapshot,
 } from "@century/sim-worker";
@@ -13,6 +12,7 @@ import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Disclosure, Headline, Notice, Pill, Section, StatRow } from "../components/ui";
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+import { useMoney } from "../format/useMoney";
 
 function percent(value: number): string {
   return `${(value * 100).toFixed(2)}%`;
@@ -29,6 +29,7 @@ export function MoneyScreen({
   readonly snapshot: SimulationSnapshot;
   readonly countryId: number | null;
 }) {
+  const money = useMoney();
   const { applyAction, busy, connection } = useSimulation();
   const country = countryById(snapshot, countryId);
   const [regime, setRegime] = useState<"pegged" | "managed">("pegged");
@@ -77,7 +78,8 @@ export function MoneyScreen({
           ? null
           : Number(parityText);
     const reserve = overrides?.reserve ?? Number(reserveText);
-    const conversion = overrides?.conversion ?? Number(conversionText);
+    // The player types the conversion in the display currency; the command carries RUSD.
+    const conversion = overrides?.conversion ?? money.fromDisplay(Number(conversionText));
     // A managed regime's rate is rule-driven, so parity must be sent as unchanged.
     const parity = regime === "managed" ? null : parsedParity;
     const preview = previewMonetaryPolicy(snapshot, country, {
@@ -136,7 +138,7 @@ export function MoneyScreen({
   const canAct = isPlayerCountry && !busy && connection === "ready";
   const parsedParity = parityText.trim() === "" ? null : Number(parityText);
   const parsedReserve = Number(reserveText);
-  const parsedConversion = Number(conversionText);
+  const parsedConversion = money.fromDisplay(Number(conversionText));
   const previewParity = regime === "managed" ? null : parsedParity;
   const preview = previewMonetaryPolicy(snapshot, country, {
     regime,
@@ -200,10 +202,10 @@ export function MoneyScreen({
           <StatRow label="Status" value={monetary.active ? "established" : "not established"} />
           <StatRow label="Parity" value={rate(monetary.parityRusdPerUnit)} />
           <StatRow label="Valuation" value={rate(monetary.valuationRusdPerUnit)} />
-          <StatRow label="Reserves" value={formatRUSD(monetary.reserveCashRUSD)} />
+          <StatRow label="Reserves" value={money.format(monetary.reserveCashRUSD)} />
           <StatRow
             label="Currency in circulation"
-            value={`${monetary.currencyIssuedUnits.toFixed(2)} units (${formatRUSD(monetary.liabilityRUSD)})`}
+            value={`${monetary.currencyIssuedUnits.toFixed(2)} units (${money.format(monetary.liabilityRUSD)})`}
           />
           <StatRow
             label="Reserve cover"
@@ -227,7 +229,7 @@ export function MoneyScreen({
           />
           <StatRow
             label="Last completed month exports / imports"
-            value={`${formatRUSD(monetary.lastMonthExportsRUSD)} / ${formatRUSD(monetary.lastMonthImportsRUSD)}`}
+            value={`${money.format(monetary.lastMonthExportsRUSD)} / ${money.format(monetary.lastMonthImportsRUSD)}`}
           />
         </>
       ) : (
@@ -240,10 +242,13 @@ export function MoneyScreen({
         </Notice>
       )}
       <Notice title={`RUSD — ${RUSD_UNIT_NAME}`} tone="info">
-        RUSD is Fabric of Nations' standard unit of economic measurement. It allows
-        currencies, prices, wages and other economic values to be compared across
-        countries. It is not an actual national currency or legal tender, is not issued
-        or adopted by any country, and is not a fixed-rate substitute for the US dollar.
+        RUSD is Fabric of Nations' standard unit of economic measurement: one RUSD has
+        the purchasing power of one US dollar of 1990. It allows currencies, prices,
+        wages and other economic values to be compared across countries and years. It
+        is not an actual national currency or legal tender, is not issued or adopted by
+        any country, and is not the simulated US dollar, whose value moves. Amounts are
+        shown in your display currency ({money.name}), converted from RUSD when shown;
+        choose another in Settings.
       </Notice>
       <Text style={styles.help}>
         The valuation is RUSD per one unit of the country's currency. Domestic accounts
@@ -370,7 +375,7 @@ export function MoneyScreen({
         max={reserveCeiling}
         step={reserveStep}
         precision={0}
-        unit="RUSD"
+        money={money}
         disabled={!canAct}
         pending={reserveCommit.hasPending}
         onChange={(value) => setReserveText(value.toFixed(0))}
@@ -381,7 +386,7 @@ export function MoneyScreen({
             : "A positive transfer is required to establish the authority."
         }
       />
-      <Text style={styles.label}>Currency conversion (RUSD; signed)</Text>
+      <Text style={styles.label}>Currency conversion ({money.code}; signed)</Text>
       <TextInput
         style={styles.input}
         value={conversionText}
@@ -397,10 +402,10 @@ export function MoneyScreen({
           label="Projected valuation"
           value={rate(preview.projectedValuationRusdPerUnit)}
         />
-        <StatRow label="Projected reserves" value={formatRUSD(preview.projectedReservesRUSD)} />
+        <StatRow label="Projected reserves" value={money.format(preview.projectedReservesRUSD)} />
         <StatRow
           label="Projected currency liability"
-          value={formatRUSD(preview.projectedLiabilityRUSD)}
+          value={money.format(preview.projectedLiabilityRUSD)}
         />
         <StatRow
           label="Projected reserve cover"

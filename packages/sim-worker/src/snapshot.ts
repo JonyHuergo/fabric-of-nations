@@ -111,6 +111,9 @@ import {
   type SnapshotTradePolicy,
   type SnapshotCountryPriceIndex,
   type SnapshotCurrency,
+  type SnapshotValuationHistory,
+  type SnapshotValuationMonth,
+  type SnapshotValuationYear,
   type SnapshotMonetaryAuthority,
   type SnapshotPriceIndex,
   type SnapshotArmy,
@@ -1318,6 +1321,8 @@ function countrySnapshot(
     id: country.id,
     tag: country.tag,
     name: country.name,
+    currencyId: country.monetary.currencyId,
+    monetaryArrangement: country.monetary.kind,
     meta:
       meta === undefined
         ? null
@@ -1586,6 +1591,49 @@ function countryPriceIndexSnapshot(
     monthOnMonthInflation: roundOptional(priceIndexInflation(world, country.id, 1)),
     yearOnYearInflation: roundOptional(priceIndexInflation(world, country.id, 12)),
   };
+}
+
+/**
+ * P3 (D-141): closing valuations of the ledger window and the mean month-end valuation of
+ * every closed year with an annual report. Means are arithmetic over the year's closed
+ * months in which the currency was specified. Reads closed summaries only.
+ */
+function valuationHistorySnapshot(world: World): SnapshotValuationHistory {
+  const summaries = world.finance.periodSummaries;
+  const months: SnapshotValuationMonth[] = summaries
+    .slice(-MAX_SNAPSHOT_LEDGER_MONTHS)
+    .map((summary) => {
+      const rusdPerUnit: Record<number, number> = {};
+      for (const entry of summary.closingValuations ?? []) rusdPerUnit[entry.currencyId] = entry.rusdPerUnit;
+      return { periodEndDay: summary.periodEndDay, rusdPerUnit };
+    });
+  const reportYears = new Set(
+    world.finance.annualSummaries.slice(-MAX_SNAPSHOT_ANNUAL_REPORTS).map((summary) => summary.year),
+  );
+  const sums = new Map<number, Map<number, { total: number; count: number }>>();
+  for (const summary of summaries) {
+    const year = dayIndexToCivilDate(summary.periodEndDay).year;
+    if (!reportYears.has(year)) continue;
+    let byCurrency = sums.get(year);
+    if (byCurrency === undefined) {
+      byCurrency = new Map();
+      sums.set(year, byCurrency);
+    }
+    for (const entry of summary.closingValuations ?? []) {
+      const sum = byCurrency.get(entry.currencyId) ?? { total: 0, count: 0 };
+      sum.total += entry.rusdPerUnit;
+      sum.count += 1;
+      byCurrency.set(entry.currencyId, sum);
+    }
+  }
+  const years: SnapshotValuationYear[] = [...sums.entries()]
+    .sort((left, right) => left[0] - right[0])
+    .map(([year, byCurrency]) => {
+      const meanRusdPerUnit: Record<number, number> = {};
+      for (const [currencyId, sum] of byCurrency) meanRusdPerUnit[currencyId] = sum.total / sum.count;
+      return { year, meanRusdPerUnit };
+    });
+  return { months, years };
 }
 
 function currenciesSnapshot(world: World): readonly SnapshotCurrency[] {
@@ -2195,6 +2243,17 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
   Object.freeze(snapshot.priceIndex);
   for (const currency of snapshot.currencies) Object.freeze(currency);
   Object.freeze(snapshot.currencies);
+  for (const month of snapshot.valuationHistory.months) {
+    Object.freeze(month.rusdPerUnit);
+    Object.freeze(month);
+  }
+  for (const year of snapshot.valuationHistory.years) {
+    Object.freeze(year.meanRusdPerUnit);
+    Object.freeze(year);
+  }
+  Object.freeze(snapshot.valuationHistory.months);
+  Object.freeze(snapshot.valuationHistory.years);
+  Object.freeze(snapshot.valuationHistory);
   for (const war of snapshot.military.wars) Object.freeze(war);
   Object.freeze(snapshot.military.wars);
   for (const offer of snapshot.military.peaceOffers) Object.freeze(offer);
@@ -2369,6 +2428,7 @@ export function buildSimulationSnapshot(
     trade: tradeNetworkSnapshot(world, definitions),
     priceIndex: priceIndexSnapshot(world, definitions, build.priceIndexes),
     currencies: currenciesSnapshot(world),
+    valuationHistory: valuationHistorySnapshot(world),
     military: militarySnapshot(world),
     diagnostics,
   });

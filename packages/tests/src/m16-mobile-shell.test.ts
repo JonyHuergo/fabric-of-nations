@@ -270,7 +270,9 @@ describe("dispatches", () => {
     expect(headlines(deriveDispatches(source(1), source(2, { countries }), names))).toEqual([
       "Research complete: Radio",
       "Railway completed in Brittany",
-      "Treasury closes the month 2.5 M RUSD in deficit",
+      // P3 (D-141): the stored headline uses the one money formatter (RUSD form);
+      // the display renders it in the player's currency with `dispatchHeadline`.
+      "Treasury closes the month 2.50M RUSD in deficit",
     ]);
   });
 
@@ -291,12 +293,12 @@ describe("dispatches", () => {
     const later = source(32, { countries: closed(30, 1_000) });
     const february = source(60, { countries: closed(59, 1_000) });
     expect(headlines(deriveDispatches(before, january, names))).toEqual([
-      "Treasury closes the month 1 k RUSD in surplus",
+      "Treasury closes the month 1.0k RUSD in surplus",
     ]);
     // The same month is not told twice, and an identical result next month still is.
     expect(deriveDispatches(january, later, names)).toEqual([]);
     expect(headlines(deriveDispatches(later, february, names))).toEqual([
-      "Treasury closes the month 1 k RUSD in surplus",
+      "Treasury closes the month 1.0k RUSD in surplus",
     ]);
   });
 

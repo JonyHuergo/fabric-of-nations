@@ -60,7 +60,9 @@ describe("M3a schema-25 serialization", () => {
     // market region list change the encoding, not the fixture's behaviour.
     // P2b schema 29 (D-135): wage tables, technique and money coefficients change the
     // encoding, not the fixture's behaviour.
-    expect(hashWorld(cloneWorld())).toBe("62dc585879bbc7fe");
+    // P3 schema 30 (D-141): the schema number only; verified by running this test with the
+    // constant set to 29, which reproduces the previous digest.
+    expect(hashWorld(cloneWorld())).toBe("74d55ceaa8f99ea8");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

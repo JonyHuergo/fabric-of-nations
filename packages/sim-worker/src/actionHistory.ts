@@ -6,6 +6,8 @@
  * command. No authoritative world state, schema, save, or hash is changed.
  */
 
+import type { MoneyText } from "./selectors.js";
+
 export const MAX_PLAYER_ACTION_HISTORY = 48;
 
 /** Confirmed E2 fiscal-policy values. */
@@ -122,17 +124,17 @@ export function recentPlayerActions(
 }
 
 /** Short human-readable summary of a requested/applied action. */
-export function describePlayerAction(action: PlayerActionRequest | null): string {
+export function describePlayerAction(action: PlayerActionRequest | null, money: MoneyText): string {
   if (action === null) return "unknown";
   switch (action.kind) {
     case "set-fiscal-policy":
-      return `tax ${(action.incomeTaxRate * 100).toFixed(2)}%, exemption ${action.incomeTaxAllowanceRUSDPerYear.toFixed(0)}/yr, welfare ${action.welfareBudgetRUSDPerYear.toFixed(0)}/yr, welfare ceiling wealth ${String(action.welfareMaxWealthLevel)}, business tax ${(action.businessProfitTaxRate * 100).toFixed(2)}%, reserve ${action.reserveTargetRUSD.toFixed(0)}`;
+      return `tax ${(action.incomeTaxRate * 100).toFixed(2)}%, exemption ${money.format(action.incomeTaxAllowanceRUSDPerYear)}/yr, welfare ${money.format(action.welfareBudgetRUSDPerYear)}/yr, welfare ceiling wealth ${String(action.welfareMaxWealthLevel)}, business tax ${(action.businessProfitTaxRate * 100).toFixed(2)}%, reserve ${money.format(action.reserveTargetRUSD)}`;
     case "issue-debt":
-      return `borrow ${action.amountRUSD.toFixed(2)} RUSD`;
+      return `borrow ${money.format(action.amountRUSD)}`;
     case "repay-debt":
-      return `repay ${action.amountRUSD.toFixed(2)} RUSD on contract ${String(action.contractId)}`;
+      return `repay ${money.format(action.amountRUSD)} on contract ${String(action.contractId)}`;
     case "set-debt-policy":
-      return `ceiling ${action.maxOutstandingPrincipalRUSD.toFixed(2)} RUSD, refinance on maturity ${action.refinanceOnMaturity ? "on" : "off"}`;
+      return `ceiling ${money.format(action.maxOutstandingPrincipalRUSD)}, refinance on maturity ${action.refinanceOnMaturity ? "on" : "off"}`;
     case "start-construction":
       return `start construction type ${String(action.definitionId)} in province ${String(action.provinceId)}`;
     case "cancel-construction":
@@ -144,23 +146,23 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
         .map((rate) => `${(rate * 100).toFixed(1)}%`)
         .join("/")}`;
     case "support-public-enterprise":
-      return `support enterprise ${String(action.buildingId)} with ${action.amountRUSD.toFixed(2)} RUSD`;
+      return `support enterprise ${String(action.buildingId)} with ${money.format(action.amountRUSD)}`;
     case "propose-law":
       return `propose law ${String(action.lawId)}`;
     case "set-institution-funding":
-      return `administration funding ${action.annualRUSD.toFixed(2)} RUSD/year`;
+      return `administration funding ${money.format(action.annualRUSD)}/year`;
     case "start-research":
       return `start research on technology ${String(action.technologyId)}`;
     case "cancel-research":
       return "cancel the active research project";
     case "set-education-funding":
-      return `education funding ${action.annualRUSD.toFixed(2)} RUSD/year`;
+      return `education funding ${money.format(action.annualRUSD)}/year`;
     case "set-research-staff-share":
       return `research staff share ${(action.share * 100).toFixed(1)}%`;
     case "set-training-budget":
-      return `training budget ${action.annualRUSD.toFixed(2)} RUSD/year`;
+      return `training budget ${money.format(action.annualRUSD)}/year`;
     case "set-training-stipend":
-      return `training stipend ${action.annualRUSD.toFixed(2)} RUSD/trainee/year`;
+      return `training stipend ${money.format(action.annualRUSD)}/trainee/year`;
     case "set-training-staff-share":
       return `training staff share ${(action.share * 100).toFixed(1)}%`;
     case "set-health-staff-share":
@@ -184,6 +186,6 @@ export function describePlayerAction(action: PlayerActionRequest | null): string
     case "set-monetary-policy":
       return `${action.regime} monetary policy, parity ${
         action.parityRusdPerUnit === null ? "unchanged" : action.parityRusdPerUnit.toFixed(6)
-      } RUSD/unit, reserve transfer ${action.reserveTransferRUSD.toFixed(2)} RUSD, currency conversion ${action.currencyConversionRUSD.toFixed(2)} RUSD`;
+      } RUSD/unit, reserve transfer ${money.format(action.reserveTransferRUSD)}, currency conversion ${money.format(action.currencyConversionRUSD)}`;
   }
 }

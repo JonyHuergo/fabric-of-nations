@@ -14,6 +14,7 @@ import {
 } from "react-native";
 
 import { TOUCH_TARGET, colors, radii, spacing, themedSheet, type } from "../theme";
+import { displaySliderScale, type MoneyFormat } from "../format/money";
 import { Badge } from "./ui";
 
 /**
@@ -102,6 +103,12 @@ export interface SliderFieldProps {
   readonly hint?: ReactNode;
   readonly pending?: boolean;
   readonly formatValue?: (value: number) => string;
+  /**
+   * P3 (D-141): set for an amount of money. `value`, `min`, `max`, `step` and tick values
+   * stay in RUSD; the field shows and edits them in the display currency and reports RUSD
+   * back through `onChange`/`onCommit`. `unit` is then a suffix such as `/yr`.
+   */
+  readonly money?: MoneyFormat;
 }
 
 export function clampToStep(value: number, min: number, max: number, step: number): number {
@@ -114,7 +121,36 @@ export function clampToStep(value: number, min: number, max: number, step: numbe
   return Number(bounded.toFixed(Math.min(8, decimals + 2)));
 }
 
-export function SliderField({
+export function SliderField(props: SliderFieldProps) {
+  const { money, ...rest } = props;
+  if (money === undefined) return <SliderFieldBase {...rest} />;
+  const scale = displaySliderScale(money, props);
+  const toRusd = (display: number): number => money.fromDisplay(display);
+  return (
+    <SliderFieldBase
+      {...rest}
+      value={scale.value}
+      min={scale.min}
+      max={scale.max}
+      step={scale.step}
+      precision={scale.precision}
+      unit={money.unit(props.unit)}
+      ticks={(props.ticks ?? []).map((tick) => ({
+        value: money.toDisplay(tick.value),
+        label: money.amount(tick.value),
+      }))}
+      onChange={(display) => props.onChange(toRusd(display))}
+      {...(props.onCommit === undefined
+        ? {}
+        : { onCommit: (display: number) => props.onCommit?.(toRusd(display)) })}
+      {...(props.formatValue === undefined
+        ? {}
+        : { formatValue: (display: number) => props.formatValue?.(toRusd(display)) ?? "" })}
+    />
+  );
+}
+
+function SliderFieldBase({
   label,
   value,
   min,

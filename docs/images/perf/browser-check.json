@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-11-04T22:19:29.522Z",
+  "startedAt": "2026-11-05T01:05:27.606Z",
   "viewport": "844,390",
   "checks": [
     {
@@ -25,12 +25,12 @@
     {
       "name": "manual save succeeds",
       "passed": true,
-      "detail": "1075 ms incl. UI"
+      "detail": "578 ms incl. UI"
     },
     {
       "name": "manual load succeeds",
       "passed": true,
-      "detail": "994 ms incl. UI"
+      "detail": "1043 ms incl. UI"
     },
     {
       "name": "speed control present",
@@ -50,7 +50,7 @@
     {
       "name": "simulation advanced while playing",
       "passed": true,
-      "detail": "wall 8151 ms"
+      "detail": "wall 8341 ms"
     },
     {
       "name": "no console errors",
@@ -78,8 +78,8 @@
   "consoleErrors": [],
   "exceptions": [],
   "failedLoads": [],
-  "saveUiMs": 1075,
-  "loadUiMs": 994,
-  "finishedAt": "2026-11-04T22:20:02.308Z",
+  "saveUiMs": 578,
+  "loadUiMs": 1043,
+  "finishedAt": "2026-11-05T01:05:55.741Z",
   "passed": true
 }

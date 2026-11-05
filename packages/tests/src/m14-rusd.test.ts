@@ -105,8 +105,11 @@ describe("M14 monetary equivalence and determinism", () => {
   // Re-pinned for P2: the 1900 world is the province world (D-131, D-132, schema 28).
   // Re-pinned for P2b: the 1900 world's money values, wages, techniques and levels are
   // re-derived from sources (D-135, schema 29).
+  // Re-pinned for P3: sourced 1900 currency valuations, adopted arrangements, corrected
+  // currency names and schema 30 (D-141). The P3 equivalence test and
+  // `p3Equivalence.js` show that no simulated quantity changed.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("62e80932e1b0d0d4");
+    expect(hashWorld(world)).toBe("447c3f725aaa8450");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {
@@ -114,7 +117,8 @@ describe("M14 monetary equivalence and determinism", () => {
     const envelope = JSON.parse(save) as { format: string; schemaVersion: number; payload: unknown };
     expect(envelope.format).toBe("century-save");
     // P2b (D-135): schema 29 adds province wages, building technique and money coefficients.
-    expect(envelope.schemaVersion).toBe(29);
+    // P3 (D-141): schema 30 adds the month-end closing valuations.
+    expect(envelope.schemaVersion).toBe(30);
     expect(hasLegacyMonetaryKey(envelope.payload)).toBe(false);
     expect(save).toContain("balanceRUSD");
     expect(save).not.toMatch(/SUSD|Susd|susd/);
@@ -149,7 +153,8 @@ describe("M14 current documentation and protocol", () => {
   test("the worker protocol version reflects the snapshot vocabulary change", () => {
     // 17: P2 province economy table, territories and professions (D-134).
     // 18: stored save form on SAVE_RESULT and LOAD (D-137).
-    expect(PROTOCOL_VERSION).toBe(18);
+    // 19: country currency link and valuation history in the snapshot (D-141).
+    expect(PROTOCOL_VERSION).toBe(19);
   });
 
   test("the monetary terminology audit passes", () => {

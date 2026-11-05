@@ -1,0 +1,126 @@
+{
+  "startedAt": "2026-11-05T01:06:40.712Z",
+  "viewport": "844,390",
+  "checks": [
+    {
+      "name": "phone landscape viewport",
+      "passed": true,
+      "detail": "{\"width\":844,\"height\":390}"
+    },
+    {
+      "name": "Settings entry on the title screen, inside the viewport",
+      "passed": true,
+      "detail": "{\"top\":233,\"bottom\":277,\"height\":44}"
+    },
+    {
+      "name": "Settings entry is at least 44 pt tall",
+      "passed": true,
+      "detail": "{\"top\":233,\"bottom\":277,\"height\":44}"
+    },
+    {
+      "name": "title-screen selector lists own currency and RUSD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "treasury shown in the own currency (USD)",
+      "passed": true,
+      "detail": "167.95M USD"
+    },
+    {
+      "name": "other currencies disclosure present",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "pound sterling selectable",
+      "passed": true,
+      "detail": "{\"height\":44,\"width\":257}"
+    },
+    {
+      "name": "currency rows are at least 44 pt tall",
+      "passed": true,
+      "detail": "{\"height\":44,\"width\":257}"
+    },
+    {
+      "name": "selector preview converts to GBP",
+      "passed": true,
+      "detail": "1.00M RUSD shows as 13.1k GBP"
+    },
+    {
+      "name": "treasury converts to GBP",
+      "passed": true,
+      "detail": "34.51M GBP"
+    },
+    {
+      "name": "USD/GBP ratio is the 1900 parity (4.8665)",
+      "passed": true,
+      "detail": "4.8667"
+    },
+    {
+      "name": "RUSD selectable",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "treasury shown in RUSD",
+      "passed": true,
+      "detail": "2.64B RUSD"
+    },
+    {
+      "name": "changing the display currency does not advance the simulation",
+      "passed": true,
+      "detail": "1 Jan 1900 → 1 Jan 1900"
+    },
+    {
+      "name": "economy domain opens",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "budget labels are in USD",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "with a save, every title entry including Settings fits in 390 pt",
+      "passed": true,
+      "detail": "[{\"label\":\"Continue\",\"top\":141,\"bottom\":195,\"height\":54},{\"label\":\"Load game\",\"top\":197,\"bottom\":241,\"height\":44},{\"label\":\"New campaign\",\"top\":243,\"bottom\":287,\"height\":44},{\"label\":\"The world of 1900\",\"top\":289,\"bottom\":333,\"height\":44},{\"label\":\"Settings\",\"top\":335,\"bottom\":379,\"height\":44}]"
+    },
+    {
+      "name": "Settings entry present with a save",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "detail": "0"
+    },
+    {
+      "name": "no uncaught exceptions",
+      "passed": true,
+      "detail": "0"
+    },
+    {
+      "name": "no failed resource loads",
+      "passed": true,
+      "detail": "0"
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "docs/images/p3/p3-844x390-menu.png",
+    "docs/images/p3/p3-844x390-menu-settings.png",
+    "docs/images/p3/p3-844x390-campaign-usd.png",
+    "docs/images/p3/p3-844x390-settings-gbp.png",
+    "docs/images/p3/p3-844x390-campaign-rusd.png",
+    "docs/images/p3/p3-844x390-budget-usd.png",
+    "docs/images/p3/p3-844x390-menu-with-save.png"
+  ],
+  "consoleErrors": [],
+  "exceptions": [],
+  "failedLoads": [],
+  "finishedAt": "2026-11-05T01:07:04.163Z",
+  "passed": true
+}

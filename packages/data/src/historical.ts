@@ -47,6 +47,7 @@ import {
   type CountryPoliticsInput,
   type CountryStatus,
   type CountryTechnologyInput,
+  type Currency,
   type CurrencyValuation,
   type EconomyDefinitions,
   type EconomyScenarioDef,
@@ -54,6 +55,7 @@ import {
   type GoodDef,
   type MarketInitialDef,
   type MarketMetaDef,
+  type MonetaryArrangement,
   type MoneyCoefficients,
   type NeedTierDef,
   type PoliticsDefinitions,
@@ -67,6 +69,7 @@ import {
   type TradeRouteInitialDef,
 } from "@century/sim";
 
+import { loadCurrencyTable, type CurrencyTable1900 } from "./currencies.js";
 import { loadM11Provinces } from "./provinces.js";
 import { DATA_PACKAGE_VERSION } from "./version.js";
 
@@ -113,6 +116,8 @@ export interface HistoricalScenarioFiles {
   readonly calibration: string;
   /** P2b money coefficients file (D-135); optional for the pre-P2b scenarios. */
   readonly moneyCoefficients?: string;
+  /** P3 currencies, arrangements and parities (D-141); supersedes the country currency blocks. */
+  readonly currencies?: string;
 }
 
 export interface HistoricalScenarioDefinitions {
@@ -317,6 +322,8 @@ export interface HistoricalData {
   readonly buildings: readonly HistoricalBuildingInput[];
   readonly employment: readonly HistoricalEmploymentInput[];
   readonly calibration: readonly HistoricalCalibrationTarget[];
+  /** P3 (D-141) derived currency table; omitted for scenarios without a currencies file. */
+  readonly currencyTable?: CurrencyTable1900;
 }
 
 export interface HistoricalValidation {
@@ -674,6 +681,9 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
       ...(files.moneyCoefficients === undefined
         ? {}
         : { moneyCoefficients: stringField(files, "moneyCoefficients", "meta.files", errors) }),
+      ...(files.currencies === undefined
+        ? {}
+        : { currencies: stringField(files, "currencies", "meta.files", errors) }),
     },
     definitions: {
       goods: stringField(definitions, "goods", "meta.definitions", errors),
@@ -765,7 +775,14 @@ export function loadHistoricalData(
     calibration,
   });
   assertValidM5HistoricalData(data);
-  return data;
+  if (meta.files.currencies === undefined) return data;
+  return {
+    ...data,
+    currencyTable: loadCurrencyTable(
+      meta.files.currencies,
+      data.countries.map((country) => country.tag),
+    ),
+  };
 }
 
 /** Load the original eight-polity M5 sample (test fixture and compatibility). */
@@ -2124,6 +2141,90 @@ export function expandHistoricalPopulation(
 }
 
 /** Build the validated economy scenario from the historical tables. */
+/** First currency id of foreign-issued currencies; country-issued currencies keep the country id. */
+export const FOREIGN_CURRENCY_ID_BASE = 1000;
+
+interface ScenarioCurrencies {
+  readonly currencies: Currency[];
+  readonly currencyValuations: CurrencyValuation[];
+  readonly arrangementByCountry: ReadonlyMap<number, MonetaryArrangement>;
+}
+
+/** Pre-P3 path: one own currency per country from the country file's currency block. */
+function countryBlockCurrencies(data: HistoricalData): ScenarioCurrencies {
+  const sorted = data.countries.slice().sort((left, right) => left.id - right.id);
+  return {
+    currencies: sorted.map((country) => ({
+      id: country.id,
+      key: country.currency.key,
+      name: country.currency.name,
+      issuer: { kind: "country" as const, countryId: country.id },
+    })),
+    currencyValuations: sorted.map((country) =>
+      country.currency.valuation.status === "specified"
+        ? {
+            currencyId: country.id,
+            status: "specified" as const,
+            rusdPerUnit: asRusdPerCurrencyUnit(country.currency.valuation.rusdPerUnit),
+            setOnDay: data.meta.startDayIndex,
+            source: "scenario" as const,
+          }
+        : { currencyId: country.id, status: "unavailable" as const },
+    ),
+    arrangementByCountry: new Map(),
+  };
+}
+
+/**
+ * P3 path (D-141): currencies, arrangements and opening valuations from the derived
+ * currency table. A country's own currency keeps the country id; foreign-issued
+ * currencies take ids from `FOREIGN_CURRENCY_ID_BASE` in table order.
+ */
+function tableCurrencies(data: HistoricalData, table: CurrencyTable1900): ScenarioCurrencies {
+  const countryByTag = new Map(data.countries.map((country) => [country.tag, country]));
+  const idByKey = new Map<string, number>();
+  const currencies: Currency[] = [];
+  const valuations: CurrencyValuation[] = [];
+  let foreignIndex = 0;
+  for (const parity of table.currencies) {
+    let id: number;
+    let issuer: Currency["issuer"];
+    if (parity.issuerTag !== null) {
+      const country = countryByTag.get(parity.issuerTag);
+      if (country === undefined) {
+        throw new HistoricalDataError([`currency ${parity.key} names unknown issuer ${parity.issuerTag}`]);
+      }
+      id = country.id;
+      issuer = { kind: "country", countryId: country.id };
+    } else {
+      id = FOREIGN_CURRENCY_ID_BASE + foreignIndex;
+      foreignIndex += 1;
+      issuer = { kind: "foreign", issuerKey: parity.foreignIssuerKey ?? parity.key };
+    }
+    idByKey.set(parity.key, id);
+    currencies.push({ id, key: parity.key, name: parity.name, issuer });
+    valuations.push({
+      currencyId: id,
+      status: "specified",
+      rusdPerUnit: asRusdPerCurrencyUnit(parity.rusdPerUnit),
+      setOnDay: data.meta.startDayIndex,
+      source: "scenario",
+    });
+  }
+  const arrangementByCountry = new Map<number, MonetaryArrangement>();
+  for (const arrangement of table.arrangements) {
+    const country = countryByTag.get(arrangement.tag);
+    const currencyId = idByKey.get(arrangement.currencyKey);
+    if (country === undefined || currencyId === undefined) {
+      throw new HistoricalDataError([`arrangement for ${arrangement.tag} could not be resolved`]);
+    }
+    arrangementByCountry.set(country.id, { kind: arrangement.kind, currencyId });
+  }
+  currencies.sort((left, right) => left.id - right.id);
+  valuations.sort((left, right) => left.currencyId - right.currencyId);
+  return { currencies, currencyValuations: valuations, arrangementByCountry };
+}
+
 export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenarioDef {
   assertValidM5HistoricalData(data);
   const goods = readJson<GoodDef[]>(data.meta.definitions.goods);
@@ -2362,29 +2463,10 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     };
   });
 
-  const currencies = data.countries
-    .slice()
-    .sort((left, right) => left.id - right.id)
-    .map((country) => ({
-      id: country.id,
-      key: country.currency.key,
-      name: country.currency.name,
-      issuer: { kind: "country" as const, countryId: country.id },
-    }));
-  const currencyValuations: CurrencyValuation[] = data.countries
-    .slice()
-    .sort((left, right) => left.id - right.id)
-    .map((country) =>
-      country.currency.valuation.status === "specified"
-        ? {
-            currencyId: country.id,
-            status: "specified" as const,
-            rusdPerUnit: asRusdPerCurrencyUnit(country.currency.valuation.rusdPerUnit),
-            setOnDay: data.meta.startDayIndex,
-            source: "scenario" as const,
-          }
-        : { currencyId: country.id, status: "unavailable" as const },
-    );
+  const { currencies, currencyValuations, arrangementByCountry } =
+    data.currencyTable === undefined
+      ? countryBlockCurrencies(data)
+      : tableCurrencies(data, data.currencyTable);
 
   const countries: CountryInitialDef[] = data.countries
     .slice()
@@ -2393,7 +2475,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       id: country.id,
       tag: country.tag,
       name: country.name,
-      monetary: { kind: "own", currencyId: country.id },
+      monetary: arrangementByCountry.get(country.id) ?? { kind: "own", currencyId: country.id },
       provinceIds: [...country.provinceIds].sort((left, right) => left - right),
       treasuryAccountId: HISTORICAL_TREASURY_ACCOUNT_BASE + country.id,
       initialTreasuryCashRUSD: country.initialTreasuryCashRUSD,

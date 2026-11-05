@@ -289,8 +289,9 @@ describe("P2b 1900 world", () => {
     expect(Math.abs(closing / opening - 1)).toBeLessThan(0.02);
   });
 
-  it("serializes the wage tables, techniques and money coefficients (schema 29)", () => {
-    expect(WORLD_SCHEMA_VERSION).toBe(29);
+  it("serializes the wage tables, techniques and money coefficients (schema 29, kept in 30)", () => {
+    // P3 (D-141) raised the schema to 30 (closing valuations); the P2b fields are unchanged.
+    expect(WORLD_SCHEMA_VERSION).toBe(30);
     const restored = deserializeWorld(serializeWorld(world));
     expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(restored.moneyCoefficients).toEqual(world.moneyCoefficients);

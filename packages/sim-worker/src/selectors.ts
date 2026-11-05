@@ -74,6 +74,27 @@ export function formatRUSD(value: number): string {
   return `${sign}${absolute.toFixed(2)} ${unit}`;
 }
 
+/**
+ * P3 (D-141): the money-text formatter the display helpers take. The app passes its
+ * display-currency formatter (`packages/app/src/format/money.ts`); headless callers pass
+ * `RUSD_MONEY_TEXT`. Conversion never happens here.
+ */
+export interface MoneyText {
+  /** Scaled amount with the unit, e.g. `1.20M GBP`. */
+  format(valueRUSD: number): string;
+  /** A price per physical unit, e.g. `0.0123 GBP/kg`. */
+  price(valueRUSDPerQuantity: number, quantityUnit?: string): string;
+}
+
+/** The RUSD money text (no conversion), for headless callers and tests. */
+export const RUSD_MONEY_TEXT: MoneyText = {
+  format: formatRUSD,
+  price: (value: number, quantityUnit?: string): string =>
+    `${formatPrice(value)} ${RUSD_UNIT_ABBREVIATION}${
+      quantityUnit === undefined || quantityUnit === "" ? "" : `/${quantityUnit}`
+    }`,
+};
+
 export function formatCount(value: number): string {
   if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
   if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;

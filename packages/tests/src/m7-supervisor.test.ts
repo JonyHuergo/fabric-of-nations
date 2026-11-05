@@ -75,6 +75,8 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         id: 0,
         tag: "USA",
         name: "United States",
+        currencyId: 0,
+        monetaryArrangement: "own",
         meta: null,
         provinceIds: [0],
         fiscal: {
@@ -377,6 +379,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
       yearOnYearInflation: null,
     },
     currencies: [],
+    valuationHistory: { months: [], years: [] },
     military: { enabled: false, wars: [], peaceOffers: [], armies: [], occupations: [] },
     diagnostics: { invalidActionCount: 0, invariantFailureCount: 0, recentWarnings: [] },
   };

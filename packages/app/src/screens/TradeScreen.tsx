@@ -3,7 +3,6 @@ import { Pressable, Text, View } from "react-native";
 
 import {
   countryById,
-  formatRUSD,
   previewTradePolicy,
   type SimulationSnapshot,
 } from "@century/sim-worker";
@@ -12,6 +11,7 @@ import { SliderField } from "../components/Slider";
 import { ActionButton, Chip, Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
 import { TOUCH_TARGET, colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+import { useMoney } from "../format/useMoney";
 
 /** Mirrors the simulation's numeric-safety bound for a monthly import quota. */
 const MAX_TRADE_QUOTA_QUANTITY = 1e15;
@@ -61,6 +61,7 @@ export function TradeScreen({
   readonly snapshot: SimulationSnapshot;
   readonly countryId: number | null;
 }) {
+  const money = useMoney();
   const { applyAction, busy, connection } = useSimulation();
   const country = countryById(snapshot, countryId);
   const goods = snapshot.goods;
@@ -199,13 +200,13 @@ export function TradeScreen({
 
       <Headline
         label="Net cargo this month"
-        value={formatRUSD(country.trade.exportsValueMonthToDateRUSD - country.trade.importsValueMonthToDateRUSD)}
+        value={money.format(country.trade.exportsValueMonthToDateRUSD - country.trade.importsValueMonthToDateRUSD)}
         tone={
           country.trade.exportsValueMonthToDateRUSD >= country.trade.importsValueMonthToDateRUSD
             ? "positive"
             : "negative"
         }
-        detail={`Exports ${formatRUSD(country.trade.exportsValueMonthToDateRUSD)} · imports ${formatRUSD(country.trade.importsValueMonthToDateRUSD)}`}
+        detail={`Exports ${money.format(country.trade.exportsValueMonthToDateRUSD)} · imports ${money.format(country.trade.importsValueMonthToDateRUSD)}`}
       />
 
       <Disclosure title={`Observed trade network · ${String(snapshot.trade.routes.length)} routes`}>
@@ -227,7 +228,7 @@ export function TradeScreen({
         <StatRow
           key={route.id}
           label={`${marketLabel(snapshot, route.marketAId)} ↔ ${marketLabel(snapshot, route.marketBId)}`}
-          value={`dist ${route.distanceUnits.toFixed(1)} · ${route.transitDays}d · ${formatRUSD(route.capacityRUSDPerDay)}/day each way`}
+          value={`dist ${route.distanceUnits.toFixed(1)} · ${route.transitDays}d · ${money.format(route.capacityRUSDPerDay)}/day each way`}
         />
       ))}
       {snapshot.markets.map((market) => (
@@ -251,11 +252,11 @@ export function TradeScreen({
         <>
           <StatRow label="Dispatched" value={`${lastDay.dispatchedShipments} shipment(s)`} />
           <StatRow label="Arrived" value={`${lastDay.arrivedShipments} shipment(s)`} />
-          <StatRow label="Freight paid" value={formatRUSD(lastDay.freightPaidRUSD)} />
-          <StatRow label="Duty paid to customs" value={formatRUSD(lastDay.dutyPaidRUSD)} />
+          <StatRow label="Freight paid" value={money.format(lastDay.freightPaidRUSD)} />
+          <StatRow label="Duty paid to customs" value={money.format(lastDay.dutyPaidRUSD)} />
           <StatRow
             label="Owner-funded working capital"
-            value={formatRUSD(lastDay.ownerFundedRUSD)}
+            value={money.format(lastDay.ownerFundedRUSD)}
           />
           {lastDay.blocked.length === 0 ? (
             <Text style={styles.help}>No blocked shipment was recorded for that day.</Text>
@@ -285,8 +286,8 @@ export function TradeScreen({
             {goodLabel(snapshot, shipment.goodId)} {shipment.quantity.toFixed(0)} units ·{" "}
             {marketLabel(snapshot, shipment.originMarketId)} →{" "}
             {marketLabel(snapshot, shipment.destinationMarketId)} · arrives day{" "}
-            {shipment.arrivalDay} · freight {formatRUSD(shipment.freightCostRUSD)} · duty{" "}
-            {formatRUSD(shipment.dutyRUSD)}
+            {shipment.arrivalDay} · freight {money.format(shipment.freightCostRUSD)} · duty{" "}
+            {money.format(shipment.dutyRUSD)}
           </Text>
         ))
       )}
@@ -306,23 +307,23 @@ export function TradeScreen({
       />
       <StatRow
         label="Duty received this month"
-        value={formatRUSD(country.trade.dutyReceivedMonthToDateRUSD)}
+        value={money.format(country.trade.dutyReceivedMonthToDateRUSD)}
       />
       <StatRow
         label="Duty paid this month (as exporter)"
-        value={formatRUSD(country.trade.dutyPaidMonthToDateRUSD)}
+        value={money.format(country.trade.dutyPaidMonthToDateRUSD)}
       />
       <StatRow
         label="Freight paid this month"
-        value={formatRUSD(country.trade.freightPaidMonthToDateRUSD)}
+        value={money.format(country.trade.freightPaidMonthToDateRUSD)}
       />
       <StatRow
         label="Exports this month (cargo value)"
-        value={formatRUSD(country.trade.exportsValueMonthToDateRUSD)}
+        value={money.format(country.trade.exportsValueMonthToDateRUSD)}
       />
       <StatRow
         label="Imports this month (cargo value)"
-        value={formatRUSD(country.trade.importsValueMonthToDateRUSD)}
+        value={money.format(country.trade.importsValueMonthToDateRUSD)}
       />
       {preview.tariffInert ? (
         <Notice title="Tariff frontier" tone="warning">
@@ -472,7 +473,7 @@ export function TradeScreen({
             <StatRow
               key={goodId}
               label={`Estimated duty per ${goodLabel(snapshot, goodId)} unit`}
-              value={formatRUSD(duty)}
+              value={money.format(duty)}
             />
           ))}
         </Disclosure>

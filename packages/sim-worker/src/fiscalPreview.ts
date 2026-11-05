@@ -13,6 +13,7 @@ import {
   type SimulationSnapshot,
   type SnapshotDebtContract,
 } from "./protocol.js";
+import type { MoneyText } from "./selectors.js";
 
 export interface FiscalPolicyPreview {
   readonly countryId: number;
@@ -163,15 +164,15 @@ export function previewFiscalPolicy(
     businessRate * country.businessTaxBaseMonthToDateRUSD;
   const constraints: string[] = [];
   if (!rateValid) constraints.push("Income tax must be between 0% and 100%.");
-  if (!allowanceValid) constraints.push("The income-tax exemption must be a non-negative RUSD amount.");
-  if (!welfareValid) constraints.push("Welfare budget must be a non-negative annual RUSD amount.");
+  if (!allowanceValid) constraints.push("The income-tax exemption must be a non-negative amount.");
+  if (!welfareValid) constraints.push("Welfare budget must be a non-negative annual amount.");
   if (!wealthLevelValid) {
     constraints.push("The welfare eligibility ceiling must be a whole wealth level from 0 to 99.");
   }
   if (!businessRateValid) {
     constraints.push("The business-profit tax must be between 0% and 100%.");
   }
-  if (!reserveValid) constraints.push("The reserve target must be a non-negative RUSD amount.");
+  if (!reserveValid) constraints.push("The reserve target must be a non-negative amount.");
   constraints.push(
     "Tax and business-tax figures use current-base estimates, not realized future wages or profit; actual amounts can differ.",
     "The income-tax allowance estimate assumes every wage-earning block exceeds the allowance; actual relief can be larger.",
@@ -246,21 +247,22 @@ export function previewDebtIssuance(
   snapshot: SimulationSnapshot,
   country: CountrySnapshot,
   amountRUSD: number,
+  money: MoneyText,
 ): DebtIssuancePreview {
   const policy = country.debtPolicy;
   const errors: string[] = [];
   if (!policy.enabled) errors.push("This country has no enabled debt policy.");
   if (!Number.isFinite(amountRUSD) || amountRUSD <= 0) {
-    errors.push("Principal must be a positive RUSD amount.");
+    errors.push("Principal must be a positive amount.");
   }
   if (Number.isFinite(amountRUSD) && amountRUSD > policy.headroomRUSD + 1e-6) {
     errors.push(
-      `Principal exceeds the ${policy.headroomRUSD.toFixed(2)} RUSD ceiling headroom.`,
+      `Principal exceeds the ${money.format(policy.headroomRUSD)} ceiling headroom.`,
     );
   }
   if (Number.isFinite(amountRUSD) && amountRUSD > policy.creditorCashRUSD + 1e-6) {
     errors.push(
-      `Principal exceeds the creditor's ${policy.creditorCashRUSD.toFixed(2)} RUSD available cash.`,
+      `Principal exceeds the creditor's ${money.format(policy.creditorCashRUSD)} available cash.`,
     );
   }
   if (country.debtContracts.length >= MAX_ACTIVE_DEBT_CONTRACTS) {
@@ -311,6 +313,7 @@ export function previewDebtRepayment(
   country: CountrySnapshot,
   contractId: number,
   amountRUSD: number,
+  money: MoneyText,
 ): DebtRepaymentPreview | null {
   const contract: SnapshotDebtContract | undefined = country.debtContracts.find(
     (candidate) => candidate.id === contractId,
@@ -319,11 +322,11 @@ export function previewDebtRepayment(
   const reserve = country.fiscal.reserveTargetRUSD;
   const errors: string[] = [];
   if (!Number.isFinite(amountRUSD) || amountRUSD <= 0) {
-    errors.push("Repayment must be a positive RUSD amount.");
+    errors.push("Repayment must be a positive amount.");
   }
   if (Number.isFinite(amountRUSD) && amountRUSD > contract.outstandingPrincipalRUSD + 1e-6) {
     errors.push(
-      `Repayment exceeds the ${contract.outstandingPrincipalRUSD.toFixed(2)} RUSD outstanding principal.`,
+      `Repayment exceeds the ${money.format(contract.outstandingPrincipalRUSD)} outstanding principal.`,
     );
   }
   if (Number.isFinite(amountRUSD) && amountRUSD > country.treasuryCashRUSD + 1e-6) {
@@ -334,7 +337,7 @@ export function previewDebtRepayment(
     country.treasuryCashRUSD - amountRUSD < reserve - 1e-6
   ) {
     errors.push(
-      `Repayment would take treasury cash below the ${reserve.toFixed(2)} RUSD reserve target.`,
+      `Repayment would take treasury cash below the ${money.format(reserve)} reserve target.`,
     );
   }
   const amount = Number.isFinite(amountRUSD) && amountRUSD > 0 ? amountRUSD : 0;
@@ -386,7 +389,7 @@ export function previewDebtPolicy(
     !Number.isFinite(proposedMaxOutstandingPrincipalRUSD) ||
     proposedMaxOutstandingPrincipalRUSD < 0
   ) {
-    errors.push("The debt ceiling must be a non-negative RUSD amount.");
+    errors.push("The debt ceiling must be a non-negative amount.");
   } else if (
     proposedMaxOutstandingPrincipalRUSD <
     country.debtOutstandingPrincipalRUSD - 1e-6

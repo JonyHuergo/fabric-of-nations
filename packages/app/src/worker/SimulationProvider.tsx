@@ -26,6 +26,9 @@ import {
   type WorkerEvent,
 } from "@century/sim-worker";
 
+import { useDisplayCurrency } from "../format/DisplayCurrency";
+import { createMoneyFormat, type MoneyFormat } from "../format/money";
+
 import {
   deleteSave as deleteStoredSave,
   listSaves,
@@ -232,6 +235,10 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     >(),
   );
   const [snapshot, setSnapshot] = useState<SimulationSnapshot | null>(null);
+  // P3: status messages name amounts in the player's display currency (D-141).
+  const { choice: displayCurrency } = useDisplayCurrency();
+  const moneyRef = useRef<MoneyFormat>(createMoneyFormat(null, displayCurrency));
+  moneyRef.current = createMoneyFormat(snapshot, displayCurrency);
   const [actionHistory, setActionHistory] = useState<readonly PlayerActionRecord[]>([]);
   const [connection, setConnection] = useState<ConnectionState>("connecting");
   const [error, setError] = useState<string | null>(null);
@@ -419,7 +426,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             setSaveStatus(
               pending === null
                 ? "Action applied"
-                : `Applied: ${describePlayerAction(pending.request)}`,
+                : `Applied: ${describePlayerAction(pending.request, moneyRef.current)}`,
             );
           } else {
             setError(event.errors.join("; ") || "The action was rejected.");
@@ -679,7 +686,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       });
       if (accepted) {
         setBusy(true);
-        setSaveStatus(`Applying: ${describePlayerAction(request)}…`);
+        setSaveStatus(`Applying: ${describePlayerAction(request, moneyRef.current)}…`);
       } else {
         pendingActionsRef.current.delete(actionId);
       }

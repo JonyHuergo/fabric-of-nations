@@ -10,7 +10,7 @@
  * 18 (D-137): SAVE_RESULT returns and LOAD/PREVIEW_SAVE accept the stored save form
  * (`STORED_SAVE_PREFIX`, compressed in the worker); a canonical save is still accepted.
  */
-export const PROTOCOL_VERSION = 18 as const;
+export const PROTOCOL_VERSION = 19 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -918,6 +918,28 @@ export interface SnapshotCurrency {
   readonly valuationSource: "scenario" | "policy" | "market" | null;
 }
 
+/** P3 (D-141): the valuations of one closed month, keyed by currency id. */
+export interface SnapshotValuationMonth {
+  readonly periodEndDay: number;
+  /** RUSD per one unit at the close, by currency id; unavailable currencies are absent. */
+  readonly rusdPerUnit: Readonly<Record<number, number>>;
+}
+
+/** P3 (D-141): the mean of a closed year's month-end valuations, keyed by currency id. */
+export interface SnapshotValuationYear {
+  readonly year: number;
+  readonly meanRusdPerUnit: Readonly<Record<number, number>>;
+}
+
+/**
+ * P3 (D-141): closing valuations the display converts history with. `months` covers the
+ * ledger window; `years` covers the annual reports. Display-only data.
+ */
+export interface SnapshotValuationHistory {
+  readonly months: readonly SnapshotValuationMonth[];
+  readonly years: readonly SnapshotValuationYear[];
+}
+
 /** One fixed basket item of the price index. */
 export interface SnapshotPriceIndexBasketItem {
   readonly goodId: number;
@@ -1148,6 +1170,9 @@ export interface CountrySnapshot {
   readonly id: number;
   readonly tag: string;
   readonly name: string;
+  /** P3 (D-141): the currency of the country's monetary arrangement (its own or adopted). */
+  readonly currencyId: number;
+  readonly monetaryArrangement: "own" | "adopted" | "shared";
   /** M11 static polity metadata; null for legacy scenarios without a catalog. */
   readonly meta: CountryMetaSnapshot | null;
   readonly provinceIds: readonly number[];
@@ -1445,6 +1470,8 @@ export interface SimulationSnapshot {
   readonly priceIndex: SnapshotPriceIndex;
   /** E6b currency identities and authoritative RUSD valuations. */
   readonly currencies: readonly SnapshotCurrency[];
+  /** P3 (D-141) month-end and annual valuations for converting history at its own rate. */
+  readonly valuationHistory: SnapshotValuationHistory;
   /** M10 wars, pending peace offers, and the enabled flag. */
   readonly military: {
     readonly enabled: boolean;

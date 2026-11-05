@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
-  formatRUSD,
   previewIndustrialPolicy,
   previewPublicEnterpriseSupport,
   type SimulationSnapshot,
@@ -13,6 +12,7 @@ import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Headline, Section, StatRow } from "../components/ui";
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+import { useMoney } from "../format/useMoney";
 
 /**
  * One enterprise support amount. A child component keeps a stable hook count for
@@ -35,6 +35,7 @@ function EnterpriseSupportField({
   readonly onChange: (value: number) => void;
   readonly onApply: (value: number) => void;
 }) {
+  const money = useMoney();
   const commit = useDeferredCommit((amount) => onApply(amount), busy);
   return (
     <SliderField
@@ -44,7 +45,7 @@ function EnterpriseSupportField({
       max={max}
       step={Math.max(1, Math.round(max / 100))}
       precision={0}
-      unit="RUSD"
+      money={money}
       disabled={disabled}
       pending={commit.hasPending}
       onChange={onChange}
@@ -61,6 +62,7 @@ export function IndustryScreen({
   readonly snapshot: SimulationSnapshot;
   readonly countryId: number | null;
 }) {
+  const money = useMoney();
   const { applyAction, busy, connection } = useSimulation();
   const country = countryById(snapshot, countryId);
   const [rateTexts, setRateTexts] = useState<string[]>([]);
@@ -166,12 +168,12 @@ export function IndustryScreen({
       >
         <StatRow
           label="Treasury cash (stock)"
-          value={formatRUSD(country.treasuryCashRUSD)}
-          detail={`Subsidy requested this month ${formatRUSD(country.industrialPolicy.requestedMonthToDateRUSD)} · paid ${formatRUSD(country.industrialPolicy.paidMonthToDateRUSD)} · shortfall ${formatRUSD(country.industrialPolicy.shortfallMonthToDateRUSD)}`}
+          value={money.format(country.treasuryCashRUSD)}
+          detail={`Subsidy requested this month ${money.format(country.industrialPolicy.requestedMonthToDateRUSD)} · paid ${money.format(country.industrialPolicy.paidMonthToDateRUSD)} · shortfall ${money.format(country.industrialPolicy.shortfallMonthToDateRUSD)}`}
         />
         <StatRow
           label="Static daily subsidy estimate"
-          value={formatRUSD(preview.estimatedDailySubsidyRUSD)}
+          value={money.format(preview.estimatedDailySubsidyRUSD)}
           detail="Current sector capacity valued at current market prices times the proposed rates. Actual payment uses verified daily output and actual cash."
         />
       </Section>
@@ -190,7 +192,7 @@ export function IndustryScreen({
               <View style={styles.rowText}>
                 <Text style={styles.label}>{sector.label}</Text>
                 <Text style={styles.detail}>
-                  Current capacity value {formatRUSD(sector.estimatedDailyOutputValueRUSD)}/day · policy rate{" "}
+                  Current capacity value {money.format(sector.estimatedDailyOutputValueRUSD)}/day · policy rate{" "}
                   {(sector.subsidyRate * 100).toFixed(2)}%
                 </Text>
               </View>
@@ -266,7 +268,7 @@ export function IndustryScreen({
                 <Text style={styles.detail}>
                   {enterprise.sector} · level {String(enterprise.level)} · condition{" "}
                   {enterprise.condition.toFixed(2)} · operating cash{" "}
-                  {formatRUSD(enterprise.operatingCashRUSD)}
+                  {money.format(enterprise.operatingCashRUSD)}
                 </Text>
                 <EnterpriseSupportField
                   label={`${enterprise.definitionName} capital support`}

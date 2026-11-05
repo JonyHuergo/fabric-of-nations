@@ -8,6 +8,7 @@
  */
 
 import type { CountrySnapshot, SimulationSnapshot, SnapshotTradeRoute } from "./protocol.js";
+import type { MoneyText } from "./selectors.js";
 
 export interface TradePolicyPreview {
   readonly valid: boolean;
@@ -126,6 +127,7 @@ export function previewTradePolicy(
 export function describeTradeRoute(
   route: SnapshotTradeRoute,
   marketLabel: (marketId: number) => string,
+  money: MoneyText,
 ): string {
-  return `${marketLabel(route.marketAId)} ↔ ${marketLabel(route.marketBId)}: distance ${route.distanceUnits.toFixed(1)}, ${route.transitDays} day(s) transit, capacity ${route.capacityRUSDPerDay.toFixed(0)} RUSD/day per direction (base ${route.baseCapacityRUSDPerDay.toFixed(0)})`;
+  return `${marketLabel(route.marketAId)} ↔ ${marketLabel(route.marketBId)}: distance ${route.distanceUnits.toFixed(1)}, ${route.transitDays} day(s) transit, capacity ${money.format(route.capacityRUSDPerDay)}/day per direction (base ${money.format(route.baseCapacityRUSDPerDay)})`;
 }

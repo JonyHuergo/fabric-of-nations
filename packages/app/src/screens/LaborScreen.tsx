@@ -3,7 +3,6 @@ import { Text, View } from "react-native";
 
 import {
   countryById,
-  formatRUSD,
   previewHealthPolicy,
   previewTrainingPolicy,
   type SimulationSnapshot,
@@ -13,6 +12,7 @@ import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Headline, Notice, Section, StatRow } from "../components/ui";
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+import { useMoney } from "../format/useMoney";
 
 function percent(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
@@ -25,6 +25,7 @@ export function LaborScreen({
   readonly snapshot: SimulationSnapshot;
   readonly countryId: number | null;
 }) {
+  const money = useMoney();
   const { applyAction, busy, connection } = useSimulation();
   const country = countryById(snapshot, countryId);
   const [budgetText, setBudgetText] = useState("");
@@ -206,19 +207,19 @@ export function LaborScreen({
       />
       <StatRow
         label="Training budget"
-        value={`${formatRUSD(country.labor.trainingBudgetRUSDPerYear)}/year`}
+        value={`${money.format(country.labor.trainingBudgetRUSDPerYear)}/year`}
       />
       <StatRow
         label="Stipend per trainee"
-        value={`${formatRUSD(country.labor.trainingStipendPerTraineeRUSDPerYear)}/year`}
+        value={`${money.format(country.labor.trainingStipendPerTraineeRUSDPerYear)}/year`}
       />
       <StatRow
         label="Month-to-date requested"
-        value={formatRUSD(country.labor.trainingRequestedMonthToDateRUSD)}
+        value={money.format(country.labor.trainingRequestedMonthToDateRUSD)}
       />
       <StatRow
         label="Month-to-date shortfall"
-        value={formatRUSD(country.labor.trainingShortfallMonthToDateRUSD)}
+        value={money.format(country.labor.trainingShortfallMonthToDateRUSD)}
       />
       {country.labor.trainingBlockedReason !== null ? (
         <Notice title="Training blocked" tone="warning">
@@ -243,7 +244,8 @@ export function LaborScreen({
         max={budgetMax}
         step={budgetStep}
         precision={0}
-        unit="RUSD/yr"
+        money={money}
+          unit="/yr"
         disabled={!canAct}
         pending={budgetCommit.hasPending}
         onChange={(value) => setBudgetText(value.toFixed(0))}
@@ -257,7 +259,8 @@ export function LaborScreen({
         max={stipendMax}
         step={stipendStep}
         precision={0}
-        unit="RUSD/yr"
+        money={money}
+          unit="/yr"
         disabled={!canAct}
         pending={stipendCommit.hasPending}
         onChange={(value) => setStipendText(value.toFixed(2))}
@@ -293,7 +296,7 @@ export function LaborScreen({
         />
         <StatRow
           label="Annual cost (budget + stipend)"
-          value={`${formatRUSD(trainingPreview.annualCostRUSD)}/year`}
+          value={`${money.format(trainingPreview.annualCostRUSD)}/year`}
         />
         <StatRow
           label="Qualification gain (first year)"
@@ -399,7 +402,7 @@ export function LaborScreen({
         label="Statutory minimum wage"
         value={
           country.labor.minimumWageRUSDPerYear > 0
-            ? `${formatRUSD(country.labor.minimumWageRUSDPerYear)}/year`
+            ? `${money.format(country.labor.minimumWageRUSDPerYear)}/year`
             : "No floor enacted"
         }
       />

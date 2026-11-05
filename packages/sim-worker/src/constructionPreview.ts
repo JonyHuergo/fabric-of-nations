@@ -8,6 +8,7 @@ import {
   type CountrySnapshot,
   type SimulationSnapshot,
 } from "./protocol.js";
+import type { MoneyText } from "./selectors.js";
 
 export interface ConstructionMaterialPreview {
   readonly goodId: number;
@@ -50,6 +51,7 @@ export function previewConstruction(
   country: CountrySnapshot,
   definitionId: number,
   provinceId: number,
+  money: MoneyText,
 ): ConstructionPreview {
   const projectType = snapshot.projectTypes.find(
     (candidate) => candidate.definitionId === definitionId,
@@ -84,7 +86,7 @@ export function previewConstruction(
   const upfront = cost + workingCapital;
   if (country.treasuryCashRUSD + 1e-6 < upfront) {
     errors.push(
-      `Treasury cash ${country.treasuryCashRUSD.toFixed(2)} does not cover the ${upfront.toFixed(2)} RUSD cost plus working capital.`,
+      `Treasury cash ${money.format(country.treasuryCashRUSD)} does not cover the ${money.format(upfront)} cost plus working capital.`,
     );
   }
   const idleWorkers = country.constructionLabor.idleWorkers;

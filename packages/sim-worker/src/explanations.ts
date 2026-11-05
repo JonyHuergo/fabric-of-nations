@@ -9,9 +9,9 @@ import type { CountrySnapshot, SimulationSnapshot } from "./protocol.js";
 import {
   essentialGoodIds,
   formatQuantity,
-  formatRUSD,
   marketsForCountry,
   productionCapacityForGood,
+  type MoneyText,
 } from "./selectors.js";
 
 export type EconomicExplanationSeverity = "critical" | "warning" | "info";
@@ -69,12 +69,12 @@ function essentialConditions(
     .filter((value): value is EssentialGoodCondition => value !== null);
 }
 
-function priceLabel(condition: EssentialGoodCondition): string {
+function priceLabel(condition: EssentialGoodCondition, money: MoneyText): string {
   if (condition.minPrice === null || condition.maxPrice === null) return "no quoted price";
   if (condition.minPrice === condition.maxPrice) {
-    return `${condition.minPrice.toFixed(4)} RUSD/${condition.unitLabel}`;
+    return money.price(condition.minPrice, condition.unitLabel);
   }
-  return `${condition.minPrice.toFixed(4)}–${condition.maxPrice.toFixed(4)} RUSD/${condition.unitLabel}`;
+  return `${money.price(condition.minPrice)}–${money.price(condition.maxPrice, condition.unitLabel)}`;
 }
 
 function rank(severity: EconomicExplanationSeverity): number {
@@ -88,6 +88,7 @@ function rank(severity: EconomicExplanationSeverity): number {
 export function buildEconomicExplanations(
   snapshot: SimulationSnapshot,
   country: CountrySnapshot,
+  money: MoneyText,
 ): readonly EconomicExplanation[] {
   const explanations: EconomicExplanation[] = [];
   const conditions = essentialConditions(snapshot, country);
@@ -99,7 +100,7 @@ export function buildEconomicExplanations(
       (condition) =>
         `${condition.goodName}: ${formatQuantity(condition.stock)} ${condition.unitLabel} in country markets; ` +
         `estimated ${formatQuantity(condition.capacity)} ${condition.unitLabel}/day domestic capacity; ` +
-        `${priceLabel(condition)}`,
+        `${priceLabel(condition, money)}`,
     );
 
   if (country.blocksWithUnmetSubsistence > 0) {
@@ -146,8 +147,8 @@ export function buildEconomicExplanations(
       severity: "warning",
       title: "Household purchasing power may be constrained",
       observation:
-        `Households hold ${formatRUSD(country.householdCashRUSD)} in cash (${formatRUSD(cashPerCapita)} per capita); ` +
-        `estimated daily wage base is ${formatRUSD(country.estimatedDailyWageBaseRUSD)}; wealth index ${country.wealthLevel.toFixed(1)}.`,
+        `Households hold ${money.format(country.householdCashRUSD)} in cash (${money.format(cashPerCapita)} per capita); ` +
+        `estimated daily wage base is ${money.format(country.estimatedDailyWageBaseRUSD)}; wealth index ${country.wealthLevel.toFixed(1)}.`,
       evidence: [
         `Employed workers: ${country.employedWorkers.toLocaleString("en-US")} of ${country.workingAgePopulation.toLocaleString("en-US")} working-age people.`,
         `The wage base is a current-employment estimate at base wages, not realized household income.`,
@@ -167,11 +168,11 @@ export function buildEconomicExplanations(
         severity: latest.netFiscalResultRUSD < 0 ? "warning" : "info",
         title: "Public finances are under pressure",
         observation:
-          `Latest closed month: tax ${formatRUSD(latest.incomeTaxRUSD)}, welfare ${formatRUSD(latest.welfareExpenseRUSD)}, ` +
-          `interest ${formatRUSD(latest.interestExpenseRUSD)}, net ${formatRUSD(latest.netFiscalResultRUSD)}. ` +
-          `Treasury cash is ${formatRUSD(country.treasuryCashRUSD)}.`,
+          `Latest closed month: tax ${money.format(latest.incomeTaxRUSD)}, welfare ${money.format(latest.welfareExpenseRUSD)}, ` +
+          `interest ${money.format(latest.interestExpenseRUSD)}, net ${money.format(latest.netFiscalResultRUSD)}. ` +
+          `Treasury cash is ${money.format(country.treasuryCashRUSD)}.`,
         evidence: [
-          `Outstanding principal: ${formatRUSD(country.debtOutstandingPrincipalRUSD)}; accrued interest payable: ${formatRUSD(country.debtInterestPayableRUSD)}.`,
+          `Outstanding principal: ${money.format(country.debtOutstandingPrincipalRUSD)}; accrued interest payable: ${money.format(country.debtInterestPayableRUSD)}.`,
           country.treasuryCashRUSD < monthlyOutflow
             ? "Treasury cash is below last month's welfare plus interest outflow."
             : "Treasury cash currently covers last month's welfare plus interest outflow.",
@@ -194,7 +195,7 @@ export function buildEconomicExplanations(
         .slice(0, 4)
         .map(
           (condition) =>
-            `${condition.goodName}: ${formatQuantity(condition.stock)} ${condition.unitLabel} current stock; ${priceLabel(condition)}`,
+            `${condition.goodName}: ${formatQuantity(condition.stock)} ${condition.unitLabel} current stock; ${priceLabel(condition, money)}`,
         ),
       caveat:
         "Capacity is estimated from current buildings, staffing, level, and condition. There is no inter-market trade model in E1, so stock cannot be replenished from another market.",

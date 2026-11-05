@@ -16,6 +16,7 @@ import { useMapView } from "../map/host/MapStage";
 import { TOUCH_TARGET, colors, fonts, spacing, themedSheet, type } from "../theme";
 import type { SaveSlot } from "../storage/saveStorage";
 import { longDate, saveEra, saveNation, saveProblem } from "./saveDisplay";
+import { DisplayCurrencySettings } from "../components/DisplayCurrencySettings";
 
 /**
  * How fast the world turns behind the title and load screens, in degrees of
@@ -57,6 +58,7 @@ export function MainMenuScreen({
   const compact = shellMetrics(width, height).compact;
   const reduceMotion = useReduceMotion();
   const [codex, setCodex] = useState(false);
+  const [settings, setSettings] = useState(false);
 
   const player = saveNation(latestSave, savedWorld);
   useMapView(
@@ -73,7 +75,7 @@ export function MainMenuScreen({
   const territories = WORLD_CATALOG.entries.filter((entry) => entry.kind === "territory").length;
 
   // The title arrives first, then the entries one after another, then the caption.
-  const entryCount = latestSave === null ? 2 : 4;
+  const entryCount = latestSave === null ? 3 : 5;
   const intro = useRef([...Array(entryCount + 2)].map(() => new Animated.Value(0))).current;
   useEffect(() => {
     Animated.stagger(
@@ -150,11 +152,14 @@ export function MainMenuScreen({
               </Animated.View>
             </>
           )}
-          <Animated.View style={rise(entryCount - 1, 12)}>
+          <Animated.View style={rise(entryCount - 2, 12)}>
             <MenuEntry label="New campaign" primary={!canContinue} disabled={loading} onPress={onNewGame} />
           </Animated.View>
-          <Animated.View style={rise(entryCount, 12)}>
+          <Animated.View style={rise(entryCount - 1, 12)}>
             <MenuEntry label="The world of 1900" onPress={() => setCodex(true)} />
+          </Animated.View>
+          <Animated.View style={rise(entryCount, 12)}>
+            <MenuEntry label="Settings" onPress={() => setSettings(true)} />
           </Animated.View>
         </View>
 
@@ -185,6 +190,22 @@ export function MainMenuScreen({
                 : `${player.commonName}, your nation, is outlined on the map`}
         </Text>
       </Animated.View>
+
+      <Dialog
+        visible={settings}
+        kicker="Settings"
+        title="Display currency"
+        onRequestClose={() => setSettings(false)}
+        scroll
+        actions={<Button label="Close" onPress={() => setSettings(false)} />}
+      >
+        {/* The title screen shows the saved world when there is one, else the live startup world. */}
+        {savedWorld === undefined || savedWorld === null ? (
+          <DisplayCurrencySettings />
+        ) : (
+          <DisplayCurrencySettings source={savedWorld} />
+        )}
+      </Dialog>
 
       <Dialog
         visible={codex}

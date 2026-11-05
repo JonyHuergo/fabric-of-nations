@@ -213,6 +213,15 @@ Acceptance: every money label goes through the formatter (audit test); changing 
 display currency changes no world hash; a forced devaluation fixture shows local figures
 rising while RUSD figures are unchanged.
 
+**Status (2026-11-04).** Implemented for review (D-141; report `P3_COMPLETION_REPORT.md`).
+Data `historical/p3/currencies_1900.json` (Director of the Mint, 1 January 1901, and the
+same report's 1900 country answers): 52 own currencies and the Maria Theresa thaler, 15
+adopted arrangements, paper currencies at their 1900 circulating rate; month-end closing
+valuations (schema 30); one formatter `packages/app/src/format/money.ts`; Settings
+selector; test `p3-local-currency`. The designer's money requirements (gold and silver as
+mined, traded goods; fluctuating currencies; giving up or creating a currency) are
+recorded as proposed decision D-140 for P5, P6 and P11.
+
 ### P4 — Cause-driven demography
 
 Model (all coefficients in constants with units/status):

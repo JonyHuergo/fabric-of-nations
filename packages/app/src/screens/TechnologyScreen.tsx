@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
-  formatRUSD,
   previewEducationFunding,
   previewResearchStaffShare,
   previewResearchStart,
@@ -14,6 +13,7 @@ import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
+import { useMoney } from "../format/useMoney";
 
 /** Mirrors the simulation's numeric-safety bound for an annual fiscal budget. */
 const MAX_ANNUAL_FUNDING_RUSD = 1e15;
@@ -53,6 +53,7 @@ export function TechnologyScreen({
   readonly snapshot: SimulationSnapshot;
   readonly countryId: number | null;
 }) {
+  const money = useMoney();
   const { applyAction, busy, connection } = useSimulation();
   const country = countryById(snapshot, countryId);
   const [fundingText, setFundingText] = useState("");
@@ -270,8 +271,8 @@ export function TechnologyScreen({
         />
         <StatRow
           label="Funding (this month)"
-          value={`${formatRUSD(country.education.fundedAnnualRUSD)}/yr`}
-          detail={`Requested ${formatRUSD(country.education.fundingRequestedMonthToDateRUSD)} · shortfall ${formatRUSD(country.education.fundingShortfallMonthToDateRUSD)}`}
+          value={`${money.format(country.education.fundedAnnualRUSD)}/yr`}
+          detail={`Requested ${money.format(country.education.fundingRequestedMonthToDateRUSD)} · shortfall ${money.format(country.education.fundingShortfallMonthToDateRUSD)}`}
         />
         </Disclosure>
         {country.education.educationBlockedReason === null ? null : (
@@ -290,7 +291,8 @@ export function TechnologyScreen({
           max={fundingLimit}
           step={fundingStep}
           precision={0}
-          unit="RUSD/yr"
+          money={money}
+          unit="/yr"
           disabled={!isPlayerCountry || connection !== "ready"}
           pending={fundingCommit.hasPending}
           onChange={(value) => setFundingText(value.toFixed(0))}
@@ -306,8 +308,8 @@ export function TechnologyScreen({
           />
         </View>
         <Text style={styles.detail}>
-          Daily request {formatRUSD(fundingPreview.dailyRequestRUSD)}; treasury cash{" "}
-          {formatRUSD(country.treasuryCashRUSD)}. Funding also pays research staff.
+          Daily request {money.format(fundingPreview.dailyRequestRUSD)}; treasury cash{" "}
+          {money.format(country.treasuryCashRUSD)}. Funding also pays research staff.
         </Text>
         <SliderField
           label="Research staff share"

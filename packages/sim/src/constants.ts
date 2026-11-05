@@ -67,8 +67,11 @@ export const SIM_VERSION = "0.28.0";
  * (`BuildingInstance.technique`) and the scenario money coefficients
  * (`World.moneyCoefficients`). Schema-28 worlds carry the pre-P2b money scale and
  * are reported as incompatible (D-120).
+ * P3 (schema 30, D-141) adds `FinancePeriodSummary.closingValuations`, the month-end
+ * valuations the display converts history with, and 1900 worlds carry sourced currency
+ * valuations and adopted arrangements. Schema-29 worlds are reported as incompatible.
  */
-export const WORLD_SCHEMA_VERSION = 29;
+export const WORLD_SCHEMA_VERSION = 30;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 2;

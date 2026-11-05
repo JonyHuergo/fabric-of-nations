@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from "react-native";
 
 import {
   countryById,
-  formatRUSD,
   previewInstitutionFunding,
   previewLawProposal,
   type SimulationSnapshot,
@@ -15,6 +14,7 @@ import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 import { provinceEconomyRows } from "@century/sim-worker";
 import { provinceDisplayName } from "../provinceNames";
+import { useMoney } from "../format/useMoney";
 
 /** Mirrors the simulation's numeric-safety bound for an annual fiscal budget. */
 const MAX_ANNUAL_FUNDING_RUSD = 1e15;
@@ -81,6 +81,7 @@ export function PoliticsScreen({
   readonly snapshot: SimulationSnapshot;
   readonly countryId: number | null;
 }) {
+  const money = useMoney();
   const { applyAction, busy, connection } = useSimulation();
   const country = countryById(snapshot, countryId);
   const [fundingText, setFundingText] = useState("");
@@ -236,8 +237,8 @@ export function PoliticsScreen({
         />
         <StatRow
           label="Funding (this month)"
-          value={`${formatRUSD(politics.institution.fundedAnnualRUSD)}/yr`}
-          detail={`Requested ${formatRUSD(politics.institution.fundingRequestedMonthToDateRUSD)} · shortfall ${formatRUSD(politics.institution.fundingShortfallMonthToDateRUSD)}`}
+          value={`${money.format(politics.institution.fundedAnnualRUSD)}/yr`}
+          detail={`Requested ${money.format(politics.institution.fundingRequestedMonthToDateRUSD)} · shortfall ${money.format(politics.institution.fundingShortfallMonthToDateRUSD)}`}
         />
         <SliderField
           label="Administration funding"
@@ -250,7 +251,8 @@ export function PoliticsScreen({
           max={fundingLimit}
           step={fundingStep}
           precision={0}
-          unit="RUSD/yr"
+          money={money}
+          unit="/yr"
           disabled={!isPlayerCountry || connection !== "ready"}
           pending={fundingCommit.hasPending}
           onChange={(value) => setFundingText(value.toFixed(0))}
@@ -266,8 +268,8 @@ export function PoliticsScreen({
           />
         </View>
         <Text style={styles.detail}>
-          Daily request {formatRUSD(fundingPreview.dailyRequestRUSD)}; treasury cash{" "}
-          {formatRUSD(country.treasuryCashRUSD)}.
+          Daily request {money.format(fundingPreview.dailyRequestRUSD)}; treasury cash{" "}
+          {money.format(country.treasuryCashRUSD)}.
         </Text>
         {fundingPreview.errors.map((error) => (
           <Text key={error} style={styles.error}>

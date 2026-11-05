@@ -1,0 +1,1410 @@
+{
+  "description": "P3 (D-141): 1900 currencies, monetary arrangements and opening valuations of the 1900 world. Each own currency records its standard, the metal of its legal unit and how its value is derived; the loader computes the fine content per unit, the 1900 circulating value in US gold dollars and rusdPerUnit = value x CPI(1990)/CPI(1900). This file supersedes the currency blocks of historical/p2b/countries_1900.json for the 1900 world.",
+  "decision": "D-141",
+  "deflator": {
+    "sourceFile": "historical/p2b/sources_1900.json",
+    "cpi1900RowId": "cpi-1900",
+    "cpi1990RowId": "cpi-1990"
+  },
+  "sources": [
+    {
+      "id": "mint-1901-coins",
+      "title": "Annual Report of the Director of the Mint for the Fiscal Year Ended June 30, 1901: Values of Foreign Coins, January 1, 1901",
+      "author": "U.S. Treasury, Bureau of the Mint",
+      "url": "https://archive.org/details/annualreportofdi1901unit_h3l5",
+      "locator": "pp. 56-57",
+      "accessDate": "2026-11-04",
+      "license": "Public domain (U.S. government work, 1901)",
+      "notes": "Values of monetary units in U.S. gold dollars proclaimed under section 25 of the act of August 28, 1894; silver-standard units are valued at the average market price of silver for the three months preceding the circular. Read from the page scans."
+    },
+    {
+      "id": "mint-1901-answers",
+      "title": "Annual Report of the Director of the Mint, 1901: answers of foreign governments to the interrogatories on coinage and currency in 1900",
+      "author": "U.S. Treasury, Bureau of the Mint",
+      "url": "https://archive.org/details/annualreportofdi1901unit_h3l5",
+      "locator": "pp. 200-370: answers (25) actual currency, (26) premium on gold, (27) exchange on London",
+      "accessDate": "2026-11-04",
+      "license": "Public domain (U.S. government work, 1901)",
+      "notes": "Argentina p. 215, Greece p. 308 and Portugal p. 347 were read from the page scans; the other answers from the archive.org OCR text."
+    },
+    {
+      "id": "mint-1901-systems",
+      "title": "Annual Report of the Director of the Mint, 1901: monetary systems of foreign countries",
+      "author": "U.S. Treasury, Bureau of the Mint",
+      "url": "https://archive.org/details/annualreportofdi1901unit_h3l5",
+      "locator": "pp. 400-420",
+      "accessDate": "2026-11-04",
+      "license": "Public domain (U.S. government work, 1901)",
+      "notes": "Coin standards of the Latin Union states, Siam, Colombia and Brazil."
+    },
+    {
+      "id": "us-gold-standard-act-1900",
+      "title": "Act of March 14, 1900 (Gold Standard Act), section 1",
+      "author": "U.S. Congress",
+      "url": "https://www.loc.gov/item/llsl-v31/",
+      "locator": "31 Stat. 45: the dollar consisting of 25.8 grains of gold nine-tenths fine",
+      "accessDate": "2026-11-04",
+      "license": "Public domain",
+      "notes": "23.22 grains = 1.504632 g fine gold per dollar, so gold is 20.671835 USD per troy ounce."
+    },
+    {
+      "id": "mtt-standard",
+      "title": "Maria Theresa thaler standard (convention thaler of 1753; Vienna Levant thaler restrikes)",
+      "author": "Secondary numismatic standard",
+      "url": "https://archive.org/details/annualreportofdi1901unit_h3l5",
+      "locator": "28.0668 g at 833 1/3 thousandths = 23.389 g fine; the Vienna mint struck 448,749 Levant thalers in 1899 (Mint report p. 231)",
+      "accessDate": "2026-11-04",
+      "license": "Public domain",
+      "notes": "The fine content is the convention standard and is not stated in the Mint report; status secondary."
+    }
+  ],
+  "metals": {
+    "gold": {
+      "usdPerFineGram": 0.664614337592182,
+      "status": "sourced",
+      "sourceId": "us-gold-standard-act-1900",
+      "derivation": "1 / 1.504632 g fine gold per US dollar"
+    },
+    "silver": {
+      "usdPerFineGram": 0.02082753654025566,
+      "status": "derived",
+      "sourceId": "mint-1901-coins",
+      "derivation": "The Mint's value of the Mexican dollar (0.509) / its legal fine content 24.4388 g (27.073 g at 902 7/9 thousandths, law of November 27, 1867): the Mint's October-December 1900 silver price, 0.6478 USD per troy ounce"
+    }
+  },
+  "referenceUnits": {
+    "OTT_PIASTER": {
+      "usd": 0.044,
+      "locator": "Values of Foreign Coins, January 1, 1901, p. 57: Turkey, piaster",
+      "sourceId": "mint-1901-coins"
+    },
+    "GUA_SILVER": {
+      "usd": 0.468,
+      "locator": "Values of Foreign Coins, January 1, 1901, p. 56: Central American States, silver peso",
+      "sourceId": "mint-1901-coins"
+    }
+  },
+  "foreignCurrencies": [
+    {
+      "key": "mtt",
+      "name": "Maria Theresa thaler",
+      "issuerKey": "vienna-levant-thaler",
+      "standard": "silver",
+      "metal": "silver",
+      "value": {
+        "kind": "fine-content",
+        "grams": 23.389,
+        "locator": "28.0668 g at 833 1/3 thousandths"
+      },
+      "status": "secondary",
+      "sourceIds": [
+        "mtt-standard"
+      ],
+      "notes": "Struck at Vienna for the Levant and Red Sea trade; a foreign-issued currency adopted by countries without coin of their own."
+    }
+  ],
+  "countries": [
+    {
+      "tag": "USA",
+      "arrangement": "own",
+      "currency": {
+        "key": "usd",
+        "name": "United States dollar",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 1,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: United States gold dollar (definition: 23.22 grains fine, act of March 14, 1900)"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "us-gold-standard-act-1900"
+        ]
+      }
+    },
+    {
+      "tag": "GBR",
+      "arrangement": "own",
+      "currency": {
+        "key": "gbp",
+        "name": "Pound sterling",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 4.8665,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Great Britain, pound sterling, 4.866 1/2"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "DEU",
+      "arrangement": "own",
+      "currency": {
+        "key": "dem",
+        "name": "German mark",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.238,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: German Empire, mark"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "FRA",
+      "arrangement": "own",
+      "currency": {
+        "key": "frf",
+        "name": "French franc",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.193,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: France, franc"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "RUS",
+      "arrangement": "own",
+      "currency": {
+        "key": "rub",
+        "name": "Russian ruble",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.515,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Russia, ruble"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "JPN",
+      "arrangement": "own",
+      "currency": {
+        "key": "jpy",
+        "name": "Japanese yen",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.498,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Japan, yen"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "ITA",
+      "arrangement": "own",
+      "currency": {
+        "key": "itl",
+        "name": "Italian lira",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.193,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Italy, lira"
+        },
+        "status": "provisional",
+        "sourceIds": [
+          "mint-1901-coins"
+        ],
+        "notes": "Paper circulated at a discount to this parity in 1900; no 1900 rate is given in the Mint report, so the metal parity stands (provisional, D-141)."
+      }
+    },
+    {
+      "tag": "ESP",
+      "arrangement": "own",
+      "currency": {
+        "key": "esp",
+        "name": "Spanish peseta",
+        "standard": "paper",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.193,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Spain, peseta"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 32.53,
+          "against": "own-unit",
+          "locator": "Spain, answers (26)-(27), p. 362: premium of exchange on London in 1900, mean of the twelve monthly averages (32.37 ... 33.56 per cent)"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "Inconvertible paper circulated; the opening valuation is the 1900 circulating value from the Mint report's country answer."
+      }
+    },
+    {
+      "tag": "PRT",
+      "arrangement": "own",
+      "currency": {
+        "key": "pte",
+        "name": "Portuguese milreis",
+        "standard": "paper",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 1.08,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Portugal, milreis"
+        },
+        "circulation": {
+          "kind": "london-exchange",
+          "pencePerUnit": 37.96,
+          "locator": "Portugal, answer (27), p. 347: average rates of exchange on London in 1900, pence per 1,000 reis, mean of the twelve monthly rates (36 5/8 ... 38 11/32)"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "The currency consisted almost exclusively of silver and inconvertible paper (answer 25)."
+      }
+    },
+    {
+      "tag": "NLD",
+      "arrangement": "own",
+      "currency": {
+        "key": "nlg",
+        "name": "Dutch guilder",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.402,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Netherlands, florin"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "BEL",
+      "arrangement": "own",
+      "currency": {
+        "key": "bef",
+        "name": "Belgian franc",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.193,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Belgium, franc"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "CHE",
+      "arrangement": "own",
+      "currency": {
+        "key": "chf",
+        "name": "Swiss franc",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.193,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Switzerland, franc"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "SWE",
+      "arrangement": "own",
+      "currency": {
+        "key": "sek",
+        "name": "Swedish krona",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.268,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Sweden, crown"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "NOR",
+      "arrangement": "own",
+      "currency": {
+        "key": "nok",
+        "name": "Norwegian krone",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.268,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Norway, crown"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "DNK",
+      "arrangement": "own",
+      "currency": {
+        "key": "dkk",
+        "name": "Danish krone",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.268,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Denmark, crown"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "GRC",
+      "arrangement": "own",
+      "currency": {
+        "key": "grx",
+        "name": "Greek drachma",
+        "standard": "paper",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.193,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Greece, drachma"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 58,
+          "against": "own-unit",
+          "locator": "Greece, answers (25)-(26), p. 308: inconvertible paper; premium on gold during 1900 highest 1.69 1/2, lowest 1.49 1/2, average 1.58"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "Inconvertible paper circulated; the opening valuation is the 1900 circulating value from the Mint report's country answer."
+      }
+    },
+    {
+      "tag": "SRB",
+      "arrangement": "own",
+      "currency": {
+        "key": "rsd",
+        "name": "Serbian dinar",
+        "standard": "paper",
+        "metal": "gold",
+        "value": {
+          "kind": "par",
+          "withTag": "FRA",
+          "ratio": 1,
+          "locator": "Servia: the dinar is struck to the Latin Union franc standard (dinar = franc)"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 11,
+          "against": "own-unit",
+          "locator": "Servia, answer (26), p. 355: during 1900 the highest premium was 14 per cent and the lowest 8 per cent (midpoint)"
+        },
+        "status": "derived",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers",
+          "mint-1901-systems"
+        ],
+        "notes": "Bank notes circulated at a premium on gold; the midpoint of the 1900 range is used."
+      }
+    },
+    {
+      "tag": "MNT",
+      "arrangement": "adopted",
+      "adopts": {
+        "countryTag": "AUT"
+      },
+      "status": "sourced",
+      "sourceIds": [
+        "mint-1901-answers"
+      ],
+      "notes": "Montenegro: the Austrian florin was the currency of the principality until the Austrian crown standard was introduced on March 1, 1901 (L'Economiste Europeen, February 15, 1901, reprinted in the Mint report, p. 333); the perper dates from 1906."
+    },
+    {
+      "tag": "ROM",
+      "arrangement": "own",
+      "currency": {
+        "key": "rol",
+        "name": "Romanian leu",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "par",
+          "withTag": "FRA",
+          "ratio": 1,
+          "locator": "Roumania: the leu is struck to the Latin Union franc standard (leu = franc)"
+        },
+        "status": "derived",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-systems"
+        ]
+      }
+    },
+    {
+      "tag": "BGR",
+      "arrangement": "own",
+      "currency": {
+        "key": "bgl",
+        "name": "Bulgarian lev",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "par",
+          "withTag": "FRA",
+          "ratio": 1,
+          "locator": "Bulgaria: the lev is struck to the Latin Union franc standard (lev = franc)"
+        },
+        "status": "provisional",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-systems"
+        ],
+        "notes": "Silver and notes circulated at a small discount in 1900; no 1900 rate is given in the Mint report (provisional)."
+      }
+    },
+    {
+      "tag": "OTT",
+      "arrangement": "own",
+      "currency": {
+        "key": "otl",
+        "name": "Ottoman lira",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "par",
+          "withTag": "OTT_PIASTER",
+          "ratio": 100,
+          "locator": "Turkey, piaster 0.044; the lira is 100 piasters"
+        },
+        "status": "derived",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "Silver piasters ran at an agio of about 8 per cent (answers 25-26, p. 366); the gold lira is the unit."
+      }
+    },
+    {
+      "tag": "LUX",
+      "arrangement": "own",
+      "currency": {
+        "key": "luf",
+        "name": "Luxembourg franc",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "par",
+          "withTag": "FRA",
+          "ratio": 1,
+          "locator": "Luxembourg reckoned in francs at the French and Belgian standard"
+        },
+        "status": "provisional",
+        "sourceIds": [
+          "mint-1901-coins"
+        ],
+        "notes": "German marks circulated widely through the Zollverein; the franc unit is kept (provisional)."
+      }
+    },
+    {
+      "tag": "MCO",
+      "arrangement": "adopted",
+      "adopts": {
+        "countryTag": "FRA"
+      },
+      "status": "sourced",
+      "sourceIds": [
+        "mint-1901-coins"
+      ],
+      "notes": "Monaco used the French franc; Monegasque coins were struck at the French standard."
+    },
+    {
+      "tag": "SMR",
+      "arrangement": "adopted",
+      "adopts": {
+        "countryTag": "ITA"
+      },
+      "status": "sourced",
+      "sourceIds": [
+        "mint-1901-coins"
+      ],
+      "notes": "San Marino used the Italian lira under its monetary convention with Italy."
+    },
+    {
+      "tag": "AND",
+      "arrangement": "adopted",
+      "adopts": {
+        "countryTag": "FRA"
+      },
+      "status": "provisional",
+      "sourceIds": [
+        "mint-1901-coins"
+      ],
+      "notes": "Andorra had no currency of its own; French francs and Spanish pesetas circulated. The franc is chosen (provisional)."
+    },
+    {
+      "tag": "LIE",
+      "arrangement": "adopted",
+      "adopts": {
+        "countryTag": "AUT"
+      },
+      "status": "sourced",
+      "sourceIds": [
+        "mint-1901-coins"
+      ],
+      "notes": "Liechtenstein was in customs and currency union with Austria; its 1898 crown coins were struck at the Austrian standard."
+    },
+    {
+      "tag": "CHN",
+      "arrangement": "own",
+      "currency": {
+        "key": "cnx",
+        "name": "Haikwan tael",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.771,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: China, tael, Haikwan (customs)"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ],
+        "notes": "The customs tael is the national unit of account; local taels differ (Shanghai 0.692 ... Amoy 0.757)."
+      }
+    },
+    {
+      "tag": "KOR",
+      "arrangement": "own",
+      "currency": {
+        "key": "krw",
+        "name": "Korean won",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "par",
+          "withTag": "JPN",
+          "ratio": 1,
+          "locator": "Korea, answers (25)-(27), p. 328: the currency is subsidiary coin with Japanese paper and silver money; exchange is made with Japan at 1/2 per cent"
+        },
+        "status": "derived",
+        "sourceIds": [
+          "mint-1901-answers",
+          "mint-1901-coins"
+        ],
+        "notes": "Valued at par with the yen (provisional derivation)."
+      }
+    },
+    {
+      "tag": "PER",
+      "arrangement": "own",
+      "currency": {
+        "key": "irq",
+        "name": "Persian kran",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.086,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Persia, kran"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "AFG",
+      "arrangement": "own",
+      "currency": {
+        "key": "afr",
+        "name": "Kabuli rupee",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.324,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: India, rupee"
+        },
+        "status": "provisional",
+        "sourceIds": [
+          "mint-1901-coins"
+        ],
+        "notes": "No 1900 value for the Kabuli rupee is given; valued at the Indian rupee, the dominant trade coin (provisional)."
+      }
+    },
+    {
+      "tag": "NPL",
+      "arrangement": "own",
+      "currency": {
+        "key": "npr",
+        "name": "Nepalese mohar",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.324,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: India, rupee"
+        },
+        "status": "provisional",
+        "sourceIds": [
+          "mint-1901-coins"
+        ],
+        "notes": "No 1900 value for the mohar is given; valued at the Indian rupee, which circulated widely (provisional)."
+      }
+    },
+    {
+      "tag": "THA",
+      "arrangement": "own",
+      "currency": {
+        "key": "thb",
+        "name": "Siamese tical",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "par",
+          "withTag": "MEX",
+          "ratio": 0.6,
+          "locator": "Siam, monetary system: payments in ticals are at the rate of 5 ticals for 3 Mexican dollars"
+        },
+        "status": "derived",
+        "sourceIds": [
+          "mint-1901-systems",
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "OMN",
+      "arrangement": "adopted",
+      "adopts": {
+        "foreignKey": "mtt"
+      },
+      "status": "provisional",
+      "sourceIds": [
+        "mtt-standard"
+      ],
+      "notes": "Muscat used the Maria Theresa thaler and the Indian rupee; the thaler is chosen (provisional)."
+    },
+    {
+      "tag": "ETH",
+      "arrangement": "adopted",
+      "adopts": {
+        "foreignKey": "mtt"
+      },
+      "status": "sourced",
+      "sourceIds": [
+        "mtt-standard"
+      ],
+      "notes": "Ethiopia used the Maria Theresa thaler; Menelik's 1894 thaler was struck to its standard."
+    },
+    {
+      "tag": "LBR",
+      "arrangement": "own",
+      "currency": {
+        "key": "lbd",
+        "name": "Liberian dollar",
+        "standard": "paper",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 1,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Liberia, dollar"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 25,
+          "against": "own-unit",
+          "locator": "Liberia, answer (26), p. 328: premium on gold 25 per cent"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "Inconvertible paper circulated; the opening valuation is the 1900 circulating value from the Mint report's country answer."
+      }
+    },
+    {
+      "tag": "MAR",
+      "arrangement": "own",
+      "currency": {
+        "key": "mah",
+        "name": "Moroccan rial",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "fine-content",
+          "grams": 24.312,
+          "locator": "Morocco (from the Report of the French Mint, 1901, p. 48, reprinted p. 333): 5-dirham piece 14.558 g at 835 thousandths; the rial (10 dirhams) holds 2 x 12.156 g fine"
+        },
+        "status": "derived",
+        "sourceIds": [
+          "mint-1901-answers",
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "ZAR",
+      "arrangement": "own",
+      "currency": {
+        "key": "zar",
+        "name": "Transvaal pound",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "par",
+          "withTag": "GBR",
+          "ratio": 1,
+          "locator": "South African Republic: the pond was struck to the sovereign standard; South Africa answer (26), p. 361: no premium on gold"
+        },
+        "status": "derived",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ]
+      }
+    },
+    {
+      "tag": "ORF",
+      "arrangement": "adopted",
+      "adopts": {
+        "countryTag": "GBR"
+      },
+      "status": "sourced",
+      "sourceIds": [
+        "mint-1901-coins",
+        "mint-1901-answers"
+      ],
+      "notes": "The Orange Free State used British coin."
+    },
+    {
+      "tag": "MEX",
+      "arrangement": "own",
+      "currency": {
+        "key": "mxp",
+        "name": "Mexican peso",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.509,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Mexico, dollar"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "GUA",
+      "arrangement": "own",
+      "currency": {
+        "key": "gtq",
+        "name": "Guatemalan peso",
+        "standard": "paper",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.468,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Central American States, peso (Guatemala)"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 510,
+          "against": "us-gold-dollar",
+          "locator": "Guatemala, answers (25)-(26), p. 265: inconvertible paper; premium on United States gold coin average 510 per cent during 1900"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "Inconvertible paper circulated; the opening valuation is the 1900 circulating value from the Mint report's country answer."
+      }
+    },
+    {
+      "tag": "HON",
+      "arrangement": "own",
+      "currency": {
+        "key": "hnl",
+        "name": "Honduran peso",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.468,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Central American States, peso (Honduras)"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ],
+        "notes": "The lempira dates from 1931."
+      }
+    },
+    {
+      "tag": "SAL",
+      "arrangement": "own",
+      "currency": {
+        "key": "svc",
+        "name": "Salvadoran peso",
+        "standard": "paper",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.468,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Central American States, peso (Salvador)"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 137,
+          "against": "us-gold-dollar",
+          "locator": "Salvador, answer (26), p. 354: premium on gold during 1900 average 137 per cent"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "Inconvertible paper circulated; the opening valuation is the 1900 circulating value from the Mint report's country answer."
+      }
+    },
+    {
+      "tag": "NIC",
+      "arrangement": "own",
+      "currency": {
+        "key": "nio",
+        "name": "Nicaraguan peso",
+        "standard": "paper",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.468,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Central American States, peso (Nicaragua)"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 180,
+          "against": "us-gold-dollar",
+          "locator": "Nicaragua, answer (26), p. 266: premium on gold during 1900 ranged from 220 to 140 per cent; average about 180 per cent"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "Inconvertible paper circulated; the opening valuation is the 1900 circulating value from the Mint report's country answer. The cordoba dates from 1912."
+      }
+    },
+    {
+      "tag": "COS",
+      "arrangement": "own",
+      "currency": {
+        "key": "crc",
+        "name": "Costa Rican colon",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.465,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Central American States, Costa Rica, colon"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "COL",
+      "arrangement": "own",
+      "currency": {
+        "key": "cop",
+        "name": "Colombian peso",
+        "standard": "paper",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.468,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Colombia, peso"
+        },
+        "status": "provisional",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-systems"
+        ],
+        "notes": "The currency consisted almost exclusively of paper money (monetary systems, Colombia); its 1900 discount is not given in the Mint report, so the silver value stands (provisional)."
+      }
+    },
+    {
+      "tag": "VEN",
+      "arrangement": "own",
+      "currency": {
+        "key": "veb",
+        "name": "Venezuelan bolivar",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.193,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Venezuela, bolivar"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "ECU",
+      "arrangement": "own",
+      "currency": {
+        "key": "ecs",
+        "name": "Ecuadorian sucre",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.468,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Ecuador, sucre"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ],
+        "notes": "Answer (26) gives the premium on gold as 108, 105, 107 average, which is ambiguous; the Mint value stands."
+      }
+    },
+    {
+      "tag": "PRU",
+      "arrangement": "own",
+      "currency": {
+        "key": "pes",
+        "name": "Peruvian sol",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.487,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Peru, sol"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "Answer (26), p. 340: gold opened 1900 at 2 per cent premium and went to par."
+      }
+    },
+    {
+      "tag": "BOL",
+      "arrangement": "own",
+      "currency": {
+        "key": "bob",
+        "name": "Bolivian boliviano",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.468,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Bolivia, boliviano"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "CHL",
+      "arrangement": "own",
+      "currency": {
+        "key": "clp",
+        "name": "Chilean peso",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.365,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Chile, peso"
+        },
+        "status": "provisional",
+        "sourceIds": [
+          "mint-1901-coins"
+        ],
+        "notes": "Paper circulated at a discount to this parity in 1900; no 1900 rate is given in the Mint report, so the metal parity stands (provisional, D-141)."
+      }
+    },
+    {
+      "tag": "ARG",
+      "arrangement": "own",
+      "currency": {
+        "key": "arp",
+        "name": "Argentine peso",
+        "standard": "paper",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.965,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Argentine Republic, peso"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 130.95,
+          "against": "own-unit",
+          "locator": "Argentina, answers (22)-(26), p. 215: paper government notes; gold premium highest 142.70, lowest 127.30, average 130.95 per cent (the 1899 conversion law fixes 44 gold cents per paper peso)"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "Inconvertible paper circulated; the opening valuation is the 1900 circulating value from the Mint report's country answer."
+      }
+    },
+    {
+      "tag": "URY",
+      "arrangement": "own",
+      "currency": {
+        "key": "uyu",
+        "name": "Uruguayan peso",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 1.034,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Uruguay, peso"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "PRY",
+      "arrangement": "own",
+      "currency": {
+        "key": "pyg",
+        "name": "Paraguayan peso",
+        "standard": "paper",
+        "metal": "gold",
+        "value": {
+          "kind": "par",
+          "withTag": "ARG",
+          "ratio": 1,
+          "locator": "Paraguay reckoned its gold peso at the Argentine gold peso (provisional reference)"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 694,
+          "against": "own-unit",
+          "locator": "Paraguay, p. 341: bank notes inconvertible; the premium on gold varied from 688 to 700 per cent during 1900 (midpoint)"
+        },
+        "status": "provisional",
+        "sourceIds": [
+          "mint-1901-answers",
+          "mint-1901-coins"
+        ],
+        "notes": "The guarani dates from 1943."
+      }
+    },
+    {
+      "tag": "BRA",
+      "arrangement": "own",
+      "currency": {
+        "key": "brl",
+        "name": "Brazilian milreis",
+        "standard": "paper",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.546,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Brazil, milreis"
+        },
+        "status": "provisional",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "The money was inconvertible paper (Brazil, monetary system); answer (27) says the 1900 exchange rate was not at hand, so the gold parity stands (provisional)."
+      }
+    },
+    {
+      "tag": "HTI",
+      "arrangement": "own",
+      "currency": {
+        "key": "htg",
+        "name": "Haitian gourde",
+        "standard": "paper",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.965,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Haiti, gourde"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 112,
+          "against": "us-gold-dollar",
+          "locator": "Haiti, answer (27), p. 314: American gold at a premium, average 112 per cent during 1900"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ],
+        "notes": "Inconvertible paper circulated; the opening valuation is the 1900 circulating value from the Mint report's country answer."
+      }
+    },
+    {
+      "tag": "DOM",
+      "arrangement": "own",
+      "currency": {
+        "key": "dop",
+        "name": "Dominican peso",
+        "standard": "silver",
+        "metal": "silver",
+        "value": {
+          "kind": "par",
+          "withTag": "GUA_SILVER",
+          "ratio": 1,
+          "locator": "No 1900 value is given for the Dominican Republic; valued at the Central American silver peso"
+        },
+        "status": "provisional",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "CAN",
+      "arrangement": "own",
+      "currency": {
+        "key": "cad",
+        "name": "Canadian dollar",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 1,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: British Possessions, N. A. (except Newfoundland), dollar"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "AUS",
+      "arrangement": "adopted",
+      "adopts": {
+        "countryTag": "GBR"
+      },
+      "status": "sourced",
+      "sourceIds": [
+        "mint-1901-coins",
+        "mint-1901-answers"
+      ],
+      "notes": "The Australian colonies used British coin (the Sydney and Melbourne mints struck sovereigns); the Australian pound dates from 1910."
+    },
+    {
+      "tag": "NZL",
+      "arrangement": "adopted",
+      "adopts": {
+        "countryTag": "GBR"
+      },
+      "status": "sourced",
+      "sourceIds": [
+        "mint-1901-coins"
+      ],
+      "notes": "New Zealand used British coin; the New Zealand pound dates from 1933."
+    },
+    {
+      "tag": "CUB",
+      "arrangement": "own",
+      "currency": {
+        "key": "cup",
+        "name": "Cuban peso",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.926,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Cuba, peso"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins"
+        ]
+      }
+    },
+    {
+      "tag": "AUT",
+      "arrangement": "own",
+      "currency": {
+        "key": "aut",
+        "name": "Austro-Hungarian krone",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "mint-table",
+          "usd": 0.203,
+          "locator": "Values of Foreign Coins, January 1, 1901, pp. 56-57: Austria-Hungary, crown"
+        },
+        "circulation": {
+          "kind": "gold-premium",
+          "premiumPercent": 0.775,
+          "against": "own-unit",
+          "locator": "Austria-Hungary, answer (26), p. 230: the average premium on gold during 1900 was 0.775 per cent"
+        },
+        "status": "sourced",
+        "sourceIds": [
+          "mint-1901-coins",
+          "mint-1901-answers"
+        ]
+      }
+    },
+    {
+      "tag": "TON",
+      "arrangement": "adopted",
+      "adopts": {
+        "countryTag": "GBR"
+      },
+      "status": "sourced",
+      "sourceIds": [
+        "mint-1901-coins"
+      ],
+      "notes": "Tonga used British coin."
+    },
+    {
+      "tag": "SOK",
+      "arrangement": "adopted",
+      "adopts": {
+        "foreignKey": "mtt"
+      },
+      "status": "provisional",
+      "sourceIds": [
+        "mtt-standard"
+      ],
+      "notes": "Cowries were the everyday money; the Maria Theresa thaler carried long-distance trade (provisional)."
+    },
+    {
+      "tag": "WAD",
+      "arrangement": "adopted",
+      "adopts": {
+        "foreignKey": "mtt"
+      },
+      "status": "provisional",
+      "sourceIds": [
+        "mtt-standard"
+      ],
+      "notes": "The Maria Theresa thaler circulated in the Sahel trade (provisional)."
+    },
+    {
+      "tag": "DAR",
+      "arrangement": "adopted",
+      "adopts": {
+        "foreignKey": "mtt"
+      },
+      "status": "provisional",
+      "sourceIds": [
+        "mtt-standard"
+      ],
+      "notes": "The Maria Theresa thaler circulated in the Sudan trade (provisional)."
+    },
+    {
+      "tag": "SHM",
+      "arrangement": "adopted",
+      "adopts": {
+        "foreignKey": "mtt"
+      },
+      "status": "provisional",
+      "sourceIds": [
+        "mtt-standard"
+      ],
+      "notes": "The Maria Theresa thaler was the common coin of Arabia (provisional)."
+    },
+    {
+      "tag": "CRT",
+      "arrangement": "own",
+      "currency": {
+        "key": "crt",
+        "name": "Cretan drachma",
+        "standard": "gold",
+        "metal": "gold",
+        "value": {
+          "kind": "par",
+          "withTag": "FRA",
+          "ratio": 1,
+          "locator": "Crete: the Cretan State's 1900 coinage was struck to the Latin Union standard (drachma = franc)"
+        },
+        "status": "derived",
+        "sourceIds": [
+          "mint-1901-answers",
+          "mint-1901-coins"
+        ]
+      }
+    }
+  ]
+}
