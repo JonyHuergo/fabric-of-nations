@@ -10,7 +10,7 @@
  * 18 (D-137): SAVE_RESULT returns and LOAD/PREVIEW_SAVE accept the stored save form
  * (`STORED_SAVE_PREFIX`, compressed in the worker); a canonical save is still accepted.
  */
-export const PROTOCOL_VERSION = 19 as const;
+export const PROTOCOL_VERSION = 20 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -308,6 +308,13 @@ export type WorkerCommand =
       readonly type: "SET_FOCUS";
       readonly commandId: string;
       readonly countryId: number;
+    }
+  | {
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
+      readonly type: "SET_PROVINCE_FOCUS";
+      readonly commandId: string;
+      /** P4: the province whose pyramid the snapshot carries; null clears it. */
+      readonly provinceId: number | null;
     }
   | {
       readonly protocolVersion: typeof PROTOCOL_VERSION;
@@ -1082,6 +1089,9 @@ export function encodeProvinceEconomyTable(
 
 const provinceRowsCache = new WeakMap<ProvinceEconomyTable, readonly ProvinceEconomySnapshot[]>();
 
+
+
+
 /**
  * Province economy rows of a snapshot, decoded once per table (presentation-side
  * cache keyed by the immutable snapshot table; it holds no simulation state).
@@ -1176,6 +1186,8 @@ export interface CountrySnapshot {
   /** M11 static polity metadata; null for legacy scenarios without a catalog. */
   readonly meta: CountryMetaSnapshot | null;
   readonly provinceIds: readonly number[];
+  /** P4 (D-142) demography, pyramid, causes and annual history; null without population definitions. */
+  readonly demography: CountryDemographySnapshot | null;
   readonly fiscal: SnapshotFiscalPolicy;
   readonly treasuryCashRUSD: number;
   readonly debtEnabled: boolean;
@@ -1322,6 +1334,83 @@ export interface SnapshotOccupation {
  * is `countryId`; `controllerCountryId` is set only while another country controls
  * the province (an occupation or an administration such as Cuba in 1900).
  */
+/**
+ * P4 (D-142) current demography of a province or country: rates implied by today's
+ * levels and age structure (per 1,000 people per year), period TFR and life
+ * expectancy, and the population-weighted causes the player can act on.
+ */
+export interface DemographyIndicatorsSnapshot {
+  readonly crudeBirthRate: number;
+  readonly crudeDeathRate: number;
+  readonly totalFertility: number;
+  readonly lifeExpectancy: number;
+  readonly under5MortalityPer1000: number;
+  readonly urbanShare: number;
+  readonly femaleLiteracy: number;
+  readonly foodSufficiency: number;
+}
+
+/** P4 population pyramid: people in the 17 five-year bands (0-4 ... 80+) by sex. */
+export interface PopulationPyramidSnapshot {
+  readonly male: readonly number[];
+  readonly female: readonly number[];
+}
+
+/** P4 one closed civil year of a country's realised births and deaths. */
+export interface DemographyYearSnapshot {
+  readonly year: number;
+  readonly populationStart: number;
+  readonly populationEnd: number;
+  readonly births: number;
+  readonly deaths: number;
+  /** Realised births and deaths per 1,000 mean population per year. */
+  readonly crudeBirthRate: number;
+  readonly crudeDeathRate: number;
+  readonly totalFertility: number;
+  readonly lifeExpectancy: number;
+  readonly under5MortalityPer1000: number;
+  readonly urbanShare: number;
+}
+
+/** P4 the country-level causes behind the levels (D-142). */
+export interface DemographyCausesSnapshot {
+  /** Combined health factor H (1 = none; lower = fewer deaths). */
+  readonly healthFactor: number;
+  /** Sanitation knowledge from research, 0..1. */
+  readonly sanitationKnowledge: number;
+  /** Public-health service output (staffing x quality), 0..1. */
+  readonly healthServiceOutput: number;
+  /** Realised sanitation coverage = knowledge x service, 0..1. */
+  readonly sanitationCoverage: number;
+  /** Fractional fertility reduction from contraception research. */
+  readonly contraception: number;
+}
+
+/**
+ * P4 (D-142) the focused province's demography: current rates and causes (null
+ * without people) and its pyramid. One province per snapshot keeps the message small.
+ */
+export interface FocusProvinceSnapshot {
+  readonly provinceId: number;
+  readonly demography: DemographyIndicatorsSnapshot | null;
+  readonly pyramid: PopulationPyramidSnapshot;
+}
+
+export interface CountryDemographySnapshot {
+  readonly current: DemographyIndicatorsSnapshot;
+  readonly pyramid: PopulationPyramidSnapshot;
+  readonly causes: DemographyCausesSnapshot;
+  /** Realised births and deaths of the current civil year so far; null before the first day. */
+  readonly yearToDate: {
+    readonly year: number;
+    readonly births: number;
+    readonly deaths: number;
+    readonly days: number;
+  } | null;
+  /** Closed years, oldest first. */
+  readonly history: readonly DemographyYearSnapshot[];
+}
+
 export interface ProvinceEconomySnapshot {
   readonly id: number;
   /** Owner country (simulation country), or null. */
@@ -1339,7 +1428,7 @@ export interface ProvinceEconomySnapshot {
   /** M8 provincial militancy aggregate and provisional infrastructure quality. */
   readonly unrest: number;
   readonly infrastructure: number;
-  /** HYDE 3.3 urban share of the 1900 population, 0..1. */
+  /** Current urban share of the province's people, 0..1 (HYDE 3.3 in 1900; P4 block state). */
   readonly urbanShare: number;
   readonly arableLandHa: number;
   readonly pastureHa: number;
@@ -1440,6 +1529,11 @@ export interface SimulationSnapshot {
   readonly playerCountryId: number | null;
   /** Presentation focus country whose full record is included; null when none. */
   readonly focusCountryId: number | null;
+  /**
+   * P4 (D-142) presentation focus province and its population pyramid; null when no
+   * province is focused. Only one province's pyramid travels per snapshot.
+   */
+  readonly focusProvince: FocusProvinceSnapshot | null;
   /** State-enterprise ownership/remittance policy required by public construction. */
   readonly constructionEnabled: boolean;
   /** Full detail for the player country and the focused country only. */
@@ -2173,6 +2267,16 @@ export function parseWorkerCommand(value: unknown): WorkerCommand {
         commandId,
         countryId: requireInteger(record.countryId, "command.countryId", 0, 0xffff_ffff),
       };
+    case "SET_PROVINCE_FOCUS":
+      return {
+        protocolVersion: PROTOCOL_VERSION,
+        type,
+        commandId,
+        provinceId:
+          record.provinceId === null
+            ? null
+            : requireInteger(record.provinceId, "command.provinceId", 0, 0xffff_ffff),
+      };
     case "LOAD":
     case "PREVIEW_SAVE":
       return {
@@ -2724,6 +2828,7 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isFiniteNumber(value.businessTaxBaseMonthToDateRUSD)) return false;
   if (!isBudgetMonthToDate(value.budgetMonthToDate)) return false;
   if (!isFiniteNumber(value.literacy)) return false;
+  if (value.demography !== null && !isCountryDemography(value.demography)) return false;
   if (!isFiniteNumber(value.wealthLevel)) return false;
   if (!isFiniteNumber(value.militancy)) return false;
   if (!isFiniteNumber(value.hardshipPopulationShare)) return false;
@@ -2785,6 +2890,56 @@ function isProvinceEconomyTable(value: unknown): value is ProvinceEconomyTable {
   if (!tags.every((tag) => tag === null || isString(tag, 16))) return false;
   const counts = value.populationByProfession;
   return Array.isArray(counts) && counts.length === length && counts.every(isFiniteNumberArray);
+}
+
+const INDICATOR_FIELDS = [
+  "crudeBirthRate",
+  "crudeDeathRate",
+  "totalFertility",
+  "lifeExpectancy",
+  "under5MortalityPer1000",
+  "urbanShare",
+  "femaleLiteracy",
+  "foodSufficiency",
+] as const;
+const CAUSE_FIELDS = [
+  "healthFactor",
+  "sanitationKnowledge",
+  "healthServiceOutput",
+  "sanitationCoverage",
+  "contraception",
+] as const;
+const YEAR_FIELDS = [
+  "year",
+  "populationStart",
+  "populationEnd",
+  "births",
+  "deaths",
+  "crudeBirthRate",
+  "crudeDeathRate",
+  "totalFertility",
+  "lifeExpectancy",
+  "under5MortalityPer1000",
+  "urbanShare",
+] as const;
+
+function isCountryDemography(value: unknown): value is CountryDemographySnapshot {
+  if (!isRecord(value)) return false;
+  const current = value.current;
+  if (!isRecord(current) || !INDICATOR_FIELDS.every((field) => isFiniteNumber(current[field]))) return false;
+  const pyramid = value.pyramid;
+  if (!isRecord(pyramid)) return false;
+  if (!isFiniteNumberArray(pyramid.male) || pyramid.male.length !== 17) return false;
+  if (!isFiniteNumberArray(pyramid.female) || pyramid.female.length !== 17) return false;
+  const causes = value.causes;
+  if (!isRecord(causes) || !CAUSE_FIELDS.every((field) => isFiniteNumber(causes[field]))) return false;
+  const ytd = value.yearToDate;
+  if (ytd !== null) {
+    if (!isRecord(ytd)) return false;
+    if (!(["year", "births", "deaths", "days"] as const).every((field) => isFiniteNumber(ytd[field]))) return false;
+  }
+  if (!Array.isArray(value.history)) return false;
+  return value.history.every((row: unknown) => isRecord(row) && YEAR_FIELDS.every((field) => isFiniteNumber(row[field])));
 }
 
 function isTerritorySnapshot(value: unknown): value is TerritorySnapshot {
@@ -2917,6 +3072,20 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
   if (!isString(value.simVersion, 128)) return false;
   if (!isNullableId(value.playerCountryId)) return false;
   if (!isNullableId(value.focusCountryId)) return false;
+  if (value.focusProvince !== null) {
+    if (!isRecord(value.focusProvince) || !isIntegerIn(value.focusProvince.provinceId, 0, 0xffff_ffff)) return false;
+    const focusDemography = value.focusProvince.demography;
+    if (
+      focusDemography !== null &&
+      (!isRecord(focusDemography) || !INDICATOR_FIELDS.every((field) => isFiniteNumber(focusDemography[field])))
+    ) {
+      return false;
+    }
+    const focusPyramid = value.focusProvince.pyramid;
+    if (!isRecord(focusPyramid)) return false;
+    if (!isFiniteNumberArray(focusPyramid.male) || focusPyramid.male.length !== 17) return false;
+    if (!isFiniteNumberArray(focusPyramid.female) || focusPyramid.female.length !== 17) return false;
+  }
   if (typeof value.constructionEnabled !== "boolean") return false;
   if (!Array.isArray(value.countries) || !value.countries.every(isCountrySnapshot)) return false;
   if (

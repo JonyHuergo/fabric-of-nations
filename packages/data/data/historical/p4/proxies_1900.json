@@ -1,0 +1,288 @@
+{
+ "meta": {
+  "description": "P4 (D-142) authored stand-ins: a modern country (geo) whose Gapminder 1900 record lacks life expectancy, total fertility or under-5 mortality, or whose values are rejected, takes the whole record of the named proxy geo. Provisional; confidence low. Crude birth rate targets follow the same rule.",
+  "rule": "A geo is used only when lex, tfr and u5mr are all present and it is not listed here; partial records are never mixed with a proxy's values."
+ },
+ "proxies": [
+  {
+   "iso3": "and",
+   "proxy": "esp",
+   "reason": "Gapminder's only 1900 value is a total fertility rate at a modern level (carried back); life expectancy and child mortality are missing. The whole record is rejected and the surrounding country is used."
+  },
+  {
+   "iso3": "mco",
+   "proxy": "fra",
+   "reason": "Gapminder's only 1900 value is a total fertility rate at a modern level (carried back); life expectancy and child mortality are missing. The whole record is rejected and the surrounding country is used."
+  },
+  {
+   "iso3": "smr",
+   "proxy": "ita",
+   "reason": "Gapminder's only 1900 value is a total fertility rate at a modern level (carried back); life expectancy and child mortality are missing. The whole record is rejected and the surrounding country is used."
+  },
+  {
+   "iso3": "lie",
+   "proxy": "che",
+   "reason": "Gapminder's only 1900 value is a total fertility rate at a modern level (carried back); life expectancy and child mortality are missing. The whole record is rejected and the surrounding country is used."
+  },
+  {
+   "iso3": "ala",
+   "proxy": "fin",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Åland was a Finnish province of the Russian Empire."
+  },
+  {
+   "iso3": "fro",
+   "proxy": "dnk",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). The Faroe Islands were Danish."
+  },
+  {
+   "iso3": "imn",
+   "proxy": "gbr",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Isle of Man: British Crown dependency."
+  },
+  {
+   "iso3": "kos",
+   "proxy": "alb",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Kosovo vilayet (Ottoman), Albanian majority; Gapminder has no Kosovo series."
+  },
+  {
+   "iso3": "kas",
+   "proxy": "ind",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Aksai Chin / Kashmir territory: no series; the Indian record of British India is used."
+  },
+  {
+   "iso3": "sol",
+   "proxy": "som",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Somaliland (British Somaliland) is not a Gapminder geo; Somalia is used."
+  },
+  {
+   "iso3": "spi",
+   "proxy": "arg",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Southern Patagonian Ice Field residual: Argentina."
+  },
+  {
+   "iso3": "esh",
+   "proxy": "mar",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Western Sahara: Morocco."
+  },
+  {
+   "iso3": "hkg",
+   "proxy": "chn",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Hong Kong lacks under-5 mortality; China is used."
+  },
+  {
+   "iso3": "mac",
+   "proxy": "chn",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Macau: China."
+  },
+  {
+   "iso3": "pri",
+   "proxy": "dom",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Puerto Rico has only a crude birth rate; the neighbouring Dominican Republic is used."
+  },
+  {
+   "iso3": "vir",
+   "proxy": "atg",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). US (then Danish) Virgin Islands: Antigua, the nearest Leeward Islands record."
+  },
+  {
+   "iso3": "vgb",
+   "proxy": "atg",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). British Virgin Islands: Antigua."
+  },
+  {
+   "iso3": "aia",
+   "proxy": "atg",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Anguilla: Antigua."
+  },
+  {
+   "iso3": "kna",
+   "proxy": "atg",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). St Kitts and Nevis has only a total fertility rate: Antigua."
+  },
+  {
+   "iso3": "msr",
+   "proxy": "atg",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Montserrat: Antigua."
+  },
+  {
+   "iso3": "maf",
+   "proxy": "atg",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Saint-Martin: Antigua."
+  },
+  {
+   "iso3": "blm",
+   "proxy": "atg",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Saint-Barthélemy: Antigua."
+  },
+  {
+   "iso3": "dma",
+   "proxy": "lca",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Dominica has only a total fertility rate: Saint Lucia, the neighbouring Windward island."
+  },
+  {
+   "iso3": "glp",
+   "proxy": "lca",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Guadeloupe: Saint Lucia."
+  },
+  {
+   "iso3": "mtq",
+   "proxy": "lca",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Martinique: Saint Lucia."
+  },
+  {
+   "iso3": "bmu",
+   "proxy": "bhs",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Bermuda: the Bahamas."
+  },
+  {
+   "iso3": "tca",
+   "proxy": "bhs",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Turks and Caicos: the Bahamas."
+  },
+  {
+   "iso3": "cym",
+   "proxy": "jam",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Cayman Islands (administered from Jamaica): Jamaica."
+  },
+  {
+   "iso3": "abw",
+   "proxy": "ven",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Aruba: the neighbouring Venezuelan coast."
+  },
+  {
+   "iso3": "cuw",
+   "proxy": "ven",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Curaçao: the neighbouring Venezuelan coast."
+  },
+  {
+   "iso3": "guf",
+   "proxy": "sur",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). French Guiana: Suriname."
+  },
+  {
+   "iso3": "spm",
+   "proxy": "can",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Saint-Pierre and Miquelon: Canada."
+  },
+  {
+   "iso3": "flk",
+   "proxy": "chl",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Falkland Islands: Chile."
+  },
+  {
+   "iso3": "sgs",
+   "proxy": "chl",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). South Georgia: Chile."
+  },
+  {
+   "iso3": "grl",
+   "proxy": "isl",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Greenland: Iceland, the nearest Nordic North-Atlantic record."
+  },
+  {
+   "iso3": "shn",
+   "proxy": "cpv",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Saint Helena: Cape Verde, the nearest Atlantic island record."
+  },
+  {
+   "iso3": "iot",
+   "proxy": "mus",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Chagos Archipelago (administered from Mauritius): Mauritius."
+  },
+  {
+   "iso3": "reu",
+   "proxy": "mus",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Réunion: Mauritius."
+  },
+  {
+   "iso3": "myt",
+   "proxy": "com",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Mayotte: Comoros."
+  },
+  {
+   "iso3": "atf",
+   "proxy": "mdg",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). French Southern Territories: Madagascar."
+  },
+  {
+   "iso3": "hmd",
+   "proxy": "aus",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Heard and McDonald Islands: Australia."
+  },
+  {
+   "iso3": "nfk",
+   "proxy": "nzl",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Norfolk Island: New Zealand."
+  },
+  {
+   "iso3": "ncl",
+   "proxy": "vut",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). New Caledonia: Vanuatu (New Hebrides), the neighbouring Melanesian record."
+  },
+  {
+   "iso3": "pyf",
+   "proxy": "wsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). French Polynesia: Samoa, the nearest Polynesian record."
+  },
+  {
+   "iso3": "wlf",
+   "proxy": "wsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Wallis and Futuna: Samoa."
+  },
+  {
+   "iso3": "cok",
+   "proxy": "wsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Cook Islands: Samoa."
+  },
+  {
+   "iso3": "niu",
+   "proxy": "wsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Niue: Samoa."
+  },
+  {
+   "iso3": "asm",
+   "proxy": "wsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). American Samoa: Samoa."
+  },
+  {
+   "iso3": "pcn",
+   "proxy": "wsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Pitcairn: Samoa."
+  },
+  {
+   "iso3": "nru",
+   "proxy": "kir",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Nauru has only a total fertility rate: Kiribati."
+  },
+  {
+   "iso3": "tuv",
+   "proxy": "kir",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Tuvalu has only a total fertility rate: Kiribati."
+  },
+  {
+   "iso3": "mhl",
+   "proxy": "fsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Marshall Islands has only a total fertility rate: Micronesia."
+  },
+  {
+   "iso3": "plw",
+   "proxy": "fsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Palau has only a total fertility rate: Micronesia."
+  },
+  {
+   "iso3": "mnp",
+   "proxy": "fsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Northern Mariana Islands: Micronesia."
+  },
+  {
+   "iso3": "gum",
+   "proxy": "fsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). Guam: Micronesia."
+  },
+  {
+   "iso3": "umi",
+   "proxy": "fsm",
+   "reason": "No complete Gapminder 1900 record (life expectancy, total fertility and under-5 mortality). US Minor Outlying Islands: Micronesia."
+  }
+ ]
+}

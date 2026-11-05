@@ -58,7 +58,7 @@ Examples of documented semi-sovereign cases:
 |---|---|---|
 | Historical fact | start date; constitutional status; capitals; parent sovereign; names used in 1900 | authored/historical reference |
 | Historical estimate | 1900 population totals; broad occupation shares | OWID/Maddison rounded estimates, per-entry confidence |
-| Model assumption | one market per country; territory-as-region; age structure reused for every country | documented in GDD/decisions |
+| Model assumption | one market per country; territory-as-region; the M2 world age structure (M5 sample only; the 1900 world uses per-province stable populations since P4) | documented in GDD/decisions |
 | Provisional calibration | building levels; treasury; tax rates; technology starts; trade routes; market grouping | project-authored, labelled provisional |
 
 No synthetic value is labelled as measured 1900 data in the UI. Population is
@@ -73,6 +73,9 @@ values are described as documented approximations.
 | Maddison Project Database 2023 | cross-checks for population totals | CC BY 4.0 | values only |
 | Our World in Data — Employment by sector | broad occupation-structure ranges | CC BY 4.0 | values only |
 | Fabric of Nations M2 1900 world age structure | age/sex expansion for every block | project data | yes (project) |
+| Gapminder life expectancy v15, babies per woman v15, child mortality v12, Systema Globalis crude birth rate (open-numbers DDF, pinned commits) | P4 1900 demographic levels: 1896–1905 means per modern country (D-142) | CC BY 4.0 | values only (`historical/p4/gapminder_1900.json`) |
+| Natural Earth 1:10m admin-0 countries | P4 province → modern country crosswalk (D-142) | public domain | derived crosswalk only |
+| UN WPP 2024 via Our World in Data | P4 validation targets: regional 1975/2000 and the world 1950–2000 schedules (never a simulation input) | CC BY 4.0 / CC BY 3.0 IGO | values only (`validation/`) |
 | Fabric of Nations M11/M11c authored catalog and boundary transfers | status, capitals, markets, geometry crosswalk, 1900 transfers, boundary provenance, fiscal/technology/building starts | project data | yes (project) |
 | Natural Earth 1:50m cultural vectors | map base geometry | public domain | yes, derived |
 | Natural Earth 1:10m admin-0/admin-1 | historical reconstruction blocks and clipping | public domain | yes, derived |

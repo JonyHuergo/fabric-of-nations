@@ -3,6 +3,7 @@ import {
   createEconomyWorld,
   populationTotal,
   runTicks,
+  tick,
   workingAgePopulation,
   type BuildingDef,
   type EconomyScenarioDef,
@@ -233,7 +234,8 @@ describe("M5 historical scenario feasibility", () => {
       economy: { definitions: scenario.definitions },
     };
     const before = world.popBlocks.reduce((total, block) => total + populationTotal(block), 0);
-    runTicks(world, 31, context);
+    runTicks(world, 30, context);
+    const last = tick(world, { ...context, detail: "full" });
     assertValidWorld(world);
     const after = world.popBlocks.reduce((total, block) => total + populationTotal(block), 0);
     expect(after).toBeGreaterThan(before * 0.995);
@@ -241,10 +243,38 @@ describe("M5 historical scenario feasibility", () => {
     // verifies that cash-constrained household blocks do not spread into a
     // world-level famine in the first month. Per-block income distribution is a
     // separate provisional calibration limitation documented in the report.
+    //
+    // P4 (D-142): the sample now grows at the sourced 1900 world levels instead of the
+    // former 1.45-scaled mortality, and the fish and livestock capacity of two markets
+    // sits at their demand: their blocks receive 99.86 % of the fish and livestock they
+    // pay for, which keeps the binary unmet-days counter above zero (25 % of people)
+    // although they eat their calories. "No structural shortage" is therefore checked on
+    // its two causes. Supply: no block receives less than 99.5 % of a subsistence good it
+    // has paid for. Money: the population with a material calorie shortfall (food
+    // sufficiency below 95 %) stays under 10 %. The binary share is bounded at 30 %.
+    // Restated in P4 and flagged for designer review (P4 completion report).
+    const needs = last.population!.needs;
+    for (const block of needs.blocks) {
+      if (block.population === 0) continue;
+      const subsistence = block.tiers.find((tier) => tier.tier === "subsistence");
+      for (const good of subsistence?.goods ?? []) {
+        // One physical unit absorbs rounding of near-zero funded quantities.
+        const supplied = good.funded - good.fulfilled <= Math.max(0.005 * good.funded, 1);
+        expect({ block: block.popBlockId, good: good.goodKey, supplied }).toEqual({
+          block: block.popBlockId,
+          good: good.goodKey,
+          supplied: true,
+        });
+      }
+    }
+    const hungryPopulation = world.popBlocks
+      .filter((block) => block.foodSufficiency < 0.95)
+      .reduce((total, block) => total + populationTotal(block), 0);
+    expect(hungryPopulation / before).toBeLessThan(0.1);
     const unmetPopulation = world.popBlocks
       .filter((block) => block.unmetSubsistenceDays > 0)
       .reduce((total, block) => total + populationTotal(block), 0);
-    expect(unmetPopulation / before).toBeLessThan(0.1);
+    expect(unmetPopulation / before).toBeLessThan(0.3);
     for (const market of world.markets) {
       for (let goodId = 0; goodId < market.priceRUSD.length; goodId += 1) {
         const base = scenario.definitions.goods[goodId]!.basePrice1900RUSD;

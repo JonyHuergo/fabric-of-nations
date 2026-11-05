@@ -164,18 +164,20 @@ describe("M2 wealth and militancy", () => {
     }
   });
 
-  test("previous-day unmet needs increase daily mortality", () => {
+  test("P4: previous days' food shortfall increases daily mortality; counters alone do not", () => {
     const withPressure = aggregateWorld();
+    const countersOnly = aggregateWorld();
     const withoutPressure = aggregateWorld();
     const definitions = withPressure.scenario.definitions;
-    const blockWith = withPressure.world.popBlocks[0]!;
-    const blockWithout = withoutPressure.world.popBlocks[0]!;
-    blockWith.unmetSubsistenceDays = 365;
-    blockWith.unmetBasicDays = 365;
-    blockWithout.unmetSubsistenceDays = 0;
-    blockWithout.unmetBasicDays = 0;
+    // D-142: the unmet-days counters keep driving militancy, wealth and AI, but
+    // mortality responds to the calories actually eaten.
+    countersOnly.world.popBlocks[0]!.unmetSubsistenceDays = 365;
+    countersOnly.world.popBlocks[0]!.unmetBasicDays = 365;
+    withPressure.world.popBlocks[0]!.foodSufficiency = 0.6;
     const withResult = applyDailyDemography(withPressure.world, definitions, 0);
+    const countersResult = applyDailyDemography(countersOnly.world, definitions, 0);
     const withoutResult = applyDailyDemography(withoutPressure.world, definitions, 0);
+    expect(countersResult.totalDeaths).toBe(withoutResult.totalDeaths);
     expect(withResult.totalDeaths).toBeGreaterThan(withoutResult.totalDeaths);
   });
 

@@ -108,8 +108,11 @@ describe("M14 monetary equivalence and determinism", () => {
   // Re-pinned for P3: sourced 1900 currency valuations, adopted arrangements, corrected
   // currency names and schema 30 (D-141). The P3 equivalence test and
   // `p3Equivalence.js` show that no simulated quantity changed.
+  // Re-pinned for P4: the 1900 world starts from per-province stable age structures and
+  // sourced demographic levels, blocks carry their demographic state, technologies gain
+  // the sanitation and contraception effects, and the schema is 31 (D-142).
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("447c3f725aaa8450");
+    expect(hashWorld(world)).toBe("1e6d9b8cd947d1a2");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {
@@ -118,7 +121,8 @@ describe("M14 monetary equivalence and determinism", () => {
     expect(envelope.format).toBe("century-save");
     // P2b (D-135): schema 29 adds province wages, building technique and money coefficients.
     // P3 (D-141): schema 30 adds the month-end closing valuations.
-    expect(envelope.schemaVersion).toBe(30);
+    // P4 (D-142): schema 31 adds the block demography and the annual record.
+    expect(envelope.schemaVersion).toBe(31);
     expect(hasLegacyMonetaryKey(envelope.payload)).toBe(false);
     expect(save).toContain("balanceRUSD");
     expect(save).not.toMatch(/SUSD|Susd|susd/);
@@ -154,7 +158,8 @@ describe("M14 current documentation and protocol", () => {
     // 17: P2 province economy table, territories and professions (D-134).
     // 18: stored save form on SAVE_RESULT and LOAD (D-137).
     // 19: country currency link and valuation history in the snapshot (D-141).
-    expect(PROTOCOL_VERSION).toBe(19);
+    // 20: demography in the snapshot and the province focus command (D-142).
+    expect(PROTOCOL_VERSION).toBe(20);
   });
 
   test("the monetary terminology audit passes", () => {

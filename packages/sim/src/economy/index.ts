@@ -239,3 +239,5 @@ export {
   type RecruitArmyInput,
 } from "./military.js";
 export * from "./provinceTransfer.js";
+export * from "./demographyFactors.js";
+export * from "./demographyReport.js";

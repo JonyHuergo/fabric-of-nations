@@ -1,7 +1,7 @@
 # Prosperity Program — peacetime economy and demography
 
 **Status:** P0–P2b accepted; the performance stages (D-137, D-139) accepted as complete on
-2026-11-04. **P3 is next.**\
+2026-11-04. P3 (D-141) and P4 (D-142) are implemented for review.\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\
 **Goal:** a country that never goes to war and never engages in diplomacy must still be
@@ -241,6 +241,13 @@ Acceptance: per-country 1900 crude birth/death rates within documented tolerance
 sources; in a no-input century run, TFR declines follow literacy/urbanisation (tested
 causally with fixtures that vary one cause); famine fixture raises mortality only through
 food shortfall; conservation exact; WPP comparison report at 1975/2000 per region.
+
+**Status (2026-11-05).** Implemented for review (D-142; report `P4_COMPLETION_REPORT.md`).
+Data `historical/p4/` (Gapminder 1896–1905 extract, province → modern-country crosswalk,
+stand-ins, generated levels, stable age structures and urban shares, built by
+`scripts/p4/`); schema 31, protocol 20; per-province and per-country rates, pyramid,
+causes and yearly history in the province panel and the Population ledger; tests
+`p4-demography`. WPP comparison: `docs/P4_WPP_COMPARISON.md`.
 
 ### P5 — Land, agriculture, harvests, resources
 

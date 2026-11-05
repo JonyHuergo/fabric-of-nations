@@ -99,6 +99,31 @@ export interface PopBlock {
   fractionalMaleBirthRemainder: number;
   /** Fractional person remainder for deaths. */
   fractionalDeathRemainder: number;
+
+  // P4 cause-driven demography (D-124, D-142). Levels are dimensionless
+  // multipliers of the definitions' WPP 1950 standard schedule (the age pattern).
+  /**
+   * Share of the block living in towns, 0..1 (HYDE 3.3, D-121). Fixed until the P7
+   * labour market moves people between town and country; migrants join the
+   * destination block's settlement pattern.
+   */
+  urbanShare: Rate;
+  /**
+   * Persistent factors the model does not simulate (marriage pattern, breastfeeding,
+   * disease environment), fixed at world creation so the 1900 levels equal their
+   * sources: residual = sourced 1900 level ÷ cause factors at the start. Never
+   * changes and never accumulates.
+   */
+  fertilityResidual: number;
+  childMortalityResidual: number;
+  adultMortalityResidual: number;
+  /** Effective child-mortality multiplier smoothed over `CHILD_MORTALITY_LAG_MONTHS`. */
+  childMortalityLagged: number;
+  /**
+   * Dietary energy actually consumed ÷ requirement, capped at 1 (saturation of the
+   * requirement, not a repair) and smoothed over `FOOD_SUFFICIENCY_SMOOTHING_DAYS`.
+   */
+  foodSufficiency: Rate;
 }
 
 export interface NeedItemDef {
@@ -115,18 +140,26 @@ export interface NeedTierDef {
   activationWealthMin: number;
 }
 
-export interface MortalityAnchor {
-  year: number;
+/**
+ * P4 (D-124): the age *pattern* of fertility and mortality. Levels are per-block
+ * state derived from causes; this schedule only shapes them across ages and sexes.
+ */
+export interface StandardDemographicSchedule {
+  /** Source year of the schedule (WPP 2024 world, 1950). */
+  sourceYear: number;
   /** 17 annual central death rates per 1,000 males in each five-year band. */
   maleAnnualDeathsPer1000ByAgeBand: readonly number[];
   /** 17 annual central death rates per 1,000 females in each five-year band. */
   femaleAnnualDeathsPer1000ByAgeBand: readonly number[];
-}
-
-export interface FertilityAnchor {
-  year: number;
   /** Seven annual ASFRs per 1,000 women, ages 15-19 through 45-49. */
   ageSpecificBirthsPer1000Women: readonly number[];
+}
+
+/** P4: dietary energy of one physical unit of a food good. */
+export interface FoodEnergyDef {
+  goodKey: string;
+  /** Kilocalories per physical unit of the good (its `unitLabel`). */
+  kcalPerUnit: number;
 }
 
 export interface FertilityMultiplierDef {
@@ -145,8 +178,10 @@ export interface PopulationDefinitions {
   dataVersion: string;
   scenarioId: string;
   needs: readonly NeedTierDef[];
-  mortalityAnchors: readonly MortalityAnchor[];
-  fertilityAnchors: readonly FertilityAnchor[];
+  /** P4 age pattern of fertility and mortality (D-124). */
+  standardSchedule: StandardDemographicSchedule;
+  /** P4 dietary energy of the food goods; goods absent here provide none. */
+  foodEnergy: readonly FoodEnergyDef[];
   /** Male births per one female birth; provisional unless sourced. */
   sexRatioAtBirth: number;
   fertilityMultipliers: readonly FertilityMultiplierDef[];
@@ -165,6 +200,23 @@ export interface PopBlockInitialDef {
   wealthLevel: number;
   initialSavingsRUSD: MoneyRUSD;
   militancy: Rate;
+  /**
+   * P4 sourced 1900 demography of the block (D-142). Absent fields default to the
+   * standard schedule (levels 1) and a rural block.
+   */
+  demography?: PopBlockDemographyInitialDef;
+}
+
+/** P4 initial demographic levels of one block. */
+export interface PopBlockDemographyInitialDef {
+  /** Urban share 0..1. */
+  urbanShare?: Rate;
+  /** TFR ÷ standard TFR at the start. */
+  fertilityLevel?: number;
+  /** Effective child (0–4) death-rate multiplier at the start, food sufficient. */
+  childMortalityLevel?: number;
+  /** Effective adult (5+) death-rate multiplier at the start, food sufficient. */
+  adultMortalityLevel?: number;
 }
 
 export interface ProvinceEconomyInitialDef {
@@ -294,6 +346,8 @@ export interface NeedTierResult extends NeedTierSummary {
 }
 
 export interface PopBlockNeedsResult {
+  /** P4: dietary energy fulfilled today across all need tiers, kcal (D-142). */
+  kcalConsumed: number;
   popBlockId: Id;
   population: number;
   /** Cash/goods budget at the start of the needs phase, before market spending. */

@@ -18,6 +18,11 @@
  * corruption and is not a security signature.
  */
 
+import {
+  decodeDemographyReport,
+  encodeDemographyReport,
+  type DemographyReportState,
+} from "./economy/demographyReportState.js";
 import { assertValidDayIndex } from "./calendar.js";
 import {
   CAMPAIGN_END_YEAR,
@@ -927,6 +932,12 @@ export type SerializedPopBlock = {
   readonly fractionalBirthRemainder: number;
   readonly fractionalMaleBirthRemainder: number;
   readonly fractionalDeathRemainder: number;
+  readonly urbanShare: number;
+  readonly fertilityResidual: number;
+  readonly childMortalityResidual: number;
+  readonly adultMortalityResidual: number;
+  readonly childMortalityLagged: number;
+  readonly foodSufficiency: number;
 };
 
 /** Encoded M12a province ownership record. */
@@ -985,6 +996,8 @@ export type SerializedWorld = {
   readonly trade: SerializedTradeState;
   readonly priceIndex: SerializedPriceIndexState;
   readonly monetary: SerializedMonetaryState;
+  /** P4 per-country annual demographic record (D-142). */
+  readonly demography: DemographyReportState;
   readonly military: SerializedMilitaryState;
   /** M12a provincial ownership/control state; definitions and geometry are static. */
   readonly provinces: SerializedProvinceState;
@@ -1478,6 +1491,12 @@ export function encodeWorld(world: World): SerializedWorld {
       fractionalBirthRemainder: block.fractionalBirthRemainder,
       fractionalMaleBirthRemainder: block.fractionalMaleBirthRemainder,
       fractionalDeathRemainder: block.fractionalDeathRemainder,
+      urbanShare: block.urbanShare,
+      fertilityResidual: block.fertilityResidual,
+      childMortalityResidual: block.childMortalityResidual,
+      adultMortalityResidual: block.adultMortalityResidual,
+      childMortalityLagged: block.childMortalityLagged,
+      foodSufficiency: block.foodSufficiency,
     })),
     buildings: [...world.buildings]
       .sort((left, right) => left.id - right.id)
@@ -1763,6 +1782,7 @@ export function encodeWorld(world: World): SerializedWorld {
               })),
             },
     },
+    demography: encodeDemographyReport(world.demography),
     priceIndex: {
       basket: [...world.priceIndex.basket]
         .sort((left, right) => left.goodId - right.goodId)
@@ -3773,6 +3793,12 @@ function decodePopBlock(value: unknown, path: string): PopBlock {
       record.fractionalDeathRemainder,
       `${path}.fractionalDeathRemainder`,
     ),
+    urbanShare: requireFiniteNumber(record.urbanShare, `${path}.urbanShare`),
+    fertilityResidual: requireFiniteNumber(record.fertilityResidual, `${path}.fertilityResidual`),
+    childMortalityResidual: requireFiniteNumber(record.childMortalityResidual, `${path}.childMortalityResidual`),
+    adultMortalityResidual: requireFiniteNumber(record.adultMortalityResidual, `${path}.adultMortalityResidual`),
+    childMortalityLagged: requireFiniteNumber(record.childMortalityLagged, `${path}.childMortalityLagged`),
+    foodSufficiency: requireFiniteNumber(record.foodSufficiency, `${path}.foodSufficiency`),
   };
 }
 
@@ -4194,6 +4220,7 @@ function decodeWorldPayload(value: unknown): World {
   const technology = { enabled: rawTechnology.enabled };
   const trade = decodeTradeState(payload.trade, "save payload.trade");
   const priceIndex = decodePriceIndexState(payload.priceIndex, "save payload.priceIndex");
+  const demography = decodeDemographyReport(payload.demography, "save payload.demography");
   const monetary = decodeMonetaryState(payload.monetary, "save payload.monetary");
   const military = decodeMilitaryState(payload.military, "save payload.military");
   const provinces = decodeProvinceState(payload.provinces);
@@ -4237,6 +4264,7 @@ function decodeWorldPayload(value: unknown): World {
     provinces,
     playerCountryId,
     moneyCoefficients,
+    demography,
     diagnostics: {
       invariantFailureCount,
       invalidActionCount,

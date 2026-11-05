@@ -67,8 +67,8 @@ interface RawM3Scenario {
 }
 
 interface RawDemography {
-  mortalityAnchors: PopulationDefinitions["mortalityAnchors"];
-  fertilityAnchors: PopulationDefinitions["fertilityAnchors"];
+  standardSchedule: PopulationDefinitions["standardSchedule"];
+  foodEnergy: PopulationDefinitions["foodEnergy"];
   sexRatioAtBirth: number;
   fertilityMultipliers: PopulationDefinitions["fertilityMultipliers"];
   provenance: unknown;
@@ -140,8 +140,8 @@ function loadScenario(scenarioFile: string): PopulationScenarioDef {
     dataVersion: raw.dataVersion,
     scenarioId: raw.scenarioId,
     needs,
-    mortalityAnchors: demography.mortalityAnchors,
-    fertilityAnchors: demography.fertilityAnchors,
+    standardSchedule: demography.standardSchedule,
+    foodEnergy: demography.foodEnergy,
     sexRatioAtBirth: demography.sexRatioAtBirth,
     fertilityMultipliers: demography.fertilityMultipliers.filter((entry) =>
       professionIds.has(entry.professionId),
@@ -201,8 +201,8 @@ export function loadM3SmallEconomy(): EconomyScenarioDef {
     dataVersion: raw.dataVersion,
     scenarioId: raw.scenarioId,
     needs,
-    mortalityAnchors: demography.mortalityAnchors,
-    fertilityAnchors: demography.fertilityAnchors,
+    standardSchedule: demography.standardSchedule,
+    foodEnergy: demography.foodEnergy,
     sexRatioAtBirth: demography.sexRatioAtBirth,
     fertilityMultipliers: demography.fertilityMultipliers.filter((entry) =>
       professionIds.has(entry.professionId),
@@ -270,4 +270,32 @@ export function loadM2PopulationCalibration(): PopulationCalibrationSeries {
     }
   }
   return series;
+}
+
+/** One year of the WPP 2024 world schedules (validation only, D-142). */
+export interface WppWorldScheduleYear {
+  readonly maleAnnualDeathsPer1000ByAgeBand: readonly number[];
+  readonly femaleAnnualDeathsPer1000ByAgeBand: readonly number[];
+  readonly ageSpecificBirthsPer1000Women: readonly number[];
+}
+
+/**
+ * P4 (D-124, D-142): WPP 2024 annual world schedules 1950–2000. Validation only —
+ * simulation code never reads them; tests feed them to the engine to check that it
+ * reproduces WPP's age structure when given WPP's own rates.
+ */
+export function loadWppWorldSchedules(): Readonly<Record<string, WppWorldScheduleYear>> {
+  const file = readJson<{ years: Record<string, WppWorldScheduleYear> }>(
+    "validation/wpp_world_schedules_1950_2000.json",
+  );
+  for (const [year, schedule] of Object.entries(file.years)) {
+    if (
+      schedule.maleAnnualDeathsPer1000ByAgeBand.length !== 17 ||
+      schedule.femaleAnnualDeathsPer1000ByAgeBand.length !== 17 ||
+      schedule.ageSpecificBirthsPer1000Women.length !== 7
+    ) {
+      throw new Error(`WPP world schedule ${year} has the wrong band counts`);
+    }
+  }
+  return file.years;
 }

@@ -2064,6 +2064,12 @@ Wealth level may affect need activation, health, birth/death rates, literacy att
 > from source-backed country-specific 1900 levels. Historical series become
 > calibration and validation targets only (§17J.3 P4). The text below remains
 > the current implementation until P4 is accepted.
+>
+> **P4 implementation for review (D-142, 2026-11-05).** The WPP 2024 world 1950
+> schedule is the age pattern; each block's fertility level and child (0–4) and adult
+> (5+) mortality levels follow the causes listed in D-142 and start from Gapminder
+> 1896–1905 levels of the province's modern country. The M2 unmet-needs mortality
+> terms are replaced by calories eaten.
 
 Demography is age-specific and sex-specific. Population changes only through explicitly counted births, deaths, and later migration. The authoritative state is the single-year `maleByAge`/`femaleByAge` arrays in §5.4; five-year bands are derived for reporting and source comparison.
 
@@ -6638,6 +6644,11 @@ P2b (historical money and productivity, schema 29) is implemented for review on
 P3 (local-currency display, schema 30) is implemented for review on 2026-11-04 (D-141);
 the designer's requirements for metal and paper money and for changing a currency
 arrangement are recorded as proposed decision D-140, not yet assigned to a stage.
+P4 (cause-driven demography, schema 31, protocol 20) is implemented for review on
+2026-11-05 (D-142): per-block fertility and child/adult mortality levels derived from
+literacy, towns, income, lagged child mortality, contraception, health services,
+sanitation and calories eaten, starting from sourced 1900 levels per province; WPP is a
+validation target only.
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair

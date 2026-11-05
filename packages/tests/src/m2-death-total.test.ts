@@ -166,22 +166,12 @@ function definitionsFor(base: PopulationDefinitions, rate: number): PopulationDe
   const zeroFertility = new Array<number>(7).fill(0);
   return {
     ...base,
-    mortalityAnchors: [
-      {
-        year: 1900,
-        maleAnnualDeathsPer1000ByAgeBand: maleRate,
-        femaleAnnualDeathsPer1000ByAgeBand: femaleRate,
-      },
-      {
-        year: 2000,
-        maleAnnualDeathsPer1000ByAgeBand: maleRate,
-        femaleAnnualDeathsPer1000ByAgeBand: femaleRate,
-      },
-    ],
-    fertilityAnchors: [
-      { year: 1900, ageSpecificBirthsPer1000Women: zeroFertility },
-      { year: 2000, ageSpecificBirthsPer1000Women: zeroFertility },
-    ],
+    standardSchedule: {
+      sourceYear: 1950,
+      maleAnnualDeathsPer1000ByAgeBand: maleRate,
+      femaleAnnualDeathsPer1000ByAgeBand: femaleRate,
+      ageSpecificBirthsPer1000Women: zeroFertility,
+    },
   };
 }
 
@@ -248,6 +238,11 @@ describe("P2b1 reused expected-death total", () => {
       block.maleByAge.set(item.male);
       block.femaleByAge.set(item.female);
       block.fractionalDeathRemainder = item.initialRemainder;
+      // P4: the allocator is checked at level 1 (the reference applies the schedule
+      // rate as given); the aggregate fixture starts from the 1900 world levels.
+      block.childMortalityResidual = 1;
+      block.adultMortalityResidual = 1;
+      block.urbanShare = 0;
 
       const reference = referenceCase(item);
       const result = applyDailyDemography(world, definitions, 0);
@@ -274,7 +269,7 @@ describe("P2b1 reused expected-death total", () => {
 
   test("uses mortalityRatePer1000-derived expectations in the reference", () => {
     const definitions = definitionsFor(aggregateScenario().definitions, 500);
-    expect(mortalityRatePer1000(definitions, 1900, 0, "male")).toBe(500);
-    expect(mortalityRatePer1000(definitions, 1900, 16, "female")).toBe(500);
+    expect(mortalityRatePer1000(definitions, 0, "male")).toBe(500);
+    expect(mortalityRatePer1000(definitions, 16, "female")).toBe(500);
   });
 });

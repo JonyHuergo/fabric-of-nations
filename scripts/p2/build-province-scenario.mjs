@@ -536,6 +536,9 @@ function build() {
     moneyCoefficients: "historical/p2b/money_coefficients_1900.json",
     // P3 (D-141): currencies, arrangements and sourced 1900 parities.
     currencies: "historical/p3/currencies_1900.json",
+    // P4 (D-142): sourced 1900 demographic levels, age structures and urban shares,
+    // built by scripts/p4/build-demography-1900.mjs.
+    demography: "historical/p4/demography_1900.json",
   };
   meta.definitions = {
     ...meta.definitions,

@@ -169,7 +169,8 @@
       "employment": "historical/p2b/employment_1900.json",
       "calibration": "historical/p2b/calibration_targets_1900.json",
       "moneyCoefficients": "historical/p2b/money_coefficients_1900.json",
-      "currencies": "historical/p3/currencies_1900.json"
+      "currencies": "historical/p3/currencies_1900.json",
+      "demography": "historical/p4/demography_1900.json"
     },
     "definitions": {
       "goods": "historical_1900_goods.json",

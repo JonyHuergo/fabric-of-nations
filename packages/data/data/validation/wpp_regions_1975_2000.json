@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "description": "UN WPP 2024 estimates for the continental regions in 1975 and 2000. Validation target only (D-124): never read by simulation code.",
+    "source": "United Nations, World Population Prospects 2024, via Our World in Data grapher (children-born-per-woman, life-expectancy-at-birth-total-years, birth-rate-vs-death-rate)",
+    "license": "CC BY 4.0",
+    "accessDate": "2026-11-05",
+    "units": {
+      "tfr": "children per woman",
+      "lifeExpectancy": "years at birth, both sexes",
+      "crudeBirthRate": "births per 1,000 people per year",
+      "crudeDeathRate": "deaths per 1,000 people per year",
+      "population": "people (1 July)"
+    },
+    "regions": "UN M49 continental regions; Americas split into Latin America and the Caribbean, and Northern America."
+  },
+  "regions": {
+    "africa": {
+      "1975": {
+        "tfr": 6.686,
+        "lifeExpectancy": 46.807,
+        "crudeBirthRate": 46.545,
+        "crudeDeathRate": 18.634,
+        "population": 418433158
+      },
+      "2000": {
+        "tfr": 5.203,
+        "lifeExpectancy": 53.667,
+        "crudeBirthRate": 38.718,
+        "crudeDeathRate": 12.824,
+        "population": 830582526
+      }
+    },
+    "asia": {
+      "1975": {
+        "tfr": 4.43,
+        "lifeExpectancy": 56.609,
+        "crudeBirthRate": 31.837,
+        "crudeDeathRate": 11.57,
+        "population": 2389170028
+      },
+      "2000": {
+        "tfr": 2.584,
+        "lifeExpectancy": 67.607,
+        "crudeBirthRate": 21.3,
+        "crudeDeathRate": 7.239,
+        "population": 3747780310
+      }
+    },
+    "europe": {
+      "1975": {
+        "tfr": 2.069,
+        "lifeExpectancy": 70.872,
+        "crudeBirthRate": 15.218,
+        "crudeDeathRate": 10.296,
+        "population": 677279663
+      },
+      "2000": {
+        "tfr": 1.41,
+        "lifeExpectancy": 73.442,
+        "crudeBirthRate": 10.036,
+        "crudeDeathRate": 11.538,
+        "population": 728164201
+      }
+    },
+    "latin-america-caribbean": {
+      "1975": {
+        "tfr": 4.644,
+        "lifeExpectancy": 61.304,
+        "crudeBirthRate": 34.329,
+        "crudeDeathRate": 9.151,
+        "population": 321910244
+      },
+      "2000": {
+        "tfr": 2.609,
+        "lifeExpectancy": 70.814,
+        "crudeBirthRate": 22.258,
+        "crudeDeathRate": 6.131,
+        "population": 521323343
+      }
+    },
+    "northern-america": {
+      "1975": {
+        "tfr": 1.813,
+        "lifeExpectancy": 72.624,
+        "crudeBirthRate": 15.097,
+        "crudeDeathRate": 8.612,
+        "population": 242386622
+      },
+      "2000": {
+        "tfr": 1.979,
+        "lifeExpectancy": 77.037,
+        "crudeBirthRate": 13.722,
+        "crudeDeathRate": 8.466,
+        "population": 312499985
+      }
+    },
+    "oceania": {
+      "1975": {
+        "tfr": 2.932,
+        "lifeExpectancy": 68.724,
+        "crudeBirthRate": 21.924,
+        "crudeDeathRate": 8.198,
+        "population": 21555564
+      },
+      "2000": {
+        "tfr": 2.447,
+        "lifeExpectancy": 75.224,
+        "crudeBirthRate": 18.315,
+        "crudeDeathRate": 6.873,
+        "population": 31352628
+      }
+    },
+    "world": {
+      "1975": {
+        "tfr": 4.08,
+        "lifeExpectancy": 58.268,
+        "crudeBirthRate": 29.732,
+        "crudeDeathRate": 11.699,
+        "population": 4070735279
+      },
+      "2000": {
+        "tfr": 2.754,
+        "lifeExpectancy": 66.433,
+        "crudeBirthRate": 21.997,
+        "crudeDeathRate": 8.464,
+        "population": 6171702992
+      }
+    }
+  }
+}

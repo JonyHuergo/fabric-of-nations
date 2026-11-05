@@ -24,6 +24,7 @@ import { assertValidDayIndex, dayIndexToCivilDate, isTerminalDayIndex } from "..
 import { MONEY_TOLERANCE_RUSD, RATE_DECIMAL_PLACES, WEALTH_DECIMAL_PLACES } from "../population/constants.js";
 import {
   mergeBlockLiteracyByAge,
+  syncBlockLiteracy,
   populationTotal,
 } from "../population/state.js";
 import { roundTo } from "../population/definitions.js";
@@ -355,6 +356,7 @@ interface MigrationBackup {
     readonly male: Uint32Array;
     readonly female: Uint32Array;
     readonly literacy: number;
+    readonly literacyByAge: readonly number[];
     readonly wealthLevel: number;
     readonly militancy: number;
   }[];
@@ -370,6 +372,7 @@ function backupWorld(world: World): MigrationBackup {
       male: block.maleByAge.slice(),
       female: block.femaleByAge.slice(),
       literacy: block.literacy,
+      literacyByAge: [...block.literacyByAge],
       wealthLevel: block.wealthLevel,
       militancy: block.militancy,
     })),
@@ -384,6 +387,7 @@ function restoreWorld(world: World, backup: MigrationBackup): void {
     entry.block.maleByAge = entry.male.slice();
     entry.block.femaleByAge = entry.female.slice();
     entry.block.literacy = entry.literacy;
+    entry.block.literacyByAge = [...entry.literacyByAge];
     entry.block.wealthLevel = entry.wealthLevel;
     entry.block.militancy = entry.militancy;
   }
@@ -831,6 +835,9 @@ function applyFlow(
 
   subtractCells(source, cells.male, cells.female);
   addCells(destination, cells.male, cells.female);
+  // P4 regression (D-142): the source's 15+ literacy aggregate is weighted by its
+  // remaining people, so it must be re-derived after the migrants leave.
+  syncBlockLiteracy(source);
 
   const destinationPopulationAfter = destinationPopulationBefore + people;
   if (destinationPopulationAfter <= 0) {

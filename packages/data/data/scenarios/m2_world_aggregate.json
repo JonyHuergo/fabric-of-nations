@@ -65,10 +65,16 @@
         5407158,
         2784235,
         1992884
-      ]
+      ],
+      "demography": {
+        "urbanShare": 0.166,
+        "fertilityLevel": 1.1444694938,
+        "childMortalityLevel": 1.7518498355,
+        "adultMortalityLevel": 1.2493791538
+      }
     }
   ],
   "needsFile": "needs.json",
   "demographyFile": "demography.json",
-  "notes": "Initial total 1,621,287,278 is the OWID Jan 1, 1900 interpolation. Male/female age groups use the provisional 1900 age shares split by WPP 1950 age-specific sex shares; this is a documented projection assumption, not a 1900 source. WPP age/sex reference is separate."
+  "notes": "Initial total 1,621,287,278 is the OWID Jan 1, 1900 interpolation. Male/female age groups use the provisional 1900 age shares split by WPP 1950 age-specific sex shares; this is a documented projection assumption, not a 1900 source. WPP age/sex reference is separate. P4 (D-142): the block starts from the 1900 world levels of the province world, population-weighted from historical/p4/demography_1900.json (TFR 5.52, life expectancy 34.6, under-5 mortality 399 per 1,000; urban share 16.6% from HYDE 3.3). A population-only world has no countries, no education and no market, so these levels only move through food and child-mortality lag: it is not a historical projection."
 }

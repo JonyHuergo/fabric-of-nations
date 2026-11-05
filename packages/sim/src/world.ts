@@ -10,6 +10,11 @@
  * remain future milestones and are not invented here.
  */
 
+import {
+  assertValidDemographyReport,
+  emptyDemographyReport,
+  type DemographyReportState,
+} from "./economy/demographyReportState.js";
 import { assertValidDayIndex } from "./calendar.js";
 import {
   CAMPAIGN_TERMINAL_DAY_INDEX,
@@ -151,6 +156,8 @@ export interface World {
   playerCountryId: Id | null;
   /** P2b scenario money coefficients (D-135); defaults to the pre-P2b constants. */
   moneyCoefficients: MoneyCoefficients;
+  /** P4 per-country annual demographic record (D-142); reporting only. */
+  demography: DemographyReportState;
   diagnostics: SimulationDiagnostics;
 }
 
@@ -285,6 +292,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     provinces: emptyProvinceState(),
     playerCountryId: null,
     moneyCoefficients: { ...DEFAULT_MONEY_COEFFICIENTS },
+    demography: emptyDemographyReport(),
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
@@ -412,6 +420,7 @@ export function assertValidWorld(
   assertValidMonetaryState(world);
   assertValidMilitaryState(world);
   assertValidProvinceState(world.provinces);
+  assertValidDemographyReport(world);
 }
 
 /**

@@ -6,6 +6,7 @@
  * production, market clearing, wages, or pricing.
  */
 
+import { calibrateDemographyForCountries } from "./demographyFactors.js";
 import { assertValidDayIndex } from "../calendar.js";
 import {
   AGE_BAND_WIDTH,
@@ -1428,6 +1429,9 @@ export function createEconomyWorld(
   world.construction.nextBuildingId =
     world.buildings.reduce((max, building) => Math.max(max, building.id), 0) + 1;
 
+  // P4 (D-142): the blocks were calibrated with neutral factors; fix their residuals
+  // under the countries' start-of-game health, sanitation and contraception.
+  calibrateDemographyForCountries(world, scenario.definitions);
 
   assertValidWorld(world);
   return world;

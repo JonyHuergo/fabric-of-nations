@@ -4,9 +4,8 @@ import {
   createPopulationWorld,
   populationTotal,
   tick,
-  type FertilityAnchor,
-  type MortalityAnchor,
   type PopulationDefinitions,
+  type StandardDemographicSchedule,
 } from "@century/sim";
 import {
   aggregateScenario,
@@ -18,26 +17,18 @@ import {
   oneBlockScenario,
 } from "./fixtures/m2.js";
 
-function zeroMortality(): MortalityAnchor[] {
-  return [
-    {
-      year: 1900,
-      maleAnnualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0),
-      femaleAnnualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0),
-    },
-    {
-      year: 2000,
-      maleAnnualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0),
-      femaleAnnualDeathsPer1000ByAgeBand: new Array<number>(17).fill(0),
-    },
-  ];
+function zeros(length: number): number[] {
+  return new Array<number>(length).fill(0);
 }
 
-function fertility(rates: number[]): FertilityAnchor[] {
-  return [
-    { year: 1900, ageSpecificBirthsPer1000Women: rates },
-    { year: 2000, ageSpecificBirthsPer1000Women: rates },
-  ];
+/** P4: the standard schedule a fixture runs at level 1. */
+function schedule(male: number[], female: number[], asfr: number[]): StandardDemographicSchedule {
+  return {
+    sourceYear: 1950,
+    maleAnnualDeathsPer1000ByAgeBand: male,
+    femaleAnnualDeathsPer1000ByAgeBand: female,
+    ageSpecificBirthsPer1000Women: asfr,
+  };
 }
 
 function definitionsWith(overrides: Partial<PopulationDefinitions>): PopulationDefinitions {
@@ -118,11 +109,7 @@ describe("M2.1 age-specific births, deaths, and fractional accumulation", () => 
     male[16] = 1000;
     female[16] = 0;
     const definitions = definitionsWith({
-      mortalityAnchors: [
-        { year: 1900, maleAnnualDeathsPer1000ByAgeBand: male, femaleAnnualDeathsPer1000ByAgeBand: female },
-        { year: 2000, maleAnnualDeathsPer1000ByAgeBand: male, femaleAnnualDeathsPer1000ByAgeBand: female },
-      ],
-      fertilityAnchors: fertility(new Array<number>(7).fill(0)),
+      standardSchedule: schedule(male, female, new Array<number>(7).fill(0)),
     });
     const scenario = scenarioWithGroups(
       groupsWith(16, 365),
@@ -139,39 +126,51 @@ describe("M2.1 age-specific births, deaths, and fractional accumulation", () => 
     expect(result.blocks[0]?.deaths).toBe(1);
   });
 
-  test("prior-day unmet needs raise next-day mortality", () => {
+  test("P4: a food shortfall raises next-day mortality (D-142)", () => {
     const male = new Array<number>(17).fill(0);
     const female = new Array<number>(17).fill(0);
     male[16] = 100;
     female[16] = 100;
     const definitions = definitionsWith({
-      mortalityAnchors: [
-        { year: 1900, maleAnnualDeathsPer1000ByAgeBand: male, femaleAnnualDeathsPer1000ByAgeBand: female },
-        { year: 2000, maleAnnualDeathsPer1000ByAgeBand: male, femaleAnnualDeathsPer1000ByAgeBand: female },
-      ],
-      fertilityAnchors: fertility(new Array<number>(7).fill(0)),
+      standardSchedule: schedule(male, female, new Array<number>(7).fill(0)),
     });
-    const calm = createPopulationWorld(
-      scenarioWithGroups(groupsWith(16, 3650), new Array<number>(17).fill(0), definitions),
-    );
-    const pressured = createPopulationWorld(
-      scenarioWithGroups(groupsWith(16, 3650), new Array<number>(17).fill(0), definitions),
-    );
-    const pressuredBlock = pressured.popBlocks[0]!;
-    pressuredBlock.unmetSubsistenceDays = 90;
-    pressuredBlock.unmetBasicDays = 90;
-    const calmDeaths = applyDailyDemography(calm, definitions, 0).totalDeaths;
-    const pressuredDeaths = applyDailyDemography(pressured, definitions, 0).totalDeaths;
-    expect(calmDeaths).toBe(1);
-    expect(pressuredDeaths).toBeGreaterThan(calmDeaths);
+    const build = () => {
+      const world = createPopulationWorld(
+        scenarioWithGroups(groupsWith(16, 3650), new Array<number>(17).fill(0), definitions),
+      );
+      // Level 1: the fixture checks the food factor alone.
+      world.popBlocks[0]!.adultMortalityResidual = 1;
+      return world;
+    };
+    const run = (world: ReturnType<typeof build>): number => {
+      let deaths = 0;
+      for (let day = 0; day < 10; day += 1) deaths += applyDailyDemography(world, definitions, day).totalDeaths;
+      return deaths;
+    };
+    const calm = build();
+    // The unmet-days counters keep driving militancy, wealth and AI; mortality
+    // responds to the calories actually eaten.
+    const countersOnly = build();
+    countersOnly.popBlocks[0]!.unmetSubsistenceDays = 90;
+    countersOnly.popBlocks[0]!.unmetBasicDays = 90;
+    const hungry = build();
+    hungry.popBlocks[0]!.foodSufficiency = 0.5;
+    // Ten days at one expected death a day (the remainder carries the fraction).
+    const calmDeaths = run(calm);
+    expect(calmDeaths).toBeGreaterThanOrEqual(9);
+    expect(calmDeaths).toBeLessThanOrEqual(10);
+    expect(run(countersOnly)).toBe(calmDeaths);
+    // Adult factor 1 + 1.5 × 0.5 = 1.75: 17.5 expected deaths over ten days.
+    const hungryDeaths = run(hungry);
+    expect(hungryDeaths).toBeGreaterThanOrEqual(17);
+    expect(hungryDeaths).toBeLessThanOrEqual(18);
   });
 
   test("different female age structures produce different births at equal total population", () => {
     const asfr = new Array<number>(7).fill(0);
     asfr[0] = 1000;
     const definitions = definitionsWith({
-      mortalityAnchors: zeroMortality(),
-      fertilityAnchors: fertility(asfr),
+      standardSchedule: schedule(zeros(17), zeros(17), asfr),
     });
     const young = createPopulationWorld(
       scenarioWithGroups(
@@ -202,8 +201,7 @@ describe("M2.1 age-specific births, deaths, and fractional accumulation", () => 
     const asfr = new Array<number>(7).fill(0);
     asfr[0] = 500;
     const definitions = definitionsWith({
-      mortalityAnchors: zeroMortality(),
-      fertilityAnchors: fertility(asfr),
+      standardSchedule: schedule(zeros(17), zeros(17), asfr),
     });
     const reproductive = createPopulationWorld(
       scenarioWithGroups(groupsWith(0, 5), groupsWith(3, 5), definitions),
@@ -226,12 +224,10 @@ describe("M2.1 age-specific births, deaths, and fractional accumulation", () => 
     const highRates = new Array<number>(7).fill(0);
     highRates[1] = 1000;
     const low = definitionsWith({
-      mortalityAnchors: zeroMortality(),
-      fertilityAnchors: fertility(lowRates),
+      standardSchedule: schedule(zeros(17), zeros(17), lowRates),
     });
     const high = definitionsWith({
-      mortalityAnchors: zeroMortality(),
-      fertilityAnchors: fertility(highRates),
+      standardSchedule: schedule(zeros(17), zeros(17), highRates),
     });
     const lowWorld = createPopulationWorld(
       scenarioWithGroups(groupsWith(0, 5), groupsWith(4, 10), low),
@@ -253,8 +249,7 @@ describe("M2.1 age-specific births, deaths, and fractional accumulation", () => 
     const asfr = new Array<number>(7).fill(0);
     asfr[0] = 1000;
     const definitions = definitionsWith({
-      mortalityAnchors: zeroMortality(),
-      fertilityAnchors: fertility(asfr),
+      standardSchedule: schedule(zeros(17), zeros(17), asfr),
     });
     const scenario = scenarioWithGroups(
       new Array<number>(17).fill(0),
@@ -280,8 +275,7 @@ describe("M2.1 age-specific births, deaths, and fractional accumulation", () => 
     const asfr = new Array<number>(7).fill(0);
     asfr[0] = 1000;
     const definitions = definitionsWith({
-      mortalityAnchors: zeroMortality(),
-      fertilityAnchors: fertility(asfr),
+      standardSchedule: schedule(zeros(17), zeros(17), asfr),
     });
     const scenario = scenarioWithGroups(
       new Array<number>(17).fill(0),

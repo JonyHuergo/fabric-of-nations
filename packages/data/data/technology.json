@@ -74,6 +74,10 @@
         {
           "kind": "mortality-reduction",
           "reduction": 0.02
+        },
+        {
+          "kind": "urban-sanitation",
+          "coverage": 0.3
         }
       ]
     },
@@ -230,6 +234,10 @@
         {
           "kind": "mortality-reduction",
           "reduction": 0.02
+        },
+        {
+          "kind": "urban-sanitation",
+          "coverage": 0.1
         }
       ]
     },
@@ -673,6 +681,10 @@
         {
           "kind": "mortality-reduction",
           "reduction": 0.04
+        },
+        {
+          "kind": "urban-sanitation",
+          "coverage": 0.4
         }
       ]
     },
@@ -1173,6 +1185,10 @@
         {
           "kind": "education-effectiveness",
           "bonus": 0.02
+        },
+        {
+          "kind": "contraception",
+          "reduction": 0.15
         }
       ]
     },
@@ -1298,6 +1314,10 @@
         {
           "kind": "mortality-reduction",
           "reduction": 0.03
+        },
+        {
+          "kind": "urban-sanitation",
+          "coverage": 0.2
         }
       ]
     },

@@ -7,6 +7,12 @@
  */
 
 import {
+  countryDemographySnapshot,
+  demographySnapshotContext,
+  focusProvinceSnapshot,
+  type DemographySnapshotContext,
+} from "./demographySnapshot.js";
+import {
   AI_HARDSHIP_SUBSISTENCE_DAYS,
   BUILDING_SECTORS,
   buildBuildingCapacityIndex,
@@ -164,6 +170,8 @@ export function createSnapshotCache(): SnapshotCache {
 interface SnapshotBuild {
   readonly cache: SnapshotCache;
   readonly priceIndexes: ReturnType<typeof derivePriceIndexes>;
+  /** P4 (D-142) shared demography factors; null without population definitions. */
+  readonly demography: DemographySnapshotContext | null;
 }
 
 export interface SnapshotRuntimeState {
@@ -174,6 +182,8 @@ export interface SnapshotRuntimeState {
   readonly achievedDaysPerSecond: number;
   /** Presentation-only focused country whose full record is included. */
   readonly focusCountryId?: number | null;
+  /** P4 presentation-only focused province whose pyramid is included. */
+  readonly focusProvinceId?: number | null;
   /** M11 static polity/market metadata from the scenario. */
   readonly countryMeta?: readonly CountryMetaDef[];
   readonly marketMeta?: readonly MarketMetaDef[];
@@ -804,6 +814,12 @@ function technologyCatalogSnapshot(
         if (effect.kind === "mortality-reduction") {
           return `-${(effect.reduction * 100).toFixed(1)}% mortality`;
         }
+        if (effect.kind === "urban-sanitation") {
+          return `+${(effect.coverage * 100).toFixed(0)}% urban sanitation coverage (with public health staff)`;
+        }
+        if (effect.kind === "contraception") {
+          return `-${(effect.reduction * 100).toFixed(0)}% fertility (contraception)`;
+        }
         return `+${(effect.bonus * 100).toFixed(1)}% education quality`;
       }),
       unlockedBuildingKeys: definitions.buildings
@@ -1321,6 +1337,7 @@ function countrySnapshot(
     id: country.id,
     tag: country.tag,
     name: country.name,
+    demography: countryDemographySnapshot(world, country, provinceIds, definitions, build?.demography ?? null),
     currencyId: country.monetary.currencyId,
     monetaryArrangement: country.monetary.kind,
     meta:
@@ -1838,6 +1855,7 @@ function provinceEconomySnapshots(
   world: World,
   territoryMeta: readonly TerritoryMetaDef[],
 ): readonly ProvinceEconomySnapshot[] {
+  const urbanPeople = new Map<number, number>();
   const ownerByProvince = buildProvinceOwnerMap(world);
   const ownershipById = new Map(world.provinces.ownership.map((entry) => [entry.provinceId, entry]));
   const territoryByProvince = new Map<number, string>();
@@ -1851,6 +1869,7 @@ function provinceEconomySnapshots(
   for (const block of world.popBlocks) {
     const count = populationTotal(block);
     population.set(block.provinceId, (population.get(block.provinceId) ?? 0) + count);
+    urbanPeople.set(block.provinceId, (urbanPeople.get(block.provinceId) ?? 0) + count * block.urbanShare);
     const record = byProfession.get(block.provinceId) ?? {};
     if (count > 0) record[String(block.professionId)] = (record[String(block.professionId)] ?? 0) + count;
     byProfession.set(block.provinceId, record);
@@ -1891,7 +1910,11 @@ function provinceEconomySnapshots(
         employedWorkers: employed.get(province.id) ?? 0,
         unrest: roundDisplay(province.unrest, 4),
         infrastructure: roundDisplay(province.infrastructure, 4),
-        urbanShare: province.urbanShare,
+        // P4: the current urban share of the province's people (block state).
+        urbanShare:
+          (population.get(province.id) ?? 0) > 0
+            ? roundDisplay((urbanPeople.get(province.id) ?? 0) / (population.get(province.id) ?? 1), 4)
+            : province.urbanShare,
         arableLandHa: province.arableLandHa,
         pastureHa: province.pastureHa,
         literacy: adultCount > 0 ? roundDisplay((literacyWeighted.get(province.id) ?? 0) / adultCount, 4) : 0,
@@ -1901,6 +1924,8 @@ function provinceEconomySnapshots(
       };
     });
 }
+
+
 
 function territorySnapshots(territoryMeta: readonly TerritoryMetaDef[]): readonly TerritorySnapshot[] {
   return [...territoryMeta]
@@ -2304,7 +2329,11 @@ export function buildSimulationSnapshot(
   /** Host presentation cache (D-137); a fresh one when omitted. */
   cache: SnapshotCache = createSnapshotCache(),
 ): SimulationSnapshot {
-  const build: SnapshotBuild = { cache, priceIndexes: derivePriceIndexes(world) };
+  const build: SnapshotBuild = {
+    cache,
+    priceIndexes: derivePriceIndexes(world),
+    demography: demographySnapshotContext(world, definitions, populationDefinitions),
+  };
   const territoryMeta = runtime.territoryMeta ?? [];
   if (
     cache.staticFor === null ||
@@ -2409,6 +2438,7 @@ export function buildSimulationSnapshot(
     simVersion: world.simVersion,
     playerCountryId,
     focusCountryId,
+    focusProvince: focusProvinceSnapshot(world, runtime.focusProvinceId ?? null, build.demography),
     constructionEnabled: world.profitDistribution.enabled,
     countries,
     countrySummaries,

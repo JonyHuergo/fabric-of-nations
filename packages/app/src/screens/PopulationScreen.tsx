@@ -8,6 +8,7 @@ import {
 } from "@century/sim-worker";
 
 import { Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
+import { DemographyRows, DemographyTrend, PopulationPyramid, percent } from "../components/Demography";
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { provinceEconomyRows } from "@century/sim-worker";
 import { useMoney } from "../format/useMoney";
@@ -31,6 +32,49 @@ export function PopulationScreen({
           value={formatCount(country.population)}
           detail={`${formatCount(country.employedWorkers)} employed · hardship ${formatRate(country.hardshipPopulationShare)}`}
         />
+      )}
+      {country === null || country.demography === null ? null : (
+        <Section title="Births, deaths and lifespans" subtitle={`${country.name} · ${snapshot.date.label}`}>
+          <DemographyRows demography={country.demography.current} />
+          <StatRow
+            label="Towns"
+            value={`${percent(country.demography.current.urbanShare)} urban`}
+            detail="Town dwellers have fewer children; until sanitation reaches them they also die younger."
+          />
+          {country.demography.yearToDate === null ? null : (
+            <StatRow
+              label={`Recorded in ${String(country.demography.yearToDate.year)}`}
+              value={`${formatCount(country.demography.yearToDate.births)} born`}
+              detail={`${formatCount(country.demography.yearToDate.deaths)} died · ${String(country.demography.yearToDate.days)} days so far`}
+            />
+          )}
+          <PopulationPyramid pyramid={country.demography.pyramid} />
+          <DemographyTrend history={country.demography.history} />
+          <Disclosure title="What moves these figures">
+            <StatRow
+              label="Public health and medicine"
+              value={`${percent(1 - country.demography.causes.healthFactor)} fewer deaths`}
+              detail="Medical research, public-health staff and funding (Labor & health), and shorter working hours. Children gain most."
+            />
+            <StatRow
+              label="Sanitation in towns"
+              value={percent(country.demography.causes.sanitationCoverage)}
+              detail={`Sanitation research ${percent(country.demography.causes.sanitationKnowledge)} × public-health service ${percent(country.demography.causes.healthServiceOutput)}. Knowledge needs staff to reach the towns.`}
+            />
+            <StatRow
+              label="Contraception"
+              value={percent(country.demography.causes.contraception)}
+              detail="Fewer births from researched family-planning methods."
+            />
+            <Notice title="How the player shapes population">
+              Fertility falls as women learn to read (fund schooling and education laws), as
+              people move to towns, as incomes rise above subsistence, some years after child
+              deaths fall, and with contraception. Deaths fall with medicine, public-health staff
+              and sanitation; they rise when people cannot buy enough food and in crowded towns
+              without sanitation. Each country started from its own sourced 1900 levels.
+            </Notice>
+          </Disclosure>
+        </Section>
       )}
       {country === null ? null : (
         <Section title={`${country.name} detail`} subtitle={snapshot.date.label}>

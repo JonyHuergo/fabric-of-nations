@@ -1,5 +1,12 @@
 ﻿import {
+  NEUTRAL_DEMOGRAPHY_FACTORS,
+  effectiveAdultMortality,
+  effectiveChildMortality,
+  fertilityLevel,
+  applyAnnualAgeing,
+  applyDailyDemography,
   civilDateToDayIndex,
+  dayIndexToCivilDate,
   createPopulationWorld,
   daysInYear,
   deserializeWorld,
@@ -15,6 +22,7 @@
   type World,
 } from "@century/sim";
 import {
+  loadWppWorldSchedules,
   loadM2PopulationCalibration,
   loadM2WorldAggregate,
   loadM2Wpp1950Validation,
@@ -93,13 +101,15 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     const anchor1950 = samples.get(1950) ?? 0;
     const anchor2000 = samples.get(2000) ?? 0;
     expect(anchor1900).toBe(1_621_287_278);
-    expect(Math.abs(anchor1950 - januaryFirstReference(1950)) / januaryFirstReference(1950))
-      .toBeLessThanOrEqual(0.03);
-    // The campaign is a no-shock gameplay baseline with a provisional 1900
-    // age/sex distribution. Its 2000 total is expected to exceed the historical
-    // source because the provisional 1950 age composition is materially younger;
-    // this is not accepted as historical demographic validation.
-    expect(anchor2000).toBeGreaterThan(januaryFirstReference(2000));
+    // P4 (D-124, D-142): the population-only aggregate starts from the sourced 1900
+    // world levels and has no country, school or market to move them, so it keeps
+    // growing at its 1900 rate. Until P4 its pre-1950 mortality was scaled by 1.45 to
+    // land on the 1950 source total; D-124 forbids forcing a trajectory, so the
+    // historical series is a validation target of the full simulation (P4 WPP
+    // comparison report), not of this fixture. The fixture only documents that
+    // the gap exists and grows.
+    expect(anchor1950).toBeGreaterThan(januaryFirstReference(1950));
+    expect(anchor2000).toBeGreaterThan(anchor1950);
 
     // Schema 23 added the E5 labor/health fields and block qualification; E6a (schema 24)
     // adds `World.trade` and `Market.customsCountryId`. The digest changes even though
@@ -109,49 +119,40 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // P2b schema 29 (D-135) adds wage tables, technique and money coefficients to the
     // encoding; the population trajectory is unchanged, so the digest is re-pinned.
     // P3 schema 30 (D-141): the schema number in the encoding only; re-pinned.
-    expect(hashWorld(world)).toBe("56c788bb18d62ec1");
+    // P4 schema 31 (D-142): cause-driven levels change the trajectory (no 1.45
+    // mortality scaling, sourced 1900 world levels) and the encoding gains the
+    // block demography and the annual record; re-pinned.
+    expect(hashWorld(world)).toBe("b742748f9ff34905");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("56c788bb18d62ec1");
+    expect(hashWorld(restored)).toBe("b742748f9ff34905");
     expect(tick(restored).advanced).toBe(false);
   });
 
-  test("campaign 1950 composition differs materially from WPP because pre-1950 inputs are provisional", () => {
+  test("P4: with unchanged causes the levels do not drift (No-Mana, D-142)", () => {
     const scenario = loadM2WorldAggregate();
-    const reference = loadM2WppAgeSexReference();
-    const reference1950 = reference.years["1950"];
-    if (reference1950 === undefined) throw new Error("missing WPP 1950 reference");
     const world = createPopulationWorld(scenario, { seed: 20_261_023 });
     const inputs = makeInputs([0]);
     const context = contextFor(scenario, inputs, false);
-    for (let year = 1900; year < 1950; year += 1) {
+    const block = world.popBlocks[0]!;
+    const neutral = NEUTRAL_DEMOGRAPHY_FACTORS;
+    const start = {
+      fertility: fertilityLevel(block, neutral),
+      child: effectiveChildMortality(block, neutral),
+      adult: effectiveAdultMortality(block, neutral),
+      lagged: block.childMortalityLagged,
+    };
+    for (let year = 1900; year < 1920; year += 1) {
       const days = daysInYear(year);
       for (let day = 0; day < days; day += 1) tick(world, context);
     }
-    const block = world.popBlocks[0]!;
-    const groups = fiveYearAgeGroups(block);
-    const campaignTotal = populationTotal(block);
-    const campaignMale = maleFiveYearAgeGroups(block).reduce((total, value) => total + value, 0);
-    const campaignFemale = femaleFiveYearAgeGroups(block).reduce((total, value) => total + value, 0);
-    const referenceGroups = reference1950.maleAgeGroups.map(
-      (value, index) => value + (reference1950.femaleAgeGroups[index] ?? 0),
-    );
-    const referenceTotal = referenceGroups.reduce((total, value) => total + value, 0);
-    const referenceMale = reference1950.maleAgeGroups.reduce((total, value) => total + value, 0);
-    const referenceFemale = reference1950.femaleAgeGroups.reduce((total, value) => total + value, 0);
-
-    const campaignYoung = (groups[0]! + groups[1]! + groups[2]!) / campaignTotal;
-    const referenceYoung =
-      (referenceGroups[0]! + referenceGroups[1]! + referenceGroups[2]!) / referenceTotal;
-    const campaignOld = groups.reduce((total, value, index) => (index >= 10 ? total + value : total), 0) / campaignTotal;
-    const referenceOld =
-      referenceGroups.reduce((total, value, index) => (index >= 10 ? total + value : total), 0) /
-      referenceTotal;
-
-    expect(campaignTotal).toBeLessThan(referenceTotal);
-    expect(campaignMale).toBeGreaterThan(referenceMale);
-    expect(campaignFemale).toBeLessThan(referenceFemale);
-    expect(campaignYoung).toBeGreaterThan(referenceYoung + 0.03);
-    expect(campaignOld).toBeLessThan(referenceOld - 0.05);
+    // Literacy, urban share and the country factors are constant here; food is fully
+    // supplied by the fixture, so no level may move by more than the drift of the
+    // monthly smoothed wealth and lagged child mortality allows.
+    expect(block.foodSufficiency).toBeGreaterThan(0.999);
+    expect(effectiveChildMortality(block, neutral) / start.child).toBeCloseTo(1, 3);
+    expect(effectiveAdultMortality(block, neutral) / start.adult).toBeCloseTo(1, 3);
+    expect(block.childMortalityLagged).toBeCloseTo(start.lagged, 3);
+    expect(Math.abs(fertilityLevel(block, neutral) / start.fertility - 1)).toBeLessThan(0.05);
   });
 
   test("changing birth or death rates changes the trajectory", () => {
@@ -160,14 +161,14 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     const baselineSamples = runSampleYears(baselineWorld, baselineScenario, 10);
     const baseline1910 = baselineSamples.get(1910) ?? 0;
 
+    // P4: scaling the standard schedule scales every level-1 block's rates.
+    const standard = baselineScenario.definitions.standardSchedule;
     const lowerBirthDefinitions: PopulationDefinitions = {
       ...baselineScenario.definitions,
-      fertilityAnchors: baselineScenario.definitions.fertilityAnchors.map((anchor) => ({
-        ...anchor,
-        ageSpecificBirthsPer1000Women: anchor.ageSpecificBirthsPer1000Women.map(
-          (rate) => rate * 0.9,
-        ),
-      })),
+      standardSchedule: {
+        ...standard,
+        ageSpecificBirthsPer1000Women: standard.ageSpecificBirthsPer1000Women.map((rate) => rate * 0.9),
+      },
     };
     const lowerBirthScenario = withDefinitions(baselineScenario, lowerBirthDefinitions);
     const lowerBirthWorld = createPopulationWorld(lowerBirthScenario);
@@ -176,15 +177,11 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
 
     const higherDeathDefinitions: PopulationDefinitions = {
       ...baselineScenario.definitions,
-      mortalityAnchors: baselineScenario.definitions.mortalityAnchors.map((anchor) => ({
-        ...anchor,
-        maleAnnualDeathsPer1000ByAgeBand: anchor.maleAnnualDeathsPer1000ByAgeBand.map(
-          (rate) => rate * 1.1,
-        ),
-        femaleAnnualDeathsPer1000ByAgeBand: anchor.femaleAnnualDeathsPer1000ByAgeBand.map(
-          (rate) => rate * 1.1,
-        ),
-      })),
+      standardSchedule: {
+        ...standard,
+        maleAnnualDeathsPer1000ByAgeBand: standard.maleAnnualDeathsPer1000ByAgeBand.map((rate) => rate * 1.1),
+        femaleAnnualDeathsPer1000ByAgeBand: standard.femaleAnnualDeathsPer1000ByAgeBand.map((rate) => rate * 1.1),
+      },
     };
     const higherDeathScenario = withDefinitions(baselineScenario, higherDeathDefinitions);
     const higherDeathWorld = createPopulationWorld(higherDeathScenario);
@@ -246,15 +243,34 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
         (reference1950.femaleAgeGroups.reduce((total, value) => total + value, 0)),
     );
 
+    // P4 (D-124, D-142): WPP rates are never simulation inputs. This engine check
+    // feeds WPP's own annual schedules to the births, deaths and ageing machinery
+    // (levels held at 1) and requires it to reproduce WPP's 1975 and 2000 structure.
+    void context;
+    const schedules = loadWppWorldSchedules();
     const samples = new Map<number, { total: number; shares: number[]; maleShare: number }>();
     let births = 0;
     let deaths = 0;
     for (let year = 1950; year < 2000; year += 1) {
       const days = daysInYear(year);
+      const wpp = schedules[String(year)];
+      if (wpp === undefined) throw new Error(`missing WPP schedule ${String(year)}`);
+      const definitions: PopulationDefinitions = {
+        ...scenario.definitions,
+        standardSchedule: { sourceYear: year, ...wpp },
+      };
       for (let day = 0; day < days; day += 1) {
-        const result = tick(world, context);
-        births += result.population?.births ?? 0;
-        deaths += result.population?.deaths ?? 0;
+        // Hold the derived fertility level at 1 (ageing changes the literacy of the
+        // 15–49 cohorts, a cause this engine check must not see).
+        const engineBlock = world.popBlocks[0]!;
+        engineBlock.fertilityResidual /= fertilityLevel(engineBlock, NEUTRAL_DEMOGRAPHY_FACTORS);
+        const dayIndex = world.dayIndex;
+        const date = dayIndexToCivilDate(dayIndex);
+        if (date.month === 1 && date.day === 1 && dayIndex !== world.startDayIndex) applyAnnualAgeing(world);
+        const result = applyDailyDemography(world, definitions, dayIndex);
+        births += result.totalBirths;
+        deaths += result.totalDeaths;
+        world.dayIndex += 1;
       }
       const nextYear = year + 1;
       if (nextYear === 1975 || nextYear === 2000) {
@@ -318,7 +334,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // Re-pinned for the P2 schema-28 province record (D-134); flows unchanged.
     // P2b schema 29 (D-135): encoding only; population flows are unchanged.
     // P3 schema 30 (D-141): encoding only (schema number); re-pinned.
-    expect(hashWorld(world)).toBe("c8315c370816ec2d");
+    // P4 schema 31 (D-142): the engine is driven directly with WPP rates (levels 1);
+    // the encoding gains the block demography and the annual record; re-pinned.
+    expect(hashWorld(world)).toBe("4df8d9869983ce04");
   });
 });
 

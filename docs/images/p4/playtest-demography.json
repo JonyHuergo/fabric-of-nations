@@ -1,0 +1,139 @@
+{
+  "startedAt": "2026-11-05T16:03:49.111Z",
+  "viewport": "844,390",
+  "checks": [
+    {
+      "name": "phone landscape viewport",
+      "passed": true,
+      "detail": "{\"width\":844,\"height\":390}"
+    },
+    {
+      "name": "Society domain opens",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "births, deaths and lifespans section",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "birth and death rates shown per 1,000",
+      "passed": true,
+      "detail": "Births and deaths 30.0 / 19.9 per 1,000 people a year at today's rates · natural growth +1.01% a year Children per woman 4.12 Total fertility rate · literacy of"
+    },
+    {
+      "name": "children per woman shown",
+      "passed": true,
+      "detail": "Children per woman 4.12 Total fertility rate · literacy of women 15–49 78% Life expectancy 45.9 years 266 of 1,000 children die before age 5 Food eaten 100% Cal"
+    },
+    {
+      "name": "life expectancy shown in years",
+      "passed": true,
+      "detail": "Life expectancy 45.9 years 266 of 1,000 children die before age 5 Food eaten 100% Calories actually consumed against need, last month's average Towns 38% urban "
+    },
+    {
+      "name": "food eaten shown",
+      "passed": true,
+      "detail": "Food eaten 100% Calories actually consumed against need, last month's average Towns 38% urban Town dwellers have fewer children; until sanitation reaches them t"
+    },
+    {
+      "name": "population pyramid drawn inside the sheet",
+      "passed": true,
+      "detail": "{\"label\":\"Population pyramid. 32% under 15, 7% aged 65 and over.\",\"width\":257,\"height\":203,\"right\":823}"
+    },
+    {
+      "name": "yearly history before the first close explains itself",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "history series switch absent before the first year closes",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "causes disclosure present",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "causes name the player's levers",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "SVG fallback map: New York pressed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "a press opens the province sheet",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "province shows births and deaths",
+      "passed": true,
+      "detail": "Births and deaths 28.1 / 18.1 per 1,000 people a year at today's rates · natural growth +1.00% a year Children per woman 3.88 Total fertility rate · literacy of"
+    },
+    {
+      "name": "province shows life expectancy",
+      "passed": true,
+      "detail": "Life expectancy 49.3 years 230 of 1,000 children die before age 5 Food eaten 100% Calories consumed against need, last month's average Men Age Women 80+ 75–79 7"
+    },
+    {
+      "name": "province pyramid drawn",
+      "passed": true,
+      "detail": "{\"label\":\"Population pyramid. 31% under 15, 8% aged 65 and over.\",\"height\":152,\"right\":823}"
+    },
+    {
+      "name": "simulation reached 1901",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "rates changed over the year",
+      "passed": true,
+      "detail": "Births and deaths 30.0 / 19.9 per 1,000 people a year at today's rates · natural growth +1.01% a year Children per woman 4.12 Total fertility rate · literacy of → Births and deaths 26.9 / 34.9 per 1,000 people a year at today's rates · natural growth -0.80% a year Children per woman 3.66 Total fertility rate · literacy of"
+    },
+    {
+      "name": "history series switch appears after the first year",
+      "passed": true,
+      "detail": "[{\"text\":\"Births · deaths\",\"height\":44},{\"text\":\"Children per woman\",\"height\":44},{\"text\":\"Life expectancy\",\"height\":44}]"
+    },
+    {
+      "name": "history switch controls are at least 44 pt tall",
+      "passed": true,
+      "detail": "[{\"text\":\"Births · deaths\",\"height\":44},{\"text\":\"Children per woman\",\"height\":44},{\"text\":\"Life expectancy\",\"height\":44}]"
+    },
+    {
+      "name": "history chart labels its series and years",
+      "passed": true,
+      "detail": "Life expectancy from 1900 to 1900: years 28.7"
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no uncaught exceptions",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no failed resource loads",
+      "passed": true,
+      "detail": "[]"
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "docs/images/p4/p4-844x390-population-pyramid.png",
+    "docs/images/p4/p4-844x390-population-causes.png",
+    "docs/images/p4/p4-844x390-province-demography.png",
+    "docs/images/p4/p4-844x390-population-1901.png"
+  ],
+  "finishedAt": "2026-11-05T16:05:55.868Z"
+}

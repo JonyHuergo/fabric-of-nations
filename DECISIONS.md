@@ -7849,3 +7849,131 @@ circulating rate, history at its own rate; the money mechanics themselves are D-
   schema 29 saves are incompatible (D-120, D-139 §3).
 - Silver currencies keep their opening RUSD value until D-140's metal prices exist; a
   player can now establish a monetary authority at the sourced parity (E6b).
+
+## D-142 — P4: cause-driven demography, sourced 1900 levels and urban share
+
+**Status:** implemented for review on 2026-11-05 under the designer's go-ahead to the P4
+pre-build report (same day), with the added requirement that the province and nation
+ledgers show population pyramids and that mortality, fertility and population can change
+and be influenced by the player.
+**Implements:** D-124, GDD §17J.2 (5), `docs/PROSPERITY_PROGRAM.md` §4 P4.
+**Supersedes:** the year-indexed world schedules as the level of fertility and mortality
+(D-026/D-027 inputs, GDD §6.6) and the M2 unmet-needs mortality terms.
+
+### Decision
+
+1. **Pattern and level.** `demography.json` holds one *standard schedule*: the WPP 2024
+   world 1950 ASFR (TFR 4.83) and sex-specific central death rates by five-year band. It is
+   only the age pattern. Each block has a fertility level (multiplier of the standard
+   ASFR) and a child (0–4) and an adult (5+) mortality level (multipliers of the standard
+   death rates). Two mortality levels let a province reproduce both its sourced life
+   expectancy and its under-5 mortality, and give fertility its child-mortality input.
+   The levels are **derived every day** from the block's fixed residuals and its current
+   causes; they are not stored, so a save holds no cached copy.
+2. **Causes** (all coefficients in `population/constants.ts` with units, justification and
+   PROVISIONAL status):
+   - fertility level = residual × exp(−0.6 × literacy of women 15–49) × (1 − 0.25 × urban
+     share) × (income ÷ subsistence)^−0.1 × (lagged child mortality)^0.35 × (1 −
+     contraception) × (1 − 0.8 × (1 − food sufficiency));
+   - child / adult mortality = residual × (1 + 0.5 / 0.3 × urban share × (1 − sanitation
+     coverage)) × H^1.5 / H × (1 + 3 / 1.5 × (1 − food sufficiency)), H being the existing
+     M9/E5 combined health factor (medical technology × public-health service × statutory
+     hours);
+   - **famine lowers births** (0.8 per unit of calorie shortfall: −40 % at half the
+     requirement; Ó Gráda 2009). Not in D-124's list; added after the first century run,
+     in which the lagged child-mortality term alone drove TFR to 8.3 and the crude birth
+     rate to 67 per 1,000 during the persistent 1900s food collapse;
+   - lagged child mortality: exponential smoothing of the effective child multiplier,
+     mean lag 60 months, updated at each month start; food sufficiency: calories actually
+     bought today ÷ 1,950 kcal per person, capped at 1 and smoothed over 30 days; both are
+     stored at `RATE_DECIMAL_PLACES` (9) like other stored rates;
+   - sanitation coverage = sanitation knowledge (new technology effect `urban-sanitation`:
+     basic-sanitation 0.3, public-health-administration 0.1, water-treatment 0.4,
+     environmental-health 0.2) × E5 public-health service output; contraception = new
+     effect `contraception` (family-planning-programs 0.15).
+   No level accumulates by itself: with constant causes the levels are constant (tested).
+3. **Residuals.** At world creation each block's residual is fixed so that, under its
+   country's start-of-game factors and full food, its levels equal the sourced 1900 levels.
+   The residual stands for persistent factors the model does not simulate (marriage
+   pattern, breastfeeding, disease environment). It never changes; migrants join the
+   destination block's residual.
+4. **Measured from existing state** (deviations): literacy is not sex-specific, so the
+   literacy of the 15–49 cohorts stands in for female literacy; income relative to
+   subsistence is recovered from the smoothed wealth indicator (GDD §6 allows wealth to act
+   on birth and death rates when documented); there is no family-law slot and no direct law
+   factor (education law acts through literacy, health law through E5 services); housing
+   and crowding wait for P6, so the urban penalty is the crowding effect; war acts on
+   civilians only through food (soldier deaths stay in the military model); there is no
+   famine switch — famine is food shortfall.
+5. **Sources.** Per province, the modern country under its own point (Natural Earth
+   admin-0 crosswalk, `historical/p4/province_modern_country_1900.json`; 21 coastal points
+   by nearest boundary) or an authored stand-in (`proxies_1900.json`, 55 entries, low
+   confidence); Gapminder life expectancy v15, babies per woman v15, under-5 mortality v12
+   and Systema Globalis crude birth rate at pinned commits (`gapminder_1900.json`). The
+   **1900 level is the 1896–1905 mean** (at least five years): single years carry crises
+   (India's 1899–1900 famine: life expectancy 19.5 against about 24–25 around it; Finland
+   in 1900). Microstate Gapminder TFRs for 1900 (Andorra 2.11, Monaco 3.06, San Marino
+   2.82, Liechtenstein 2.71) are modern values carried back and are rejected. 182 source
+   geos; 74 provinces by stand-in.
+6. **Age structure.** Each province starts from the stable population of its sourced
+   fertility and mortality (Lotka r), replacing the single world pyramid; totals unchanged.
+7. **Urban/rural.** Each block carries an urban share: a province's HYDE 3.3 urban people go
+   first to its clerk, laborer, academic and capitalist blocks, then to peasants. Fixed until
+   P7 moves people between town and country.
+8. **Acceptance tolerances** (documented in the generated file): crude birth rate ±15 % of
+   Gapminder per 1900 country; life expectancy ±1 year, under-5 mortality and TFR ±5 % per
+   source geo. **Exceptions:** Greece and Crete — Gapminder's Greek crude birth rate (30.5)
+   is inconsistent with its own TFR 5.2 and life expectancy 40.9 (about 38 implied), the
+   mark of under-registered births. **Crude death rate:** no open per-country 1900 source
+   exists (Gapminder and OWID start in 1950, the Human Mortality Database requires a login,
+   Mitchell is not accessible); the target is the rate implied by the sourced life
+   expectancy and under-5 mortality in the stable population. A designer-supplied Mitchell
+   table would replace it.
+9. **WPP is validation only.** The WPP 1950–2000 annual world schedules moved to
+   `validation/wpp_world_schedules_1950_2000.json` and WPP 2024 regional 1975/2000 figures to
+   `validation/wpp_regions_1975_2000.json`; a test asserts no simulation source reads them.
+   The M2 engine test feeds the annual schedules to the births/deaths/ageing engine itself
+   (levels held at 1) and still requires WPP's 1975 and 2000 structure.
+10. **Migration fix (regression).** Migration removed migrants from the source block
+    without re-deriving its 15+ literacy aggregate, so from the first migration month
+    (day 31) full validation — and with it every save — failed, on `main` as well
+    (aggregate off by about 1e-7 against a 1e-8 tolerance). The source is now re-synced,
+    and a failed migration also restores per-age literacy. Test:
+    `p4-demography` "validates and saves after its first migration month".
+11. **Reporting.** `World.demography` records per country and civil year realised births and
+    deaths, start and end population, and TFR, life expectancy, under-5 mortality and urban
+    share at the turn of the year (reporting only; schema 31). The snapshot (protocol 20)
+    carries, for the player and focused countries, rates, pyramid, causes and annual
+    history, and for one focused province (new presentation-only command
+    `SET_PROVINCE_FOCUS`) its rates and pyramid — per-province columns for all 1,687
+    provinces would have pushed the snapshot past the 700k-character budget. The province
+    panel and the Population ledger show them with a pyramid and a yearly chart, and name
+    the player's levers.
+
+### Provisional values and open items
+
+- Every P4 coefficient is provisional (P15 calibrates against WPP 1950–2000).
+- Food energy per kg (grain 3,400, livestock 2,300, fish 1,000, food-products 2,500 kcal)
+  and the 1,950 kcal requirement are provisional.
+- The M2 population-only aggregate starts from the population-weighted 1900 world levels
+  (TFR 5.52, life expectancy 34.6, under-5 mortality 399); with no causes to move them it
+  overshoots the 1950 total, which the restated M2.1 test documents instead of keeping the
+  former 1.45 mortality scaling (D-124 forbids forcing a trajectory).
+- The eight-polity M5 sample likewise starts from the 1900 world levels
+  (`meta.worldDemography`). Its fish and livestock capacity sits at demand in two markets,
+  so the binary unmet-days share is 25 % on day 31 although 99.86 % of what is paid for is
+  supplied; `m5-feasibility` now checks the two causes of a structural shortage (supply
+  under 99.5 % of paid demand; population below 95 % food sufficiency under 10 %) and
+  bounds the binary share at 30 %. **Restated for designer review.**
+- Data version stays `m3-economy-v12` (as in P2–P3); saves break through schema 31.
+
+### Consequences
+
+- 1900 starts differ by province and country; the world opens at crude birth rate 41.2,
+  crude death rate 30.4, TFR 5.52, life expectancy 32.9 and 16.6 % urban.
+- The pre-existing household-income spiral of the 1900 world (grain piles up while
+  households afford under half their basket by month ten; present on `main`, where the
+  unmet-days terms drive deaths to about 91 million in the first year) now acts through
+  calories. P4 does not hide it; its cause belongs to P5–P7 (own consumption, wages). See
+  `P4_COMPLETION_REPORT.md`.
+- Every world hash changes; schema-30 saves are incompatible (D-120, D-139 §3).

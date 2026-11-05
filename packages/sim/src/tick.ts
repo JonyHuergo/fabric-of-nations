@@ -26,6 +26,11 @@ import {
   assertValidPopulationInputs,
 } from "./population/definitions.js";
 import { applyDailyDemography } from "./population/demography.js";
+import {
+  isDemographicLevelDay,
+  NEUTRAL_DEMOGRAPHY_FACTORS,
+  updateDemographicLevels,
+} from "./population/demographicLevels.js";
 import { settlePopulationNeeds } from "./population/needs.js";
 import { workingAgePopulation, worldPopulation } from "./population/state.js";
 import { updateDailyMilitancy, updateMonthlyWealth } from "./population/wealth.js";
@@ -111,6 +116,11 @@ function runPopulationDay(
   const aged = date.month === 1 && date.day === 1 && dayIndex !== world.startDayIndex;
   const populationStart = worldPopulation(world);
   if (aged) applyAnnualAgeing(world);
+  // P4 (D-142): month-start levels from causes; population-only worlds have no
+  // country, so their blocks see neutral country factors.
+  if (isDemographicLevelDay(date.day)) {
+    updateDemographicLevels(world.popBlocks, () => NEUTRAL_DEMOGRAPHY_FACTORS);
+  }
 
   const demography = applyDailyDemography(world, definitions, dayIndex, aged);
   const needs = settlePopulationNeeds(

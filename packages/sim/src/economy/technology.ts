@@ -15,7 +15,7 @@
  */
 
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
-import { RATE_DECIMAL_PLACES } from "../population/constants.js";
+import { CONTRACEPTION_MAX_REDUCTION, RATE_DECIMAL_PLACES } from "../population/constants.js";
 import { populationTotal, syncBlockLiteracy, workingAgePopulation } from "../population/state.js";
 import { localWageIndex } from "./localWages.js";
 import type { Day, Id, Rate } from "../types.js";
@@ -125,6 +125,18 @@ function parseEffect(raw: unknown, path: string): TechnologyDef["effects"][numbe
       );
     }
     return { kind, bonus };
+  }
+  if (kind === "urban-sanitation") {
+    const coverage = requireFiniteNumber(record.coverage, `${path}.coverage`);
+    if (!(coverage > 0) || coverage > 1) throw new RangeError(`${path}.coverage must be in (0, 1]`);
+    return { kind, coverage };
+  }
+  if (kind === "contraception") {
+    const reduction = requireFiniteNumber(record.reduction, `${path}.reduction`);
+    if (!(reduction > 0) || reduction > CONTRACEPTION_MAX_REDUCTION) {
+      throw new RangeError(`${path}.reduction must be in (0, ${String(CONTRACEPTION_MAX_REDUCTION)}]`);
+    }
+    return { kind, reduction };
   }
   throw new RangeError(`${path}.kind is not a supported technology effect`);
 }
@@ -620,6 +632,45 @@ export function technologyMortalityFactor(
     }
   }
   return clamp(1 - reduction, MIN_TECHNOLOGY_MORTALITY_FACTOR, 1);
+}
+
+/**
+ * P4 (D-142): sanitation knowledge, 0..1 — the summed `urban-sanitation` coverage of
+ * researched technologies, capped at full coverage.
+ */
+export function technologySanitationKnowledge(
+  country: Country,
+  definitions: EconomyDefinitions | undefined,
+): number {
+  const content = definitions?.technology;
+  if (content === undefined) return 0;
+  let coverage = 0;
+  for (const entry of country.technology.researched) {
+    const definition = technologyDefinition(content, entry.technologyId);
+    if (definition === null) continue;
+    for (const effect of definition.effects) {
+      if (effect.kind === "urban-sanitation") coverage += effect.coverage;
+    }
+  }
+  return clamp(coverage, 0, 1);
+}
+
+/** P4 (D-142): fractional TFR reduction from researched contraceptive methods. */
+export function technologyContraception(
+  country: Country,
+  definitions: EconomyDefinitions | undefined,
+): number {
+  const content = definitions?.technology;
+  if (content === undefined) return 0;
+  let reduction = 0;
+  for (const entry of country.technology.researched) {
+    const definition = technologyDefinition(content, entry.technologyId);
+    if (definition === null) continue;
+    for (const effect of definition.effects) {
+      if (effect.kind === "contraception") reduction += effect.reduction;
+    }
+  }
+  return clamp(reduction, 0, CONTRACEPTION_MAX_REDUCTION);
 }
 
 /** Additive education-quality bonus from researched technologies. */

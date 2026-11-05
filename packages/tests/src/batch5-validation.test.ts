@@ -69,7 +69,10 @@ const SEED = 20_261_023;
 // moves this M5-sample trajectory by design.
 // P3 re-pins it for schema 30 (D-141) only: with the schema constant set to 29 this
 // test reproduces "8c9635f488c07ffe"; the M5 sample's trajectory is unchanged.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "35edddfe03e983b8";
+// P4 re-pins it: the M5 sample starts from the sourced 1900 world demographic levels
+// instead of the year-indexed schedules, mortality follows calories, blocks carry their
+// demographic state and the schema is 31 (D-142); the trajectory changes by design.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "6b50f58b93760b31";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

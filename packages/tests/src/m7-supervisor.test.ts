@@ -69,6 +69,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
     simVersion: "test",
     playerCountryId: null,
     focusCountryId: null,
+    focusProvince: null,
     constructionEnabled: false,
     countries: [
       {
@@ -78,6 +79,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         currencyId: 0,
         monetaryArrangement: "own",
         meta: null,
+        demography: null,
         provinceIds: [0],
         fiscal: {
           incomeTaxRate: 0.1,

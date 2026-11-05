@@ -15,6 +15,7 @@
  * invented. See `data/historical/source_notes.md`.
  */
 
+import { loadDemography1900, type Demography1900 } from "./demography1900.js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -118,6 +119,12 @@ export interface HistoricalScenarioFiles {
   readonly moneyCoefficients?: string;
   /** P3 currencies, arrangements and parities (D-141); supersedes the country currency blocks. */
   readonly currencies?: string;
+  /**
+   * P4 sourced 1900 demography (D-142): per-province levels and age structures and
+   * per-block urban shares. Without it every block uses the world age structure and
+   * the standard schedule (the M5 sample).
+   */
+  readonly demography?: string;
 }
 
 export interface HistoricalScenarioDefinitions {
@@ -158,6 +165,16 @@ export interface HistoricalScenarioMeta {
   readonly marketMeta?: readonly MarketMetaDef[];
   /** P2 dependent-territory metadata (D-118 §3). */
   readonly territoryMeta?: readonly TerritoryMetaDef[];
+  /**
+   * P4 (D-142): demographic levels for every block of a scenario without a per-province
+   * demography file (the 1900 world aggregate levels); absent means the standard schedule.
+   */
+  readonly worldDemography?: {
+    readonly fertilityLevel: number;
+    readonly childMortalityLevel: number;
+    readonly adultMortalityLevel: number;
+    readonly urbanShare: number;
+  };
   /** P2b sourced money coefficients (D-135); omitted means the simulation defaults. */
   readonly moneyCoefficients?: MoneyCoefficients;
 }
@@ -324,6 +341,8 @@ export interface HistoricalData {
   readonly calibration: readonly HistoricalCalibrationTarget[];
   /** P3 (D-141) derived currency table; omitted for scenarios without a currencies file. */
   readonly currencyTable?: CurrencyTable1900;
+  /** P4 (D-142) sourced 1900 demography; omitted for scenarios without a demography file. */
+  readonly demography1900?: Demography1900;
 }
 
 export interface HistoricalValidation {
@@ -621,6 +640,24 @@ function readTerritoryMeta(value: unknown, errors: string[]): TerritoryMetaDef[]
   });
 }
 
+function readWorldDemography(
+  value: unknown,
+  errors: string[],
+): NonNullable<HistoricalScenarioMeta["worldDemography"]> {
+  const record = assertRecord(value, "meta.worldDemography", errors);
+  const field = (name: string, minimum: number, maximum: number): number => {
+    const number = numberField(record, name, "meta.worldDemography", errors);
+    if (!(number >= minimum && number <= maximum)) errors.push(`meta.worldDemography.${name} must be in ${String(minimum)}..${String(maximum)}`);
+    return number;
+  };
+  return {
+    fertilityLevel: field("fertilityLevel", 0, 4),
+    childMortalityLevel: field("childMortalityLevel", 1e-4, 50),
+    adultMortalityLevel: field("adultMortalityLevel", 1e-4, 50),
+    urbanShare: field("urbanShare", 0, 1),
+  };
+}
+
 function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  const record = assertRecord(value, "meta", errors);
   const files = assertRecord(record.files, "meta.files", errors);
   const definitions = assertRecord(record.definitions, "meta.definitions", errors);
@@ -684,6 +721,9 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
       ...(files.currencies === undefined
         ? {}
         : { currencies: stringField(files, "currencies", "meta.files", errors) }),
+      ...(files.demography === undefined
+        ? {}
+        : { demography: stringField(files, "demography", "meta.files", errors) }),
     },
     definitions: {
       goods: stringField(definitions, "goods", "meta.definitions", errors),
@@ -701,6 +741,9 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
     ...(record.marketMeta === undefined
       ? {}
       : { marketMeta: readMarketMeta(record.marketMeta, errors) }),
+    ...(record.worldDemography === undefined
+      ? {}
+      : { worldDemography: readWorldDemography(record.worldDemography, errors) }),
     ...(record.territoryMeta === undefined
       ? {}
       : { territoryMeta: readTerritoryMeta(record.territoryMeta, errors) }),
@@ -775,13 +818,19 @@ export function loadHistoricalData(
     calibration,
   });
   assertValidM5HistoricalData(data);
-  if (meta.files.currencies === undefined) return data;
   return {
     ...data,
-    currencyTable: loadCurrencyTable(
-      meta.files.currencies,
-      data.countries.map((country) => country.tag),
-    ),
+    ...(meta.files.currencies === undefined
+      ? {}
+      : {
+          currencyTable: loadCurrencyTable(
+            meta.files.currencies,
+            data.countries.map((country) => country.tag),
+          ),
+        }),
+    ...(meta.files.demography === undefined
+      ? {}
+      : { demography1900: loadDemography1900(meta.files.demography) }),
   };
 }
 
@@ -2232,8 +2281,8 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
   const buildings = readJson<BuildingDef[]>(data.meta.definitions.buildings);
   const needs = readJson<NeedTierDef[]>(data.meta.definitions.needs);
   const demography = readJson<{
-    mortalityAnchors: PopulationDefinitions["mortalityAnchors"];
-    fertilityAnchors: PopulationDefinitions["fertilityAnchors"];
+    standardSchedule: PopulationDefinitions["standardSchedule"];
+    foodEnergy: PopulationDefinitions["foodEnergy"];
     sexRatioAtBirth: number;
     fertilityMultipliers: PopulationDefinitions["fertilityMultipliers"];
   }>(data.meta.definitions.demography);
@@ -2262,8 +2311,8 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     dataVersion: data.meta.dataVersion,
     scenarioId: data.meta.scenarioId,
     needs,
-    mortalityAnchors: demography.mortalityAnchors,
-    fertilityAnchors: demography.fertilityAnchors,
+    standardSchedule: demography.standardSchedule,
+    foodEnergy: demography.foodEnergy,
     sexRatioAtBirth: demography.sexRatioAtBirth,
     fertilityMultipliers: demography.fertilityMultipliers.filter((entry) =>
       professions.some((profession) => profession.id === entry.professionId),
@@ -2279,6 +2328,16 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
         ? 1
         : 0;
   });
+  const demographyByProvince =
+    data.demography1900 === undefined
+      ? undefined
+      : new Map(data.demography1900.provinces.map((row) => [row.provinceId, row]));
+  const urbanByBlock =
+    data.demography1900 === undefined
+      ? undefined
+      : new Map(
+          data.demography1900.blocks.map((row) => [`${String(row.provinceId)}:${row.professionKey}`, row.urbanShare]),
+        );
   const blockIdByKey = new Map<string, number>();
   const accountIdByKey = new Map<string, number>();
   const popBlocks = sortedPopulations.map((population, index) => {
@@ -2292,11 +2351,26 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     const key = `${String(population.provinceId)}:${population.professionKey}`;
     blockIdByKey.set(key, index);
     accountIdByKey.set(key, householdAccountId);
+    // P4 (D-142): the province's stable 1900 age structure and sourced levels.
+    const provinceDemography = demographyByProvince?.get(population.provinceId);
+    if (demographyByProvince !== undefined && provinceDemography === undefined) {
+      throw new HistoricalDataError([`population ${key} has no 1900 demography for its province`]);
+    }
     const ages = expandHistoricalPopulation(
       population.population,
-      profile,
+      provinceDemography === undefined
+        ? profile
+        : {
+            ...profile,
+            maleCounts: provinceDemography.maleAgeWeights,
+            femaleCounts: provinceDemography.femaleAgeWeights,
+          },
       `population ${key}`,
     );
+    const urbanShare = urbanByBlock?.get(key);
+    if (urbanByBlock !== undefined && urbanShare === undefined) {
+      throw new HistoricalDataError([`population ${key} has no 1900 urban share`]);
+    }
     return {
       id: index,
       provinceId: population.provinceId,
@@ -2308,6 +2382,18 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       wealthLevel: population.wealthLevel,
       initialSavingsRUSD: population.population * population.savingsPerCapitaRUSD,
       militancy: population.militancy,
+      ...(provinceDemography === undefined
+        ? data.meta.worldDemography === undefined
+          ? {}
+          : { demography: { ...data.meta.worldDemography } }
+        : {
+            demography: {
+              urbanShare: urbanShare ?? 0,
+              fertilityLevel: provinceDemography.fertilityLevel,
+              childMortalityLevel: provinceDemography.childMortalityLevel,
+              adultMortalityLevel: provinceDemography.adultMortalityLevel,
+            },
+          }),
     };
   });
 

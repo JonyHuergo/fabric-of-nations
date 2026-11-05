@@ -196,13 +196,11 @@ export function m5EconomyDefinitions(): EconomyDefinitions {
   };
 }
 
-function mortality(year: number): {
-  year: number;
+function mortalityRates(): {
   maleAnnualDeathsPer1000ByAgeBand: number[];
   femaleAnnualDeathsPer1000ByAgeBand: number[];
 } {
   return {
-    year,
     maleAnnualDeathsPer1000ByAgeBand: Array.from({ length: 17 }, (_value, index) =>
       index < 2 ? 40 : 10,
     ),
@@ -241,10 +239,15 @@ export function m5PopulationDefinitions(): PopulationDefinitions {
         items: [{ goodKey: "clothing", quantityPerCapitaPerDay: 0.001 }],
       },
     ],
-    mortalityAnchors: [mortality(1900), mortality(2000)],
-    fertilityAnchors: [
-      { year: 1900, ageSpecificBirthsPer1000Women: [100, 120, 130, 120, 90, 50, 10] },
-      { year: 2000, ageSpecificBirthsPer1000Women: [60, 90, 110, 100, 70, 30, 5] },
+    // P4 (D-142): the 1900 rates are the age pattern; levels are per-block state.
+    standardSchedule: {
+      sourceYear: 1900,
+      ...mortalityRates(),
+      ageSpecificBirthsPer1000Women: [100, 120, 130, 120, 90, 50, 10],
+    },
+    foodEnergy: [
+      { goodKey: "grain", kcalPerUnit: 3400 },
+      { goodKey: "food-products", kcalPerUnit: 2500 },
     ],
     sexRatioAtBirth: 1.05,
     fertilityMultipliers: [

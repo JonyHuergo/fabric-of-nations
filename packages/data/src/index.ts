@@ -11,3 +11,4 @@ export * from "./load.js";
 export * from "./historical.js";
 export * from "./currencies.js";
 export * from "./provinces.js";
+export * from "./demography1900.js";

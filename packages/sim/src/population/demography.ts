@@ -5,17 +5,27 @@
  * the seven maternal five-year bands. Deaths use sex-specific age-band mortality.
  * Both use per-block fractional accumulators and the actual civil-year length.
  * Newborns enter age 0, split with the definitions' sex ratio at birth.
+ *
+ * P4 (D-124, D-142): the definitions' standard schedule is the age pattern; each
+ * block's fertility and mortality *levels* (`demographicLevels.ts`) scale it. The
+ * daily health factor and the block's food sufficiency act on the death rates
+ * through `effectiveChildMortality` / `effectiveAdultMortality`.
  */
 
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
+import {
+  effectiveAdultMortality,
+  effectiveChildMortality,
+  fertilityLevel,
+  NEUTRAL_DEMOGRAPHY_FACTORS,
+  type DemographyCountryFactors,
+} from "./demographicLevels.js";
 import type { DayIndex, Id } from "../types.js";
 import type { World } from "../world.js";
 import {
   AGE_BAND_WIDTH,
+  CHILD_MORTALITY_BAND,
   MATERNAL_AGE_GROUP_COUNT,
-  MORTALITY_BASIC_WEIGHT,
-  MORTALITY_SCALE_DAYS,
-  MORTALITY_SUBSISTENCE_WEIGHT,
   REPRODUCTIVE_AGE_END,
   REPRODUCTIVE_AGE_START,
   SINGLE_AGE_COUNT,
@@ -25,7 +35,6 @@ import {
   ageSpecificFertilityRatePer1000,
   assertRemainderValue,
   mortalityRatePer1000,
-  saturate,
 } from "./definitions.js";
 import { populationTotal, syncBlockLiteracy } from "./state.js";
 import { selectDeathBands } from "./deathAllocationSelection.js";
@@ -46,14 +55,6 @@ function fertilityMultiplier(definitions: PopulationDefinitions, professionId: I
     throw new RangeError(`invalid fertility multiplier for profession ${String(professionId)}`);
   }
   return found.multiplier;
-}
-
-function needMortalityMultiplier(block: World["popBlocks"][number]): number {
-  return (
-    1 +
-    MORTALITY_SUBSISTENCE_WEIGHT * saturate(block.unmetSubsistenceDays, MORTALITY_SCALE_DAYS) +
-    MORTALITY_BASIC_WEIGHT * saturate(block.unmetBasicDays, MORTALITY_SCALE_DAYS)
-  );
 }
 
 function ageBandForAge(age: number): number {
@@ -192,10 +193,10 @@ export function applyDailyDemography(
   aged: boolean = false,
   options: {
     /**
-     * M9 per-block technology mortality multiplier. Absent for the M2-only path and
-     * for worlds without technology definitions, where the factor is 1.
+     * P4 country causes of each block (combined health factor, sanitation coverage,
+     * contraception). Absent for the M2-only path; blocks in no country are neutral.
      */
-    readonly mortalityFactorByBlock?: ReadonlyMap<Id, number>;
+    readonly factorsOf?: (block: World["popBlocks"][number]) => DemographyCountryFactors;
   } = {},
 ): DemographyDayResult {
   const date = dayIndexToCivilDate(dayIndex);
@@ -212,14 +213,13 @@ export function applyDailyDemography(
   const maleBandRates = new Float64Array(17);
   const femaleBandRates = new Float64Array(17);
   for (let band = 0; band < 17; band += 1) {
-    maleBandRates[band] = mortalityRatePer1000(definitions, year, band, "male");
-    femaleBandRates[band] = mortalityRatePer1000(definitions, year, band, "female");
+    maleBandRates[band] = mortalityRatePer1000(definitions, band, "male");
+    femaleBandRates[band] = mortalityRatePer1000(definitions, band, "female");
   }
-  // D-139: per-day fertility rates by maternal band and multipliers by profession;
-  // the same pure functions of (definitions, year), computed once instead of per block.
+  // Standard ASFR by maternal band and multipliers by profession, computed once.
   const fertilityByBand = new Float64Array(MATERNAL_AGE_GROUP_COUNT);
   for (let band = 0; band < MATERNAL_AGE_GROUP_COUNT; band += 1) {
-    fertilityByBand[band] = ageSpecificFertilityRatePer1000(definitions, year, band);
+    fertilityByBand[band] = ageSpecificFertilityRatePer1000(definitions, band);
   }
   const multiplierByProfession = new Map<Id, number>();
   const maleEffectiveByBand = new Float64Array(17);
@@ -250,19 +250,19 @@ export function applyDailyDemography(
 
     const male = block.maleByAge;
     const female = block.femaleByAge;
-    const mortalityMultiplier =
-      needMortalityMultiplier(block) *
-      (options.mortalityFactorByBlock?.get(block.id) ?? 1);
-    // The effective rate is a function of the band only, so it is formed once per
-    // band (D-139) with the same expression as before.
+    const factors = options.factorsOf?.(block) ?? NEUTRAL_DEMOGRAPHY_FACTORS;
+    const childMultiplier = effectiveChildMortality(block, factors);
+    const adultMultiplier = effectiveAdultMortality(block, factors);
+    // The effective rate is a function of the band only, so it is formed once per band.
     for (let band = 0; band < 17; band += 1) {
+      const multiplier = band === CHILD_MORTALITY_BAND ? childMultiplier : adultMultiplier;
       maleEffectiveByBand[band] = Math.min(
         1,
-        ((maleBandRates[band] ?? 0) / 1000) * mortalityMultiplier,
+        ((maleBandRates[band] ?? 0) / 1000) * multiplier,
       );
       femaleEffectiveByBand[band] = Math.min(
         1,
-        ((femaleBandRates[band] ?? 0) / 1000) * mortalityMultiplier,
+        ((femaleBandRates[band] ?? 0) / 1000) * multiplier,
       );
     }
     for (let age = 0; age < SINGLE_AGE_COUNT; age += 1) {
@@ -291,11 +291,12 @@ export function applyDailyDemography(
       );
     }
 
-    let multiplier = multiplierByProfession.get(block.professionId);
-    if (multiplier === undefined) {
-      multiplier = fertilityMultiplier(definitions, block.professionId);
-      multiplierByProfession.set(block.professionId, multiplier);
+    let professionMultiplier = multiplierByProfession.get(block.professionId);
+    if (professionMultiplier === undefined) {
+      professionMultiplier = fertilityMultiplier(definitions, block.professionId);
+      multiplierByProfession.set(block.professionId, professionMultiplier);
     }
+    const multiplier = professionMultiplier * fertilityLevel(block, factors);
     let expectedBirths = 0;
     for (let age = REPRODUCTIVE_AGE_START; age <= REPRODUCTIVE_AGE_END; age += 1) {
       const maternalBand = Math.min(

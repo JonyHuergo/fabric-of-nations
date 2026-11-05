@@ -1209,7 +1209,14 @@ export type TechnologyEffect =
   /** Multiplicative reduction of age/sex mortality (0..0.95). */
   | { kind: "mortality-reduction"; reduction: number }
   /** Additive education-quality term used by the literacy model (0..0.5). */
-  | { kind: "education-effectiveness"; bonus: number };
+  | { kind: "education-effectiveness"; bonus: number }
+  /**
+   * P4 (D-142): share of the urban mortality penalty that sanitation knowledge can
+   * remove (0..1, summed and capped at 1); realised through public-health service.
+   */
+  | { kind: "urban-sanitation"; coverage: number }
+  /** P4 (D-142): fractional TFR reduction from contraceptive methods (0..0.6, summed and capped). */
+  | { kind: "contraception"; reduction: number };
 
 /** One validated technology definition. */
 export interface TechnologyDef {

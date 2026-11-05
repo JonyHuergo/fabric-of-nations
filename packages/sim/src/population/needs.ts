@@ -17,6 +17,7 @@ import {
   supplyForGood,
 } from "./definitions.js";
 import { populationTotal } from "./state.js";
+import { updateBlockFoodSufficiency } from "./demographicLevels.js";
 import type { World } from "../world.js";
 import type { DayIndex, Id } from "../types.js";
 import type {
@@ -35,6 +36,8 @@ interface DraftBlock {
   budget: number;
   readonly budgetStart: number;
   spent: number;
+  /** P4: dietary energy fulfilled today across all tiers, kcal. */
+  kcal: number;
   readonly tierSummaries: NeedTierSummary[];
   readonly tierResults: NeedTierResult[];
 }
@@ -159,6 +162,9 @@ export function settlePopulationNeeds(
     consumedSupply[goodKey] = 0;
   }
   const priceByGood = new Map<string, number>();
+  const kcalByGood = new Map<string, number>(
+    definitions.foodEnergy.map((entry) => [entry.goodKey, entry.kcalPerUnit]),
+  );
   for (const price of inputs.prices) {
     priceByGood.set(price.goodKey, price.unitPriceRUSD);
   }
@@ -191,6 +197,7 @@ export function settlePopulationNeeds(
       budget: budgetStart,
       budgetStart,
       spent: 0,
+      kcal: 0,
       tierSummaries: [],
       tierResults: [],
     });
@@ -311,6 +318,7 @@ export function settlePopulationNeeds(
           });
         }
         const price = priceByGood.get(goodKey) ?? 0;
+        draft.kcal += fulfilledValue * (kcalByGood.get(goodKey) ?? 0);
         spent += fulfilledValue * price;
         desiredCost += desiredValue * price;
         fundedCost += fundedValue * price;
@@ -354,6 +362,7 @@ export function settlePopulationNeeds(
 
     if (comfortMet) block.comfortFulfilledDays += 1;
     else block.comfortFulfilledDays = 0;
+    updateBlockFoodSufficiency(block, draft.population, draft.kcal);
   }
 
   const results: PopBlockNeedsResult[] = [];
@@ -366,6 +375,7 @@ export function settlePopulationNeeds(
       budgetStartBeforeNeedsRUSD: draft.budgetStart,
       budgetEndAfterNeedsRUSD: draft.budget,
       spentRUSD: draft.spent,
+      kcalConsumed: draft.kcal,
       tiers: collectNeedDetails ? draft.tierResults : [],
       tierSummaries: draft.tierSummaries,
     });

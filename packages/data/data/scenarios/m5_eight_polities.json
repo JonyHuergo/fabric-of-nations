@@ -103,6 +103,13 @@
         "notes": "World 1900 five-year profile reused for every country. Country-specific age structures are not implemented and would be required for historical age-structure validation."
       }
     },
+    "worldDemography": {
+      "fertilityLevel": 1.1444694938,
+      "childMortalityLevel": 1.7518498355,
+      "adultMortalityLevel": 1.2493791538,
+      "urbanShare": 0.166,
+      "notes": "P4 (D-142): the 1900 world levels, population-weighted from historical/p4/demography_1900.json (TFR 5.52, life expectancy 34.6, under-5 mortality 399 per 1,000; HYDE 3.3 urban share 16.6%). The eight-polity sample has no per-province sources."
+    },
     "files": {
       "countries": "historical/countries_1900.json",
       "provinces": "historical/provinces_1900.json",

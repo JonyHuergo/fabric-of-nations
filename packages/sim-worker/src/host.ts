@@ -94,6 +94,8 @@ export class SimulationHost {
    */
   private runner: RollbackRunner;
   private focusCountryId: number | null = null;
+  /** P4 presentation-only focused province (its pyramid is included in snapshots). */
+  private focusProvinceId: number | null = null;
   /**
    * D-139: the world is still exactly `createEconomyWorld(baseScenario, seed)` as
    * built at startup: never ticked, acted on, loaded or used for a campaign.
@@ -150,6 +152,7 @@ export class SimulationHost {
       speedDaysPerSecond: this.speed,
       achievedDaysPerSecond: this.achievedDaysPerSecond,
       focusCountryId: this.focusCountryId,
+      focusProvinceId: this.focusProvinceId,
       ...(this.scenario.countryMeta === undefined ? {} : { countryMeta: this.scenario.countryMeta }),
       ...(this.scenario.marketMeta === undefined ? {} : { marketMeta: this.scenario.marketMeta }),
       ...(this.scenario.territoryMeta === undefined ? {} : { territoryMeta: this.scenario.territoryMeta }),
@@ -226,6 +229,9 @@ export class SimulationHost {
         return;
       case "SET_FOCUS":
         this.setFocus(command.commandId, command.countryId);
+        return;
+      case "SET_PROVINCE_FOCUS":
+        this.setProvinceFocus(command.commandId, command.provinceId);
         return;
       case "CREATE_GAME":
         this.createGame(command.commandId, command.playerCountryId);
@@ -417,6 +423,19 @@ export class SimulationHost {
   }
 
   /**
+   * P4: presentation-only province focus. It never mutates simulation state; it only
+   * decides which province's population pyramid the snapshots carry.
+   */
+  private setProvinceFocus(commandId: string, provinceId: number | null): void {
+    if (provinceId !== null && !this.world.provinceEconomies.some((province) => province.id === provinceId)) {
+      this.emitError(commandId, "invalid_focus", `province ${String(provinceId)} is not registered`);
+      return;
+    }
+    this.focusProvinceId = provinceId;
+    this.emitSnapshot("SNAPSHOT", commandId);
+  }
+
+  /**
    * Start a fresh 1900 world with an explicitly selected player country. The
    * selection is validated against the scenario catalog: unknown countries and
    * non-selectable dependencies are rejected, never silently defaulted.
@@ -470,6 +489,7 @@ export class SimulationHost {
     this.world = world;
     this.runner = createRollbackRunner(world, { worldJustValidated: true });
     this.focusCountryId = null;
+    this.focusProvinceId = null;
     this.lastSnapshotMs = this.clock();
     this.emitEvent({
       protocolVersion: PROTOCOL_VERSION,

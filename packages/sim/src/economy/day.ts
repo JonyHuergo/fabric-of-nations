@@ -8,6 +8,12 @@
  */
 
 import {
+  accumulateDemography,
+  cloneDemographyReport,
+  closeDemographyYear,
+  populationsByCountry,
+} from "./demographyReport.js";
+import {
   applyAnnualAgeing,
 } from "../population/ageing.js";
 import {
@@ -16,6 +22,12 @@ import {
   type NeedTier,
 } from "../population/constants.js";
 import { applyDailyDemography } from "../population/demography.js";
+import {
+  isDemographicLevelDay,
+  updateBlockFoodSufficiency,
+  updateDemographicLevels,
+} from "../population/demographicLevels.js";
+import { demographyFactorsByCountry, demographyFactorsOfBlock } from "./demographyFactors.js";
 import { assertValidPopulationDefinitions } from "../population/definitions.js";
 import { populationTotal, workingAgePopulation } from "../population/state.js";
 import type {
@@ -38,13 +50,7 @@ import type { DayPhaseObserver, DayResultDetail } from "../population/types.js";
 import { buildBuildingCapacityIndex, computeBuildingCapacity } from "./production.js";
 import { runCountryAIPhase, type CountryAIPhaseResult } from "./ai.js";
 import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
-import {
-  buildCountryPopulationIndex,
-  copyCountry,
-  copyCurrency,
-  buildProvinceOwnerMap,
-  copyCurrencyValuation,
-} from "./country.js";
+import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
 import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
 import { runBusinessTaxPhase, type BusinessTaxPhaseResult } from "./businessTax.js";
@@ -84,9 +90,6 @@ import { settleMarketDays, type MarketSettlementResult } from "./settlement.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { runPoliticsDayStart, runUnrestPhase } from "./politics.js";
 import {
-  combinedMortalityFactor,
-  deriveHealth,
-  laborHoursMortalityFactor,
   runLaborMonthStart,
   runTrainingPhase,
   type TrainingPhaseResult,
@@ -94,7 +97,6 @@ import {
 import {
   assertTechnologyStateMatchesDefinitions,
   runEducationPhase,
-  technologyMortalityFactor,
   type EducationPhaseResult,
 } from "./technology.js";
 import {
@@ -277,6 +279,7 @@ export function cloneWorld(
               blocked: source.trade.lastDay.blocked.map((entry) => ({ ...entry })),
             },
     },
+    demography: cloneDemographyReport(source.demography),
     priceIndex: {
       ...source.priceIndex,
       basket: source.priceIndex.basket.map((item) => ({ ...item })),
@@ -625,6 +628,8 @@ function buildNeedsResult(
   detail: DayResultDetail,
   /** Fulfilled quantity per household demand row (D-139); NaN marks a missing result. */
   fulfilledByRecord: Float64Array,
+  /** P4: dietary energy per unit of each good id, kcal (0 for non-food goods). */
+  kcalByGoodId: Float64Array,
 ): PopulationNeedsDayResult {
   const householdByName = new Map(
     settlement.households.map((entry) => [entry.popBlockId, entry]),
@@ -645,6 +650,7 @@ function buildNeedsResult(
     const summaries: NeedTierSummary[] = [];
     const tierResults: NeedTierResult[] = [];
     let lowerMet = true;
+    let kcalConsumed = 0;
 
     for (const tier of NEED_TIER_ORDER) {
       tierRows.length = 0;
@@ -674,6 +680,7 @@ function buildNeedsResult(
         desiredCost += desired * price;
         fundedCost += funded * price;
         spent += fulfilledQuantity * price;
+        kcalConsumed += fulfilledQuantity * (kcalByGoodId[goodId] ?? 0);
         if (!active || fulfilledQuantity + quantityTolerance(desired, fulfilledQuantity) < desired) {
           allMet = false;
         }
@@ -710,6 +717,7 @@ function buildNeedsResult(
       budgetStartBeforeNeedsRUSD: householdSettlement.initialCashRUSD,
       budgetEndAfterNeedsRUSD: householdSettlement.initialCashRUSD - spent,
       spentRUSD: spent,
+      kcalConsumed,
       tiers: tierResults,
       tierSummaries: summaries,
     });
@@ -766,7 +774,22 @@ function updateNeedsCounters(world: World, needs: PopulationNeedsDayResult): voi
     } else {
       block.comfortFulfilledDays = 0;
     }
+    // P4 (D-142): food sufficiency from the calories actually bought today.
+    updateBlockFoodSufficiency(block, result.population, result.kcalConsumed);
   }
+}
+
+/** P4: kcal per unit by good id from the population definitions' food energy. */
+function kcalByGoodIdOf(
+  economyDefinitions: EconomyDefinitions,
+  populationDefinitions: PopulationDefinitions,
+): Float64Array {
+  const byKey = new Map(populationDefinitions.foodEnergy.map((entry) => [entry.goodKey, entry.kcalPerUnit]));
+  let maxId = 0;
+  for (const good of economyDefinitions.goods) maxId = Math.max(maxId, good.id);
+  const table = new Float64Array(maxId + 1);
+  for (const good of economyDefinitions.goods) table[good.id] = byKey.get(good.key) ?? 0;
+  return table;
 }
 
 function isLastDayOfMonth(dayIndex: DayIndex): boolean {
@@ -1127,49 +1150,37 @@ export function runEconomicDay(
   );
   const calendarDate = dayIndexToCivilDate(dayIndex);
   const aged = calendarDate.month === 1 && calendarDate.day === 1 && dayIndex !== world.startDayIndex;
-  if (aged) applyAnnualAgeing(world);
-  // M9/E5: demography reads the combined mortality factor (technology × public
-  // health × labor hours) at the start of the day. A technology completed or a law
-  // enacted later today applies from the next civil day.
-  // The factor is a function of the block's country only, so it is derived once per
-  // country (P2 scale) from the same start-of-day state.
-  const mortalityFactorByBlock = new Map<Id, number>();
-  const provinceOwners = buildProvinceOwnerMap(world);
-  const countryById = new Map(world.countries.map((country) => [country.id, country]));
-  const factorByCountry = new Map<Id, number>();
-  const countryPopulation = buildCountryPopulationIndex(world);
-  for (const block of world.popBlocks) {
-    const ownerId = provinceOwners.get(block.provinceId);
-    const country = ownerId === undefined ? undefined : countryById.get(ownerId);
-    if (country === undefined) {
-      mortalityFactorByBlock.set(block.id, 1);
-      continue;
-    }
-    let factor = factorByCountry.get(country.id);
-    if (factor === undefined) {
-      const technologyFactor =
-        world.technology.enabled && economyDefinitions.technology !== undefined
-          ? technologyMortalityFactor(country, economyDefinitions)
-          : 1;
-      const healthFactor = deriveHealth(
-        world,
-        country,
-        economyDefinitions,
-        countryPopulation,
-      ).mortalityFactor;
-      const hoursFactor = laborHoursMortalityFactor(country, economyDefinitions);
-      factor = combinedMortalityFactor(technologyFactor, healthFactor, hoursFactor);
-      factorByCountry.set(country.id, factor);
-    }
-    mortalityFactorByBlock.set(block.id, factor);
+  // P4 (D-142): on 1 January the closed year is recorded with the state at the
+  // turn of the year, before ageing (reporting only).
+  if (aged) {
+    const yearEndFactors = demographyFactorsOfBlock(
+      world,
+      demographyFactorsByCountry(world, economyDefinitions),
+    );
+    closeDemographyYear(world, populationDefinitions, yearEndFactors);
   }
+  const populationsAtStart = world.countries.length > 0 ? populationsByCountry(world) : new Map<Id, number>();
+  if (aged) applyAnnualAgeing(world);
+  // M9/E5: demography reads the combined health factor (technology × public health ×
+  // labor hours) at the start of the day. A technology completed or a law enacted
+  // later today applies from the next civil day. P4 (D-142) adds the realised
+  // sanitation coverage and contraception; all are functions of the block's country
+  // only, so they are derived once per country from the same start-of-day state.
+  const blockFactors = demographyFactorsOfBlock(
+    world,
+    demographyFactorsByCountry(world, economyDefinitions),
+  );
+
+  // P4: month-start levels from causes, before the day's births and deaths.
+  if (isDemographicLevelDay(calendarDate.day)) updateDemographicLevels(world.popBlocks, blockFactors);
   const demography = applyDailyDemography(
     world,
     populationDefinitions,
     dayIndex,
     aged,
-    { mortalityFactorByBlock },
+    { factorsOf: blockFactors },
   );
+  accumulateDemography(world, calendarDate.year, populationsAtStart, demography);
   // Population decline can invalidate assignments before the next monthly
   // refresh. D-126: trim the over-assigned blocks first; only a state that the
   // trim cannot make valid falls back to the dirty full refresh.
@@ -1322,6 +1333,7 @@ export function runEconomicDay(
     settlement,
     options.detail ?? "full",
     attempt.fulfilledByRecord,
+    kcalByGoodIdOf(economyDefinitions, populationDefinitions),
   );
   updateNeedsCounters(world, needs);
   updateDailyMilitancy(world, needs);

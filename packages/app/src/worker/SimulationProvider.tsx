@@ -83,6 +83,8 @@ export interface SimulationContextValue {
   readonly createGame: (playerCountryId: number) => void;
   /** Ask the worker to include another country's full record in snapshots. */
   readonly setFocus: (countryId: number) => void;
+  /** P4: ask the worker to include one province's population pyramid in snapshots. */
+  readonly setProvinceFocus: (provinceId: number | null) => void;
   readonly start: () => void;
   readonly pause: () => void;
   readonly step: () => void;
@@ -224,6 +226,8 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   const startupStorageErrorRef = useRef<string | null>(null);
   const autosaveRequestRef = useRef<() => void>(() => {});
   const focusRequestRef = useRef<number | null>(null);
+  /** P4: province whose pyramid the worker was last asked for. */
+  const provinceFocusRef = useRef<number | null>(null);
   const activePlayerCountryIdRef = useRef<number | null>(null);
   const pendingActionsRef = useRef(
     new Map<
@@ -492,6 +496,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             pendingLoadSlotRef.current = null;
             activePlayerCountryIdRef.current = event.snapshot.playerCountryId;
             focusRequestRef.current = null;
+            provinceFocusRef.current = null;
             // A successful load replaces the unreadable-save diagnosis.
             startupStorageErrorRef.current = null;
             setError(null);
@@ -548,6 +553,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             setActionHistory([]);
             pendingActionsRef.current.clear();
             focusRequestRef.current = null;
+            provinceFocusRef.current = null;
             activePlayerCountryIdRef.current = event.snapshot.playerCountryId;
             startupStorageErrorRef.current = null;
             // A new campaign saves to a slot of its own: no other save is at risk.
@@ -860,6 +866,20 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     [nextCommandId, send],
   );
 
+  const setProvinceFocus = useCallback(
+    (provinceId: number | null) => {
+      if (provinceFocusRef.current === provinceId) return;
+      provinceFocusRef.current = provinceId;
+      send({
+        protocolVersion: PROTOCOL_VERSION,
+        type: "SET_PROVINCE_FOCUS",
+        commandId: nextCommandId("province-focus"),
+        provinceId,
+      });
+    },
+    [nextCommandId, send],
+  );
+
   /** Return the campaign in play to its last save. */
   const loadGame = useCallback(() => {
     const slotId = activeSlotIdRef.current;
@@ -1102,6 +1122,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       deleteSave,
       createGame,
       setFocus,
+      setProvinceFocus,
       start,
       pause,
       step,
@@ -1134,6 +1155,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       deleteSave,
       createGame,
       setFocus,
+      setProvinceFocus,
       start,
       pause,
       step,

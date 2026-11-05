@@ -567,7 +567,9 @@ describe("P3 month-end closing valuations", () => {
   }
 
   test("each close records the specified valuations, ascending, and saves round-trip them", () => {
-    expect(WORLD_SCHEMA_VERSION).toBe(30);
+    // P4 (D-142) raised the schema to 31 (block demography, annual record); the
+    // closing valuations are unchanged.
+    expect(WORLD_SCHEMA_VERSION).toBe(31);
     const { world } = runToFirstClose();
     const summary = world.finance.periodSummaries[0];
     expect(summary?.closingValuations).toEqual([

@@ -54,3 +54,13 @@ function legacyMonetaryView(value: unknown): unknown {
 export function hashWorld(world: World): string {
   return dualFnv1a32Hex(stableStringify(legacyMonetaryView(encodeWorld(world))));
 }
+
+/**
+ * Digest of an already-encoded world (the `encodeWorld` shape), with the same view
+ * and algorithm as `hashWorld`. Tests use it to show that a re-pinned digest differs
+ * only by named encoding changes: removing them from a new encoding must reproduce
+ * the previous digest.
+ */
+export function hashEncodedWorld(encoded: unknown): string {
+  return dualFnv1a32Hex(stableStringify(legacyMonetaryView(JSON.parse(JSON.stringify(encoded)))));
+}

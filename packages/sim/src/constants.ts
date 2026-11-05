@@ -70,8 +70,12 @@ export const SIM_VERSION = "0.28.0";
  * P3 (schema 30, D-141) adds `FinancePeriodSummary.closingValuations`, the month-end
  * valuations the display converts history with, and 1900 worlds carry sourced currency
  * valuations and adopted arrangements. Schema-29 worlds are reported as incompatible.
+ * P4 (schema 31, D-142) adds the cause-driven demographic state of every block
+ * (`urbanShare`, the fertility and child/adult mortality residuals and levels, lagged
+ * child mortality and food sufficiency) and `World.demography`, the per-country
+ * annual demographic record. Schema-30 worlds are reported as incompatible.
  */
-export const WORLD_SCHEMA_VERSION = 30;
+export const WORLD_SCHEMA_VERSION = 31;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 2;

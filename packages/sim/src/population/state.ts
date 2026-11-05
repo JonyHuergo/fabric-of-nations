@@ -6,6 +6,13 @@
  * different simulation.
  */
 
+import { emptyDemographyReport } from "../economy/demographyReportState.js";
+import {
+  assertValidBlockDemography,
+  calibrateBlockDemography,
+  NEUTRAL_DEMOGRAPHY_FACTORS,
+  sourcedLevelsOf,
+} from "./demographicLevels.js";
 import { assertValidDayIndex } from "../calendar.js";
 import { DEFAULT_DATA_VERSION, MAX_SCENARIO_ID_LENGTH, SIM_VERSION, WORLD_SCHEMA_VERSION } from "../constants.js";
 import { applyOpeningBalances, categoryForSubtype } from "../economy/accounts.js";
@@ -185,6 +192,7 @@ export function assertValidPopBlock(block: PopBlock): void {
   assertRemainder(record.fractionalBirthRemainder, "popBlock.fractionalBirthRemainder");
   assertRemainder(record.fractionalMaleBirthRemainder, "popBlock.fractionalMaleBirthRemainder");
   assertRemainder(record.fractionalDeathRemainder, "popBlock.fractionalDeathRemainder");
+  assertValidBlockDemography(block, `popBlock ${String(block.id)}`);
 }
 
 function assertUnique<T>(values: readonly T[], key: (value: T) => string | number, path: string): void {
@@ -566,7 +574,25 @@ export function createPopulationWorld(
       fractionalBirthRemainder: 0,
       fractionalMaleBirthRemainder: 0,
       fractionalDeathRemainder: 0,
+      // P4 (D-142): set by `calibrateBlockDemography` below.
+      urbanShare: 0,
+      fertilityResidual: 1,
+      childMortalityResidual: 1,
+      adultMortalityResidual: 1,
+      childMortalityLagged: 1,
+      foodSufficiency: 1,
     };
+    const sourced = sourcedLevelsOf(initial.demography);
+    assertRate(sourced.urbanShare, `popBlock ${String(initial.id)} demography.urbanShare`);
+    block.urbanShare = sourced.urbanShare;
+    // Population worlds see neutral country factors; economy worlds recalibrate once
+    // their countries exist (`calibrateDemographyForCountries`).
+    calibrateBlockDemography(
+      block,
+      sourced.levels,
+      NEUTRAL_DEMOGRAPHY_FACTORS,
+      `popBlock ${String(initial.id)}`,
+    );
     blocks.push(block);
 
     // The cash account id is scenario-declared; the rest are deterministically
@@ -686,6 +712,7 @@ export function createPopulationWorld(
     },
     playerCountryId: null,
     moneyCoefficients: { ...DEFAULT_MONEY_COEFFICIENTS },
+    demography: emptyDemographyReport(),
     politics: {
       enabled: false,
       eventQueue: [],

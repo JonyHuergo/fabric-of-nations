@@ -1,3 +1,4 @@
+import { DemographyRows, PopulationPyramid } from "../components/Demography";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   Animated,
@@ -1144,7 +1145,12 @@ const percentText = (value: number): string => `${(value * 100).toFixed(0)}%`;
 
 /** P2 live population and economy of one province (D-118). */
 function ProvinceEconomySection({ economy }: { readonly economy: ProvinceEconomySnapshot }) {
-  const { snapshot } = useSimulation();
+  const { snapshot, setProvinceFocus } = useSimulation();
+  // P4: the worker sends one province's pyramid, the one this panel shows.
+  useEffect(() => {
+    setProvinceFocus(economy.id);
+  }, [economy.id, setProvinceFocus]);
+  const focus = snapshot?.focusProvince?.provinceId === economy.id ? snapshot.focusProvince : null;
   const professionName = new Map((snapshot?.professions ?? []).map((profession) => [String(profession.id), profession.name]));
   const marketName = snapshot?.markets.find((market) => market.id === economy.marketId)?.name ?? null;
   const occupations = Object.entries(economy.populationByProfession)
@@ -1163,8 +1169,20 @@ function ProvinceEconomySection({ economy }: { readonly economy: ProvinceEconomy
       <StatRow
         label="Towns and literacy"
         value={`${percentText(economy.urbanShare)} urban`}
-        detail={`Adult literacy ${percentText(economy.literacy)} · urban share from HYDE 3.3 (1900)`}
+        detail={`Adult literacy ${percentText(economy.literacy)} · 1900 urban share from HYDE 3.3`}
       />
+      {focus === null || focus.demography === null ? null : (
+        <>
+          <DemographyRows demography={focus.demography} compact />
+          <StatRow
+            label="Food eaten"
+            value={percentText(focus.demography.foodSufficiency)}
+            detail="Calories consumed against need, last month's average"
+            tone={focus.demography.foodSufficiency < 0.9 ? "negative" : "default"}
+          />
+          <PopulationPyramid pyramid={focus.pyramid} compact />
+        </>
+      )}
       <StatRow
         label="Land"
         value={`${formatPeople(economy.arableLandHa)} ha cropland`}

@@ -1,4 +1,5 @@
-﻿import {
+﻿import { prePhase4Digest } from "./fixtures/p4Encoding.js";
+import {
   WORLD_SCHEMA_VERSION,
   createEconomyWorld,
   decodeSavePayload,
@@ -62,7 +63,10 @@ describe("M3a schema-25 serialization", () => {
     // encoding, not the fixture's behaviour.
     // P3 schema 30 (D-141): the schema number only; verified by running this test with the
     // constant set to 29, which reproduces the previous digest.
-    expect(hashWorld(cloneWorld())).toBe("74d55ceaa8f99ea8");
+    // P4 schema 31 (D-142): encoding only — the schema number, the block demography
+    // fields and `World.demography`. Removing them reproduces the P3 digest.
+    expect(prePhase4Digest(cloneWorld())).toBe("74d55ceaa8f99ea8");
+    expect(hashWorld(cloneWorld())).toBe("ba77ec857fa65fab");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {
