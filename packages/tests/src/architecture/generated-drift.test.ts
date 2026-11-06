@@ -1,5 +1,5 @@
 /**
- * Batch 7 — generated worker bundle integrity.
+ * Generated worker bundle integrity (post-M7 batch 7).
  *
  * These tests exercise the real build-worker script. The check path must pass for
  * the committed bundle, fail for an intentionally stale copy without overwriting
@@ -32,17 +32,24 @@ function runWorkerScript(args: readonly string[]): string {
 
 describe("generated worker bundle drift", () => {
   test("the committed bundle is current and generation is deterministic", () => {
+    // Generation 1: `--check` regenerates the bundle and compares it with the
+    // committed file in full.
     const check = runWorkerScript(["--check"]);
     expect(check).toMatch(/worker bundle is current/);
 
+    // Generation 2, independent of the first, must also equal the committed file
+    // byte for byte, so the two generations are identical (D-145: formerly two
+    // further generations compared with each other and with the committed file).
+    // Buffer.equals compares the 12 MB bundle without Jest's element-wise deep
+    // equality, which needs far more memory on a large heap.
     const directory = mkdtempSync(join(tmpdir(), "century-worker-"));
     try {
-      const first = join(directory, "first.ts");
-      const second = join(directory, "second.ts");
-      runWorkerScript(["--output", first]);
-      runWorkerScript(["--output", second]);
-      expect(readFileSync(first)).toEqual(readFileSync(second));
-      expect(readFileSync(first)).toEqual(readFileSync(COMMITTED));
+      const generated = join(directory, "generated.ts");
+      runWorkerScript(["--output", generated]);
+      const bytes = readFileSync(generated);
+      const committed = readFileSync(COMMITTED);
+      expect(bytes.length).toBe(committed.length);
+      expect(bytes.equals(committed)).toBe(true);
     } finally {
       rmSync(directory, { recursive: true, force: true });
     }
