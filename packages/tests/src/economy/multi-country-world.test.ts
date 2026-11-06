@@ -1,0 +1,261 @@
+import {
+  assertValidEmploymentState,
+  assertValidEconomyScenario,
+  assertValidWorld,
+  createEconomyWorld,
+  designatedCashTotal,
+  hashWorld,
+  populationTotal,
+  runMigrationPhase,
+  runTicks,
+  serializeWorld,
+  deserializeWorld,
+  tick,
+  type TickContext,
+  countryProvinceIds,
+  marketProvinceIds,
+} from "@century/sim";
+import {
+  M5_COUNTRY_A,
+  M5_COUNTRY_B,
+  M5_COUNTRY_C,
+  M5_FARM,
+  M5_REGION_A2,
+  M5_REGION_B1,
+  m5Scenario,
+  m5World,
+} from "../fixtures/m5.js";
+
+function context(scenario: ReturnType<typeof m5Scenario>): TickContext {
+  return {
+    population: { definitions: scenario.population.definitions },
+    economy: { definitions: scenario.definitions },
+  };
+}
+
+describe("M5 multi-province and multi-country world", () => {
+  test("constructs three countries, four provinces, two markets, and seven blocks", () => {
+    const { scenario, world } = m5World();
+    expect(world.countries).toHaveLength(3);
+    expect(world.currencies).toHaveLength(3);
+    expect(world.provinceEconomies).toHaveLength(4);
+    expect(world.markets).toHaveLength(2);
+    expect(world.popBlocks).toHaveLength(7);
+    assertValidWorld(world);
+    assertValidEconomyScenario(scenario);
+
+    expect(world.provinceEconomies.map((province) => province.marketId)).toEqual([0, 0, 1, 0]);
+    expect(marketProvinceIds(world, 0)).toEqual([0, 1, 3]);
+    expect(countryProvinceIds(world, M5_COUNTRY_A)).toEqual([
+      0, 1,
+    ]);
+    expect(world.countries.find((country) => country.id === M5_COUNTRY_C)?.immigrationOpen).toBe(
+      true,
+    );
+    expect(world.countries.find((country) => country.id === M5_COUNTRY_B)?.immigrationOpen).toBe(
+      false,
+    );
+  });
+
+  test("assigns cross-province labor within a country and cross-border labor only into an open country", () => {
+    const { world } = m5World();
+    runTicks(world, 1, context(m5Scenario()));
+    expect(world.employment.length).toBeGreaterThan(0);
+    assertValidWorld(world);
+    const provinceByBuilding = new Map(world.buildings.map((building) => [building.id, building.provinceId]));
+    const countryOfProvince = new Map<number, number>();
+    for (const country of world.countries) {
+      for (const provinceId of countryProvinceIds(world, country.id)) countryOfProvince.set(provinceId, country.id);
+    }
+    let crossProvinceSameCountry = 0;
+    for (const assignment of world.employment) {
+      const block = world.popBlocks.find((candidate) => candidate.id === assignment.popBlockId);
+      expect(block).toBeDefined();
+      if (block === undefined) continue;
+      const buildingProvince = provinceByBuilding.get(assignment.buildingInstanceId);
+      if (buildingProvince === undefined) continue;
+      if (buildingProvince !== block.provinceId) {
+        const sourceCountry = countryOfProvince.get(block.provinceId);
+        const destinationCountry = countryOfProvince.get(buildingProvince);
+        if (sourceCountry === destinationCountry) crossProvinceSameCountry += 1;
+        else {
+          expect(destinationCountry).toBe(M5_COUNTRY_C);
+          expect(world.countries.find((country) => country.id === destinationCountry)?.immigrationOpen).toBe(true);
+        }
+      }
+    }
+    expect(crossProvinceSameCountry).toBeGreaterThan(0);
+  });
+
+  test("keeps a closed border closed even when vacancies exist", () => {
+    const scenario = m5Scenario();
+    const farm = scenario.buildingInstances.find(
+      (building) => building.id === 5 && building.provinceId === M5_REGION_B1,
+    );
+    expect(farm?.definitionId).toBe(M5_FARM);
+    // Enlarge B's farm far beyond its domestic workforce.
+    scenario.buildingInstances = scenario.buildingInstances.map((building) =>
+      building.id === 5 ? { ...building, level: 10 } : building,
+    );
+    const world = createEconomyWorld(scenario, { seed: 20_261_023 });
+    runTicks(world, 1, context(scenario));
+    const bBlocks = world.popBlocks.filter((block) => block.provinceId === M5_REGION_B1);
+    const bBuildingIds = new Set(
+      world.buildings.filter((building) => building.provinceId === M5_REGION_B1).map((building) => building.id),
+    );
+    for (const assignment of world.employment) {
+      if (!bBuildingIds.has(assignment.buildingInstanceId)) continue;
+      expect(bBlocks.some((block) => block.id === assignment.popBlockId)).toBe(true);
+    }
+  });
+
+  test("rejects invalid market and country membership", () => {
+    const duplicateProvince = m5Scenario();
+    duplicateProvince.markets = duplicateProvince.markets.map((market) =>
+      market.id === 1 ? { ...market, provinceIds: [M5_REGION_B1, 0] } : market,
+    );
+    expect(() => createEconomyWorld(duplicateProvince)).toThrow(/belongs to both market/);
+
+    const splitCountry = m5Scenario();
+    splitCountry.countries = (splitCountry.countries ?? []).map((country) =>
+      country.id === M5_COUNTRY_A ? { ...country, provinceIds: [0] } : country,
+    );
+    // ProvinceEconomy 1 becomes unowned; zero-fiscal countries allow unowned provinces only
+    // when no fiscal policy is active. A is active, so ownership must cover it.
+    expect(() => createEconomyWorld(splitCountry)).toThrow(/province 1 must be owned/);
+
+    const unknownMarket = m5Scenario();
+    unknownMarket.population.provinceEconomies = unknownMarket.population.provinceEconomies.map((province) =>
+      province.id === M5_REGION_A2 ? { ...province, key: "a2", name: "A2" } : province,
+    );
+    unknownMarket.markets = unknownMarket.markets.map((market) =>
+      market.id === 0 ? { ...market, provinceIds: [0, 3] } : market,
+    );
+    expect(() => createEconomyWorld(unknownMarket)).toThrow(/not assigned to a market/);
+  });
+
+  test("round-trips and hashes the multi-country world", () => {
+    const { world } = m5World();
+    const serialized = serializeWorld(world);
+    const restored = deserializeWorld(serialized);
+    expect(hashWorld(restored)).toBe(hashWorld(world));
+    restored.countries.forEach((country) => {
+      expect(typeof country.immigrationOpen).toBe("boolean");
+    });
+  });
+
+  test("runs a month including the first migration date without errors", () => {
+    const scenario = m5Scenario();
+    const world = createEconomyWorld(scenario, { seed: 20_261_023 });
+    const start = hashWorld(world);
+    runTicks(world, 31, context(scenario)); // reaches day 31 (February 1)
+    const migration = tick(world, context(scenario)); // processes day 31
+    expect(migration.economy?.migration.ran).toBe(true);
+    expect(migration.economy?.migration.totalPeople ?? 0).toBeGreaterThan(0);
+    expect(world.dayIndex).toBe(32);
+    expect(hashWorld(world)).not.toBe(start);
+    assertValidWorld(world);
+  });
+
+  test("migration phase is a no-op outside the first day of a month", () => {
+    const scenario = m5Scenario();
+    const world = createEconomyWorld(scenario, { seed: 20_261_023 });
+    const before = hashWorld(world);
+    const result = runMigrationPhase(world, scenario.definitions, 0);
+    expect(result.ran).toBe(false);
+    expect(result.employmentRefresh).toBeNull();
+    expect(hashWorld(world)).toBe(before);
+  });
+
+  test("conserves population and cash across an actual migration tick", () => {
+    const scenario = m5Scenario();
+    const world = createEconomyWorld(scenario, { seed: 20_261_023 });
+    runTicks(world, 31, context(scenario)); // day 31 is due for migration
+    const populationBefore = world.popBlocks.reduce(
+      (total, block) => total + populationTotal(block),
+      0,
+    );
+    const cashBefore = designatedCashTotal(world.finance);
+
+    const result = tick(world, context(scenario));
+    expect(result.economy?.migration.ran).toBe(true);
+    expect(result.economy?.migration.totalPeople ?? 0).toBeGreaterThan(0);
+    expect(result.population).toBeDefined();
+    const births = result.population?.births ?? 0;
+    const deaths = result.population?.deaths ?? 0;
+    const populationAfter = world.popBlocks.reduce(
+      (total, block) => total + populationTotal(block),
+      0,
+    );
+    // Migration moves people between blocks; it does not change the world total.
+    // The only world-level population change is the day's births minus deaths.
+    expect(populationAfter).toBe(populationBefore + births - deaths);
+    expect(designatedCashTotal(world.finance)).toBeCloseTo(cashBefore, 6);
+    expect(world.employmentDirty).toBe(false);
+    assertValidEmploymentState(world, scenario.definitions);
+    assertValidWorld(world);
+    expect(world.dayIndex).toBe(32);
+  });
+
+  test("keeps a countryless multi-province world valid and tickable", () => {
+    const scenario = m5Scenario();
+    scenario.countries = [];
+    scenario.currencies = [];
+    scenario.currencyValuations = [];
+    const world = createEconomyWorld(scenario, { seed: 20_261_023 });
+    expect(world.countries).toHaveLength(0);
+    expect(world.provinceEconomies).toHaveLength(4);
+    expect(world.markets).toHaveLength(2);
+    runTicks(world, 3, context(scenario));
+    assertValidWorld(world);
+    // Countryless labor access is unrestricted only among countryless provinces.
+    for (const assignment of world.employment) {
+      expect(assignment.workers).toBeGreaterThan(0);
+    }
+  });
+
+  test("rejects schema-9/10/11/12 and simulation-0.9.0 saves", () => {
+    const { world } = m5World();
+    const envelope = JSON.parse(serializeWorld(world)) as {
+      schemaVersion: number;
+      simVersion: string;
+    };
+    envelope.schemaVersion = 9;
+    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
+      /Save world schema 9 is incompatible/,
+    );
+    envelope.schemaVersion = 10;
+    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
+      /Save world schema 10 is incompatible/,
+    );
+    envelope.schemaVersion = 11;
+    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
+      /Save world schema 11 is incompatible/,
+    );
+    envelope.schemaVersion = 12;
+    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
+      /Save world schema 12 is incompatible/,
+    );
+    const sim = JSON.parse(serializeWorld(world)) as { simVersion: string };
+    sim.simVersion = "0.9.0";
+    // The envelope still claims the current schema, so the simulation-version
+    // check is the one that rejects the save.
+    expect(() => deserializeWorld(JSON.stringify(sim))).toThrow(
+      /Save simulation version "0.9.0" is incompatible/,
+    );
+  });
+
+  test("resumes after a migration-and-trade day exactly like an uninterrupted run", () => {
+    const scenario = m5Scenario();
+    const contextValue = context(scenario);
+    const uninterrupted = createEconomyWorld(scenario, { seed: 20_261_023 });
+    runTicks(uninterrupted, 36, contextValue); // includes the 1 February migration day
+    const saved = serializeWorld(uninterrupted);
+    const resumed = deserializeWorld(saved);
+    expect(hashWorld(resumed)).toBe(hashWorld(uninterrupted));
+    runTicks(resumed, 6, contextValue);
+    const direct = createEconomyWorld(scenario, { seed: 20_261_023 });
+    runTicks(direct, 42, contextValue);
+    expect(hashWorld(resumed)).toBe(hashWorld(direct));
+  });
+});

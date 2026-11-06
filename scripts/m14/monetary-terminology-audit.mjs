@@ -39,8 +39,8 @@ const LEGACY_COMPATIBILITY_FILES = new Set([
   "packages/data/src/historical.ts",
   // P3 (D-141): the currency-table loader rejects the reserved legacy key too.
   "packages/data/src/currencies.ts",
-  "packages/tests/src/m14-rusd.test.ts",
-  "packages/tests/src/m4a2-country-currency.test.ts",
+  "packages/tests/src/architecture/m14-rusd.test.ts",
+  "packages/tests/src/money/currency-identity.test.ts",
   "scripts/m14/monetary-terminology-audit.mjs",
   "scripts/m14/playtest-rusd.mjs",
 ]);

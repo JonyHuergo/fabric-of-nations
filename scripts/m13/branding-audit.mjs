@@ -68,7 +68,7 @@ function isHistorical(relativePath) {
     relativePath === "docs/M13_REBRANDING_REPORT.md" ||
     relativePath === "docs/M14_RUSD_RENAMING_REPORT.md" ||
     relativePath === "packages/tests/src/fixtures/century-era-save.json" ||
-    relativePath === "packages/tests/src/m13-branding.test.ts" ||
+    relativePath === "packages/tests/src/architecture/naming-audits.test.ts" ||
     relativePath === "scripts/m13/branding-audit.mjs" ||
     relativePath === "scripts/m13/playtest-rebrand.mjs" ||
     relativePath === "scripts/m14/monetary-terminology-audit.mjs" ||
