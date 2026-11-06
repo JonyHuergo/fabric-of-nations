@@ -1,0 +1,433 @@
+{
+ "description": "USGS Data Series 140 (historical statistics for mineral and material commodities in the United States): every column of the 1900 and 1990 rows, as published. Extracted by scripts/p5b/extract-ds140.mjs from hand-downloaded workbooks (usgs.gov refuses scripted downloads).",
+ "decision": "D-146",
+ "source": {
+  "title": "Historical statistics for mineral and material commodities in the United States",
+  "series": "U.S. Geological Survey Data Series 140",
+  "url": "https://pubs.usgs.gov/publication/ds140",
+  "doi": "10.3133/ds140",
+  "license": "Public domain (U.S. government work)"
+ },
+ "years": [
+  1900,
+  1990
+ ],
+ "tables": [
+  {
+   "file": "ds140-aluminum-2021.xlsx",
+   "sha256": "7646adb3647b78a38adcf6d569913db892263903042192fd5f3d4a659ebdd4e9",
+   "sheet": "Aluminum",
+   "title": "ALUMINUM STATISTICS1",
+   "unitNote": "[All values are in metric tons (t) aluminum content unless otherwise noted]",
+   "lastModification": "Last modification: July 5, 2023",
+   "values": {
+    "1900": {
+     "Primary production": 2296,
+     "Secondary production old scrap": "NA",
+     "Secondary production new scrap": "NA",
+     "Secondary production": "NA",
+     "Shipments": "NA",
+     "Imports": "NA",
+     "Exports": "NA",
+     "Industry stocks": "NA",
+     "LME stocks": "NA",
+     "Government stocks": "NA",
+     "Total stocks": "NA",
+     "Apparent consumption": 2300,
+     "Unit value ($/t)": 721,
+     "Unit value (98$/t)": 14000,
+     "World production": 6800,
+     "Employment": "NA",
+     "Net import reliance (%)": "NA"
+    },
+    "1990": {
+     "Primary production": 4048000,
+     "Secondary production old scrap": 1360000,
+     "Secondary production new scrap": 1030000,
+     "Secondary production": 2390000,
+     "Shipments": 6640000,
+     "Imports": 1300000,
+     "Exports": 1660000,
+     "Industry stocks": 1820000,
+     "LME stocks": "NA",
+     "Government stocks": 2000,
+     "Total stocks": 1820000,
+     "Apparent consumption": 5050000,
+     "Unit value ($/t)": 1630,
+     "Unit value (98$/t)": 2030,
+     "World production": 19300000,
+     "Employment": 77900,
+     "Net import reliance (%)": "E"
+    }
+   }
+  },
+  {
+   "file": "ds140-bauxite-alumina-2021.xlsx",
+   "sha256": "563835e525d0846321159073efacb73d29c31682e4ddac5b31ae54bf72a5ce38",
+   "sheet": "Bauxite",
+   "title": "BAUXITE STATISTICS1",
+   "unitNote": "[All values are in metric tons (t) gross weight unless otherwise noted]",
+   "lastModification": "Last modification: May 8, 2024",
+   "values": {
+    "1900": {
+     "Production": 23600,
+     "Shipments": 23800,
+     "Imports": 8800,
+     "Exports": 1020,
+     "Industry stocks": "NA",
+     "Government stocks": "NA",
+     "Apparent consumption": 31300,
+     "Unit value ($/t)": 3.75,
+     "Unit value (98$/t)": 74,
+     "World production": 88000
+    },
+    "1990": {
+     "Production": "W",
+     "Shipments": "W",
+     "Imports": 12700000,
+     "Exports": 53000,
+     "Industry stocks": 2320000,
+     "Government stocks": 18500000,
+     "Apparent consumption": 12000000,
+     "Unit value ($/t)": 27.2,
+     "Unit value (98$/t)": 34,
+     "World production": 113000000
+    }
+   }
+  },
+  {
+   "file": "ds140-bauxite-alumina-2021.xlsx",
+   "sha256": "563835e525d0846321159073efacb73d29c31682e4ddac5b31ae54bf72a5ce38",
+   "sheet": "Alumina",
+   "title": "ALUMINA STATISTICS1",
+   "unitNote": "[All values are in metric tons (t) gross weight unless otherwise noted]",
+   "lastModification": "Last modification: April 8, 2024",
+   "values": {
+    "1990": {
+     "Production": 5230000,
+     "Shipments": 5150000,
+     "Imports": 4070000,
+     "Exports": 1260000,
+     "Industry stocks": 2100000,
+     "Apparent consumption": 7910000,
+     "Unit value ($/t)": 305,
+     "Unit value (98$/t)": 380,
+     "World production": 42600000
+    }
+   }
+  },
+  {
+   "file": "ds140-cement-2021.xlsx",
+   "sha256": "0053f8d21454e503232e5f8b84e979aa5af80996105421d4ea12c401c6834521",
+   "sheet": "Cement",
+   "title": "CEMENT STATISTICS1",
+   "unitNote": "[All values in metric tons (t) gross weight unless otherwise noted]",
+   "lastModification": "Last modification: May 3, 2023",
+   "values": {
+    "1900": {
+     "Production": 2680400,
+     "Imports": 411440,
+     "Exports": 17200,
+     "Stocks": "NA",
+     "Apparent consumption": 3074600,
+     "Unit value ($/t)": 4,
+     "Unit value (98$/t)": 78,
+     "World production": "NA"
+    },
+    "1990": {
+     "Production": 69954000,
+     "Imports": 10344000,
+     "Exports": 503000,
+     "Stocks": 5637000,
+     "Apparent consumption": 80964000,
+     "Unit value ($/t)": 55.3,
+     "Unit value (98$/t)": 69,
+     "World production": 1160000000
+    }
+   }
+  },
+  {
+   "file": "ds140-copper-2020.xlsx",
+   "sha256": "8c5e3682ceae94a06146c4b5000c4499521b02fcbd7dda5954e9ac4eb17ffc3f",
+   "sheet": "Copper",
+   "title": "COPPER STATISTICS1",
+   "unitNote": "[All values are in metric tons (t) copper content unless otherwise noted]",
+   "lastModification": "Last modification: June 27, 2023",
+   "values": {
+    "1900": {
+     "Primary production": 291000,
+     "Secondary production": "NA",
+     "New scrap": "NA",
+     "Refinery scrap": "NA",
+     "Imports": 28000,
+     "Exports": 154000,
+     "Stocks": 76000,
+     "Consumption": 166000,
+     "Apparent consumption": 166000,
+     "Unit value ($/t)": 357,
+     "Unit value (98$/t)": 7000,
+     "World production": 495000
+    },
+    "1990": {
+     "Primary production": 1580000,
+     "Secondary production": 536000,
+     "New scrap": 775000,
+     "Refinery scrap": 441000,
+     "Imports": 262000,
+     "Exports": 211000,
+     "Stocks": 101000,
+     "Consumption": 2150000,
+     "Apparent consumption": 2170000,
+     "Unit value ($/t)": 2710,
+     "Unit value (98$/t)": 3380,
+     "World production": 9200000
+    }
+   }
+  },
+  {
+   "file": "ds140-gold-2022.xlsx",
+   "sha256": "025f3eb98adb606cc214b82caa70646b80cf9debdf6544dbafce361283c1c480",
+   "sheet": "Gold",
+   "title": "GOLD STATISTICS1",
+   "unitNote": "[All values are in metric tons (t) gold content unless otherwise noted]",
+   "lastModification": "Last modification: November 20, 2023",
+   "values": {
+    "1900": {
+     "Primary production": 120,
+     "Secondary production": "NA",
+     "Imports": "NA",
+     "Exports": "NA",
+     "Reported consumption": 33.2,
+     "Unit value ($/t)": 609000,
+     "Unit value (98$/t)": 11900000,
+     "World production": 386
+    },
+    "1990": {
+     "Primary production": 294,
+     "Secondary production": 44,
+     "Imports": 97.5,
+     "Exports": 241,
+     "Reported consumption": 215,
+     "Unit value ($/t)": 12400000,
+     "Unit value (98$/t)": 15500000,
+     "World production": 2180
+    }
+   }
+  },
+  {
+   "file": "ds140-iron-steel-2021.xlsx",
+   "sha256": "b666e19fcd643188dc2626736bb3d203877153634e2aff16645a1d8e08c4fa8e",
+   "sheet": "Pig Iron",
+   "title": "IRON AND STEEL STATISTICS1",
+   "unitNote": "[All values in metric tons (t) unless otherwise noted]",
+   "lastModification": "Last modification: June 29, 2023",
+   "values": {
+    "1900": {
+     "Primary production": 13200000,
+     "Shipments": "NA",
+     "Imports": 52000,
+     "Exports": 287000,
+     "Apparent consumption": 13000000,
+     "Unit value ($/t)": 20.8,
+     "Unit value (98$/t)": 410,
+     "World production": "NA"
+    },
+    "1990": {
+     "Primary production": 49700000,
+     "Shipments": 49700000,
+     "Imports": 347000,
+     "Exports": 14000,
+     "Apparent consumption": 50000000,
+     "Unit value ($/t)": "NA",
+     "Unit value (98$/t)": "NA",
+     "World production": 531000000
+    }
+   }
+  },
+  {
+   "file": "ds140-iron-steel-2021.xlsx",
+   "sha256": "b666e19fcd643188dc2626736bb3d203877153634e2aff16645a1d8e08c4fa8e",
+   "sheet": "Direct Reduced Iron",
+   "title": "IRON AND STEEL STATISTICS1",
+   "unitNote": "[All values in metric tons (t) unless otherwise noted]",
+   "lastModification": "Last modification: June 29, 2023",
+   "values": {
+    "1990": {
+     "Production": 390000,
+     "Imports": 333000,
+     "Exports": 4000,
+     "Apparent consumption": 719000,
+     "World production": 18200000
+    }
+   }
+  },
+  {
+   "file": "ds140-iron-steel-2021.xlsx",
+   "sha256": "b666e19fcd643188dc2626736bb3d203877153634e2aff16645a1d8e08c4fa8e",
+   "sheet": "Steel",
+   "title": "IRON AND STEEL STATISTICS1",
+   "unitNote": "[All values in metric tons (t) unless otherwise noted]",
+   "lastModification": "Last modification: June 29, 2023",
+   "values": {
+    "1900": {
+     "Steel product shipments": 9490000,
+     "Raw steel production": 9240000,
+     "Imports": "NA",
+     "Exports": "NA",
+     "Semifinished imports": "NA",
+     "Stock changes": "NA",
+     "Apparent consumption": 9490000,
+     "Unit value ($/t)": 35.5,
+     "Unit value (98$/t)": 697,
+     "World production": "NA"
+    },
+    "1990": {
+     "Steel product shipments": 77100000,
+     "Raw steel production": 89700000,
+     "Imports": 15600000,
+     "Exports": 3900000,
+     "Semifinished imports": 2110000,
+     "Stock changes": "NA",
+     "Apparent consumption": 86700000,
+     "Unit value ($/t)": 441,
+     "Unit value (98$/t)": 550,
+     "World production": 771000000
+    }
+   }
+  },
+  {
+   "file": "ds140-iron_ore-2021.xlsx",
+   "sha256": "6cca49247916618a45305573cdbe56f27e139a2dc362a2e8be126b5dcfe816f3",
+   "sheet": "Iron ore",
+   "title": "IRON ORE STATISTICS1",
+   "unitNote": "[All values in metric tons (t) gross weight unless otherwise noted]",
+   "lastModification": "Last modification: January 14, 2024",
+   "values": {
+    "1900": {
+     "Production": 28000000,
+     "Shipments": "NA",
+     "Imports": 912000,
+     "Exports": 52300,
+     "Stocks": 9770000,
+     "Apparent consumption": 28900000,
+     "Unit value ($/t)": 2.42,
+     "Unit value (98$/t)": 47.45,
+     "World production": "NA"
+    },
+    "1990": {
+     "Production": 56400000,
+     "Shipments": 57000000,
+     "Imports": 18100000,
+     "Exports": 3200000,
+     "Stocks": 23000000,
+     "Apparent consumption": 71400000,
+     "Unit value ($/t)": 30.54,
+     "Unit value (98$/t)": 38.08,
+     "World production": 982000000
+    }
+   }
+  },
+  {
+   "file": "ds140-phosphate-2022.xlsx",
+   "sha256": "8b6e61d7e49367461fc54f1a7a5e196ae5e81ea844371cbfcc84a84eb0a68ef8",
+   "sheet": "Phosphate rock",
+   "title": "PHOSPHATE ROCK STATISTICS1",
+   "unitNote": "[All values are in metric tons (t) gross weight unless otherwise noted]",
+   "lastModification": "Last modification: October 10, 2023",
+   "values": {
+    "1900": {
+     "Production": 1520000,
+     "Sold or used": 1520000,
+     "Imports": "NA",
+     "Exports": 630000,
+     "Apparent consumption": 885000,
+     "Unit value ($/t)": 3.54,
+     "Unit value (98$/t)": 69,
+     "World production": 3150000
+    },
+    "1990": {
+     "Production": 46300000,
+     "Sold or used": 49800000,
+     "Imports": 451000,
+     "Exports": 6240000,
+     "Apparent consumption": 44000000,
+     "Unit value ($/t)": 22.3,
+     "Unit value (98$/t)": 27.8,
+     "World production": 162000000
+    }
+   }
+  },
+  {
+   "file": "ds140-silver-2021.xlsx",
+   "sha256": "e57b952a5fd469291341bf275fbaa1c20dfd0caa9b40f383a2a19076efa9e997",
+   "sheet": "Silver",
+   "title": "SILVER STATISTICS1",
+   "unitNote": "[All values in metric tons (t) silver content unless otherwise noted]",
+   "lastModification": "Last modification: September 1, 2023",
+   "values": {
+    "1900": {
+     "Mine production": 1790,
+     "Primary production": 1790,
+     "Secondary production": "NA",
+     "Shipments": "NA",
+     "Imports": "NA",
+     "Exports": "NA",
+     "Stocks": "NA",
+     "Apparent consumption": 420,
+     "Unit value ($/t)": 20000,
+     "Unit value (98$/t)": 390000,
+     "World production": 5400
+    },
+    "1990": {
+     "Mine production": 2120,
+     "Primary production": 1940,
+     "Secondary production": 454,
+     "Shipments": 107,
+     "Imports": 2700,
+     "Exports": 736,
+     "Stocks": 583,
+     "Apparent consumption": 4360,
+     "Unit value ($/t)": 155000,
+     "Unit value (98$/t)": 193300,
+     "World production": 16600
+    }
+   }
+  },
+  {
+   "file": "ds140-tin-2021.xlsx",
+   "sha256": "ca5c4715a5081b0d9500993bb52c285cb5006a3f31641be795cdf9999e2274d4",
+   "sheet": "Tin",
+   "title": "TIN STATISTICS1",
+   "unitNote": "[All values in metric tons (t) tin content unless otherwise noted]",
+   "lastModification": "Last modification: March 27, 2024",
+   "values": {
+    "1900": {
+     "Primary production": "NA",
+     "Secondary production": "NA",
+     "Imports": 31700,
+     "Exports": "NA",
+     "Government shipments": "NA",
+     "Government stocks": "NA",
+     "Industry stocks": "NA",
+     "Apparent consumption": 31700,
+     "Unit value ($/t)": 659,
+     "Unit value (98$/t)": 12900,
+     "World production": "NA"
+    },
+    "1990": {
+     "Primary production": 0,
+     "Secondary production": 13200,
+     "Imports": 33800,
+     "Exports": 658,
+     "Government shipments": 2150,
+     "Government stocks": "NA",
+     "Industry stocks": 17300,
+     "Apparent consumption": 45900,
+     "Unit value ($/t)": 8520,
+     "Unit value (98$/t)": 10600,
+     "World production": 221000
+    }
+   }
+  }
+ ]
+}
