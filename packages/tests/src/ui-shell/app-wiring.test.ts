@@ -1,4 +1,9 @@
 /**
+ * Source-level wiring of the app shell to the snapshot/command contract.
+ * Merged in D-145 from the E1 UI wiring, M7 app lifecycle, M11d provider lifecycle
+ * and M11d slider accessibility tests; each keeps its section.
+ */
+/**
  * E1 UI wiring guard.
  *
  * These are source-level integration checks: the repository has no React Native

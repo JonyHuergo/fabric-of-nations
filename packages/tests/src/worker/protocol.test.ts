@@ -1,3 +1,8 @@
+/**
+ * Worker protocol boundary: snapshot sections, validated actions and app-valid
+ * campaign snapshots. Merged in D-145 from the M9 worker, E5 worker and M11d runtime
+ * contract tests; each keeps its section.
+ */
 import { SimulationHost } from "@century/sim-worker/host";
 import {
   PROTOCOL_VERSION,

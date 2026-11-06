@@ -1,5 +1,9 @@
 /// <reference lib="dom" />
 /**
+ * Map labels: candidates, placement and ink. Merged in D-145 from the M15 label tests
+ * and the M16 label-ink tests.
+ */
+/**
  * Label candidates and placement.
  */
 

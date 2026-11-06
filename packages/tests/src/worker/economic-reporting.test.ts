@@ -1,4 +1,8 @@
 /**
+ * Economic reporting through the snapshot. Merged in D-145 from the E1 economic
+ * clarity and E1 fiscal reporting tests.
+ */
+/**
  * E1 economic clarity selectors and snapshot contract.
  *
  * These tests use the real eight-polity world and snapshot builder for the

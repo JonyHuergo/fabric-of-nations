@@ -1,3 +1,7 @@
+/**
+ * Simulation isolation and the No-Mana Doctrine (AGENTS.md §3).
+ * Merged in D-145 from `architecture.test.ts` and `no-mana.test.ts`.
+ */
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";

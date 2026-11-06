@@ -79,3 +79,14 @@ describe("generated worker bundle drift", () => {
     }
   });
 });
+
+describe("decision register index (D-145)", () => {
+  test("the DECISIONS.md index lists every decision once, in order", () => {
+    // `--check` fails on a stale index and on a duplicate or missing decision number.
+    const output = execFileSync(process.execPath, [join(ROOT, "scripts", "docs", "decisions-index.mjs"), "--check"], {
+      cwd: ROOT,
+      encoding: "utf8",
+    });
+    expect(output).toMatch(/DECISIONS\.md index is current \(\d+ decisions\)/);
+  });
+});

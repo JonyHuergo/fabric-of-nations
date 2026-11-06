@@ -1,4 +1,9 @@
 /**
+ * The SVG fallback map: `WorldMap.tsx`, `mapViewport.ts` and `worldMapGeometry.ts`.
+ * Merged in D-145 from the M11c.1, M11d and M11e map tests (geometry, viewport,
+ * rendering contract, legibility, selection and wheel zoom); each keeps its section.
+ */
+/**
  * M11e complete world-map geometry and render-plan smoke test.
  *
  * The 1900 bundle contains 133 polities. This suite decodes every ring through

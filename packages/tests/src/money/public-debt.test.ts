@@ -1,3 +1,7 @@
+/**
+ * Public debt and deficit financing. Merged in D-145 from the M5b debt tests and the
+ * bounded-debt-contract tests.
+ */
 import {
   assertAccountingIdentity,
   assertValidWorld,

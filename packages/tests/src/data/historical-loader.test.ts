@@ -1,4 +1,9 @@
 /**
+ * Historical-data loaders: validation at the data stage, data-version agreement and
+ * the eight-polity M5 pipeline. Merged in D-145 from the batch-7 loader validation,
+ * data-version consistency and M5 history tests.
+ */
+/**
  * Batch 7 — historical loader boundary validation.
  *
  * These tests construct malformed variants of the shipped historical data and

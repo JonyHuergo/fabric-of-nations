@@ -1,4 +1,9 @@
 /**
+ * Diplomacy, warfare and territorial control. Includes, since D-145, the AUDIT-014
+ * military payroll test; the other audit-remediation tests are in
+ * `military-recruitment` and `military-validation` / `military-actions`.
+ */
+/**
  * M10 — diplomacy, warfare, and territorial control (GDD §11, D-081).
  *
  * The central invariant is that military control (`ProvinceEconomy.controllerCountryId`) is
