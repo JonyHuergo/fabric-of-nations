@@ -1,0 +1,353 @@
+{
+ "generator": "scripts/p5/build-p5-world.mjs",
+ "decision": "D-143",
+ "inputs": {
+  "provinces": "65cf3bca7b91ec2673aec928aad23f0893a2cae27e6ef6993499b9cc531e69f1",
+  "buildings": "f1d97a7acc5105f0b97a41790a5d4c085101c26ed8581763016a10a6a1e26362",
+  "countries": "ee8b3fe36d5a0462a3e3cabdf7f0bc7e9d2365d261fd0093bd880c066b2e224a",
+  "buildingDefinitions": "5e62b41ef5937491165a68a29176dc61fe8f270644a2c1dbd337f0d529be3ae1",
+  "geography": "a1479e70fa3741c486d60202becf170aeb1c26e297cc1713deeb706c79aaa22a",
+  "authoredDeposits": "dde612715badf23edadf53cd68d6ffd12f7ed72bd3ba6ffee4c6fdc2d610a2db",
+  "mrds": "2fe7b520aadfe6df78069461ad55793395d2f64d58f5641b0e2f4c41f5969e61",
+  "forest": "1b6c7161a79e1aa2b148ff067b0c0ab5f789a50061227a4a0c4817f4057a557e",
+  "technology": "28a4e2df6efd781bb77da4de24f6d600bdac3c07d906b089c548e7cfc4ad85ea"
+ },
+ "outputs": {
+  "provinces_1900.json": "3451cf5db70c200235dd3d34f1c2f2dbe52078e82ad8c9716522279118df7507",
+  "buildings_definitions_1900.json": "7396751b3a99a48c6fa6988dbda77bf17efad618d8923d7ababd20a517972184",
+  "deposits_1900.json": "9133465539eb23b054bf43ba5b65b5424a55323240047ab5ff2914088022249d",
+  "countries_1900.json": "1103f7cdd0541aeb488082813d79c8293c9a688620ebc446c9690417ea5c6542"
+ },
+ "land": {
+  "source": "HYDE 3.3 1900 cropland and grazing land, as allocated to provinces in P2 (docs/PROVINCE_GEOGRAPHY.md)",
+  "landUseByDefinition": {
+   "subsistence-farm": "cropland",
+   "commercial-farm": "cropland",
+   "commercial-farm-peasant": "cropland",
+   "mechanized-farm": "cropland",
+   "ranch": "pasture"
+  },
+  "worldMedianHectaresPerFarmJob": {
+   "cropland": 9.9708,
+   "pasture": 2.737
+  },
+  "croplandHa": 902336004,
+  "pastureHa": 1571931043,
+  "imputations": [
+   {
+    "provinceId": 3070,
+    "key": "fra-paris",
+    "country": "FRA",
+    "landUse": "pasture",
+    "farmJobs": 227000,
+    "hectaresPerJob": 2.429,
+    "basis": "FRA median, bounded by land area",
+    "hectares": 11226,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 4095,
+    "key": "rus-arkhangelsk",
+    "country": "RUS",
+    "landUse": "cropland",
+    "farmJobs": 22000,
+    "hectaresPerJob": 27.1619,
+    "basis": "RUS median",
+    "hectares": 597562,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 22001,
+    "key": "mco-monaco",
+    "country": "MCO",
+    "landUse": "cropland",
+    "farmJobs": 2000,
+    "hectaresPerJob": 9.9708,
+    "basis": "world median",
+    "hectares": 19942,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 22001,
+    "key": "mco-monaco",
+    "country": "MCO",
+    "landUse": "pasture",
+    "farmJobs": 1000,
+    "hectaresPerJob": 2.737,
+    "basis": "world median",
+    "hectares": 2737,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 100162,
+    "key": "as-rus-kamchatka",
+    "country": "RUS",
+    "landUse": "cropland",
+    "farmJobs": 11000,
+    "hectaresPerJob": 27.1619,
+    "basis": "RUS median",
+    "hectares": 298781,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 300427,
+    "key": "am-bwi-jam-cornwall",
+    "country": "GBR",
+    "landUse": "cropland",
+    "farmJobs": 21000,
+    "hectaresPerJob": 7.3771,
+    "basis": "GBR median",
+    "hectares": 154920,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 300428,
+    "key": "am-bwi-jam-middlesex",
+    "country": "GBR",
+    "landUse": "cropland",
+    "farmJobs": 67000,
+    "hectaresPerJob": 7.3771,
+    "basis": "GBR median, bounded by land area",
+    "hectares": 420169,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 300429,
+    "key": "am-bwi-jam-surrey",
+    "country": "GBR",
+    "landUse": "cropland",
+    "farmJobs": 21000,
+    "hectaresPerJob": 7.3771,
+    "basis": "GBR median",
+    "hectares": 154920,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 300465,
+    "key": "am-bsa-falkland-islands",
+    "country": "GBR",
+    "landUse": "cropland",
+    "farmJobs": 2000,
+    "hectaresPerJob": 7.3771,
+    "basis": "GBR median",
+    "hectares": 14754,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 300468,
+    "key": "am-grl-south-greenland",
+    "country": "DNK",
+    "landUse": "cropland",
+    "farmJobs": 2000,
+    "hectaresPerJob": 22.7454,
+    "basis": "DNK median",
+    "hectares": 45491,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 400084,
+    "key": "oc-gpn-caroline-pohnpei",
+    "country": "DEU",
+    "landUse": "cropland",
+    "farmJobs": 12000,
+    "hectaresPerJob": 8.0271,
+    "basis": "DEU median",
+    "hectares": 96325,
+    "confidence": "low"
+   },
+   {
+    "provinceId": 400092,
+    "key": "oc-gum-guam",
+    "country": "USA",
+    "landUse": "cropland",
+    "farmJobs": 3000,
+    "hectaresPerJob": 70.1083,
+    "basis": "USA median",
+    "hectares": 210325,
+    "confidence": "low"
+   }
+  ]
+ },
+ "deposits": {
+  "authored": 221,
+  "fromMrds": 2266,
+  "forests": 1347,
+  "total": 3834,
+  "classStock": {
+   "coal": {
+    "S": 100000000,
+    "M": 1000000000,
+    "L": 10000000000,
+    "G": 100000000000,
+    "SG": 1000000000000
+   },
+   "oil": {
+    "S": 1000000,
+    "M": 10000000,
+    "L": 100000000,
+    "G": 1000000000,
+    "SG": 10000000000
+   },
+   "gas": {
+    "S": 1000000,
+    "M": 10000000,
+    "L": 100000000,
+    "G": 1000000000,
+    "SG": 10000000000
+   },
+   "iron": {
+    "S": 2000000,
+    "M": 20000000,
+    "L": 200000000,
+    "G": 2000000000,
+    "SG": 20000000000
+   },
+   "copper": {
+    "S": 50000,
+    "M": 500000,
+    "L": 5000000,
+    "G": 50000000,
+    "SG": 200000000
+   },
+   "bauxite": {
+    "S": 5000000,
+    "M": 50000000,
+    "L": 500000000,
+    "G": 2000000000,
+    "SG": 5000000000
+   },
+   "tin": {
+    "S": 5000,
+    "M": 50000,
+    "L": 300000,
+    "G": 2000000,
+    "SG": 5000000
+   },
+   "gold": {
+    "S": 1000,
+    "M": 10000,
+    "L": 100000,
+    "G": 1000000,
+    "SG": 40000000
+   },
+   "silver": {
+    "S": 10000,
+    "M": 100000,
+    "L": 1000000,
+    "G": 10000000,
+    "SG": 100000000
+   },
+   "nitrate": {
+    "S": 100000,
+    "M": 1000000,
+    "L": 10000000,
+    "G": 30000000,
+    "SG": 100000000
+   },
+   "uranium": {
+    "S": 1000,
+    "M": 10000,
+    "L": 100000,
+    "G": 500000,
+    "SG": 1000000
+   }
+  },
+  "timberM3PerHa": {
+   "tropical": 180,
+   "temperate": 120,
+   "boreal": 90
+  },
+  "byResource": {
+   "coal": {
+    "deposits": 73,
+    "known": 72,
+    "stock": 1855900000000,
+    "knownStock": 1755900000000
+   },
+   "iron": {
+    "deposits": 423,
+    "known": 50,
+    "stock": 18553040000,
+    "knownStock": 11182600000
+   },
+   "bauxite": {
+    "deposits": 297,
+    "known": 11,
+    "stock": 18325000000,
+    "knownStock": 1717000000
+   },
+   "silver": {
+    "deposits": 322,
+    "known": 99,
+    "stock": 287176000,
+    "knownStock": 281553000
+   },
+   "timber": {
+    "deposits": 1347,
+    "known": 1347,
+    "stock": 656598943200,
+    "knownStock": 656598943200
+   },
+   "copper": {
+    "deposits": 526,
+    "known": 111,
+    "stock": 981565000,
+    "knownStock": 785050000
+   },
+   "tin": {
+    "deposits": 155,
+    "known": 25,
+    "stock": 8258000,
+    "knownStock": 7190000
+   },
+   "gold": {
+    "deposits": 499,
+    "known": 120,
+    "stock": 70200800,
+    "knownStock": 67362100
+   },
+   "gas": {
+    "deposits": 24,
+    "known": 4,
+    "stock": 36852000000,
+    "knownStock": 22000000
+   },
+   "oil": {
+    "deposits": 68,
+    "known": 16,
+    "stock": 127409000000,
+    "knownStock": 2077000000
+   },
+   "uranium": {
+    "deposits": 98,
+    "known": 1,
+    "stock": 4533280,
+    "knownStock": 1000
+   },
+   "nitrate": {
+    "deposits": 2,
+    "known": 2,
+    "stock": 40000000,
+    "knownStock": 40000000
+   }
+  }
+ },
+ "surveyCountries1900": {
+  "GBR": "Geological Survey of Great Britain, 1835",
+  "USA": "United States Geological Survey, 1879",
+  "DEU": "Prussian Geological Survey, 1873",
+  "FRA": "Service de la carte geologique, 1868",
+  "AUT": "k.k. Geologische Reichsanstalt, 1849",
+  "RUS": "Geological Committee (Geolkom), 1882",
+  "JPN": "Geological Survey of Japan, 1882",
+  "ITA": "Regio Ufficio Geologico, 1867",
+  "ESP": "Comision del Mapa Geologico, 1849",
+  "PRT": "Comissao Geologica, 1857",
+  "SWE": "Sveriges geologiska undersokning, 1858",
+  "NOR": "Norges geologiske undersokelse, 1858",
+  "BEL": "Service geologique de Belgique, 1896",
+  "CAN": "Geological Survey of Canada, 1842",
+  "AUS": "colonial geological surveys (Victoria 1852, New South Wales 1875)",
+  "NZL": "New Zealand Geological Survey, 1865"
+ }
+}

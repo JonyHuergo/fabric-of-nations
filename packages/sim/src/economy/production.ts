@@ -26,12 +26,22 @@ import {
   qualificationProductivityFactor,
 } from "./labor.js";
 import { technologyProductivityFactor } from "./technology.js";
+import {
+  type OwnConsumptionPlan,
+  farmLandFactor,
+  harvestWeatherFactor,
+  harvestYearOf,
+  landKey,
+  landPerLevelByProvince,
+} from "./agriculture.js";
+import { FARM_LABOUR_ELASTICITY } from "./constants.js";
 import type {
   BuildingDef,
   BuildingInstance,
   EconomyDefinitions,
   EmploymentAssignment,
   GoodQuantityDef,
+  LandUse,
   ProfessionDef,
   StockLot,
 } from "./types.js";
@@ -91,7 +101,10 @@ export interface BuildingProductionResult {
   }[];
   readonly outputs: readonly {
     readonly goodId: number;
+    /** Quantity added to the building's lot (marketed). */
     readonly quantity: number;
+    /** P5 (D-143 §2): quantity the owner household kept; absent when none. */
+    readonly ownConsumption?: number;
   }[];
 }
 
@@ -162,6 +175,12 @@ export interface ProductionLookups {
   readonly definitionById?: ReadonlyMap<number, BuildingDef>;
   /** `deriveStorageCapacityByGood` of a market, computed once per market (D-139). */
   readonly storageCapacityOf?: (marketId: number) => readonly number[];
+  /**
+   * P5 (D-143 §2): the day's own-consumption plan. Production diverts each planned
+   * quantity from the building's output before it reaches the building's lot; the
+   * owner household consumes it. Absent means nothing is kept.
+   */
+  readonly ownConsumption?: OwnConsumptionPlan;
 }
 
 export function buildProductionLookups(
@@ -297,6 +316,13 @@ export interface BuildingCapacityIndex {
   readonly assignmentsByBuilding: ReadonlyMap<number, readonly EmploymentAssignment[]>;
   readonly blockById: ReadonlyMap<number, World["popBlocks"][number]>;
   readonly ownerByProvince: ReadonlyMap<number, World["countries"][number]>;
+  /** P5 (D-143): hectares per level by `landKey(province, land kind)`. */
+  readonly landPerLevel: ReadonlyMap<number, number>;
+  /** P5: world seed and calendar year of the harvest weather. */
+  readonly seed: number;
+  readonly harvestYear: number;
+  /** P5: harvest weather by province, filled on first use (a pure derived cache). */
+  readonly weatherByProvince: Map<number, number>;
 }
 
 /** Build the capacity lookup tables for the current world state. */
@@ -324,14 +350,41 @@ export function buildBuildingCapacityIndex(
     const country = countryById.get(countryId);
     if (country !== undefined) ownerByProvince.set(provinceId, country);
   }
+  const definitionsById = definitionById(definitions);
   return {
     buildingById,
-    definitionById: definitionById(definitions),
+    definitionById: definitionsById,
     professionById: profileById(definitions),
     assignmentsByBuilding,
     blockById,
     ownerByProvince,
+    landPerLevel: landPerLevelByProvince(world, definitionsById),
+    seed: world.seed,
+    harvestYear: harvestYearOf(world.dayIndex),
+    weatherByProvince: new Map(),
   };
+}
+
+/**
+ * P5 (D-143 §1): the land, labour and weather terms of a land-using building, or 1
+ * for every other building. Returns the multiplier that replaces the linear staffing
+ * ratio: staffing^labourElasticity × land factor × harvest weather.
+ */
+function farmFactor(
+  index: BuildingCapacityIndex,
+  building: BuildingInstance,
+  use: LandUse,
+  staffingRatio: number,
+): number {
+  if (!(staffingRatio > 0)) return 0;
+  const land = farmLandFactor(index.landPerLevel.get(landKey(building.provinceId, use)) ?? 0);
+  if (!(land > 0)) return 0;
+  let weather = index.weatherByProvince.get(building.provinceId);
+  if (weather === undefined) {
+    weather = harvestWeatherFactor(index.seed, building.provinceId, index.harvestYear);
+    index.weatherByProvince.set(building.provinceId, weather);
+  }
+  return staffingRatio ** FARM_LABOUR_ELASTICITY * land * weather;
 }
 
 const NO_ASSIGNMENTS: readonly EmploymentAssignment[] = [];
@@ -437,13 +490,19 @@ export function computeBuildingCapacity(
   const hoursFactor =
     owner === undefined ? 1 : laborHoursFactor(owner, definitions);
 
+  // P5 (D-143): a farm's labour has diminishing returns on its share of the province's
+  // land, and its harvest follows the year's weather.
+  const staffingTerm =
+    definition.landUse === undefined
+      ? staffingRatio
+      : farmFactor(index, building, definition.landUse, staffingRatio);
   const capacityTU =
     definition.referenceThroughputPerDayAtLevelOne *
     building.level *
     building.condition *
     // P2b (D-135): the plant's technique scales output per staffed throughput unit.
     building.technique *
-    staffingRatio *
+    staffingTerm *
     productivityFactor *
     e5LaborFactor *
     hoursFactor *
@@ -590,15 +649,24 @@ export function applyOverflowToTable(
       throw new RangeError(`unable to allocate overflow loss for good ${String(goodId)}`);
     }
     for (let index = 0; index < slots.length; index += 1) {
-      const amount = amounts[index] ?? 0;
+      let amount = amounts[index] ?? 0;
       if (!(amount > 0)) continue;
       const slot = slots[index] ?? 0;
       const cell = base + slot;
       const quantity = table.quantity[cell] ?? 0;
-      const remaining = quantity - amount;
+      let remaining = quantity - amount;
       const owner = table.owners[slot] ?? 0;
       if (remaining < -tolerance(quantity, amount)) {
         throw new RangeError(`overflow loss makes lot ${lotKey(goodId, owner)} negative`);
+      }
+      // P5 (D-143 §5): a proportional cut repeated every day shrinks a lot that never
+      // sells geometrically, into subnormal quantities whose price × quantity is 0 (the
+      // P4 century run failed settlement on such a lot in 1917). A lot that would be
+      // left below the quantity tolerance is lost whole; the dust is part of the
+      // recorded loss, so the inventory identity still holds exactly.
+      if (remaining > 0 && remaining < QUANTITY_TOLERANCE) {
+        amount = quantity;
+        remaining = 0;
       }
       if (remaining <= 0) {
         table.present[cell] = 0;
@@ -903,13 +971,22 @@ export function runProductionCore(
         ? 1
         : technologyProductivityFactor(owner, definitions, definition.sector);
     const producerSlot = next.slotOf.get(building.id) ?? -1;
+    const keptRow = lookups.ownConsumption?.byBuilding.get(building.id);
     for (const output of sortedOutputs) {
-      const quantity = output.quantityPerThroughputUnit * executedTU * technologyFactor;
-      if (!Number.isFinite(quantity) || quantity < 0) {
+      const produced = output.quantityPerThroughputUnit * executedTU * technologyFactor;
+      if (!Number.isFinite(produced) || produced < 0) {
         throw new RangeError(`building ${String(building.id)} produced an invalid output quantity`);
       }
+      // P5 (D-143 §2): the owner household's kept food never reaches the lot. The plan
+      // was computed from this same capacity, so it never exceeds the output.
+      const kept = keptRow === undefined ? 0 : (keptRow[output.goodId] ?? 0);
+      if (kept > produced + tolerance(produced, kept)) {
+        throw new RangeError(`building ${String(building.id)} keeps more than it produced`);
+      }
+      const quantity = kept > 0 ? Math.max(0, produced - kept) : produced;
+      if (kept > 0) outputResults.push({ goodId: output.goodId, quantity, ownConsumption: kept });
       if (quantity > 0) {
-        outputResults.push({ goodId: output.goodId, quantity });
+        if (!(kept > 0)) outputResults.push({ goodId: output.goodId, quantity });
         productionByGood[output.goodId] = (productionByGood[output.goodId] ?? 0) + quantity;
         if (producerSlot < 0) throw new RangeError(`building ${String(building.id)} has no lot slot`);
         const cell = output.goodId * ownerCount + producerSlot;

@@ -9,6 +9,7 @@
  */
 
 import type { SimulationSnapshot } from "@century/sim-worker";
+import { provinceOwnershipRows } from "@century/sim-worker";
 
 import { RUSD_FORMAT, type MoneyFormat } from "../format/money";
 
@@ -54,7 +55,7 @@ export type DispatchSource = Pick<
   | "campaignComplete"
   | "countrySummaries"
   | "countries"
-  | "provinces"
+  | "provinceOwnership"
   | "military"
   | "technologyCatalog"
 >;
@@ -107,8 +108,8 @@ export function deriveDispatches(
     );
   }
 
-  const provincesBefore = new Map(previous.provinces.map((entry) => [entry.provinceId, entry] as const));
-  for (const entry of current.provinces) {
+  const provincesBefore = new Map(provinceOwnershipRows(previous).map((entry) => [entry.provinceId, entry] as const));
+  for (const entry of provinceOwnershipRows(current)) {
     const before = provincesBefore.get(entry.provinceId);
     if (before === undefined) continue;
     const place = names.province(entry.provinceId);

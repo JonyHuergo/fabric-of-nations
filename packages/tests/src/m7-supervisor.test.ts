@@ -6,6 +6,7 @@ import {
   type WorkerCommand,
   type WorkerEvent,
   encodeProvinceEconomyTable,
+  encodeProvinceOwnershipTable,
 } from "@century/sim-worker";
 
 class ManualScheduler {
@@ -301,13 +302,13 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
     ],
     provinceTable: encodeProvinceEconomyTable(
       [
-        { id: 0, countryId: 0, marketId: 0, population: 100, populationByProfession: {}, buildingCount: 1, buildingLevels: 1, employedWorkers: 0, unrest: 0, infrastructure: 0.5, urbanShare: 0, arableLandHa: 0, pastureHa: 0, literacy: 0, controllerCountryId: null, controlledSinceDay: null, territoryTag: null },
+        { id: 0, countryId: 0, marketId: 0, population: 100, populationByProfession: {}, buildingCount: 1, buildingLevels: 1, employedWorkers: 0, unrest: 0, infrastructure: 0.5, urbanShare: 0, arableLandHa: 0, pastureHa: 0, literacy: 0, controllerCountryId: null, controlledSinceDay: null, territoryTag: null, harvestFactor: null },
       ],
       [],
     ),
     territories: [],
     professions: [],
-    provinces: [],
+    provinceOwnership: encodeProvinceOwnershipTable([]),
     countrySummaries: [
       {
         id: 0,

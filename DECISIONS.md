@@ -7977,3 +7977,111 @@ and be influenced by the player.
   calories. P4 does not hide it; its cause belongs to P5–P7 (own consumption, wages). See
   `P4_COMPLETION_REPORT.md`.
 - Every world hash changes; schema-30 saves are incompatible (D-120, D-139 §3).
+
+## D-143 — P5: land, harvests, own consumption, resources and the full goods catalogue
+
+**Status:** in progress (2026-11-05). The designer approved the P5 pre-build report
+("looks good"), then asked for the whole 1900–2000 goods catalogue in P5, adding tin, gold
+and silver and splitting consumer electronics and refined fuels (57 goods; proposal
+`docs/P5_GOODS_CATALOGUE_PROPOSAL.md`).
+**Implements:** `docs/PROSPERITY_PROGRAM.md` §4 P5, GDD §17J.3 P5, D-121; brings the goods
+catalogue of P6 forward (P6 keeps the linear-expenditure demand, saving and housing).
+
+### Approved basis (pre-build report)
+
+1. **Farm output** = P2b output × staffing^0.6 × (land share ÷ 1900 land share)^0.4 ×
+   harvest weather × technology. A province's cropland (pasture for ranches) is shared
+   among its farms in proportion to their levels. At world creation each farm's technique
+   is divided by its 1900 land factor, so 1900 output is unchanged and nothing new is
+   stored. Factor shares labour 0.6 / land 0.4 (Clark 2002), provisional.
+2. **Own consumption.** Each peasant block keeps the subsistence quantities of the food its
+   own farms make before anything is sold, spread over those farms by their day's output.
+   No cash moves: the kept food, valued at the opening price, is first a wage in kind
+   (the farm's cash wage to that block falls by it), then an owner's draw. The kept
+   calories count toward P4 food sufficiency.
+3. **Harvest variance:** keyed draw `harvest.weather` per (province, calendar year),
+   lognormal with mean 1 and σ 0.15 (provisional), for farms and ranches.
+4. **Deposits:** sparse per (province, resource) state with size, remaining stock, quality
+   and a discovered flag; hidden deposits need a prospecting technology and are then
+   found by a keyed monthly draw `resource.discovery` scaled by province infrastructure;
+   extraction depletes them through one validated function.
+5. **Day-6,320 failure:** storage overflow shrank unsold lots geometrically into subnormal
+   quantities (first subnormal lots in 1911 on `main`); a sale of a 1.5e-323 kg lot has
+   price × quantity = 0. Lots that would fall below the quantity tolerance are removed
+   whole and recorded as overflow loss.
+6. **Saves:** only the latest monthly summary keeps the per-account trial balance;
+   compacted months keep per-country closing treasury, debt and household cash (what the
+   Ledger history reads).
+
+### Implemented in P5a (2026-11-05)
+
+1. **State (schema 32).** `World.resources` holds the deposits (`economy/resourceState.ts`:
+   one per province and resource; `initialStock`, cumulative `extracted`, `quality`,
+   `discovered`, `discoveredOnDay`, `requiredTechnologyId`). Remaining stock is
+   `initialStock − extracted`, so depletion is conserved by construction; validation
+   rejects negative, excessive or hidden-but-extracted states. Saves store the deposits as
+   columns. `BuildingDef.landUse` (cropland, pasture) is content, set only in the 1900
+   definitions; the legacy definitions (M5 sample, fixtures) farm no land and keep their
+   behaviour apart from own consumption.
+2. **Farm output** (`economy/agriculture.ts`, `production.ts`): staffing^0.6 × land
+   factor × harvest weather replaces the linear staffing ratio of land-using buildings; the
+   land factor is `(hectares per level ÷ 1,000)^0.4`, land shared by operational levels per
+   province and kind; world creation divides each farm's technique by its starting land
+   factor. A farm in a province without land of its kind produces nothing; world creation
+   and construction reject such placements.
+3. **Own consumption** (`planOwnConsumption`): computed before demand from the day's
+   capacity results; production diverts the planned quantity from the owner's lot
+   (`BuildingProductionResult.outputs[].ownConsumption`); household demand is reduced by
+   it; the kept calories count in food sufficiency; settlement pays its value at opening
+   prices as a wage in kind to the owner block (`WagePayment.paidInKindRUSD`), the rest
+   being the owner's draw. The day result lists the entries (`economy.ownConsumption`).
+   It applies to any population block that privately owns an agriculture building without
+   inputs that makes a subsistence food.
+4. **Discovery** (`economy/resources.ts`): on the first civil day of a month, each hidden
+   deposit whose province owner knows its technology is found with probability
+   `RESOURCE_DISCOVERY_MONTHLY_HAZARD` (1/120) × province infrastructure, keyed draw
+   `resource.discovery` per (deposit, month). `extractFromDeposit` is the only depletion
+   path; extraction buildings arrive with the goods catalogue (P5b).
+5. **Data** (`scripts/p5/`; provenance `docs/P5_LAND_AND_RESOURCES_PROVENANCE.md`): land and
+   imputation, 3,834 deposits from the authored table, USGS MRDS and SAGE/HYDE forest,
+   three prospecting technologies and 16 survey countries; the runtime reads the P5
+   overlays of the P2b provinces, countries and building definitions.
+6. **Saves:** `MAX_DETAILED_PERIOD_SUMMARIES` 12 → 1 with per-country closing balances kept
+   through compaction (Ledger history unchanged).
+7. **Snapshot (protocol 21):** province ownership as columns (`provinceOwnership`,
+   `provinceOwnershipRows`), which removed 214k characters; a `harvestFactor` column (the
+   Harvest lens, map bridge protocol 3); the focused province's `land` section (harvest,
+   farm output and kept food today, known deposits; hidden deposits are never sent).
+8. **Day-6,320 fix:** `applyOverflowToTable` removes a lot that would fall below the
+   quantity tolerance and records it as loss (regression tests in `p5-land`).
+9. **Trade funding fix (found by the P5 five-year run).** On day 460 trade dispatch let an
+   owner commit 6,248.601058167046 RUSD against a balance of 6,248.601058167045: the day's
+   trade postings are one journal batch that sums each account's lines, while the cash
+   tracked per shipment is a sequence of differences. `shipmentFunding` now keeps a margin
+   of 16 ulps (at least of 1 RUSD; below 1e-10 RUSD at 1900 scale) on the enterprise's and
+   the owner's cash, and the owner's injection covers the cost plus that margin (the
+   extra stays in the enterprise; conserved). Pre-existing; P5's different state exposed it.
+10. **Measured saves (stored characters, 1900 world, same seed):** day 3 — main 2.87 M,
+    P5 3.00 M (+4 %, the deposits); day 92 — 5.22 M → 4.28 M (−18 %); day 366 —
+    11.03 M → 4.67 M (−58 %). The web save still fails: the save library writes a staging
+    copy and the primary (and keeps the previous one), so even 2.9 M exceeds Chrome's
+    ~5.24 M quota from the first save, on `main` as well. A storage-backend change is not
+    started (designer's instruction).
+
+### Restated tests (designer review)
+
+- `m5-feasibility`: supply criterion 99.5 % → 99 % of what a block pays for. Owners keep
+  their farms' subsistence food first, so in the two M5 markets whose fish and livestock
+  capacity equals demand the buyers receive 99.28 % (P4: 99.86 %); food sufficiency stays 1.
+- `batch5-validation`: `fallbackTicks > 0` became a reported value. Since D-125 a capped
+  input demand adds no market attempt or validation; with wages partly paid in kind no
+  input demand is capped in the measured window. The validation count (12) is unchanged.
+- `e2-fiscal-management`, `m6-ai`, `m4b-save-compaction`: restated for the one-month
+  detailed window (closed months keep exact fiscal totals, budgets, flows, valuations and
+  closing balances; corruption of a compacted month is still caught at save boundaries).
+- `p2b-money`, `batch6-integration`: an owner's wage counts cash plus in kind.
+11. **Century run (P5 branch):** passed P4's 1917 stop and stopped on 1 February 1993 (day
+    34,058) when the P4 validator rejected a block's derived fertility level of 4.009 (range
+    0..4). Households without farms still starve, so towns and literacy collapse (2.4 % urban,
+    7 % women literate by 1993), and P4's causal fertility rises with them. Left for the
+    designer (a bound, a saturating response, or the economy fix first); not clamped.

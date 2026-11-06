@@ -6,6 +6,7 @@
  * journals, or references into `World`. The app never receives the world itself.
  */
 
+import { provinceHarvestFactor, provinceLandSnapshot } from "./landSnapshot.js";
 import {
   countryDemographySnapshot,
   demographySnapshotContext,
@@ -85,11 +86,13 @@ import {
   MAX_SNAPSHOT_TRADE_SHIPMENTS,
   PROTOCOL_VERSION,
   encodeProvinceEconomyTable,
+  encodeProvinceOwnershipTable,
   type CountrySnapshot,
   type CountrySummarySnapshot,
   type GoodSnapshot,
   type MarketSnapshot,
   type ProvinceOwnershipSnapshot,
+  type FocusProvinceSnapshot,
   type ProvinceEconomySnapshot,
   type TerritorySnapshot,
   type SimulationSnapshot,
@@ -685,7 +688,14 @@ function buildFinanceHistory(
     let treasury: number | null = null;
     let debt: number | null = null;
     let household: number | null = null;
-    if (detailed) {
+    // P5 (D-143 §6): closes record each country's closing balances, kept through
+    // compaction; older summaries (fixtures) fall back to the account trial balance.
+    const closing = summary.countryClosingBalances?.find((entry) => entry.countryId === country.id);
+    if (closing !== undefined) {
+      treasury = roundDisplay(closing.treasuryCashRUSD, 6);
+      debt = roundDisplay(closing.debtOutstandingRUSD, 6);
+      household = roundDisplay(closing.householdCashRUSD, 6);
+    } else if (detailed) {
       treasury = roundDisplay(
         treasuryId === undefined ? 0 : (summary.accountTotals[treasuryId] ?? 0),
         6,
@@ -1921,8 +1931,20 @@ function provinceEconomySnapshots(
         controllerCountryId: controlled ? ownership.controllerPolityId : null,
         controlledSinceDay: controlled ? ownership.controlledSinceDay : null,
         territoryTag: territoryByProvince.get(province.id) ?? null,
+        harvestFactor: provinceHarvestFactor(world, province),
       };
     });
+}
+
+/** P5 (D-143): attach the focused province's land section. */
+function withLand(
+  focus: Omit<FocusProvinceSnapshot, "land"> | null,
+  world: World,
+  definitions: EconomyDefinitions,
+  populationDefinitions: PopulationDefinitions | undefined,
+): FocusProvinceSnapshot | null {
+  if (focus === null) return null;
+  return { ...focus, land: provinceLandSnapshot(world, definitions, populationDefinitions, focus.provinceId) };
 }
 
 
@@ -2314,7 +2336,14 @@ function freezeSnapshot(snapshot: SimulationSnapshot): SimulationSnapshot {
     Object.freeze(market.memberCountryIds);
   }
   Object.freeze(snapshot.countries);
-  Object.freeze(snapshot.provinces);
+  Object.freeze(snapshot.provinceOwnership.ids);
+  Object.freeze(snapshot.provinceOwnership.owners);
+  for (const row of snapshot.provinceOwnership.exceptions) {
+    Object.freeze(row.claimantPolityIds);
+    Object.freeze(row);
+  }
+  Object.freeze(snapshot.provinceOwnership.exceptions);
+  Object.freeze(snapshot.provinceOwnership);
   Object.freeze(snapshot.markets);
   Object.freeze(snapshot.goods);
   return Object.freeze(snapshot);
@@ -2438,7 +2467,12 @@ export function buildSimulationSnapshot(
     simVersion: world.simVersion,
     playerCountryId,
     focusCountryId,
-    focusProvince: focusProvinceSnapshot(world, runtime.focusProvinceId ?? null, build.demography),
+    focusProvince: withLand(
+      focusProvinceSnapshot(world, runtime.focusProvinceId ?? null, build.demography),
+      world,
+      definitions,
+      populationDefinitions,
+    ),
     constructionEnabled: world.profitDistribution.enabled,
     countries,
     countrySummaries,
@@ -2447,7 +2481,7 @@ export function buildSimulationSnapshot(
       [...definitions.professions].sort((left, right) => left.id - right.id),
     ),
     territories: staticSections.territories,
-    provinces: provinceSnapshots(world),
+    provinceOwnership: encodeProvinceOwnershipTable(provinceSnapshots(world)),
     markets: marketSnapshots(world, definitions, capacities.byMarket, marketMetaById),
     goods: staticSections.goods,
     professions: staticSections.professions,

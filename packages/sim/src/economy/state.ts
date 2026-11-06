@@ -6,6 +6,8 @@
  * production, market clearing, wages, or pricing.
  */
 
+import { normaliseFarmTechniques } from "./agriculture.js";
+import { assertValidResourceState, createResourceState } from "./resourceState.js";
 import { calibrateDemographyForCountries } from "./demographyFactors.js";
 import { assertValidDayIndex } from "../calendar.js";
 import {
@@ -1432,6 +1434,18 @@ export function createEconomyWorld(
   // P4 (D-142): the blocks were calibrated with neutral factors; fix their residuals
   // under the countries' start-of-game health, sanitation and contraception.
   calibrateDemographyForCountries(world, scenario.definitions);
+  // P5 (D-143 §1): farms' techniques absorb their starting land factor, so the
+  // scenario's calibrated output is unchanged on day 0.
+  normaliseFarmTechniques(world, scenario.definitions);
+  // P5 (D-143 §4): the scenario's deposits; a required technology must exist.
+  world.resources = createResourceState(scenario.deposits);
+  const technologyIds = new Set((scenario.definitions.technology?.technologies ?? []).map((entry) => entry.id));
+  assertValidResourceState(
+    world.resources,
+    new Set(world.provinceEconomies.map((province) => province.id)),
+    scenario.definitions.technology === undefined ? null : technologyIds,
+    "scenario.deposits",
+  );
 
   assertValidWorld(world);
   return world;

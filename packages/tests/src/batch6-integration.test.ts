@@ -140,7 +140,10 @@ describe("Batch 6 integrated multi-country economic run", () => {
       expect(upkeepIds.length).toBeGreaterThan(0);
       for (const wage of economy.settlement.wages) {
         expect(wage.paidRUSD + wage.unpaidRUSD).toBeCloseTo(wage.obligationRUSD, 6);
-        expect(wage.obligationRUSD).toBeGreaterThan(0);
+        // P5 (D-143 §2): an owner's wage at its own farm may be paid wholly in kind, so
+        // the cash obligation can be zero; cash + in kind is always positive.
+        const inKind = wage.payments.reduce((total, payment) => total + (payment.paidInKindRUSD ?? 0), 0);
+        expect(wage.obligationRUSD + inKind).toBeGreaterThan(0);
       }
       const definitionById = new Map(
         scenario.definitions.buildings.map((definition) => [definition.id, definition]),

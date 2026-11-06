@@ -50,6 +50,7 @@ import {
   type CountryTechnologyInput,
   type Currency,
   type CurrencyValuation,
+  type DepositInitialDef,
   type EconomyDefinitions,
   type EconomyScenarioDef,
   type EmploymentAssignmentInitialDef,
@@ -125,6 +126,8 @@ export interface HistoricalScenarioFiles {
    * the standard schedule (the M5 sample).
    */
   readonly demography?: string;
+  /** P5 (D-143 §4) natural-resource deposits, built by scripts/p5/build-p5-world.mjs. */
+  readonly deposits?: string;
 }
 
 export interface HistoricalScenarioDefinitions {
@@ -724,6 +727,9 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
       ...(files.demography === undefined
         ? {}
         : { demography: stringField(files, "demography", "meta.files", errors) }),
+      ...(files.deposits === undefined
+        ? {}
+        : { deposits: stringField(files, "deposits", "meta.files", errors) }),
     },
     definitions: {
       goods: stringField(definitions, "goods", "meta.definitions", errors),
@@ -2635,7 +2641,47 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     ...(data.meta.moneyCoefficients === undefined
       ? {}
       : { moneyCoefficients: { ...data.meta.moneyCoefficients } }),
+    ...(data.meta.files.deposits === undefined
+      ? {}
+      : { deposits: readDeposits(data.meta.files.deposits, economyDefinitions) }),
   };
+}
+
+/**
+ * P5 (D-143 §4): the scenario's deposits. Each row's `requiredTechnologyKey` resolves to
+ * a technology id; the simulation validates provinces, stocks, quality and uniqueness.
+ */
+function readDeposits(file: string, definitions: EconomyDefinitions): DepositInitialDef[] {
+  const rows = readJson<unknown>(file);
+  if (!Array.isArray(rows)) throw new HistoricalDataError([`${file} must be a JSON array`]);
+  const technologyByKey = new Map((definitions.technology?.technologies ?? []).map((entry) => [entry.key, entry.id]));
+  const errors: string[] = [];
+  const deposits: DepositInitialDef[] = [];
+  rows.forEach((value, index) => {
+    const path = `${file}[${String(index)}]`;
+    const row = assertRecord(value, path, errors);
+    const key = row.requiredTechnologyKey;
+    let requiredTechnologyId: number | null = null;
+    if (key !== null) {
+      const id = typeof key === "string" ? technologyByKey.get(key) : undefined;
+      if (id === undefined) {
+        errors.push(`${path}.requiredTechnologyKey ${JSON.stringify(key)} is not a technology`);
+        return;
+      }
+      requiredTechnologyId = id;
+    }
+    deposits.push({
+      id: row.id as number,
+      provinceId: row.provinceId as number,
+      resource: row.resource as DepositInitialDef["resource"],
+      quality: row.quality as number,
+      initialStock: row.initialStock as number,
+      discovered: row.discovered as boolean,
+      requiredTechnologyId,
+    });
+  });
+  if (errors.length > 0) throw new HistoricalDataError(errors.sort());
+  return deposits;
 }
 
 /** Load and build the eight-polity M5 scenario. */

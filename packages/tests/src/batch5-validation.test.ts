@@ -72,7 +72,11 @@ const SEED = 20_261_023;
 // P4 re-pins it: the M5 sample starts from the sourced 1900 world demographic levels
 // instead of the year-indexed schedules, mortality follows calories, blocks carry their
 // demographic state and the schema is 31 (D-142); the trajectory changes by design.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "6b50f58b93760b31";
+// P5 re-pins it: owner households keep their farms' subsistence food before the market
+// and are paid that part of their wage in kind (D-143 §2), and the schema is 32 with
+// `World.resources`; the M5 sample's farms have no land use (legacy definitions), so
+// land and weather do not act. The trajectory changes by design.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "d1580017f60be441";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {
@@ -123,10 +127,14 @@ describe("Batch 5 validation boundary and determinism", () => {
         if (requireEconomy(result).fallbackUsed) fallbackTicks += 1;
       }
       const { worldValidations } = readValidationInstrumentation();
-      // Five markets, repeated market attempts on funding fallback, settlement,
-      // fiscal, migration, and debt all fit inside the two boundary checks.
+      // Five markets, settlement, fiscal, migration, and debt all fit inside the two
+      // boundary checks. Since D-125 a capped input demand (`fallbackUsed`) no longer
+      // repeats the market attempt, so it adds no validation either way. P5 (D-143):
+      // wages paid in kind leave the sample's processors enough cash that no input
+      // demand is capped in this window; the former precondition `fallbackTicks > 0`
+      // is restated as reported, not required (designer review, P5 report).
       expect(world.markets.length).toBe(5);
-      expect(fallbackTicks).toBeGreaterThan(0);
+      expect(fallbackTicks).toBeGreaterThanOrEqual(0);
       expect(worldValidations).toBe(12);
     } finally {
       setValidationInstrumentationEnabled(false);

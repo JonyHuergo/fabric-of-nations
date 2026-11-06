@@ -7,6 +7,8 @@
  * world only after every phase succeeds.
  */
 
+import { cloneResourceState } from "./resourceState.js";
+import { runDiscoveryPhase, type DiscoveryPhaseResult } from "./resources.js";
 import {
   accumulateDemography,
   cloneDemographyReport,
@@ -87,6 +89,12 @@ import {
   type ProductionDemandRecord,
 } from "./market.js";
 import { settleMarketDays, type MarketSettlementResult } from "./settlement.js";
+import {
+  EMPTY_OWN_CONSUMPTION,
+  planOwnConsumption,
+  type OwnConsumptionEntry,
+  type OwnConsumptionPlan,
+} from "./agriculture.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { runPoliticsDayStart, runUnrestPhase } from "./politics.js";
 import {
@@ -191,6 +199,13 @@ export interface EconomyDayResult {
     readonly financeClose: FinanceCloseResult | null;
     /** M5a month-end allocation; applied false when the policy is disabled. */
     readonly profitDistribution: ProfitDistributionResult | null;
+    /**
+     * P5 (D-143 §2): food kept by owner households from their own farms today, in
+     * (block, building, good) order. Production's outputs are the marketed remainder.
+     */
+    readonly ownConsumption: readonly OwnConsumptionEntry[];
+    /** P5 (D-143 §4): deposits found by this month's prospecting (first civil day). */
+    readonly discovery: DiscoveryPhaseResult;
   };
 }
 
@@ -280,6 +295,7 @@ export function cloneWorld(
             },
     },
     demography: cloneDemographyReport(source.demography),
+    resources: cloneResourceState(source.resources),
     priceIndex: {
       ...source.priceIndex,
       basket: source.priceIndex.basket.map((item) => ({ ...item })),
@@ -355,6 +371,7 @@ function buildHouseholdDemand(
   populationDefinitions: PopulationDefinitions,
   index: FinanceIndex,
   detail: DayResultDetail,
+  ownConsumption: OwnConsumptionPlan = EMPTY_OWN_CONSUMPTION,
 ): HouseholdDemandBuild {
   const provinceToMarket = marketByProvince(world);
   const goodByKey = new Map(economyDefinitions.goods.map((good) => [good.key, good]));
@@ -427,6 +444,8 @@ function buildHouseholdDemand(
     }
     let remainingCash = account.balanceRUSD;
     const blockStart = build.popBlockId.length;
+    // P5 (D-143 §2): subsistence food the block kept from its own farms today.
+    const kept = ownConsumption.byBlock.get(block.id);
 
     // Indexed loops (D-139): the same order, without iterator allocation.
     for (let planIndex = 0; planIndex < tierPlans.length; planIndex += 1) {
@@ -438,7 +457,14 @@ function buildHouseholdDemand(
         if (block.wealthLevel < need.activationWealthMin) continue;
         for (let itemIndex = 0; itemIndex < need.items.length; itemIndex += 1) {
           const item = need.items[itemIndex] as (typeof need.items)[number];
-          const desired = item.quantityPerCapitaPerDay * population;
+          let desired = item.quantityPerCapitaPerDay * population;
+          if (kept !== undefined && need.needTier === "subsistence") {
+            const keptQuantity = kept[item.goodId] ?? 0;
+            if (keptQuantity > 0) {
+              desired -= keptQuantity;
+              if (desired <= quantityTolerance(keptQuantity)) continue;
+            }
+          }
           if (desired <= 0) continue;
           if (present[item.goodId] !== 1) {
             present[item.goodId] = 1;
@@ -630,6 +656,8 @@ function buildNeedsResult(
   fulfilledByRecord: Float64Array,
   /** P4: dietary energy per unit of each good id, kcal (0 for non-food goods). */
   kcalByGoodId: Float64Array,
+  /** P5 (D-143 §2): food kept from own farms; it counts toward calories eaten. */
+  ownConsumption: OwnConsumptionPlan = EMPTY_OWN_CONSUMPTION,
 ): PopulationNeedsDayResult {
   const householdByName = new Map(
     settlement.households.map((entry) => [entry.popBlockId, entry]),
@@ -651,6 +679,19 @@ function buildNeedsResult(
     const tierResults: NeedTierResult[] = [];
     let lowerMet = true;
     let kcalConsumed = 0;
+    // P5: kept food is eaten; a subsistence tier fully covered in kind has no market
+    // rows and is met.
+    const kept = ownConsumption.byBlock.get(block.id);
+    let keptAny = false;
+    if (kept !== undefined && population > 0) {
+      for (let goodId = 0; goodId < kept.length; goodId += 1) {
+        const quantity = kept[goodId] ?? 0;
+        if (quantity > 0) {
+          kcalConsumed += quantity * (kcalByGoodId[goodId] ?? 0);
+          keptAny = true;
+        }
+      }
+    }
 
     for (const tier of NEED_TIER_ORDER) {
       tierRows.length = 0;
@@ -659,7 +700,8 @@ function buildNeedsResult(
           if (household.needTier[row] === tier) tierRows.push(row);
         }
       }
-      const active = population > 0 && lowerMet && tierRows.length > 0;
+      const active =
+        population > 0 && lowerMet && (tierRows.length > 0 || (tier === "subsistence" && keptAny));
       let desiredCost = 0;
       let fundedCost = 0;
       let spent = 0;
@@ -933,6 +975,36 @@ interface MarketAttempt {
   readonly settlement: MarketSettlementResult;
   /** Fulfilled quantity of each household demand row (D-139); NaN where unmarketed. */
   readonly fulfilledByRecord: Float64Array;
+  /** P5 (D-143 §2): the food owner households kept from their own farms today. */
+  readonly ownConsumption: OwnConsumptionPlan;
+}
+
+/**
+ * P5 (D-143 §2): value of each building's kept food at its market's opening prices,
+ * keyed by building, with the owner block that kept it. Settlement pays it as a wage
+ * in kind to that block (up to the block's cash wage at the building).
+ */
+function inKindWageValues(
+  world: World,
+  plan: OwnConsumptionPlan,
+  markets: readonly MarketDayResult[],
+): ReadonlyMap<Id, { readonly popBlockId: Id; readonly valueRUSD: number }> {
+  const result = new Map<Id, { popBlockId: Id; valueRUSD: number }>();
+  if (plan.entries.length === 0) return result;
+  const pricesByMarket = new Map(markets.map((market) => [market.marketId, market.openingPrices]));
+  const marketOfProvince = marketByProvince(world);
+  const provinceOfBuilding = new Map(world.buildings.map((building) => [building.id, building.provinceId]));
+  for (const entry of plan.entries) {
+    const provinceId = provinceOfBuilding.get(entry.buildingId);
+    const marketId = provinceId === undefined ? undefined : marketOfProvince.get(provinceId);
+    const prices = marketId === undefined ? undefined : pricesByMarket.get(marketId);
+    if (prices === undefined) throw new RangeError(`kept food of building ${String(entry.buildingId)} has no market`);
+    const value = entry.quantity * (prices[entry.goodId] ?? 0);
+    const current = result.get(entry.buildingId);
+    if (current === undefined) result.set(entry.buildingId, { popBlockId: entry.popBlockId, valueRUSD: value });
+    else current.valueRUSD += value;
+  }
+  return result;
 }
 
 function runMarketAttempt(
@@ -946,19 +1018,33 @@ function runMarketAttempt(
   detail: DayResultDetail = "full",
 ): MarketAttempt {
   observe?.("market-household-demand");
+  // D-137: one set of day-level lookups (capacity index and per-building capacity)
+  // serves the input demand here and the production of every market below; the
+  // market phase changes only stock and prices, never what capacity reads.
+  const baseLookups = buildMarketDayLookups(world, definitions);
+  // P5 (D-143 §2): owner households keep their subsistence food from their own farms
+  // before demand is built; production diverts the same quantities.
+  const ownConsumption = planOwnConsumption(
+    world,
+    definitions,
+    populationDefinitions,
+    baseLookups.production,
+    index,
+  );
+  const lookups =
+    ownConsumption.entries.length === 0
+      ? baseLookups
+      : { ...baseLookups, production: { ...baseLookups.production, ownConsumption } };
   const household = buildHouseholdDemand(
     world,
     definitions,
     populationDefinitions,
     index,
     detail,
+    ownConsumption,
   );
   const cap = { cappedBuildings: 0 };
   observe?.("market-production-demand");
-  // D-137: one set of day-level lookups (capacity index and per-building capacity)
-  // serves the input demand here and the production of every market below; the
-  // market phase changes only stock and prices, never what capacity reads.
-  const lookups = buildMarketDayLookups(world, definitions);
   const production = buildProductionDemands(
     world,
     definitions,
@@ -1050,6 +1136,7 @@ function runMarketAttempt(
     validateEmployment: false,
     atomic: false,
     detail,
+    inKindWages: inKindWageValues(world, ownConsumption, results),
   });
   return {
     household,
@@ -1058,6 +1145,7 @@ function runMarketAttempt(
     markets: results,
     settlement,
     fulfilledByRecord,
+    ownConsumption,
   };
 }
 
@@ -1214,6 +1302,10 @@ export function runEconomicDay(
     validateWorld: false,
   });
 
+  // P5 (D-143 §4): monthly prospecting; a deposit found today is extractable today.
+  observe?.("resources");
+  const discovery = runDiscoveryPhase(world, dayIndex);
+
   // D-125: one market attempt per day. Production input demand is capped by each
   // building’s opening operating cash, so settlement cannot overdraw a buyer and the
   // market is cleared once. A building whose full input cost fits in its opening cash
@@ -1334,6 +1426,7 @@ export function runEconomicDay(
     options.detail ?? "full",
     attempt.fulfilledByRecord,
     kcalByGoodIdOf(economyDefinitions, populationDefinitions),
+    attempt.ownConsumption,
   );
   updateNeedsCounters(world, needs);
   updateDailyMilitancy(world, needs);
@@ -1410,6 +1503,8 @@ export function runEconomicDay(
       fallbackUsed,
       financeClose,
       profitDistribution,
+      ownConsumption: attempt.ownConsumption.entries,
+      discovery,
     },
   };
 }

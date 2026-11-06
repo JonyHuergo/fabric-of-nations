@@ -79,7 +79,7 @@ describe("saved-world preview for the title screen", () => {
     host.handleCommand(command("LOAD", "load-1", { save }));
     const loaded = last(events, "LOAD_RESULT");
     expect(loaded.accepted).toBe(true);
-    expect(preview.snapshot?.provinces).toEqual(loaded.snapshot.provinces);
+    expect(preview.snapshot?.provinceOwnership).toEqual(loaded.snapshot.provinceOwnership);
     expect(preview.snapshot?.provinceTable.marketId).toEqual(loaded.snapshot.provinceTable.marketId);
     expect(preview.snapshot?.playerCountryId).toBe(loaded.snapshot.playerCountryId);
   });
@@ -104,7 +104,7 @@ describe("saved-world preview for the title screen", () => {
       host.handleCommand(command("PREVIEW_SAVE", "preview", { save }));
       return last(events, "SAVE_PREVIEW").snapshot;
     });
-    expect(previews[0]?.provinces).toEqual(previews[1]?.provinces);
+    expect(previews[0]?.provinceOwnership).toEqual(previews[1]?.provinceOwnership);
     expect(previews[0]?.countrySummaries).toEqual(previews[1]?.countrySummaries);
   });
 

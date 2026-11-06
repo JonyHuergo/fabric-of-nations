@@ -99,7 +99,7 @@ export function focusProvinceSnapshot(
   world: World,
   provinceId: Id | null,
   context: DemographySnapshotContext | null,
-): FocusProvinceSnapshot | null {
+): Omit<FocusProvinceSnapshot, "land"> | null {
   if (provinceId === null || context === null) return null;
   if (!world.provinceEconomies.some((province) => province.id === provinceId)) return null;
   const blocks = world.popBlocks.filter((block) => block.provinceId === provinceId);

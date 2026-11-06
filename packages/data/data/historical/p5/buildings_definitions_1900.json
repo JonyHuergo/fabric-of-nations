@@ -1,0 +1,550 @@
+[
+ {
+  "id": 0,
+  "key": "subsistence-farm",
+  "name": "Subsistence Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 6000
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 3,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": true,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 0,
+    "quantity": 20
+   }
+  ],
+  "landUse": "cropland"
+ },
+ {
+  "id": 1,
+  "key": "commercial-farm",
+  "name": "Commercial Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 6250
+   },
+   {
+    "goodId": 3,
+    "quantityPerThroughputUnit": 250
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 3,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 0,
+    "quantity": 50
+   },
+   {
+    "goodId": 3,
+    "quantity": 5
+   }
+  ],
+  "landUse": "cropland"
+ },
+ {
+  "id": 2,
+  "key": "ranch",
+  "name": "Ranch",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 1,
+    "quantityPerThroughputUnit": 4000
+   },
+   {
+    "goodId": 4,
+    "quantityPerThroughputUnit": 533.333333
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 1,
+    "quantity": 6.666667
+   },
+   {
+    "goodId": 0,
+    "quantity": 133.333333
+   }
+  ],
+  "landUse": "pasture"
+ },
+ {
+  "id": 3,
+  "key": "fishery",
+  "name": "Fishery",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 2,
+    "quantityPerThroughputUnit": 4800
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 5,
+    "quantity": 8
+   }
+  ]
+ },
+ {
+  "id": 4,
+  "key": "food-processing",
+  "name": "Food Processing Plant",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 4500.09
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 7,
+    "quantityPerThroughputUnit": 3150
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 5,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": true,
+  "sector": "food-processing",
+  "constructionMaterials": [
+   {
+    "goodId": 0,
+    "quantity": 250
+   },
+   {
+    "goodId": 5,
+    "quantity": 5
+   }
+  ]
+ },
+ {
+  "id": 5,
+  "key": "textile-mill",
+  "name": "Textile Mill",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 3,
+    "quantityPerThroughputUnit": 266.666667
+   },
+   {
+    "goodId": 4,
+    "quantityPerThroughputUnit": 50
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 275.362319
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 5,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "textiles",
+  "constructionMaterials": [
+   {
+    "goodId": 3,
+    "quantity": 100
+   },
+   {
+    "goodId": 4,
+    "quantity": 16.666667
+   }
+  ]
+ },
+ {
+  "id": 6,
+  "key": "workshop",
+  "name": "Workshop",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 866.666667
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 6,
+    "quantityPerThroughputUnit": 1733.333333
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 333.333333
+   },
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 666.666667
+   }
+  ],
+  "constructionCostRUSD": 9898736.67,
+  "constructionWorkers": 5,
+  "dailyUpkeepRUSDAtLevelOne": 813.59,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 5,
+    "quantity": 66.666667
+   }
+  ]
+ },
+ {
+  "id": 7,
+  "key": "warehouse",
+  "name": "Warehouse",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [],
+  "jobs": [],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 40,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [
+   {
+    "goodId": 0,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 1,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 2,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 3,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 4,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 5,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 6,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 7,
+    "quantity": 27215542
+   }
+  ],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": true,
+  "sector": "storage",
+  "constructionMaterials": []
+ },
+ {
+  "id": 8,
+  "key": "commercial-farm-peasant",
+  "name": "Peasant Commercial Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 6250
+   },
+   {
+    "goodId": 3,
+    "quantityPerThroughputUnit": 250
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 3,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 0,
+    "quantity": 50
+   },
+   {
+    "goodId": 3,
+    "quantity": 5
+   }
+  ],
+  "landUse": "cropland"
+ },
+ {
+  "id": 9,
+  "key": "workshop-peasant",
+  "name": "Peasant Workshop",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 866.666667
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 6,
+    "quantityPerThroughputUnit": 1733.333333
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 333.333333
+   },
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 666.666667
+   }
+  ],
+  "constructionCostRUSD": 7612230,
+  "constructionWorkers": 5,
+  "dailyUpkeepRUSDAtLevelOne": 625.66,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 5,
+    "quantity": 66.666667
+   }
+  ]
+ },
+ {
+  "id": 10,
+  "key": "mechanized-farm",
+  "name": "Mechanized Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 40000
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 13,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 1,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 0,
+    "quantity": 400
+   },
+   {
+    "goodId": 3,
+    "quantity": 26.666667
+   }
+  ],
+  "landUse": "cropland"
+ },
+ {
+  "id": 11,
+  "key": "power-loom-mill",
+  "name": "Power Loom Mill",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 3,
+    "quantityPerThroughputUnit": 300
+   },
+   {
+    "goodId": 4,
+    "quantityPerThroughputUnit": 100
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 347.826087
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 12,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 9,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "textiles",
+  "constructionMaterials": [
+   {
+    "goodId": 3,
+    "quantity": 150
+   },
+   {
+    "goodId": 4,
+    "quantity": 50
+   }
+  ]
+ }
+]

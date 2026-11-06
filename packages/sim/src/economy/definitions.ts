@@ -18,11 +18,13 @@ import { M3_DEFERRED_GOOD_KEYS } from "./constants.js";
 import {
   BUILDING_SECTORS,
   GOOD_CATEGORIES,
+  LAND_USES,
   PROFESSION_STRATA,
   type BuildingDef,
   type BuildingSector,
   type EconomyDefinitions,
   type GoodDef,
+  type LandUse,
   type PoliticsDefinitions,
   type ProfessionDef,
   type TechnologyDefinitions,
@@ -294,6 +296,10 @@ function assertBuilding(
     );
   }
 
+  const landUse = record.landUse;
+  if (landUse !== undefined && !(LAND_USES as readonly unknown[]).includes(landUse)) {
+    throw new RangeError(`${path}.landUse must be one of ${LAND_USES.join(", ")}`);
+  }
   const building: BuildingDef = {
     id: requireInteger(record.id, `${path}.id`, 0, 0xffff_ffff),
     key: requireString(record.key, `${path}.key`, { minLength: 1 }),
@@ -326,6 +332,7 @@ function assertBuilding(
     requiredTechnologyId,
     ownershipAllowed: ownership as BuildingDef["ownershipAllowed"],
     isEssentialInfrastructure: record.isEssentialInfrastructure === true,
+    ...(landUse === undefined ? {} : { landUse: landUse as LandUse }),
   };
   if (typeof record.isEssentialInfrastructure !== "boolean") {
     throw new TypeError(`${path}.isEssentialInfrastructure must be a boolean`);

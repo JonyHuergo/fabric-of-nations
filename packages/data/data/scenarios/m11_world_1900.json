@@ -160,8 +160,8 @@
       }
     },
     "files": {
-      "countries": "historical/p2b/countries_1900.json",
-      "provinces": "historical/p2b/provinces_1900.json",
+      "countries": "historical/p5/countries_1900.json",
+      "provinces": "historical/p5/provinces_1900.json",
       "markets": "historical/p2b/markets_1900.json",
       "tradeRoutes": "historical/p2b/trade_routes_1900.json",
       "populations": "historical/p2b/pops_1900.json",
@@ -170,12 +170,13 @@
       "calibration": "historical/p2b/calibration_targets_1900.json",
       "moneyCoefficients": "historical/p2b/money_coefficients_1900.json",
       "currencies": "historical/p3/currencies_1900.json",
-      "demography": "historical/p4/demography_1900.json"
+      "demography": "historical/p4/demography_1900.json",
+      "deposits": "historical/p5/deposits_1900.json"
     },
     "definitions": {
       "goods": "historical_1900_goods.json",
       "professions": "historical_1900_professions.json",
-      "buildings": "historical_1900_buildings.json",
+      "buildings": "historical/p5/buildings_definitions_1900.json",
       "needs": "historical_1900_needs.json",
       "demography": "demography.json",
       "technology": "technology.json"

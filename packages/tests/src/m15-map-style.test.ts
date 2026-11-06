@@ -25,7 +25,7 @@ import {
   type Rgb,
 } from "../../app/src/map/politicalPalette.js";
 import { bandMix, levelOfDetail } from "../../app/src/map/mapStyle.js";
-import { encodeProvinceEconomyTable } from "@century/sim-worker";
+import { encodeProvinceEconomyTable, encodeProvinceOwnershipTable } from "@century/sim-worker";
 
 const entryByTag = new Map(WORLD_CATALOG.entries.map((entry) => [entry.tag, entry] as const));
 const provinces = PROVINCE_MAP_1900.provinces;
@@ -46,7 +46,8 @@ function snapshotWith(
   changes: readonly { provinceId: number; ownerPolityId?: number; controllerPolityId?: number }[],
 ): SimulationSnapshot {
   return {
-    provinces: changes.map((change) => {
+    // P5 (D-143): ownership travels as a column table.
+    provinceOwnership: encodeProvinceOwnershipTable(changes.map((change) => {
       const province = provinces[provinceIndex.get(change.provinceId) ?? 0];
       const owner = change.ownerPolityId ?? province?.initialOwnerPolityId ?? 0;
       return {
@@ -57,7 +58,7 @@ function snapshotWith(
         claimantPolityIds: [],
         specialStatus: "ordinary",
       };
-    }),
+    })),
     provinceTable: encodeProvinceEconomyTable([], []),
     professions: [],
     markets: [],
@@ -209,10 +210,11 @@ describe("map modes", () => {
   const context = contextFor(null);
 
   test("every mode is registered with the same interface", () => {
-    // P2 adds the four province data lenses.
+    // P2 adds the four province data lenses; P5 (D-143) the harvest lens.
     expect(Object.keys(MAP_MODES).sort()).toEqual([
       "control",
       "density",
+      "harvest",
       "literacy",
       "markets",
       "political",

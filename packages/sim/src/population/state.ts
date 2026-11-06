@@ -6,6 +6,7 @@
  * different simulation.
  */
 
+import { emptyResourceState } from "../economy/resourceState.js";
 import { emptyDemographyReport } from "../economy/demographyReportState.js";
 import {
   assertValidBlockDemography,
@@ -713,6 +714,7 @@ export function createPopulationWorld(
     playerCountryId: null,
     moneyCoefficients: { ...DEFAULT_MONEY_COEFFICIENTS },
     demography: emptyDemographyReport(),
+    resources: emptyResourceState(),
     politics: {
       enabled: false,
       eventQueue: [],

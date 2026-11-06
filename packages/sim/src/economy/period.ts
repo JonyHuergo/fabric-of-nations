@@ -60,6 +60,7 @@ import {
   type AnnualFinanceSummary,
   type FinancePeriodBudgetTotals,
   type FinancePeriodFiscalTotals,
+  type ClosingCountryBalances,
   type ClosingCurrencyValuation,
   type FinancePeriodSummary,
   type FinanceState,
@@ -306,6 +307,9 @@ export function compactFinanceHistory(finance: FinanceState): number {
       ...(summary.closingValuations === undefined
         ? {}
         : { closingValuations: summary.closingValuations.map((entry) => ({ ...entry })) }),
+      ...(summary.countryClosingBalances === undefined
+        ? {}
+        : { countryClosingBalances: summary.countryClosingBalances.map((entry) => ({ ...entry })) }),
     };
     compacted += 1;
   }
@@ -961,6 +965,51 @@ function closingValuationsOf(world: World): ClosingCurrencyValuation[] {
 }
 
 /**
+ * P5 (D-143 §6): each country's treasury cash, debt-liability principal and the
+ * household cash of the blocks in the provinces it owns, from the pre-close balances
+ * (closing entries touch only revenue, expense and equity). Ascending country id.
+ * Monthly cadence; read only by the Ledger history.
+ */
+function countryClosingBalancesOf(world: World, finance: FinanceState): ClosingCountryBalances[] {
+  const treasury = new Map<Id, number>();
+  const debt = new Map<Id, number>();
+  const household = new Map<Id, number>();
+  for (const country of world.countries) {
+    treasury.set(country.id, 0);
+    debt.set(country.id, 0);
+    household.set(country.id, 0);
+  }
+  const ownerOfProvince = new Map<Id, Id>();
+  for (const row of world.provinces.ownership) ownerOfProvince.set(row.provinceId, row.ownerPolityId);
+  const countryOfBlock = new Map<Id, Id>();
+  for (const block of world.popBlocks) {
+    const owner = ownerOfProvince.get(block.provinceId);
+    if (owner !== undefined && household.has(owner)) countryOfBlock.set(block.id, owner);
+  }
+  for (const account of finance.accounts) {
+    if (account.ownerId === null) continue;
+    if (account.ownerKind === "country") {
+      if (account.subtype === "treasury-cash" && treasury.has(account.ownerId)) {
+        treasury.set(account.ownerId, (treasury.get(account.ownerId) ?? 0) + account.balanceRUSD);
+      } else if (account.subtype === "debt-liability" && debt.has(account.ownerId)) {
+        debt.set(account.ownerId, (debt.get(account.ownerId) ?? 0) + account.balanceRUSD);
+      }
+    } else if (account.ownerKind === "popBlock" && account.subtype === "household-cash") {
+      const countryId = countryOfBlock.get(account.ownerId);
+      if (countryId !== undefined) household.set(countryId, (household.get(countryId) ?? 0) + account.balanceRUSD);
+    }
+  }
+  return [...treasury.keys()]
+    .sort((left, right) => left - right)
+    .map((countryId) => ({
+      countryId,
+      treasuryCashRUSD: treasury.get(countryId) ?? 0,
+      debtOutstandingRUSD: debt.get(countryId) ?? 0,
+      householdCashRUSD: household.get(countryId) ?? 0,
+    }));
+}
+
+/**
  * Close the current month on a staged world.
  *
  * Inputs: an authoritative world whose `dayIndex` is a civil month-end.
@@ -1000,9 +1049,11 @@ export function closeFinancePeriod(
 
   // A world without specified valuations records none (the field is omitted).
   const closingValuations = closingValuationsOf(world);
+  const countryClosingBalances = countryClosingBalancesOf(world, staged);
   const summary: FinancePeriodSummary = {
     ...capturePeriodSummary(staged, bounds),
     ...(closingValuations.length === 0 ? {} : { closingValuations }),
+    ...(countryClosingBalances.length === 0 ? {} : { countryClosingBalances }),
   };
   assertSummaryTrialBalance(staged, summary);
 

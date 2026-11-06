@@ -77,7 +77,12 @@ import type {
   WorldMapPolity,
 } from "../worldCatalogTypes";
 import { Badge } from "./ui";
-import { provinceEconomyRows, type ProvinceEconomySnapshot } from "@century/sim-worker";
+import {
+  provinceEconomyRows,
+  provinceOwnershipRows,
+  type ProvinceEconomySnapshot,
+  type ProvinceOwnershipSnapshot,
+} from "@century/sim-worker";
 
 const MIN_SCALE = MAP_MIN_SCALE;
 const MAX_SCALE = MAP_MAX_SCALE;
@@ -352,9 +357,9 @@ function SvgWorldMap({
     return byId;
   }, [provinceMap.futurePolities]);
   const ownershipByProvinceId = useMemo(() => {
-    const byId = new Map<number, SimulationSnapshot["provinces"][number]>();
+    const byId = new Map<number, ProvinceOwnershipSnapshot>();
     if (snapshot !== null) {
-      for (const entry of snapshot.provinces) byId.set(entry.provinceId, entry);
+      for (const entry of provinceOwnershipRows(snapshot)) byId.set(entry.provinceId, entry);
     }
     return byId;
   }, [snapshot]);
@@ -398,7 +403,7 @@ function SvgWorldMap({
    */
   const provincesChanged = useMemo(() => {
     if (snapshot === null) return false;
-    for (const entry of snapshot.provinces) {
+    for (const entry of provinceOwnershipRows(snapshot)) {
       const definition = provinceById.get(entry.provinceId);
       if (definition !== undefined && entry.ownerPolityId !== definition.initialOwnerPolityId) {
         return true;

@@ -10,7 +10,7 @@ import type { SimulationSnapshot } from "@century/sim-worker";
 import { MAP_MODES, type MapModeId } from "./mapModes";
 import { provinceEconomyRows } from "@century/sim-worker";
 
-export type LensData = Pick<SimulationSnapshot, "provinces" | "markets" | "provinceTable" | "professions">;
+export type LensData = Pick<SimulationSnapshot, "provinceOwnership" | "markets" | "provinceTable" | "professions">;
 
 export interface Lens {
   readonly id: MapModeId;
@@ -21,7 +21,7 @@ const LENS_RULES: Readonly<Record<MapModeId, (data: LensData | null) => boolean>
   // Sovereignty is in the catalogue before any campaign exists.
   political: () => true,
   // Who holds a province is worker state, so it needs a campaign.
-  control: (data) => data !== null && data.provinces.length > 0,
+  control: (data) => data !== null && data.provinceOwnership.ids.length > 0,
   // Market membership needs live markets with member provinces.
   markets: (data) =>
     data !== null && data.markets.length > 0 && provinceEconomyRows(data).some((province) => province.marketId !== null),
@@ -30,6 +30,8 @@ const LENS_RULES: Readonly<Record<MapModeId, (data: LensData | null) => boolean>
   urban: (data) => populated(data),
   literacy: (data) => populated(data),
   unrest: (data) => populated(data),
+  // P5: the harvest lens needs a campaign whose provinces have farm land.
+  harvest: (data) => data !== null && provinceEconomyRows(data).some((province) => province.harvestFactor !== null),
 };
 
 function populated(data: LensData | null): boolean {
@@ -44,6 +46,7 @@ export const LENS_ORDER: readonly MapModeId[] = [
   "urban",
   "literacy",
   "unrest",
+  "harvest",
 ];
 
 /** The lenses that have real data right now, in display order. */

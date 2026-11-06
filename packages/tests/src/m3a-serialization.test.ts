@@ -1,4 +1,5 @@
 ﻿import { prePhase4Digest } from "./fixtures/p4Encoding.js";
+import { prePhase5Digest } from "./fixtures/p5Encoding.js";
 import {
   WORLD_SCHEMA_VERSION,
   createEconomyWorld,
@@ -66,7 +67,10 @@ describe("M3a schema-25 serialization", () => {
     // P4 schema 31 (D-142): encoding only — the schema number, the block demography
     // fields and `World.demography`. Removing them reproduces the P3 digest.
     expect(prePhase4Digest(cloneWorld())).toBe("74d55ceaa8f99ea8");
-    expect(hashWorld(cloneWorld())).toBe("ba77ec857fa65fab");
+    // P5 schema 32 (D-143): encoding only — the schema number and the empty
+    // `World.resources`. Removing them reproduces the P4 digest.
+    expect(prePhase5Digest(cloneWorld())).toBe("ba77ec857fa65fab");
+    expect(hashWorld(cloneWorld())).toBe("7d816ee4e04c0e72");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

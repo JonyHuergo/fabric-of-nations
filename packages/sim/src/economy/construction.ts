@@ -25,6 +25,7 @@
  * are balanced and cash-neutral; no construction flow creates cash or expense.
  */
 
+import { provinceLandHa } from "./agriculture.js";
 import {
   assertValidDayIndex,
   dayIndexToCivilDate,
@@ -976,6 +977,10 @@ export function validateConstructionStart(
   }
   if (world.markets.length > 0 && province.marketId === null) {
     throw new RangeError(`province ${String(province.id)} has no market`);
+  }
+  // P5 (D-143 §1): a farm needs land of its kind in the province.
+  if (definition.landUse !== undefined && !(provinceLandHa(province, definition.landUse) > 0)) {
+    throw new RangeError(`province ${String(province.id)} has no ${definition.landUse} for this building`);
   }
   if (!world.profitDistribution.enabled) {
     throw new RangeError(

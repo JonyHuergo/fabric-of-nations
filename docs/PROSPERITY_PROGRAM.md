@@ -264,6 +264,13 @@ Acceptance: marginal product falls with labour per hectare; bad-harvest + low-ac
 fixture produces shortage, price spike and mortality; deposits never go negative and
 depletion is conserved; discovery deterministic under replay.
 
+**Status (2026-11-05).** Split by the designer into **P5a** (land, harvests, own
+consumption, deposits and discovery; implemented for review, D-143, report
+`P5_COMPLETION_REPORT.md`, schema 32, protocol 21) and **P5b** (the 57-good catalogue of
+`docs/P5_GOODS_CATALOGUE_PROPOSAL.md`, its recipes, extraction buildings and 1900
+production; brought forward from P6, not started). P6 keeps the linear-expenditure
+demand, saving and housing. Data provenance: `docs/P5_LAND_AND_RESOURCES_PROVENANCE.md`.
+
 ### P6 — Goods catalogue, Engel demand, housing
 
 - ~22 goods covering food (grain, meat, fish, processed food), fibres, timber, coal,

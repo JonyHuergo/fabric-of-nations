@@ -6649,6 +6649,8 @@ P4 (cause-driven demography, schema 31, protocol 20) is implemented for review o
 literacy, towns, income, lagged child mortality, contraception, health services,
 sanitation and calories eaten, starting from sourced 1900 levels per province; WPP is a
 validation target only.
+P5a (land, harvest weather, own consumption, deposits and prospecting; schema 32) is
+implemented for review on 2026-11-05 (D-143); the goods catalogue moves from P6 into P5b.
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair

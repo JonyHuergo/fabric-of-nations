@@ -1,4 +1,5 @@
 ﻿import { prePhase4Digest } from "./fixtures/p4Encoding.js";
+import { prePhase5Digest } from "./fixtures/p5Encoding.js";
 import {
   CAMPAIGN_TERMINAL_DAY_INDEX,
   CAMPAIGN_TICKS,
@@ -48,7 +49,10 @@ describe("determinism", () => {
     // P4 schema 31 (D-142): encoding only — the schema number and the empty
     // `World.demography` record. Removing them reproduces the P3 digest.
     expect(prePhase4Digest(world)).toBe("f4a2b473a9d60631");
-    expect(hashWorld(world)).toBe("ed7c95c6ed740c64");
+    // P5 schema 32 (D-143): encoding only — the schema number and the empty
+    // `World.resources`. Removing them reproduces the P4 digest.
+    expect(prePhase5Digest(world)).toBe("ed7c95c6ed740c64");
+    expect(hashWorld(world)).toBe("8f7987a7a6119c7d");
   });
 
   test("a one-year economic simulation is deterministic and save/resume safe", () => {

@@ -92,7 +92,10 @@ export interface WagePayment {
   readonly professionId: Id;
   readonly workers: number;
   readonly accountId: Id;
+  /** Cash wage owed today (after any wage in kind, P5). */
   readonly obligationRUSD: number;
+  /** P5 (D-143 §2): wage paid in kind (kept food at opening prices); absent when none. */
+  readonly paidInKindRUSD?: number;
   readonly paidRUSD: number;
   readonly unpaidRUSD: number;
 }
@@ -199,7 +202,10 @@ interface WageGroup {
   readonly professionId: Id;
   readonly workers: number;
   readonly accountId: Id;
+  /** Cash wage owed today (after any wage in kind, P5). */
   readonly obligationRUSD: number;
+  /** P5 (D-143 §2): wage paid in kind (kept food at opening prices); absent when none. */
+  readonly paidInKindRUSD?: number;
 }
 
 /**
@@ -1080,6 +1086,12 @@ export function settleMarketDays(
      * false (D-139): its rollback runner or staged copy already owns atomicity.
      */
     readonly atomic?: boolean;
+    /**
+     * P5 (D-143 §2): value at opening prices of the food each building's owner block
+     * kept from it today. It is paid as a wage in kind: the building's cash wage to
+     * that block falls by it (never below zero); any remainder was the owner's draw.
+     */
+    readonly inKindWages?: ReadonlyMap<Id, { readonly popBlockId: Id; readonly valueRUSD: number }>;
   } = {},
 ): MarketSettlementResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
@@ -1125,6 +1137,7 @@ export function settleMarketDays(
     sortedResults,
     options.detail ?? "full",
     options.atomic !== false,
+    options.inKindWages,
   );
   for (const marketDay of marketDays) marketDay.settled = true;
   return result;
@@ -1157,6 +1170,7 @@ function settleMarketDaysInternal(
   marketDays: readonly MarketDayResult[],
   detail: "full" | "summary",
   atomic: boolean,
+  inKindWages?: ReadonlyMap<Id, { readonly popBlockId: Id; readonly valueRUSD: number }>,
 ): MarketSettlementResult {
   const dayIndex = marketDays[0]?.dayIndex;
   if (dayIndex === undefined) throw new RangeError("settlement requires a market-day result");
@@ -1226,7 +1240,7 @@ function settleMarketDaysInternal(
       if (definition === undefined) {
         throw new RangeError(`building ${String(building.id)} has no definition`);
       }
-      const groups = buildWageGroups(
+      const grossGroups = buildWageGroups(
         wageLookup,
         building,
         professions,
@@ -1242,7 +1256,19 @@ function settleMarketDaysInternal(
               };
         })(),
       );
-      if (groups.length === 0) continue;
+      if (grossGroups.length === 0) continue;
+      // P5 (D-143 §2): the owner block's kept food is a wage in kind, up to its cash
+      // wage here; no money moves for it.
+      const inKind = inKindWages?.get(building.id);
+      const groups =
+        inKind === undefined || !(inKind.valueRUSD > 0)
+          ? grossGroups
+          : grossGroups.map((group) => {
+              if (group.popBlockId !== inKind.popBlockId) return group;
+              const applied = Math.min(group.obligationRUSD, inKind.valueRUSD);
+              if (!(applied > 0)) return group;
+              return { ...group, obligationRUSD: group.obligationRUSD - applied, paidInKindRUSD: applied };
+            });
       const obligation = groups.reduce((total, group) => total + group.obligationRUSD, 0);
       const employer = operatingCash(index, building.id);
       const paid = Math.min(employer.balanceRUSD, obligation);

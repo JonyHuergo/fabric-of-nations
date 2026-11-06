@@ -1,0 +1,82 @@
+{
+  "startedAt": "2026-11-05T21:23:47.643Z",
+  "viewport": "844,390",
+  "checks": [
+    {
+      "name": "phone landscape viewport",
+      "passed": true,
+      "detail": "{\"width\":844,\"height\":390}"
+    },
+    {
+      "name": "SVG fallback map: New York pressed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "harvest row shows this year's weather against normal",
+      "passed": true,
+      "detail": "Harvest 1900 83% of normal Weather this year · 3 farms, 740 levels · 0.03 workers per hectare of cropland Farm food today 6% kept at home Grain 15 k t, 1 k t kept · Livestock 4 k t, 63 t kept · Fish 8"
+    },
+    {
+      "name": "harvest row names farms and workers per hectare",
+      "passed": true,
+      "detail": "Harvest 1900 83% of normal Weather this year · 3 farms, 740 levels · 0.03 workers per hectare of cropland Farm food today 6% kept at home Grain 15 k t, 1 k t kept · Livestock 4 k t, 63 t kept · Fish 8"
+    },
+    {
+      "name": "farm food row shows the share kept at home",
+      "passed": true,
+      "detail": "Farm food today 6% kept at home Grain 15 k t, 1 k t kept · Livestock 4 k t, 63 t kept · Fish 838 t, 63 t kept · Cotton 104 t · Wool 598 t. Farm households eat their own food first and sell the rest Ir"
+    },
+    {
+      "name": "farm food row lists grain kept",
+      "passed": true,
+      "detail": "Farm food today 6% kept at home Grain 15 k t, 1 k t kept · Livestock 4 k t, 63 t kept · Fish 838 t, 63 t kept · Cotton 104 t · Wool 598 t. Farm households eat their own food first and sell the rest Ir"
+    },
+    {
+      "name": "known deposits listed with remaining stock and quality",
+      "passed": true,
+      "detail": "Timber 781.1 M m³ left Quality 90% · known in 1900 Work 900 k employed here 8 buildings, 903 capacity levels Unrest 7% Infrastructure 68% Market United States of America and dependencies The customs t"
+    },
+    {
+      "name": "land rows fit the phone width",
+      "passed": true,
+      "detail": "823"
+    },
+    {
+      "name": "lens switch is at least 44 pt",
+      "passed": true,
+      "detail": "{\"height\":44,\"width\":93.5625}"
+    },
+    {
+      "name": "Harvest lens offered, at least 44 pt",
+      "passed": true,
+      "detail": "{\"height\":44}"
+    },
+    {
+      "name": "harvest legend shows the bands",
+      "passed": true,
+      "detail": "Below 85% 85% to 95% 95% to 105% 105% to 115% 115% and above No data Harvest 1× Autosave failed: Failed to execute 'setItem' on 'Storage': Setting the value of 'fon.saves.slot.c1' exceeded the quota. "
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no uncaught exceptions",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no failed resource loads",
+      "passed": true,
+      "detail": "[]"
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "docs/images/p5/p5-844x390-province-land.png",
+    "docs/images/p5/p5-844x390-harvest-lens.png"
+  ],
+  "finishedAt": "2026-11-05T21:24:09.887Z"
+}

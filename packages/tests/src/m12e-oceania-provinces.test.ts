@@ -32,6 +32,7 @@ import {
 } from "@century/sim";
 import { loadM11World, loadProvinceBundle } from "@century/data";
 import { buildSimulationSnapshot } from "@century/sim-worker/snapshot";
+import { provinceOwnershipRows } from "@century/sim-worker";
 
 import {
   decodeProvinceGeometry,
@@ -1413,8 +1414,8 @@ describe("M12e persistence and determinism", () => {
     const world = referenceWorld();
     australianFederation1901(world);
     const snapshot = snapshotFor(world);
-    expect(snapshot.provinces.length).toBe(PROVINCES_AFTER_P2_REPAIR);
-    const byId = new Map(snapshot.provinces.map((entry) => [entry.provinceId, entry]));
+    expect(provinceOwnershipRows(snapshot).length).toBe(PROVINCES_AFTER_P2_REPAIR);
+    const byId = new Map(provinceOwnershipRows(snapshot).map((entry) => [entry.provinceId, entry]));
     expect(byId.get(idOf("oc-aus-new-south-wales"))?.ownerPolityId).toBe(futureId("AUS"));
     expect(byId.get(idOf("oc-gng-madang"))?.ownerPolityId).toBe(2);
     expect(byId.get(idOf("oc-bpo-papua-central"))?.ownerPolityId).toBe(1);

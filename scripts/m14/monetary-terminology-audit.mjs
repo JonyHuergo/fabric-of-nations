@@ -233,8 +233,9 @@ requireIncludes("save format version unchanged", serialization, "formatVersion: 
 const protocol = readFileSync(join(ROOT, "packages/sim-worker/src/protocol.ts"), "utf8");
 // 18: D-137 stored save form on SAVE_RESULT/LOAD; 19: P3 (D-141) currency link and
 // valuation history in the snapshot; 20: P4 (D-142) demography in the snapshot and the
-// province focus command (the m14 test pins the value).
-requireIncludes("worker protocol version", protocol, "PROTOCOL_VERSION = 20");
+// province focus command; 21: P5 (D-143) province ownership columns, harvest column and
+// province land (the m14 test pins the value).
+requireIncludes("worker protocol version", protocol, "PROTOCOL_VERSION = 21");
 if (!existsSync(join(ROOT, "docs/M14_RUSD_RENAMING_REPORT.md"))) {
   errors.push("the M14 renaming report is missing");
 }

@@ -525,8 +525,11 @@ function build() {
   // The runtime reads the P2b calibration of these tables (D-135), built from the P2
   // outputs by scripts/p2b/build-money-calibration.mjs, and the 1900-world definitions.
   meta.files = {
-    countries: "historical/p2b/countries_1900.json",
-    provinces: "historical/p2b/provinces_1900.json",
+    // P5 (D-143): the P2b countries with the national geological surveys of 1900.
+    countries: "historical/p5/countries_1900.json",
+    // P5 (D-143): the P2b provinces with land use and imputed land, built by
+    // scripts/p5/build-p5-world.mjs.
+    provinces: "historical/p5/provinces_1900.json",
     markets: "historical/p2b/markets_1900.json",
     tradeRoutes: "historical/p2b/trade_routes_1900.json",
     populations: "historical/p2b/pops_1900.json",
@@ -539,12 +542,15 @@ function build() {
     // P4 (D-142): sourced 1900 demographic levels, age structures and urban shares,
     // built by scripts/p4/build-demography-1900.mjs.
     demography: "historical/p4/demography_1900.json",
+    // P5 (D-143): natural-resource deposits (authored, USGS MRDS, SAGE/HYDE forest).
+    deposits: "historical/p5/deposits_1900.json",
   };
   meta.definitions = {
     ...meta.definitions,
     goods: "historical_1900_goods.json",
     professions: "historical_1900_professions.json",
-    buildings: "historical_1900_buildings.json",
+    // P5 (D-143): the P2b definitions with each farm's land use.
+    buildings: "historical/p5/buildings_definitions_1900.json",
     needs: "historical_1900_needs.json",
   };
   meta.countryMeta = meta.countryMeta.map((entry) => {

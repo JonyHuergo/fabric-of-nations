@@ -18,6 +18,7 @@ import {
   type CountrySummarySnapshot,
   type ProvinceOwnershipSnapshot,
   type ProvinceEconomySnapshot,
+  type ProvinceLandSnapshot,
   type SimulationSnapshot,
   type SpeedDaysPerSecond,
 } from "@century/sim-worker";
@@ -62,7 +63,7 @@ import { PopulationScreen } from "./PopulationScreen";
 import { TechnologyScreen } from "./TechnologyScreen";
 import { TradeScreen } from "./TradeScreen";
 import { WarScreen } from "./WarScreen";
-import { provinceEconomyRows } from "@century/sim-worker";
+import { provinceEconomyRows, provinceOwnershipRows } from "@century/sim-worker";
 
 const DOMAIN_ICON: Readonly<Record<DomainId, IconName>> = {
   realm: "realm",
@@ -560,7 +561,9 @@ export function GameShell() {
               <ProvincePanel
                 province={PROVINCE_BY_ID.get(selectedProvinceId) ?? null}
                 ownership={
-                  snapshot?.provinces.find((entry) => entry.provinceId === selectedProvinceId) ?? null
+                  (snapshot === null
+                    ? undefined
+                    : provinceOwnershipRows(snapshot).find((entry) => entry.provinceId === selectedProvinceId)) ?? null
                 }
                 economy={
                   (snapshot === null ? undefined : provinceEconomyRows(snapshot).find((entry) => entry.id === selectedProvinceId)) ?? null
@@ -1143,6 +1146,84 @@ function territoryAggregate(snapshot: SimulationSnapshot, entry: WorldCatalogEnt
 
 const percentText = (value: number): string => `${(value * 100).toFixed(0)}%`;
 
+/** P5: a physical quantity with its unit, compact (kg shown as t from 10 t). */
+function formatQuantity(value: number, unit: string): string {
+  if (unit === "kg" && value >= 10_000) return `${formatPeople(value / 1_000)} t`;
+  return `${formatPeople(value)} ${unit}`;
+}
+
+const RESOURCE_NAMES: Readonly<Record<string, string>> = {
+  coal: "Coal",
+  oil: "Oil",
+  gas: "Natural gas",
+  iron: "Iron ore",
+  copper: "Copper ore",
+  bauxite: "Bauxite",
+  tin: "Tin",
+  gold: "Gold",
+  silver: "Silver",
+  nitrate: "Nitrate",
+  uranium: "Uranium",
+  timber: "Timber",
+};
+
+/** P5 (D-143): this year's harvest, today's farm food and own consumption, known deposits. */
+function LandRows({ land }: { readonly land: ProvinceLandSnapshot }) {
+  const { snapshot } = useSimulation();
+  const goods = new Map((snapshot?.goods ?? []).map((good) => [good.id, good]));
+  const kept = new Map(land.keptToday.map((entry) => [entry.goodId, entry.quantity]));
+  const food = land.farmOutputToday
+    .map((entry) => {
+      const good = goods.get(entry.goodId);
+      const unit = good?.unitLabel ?? "";
+      const keptHere = kept.get(entry.goodId) ?? 0;
+      return `${good?.name ?? `good ${String(entry.goodId)}`} ${formatQuantity(entry.quantity, unit)}${
+        keptHere > 0 ? `, ${formatQuantity(keptHere, unit)} kept` : ""
+      }`;
+    })
+    .join(" · ");
+  const keptShare =
+    land.farmOutputToday.length === 0
+      ? null
+      : land.keptToday.reduce((sum, entry) => sum + entry.quantity, 0) /
+        Math.max(1, land.farmOutputToday.reduce((sum, entry) => sum + entry.quantity, 0));
+  return (
+    <>
+      <StatRow
+        label={`Harvest ${String(land.harvestYear)}`}
+        value={`${percentText(land.harvestFactor)} of normal`}
+        detail={`Weather this year · ${String(land.farms)} farm${land.farms === 1 ? "" : "s"}, ${String(
+          land.farmLevels,
+        )} level${land.farmLevels === 1 ? "" : "s"} · ${land.workersPerCroplandHa.toFixed(2)} workers per hectare of cropland`}
+        tone={land.harvestFactor < 0.9 ? "negative" : "default"}
+      />
+      {keptShare === null ? null : (
+        <StatRow
+          label="Farm food today"
+          value={`${percentText(keptShare)} kept at home`}
+          detail={`${food}. Farm households eat their own food first and sell the rest`}
+        />
+      )}
+      {land.deposits.length === 0 ? (
+        <StatRow label="Resources" value="None known" detail="Prospecting can find deposits not yet known" />
+      ) : (
+        land.deposits.map((deposit) => (
+          <StatRow
+            key={deposit.resource}
+            label={RESOURCE_NAMES[deposit.resource] ?? deposit.resource}
+            value={`${formatPeople(deposit.remaining)} ${deposit.unit} left`}
+            detail={`Quality ${percentText(deposit.quality)} · ${
+              deposit.remaining < deposit.initialStock
+                ? `${percentText(1 - deposit.remaining / deposit.initialStock)} extracted · `
+                : ""
+            }${deposit.discoveredOnDay === null ? "known in 1900" : "found by prospecting"}`}
+          />
+        ))
+      )}
+    </>
+  );
+}
+
 /** P2 live population and economy of one province (D-118). */
 function ProvinceEconomySection({ economy }: { readonly economy: ProvinceEconomySnapshot }) {
   const { snapshot, setProvinceFocus } = useSimulation();
@@ -1188,6 +1269,7 @@ function ProvinceEconomySection({ economy }: { readonly economy: ProvinceEconomy
         value={`${formatPeople(economy.arableLandHa)} ha cropland`}
         detail={`${formatPeople(economy.pastureHa)} ha pasture and rangeland (HYDE 3.3)`}
       />
+      {focus === null || focus.land === null ? null : <LandRows land={focus.land} />}
       <StatRow
         label="Work"
         value={`${formatPeople(economy.employedWorkers)} employed here`}

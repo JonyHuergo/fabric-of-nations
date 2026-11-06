@@ -12,6 +12,9 @@ export * from "./validation.js";
 export * from "./state.js";
 export * from "./employment.js";
 export * from "./production.js";
+export * from "./agriculture.js";
+export * from "./resourceState.js";
+export * from "./resources.js";
 export * from "./market.js";
 export * from "./settlement.js";
 export * from "./migration.js";
@@ -23,6 +26,7 @@ export * from "./labor.js";
 export * from "./localWages.js";
 export {
   assertValidTradePolicyState,
+  shipmentFunding,
   assertValidTradeState,
   createTradePolicyState,
   createTradeState,

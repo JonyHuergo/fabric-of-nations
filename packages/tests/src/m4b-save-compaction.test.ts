@@ -10,6 +10,7 @@ import {
   deserializeWorld,
   governmentPeriodTotals,
   hashWorld,
+  MAX_DETAILED_PERIOD_SUMMARIES,
   serializeWorld,
   tick,
   type FinancePeriodSummary,
@@ -28,6 +29,8 @@ import {
 } from "@century/sim-worker/persistence";
 
 const SEED = 20_261_023;
+/** P5 (D-143 §6): the detailed window is one month (it was twelve until P5). */
+const WINDOW = MAX_DETAILED_PERIOD_SUMMARIES;
 const FOUR_MIB = 4 * 1024 * 1024;
 
 function monthlyPeriods(count: number): FinancePeriodSummary[] {
@@ -108,16 +111,17 @@ function worldWithRepresentativeHistory(): {
 }
 
 describe("monthly finance history compaction (D-065)", () => {
-  test("retains twelve detailed months and exact per-country totals for older months", () => {
+  test("retains the detailed window and exact per-country totals for older months", () => {
+    expect(WINDOW).toBe(1);
     const { world } = worldWithRepresentativeHistory();
     const before = world.finance.periodSummaries.map((summary) =>
       governmentPeriodTotals(world.finance, summary),
     );
     const compacted = compactFinanceHistory(world.finance);
-    expect(compacted).toBe(1188);
+    expect(compacted).toBe(1200 - WINDOW);
     expect(world.finance.periodSummaries).toHaveLength(1200);
 
-    const detailed = world.finance.periodSummaries.slice(-12);
+    const detailed = world.finance.periodSummaries.slice(-WINDOW);
     expect(detailed.every((summary) => Object.keys(summary.accountTotals).length > 0)).toBe(true);
 
     const old = world.finance.periodSummaries[0];
@@ -178,8 +182,8 @@ describe("monthly finance history compaction (D-065)", () => {
     );
     expect(before?.militaryExpenseRUSD ?? 0).toBeGreaterThan(0);
 
-    // Reproduce the 13th-close boundary: thirteen detailed periods become one
-    // compacted period plus the retained detailed window.
+    // Thirteen detailed periods become compacted periods plus the retained detailed
+    // window.
     const periods = monthlyPeriods(13).map((period) => ({
       ...period,
       accountTotals: { ...baseSummary.accountTotals },
@@ -197,7 +201,7 @@ describe("monthly finance history compaction (D-065)", () => {
     keepShipmentsInTransit(world);
     assertValidWorld(world);
 
-    expect(compactFinanceHistory(world.finance)).toBe(1);
+    expect(compactFinanceHistory(world.finance)).toBe(13 - WINDOW);
     const compacted = world.finance.periodSummaries[0];
     const totals = compacted?.countryFiscalTotals?.[0];
     if (totals === undefined) throw new Error("fixture did not compact a country");
@@ -270,10 +274,16 @@ describe("monthly finance history compaction (D-065)", () => {
       closeFinancePeriod(world);
     }
     expect(world.finance.periodSummaries).toHaveLength(13);
-    expect(world.finance.periodSummaries[0]?.countryFiscalTotals).toBeDefined();
-    expect(Object.keys(world.finance.periodSummaries[0]?.accountTotals ?? {})).toHaveLength(0);
-    expect(Object.keys(world.finance.periodSummaries[1]?.accountTotals ?? {}).length).toBeGreaterThan(0);
-    expect(Object.keys(world.finance.periodSummaries.at(-1)?.accountTotals ?? {}).length).toBeGreaterThan(0);
+    const summaries = world.finance.periodSummaries;
+    for (let index = 0; index < summaries.length; index += 1) {
+      const summary = summaries[index];
+      const compacted = index < summaries.length - WINDOW;
+      expect(summary?.countryFiscalTotals !== undefined).toBe(compacted);
+      expect(Object.keys(summary?.accountTotals ?? {}).length > 0).toBe(!compacted);
+      // P5 (D-143 §6): every close records the per-country closing balances the
+      // Ledger history reads, and compaction keeps them.
+      expect(summary?.countryClosingBalances?.length).toBe(world.countries.length);
+    }
   });
 
   test("the compacted late-game save loads through the worker protocol", () => {

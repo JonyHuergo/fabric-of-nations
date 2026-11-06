@@ -16,9 +16,12 @@ export const MAX_PERIOD_SUMMARIES = 1200;
  * Number of most recent monthly summaries that retain the full pre-close trial
  * balance. Older summaries retain period dates, the four gross flow totals, and
  * per-country fiscal totals, but not the account-level trial balance (D-065).
- * Twelve matches the Ledger snapshot window and keeps canonical saves bounded.
+ * P5 (D-143 §6): one. Every summary carries the per-country closing balances the
+ * Ledger history reads, and only the latest close is read account by account (profit
+ * allocation, AI); each detailed month added about 0.6 M stored characters, so twelve
+ * pushed web saves past the browser storage quota.
  */
-export const MAX_DETAILED_PERIOD_SUMMARIES = 12;
+export const MAX_DETAILED_PERIOD_SUMMARIES = 1;
 
 /**
  * Maximum annual summaries retained. Derivation: 1900..1999 inclusive = 100
@@ -635,3 +638,63 @@ export const MONEY_COEFFICIENT_KEYS = [
   "educationFundingPerStaffPerYearRUSD",
   "trainingInstructorCostPerYearRUSD",
 ] as const;
+
+/*
+ * P5 (D-143) land, agriculture and harvests. Every coefficient below is PROVISIONAL
+ * (P15 calibrates); units and sources are stated with each.
+ *
+ * Farm output per building and day (cadence: daily, in the production capacity):
+ *   P2b output × staffing^FARM_LABOUR_ELASTICITY
+ *            × (hectares per level / FARM_REFERENCE_HECTARES_PER_LEVEL)^FARM_LAND_ELASTICITY
+ *            × harvest weather × technology,
+ * where a province's land of the building's kind is shared among its operational
+ * buildings of that kind in proportion to their levels. Constant returns to scale
+ * (the two elasticities sum to 1), so the marginal product of labour falls as labour
+ * per hectare rises. At world creation each farm's technique is divided by its 1900
+ * land factor, so 1900 output is the P2b calibration (D-135) unchanged.
+ */
+
+/**
+ * Output elasticity of farm labour, dimensionless. Labour's share of pre-industrial
+ * farm income (Clark 2002, "Farmland rental values and agrarian history: England
+ * 1500-1912", land rent about 0.25-0.4 of output). PROVISIONAL.
+ */
+export const FARM_LABOUR_ELASTICITY = 0.6;
+
+/** Output elasticity of farm land, dimensionless: 1 − labour (constant returns). PROVISIONAL. */
+export const FARM_LAND_ELASTICITY = 0.4;
+
+/**
+ * Normalising land per building level, hectares (one level = 1,000 jobs in the 1900
+ * definitions, so 1 ha per job). It only fixes the scale of the land factor: world
+ * creation divides each farm's technique by its 1900 land factor, so its value does
+ * not change any 1900 output. PROVISIONAL (a scale, not a calibration).
+ */
+export const FARM_REFERENCE_HECTARES_PER_LEVEL = 1_000;
+
+/** Keyed-draw purpose of the yearly harvest weather of a province (GDD §16.1). */
+export const HARVEST_WEATHER_PURPOSE = "harvest.weather";
+
+/**
+ * Standard deviation of the log harvest weather factor, dimensionless; the factor is
+ * lognormal with mean 1 (exp(σZ − σ²/2)), drawn once per (province, calendar year).
+ * Weather explains most year-to-year variation of 1850–1913 European grain yields,
+ * national coefficients of variation about 0.10–0.15 (Solomou & Wu 1999, "Weather
+ * effects on European agricultural output, 1850–1913"); a province varies more than a
+ * nation. PROVISIONAL.
+ */
+export const HARVEST_WEATHER_SIGMA = 0.15;
+
+/** Keyed-draw purpose of the monthly prospecting discovery of a hidden deposit (GDD §16.1). */
+export const RESOURCE_DISCOVERY_PURPOSE = "resource.discovery";
+
+/**
+ * Monthly probability that prospecting finds a hidden, prospectable deposit in a
+ * province with infrastructure 1 (it scales with the province's infrastructure,
+ * 0..1: prospectors need access). 1/120 per month = a mean of ten years. Order of
+ * magnitude of the 20th-century lag between a prospecting method and the deposits it
+ * revealed (seismic reflection from the 1920s and the Gulf giants of 1927–1948;
+ * airborne magnetics from the 1950s and the Pilbara iron ores of the 1960s).
+ * Cadence: first day of each month. PROVISIONAL.
+ */
+export const RESOURCE_DISCOVERY_MONTHLY_HAZARD = 1 / 120;

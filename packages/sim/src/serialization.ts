@@ -19,6 +19,12 @@
  */
 
 import {
+  decodeSerializedResourceState,
+  encodeResourceState,
+  type ResourceState,
+  type SerializedResourceState,
+} from "./economy/resourceState.js";
+import {
   decodeDemographyReport,
   encodeDemographyReport,
   type DemographyReportState,
@@ -113,7 +119,7 @@ import {
   assertValidCountryAIState,
 } from "./economy/aiState.js";
 import { asRusdPerCurrencyUnit } from "./economy/currency.js";
-import { assertValidClosingValuations } from "./economy/validation.js";
+import { assertValidClosingValuations, assertValidCountryClosingBalances } from "./economy/validation.js";
 import { assertValidProfitDistributionPolicy } from "./economy/profit.js";
 import { assertValidProvinceState } from "./provinces/state.js";
 import type {
@@ -406,6 +412,13 @@ export type SerializedFinancePeriodSummary = {
   readonly countryBudgetTotals: Readonly<Record<string, SerializedFinanceBudgetTotals>>;
   /** P3 (D-141) specified valuations at the close, ascending currency id. */
   readonly closingValuations?: readonly { readonly currencyId: number; readonly rusdPerUnit: number }[];
+  /** P5 (D-143 §6) per-country closing balances, ascending country id. */
+  readonly countryClosingBalances?: readonly {
+    readonly countryId: number;
+    readonly treasuryCashRUSD: number;
+    readonly debtOutstandingRUSD: number;
+    readonly householdCashRUSD: number;
+  }[];
 };
 
 /** Encoded annual finance summary. No account-level trial balance is stored. */
@@ -998,6 +1011,8 @@ export type SerializedWorld = {
   readonly monetary: SerializedMonetaryState;
   /** P4 per-country annual demographic record (D-142). */
   readonly demography: DemographyReportState;
+  /** P5 natural-resource deposits (D-143 §4), as columns. */
+  readonly resources: SerializedResourceState;
   readonly military: SerializedMilitaryState;
   /** M12a provincial ownership/control state; definitions and geometry are static. */
   readonly provinces: SerializedProvinceState;
@@ -1287,6 +1302,17 @@ function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePe
             rusdPerUnit: entry.rusdPerUnit,
           })),
         };
+  const countryClosingBalances =
+    summary.countryClosingBalances === undefined
+      ? {}
+      : {
+          countryClosingBalances: summary.countryClosingBalances.map((entry) => ({
+            countryId: entry.countryId,
+            treasuryCashRUSD: entry.treasuryCashRUSD,
+            debtOutstandingRUSD: entry.debtOutstandingRUSD,
+            householdCashRUSD: entry.householdCashRUSD,
+          })),
+        };
   if (summary.countryFiscalTotals === undefined) {
     return {
       periodStartDay: summary.periodStartDay,
@@ -1295,6 +1321,7 @@ function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePe
       flowTotalsByKind,
       countryBudgetTotals,
       ...closingValuations,
+      ...countryClosingBalances,
     };
   }
   return {
@@ -1305,6 +1332,7 @@ function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePe
     countryFiscalTotals: encodeCountryFiscalTotals(summary.countryFiscalTotals),
     countryBudgetTotals,
     ...closingValuations,
+    ...countryClosingBalances,
   };
 }
 
@@ -1783,6 +1811,7 @@ export function encodeWorld(world: World): SerializedWorld {
             },
     },
     demography: encodeDemographyReport(world.demography),
+    resources: encodeResourceState(world.resources),
     priceIndex: {
       basket: [...world.priceIndex.basket]
         .sort((left, right) => left.goodId - right.goodId)
@@ -3478,6 +3507,27 @@ function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary
       (entry) => ({ currencyId: entry.currencyId, rusdPerUnit: asRusdPerCurrencyUnit(entry.rusdPerUnit) }),
     );
   }
+  let countryClosingBalances: FinancePeriodSummary["countryClosingBalances"];
+  if (record.countryClosingBalances !== undefined) {
+    try {
+      assertValidCountryClosingBalances(record.countryClosingBalances, `${path}.countryClosingBalances`);
+    } catch (error) {
+      throw new SaveFormatError(errorMessage(error));
+    }
+    countryClosingBalances = (
+      record.countryClosingBalances as {
+        countryId: number;
+        treasuryCashRUSD: number;
+        debtOutstandingRUSD: number;
+        householdCashRUSD: number;
+      }[]
+    ).map((entry) => ({
+      countryId: entry.countryId,
+      treasuryCashRUSD: entry.treasuryCashRUSD,
+      debtOutstandingRUSD: entry.debtOutstandingRUSD,
+      householdCashRUSD: entry.householdCashRUSD,
+    }));
+  }
   return {
     periodStartDay: requireInteger(
       record.periodStartDay,
@@ -3496,6 +3546,7 @@ function decodePeriodSummary(value: unknown, path: string): FinancePeriodSummary
     ...(countryFiscalTotals === undefined ? {} : { countryFiscalTotals }),
     countryBudgetTotals,
     ...(closingValuations === undefined ? {} : { closingValuations }),
+    ...(countryClosingBalances === undefined ? {} : { countryClosingBalances }),
   };
 }
 
@@ -4221,6 +4272,12 @@ function decodeWorldPayload(value: unknown): World {
   const trade = decodeTradeState(payload.trade, "save payload.trade");
   const priceIndex = decodePriceIndexState(payload.priceIndex, "save payload.priceIndex");
   const demography = decodeDemographyReport(payload.demography, "save payload.demography");
+  let resources: ResourceState;
+  try {
+    resources = decodeSerializedResourceState(payload.resources, "save payload.resources");
+  } catch (error) {
+    throw new SaveFormatError(errorMessage(error));
+  }
   const monetary = decodeMonetaryState(payload.monetary, "save payload.monetary");
   const military = decodeMilitaryState(payload.military, "save payload.military");
   const provinces = decodeProvinceState(payload.provinces);
@@ -4265,6 +4322,7 @@ function decodeWorldPayload(value: unknown): World {
     playerCountryId,
     moneyCoefficients,
     demography,
+    resources,
     diagnostics: {
       invariantFailureCount,
       invalidActionCount,

@@ -1879,6 +1879,9 @@ export function cloneFinanceState(
             ...(summary.closingValuations === undefined
               ? {}
               : { closingValuations: summary.closingValuations.map((entry) => ({ ...entry })) }),
+            ...(summary.countryClosingBalances === undefined
+              ? {}
+              : { countryClosingBalances: summary.countryClosingBalances.map((entry) => ({ ...entry })) }),
           })),
     annualSummaries: finance.annualSummaries.map((summary) => ({
       ...summary,

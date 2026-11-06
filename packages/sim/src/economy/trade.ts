@@ -308,6 +308,35 @@ function cloneTradeState(state: TradeState): TradeState {
   };
 }
 
+/**
+ * Binary64 safety margin for cash an exporter or its owner may commit, RUSD: 16 ulps of
+ * the amount (at least of 1 RUSD). The day's trade postings are one journal batch that
+ * sums each account's lines before applying them, so the per-shipment cash tracked here
+ * (sequential differences) can differ from the batch result by a few ulps. P5 (D-143):
+ * a no-input 1900 run failed on day 460 when an owner committed 6,248.601058167046 RUSD
+ * against 6,248.601058167045. Below 1e-10 RUSD for any 1900-world amount.
+ */
+function cashMargin(amount: number): number {
+  return 16 * Number.EPSILON * Math.max(1, Math.abs(amount));
+}
+
+/**
+ * Split a shipment's cost between the exporting enterprise and its owner (D-079 §12a):
+ * the enterprise pays what it can, the owner injects the rest plus a rounding margin, and
+ * neither commits cash within `cashMargin` of its balance. Null when they cannot pay.
+ */
+export function shipmentFunding(
+  buildingCash: number,
+  ownerCash: number,
+  totalCost: number,
+): { readonly buildingPortion: number; readonly ownerPortion: number } | null {
+  const spendable = Math.max(0, buildingCash - cashMargin(buildingCash));
+  if (totalCost <= spendable) return { buildingPortion: totalCost, ownerPortion: 0 };
+  const ownerPortion = totalCost - spendable + cashMargin(totalCost);
+  if (ownerPortion > ownerCash - cashMargin(ownerCash)) return null;
+  return { buildingPortion: spendable, ownerPortion };
+}
+
 function dispatchTrade(
   world: World,
   definitions: EconomyDefinitions,
@@ -675,11 +704,11 @@ function dispatchTrade(
           // Working-capital rule (D-079 §12a): the enterprise pays from its own cash;
           // any shortfall is funded by its owner as an explicit capital injection, never
           // a loan, payable, or negative balance.
-          const buildingPortion = Math.min(buildingCash, totalCost);
-          const ownerPortion = totalCost - buildingPortion;
-          if (ownerPortion > ownerCash + MONEY_TOLERANCE_RUSD * Math.max(1, ownerCash)) {
-            continue;
-          }
+          // P5 (D-143): the split keeps a rounding margin on both accounts (`shipmentFunding`).
+          const funding = shipmentFunding(buildingCash, ownerCash, totalCost);
+          if (funding === null) continue;
+          const buildingPortion = funding.buildingPortion;
+          const ownerPortion = funding.ownerPortion;
           if (ownerPortion > 0) {
             entries.push({
               transactionKind: "owner-capital-injection",

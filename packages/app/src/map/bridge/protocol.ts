@@ -14,8 +14,8 @@ import { ERA_ORDER, type EraId } from "../../design/tokens";
 import type { ReservedBox } from "../labels";
 import type { MapModeId } from "../mapModes";
 
-/** 2: P2 province lens values in every state change. */
-export const MAP_PROTOCOL_VERSION = 2;
+/** 2: P2 province lens values in every state change. 3: P5 harvest lens value. */
+export const MAP_PROTOCOL_VERSION = 3;
 
 export const MAP_LENS_IDS: readonly MapModeId[] = [
   "political",
@@ -25,6 +25,7 @@ export const MAP_LENS_IDS: readonly MapModeId[] = [
   "urban",
   "literacy",
   "unrest",
+  "harvest",
 ];
 
 /** Fastest backdrop rotation the runtime accepts, in degrees of longitude per second. */
@@ -32,13 +33,14 @@ export const MAX_DRIFT_DEGREES_PER_SECOND = 30;
 
 /**
  * [province index, owner tag, controller tag, unit tag, market id, density per km²,
- * urban share, literacy, unrest]; the four lens values are null without data.
+ * urban share, literacy, unrest, harvest]; the five lens values are null without data.
  */
 export type ProvinceStateChange = readonly [
   number,
   string,
   string,
   string,
+  number | null,
   number | null,
   number | null,
   number | null,
@@ -118,13 +120,13 @@ function isReservedBox(value: unknown): value is ReservedBox {
 function isStateChange(value: unknown): value is ProvinceStateChange {
   return (
     Array.isArray(value) &&
-    value.length === 9 &&
+    value.length === 10 &&
     isIndex(value[0]) &&
     typeof value[1] === "string" &&
     typeof value[2] === "string" &&
     typeof value[3] === "string" &&
     (value[4] === null || isIndex(value[4])) &&
-    [value[5], value[6], value[7], value[8]].every((entry) => entry === null || isFiniteNumber(entry))
+    [value[5], value[6], value[7], value[8], value[9]].every((entry) => entry === null || isFiniteNumber(entry))
   );
 }
 

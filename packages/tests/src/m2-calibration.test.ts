@@ -21,6 +21,7 @@
   type PopulationScenarioDef,
   type World,
 } from "@century/sim";
+import { prePhase5Digest } from "./fixtures/p5Encoding.js";
 import {
   loadWppWorldSchedules,
   loadM2PopulationCalibration,
@@ -122,9 +123,12 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // P4 schema 31 (D-142): cause-driven levels change the trajectory (no 1.45
     // mortality scaling, sourced 1900 world levels) and the encoding gains the
     // block demography and the annual record; re-pinned.
-    expect(hashWorld(world)).toBe("b742748f9ff34905");
+    // P5 schema 32 (D-143): encoding only — the schema number and the empty
+    // `World.resources`; removing them reproduces the P4 digest.
+    expect(prePhase5Digest(world)).toBe("b742748f9ff34905");
+    expect(hashWorld(world)).toBe("25dd311842cb4d96");
     const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe("b742748f9ff34905");
+    expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(tick(restored).advanced).toBe(false);
   });
 
@@ -336,7 +340,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // P3 schema 30 (D-141): encoding only (schema number); re-pinned.
     // P4 schema 31 (D-142): the engine is driven directly with WPP rates (levels 1);
     // the encoding gains the block demography and the annual record; re-pinned.
-    expect(hashWorld(world)).toBe("4df8d9869983ce04");
+    // P5 schema 32 (D-143): encoding only; removing it reproduces the P4 digest.
+    expect(prePhase5Digest(world)).toBe("4df8d9869983ce04");
+    expect(hashWorld(world)).toBe("03cbedcb11ce7e19");
   });
 });
 

@@ -11,6 +11,11 @@
  */
 
 import {
+  assertValidResourceState,
+  emptyResourceState,
+  type ResourceState,
+} from "./economy/resourceState.js";
+import {
   assertValidDemographyReport,
   emptyDemographyReport,
   type DemographyReportState,
@@ -158,6 +163,8 @@ export interface World {
   moneyCoefficients: MoneyCoefficients;
   /** P4 per-country annual demographic record (D-142); reporting only. */
   demography: DemographyReportState;
+  /** P5 natural-resource deposits: stock, extraction and discovery (D-143 §4). */
+  resources: ResourceState;
   diagnostics: SimulationDiagnostics;
 }
 
@@ -293,6 +300,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     playerCountryId: null,
     moneyCoefficients: { ...DEFAULT_MONEY_COEFFICIENTS },
     demography: emptyDemographyReport(),
+    resources: emptyResourceState(),
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
@@ -421,6 +429,11 @@ export function assertValidWorld(
   assertValidMilitaryState(world);
   assertValidProvinceState(world.provinces);
   assertValidDemographyReport(world);
+  assertValidResourceState(
+    world.resources,
+    new Set(world.provinceEconomies.map((province) => province.id)),
+    null,
+  );
 }
 
 /**

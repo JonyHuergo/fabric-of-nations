@@ -428,11 +428,14 @@ describe("M6 country AI and action validation", () => {
     expect(world.finance.periodSummaries).toHaveLength(1);
     tickDays(world, scenario, 29);
     expect(world.finance.periodSummaries.length).toBeGreaterThan(1);
+    // P5 (D-143 §6): older months are compacted (no account trial balance), so the
+    // corruption is planted in what an old summary retains.
     const firstSummary = world.finance.periodSummaries[0]!;
-    firstSummary.accountTotals["999999"] = 1;
-    expect(() => assertValidWorld(world)).toThrow(/unknown account/);
+    expect(Object.keys(firstSummary.accountTotals)).toHaveLength(0);
+    firstSummary.flowTotalsByKind.wages = Number.NaN;
+    expect(() => assertValidWorld(world)).toThrow(/flowTotalsByKind/);
     expect(() => assertValidWorldForTick(world)).not.toThrow();
-    expect(() => serializeWorld(world)).toThrow(/unknown account/);
+    expect(() => serializeWorld(world)).toThrow(/flowTotalsByKind/);
     expect(() => createEconomyWorld(scenario, { seed: SEED })).not.toThrow();
   });
 });

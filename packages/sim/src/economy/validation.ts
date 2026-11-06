@@ -896,6 +896,28 @@ export function assertValidClosingValuations(value: unknown, path: string): void
   }
 }
 
+/**
+ * P5 (D-143 §6): per-country closing balances are an array of `{ countryId,
+ * treasuryCashRUSD, debtOutstandingRUSD, householdCashRUSD }`, strictly ascending by
+ * country id, every amount finite.
+ */
+export function assertValidCountryClosingBalances(value: unknown, path: string): void {
+  const entries = requireArray(value, path);
+  let previous = -1;
+  for (let index = 0; index < entries.length; index += 1) {
+    const entryPath = `${path}[${String(index)}]`;
+    const entry = requireRecord(entries[index], entryPath);
+    const countryId = requireInteger(entry.countryId, `${entryPath}.countryId`, 0, Number.MAX_SAFE_INTEGER);
+    if (countryId <= previous) {
+      throw new RangeError(`${path} must be strictly ascending by countryId`);
+    }
+    previous = countryId;
+    requireFiniteNumber(entry.treasuryCashRUSD, `${entryPath}.treasuryCashRUSD`);
+    requireFiniteNumber(entry.debtOutstandingRUSD, `${entryPath}.debtOutstandingRUSD`);
+    requireFiniteNumber(entry.householdCashRUSD, `${entryPath}.householdCashRUSD`);
+  }
+}
+
 export function assertValidFinancePeriodSummary(
   summary: FinancePeriodSummary,
   accounts: ReadonlyMap<number, FinancialAccount>,
@@ -923,6 +945,9 @@ export function assertValidFinancePeriodSummary(
 
   if (record.closingValuations !== undefined) {
     assertValidClosingValuations(record.closingValuations, `${path}.closingValuations`);
+  }
+  if (record.countryClosingBalances !== undefined) {
+    assertValidCountryClosingBalances(record.countryClosingBalances, `${path}.countryClosingBalances`);
   }
 
   const totals = requireRecord(record.accountTotals, `${path}.accountTotals`);

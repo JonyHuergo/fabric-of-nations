@@ -42,7 +42,7 @@ import {
   type DispatchSource,
 } from "../../app/src/screens/dispatches.js";
 import { DOMAINS, domainOf, type ScreenId } from "../../app/src/screens/navigation.js";
-import { encodeProvinceEconomyTable } from "@century/sim-worker";
+import { encodeProvinceEconomyTable, encodeProvinceOwnershipTable } from "@century/sim-worker";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const APP = join(ROOT, "packages/app");
@@ -132,9 +132,12 @@ describe("navigation", () => {
 describe("lenses", () => {
   const table = (rows: readonly object[]) =>
     encodeProvinceEconomyTable(rows as unknown as Parameters<typeof encodeProvinceEconomyTable>[0], []);
-  const empty: LensData = { provinces: [], markets: [], provinceTable: table([]), professions: [] };
+  // P5 (D-143): province ownership is a column table.
+  const ownership = (rows: readonly object[]) =>
+    encodeProvinceOwnershipTable(rows as unknown as Parameters<typeof encodeProvinceOwnershipTable>[0]);
+  const empty: LensData = { provinceOwnership: ownership([]), markets: [], provinceTable: table([]), professions: [] };
   const live = {
-    provinces: [{ provinceId: 1 }],
+    provinceOwnership: ownership([{ provinceId: 1, ownerPolityId: 1, controllerPolityId: 1, controlledSinceDay: null, claimantPolityIds: [], specialStatus: "ordinary" }]),
     markets: [{ id: 0 }],
     provinceTable: table([{ id: 1, marketId: 0 }]),
     professions: [],
@@ -172,6 +175,13 @@ describe("lenses", () => {
       "literacy",
       "unrest",
     ]);
+    // P5 (D-143): the harvest lens needs a province with farm land (a harvest factor).
+    const farmed = {
+      ...live,
+      provinceTable: table([{ id: 1, marketId: 0, population: 10, harvestFactor: 0.92 }]),
+    } as unknown as LensData;
+    expect(availableLenses(farmed).map((lens) => lens.id)).toContain("harvest");
+    expect(availableLenses(populated).map((lens) => lens.id)).not.toContain("harvest");
   });
 
   test("no lens is offered that the snapshot cannot back", () => {
@@ -180,8 +190,10 @@ describe("lenses", () => {
     for (const field of ["population", "urbanShare", "literacy", "unrest"]) {
       expect(protocol).toMatch(new RegExp(`readonly ${field}: number;`, "u"));
     }
+    // P5 (D-143): harvests are modelled; the snapshot carries this year's factor.
+    expect(protocol).toMatch(/readonly harvestFactor: number \| null;/u);
     // Nothing the simulation does not model yet may appear as a lens.
-    expect(read("src/map/lenses.ts")).not.toMatch(/gdp|wealth|deposit|harvest|infrastructure/iu);
+    expect(read("src/map/lenses.ts")).not.toMatch(/gdp|wealth|deposit|infrastructure/iu);
   });
 });
 
@@ -209,7 +221,7 @@ describe("dispatches", () => {
           financeHistory: [],
         },
       ],
-      provinces: [{ provinceId: 9, ownerPolityId: 1, controllerPolityId: 1 }],
+      provinceOwnership: encodeProvinceOwnershipTable([{ provinceId: 9, ownerPolityId: 1, controllerPolityId: 1, controlledSinceDay: null, claimantPolityIds: [], specialStatus: "ordinary" }]),
       military: { wars: [], peaceOffers: [] },
       technologyCatalog: [{ technologyId: 7, name: "Radio" }],
       ...changes,
@@ -248,11 +260,11 @@ describe("dispatches", () => {
 
   test("territory and occupation come from province ownership", () => {
     const transfer = source(2, {
-      provinces: [{ provinceId: 9, ownerPolityId: 2, controllerPolityId: 2 }] as unknown as DispatchSource["provinces"],
+      provinceOwnership: encodeProvinceOwnershipTable([{ provinceId: 9, ownerPolityId: 2, controllerPolityId: 2, controlledSinceDay: null, claimantPolityIds: [], specialStatus: "ordinary" }]),
     });
     expect(headlines(deriveDispatches(source(1), transfer, names))).toEqual(["Province 9 passes to Polity 2"]);
     const occupied = source(2, {
-      provinces: [{ provinceId: 9, ownerPolityId: 1, controllerPolityId: 2 }] as unknown as DispatchSource["provinces"],
+      provinceOwnership: encodeProvinceOwnershipTable([{ provinceId: 9, ownerPolityId: 1, controllerPolityId: 2, controlledSinceDay: null, claimantPolityIds: [], specialStatus: "ordinary" }]),
     });
     expect(headlines(deriveDispatches(source(1), occupied, names))).toEqual(["Polity 2 occupies Province 9"]);
     expect(headlines(deriveDispatches(occupied, source(3), names))).toEqual(["Polity 1 retakes Province 9"]);
@@ -406,8 +418,8 @@ describe("the bridge", () => {
     {
       type: "set-states",
       changes: [
-        [4, "FRA", "DEU", "FRA", 2, 61.5, 0.3, 0.8, 0.02],
-        [5, "DEU", "DEU", "DEU", null, null, null, null, null],
+        [4, "FRA", "DEU", "FRA", 2, 61.5, 0.3, 0.8, 0.02, 1.07],
+        [5, "DEU", "DEU", "DEU", null, null, null, null, null, null],
       ],
     },
     { type: "set-selection", selectedTag: "GBR", playerTag: null, selectedProvinceIndex: 12 },
@@ -503,6 +515,7 @@ describe("the bridge", () => {
       first.urbanShare,
       first.literacy,
       first.unrest,
+      first.harvest,
     ];
     expect(diffProvinceStates(base, next)).toEqual([change]);
     expect(planMapCommands(inputs(), inputs({ states: next }), base)).toEqual([
@@ -617,7 +630,11 @@ describe("province data without geometry", () => {
   });
 
   test("ownership resolves identically from either source", () => {
-    const snapshot = { provinces: [], provinceTable: encodeProvinceEconomyTable([], []), professions: [] } as unknown as SimulationSnapshot;
+    const snapshot = {
+      provinceOwnership: encodeProvinceOwnershipTable([]),
+      provinceTable: encodeProvinceEconomyTable([], []),
+      professions: [],
+    } as unknown as SimulationSnapshot;
     expect(buildProvinceStates(PROVINCE_CATALOG, WORLD_CATALOG, snapshot)).toEqual(
       buildProvinceStates(PROVINCE_MAP_1900, WORLD_CATALOG, snapshot),
     );

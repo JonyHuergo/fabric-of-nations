@@ -41,7 +41,8 @@ export function diffProvinceStates(
       before.densityPerKm2 !== state.densityPerKm2 ||
       before.urbanShare !== state.urbanShare ||
       before.literacy !== state.literacy ||
-      before.unrest !== state.unrest
+      before.unrest !== state.unrest ||
+      before.harvest !== state.harvest
     ) {
       changes.push([
         index,
@@ -53,6 +54,7 @@ export function diffProvinceStates(
         state.urbanShare,
         state.literacy,
         state.unrest,
+        state.harvest,
       ]);
     }
   });

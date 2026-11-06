@@ -74,8 +74,12 @@ export const SIM_VERSION = "0.28.0";
  * (`urbanShare`, the fertility and child/adult mortality residuals and levels, lagged
  * child mortality and food sufficiency) and `World.demography`, the per-country
  * annual demographic record. Schema-30 worlds are reported as incompatible.
+ * P5 (schema 32, D-143) adds `World.resources` (natural-resource deposits with their
+ * extraction and discovery) and `FinancePeriodSummary.countryClosingBalances`, and keeps
+ * the account-level trial balance on the latest monthly summary only. Schema-31 worlds
+ * are reported as incompatible (D-139 §3).
  */
-export const WORLD_SCHEMA_VERSION = 31;
+export const WORLD_SCHEMA_VERSION = 32;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 2;

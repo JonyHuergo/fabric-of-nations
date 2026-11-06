@@ -1,0 +1,9468 @@
+{
+ "meta": {
+  "generator": "scripts/p5/extract-forest-1900.mjs",
+  "accessDate": "2026-11-05",
+  "sources": [
+   {
+    "id": "sage-potential-vegetation",
+    "title": "SAGE Global Potential Vegetation, 5 arc-minute (Ramankutty & Foley 1999)",
+    "url": "https://sage.nelson.wisc.edu/data-and-models/datasets/global-potential-vegetation-dataset",
+    "licence": "No licence stated on the distribution page (University of Wisconsin); used with attribution. Designer to confirm before release."
+   },
+   {
+    "id": "hyde-3.3",
+    "title": "HYDE 3.3 1900 land area, cropland and grazing land",
+    "licence": "CC BY 3.0"
+   }
+  ],
+  "method": "forest = max(0, land - cropland - grazing) in cells whose potential vegetation is a forest or woodland biome (SAGE classes 1-8)",
+  "unit": "km²",
+  "worldForestKm2": 46933581,
+  "unassignedForestKm2": 260626
+ },
+ "provinces": [
+  {
+   "provinceId": 1001,
+   "key": "gbr-northumberland-and-durham",
+   "tropicalKm2": 0,
+   "temperateKm2": 2933.3,
+   "borealKm2": 220.2
+  },
+  {
+   "provinceId": 1002,
+   "key": "gbr-lancashire-and-cheshire",
+   "tropicalKm2": 0,
+   "temperateKm2": 4958.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1003,
+   "key": "gbr-yorkshire",
+   "tropicalKm2": 0,
+   "temperateKm2": 4584.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1004,
+   "key": "gbr-derbyshire-and-nottinghamshire",
+   "tropicalKm2": 0,
+   "temperateKm2": 3522.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1005,
+   "key": "gbr-staffordshire-and-warwickshire",
+   "tropicalKm2": 0,
+   "temperateKm2": 3879.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1006,
+   "key": "gbr-east-anglia-and-essex",
+   "tropicalKm2": 0,
+   "temperateKm2": 4532.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1007,
+   "key": "gbr-middlesex-and-london",
+   "tropicalKm2": 0,
+   "temperateKm2": 1110.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1008,
+   "key": "gbr-surrey-kent-and-sussex",
+   "tropicalKm2": 0,
+   "temperateKm2": 4787.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1009,
+   "key": "gbr-devon-and-cornwall",
+   "tropicalKm2": 0,
+   "temperateKm2": 2829.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1010,
+   "key": "gbr-wessex",
+   "tropicalKm2": 0,
+   "temperateKm2": 3194.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1011,
+   "key": "gbr-north-wales",
+   "tropicalKm2": 0,
+   "temperateKm2": 1893.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1012,
+   "key": "gbr-mid-wales",
+   "tropicalKm2": 0,
+   "temperateKm2": 1518.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1013,
+   "key": "gbr-south-wales",
+   "tropicalKm2": 0,
+   "temperateKm2": 2067.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1014,
+   "key": "gbr-highlands-and-islands",
+   "tropicalKm2": 0,
+   "temperateKm2": 10848.6,
+   "borealKm2": 6749.8
+  },
+  {
+   "provinceId": 1015,
+   "key": "gbr-north-east-scotland",
+   "tropicalKm2": 0,
+   "temperateKm2": 589.1,
+   "borealKm2": 948.5
+  },
+  {
+   "provinceId": 1016,
+   "key": "gbr-east-scotland",
+   "tropicalKm2": 0,
+   "temperateKm2": 2689.3,
+   "borealKm2": 2323.6
+  },
+  {
+   "provinceId": 1017,
+   "key": "gbr-south-west-scotland",
+   "tropicalKm2": 0,
+   "temperateKm2": 3323,
+   "borealKm2": 702.2
+  },
+  {
+   "provinceId": 1018,
+   "key": "gbr-ni-antrim",
+   "tropicalKm2": 0,
+   "temperateKm2": 1007.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1019,
+   "key": "gbr-ni-down",
+   "tropicalKm2": 0,
+   "temperateKm2": 632.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1020,
+   "key": "gbr-ni-armagh",
+   "tropicalKm2": 0,
+   "temperateKm2": 277.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1021,
+   "key": "gbr-ni-fermanagh",
+   "tropicalKm2": 0,
+   "temperateKm2": 678.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1022,
+   "key": "gbr-ni-londonderry",
+   "tropicalKm2": 0,
+   "temperateKm2": 653.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1023,
+   "key": "gbr-ni-tyrone",
+   "tropicalKm2": 0,
+   "temperateKm2": 1189.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1024,
+   "key": "gbr-ie-clare",
+   "tropicalKm2": 0,
+   "temperateKm2": 101.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1025,
+   "key": "gbr-ie-cavan",
+   "tropicalKm2": 0,
+   "temperateKm2": 130.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1026,
+   "key": "gbr-ie-cork",
+   "tropicalKm2": 0,
+   "temperateKm2": 265.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1027,
+   "key": "gbr-ie-carlow",
+   "tropicalKm2": 0,
+   "temperateKm2": 22.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1028,
+   "key": "gbr-ie-dublin",
+   "tropicalKm2": 0,
+   "temperateKm2": 121.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1029,
+   "key": "gbr-ie-donegal",
+   "tropicalKm2": 0,
+   "temperateKm2": 1650.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1030,
+   "key": "gbr-ie-galway",
+   "tropicalKm2": 0,
+   "temperateKm2": 1363.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1031,
+   "key": "gbr-ie-kildare",
+   "tropicalKm2": 0,
+   "temperateKm2": 56.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1032,
+   "key": "gbr-ie-kilkenny",
+   "tropicalKm2": 0,
+   "temperateKm2": 11.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1033,
+   "key": "gbr-ie-kerry",
+   "tropicalKm2": 0,
+   "temperateKm2": 1324.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1034,
+   "key": "gbr-ie-longford",
+   "tropicalKm2": 0,
+   "temperateKm2": 3.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1035,
+   "key": "gbr-ie-louth",
+   "tropicalKm2": 0,
+   "temperateKm2": 21.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1036,
+   "key": "gbr-ie-limerick",
+   "tropicalKm2": 0,
+   "temperateKm2": 29.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1037,
+   "key": "gbr-ie-leitrim",
+   "tropicalKm2": 0,
+   "temperateKm2": 327.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1038,
+   "key": "gbr-ie-laois",
+   "tropicalKm2": 0,
+   "temperateKm2": 32.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1039,
+   "key": "gbr-ie-meath",
+   "tropicalKm2": 0,
+   "temperateKm2": 21.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1040,
+   "key": "gbr-ie-monaghan",
+   "tropicalKm2": 0,
+   "temperateKm2": 38.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1041,
+   "key": "gbr-ie-mayo",
+   "tropicalKm2": 0,
+   "temperateKm2": 1816.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1042,
+   "key": "gbr-ie-offaly",
+   "tropicalKm2": 0,
+   "temperateKm2": 40.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1043,
+   "key": "gbr-ie-roscommon",
+   "tropicalKm2": 0,
+   "temperateKm2": 37.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1044,
+   "key": "gbr-ie-sligo",
+   "tropicalKm2": 0,
+   "temperateKm2": 152.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1045,
+   "key": "gbr-ie-tipperary",
+   "tropicalKm2": 0,
+   "temperateKm2": 88.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1046,
+   "key": "gbr-ie-waterford",
+   "tropicalKm2": 0,
+   "temperateKm2": 51,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1047,
+   "key": "gbr-ie-westmeath",
+   "tropicalKm2": 0,
+   "temperateKm2": 14.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1048,
+   "key": "gbr-ie-wicklow",
+   "tropicalKm2": 0,
+   "temperateKm2": 498.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1049,
+   "key": "gbr-ie-wexford",
+   "tropicalKm2": 0,
+   "temperateKm2": 10.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 1050,
+   "key": "cyp-cyprus",
+   "tropicalKm2": 0,
+   "temperateKm2": 6425.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2001,
+   "key": "deu-bavaria",
+   "tropicalKm2": 0,
+   "temperateKm2": 17642.9,
+   "borealKm2": 1615.8
+  },
+  {
+   "provinceId": 2002,
+   "key": "deu-saxony",
+   "tropicalKm2": 0,
+   "temperateKm2": 3659.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2003,
+   "key": "deu-prussian-saxony",
+   "tropicalKm2": 0,
+   "temperateKm2": 2863.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2004,
+   "key": "deu-thuringia",
+   "tropicalKm2": 0,
+   "temperateKm2": 9004.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2005,
+   "key": "deu-hesse",
+   "tropicalKm2": 0,
+   "temperateKm2": 9948,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2006,
+   "key": "deu-hamburg",
+   "tropicalKm2": 0,
+   "temperateKm2": 379.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2007,
+   "key": "deu-bremen",
+   "tropicalKm2": 0,
+   "temperateKm2": 142.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2008,
+   "key": "deu-berlin",
+   "tropicalKm2": 0,
+   "temperateKm2": 694.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2009,
+   "key": "deu-brandenburg",
+   "tropicalKm2": 0,
+   "temperateKm2": 7709.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2010,
+   "key": "deu-brandenburg-lebus",
+   "tropicalKm2": 0,
+   "temperateKm2": 5981.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2011,
+   "key": "deu-schleswig-holstein",
+   "tropicalKm2": 0,
+   "temperateKm2": 490,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2012,
+   "key": "deu-saar",
+   "tropicalKm2": 0,
+   "temperateKm2": 932.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2013,
+   "key": "deu-baden",
+   "tropicalKm2": 0,
+   "temperateKm2": 6143.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2014,
+   "key": "deu-wurttemberg",
+   "tropicalKm2": 0,
+   "temperateKm2": 6512.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2015,
+   "key": "deu-hohenzollern",
+   "tropicalKm2": 0,
+   "temperateKm2": 623.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2016,
+   "key": "deu-mecklenburg",
+   "tropicalKm2": 0,
+   "temperateKm2": 1662.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2017,
+   "key": "deu-pomerania",
+   "tropicalKm2": 0,
+   "temperateKm2": 3849.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2018,
+   "key": "deu-west-prussia",
+   "tropicalKm2": 0,
+   "temperateKm2": 3352.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2019,
+   "key": "deu-danzig",
+   "tropicalKm2": 0,
+   "temperateKm2": 127.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2020,
+   "key": "deu-posen",
+   "tropicalKm2": 0,
+   "temperateKm2": 2779.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2021,
+   "key": "deu-lower-silesia",
+   "tropicalKm2": 0,
+   "temperateKm2": 2155.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2022,
+   "key": "deu-middle-silesia",
+   "tropicalKm2": 0,
+   "temperateKm2": 684,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2023,
+   "key": "deu-upper-silesia",
+   "tropicalKm2": 0,
+   "temperateKm2": 1181.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2024,
+   "key": "deu-east-prussia-north",
+   "tropicalKm2": 0,
+   "temperateKm2": 5675.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2025,
+   "key": "deu-east-prussia-south",
+   "tropicalKm2": 0,
+   "temperateKm2": 2326.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2026,
+   "key": "deu-memel",
+   "tropicalKm2": 0,
+   "temperateKm2": 1662.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2027,
+   "key": "deu-north-schleswig",
+   "tropicalKm2": 0,
+   "temperateKm2": 1180.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2028,
+   "key": "deu-eupen-malmedy",
+   "tropicalKm2": 0,
+   "temperateKm2": 715.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2029,
+   "key": "deu-alsace",
+   "tropicalKm2": 0,
+   "temperateKm2": 2412,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2030,
+   "key": "deu-lorraine",
+   "tropicalKm2": 0,
+   "temperateKm2": 1100.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2031,
+   "key": "deu-hanover",
+   "tropicalKm2": 0,
+   "temperateKm2": 6011.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2032,
+   "key": "deu-westphalia",
+   "tropicalKm2": 0,
+   "temperateKm2": 5581.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2033,
+   "key": "deu-rhine-province",
+   "tropicalKm2": 0,
+   "temperateKm2": 9801.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 2034,
+   "key": "deu-palatinate",
+   "tropicalKm2": 0,
+   "temperateKm2": 2550.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3001,
+   "key": "fra-nord",
+   "tropicalKm2": 0,
+   "temperateKm2": 375.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3002,
+   "key": "fra-ardennes",
+   "tropicalKm2": 0,
+   "temperateKm2": 557.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3003,
+   "key": "fra-aisne",
+   "tropicalKm2": 0,
+   "temperateKm2": 329.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3004,
+   "key": "fra-meuse",
+   "tropicalKm2": 0,
+   "temperateKm2": 489.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3005,
+   "key": "fra-meurthe-et-moselle",
+   "tropicalKm2": 0,
+   "temperateKm2": 926.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3006,
+   "key": "fra-alpes-maritimes",
+   "tropicalKm2": 0,
+   "temperateKm2": 2656.2,
+   "borealKm2": 61.5
+  },
+  {
+   "provinceId": 3007,
+   "key": "fra-alpes-de-haute-provence",
+   "tropicalKm2": 0,
+   "temperateKm2": 2149.5,
+   "borealKm2": 366.5
+  },
+  {
+   "provinceId": 3008,
+   "key": "fra-hautes-alpes",
+   "tropicalKm2": 0,
+   "temperateKm2": 1109.7,
+   "borealKm2": 776.2
+  },
+  {
+   "provinceId": 3009,
+   "key": "fra-savoie",
+   "tropicalKm2": 0,
+   "temperateKm2": 1241.8,
+   "borealKm2": 1091.8
+  },
+  {
+   "provinceId": 3010,
+   "key": "fra-haute-savoie",
+   "tropicalKm2": 0,
+   "temperateKm2": 2000.5,
+   "borealKm2": 211.6
+  },
+  {
+   "provinceId": 3011,
+   "key": "fra-pyrenees-atlantiques",
+   "tropicalKm2": 0,
+   "temperateKm2": 2071.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3012,
+   "key": "fra-haute-garonne",
+   "tropicalKm2": 0,
+   "temperateKm2": 917.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3013,
+   "key": "fra-hautes-pyrenees",
+   "tropicalKm2": 0,
+   "temperateKm2": 1629.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3014,
+   "key": "fra-ariege",
+   "tropicalKm2": 0,
+   "temperateKm2": 2281.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3015,
+   "key": "fra-pyrenees-orientales",
+   "tropicalKm2": 0,
+   "temperateKm2": 1899,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3016,
+   "key": "fra-territoire-de-belfort",
+   "tropicalKm2": 0,
+   "temperateKm2": 239.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3017,
+   "key": "fra-doubs",
+   "tropicalKm2": 0,
+   "temperateKm2": 1487.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3018,
+   "key": "fra-ain",
+   "tropicalKm2": 0,
+   "temperateKm2": 1262.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3019,
+   "key": "fra-jura",
+   "tropicalKm2": 0,
+   "temperateKm2": 1595.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3020,
+   "key": "fra-var",
+   "tropicalKm2": 0,
+   "temperateKm2": 2608.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3021,
+   "key": "fra-bouches-du-rhone",
+   "tropicalKm2": 0,
+   "temperateKm2": 0.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3022,
+   "key": "fra-gard",
+   "tropicalKm2": 0,
+   "temperateKm2": 2083,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3023,
+   "key": "fra-herault",
+   "tropicalKm2": 0,
+   "temperateKm2": 1641.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3024,
+   "key": "fra-aude",
+   "tropicalKm2": 0,
+   "temperateKm2": 1514.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3025,
+   "key": "fra-landes",
+   "tropicalKm2": 0,
+   "temperateKm2": 4780.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3026,
+   "key": "fra-gironde",
+   "tropicalKm2": 0,
+   "temperateKm2": 4676.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3027,
+   "key": "fra-charente-maritime",
+   "tropicalKm2": 0,
+   "temperateKm2": 317.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3028,
+   "key": "fra-vendee",
+   "tropicalKm2": 0,
+   "temperateKm2": 52.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3029,
+   "key": "fra-loire-atlantique",
+   "tropicalKm2": 0,
+   "temperateKm2": 184.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3030,
+   "key": "fra-morbihan",
+   "tropicalKm2": 0,
+   "temperateKm2": 132.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3031,
+   "key": "fra-finistere",
+   "tropicalKm2": 0,
+   "temperateKm2": 109.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3032,
+   "key": "fra-cotes-d-armor",
+   "tropicalKm2": 0,
+   "temperateKm2": 69.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3033,
+   "key": "fra-ille-et-vilaine",
+   "tropicalKm2": 0,
+   "temperateKm2": 119.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3034,
+   "key": "fra-manche",
+   "tropicalKm2": 0,
+   "temperateKm2": 64.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3035,
+   "key": "fra-calvados",
+   "tropicalKm2": 0,
+   "temperateKm2": 56.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3036,
+   "key": "fra-eure",
+   "tropicalKm2": 0,
+   "temperateKm2": 356.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3037,
+   "key": "fra-seine-maritime",
+   "tropicalKm2": 0,
+   "temperateKm2": 342.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3038,
+   "key": "fra-somme",
+   "tropicalKm2": 0,
+   "temperateKm2": 58.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3039,
+   "key": "fra-pas-de-calais",
+   "tropicalKm2": 0,
+   "temperateKm2": 174.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3040,
+   "key": "fra-haute-corse",
+   "tropicalKm2": 0,
+   "temperateKm2": 129.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3041,
+   "key": "fra-corse-du-sud",
+   "tropicalKm2": 0,
+   "temperateKm2": 1335.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3042,
+   "key": "fra-gers",
+   "tropicalKm2": 0,
+   "temperateKm2": 30.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3043,
+   "key": "fra-haute-vienne",
+   "tropicalKm2": 0,
+   "temperateKm2": 480.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3044,
+   "key": "fra-correze",
+   "tropicalKm2": 0,
+   "temperateKm2": 2437.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3045,
+   "key": "fra-tarn-et-garonne",
+   "tropicalKm2": 0,
+   "temperateKm2": 141.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3046,
+   "key": "fra-tarn",
+   "tropicalKm2": 0,
+   "temperateKm2": 1296.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3047,
+   "key": "fra-isere",
+   "tropicalKm2": 0,
+   "temperateKm2": 2370.1,
+   "borealKm2": 343.6
+  },
+  {
+   "provinceId": 3048,
+   "key": "fra-drome",
+   "tropicalKm2": 0,
+   "temperateKm2": 2271,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3049,
+   "key": "fra-aveyron",
+   "tropicalKm2": 0,
+   "temperateKm2": 658.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3050,
+   "key": "fra-lot",
+   "tropicalKm2": 0,
+   "temperateKm2": 830.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3051,
+   "key": "fra-indre-et-loire",
+   "tropicalKm2": 0,
+   "temperateKm2": 468.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3052,
+   "key": "fra-indre",
+   "tropicalKm2": 0,
+   "temperateKm2": 110.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3053,
+   "key": "fra-loir-et-cher",
+   "tropicalKm2": 0,
+   "temperateKm2": 1489.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3054,
+   "key": "fra-creuse",
+   "tropicalKm2": 0,
+   "temperateKm2": 971.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3055,
+   "key": "fra-mayenne",
+   "tropicalKm2": 0,
+   "temperateKm2": 59.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3056,
+   "key": "fra-sarthe",
+   "tropicalKm2": 0,
+   "temperateKm2": 213.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3057,
+   "key": "fra-vaucluse",
+   "tropicalKm2": 0,
+   "temperateKm2": 325.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3058,
+   "key": "fra-haute-marne",
+   "tropicalKm2": 0,
+   "temperateKm2": 1196.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3059,
+   "key": "fra-marne",
+   "tropicalKm2": 0,
+   "temperateKm2": 662.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3060,
+   "key": "fra-dordogne",
+   "tropicalKm2": 0,
+   "temperateKm2": 2274.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3061,
+   "key": "fra-rhone",
+   "tropicalKm2": 0,
+   "temperateKm2": 545.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3062,
+   "key": "fra-vosges",
+   "tropicalKm2": 0,
+   "temperateKm2": 2388.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3063,
+   "key": "fra-ardeche",
+   "tropicalKm2": 0,
+   "temperateKm2": 2629.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3064,
+   "key": "fra-loire",
+   "tropicalKm2": 0,
+   "temperateKm2": 1281.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3065,
+   "key": "fra-puy-de-dome",
+   "tropicalKm2": 0,
+   "temperateKm2": 1852.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3066,
+   "key": "fra-allier",
+   "tropicalKm2": 0,
+   "temperateKm2": 274.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3067,
+   "key": "fra-loiret",
+   "tropicalKm2": 0,
+   "temperateKm2": 937.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3068,
+   "key": "fra-maine-et-loire",
+   "tropicalKm2": 0,
+   "temperateKm2": 190.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3069,
+   "key": "fra-aube",
+   "tropicalKm2": 0,
+   "temperateKm2": 674.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3070,
+   "key": "fra-paris",
+   "tropicalKm2": 0,
+   "temperateKm2": 112.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3071,
+   "key": "fra-hauts-de-seine",
+   "tropicalKm2": 0,
+   "temperateKm2": 87.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3072,
+   "key": "fra-seine-saint-denis",
+   "tropicalKm2": 0,
+   "temperateKm2": 191.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3073,
+   "key": "fra-val-d-oise",
+   "tropicalKm2": 0,
+   "temperateKm2": 496,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3074,
+   "key": "fra-yvelines",
+   "tropicalKm2": 0,
+   "temperateKm2": 1059.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3075,
+   "key": "fra-charente",
+   "tropicalKm2": 0,
+   "temperateKm2": 145.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3076,
+   "key": "fra-cher",
+   "tropicalKm2": 0,
+   "temperateKm2": 518.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3077,
+   "key": "fra-eure-et-loir",
+   "tropicalKm2": 0,
+   "temperateKm2": 128.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3078,
+   "key": "fra-haute-loire",
+   "tropicalKm2": 0,
+   "temperateKm2": 1681,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3079,
+   "key": "fra-cantal",
+   "tropicalKm2": 0,
+   "temperateKm2": 702.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3080,
+   "key": "fra-lot-et-garonne",
+   "tropicalKm2": 0,
+   "temperateKm2": 696.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3081,
+   "key": "fra-lozere",
+   "tropicalKm2": 0,
+   "temperateKm2": 2151.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3082,
+   "key": "fra-nievre",
+   "tropicalKm2": 0,
+   "temperateKm2": 770.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3083,
+   "key": "fra-cote-d-or",
+   "tropicalKm2": 0,
+   "temperateKm2": 1586.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3084,
+   "key": "fra-oise",
+   "tropicalKm2": 0,
+   "temperateKm2": 554.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3085,
+   "key": "fra-orne",
+   "tropicalKm2": 0,
+   "temperateKm2": 204.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3086,
+   "key": "fra-haute-saone",
+   "tropicalKm2": 0,
+   "temperateKm2": 1002.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3087,
+   "key": "fra-saone-et-loire",
+   "tropicalKm2": 0,
+   "temperateKm2": 319.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3088,
+   "key": "fra-deux-sevres",
+   "tropicalKm2": 0,
+   "temperateKm2": 38.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3089,
+   "key": "fra-vienne",
+   "tropicalKm2": 0,
+   "temperateKm2": 89,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3090,
+   "key": "fra-yonne",
+   "tropicalKm2": 0,
+   "temperateKm2": 528.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3091,
+   "key": "fra-essonne",
+   "tropicalKm2": 0,
+   "temperateKm2": 689.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3092,
+   "key": "fra-seien-et-marne",
+   "tropicalKm2": 0,
+   "temperateKm2": 846.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 3093,
+   "key": "fra-val-de-marne",
+   "tropicalKm2": 0,
+   "temperateKm2": 187.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4001,
+   "key": "rus-fin-uusimaa",
+   "tropicalKm2": 0,
+   "temperateKm2": 5871.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4002,
+   "key": "rus-fin-finland-proper",
+   "tropicalKm2": 0,
+   "temperateKm2": 7636.3,
+   "borealKm2": 4652.1
+  },
+  {
+   "provinceId": 4003,
+   "key": "rus-fin-hame",
+   "tropicalKm2": 0,
+   "temperateKm2": 5251.6,
+   "borealKm2": 28314.3
+  },
+  {
+   "provinceId": 4004,
+   "key": "rus-fin-kymi",
+   "tropicalKm2": 0,
+   "temperateKm2": 8366.7,
+   "borealKm2": 314.3
+  },
+  {
+   "provinceId": 4005,
+   "key": "rus-fin-mikkeli",
+   "tropicalKm2": 0,
+   "temperateKm2": 7419.4,
+   "borealKm2": 4750
+  },
+  {
+   "provinceId": 4006,
+   "key": "rus-fin-kuopio",
+   "tropicalKm2": 0,
+   "temperateKm2": 2735,
+   "borealKm2": 27280.2
+  },
+  {
+   "provinceId": 4007,
+   "key": "rus-fin-vaasa",
+   "tropicalKm2": 0,
+   "temperateKm2": 422.2,
+   "borealKm2": 20961.6
+  },
+  {
+   "provinceId": 4008,
+   "key": "rus-fin-oulu",
+   "tropicalKm2": 0,
+   "temperateKm2": 1908.1,
+   "borealKm2": 52192.3
+  },
+  {
+   "provinceId": 4009,
+   "key": "rus-fin-lapland",
+   "tropicalKm2": 0,
+   "temperateKm2": 17222.8,
+   "borealKm2": 69320
+  },
+  {
+   "provinceId": 4010,
+   "key": "rus-fin-aland",
+   "tropicalKm2": 0,
+   "temperateKm2": 288.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4011,
+   "key": "rus-est-harju",
+   "tropicalKm2": 0,
+   "temperateKm2": 1722,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4012,
+   "key": "rus-est-jarva",
+   "tropicalKm2": 0,
+   "temperateKm2": 448.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4013,
+   "key": "rus-est-viru",
+   "tropicalKm2": 0,
+   "temperateKm2": 1312.6,
+   "borealKm2": 80.8
+  },
+  {
+   "provinceId": 4014,
+   "key": "rus-est-tartu",
+   "tropicalKm2": 0,
+   "temperateKm2": 473.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4015,
+   "key": "rus-est-voru",
+   "tropicalKm2": 0,
+   "temperateKm2": 1109.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4016,
+   "key": "rus-est-viljandi",
+   "tropicalKm2": 0,
+   "temperateKm2": 1783.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4017,
+   "key": "rus-est-parnu",
+   "tropicalKm2": 0,
+   "temperateKm2": 1371.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4018,
+   "key": "rus-est-laane",
+   "tropicalKm2": 0,
+   "temperateKm2": 395.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4019,
+   "key": "rus-est-saare",
+   "tropicalKm2": 0,
+   "temperateKm2": 909.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4020,
+   "key": "rus-lva-riga",
+   "tropicalKm2": 0,
+   "temperateKm2": 5173.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4021,
+   "key": "rus-lva-vidzeme",
+   "tropicalKm2": 0,
+   "temperateKm2": 11748.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4022,
+   "key": "rus-lva-kurzeme",
+   "tropicalKm2": 0,
+   "temperateKm2": 7041.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4023,
+   "key": "rus-lva-zemgale",
+   "tropicalKm2": 0,
+   "temperateKm2": 4437.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4024,
+   "key": "rus-lva-latgale",
+   "tropicalKm2": 0,
+   "temperateKm2": 12239.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4025,
+   "key": "rus-ltu-vilnius",
+   "tropicalKm2": 0,
+   "temperateKm2": 6338.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4026,
+   "key": "rus-ltu-kaunas",
+   "tropicalKm2": 0,
+   "temperateKm2": 4197,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4027,
+   "key": "rus-ltu-siauliai",
+   "tropicalKm2": 0,
+   "temperateKm2": 4768.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4028,
+   "key": "rus-ltu-panevezys",
+   "tropicalKm2": 0,
+   "temperateKm2": 4501.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4029,
+   "key": "rus-ltu-alytus",
+   "tropicalKm2": 0,
+   "temperateKm2": 4058.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4030,
+   "key": "rus-ltu-marijampole",
+   "tropicalKm2": 0,
+   "temperateKm2": 2180.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4031,
+   "key": "rus-ltu-taurage",
+   "tropicalKm2": 0,
+   "temperateKm2": 2111.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4032,
+   "key": "rus-ltu-telsiai",
+   "tropicalKm2": 0,
+   "temperateKm2": 3407.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4033,
+   "key": "rus-ltu-utena",
+   "tropicalKm2": 0,
+   "temperateKm2": 4581.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4034,
+   "key": "rus-pol-warsaw",
+   "tropicalKm2": 0,
+   "temperateKm2": 1460,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4035,
+   "key": "rus-pol-odz",
+   "tropicalKm2": 0,
+   "temperateKm2": 1051.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4036,
+   "key": "rus-pol-lublin",
+   "tropicalKm2": 0,
+   "temperateKm2": 1003.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4037,
+   "key": "rus-pol-siedlce",
+   "tropicalKm2": 0,
+   "temperateKm2": 1760.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4038,
+   "key": "rus-pol-kielce",
+   "tropicalKm2": 0,
+   "temperateKm2": 1172.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4039,
+   "key": "rus-pol-kalisz",
+   "tropicalKm2": 0,
+   "temperateKm2": 336.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4040,
+   "key": "rus-blr-brest",
+   "tropicalKm2": 0,
+   "temperateKm2": 16900.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4041,
+   "key": "rus-blr-grodno",
+   "tropicalKm2": 0,
+   "temperateKm2": 13461.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4042,
+   "key": "rus-blr-minsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 23014.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4043,
+   "key": "rus-blr-mogilev",
+   "tropicalKm2": 0,
+   "temperateKm2": 17269.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4044,
+   "key": "rus-blr-gomel",
+   "tropicalKm2": 0,
+   "temperateKm2": 26059.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4045,
+   "key": "rus-blr-vitebsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 25709.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4046,
+   "key": "rus-ukr-kiev",
+   "tropicalKm2": 0,
+   "temperateKm2": 28088,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4047,
+   "key": "rus-ukr-volhynia",
+   "tropicalKm2": 0,
+   "temperateKm2": 24147.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4048,
+   "key": "rus-ukr-podolia",
+   "tropicalKm2": 0,
+   "temperateKm2": 19655.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4050,
+   "key": "rus-ukr-yekaterinoslav",
+   "tropicalKm2": 0,
+   "temperateKm2": 1222.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4051,
+   "key": "rus-ukr-taurida",
+   "tropicalKm2": 0,
+   "temperateKm2": 5227.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4052,
+   "key": "rus-ukr-kharkov",
+   "tropicalKm2": 0,
+   "temperateKm2": 11709.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4053,
+   "key": "rus-ukr-poltava",
+   "tropicalKm2": 0,
+   "temperateKm2": 7938.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4054,
+   "key": "rus-ukr-chernigov",
+   "tropicalKm2": 0,
+   "temperateKm2": 15250,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4055,
+   "key": "rus-ukr-donetsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 58.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4056,
+   "key": "rus-ukr-odessa",
+   "tropicalKm2": 0,
+   "temperateKm2": 1626.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4057,
+   "key": "rus-mda-kishinev",
+   "tropicalKm2": 0,
+   "temperateKm2": 8740.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4060,
+   "key": "rus-moscow",
+   "tropicalKm2": 0,
+   "temperateKm2": 34827.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4061,
+   "key": "rus-saint-petersburg",
+   "tropicalKm2": 0,
+   "temperateKm2": 39890,
+   "borealKm2": 25021.7
+  },
+  {
+   "provinceId": 4062,
+   "key": "rus-novgorod",
+   "tropicalKm2": 0,
+   "temperateKm2": 43410.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4063,
+   "key": "rus-pskov",
+   "tropicalKm2": 0,
+   "temperateKm2": 38314.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4064,
+   "key": "rus-smolensk",
+   "tropicalKm2": 0,
+   "temperateKm2": 22248.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4065,
+   "key": "rus-tver",
+   "tropicalKm2": 0,
+   "temperateKm2": 63166.6,
+   "borealKm2": 572.7
+  },
+  {
+   "provinceId": 4066,
+   "key": "rus-yaroslavl",
+   "tropicalKm2": 0,
+   "temperateKm2": 22103.7,
+   "borealKm2": 1514.1
+  },
+  {
+   "provinceId": 4067,
+   "key": "rus-kostroma",
+   "tropicalKm2": 0,
+   "temperateKm2": 41715.1,
+   "borealKm2": 10879.9
+  },
+  {
+   "provinceId": 4068,
+   "key": "rus-vladimir",
+   "tropicalKm2": 0,
+   "temperateKm2": 22846.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4069,
+   "key": "rus-ivanovo",
+   "tropicalKm2": 0,
+   "temperateKm2": 16228.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4070,
+   "key": "rus-nizhny-novgorod",
+   "tropicalKm2": 0,
+   "temperateKm2": 49459,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4071,
+   "key": "rus-ryazan",
+   "tropicalKm2": 0,
+   "temperateKm2": 11452.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4072,
+   "key": "rus-tula",
+   "tropicalKm2": 0,
+   "temperateKm2": 9859.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4073,
+   "key": "rus-kaluga",
+   "tropicalKm2": 0,
+   "temperateKm2": 17826.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4074,
+   "key": "rus-bryansk",
+   "tropicalKm2": 0,
+   "temperateKm2": 18884.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4075,
+   "key": "rus-orel",
+   "tropicalKm2": 0,
+   "temperateKm2": 5192.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4076,
+   "key": "rus-kursk",
+   "tropicalKm2": 0,
+   "temperateKm2": 2004,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4077,
+   "key": "rus-belgorod",
+   "tropicalKm2": 0,
+   "temperateKm2": 1423.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4079,
+   "key": "rus-tsaritsyn",
+   "tropicalKm2": 0,
+   "temperateKm2": 37.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4080,
+   "key": "rus-kurgan",
+   "tropicalKm2": 0,
+   "temperateKm2": 7343,
+   "borealKm2": 5558.9
+  },
+  {
+   "provinceId": 4081,
+   "key": "rus-lipetsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 774.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4082,
+   "key": "rus-tambov",
+   "tropicalKm2": 0,
+   "temperateKm2": 762.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4083,
+   "key": "rus-penza",
+   "tropicalKm2": 0,
+   "temperateKm2": 7831.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4085,
+   "key": "rus-samara",
+   "tropicalKm2": 0,
+   "temperateKm2": 1597.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4086,
+   "key": "rus-simbirsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 2312.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4087,
+   "key": "rus-kazan",
+   "tropicalKm2": 0,
+   "temperateKm2": 880,
+   "borealKm2": 155.7
+  },
+  {
+   "provinceId": 4088,
+   "key": "rus-chuvash",
+   "tropicalKm2": 0,
+   "temperateKm2": 8669.4,
+   "borealKm2": 211.2
+  },
+  {
+   "provinceId": 4089,
+   "key": "rus-mari-el",
+   "tropicalKm2": 0,
+   "temperateKm2": 14087.1,
+   "borealKm2": 2519.9
+  },
+  {
+   "provinceId": 4090,
+   "key": "rus-mordovia",
+   "tropicalKm2": 0,
+   "temperateKm2": 8478.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4091,
+   "key": "rus-udmurt",
+   "tropicalKm2": 0,
+   "temperateKm2": 30511.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 4092,
+   "key": "rus-vyatka",
+   "tropicalKm2": 0,
+   "temperateKm2": 64644.1,
+   "borealKm2": 30991.3
+  },
+  {
+   "provinceId": 4093,
+   "key": "rus-perm",
+   "tropicalKm2": 0,
+   "temperateKm2": 70355.8,
+   "borealKm2": 72926.3
+  },
+  {
+   "provinceId": 4094,
+   "key": "rus-vologda",
+   "tropicalKm2": 0,
+   "temperateKm2": 33495.1,
+   "borealKm2": 90454.8
+  },
+  {
+   "provinceId": 4095,
+   "key": "rus-arkhangelsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 115015.9,
+   "borealKm2": 293936
+  },
+  {
+   "provinceId": 4096,
+   "key": "rus-olonets",
+   "tropicalKm2": 0,
+   "temperateKm2": 1274.9,
+   "borealKm2": 133111.7
+  },
+  {
+   "provinceId": 4097,
+   "key": "rus-ust-sysolsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 122700.6,
+   "borealKm2": 278315.4
+  },
+  {
+   "provinceId": 4098,
+   "key": "rus-orenburg",
+   "tropicalKm2": 0,
+   "temperateKm2": 415.5,
+   "borealKm2": 231
+  },
+  {
+   "provinceId": 4099,
+   "key": "rus-ufa",
+   "tropicalKm2": 0,
+   "temperateKm2": 58693.9,
+   "borealKm2": 4308.6
+  },
+  {
+   "provinceId": 4100,
+   "key": "rus-yekaterinburg",
+   "tropicalKm2": 0,
+   "temperateKm2": 118753.6,
+   "borealKm2": 62252.5
+  },
+  {
+   "provinceId": 4101,
+   "key": "rus-chelyabinsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 17697.6,
+   "borealKm2": 8323.8
+  },
+  {
+   "provinceId": 4103,
+   "key": "rus-kuban",
+   "tropicalKm2": 0,
+   "temperateKm2": 22832.7,
+   "borealKm2": 544.4
+  },
+  {
+   "provinceId": 4104,
+   "key": "rus-stavropol",
+   "tropicalKm2": 0,
+   "temperateKm2": 3627.6,
+   "borealKm2": 2281.3
+  },
+  {
+   "provinceId": 4105,
+   "key": "rus-terek",
+   "tropicalKm2": 0,
+   "temperateKm2": 7837.6,
+   "borealKm2": 3188.2
+  },
+  {
+   "provinceId": 4106,
+   "key": "rus-dagestan",
+   "tropicalKm2": 0,
+   "temperateKm2": 6386,
+   "borealKm2": 2551.4
+  },
+  {
+   "provinceId": 4109,
+   "key": "rus-alexandrovsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 12153,
+   "borealKm2": 86596.8
+  },
+  {
+   "provinceId": 6001,
+   "key": "ita-piedmont",
+   "tropicalKm2": 0,
+   "temperateKm2": 6701.1,
+   "borealKm2": 505.2
+  },
+  {
+   "provinceId": 6002,
+   "key": "ita-aosta",
+   "tropicalKm2": 0,
+   "temperateKm2": 378.1,
+   "borealKm2": 311.3
+  },
+  {
+   "provinceId": 6003,
+   "key": "ita-liguria",
+   "tropicalKm2": 0,
+   "temperateKm2": 3694.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6004,
+   "key": "ita-lombardy",
+   "tropicalKm2": 0,
+   "temperateKm2": 4823.9,
+   "borealKm2": 893.9
+  },
+  {
+   "provinceId": 6005,
+   "key": "ita-venetia",
+   "tropicalKm2": 0,
+   "temperateKm2": 3381.5,
+   "borealKm2": 692.2
+  },
+  {
+   "provinceId": 6006,
+   "key": "ita-emilia-romagna",
+   "tropicalKm2": 0,
+   "temperateKm2": 5026.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6007,
+   "key": "ita-tuscany",
+   "tropicalKm2": 0,
+   "temperateKm2": 9145.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6008,
+   "key": "ita-umbria",
+   "tropicalKm2": 0,
+   "temperateKm2": 2193.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6009,
+   "key": "ita-marche",
+   "tropicalKm2": 0,
+   "temperateKm2": 1508.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6010,
+   "key": "ita-lazio",
+   "tropicalKm2": 0,
+   "temperateKm2": 3300.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6011,
+   "key": "ita-abruzzo",
+   "tropicalKm2": 0,
+   "temperateKm2": 3801,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6012,
+   "key": "ita-molise",
+   "tropicalKm2": 0,
+   "temperateKm2": 593.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6013,
+   "key": "ita-campania",
+   "tropicalKm2": 0,
+   "temperateKm2": 3371.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6014,
+   "key": "ita-apulia",
+   "tropicalKm2": 0,
+   "temperateKm2": 1162.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6015,
+   "key": "ita-basilicata",
+   "tropicalKm2": 0,
+   "temperateKm2": 2049.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6016,
+   "key": "ita-calabria",
+   "tropicalKm2": 0,
+   "temperateKm2": 5733.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6017,
+   "key": "ita-sicily",
+   "tropicalKm2": 0,
+   "temperateKm2": 954.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6018,
+   "key": "ita-sardinia",
+   "tropicalKm2": 0.1,
+   "temperateKm2": 1519.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 6019,
+   "key": "ita-friuli",
+   "tropicalKm2": 0,
+   "temperateKm2": 2489.2,
+   "borealKm2": 73.8
+  },
+  {
+   "provinceId": 7001,
+   "key": "esp-navarra",
+   "tropicalKm2": 0,
+   "temperateKm2": 1874.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7002,
+   "key": "esp-gipuzkoa",
+   "tropicalKm2": 0,
+   "temperateKm2": 1616,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7003,
+   "key": "esp-huesca",
+   "tropicalKm2": 0,
+   "temperateKm2": 3774.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7004,
+   "key": "esp-lerida",
+   "tropicalKm2": 0,
+   "temperateKm2": 2625,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7005,
+   "key": "esp-gerona",
+   "tropicalKm2": 0,
+   "temperateKm2": 2445.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7006,
+   "key": "esp-badajoz",
+   "tropicalKm2": 0,
+   "temperateKm2": 539.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7007,
+   "key": "esp-cadiz",
+   "tropicalKm2": 36.3,
+   "temperateKm2": 483,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7008,
+   "key": "esp-orense",
+   "tropicalKm2": 0,
+   "temperateKm2": 410.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7009,
+   "key": "esp-caceres",
+   "tropicalKm2": 0,
+   "temperateKm2": 529.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7010,
+   "key": "esp-salamanca",
+   "tropicalKm2": 0,
+   "temperateKm2": 2726.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7011,
+   "key": "esp-zamora",
+   "tropicalKm2": 0,
+   "temperateKm2": 2310.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7013,
+   "key": "esp-huelva",
+   "tropicalKm2": 0,
+   "temperateKm2": 1242.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7014,
+   "key": "esp-barcelona",
+   "tropicalKm2": 0,
+   "temperateKm2": 1764.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7015,
+   "key": "esp-tarragona",
+   "tropicalKm2": 0,
+   "temperateKm2": 14.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7016,
+   "key": "esp-castellon",
+   "tropicalKm2": 306.3,
+   "temperateKm2": 996,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7017,
+   "key": "esp-valencia",
+   "tropicalKm2": 1915.8,
+   "temperateKm2": 124.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7023,
+   "key": "esp-sevilla",
+   "tropicalKm2": 0,
+   "temperateKm2": 1011.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7024,
+   "key": "esp-la-coruna",
+   "tropicalKm2": 0,
+   "temperateKm2": 343.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7025,
+   "key": "esp-lugo",
+   "tropicalKm2": 0,
+   "temperateKm2": 1302.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7026,
+   "key": "esp-asturias",
+   "tropicalKm2": 0,
+   "temperateKm2": 4522,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7027,
+   "key": "esp-cantabria",
+   "tropicalKm2": 0,
+   "temperateKm2": 143.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7028,
+   "key": "esp-bizkaia",
+   "tropicalKm2": 0,
+   "temperateKm2": 1375.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7032,
+   "key": "esp-zaragoza",
+   "tropicalKm2": 0,
+   "temperateKm2": 702.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7033,
+   "key": "esp-la-rioja",
+   "tropicalKm2": 0,
+   "temperateKm2": 1968.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7034,
+   "key": "esp-alava",
+   "tropicalKm2": 0,
+   "temperateKm2": 1627.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7036,
+   "key": "esp-teruel",
+   "tropicalKm2": 207,
+   "temperateKm2": 1354.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7037,
+   "key": "esp-cuenca",
+   "tropicalKm2": 3410.7,
+   "temperateKm2": 1022,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7039,
+   "key": "esp-leon",
+   "tropicalKm2": 0,
+   "temperateKm2": 2261.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7040,
+   "key": "esp-soria",
+   "tropicalKm2": 0,
+   "temperateKm2": 2485.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7041,
+   "key": "esp-burgos",
+   "tropicalKm2": 0,
+   "temperateKm2": 37.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7044,
+   "key": "esp-ciudad-real",
+   "tropicalKm2": 0,
+   "temperateKm2": 2391.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7045,
+   "key": "esp-cordoba",
+   "tropicalKm2": 0,
+   "temperateKm2": 782.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7046,
+   "key": "esp-guadalajara",
+   "tropicalKm2": 542.6,
+   "temperateKm2": 2664.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7047,
+   "key": "esp-jaen",
+   "tropicalKm2": 0,
+   "temperateKm2": 71.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7048,
+   "key": "esp-madrid",
+   "tropicalKm2": 1751,
+   "temperateKm2": 52.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 7049,
+   "key": "esp-segovia",
+   "tropicalKm2": 54.2,
+   "temperateKm2": 1152.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8001,
+   "key": "prt-evora",
+   "tropicalKm2": 0,
+   "temperateKm2": 936,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8003,
+   "key": "prt-viana-do-castelo",
+   "tropicalKm2": 0,
+   "temperateKm2": 191.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8004,
+   "key": "prt-castelo-branco",
+   "tropicalKm2": 0,
+   "temperateKm2": 488.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8005,
+   "key": "prt-guarda",
+   "tropicalKm2": 0,
+   "temperateKm2": 1560.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8006,
+   "key": "prt-braganca",
+   "tropicalKm2": 0,
+   "temperateKm2": 3293.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8007,
+   "key": "prt-vila-real",
+   "tropicalKm2": 0,
+   "temperateKm2": 1361.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8008,
+   "key": "prt-braga",
+   "tropicalKm2": 0,
+   "temperateKm2": 273,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8010,
+   "key": "prt-beja",
+   "tropicalKm2": 0,
+   "temperateKm2": 1131.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8016,
+   "key": "prt-aveiro",
+   "tropicalKm2": 0,
+   "temperateKm2": 256.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8017,
+   "key": "prt-porto",
+   "tropicalKm2": 0,
+   "temperateKm2": 379.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 8020,
+   "key": "prt-viseu",
+   "tropicalKm2": 0,
+   "temperateKm2": 978.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9001,
+   "key": "nld-groningen",
+   "tropicalKm2": 0,
+   "temperateKm2": 389,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9002,
+   "key": "nld-drenthe",
+   "tropicalKm2": 0,
+   "temperateKm2": 857.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9003,
+   "key": "nld-overijssel",
+   "tropicalKm2": 0,
+   "temperateKm2": 1051,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9004,
+   "key": "nld-gelderland",
+   "tropicalKm2": 0,
+   "temperateKm2": 1973.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9005,
+   "key": "nld-limburg",
+   "tropicalKm2": 0,
+   "temperateKm2": 639.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9006,
+   "key": "nld-zeeland",
+   "tropicalKm2": 0,
+   "temperateKm2": 211.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9007,
+   "key": "nld-noord-brabant",
+   "tropicalKm2": 0,
+   "temperateKm2": 1880.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9008,
+   "key": "nld-zuid-holland",
+   "tropicalKm2": 0,
+   "temperateKm2": 897.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9009,
+   "key": "nld-noord-holland",
+   "tropicalKm2": 0,
+   "temperateKm2": 752.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9010,
+   "key": "nld-friesland",
+   "tropicalKm2": 0,
+   "temperateKm2": 599.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9011,
+   "key": "nld-flevoland",
+   "tropicalKm2": 0,
+   "temperateKm2": 737.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 9012,
+   "key": "nld-utrecht",
+   "tropicalKm2": 0,
+   "temperateKm2": 579.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10001,
+   "key": "bel-west-flanders",
+   "tropicalKm2": 0,
+   "temperateKm2": 212.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10002,
+   "key": "bel-hainaut",
+   "tropicalKm2": 0,
+   "temperateKm2": 748.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10003,
+   "key": "bel-namur",
+   "tropicalKm2": 0,
+   "temperateKm2": 482.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10004,
+   "key": "bel-luxembourg",
+   "tropicalKm2": 0,
+   "temperateKm2": 1686,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10005,
+   "key": "bel-liege",
+   "tropicalKm2": 0,
+   "temperateKm2": 323.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10006,
+   "key": "bel-east-flanders",
+   "tropicalKm2": 0,
+   "temperateKm2": 344.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10007,
+   "key": "bel-antwerp",
+   "tropicalKm2": 0,
+   "temperateKm2": 283.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10008,
+   "key": "bel-limburg",
+   "tropicalKm2": 0,
+   "temperateKm2": 69.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10009,
+   "key": "bel-brussels",
+   "tropicalKm2": 0,
+   "temperateKm2": 145.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10010,
+   "key": "bel-flemish-brabant",
+   "tropicalKm2": 0,
+   "temperateKm2": 175.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 10011,
+   "key": "bel-walloon-brabant",
+   "tropicalKm2": 0,
+   "temperateKm2": 97.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11001,
+   "key": "che-valais",
+   "tropicalKm2": 0,
+   "temperateKm2": 999.7,
+   "borealKm2": 741.9
+  },
+  {
+   "provinceId": 11002,
+   "key": "che-ticino",
+   "tropicalKm2": 0,
+   "temperateKm2": 1026.9,
+   "borealKm2": 572
+  },
+  {
+   "provinceId": 11003,
+   "key": "che-graubunden",
+   "tropicalKm2": 0,
+   "temperateKm2": 276.2,
+   "borealKm2": 2582.5
+  },
+  {
+   "provinceId": 11004,
+   "key": "che-schaffhausen",
+   "tropicalKm2": 0,
+   "temperateKm2": 126,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11005,
+   "key": "che-thurgau",
+   "tropicalKm2": 0,
+   "temperateKm2": 239,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11006,
+   "key": "che-zurich",
+   "tropicalKm2": 0,
+   "temperateKm2": 981.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11007,
+   "key": "che-aargau",
+   "tropicalKm2": 0,
+   "temperateKm2": 775.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11008,
+   "key": "che-basel-stadt",
+   "tropicalKm2": 0,
+   "temperateKm2": 36.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11009,
+   "key": "che-basel-landschaft",
+   "tropicalKm2": 0,
+   "temperateKm2": 233.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11010,
+   "key": "che-sankt-gallen",
+   "tropicalKm2": 0,
+   "temperateKm2": 604,
+   "borealKm2": 213.5
+  },
+  {
+   "provinceId": 11011,
+   "key": "che-solothurn",
+   "tropicalKm2": 0,
+   "temperateKm2": 522,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11012,
+   "key": "che-jura",
+   "tropicalKm2": 0,
+   "temperateKm2": 355.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11013,
+   "key": "che-geneve",
+   "tropicalKm2": 0,
+   "temperateKm2": 76.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11014,
+   "key": "che-vaud",
+   "tropicalKm2": 0,
+   "temperateKm2": 1399.6,
+   "borealKm2": 214.3
+  },
+  {
+   "provinceId": 11015,
+   "key": "che-neuchatel",
+   "tropicalKm2": 0,
+   "temperateKm2": 424.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11016,
+   "key": "che-bern",
+   "tropicalKm2": 0,
+   "temperateKm2": 2042,
+   "borealKm2": 772.2
+  },
+  {
+   "provinceId": 11017,
+   "key": "che-lucerne",
+   "tropicalKm2": 0,
+   "temperateKm2": 657.8,
+   "borealKm2": 39.2
+  },
+  {
+   "provinceId": 11018,
+   "key": "che-zug",
+   "tropicalKm2": 0,
+   "temperateKm2": 148.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11019,
+   "key": "che-uri",
+   "tropicalKm2": 0,
+   "temperateKm2": 71.6,
+   "borealKm2": 310.7
+  },
+  {
+   "provinceId": 11020,
+   "key": "che-schwyz",
+   "tropicalKm2": 0,
+   "temperateKm2": 428.4,
+   "borealKm2": 90.1
+  },
+  {
+   "provinceId": 11021,
+   "key": "che-glarus",
+   "tropicalKm2": 0,
+   "temperateKm2": 91.2,
+   "borealKm2": 187.8
+  },
+  {
+   "provinceId": 11022,
+   "key": "che-nidwalden",
+   "tropicalKm2": 0,
+   "temperateKm2": 59.8,
+   "borealKm2": 114.8
+  },
+  {
+   "provinceId": 11023,
+   "key": "che-fribourg",
+   "tropicalKm2": 0,
+   "temperateKm2": 605.7,
+   "borealKm2": 36.4
+  },
+  {
+   "provinceId": 11024,
+   "key": "che-obwalden",
+   "tropicalKm2": 0,
+   "temperateKm2": 121.3,
+   "borealKm2": 209
+  },
+  {
+   "provinceId": 11025,
+   "key": "che-appenzell-ausserrhoden",
+   "tropicalKm2": 0,
+   "temperateKm2": 141.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 11026,
+   "key": "che-appenzell-innerrhoden",
+   "tropicalKm2": 0,
+   "temperateKm2": 67.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 12001,
+   "key": "swe-norrbotten",
+   "tropicalKm2": 0,
+   "temperateKm2": 21287.1,
+   "borealKm2": 62304.8
+  },
+  {
+   "provinceId": 12002,
+   "key": "swe-vasterbotten",
+   "tropicalKm2": 0,
+   "temperateKm2": 7295.7,
+   "borealKm2": 44079.5
+  },
+  {
+   "provinceId": 12003,
+   "key": "swe-jamtland",
+   "tropicalKm2": 0,
+   "temperateKm2": 7819.4,
+   "borealKm2": 39188.8
+  },
+  {
+   "provinceId": 12004,
+   "key": "swe-dalarna",
+   "tropicalKm2": 0,
+   "temperateKm2": 957.3,
+   "borealKm2": 26757.8
+  },
+  {
+   "provinceId": 12005,
+   "key": "swe-varmland",
+   "tropicalKm2": 0,
+   "temperateKm2": 7098.4,
+   "borealKm2": 8893.1
+  },
+  {
+   "provinceId": 12006,
+   "key": "swe-vastra-gotaland",
+   "tropicalKm2": 0,
+   "temperateKm2": 18148.3,
+   "borealKm2": 278.5
+  },
+  {
+   "provinceId": 12007,
+   "key": "swe-vasternorrland",
+   "tropicalKm2": 0,
+   "temperateKm2": 188.8,
+   "borealKm2": 20367.4
+  },
+  {
+   "provinceId": 12008,
+   "key": "swe-gavleborg",
+   "tropicalKm2": 0,
+   "temperateKm2": 2518.7,
+   "borealKm2": 14103.5
+  },
+  {
+   "provinceId": 12009,
+   "key": "swe-uppsala",
+   "tropicalKm2": 0,
+   "temperateKm2": 4523.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 12010,
+   "key": "swe-stockholm",
+   "tropicalKm2": 0,
+   "temperateKm2": 3849.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 12011,
+   "key": "swe-sodermanland",
+   "tropicalKm2": 0,
+   "temperateKm2": 3902.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 12012,
+   "key": "swe-ostergotland",
+   "tropicalKm2": 0,
+   "temperateKm2": 7408.2,
+   "borealKm2": 29.6
+  },
+  {
+   "provinceId": 12013,
+   "key": "swe-kalmar",
+   "tropicalKm2": 0,
+   "temperateKm2": 7965.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 12014,
+   "key": "swe-blekinge",
+   "tropicalKm2": 0,
+   "temperateKm2": 2452.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 12015,
+   "key": "swe-skane",
+   "tropicalKm2": 0,
+   "temperateKm2": 5623.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 12016,
+   "key": "swe-halland",
+   "tropicalKm2": 0,
+   "temperateKm2": 4164.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 12017,
+   "key": "swe-gotland",
+   "tropicalKm2": 0,
+   "temperateKm2": 1303.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 12018,
+   "key": "swe-vastmanland",
+   "tropicalKm2": 0,
+   "temperateKm2": 5279.3,
+   "borealKm2": 171.5
+  },
+  {
+   "provinceId": 12019,
+   "key": "swe-jonkoping",
+   "tropicalKm2": 0,
+   "temperateKm2": 6352.3,
+   "borealKm2": 2806.6
+  },
+  {
+   "provinceId": 12020,
+   "key": "swe-orebro",
+   "tropicalKm2": 0,
+   "temperateKm2": 4806.8,
+   "borealKm2": 2543.7
+  },
+  {
+   "provinceId": 12021,
+   "key": "swe-kronoberg",
+   "tropicalKm2": 0,
+   "temperateKm2": 7586.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 13001,
+   "key": "nor-troms",
+   "tropicalKm2": 0,
+   "temperateKm2": 11841.6,
+   "borealKm2": 228.5
+  },
+  {
+   "provinceId": 13002,
+   "key": "nor-nordland",
+   "tropicalKm2": 0,
+   "temperateKm2": 10239.8,
+   "borealKm2": 4365.3
+  },
+  {
+   "provinceId": 13003,
+   "key": "nor-nord-tr-ndelag",
+   "tropicalKm2": 0,
+   "temperateKm2": 8245.8,
+   "borealKm2": 9574.4
+  },
+  {
+   "provinceId": 13004,
+   "key": "nor-s-r-tr-ndelag",
+   "tropicalKm2": 0,
+   "temperateKm2": 5885.7,
+   "borealKm2": 10173.7
+  },
+  {
+   "provinceId": 13005,
+   "key": "nor-hedmark",
+   "tropicalKm2": 0,
+   "temperateKm2": 4867.5,
+   "borealKm2": 19914.9
+  },
+  {
+   "provinceId": 13006,
+   "key": "nor-akershus",
+   "tropicalKm2": 0,
+   "temperateKm2": 1357.8,
+   "borealKm2": 2538.2
+  },
+  {
+   "provinceId": 13007,
+   "key": "nor-stfold",
+   "tropicalKm2": 0,
+   "temperateKm2": 2946.4,
+   "borealKm2": 75.4
+  },
+  {
+   "provinceId": 13008,
+   "key": "nor-finnmark",
+   "tropicalKm2": 0,
+   "temperateKm2": 27699.6,
+   "borealKm2": 2288.8
+  },
+  {
+   "provinceId": 13009,
+   "key": "nor-oslo",
+   "tropicalKm2": 0,
+   "temperateKm2": 97.3,
+   "borealKm2": 358.5
+  },
+  {
+   "provinceId": 13010,
+   "key": "nor-buskerud",
+   "tropicalKm2": 0,
+   "temperateKm2": 3023,
+   "borealKm2": 10392.3
+  },
+  {
+   "provinceId": 13011,
+   "key": "nor-vestfold",
+   "tropicalKm2": 0,
+   "temperateKm2": 1513.4,
+   "borealKm2": 333.7
+  },
+  {
+   "provinceId": 13012,
+   "key": "nor-telemark",
+   "tropicalKm2": 0,
+   "temperateKm2": 3831.7,
+   "borealKm2": 9898.1
+  },
+  {
+   "provinceId": 13013,
+   "key": "nor-aust-agder",
+   "tropicalKm2": 0,
+   "temperateKm2": 2158.7,
+   "borealKm2": 5625.6
+  },
+  {
+   "provinceId": 13014,
+   "key": "nor-vest-agder",
+   "tropicalKm2": 0,
+   "temperateKm2": 2079.4,
+   "borealKm2": 4390.8
+  },
+  {
+   "provinceId": 13015,
+   "key": "nor-rogaland",
+   "tropicalKm2": 0,
+   "temperateKm2": 2026.9,
+   "borealKm2": 3611.6
+  },
+  {
+   "provinceId": 13016,
+   "key": "nor-hordaland",
+   "tropicalKm2": 0,
+   "temperateKm2": 3400.2,
+   "borealKm2": 2902.4
+  },
+  {
+   "provinceId": 13017,
+   "key": "nor-sogn-og-fjordane",
+   "tropicalKm2": 0,
+   "temperateKm2": 5290.1,
+   "borealKm2": 2910.1
+  },
+  {
+   "provinceId": 13018,
+   "key": "nor-m-re-og-romsdal",
+   "tropicalKm2": 0,
+   "temperateKm2": 1964.1,
+   "borealKm2": 6683.1
+  },
+  {
+   "provinceId": 13019,
+   "key": "nor-oppland",
+   "tropicalKm2": 0,
+   "temperateKm2": 5639.9,
+   "borealKm2": 12449.2
+  },
+  {
+   "provinceId": 14001,
+   "key": "dnk-north-jutland",
+   "tropicalKm2": 0,
+   "temperateKm2": 2656.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 14002,
+   "key": "dnk-central-jutland",
+   "tropicalKm2": 0,
+   "temperateKm2": 5277,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 14003,
+   "key": "dnk-south-jutland",
+   "tropicalKm2": 0,
+   "temperateKm2": 2717.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 14004,
+   "key": "dnk-copenhagen",
+   "tropicalKm2": 0,
+   "temperateKm2": 1041.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 14005,
+   "key": "dnk-zealand",
+   "tropicalKm2": 0,
+   "temperateKm2": 2126.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 14006,
+   "key": "isl-iceland",
+   "tropicalKm2": 0,
+   "temperateKm2": 23682.6,
+   "borealKm2": 1840.2
+  },
+  {
+   "provinceId": 15001,
+   "key": "grc-attica",
+   "tropicalKm2": 0,
+   "temperateKm2": 91.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 15002,
+   "key": "grc-peloponnese",
+   "tropicalKm2": 0,
+   "temperateKm2": 2811.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 15003,
+   "key": "grc-thessaly",
+   "tropicalKm2": 0,
+   "temperateKm2": 5400.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 15004,
+   "key": "grc-central-greece",
+   "tropicalKm2": 0,
+   "temperateKm2": 1384.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 15005,
+   "key": "grc-ionian-islands",
+   "tropicalKm2": 0,
+   "temperateKm2": 216.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 15008,
+   "key": "grc-epirus",
+   "tropicalKm2": 0,
+   "temperateKm2": 17.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 15009,
+   "key": "grc-macedonia",
+   "tropicalKm2": 0,
+   "temperateKm2": 62.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 16001,
+   "key": "srb-belgrade",
+   "tropicalKm2": 0,
+   "temperateKm2": 853.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 16002,
+   "key": "srb-sumadija",
+   "tropicalKm2": 0,
+   "temperateKm2": 2463.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 16003,
+   "key": "srb-podrinje",
+   "tropicalKm2": 0,
+   "temperateKm2": 10039.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 16004,
+   "key": "srb-nis",
+   "tropicalKm2": 0,
+   "temperateKm2": 12686.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 16005,
+   "key": "srb-timok",
+   "tropicalKm2": 0,
+   "temperateKm2": 2197.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 17001,
+   "key": "mnt-montenegro",
+   "tropicalKm2": 0,
+   "temperateKm2": 4204.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 17002,
+   "key": "mnt-brda",
+   "tropicalKm2": 0,
+   "temperateKm2": 1758.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 17003,
+   "key": "mnt-old-herzegovina",
+   "tropicalKm2": 0,
+   "temperateKm2": 217.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 18001,
+   "key": "rom-muntenia",
+   "tropicalKm2": 0,
+   "temperateKm2": 14901,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 18002,
+   "key": "rom-oltenia",
+   "tropicalKm2": 0,
+   "temperateKm2": 13069.9,
+   "borealKm2": 121
+  },
+  {
+   "provinceId": 18003,
+   "key": "rom-moldavia",
+   "tropicalKm2": 0,
+   "temperateKm2": 11796.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 18004,
+   "key": "rom-dobruja",
+   "tropicalKm2": 0,
+   "temperateKm2": 260.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 19001,
+   "key": "bgr-sofia",
+   "tropicalKm2": 63.9,
+   "temperateKm2": 15609.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 19002,
+   "key": "bgr-plovdiv",
+   "tropicalKm2": 0,
+   "temperateKm2": 8846,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 19003,
+   "key": "bgr-stara-zagora",
+   "tropicalKm2": 0,
+   "temperateKm2": 6526.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 19004,
+   "key": "bgr-ruse",
+   "tropicalKm2": 0,
+   "temperateKm2": 5965.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 19005,
+   "key": "bgr-varna",
+   "tropicalKm2": 0,
+   "temperateKm2": 3671.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 19006,
+   "key": "bgr-pleven",
+   "tropicalKm2": 0,
+   "temperateKm2": 7521.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 20001,
+   "key": "ott-constantinople",
+   "tropicalKm2": 0,
+   "temperateKm2": 3148.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 20002,
+   "key": "ott-adrianople",
+   "tropicalKm2": 0,
+   "temperateKm2": 7934.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 20003,
+   "key": "ott-salonika",
+   "tropicalKm2": 0,
+   "temperateKm2": 12617.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 20004,
+   "key": "ott-monastir",
+   "tropicalKm2": 0,
+   "temperateKm2": 8746.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 20005,
+   "key": "ott-kosovo",
+   "tropicalKm2": 0,
+   "temperateKm2": 6114.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 20006,
+   "key": "ott-scutari",
+   "tropicalKm2": 0,
+   "temperateKm2": 9625.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 20007,
+   "key": "ott-janina",
+   "tropicalKm2": 0,
+   "temperateKm2": 2813,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 21001,
+   "key": "lux-diekirch",
+   "tropicalKm2": 0,
+   "temperateKm2": 403.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 21002,
+   "key": "lux-grevenmacher",
+   "tropicalKm2": 0,
+   "temperateKm2": 54.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 21003,
+   "key": "lux-luxembourg",
+   "tropicalKm2": 0,
+   "temperateKm2": 189.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 24001,
+   "key": "and-andorra",
+   "tropicalKm2": 0,
+   "temperateKm2": 201.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 25001,
+   "key": "lie-liechtenstein",
+   "tropicalKm2": 0,
+   "temperateKm2": 20.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60001,
+   "key": "aut-vienna",
+   "tropicalKm2": 0,
+   "temperateKm2": 236.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60002,
+   "key": "aut-lower-austria",
+   "tropicalKm2": 0,
+   "temperateKm2": 6958.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60003,
+   "key": "aut-upper-austria",
+   "tropicalKm2": 0,
+   "temperateKm2": 3400.3,
+   "borealKm2": 1182.1
+  },
+  {
+   "provinceId": 60004,
+   "key": "aut-salzburg",
+   "tropicalKm2": 0,
+   "temperateKm2": 408,
+   "borealKm2": 3593.9
+  },
+  {
+   "provinceId": 60005,
+   "key": "aut-styria",
+   "tropicalKm2": 0,
+   "temperateKm2": 8455.5,
+   "borealKm2": 3254.6
+  },
+  {
+   "provinceId": 60006,
+   "key": "aut-carinthia",
+   "tropicalKm2": 0,
+   "temperateKm2": 5409.5,
+   "borealKm2": 1575.6
+  },
+  {
+   "provinceId": 60007,
+   "key": "aut-tyrol",
+   "tropicalKm2": 0,
+   "temperateKm2": 1197.7,
+   "borealKm2": 4659.4
+  },
+  {
+   "provinceId": 60008,
+   "key": "aut-vorarlberg",
+   "tropicalKm2": 0,
+   "temperateKm2": 423,
+   "borealKm2": 717.5
+  },
+  {
+   "provinceId": 60009,
+   "key": "aut-prague",
+   "tropicalKm2": 0,
+   "temperateKm2": 246.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60010,
+   "key": "aut-bohemia",
+   "tropicalKm2": 0,
+   "temperateKm2": 7643.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60011,
+   "key": "aut-moravia",
+   "tropicalKm2": 0,
+   "temperateKm2": 3219.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60012,
+   "key": "aut-austrian-silesia",
+   "tropicalKm2": 0,
+   "temperateKm2": 940.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60014,
+   "key": "aut-western-galicia",
+   "tropicalKm2": 0,
+   "temperateKm2": 4440.4,
+   "borealKm2": 56.9
+  },
+  {
+   "provinceId": 60015,
+   "key": "aut-eastern-galicia",
+   "tropicalKm2": 0,
+   "temperateKm2": 21490.2,
+   "borealKm2": 941.6
+  },
+  {
+   "provinceId": 60016,
+   "key": "aut-tarnopol",
+   "tropicalKm2": 0,
+   "temperateKm2": 3577.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60017,
+   "key": "aut-northern-bukovina",
+   "tropicalKm2": 0,
+   "temperateKm2": 3791.4,
+   "borealKm2": 157.1
+  },
+  {
+   "provinceId": 60018,
+   "key": "aut-southern-bukovina",
+   "tropicalKm2": 0,
+   "temperateKm2": 5579.6,
+   "borealKm2": 583.3
+  },
+  {
+   "provinceId": 60019,
+   "key": "aut-carpathian-ruthenia",
+   "tropicalKm2": 0,
+   "temperateKm2": 9689.5,
+   "borealKm2": 943.9
+  },
+  {
+   "provinceId": 60020,
+   "key": "aut-carniola",
+   "tropicalKm2": 0,
+   "temperateKm2": 7522.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60021,
+   "key": "aut-lower-styria",
+   "tropicalKm2": 0,
+   "temperateKm2": 4733.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60022,
+   "key": "aut-gorizia-gradisca",
+   "tropicalKm2": 0,
+   "temperateKm2": 2527.4,
+   "borealKm2": 533.5
+  },
+  {
+   "provinceId": 60023,
+   "key": "aut-istria",
+   "tropicalKm2": 0,
+   "temperateKm2": 3207.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60024,
+   "key": "aut-trieste",
+   "tropicalKm2": 0,
+   "temperateKm2": 76.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60025,
+   "key": "aut-south-tyrol",
+   "tropicalKm2": 0,
+   "temperateKm2": 758.4,
+   "borealKm2": 2061.3
+  },
+  {
+   "provinceId": 60026,
+   "key": "aut-trentino",
+   "tropicalKm2": 0,
+   "temperateKm2": 2115.2,
+   "borealKm2": 708.5
+  },
+  {
+   "provinceId": 60027,
+   "key": "aut-northern-dalmatia",
+   "tropicalKm2": 0,
+   "temperateKm2": 4539.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60028,
+   "key": "aut-southern-dalmatia",
+   "tropicalKm2": 0,
+   "temperateKm2": 2131.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60030,
+   "key": "aut-bosnia",
+   "tropicalKm2": 0,
+   "temperateKm2": 11072.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60031,
+   "key": "aut-herzegovina",
+   "tropicalKm2": 0,
+   "temperateKm2": 26965.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60032,
+   "key": "aut-croatia-proper",
+   "tropicalKm2": 0,
+   "temperateKm2": 14944.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60033,
+   "key": "aut-slavonia",
+   "tropicalKm2": 0,
+   "temperateKm2": 11431.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60034,
+   "key": "aut-hun-central-hungary",
+   "tropicalKm2": 0,
+   "temperateKm2": 1672.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60035,
+   "key": "aut-hun-transdanubia",
+   "tropicalKm2": 0,
+   "temperateKm2": 9031.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60036,
+   "key": "aut-hun-northern-hungary",
+   "tropicalKm2": 0,
+   "temperateKm2": 4041.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60037,
+   "key": "aut-hun-great-hungarian-plain",
+   "tropicalKm2": 0,
+   "temperateKm2": 2040.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60038,
+   "key": "aut-burgenland",
+   "tropicalKm2": 0,
+   "temperateKm2": 828.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60039,
+   "key": "aut-svk-pressburg",
+   "tropicalKm2": 0,
+   "temperateKm2": 941.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60040,
+   "key": "aut-svk-nagyszombat",
+   "tropicalKm2": 0,
+   "temperateKm2": 772.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60041,
+   "key": "aut-svk-nyitra",
+   "tropicalKm2": 0,
+   "temperateKm2": 1150.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60042,
+   "key": "aut-svk-trencsen",
+   "tropicalKm2": 0,
+   "temperateKm2": 2458.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60043,
+   "key": "aut-svk-turoc",
+   "tropicalKm2": 0,
+   "temperateKm2": 4955.8,
+   "borealKm2": 56.1
+  },
+  {
+   "provinceId": 60044,
+   "key": "aut-svk-besztercebanya",
+   "tropicalKm2": 0,
+   "temperateKm2": 5918,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60045,
+   "key": "aut-svk-kassa",
+   "tropicalKm2": 0,
+   "temperateKm2": 3629.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60046,
+   "key": "aut-svk-eperjes",
+   "tropicalKm2": 0,
+   "temperateKm2": 4503.9,
+   "borealKm2": 546.4
+  },
+  {
+   "provinceId": 60047,
+   "key": "aut-transylvania",
+   "tropicalKm2": 0,
+   "temperateKm2": 24513.4,
+   "borealKm2": 351.4
+  },
+  {
+   "provinceId": 60048,
+   "key": "aut-szekely-land",
+   "tropicalKm2": 0,
+   "temperateKm2": 5944.2,
+   "borealKm2": 845.7
+  },
+  {
+   "provinceId": 60049,
+   "key": "aut-partium",
+   "tropicalKm2": 0,
+   "temperateKm2": 12647.5,
+   "borealKm2": 1569.3
+  },
+  {
+   "provinceId": 60050,
+   "key": "aut-banat",
+   "tropicalKm2": 0,
+   "temperateKm2": 6549.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60051,
+   "key": "aut-backa",
+   "tropicalKm2": 0,
+   "temperateKm2": 1080.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60052,
+   "key": "aut-syrmia",
+   "tropicalKm2": 0,
+   "temperateKm2": 570.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 60053,
+   "key": "aut-cieszyn-silesia",
+   "tropicalKm2": 0,
+   "temperateKm2": 515,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 66001,
+   "key": "crt-crete",
+   "tropicalKm2": 0,
+   "temperateKm2": 3001.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100001,
+   "key": "as-ott-hudavendigar",
+   "tropicalKm2": 0,
+   "temperateKm2": 25137,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100002,
+   "key": "as-ott-aydin",
+   "tropicalKm2": 0,
+   "temperateKm2": 13531.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100003,
+   "key": "as-ott-konya",
+   "tropicalKm2": 0,
+   "temperateKm2": 21626.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100004,
+   "key": "as-ott-ankara",
+   "tropicalKm2": 0,
+   "temperateKm2": 13708,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100005,
+   "key": "as-ott-kastamonu",
+   "tropicalKm2": 0,
+   "temperateKm2": 25839,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100006,
+   "key": "as-ott-sivas",
+   "tropicalKm2": 0,
+   "temperateKm2": 17697.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100007,
+   "key": "as-ott-trabzon",
+   "tropicalKm2": 0,
+   "temperateKm2": 21156.1,
+   "borealKm2": 51.5
+  },
+  {
+   "provinceId": 100008,
+   "key": "as-ott-erzurum",
+   "tropicalKm2": 0,
+   "temperateKm2": 7411.9,
+   "borealKm2": 2227.8
+  },
+  {
+   "provinceId": 100009,
+   "key": "as-ott-van",
+   "tropicalKm2": 0,
+   "temperateKm2": 1576.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100010,
+   "key": "as-ott-bitlis",
+   "tropicalKm2": 0,
+   "temperateKm2": 48,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100011,
+   "key": "as-ott-diyarbekir",
+   "tropicalKm2": 0,
+   "temperateKm2": 93.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100012,
+   "key": "as-ott-mamuret-ul-aziz",
+   "tropicalKm2": 0,
+   "temperateKm2": 871,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100013,
+   "key": "as-ott-adana",
+   "tropicalKm2": 0,
+   "temperateKm2": 7802.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100014,
+   "key": "as-ott-hatay",
+   "tropicalKm2": 0,
+   "temperateKm2": 538.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100016,
+   "key": "as-ott-urfa",
+   "tropicalKm2": 0,
+   "temperateKm2": 5391.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100019,
+   "key": "as-ott-damascus",
+   "tropicalKm2": 0,
+   "temperateKm2": 69.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100023,
+   "key": "as-ott-baghdad",
+   "tropicalKm2": 0,
+   "temperateKm2": 298.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100024,
+   "key": "as-ott-basra",
+   "tropicalKm2": 0,
+   "temperateKm2": 440.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100025,
+   "key": "as-ott-mosul",
+   "tropicalKm2": 0,
+   "temperateKm2": 4034.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100040,
+   "key": "as-per-azerbaijan",
+   "tropicalKm2": 0,
+   "temperateKm2": 3559.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100041,
+   "key": "as-per-gilan",
+   "tropicalKm2": 0,
+   "temperateKm2": 4287.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100042,
+   "key": "as-per-mazandaran",
+   "tropicalKm2": 0,
+   "temperateKm2": 12106.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100043,
+   "key": "as-per-khorasan",
+   "tropicalKm2": 0,
+   "temperateKm2": 136.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100048,
+   "key": "as-per-kermanshah",
+   "tropicalKm2": 0,
+   "temperateKm2": 2689.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100049,
+   "key": "as-per-tehran",
+   "tropicalKm2": 0,
+   "temperateKm2": 432.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100050,
+   "key": "as-per-khuzestan",
+   "tropicalKm2": 0,
+   "temperateKm2": 95.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100054,
+   "key": "as-afg-afghan-turkestan",
+   "tropicalKm2": 0,
+   "temperateKm2": 666.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100056,
+   "key": "as-afg-badakhshan",
+   "tropicalKm2": 0,
+   "temperateKm2": 69.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100057,
+   "key": "as-npl-western-nepal",
+   "tropicalKm2": 11824.1,
+   "temperateKm2": 30764.6,
+   "borealKm2": 2478.1
+  },
+  {
+   "provinceId": 100058,
+   "key": "as-npl-eastern-nepal",
+   "tropicalKm2": 18221.6,
+   "temperateKm2": 19370.4,
+   "borealKm2": 657.8
+  },
+  {
+   "provinceId": 100059,
+   "key": "as-bhu-western-bhutan",
+   "tropicalKm2": 13455.9,
+   "temperateKm2": 1117.2,
+   "borealKm2": 2073.4
+  },
+  {
+   "provinceId": 100060,
+   "key": "as-bhu-eastern-bhutan",
+   "tropicalKm2": 12791.7,
+   "temperateKm2": 440.9,
+   "borealKm2": 349.3
+  },
+  {
+   "provinceId": 100061,
+   "key": "as-tha-bangkok",
+   "tropicalKm2": 56613.2,
+   "temperateKm2": 2279.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100062,
+   "key": "as-tha-nakhon-sawan",
+   "tropicalKm2": 68144.3,
+   "temperateKm2": 1214.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100063,
+   "key": "as-tha-phitsanulok",
+   "tropicalKm2": 64946.8,
+   "temperateKm2": 8670.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100064,
+   "key": "as-tha-nakhon-ratchasima",
+   "tropicalKm2": 137031.2,
+   "temperateKm2": 6084.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100065,
+   "key": "as-tha-nakhon-si-thammarat",
+   "tropicalKm2": 60554.9,
+   "temperateKm2": 2469.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100066,
+   "key": "as-tha-chanthaburi",
+   "tropicalKm2": 31102.1,
+   "temperateKm2": 1662,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100067,
+   "key": "as-tha-inner-cambodia",
+   "tropicalKm2": 37247.7,
+   "temperateKm2": 16825.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100068,
+   "key": "as-tha-kedah-and-perlis",
+   "tropicalKm2": 7869.5,
+   "temperateKm2": 148.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100069,
+   "key": "as-tha-kelantan",
+   "tropicalKm2": 13268.1,
+   "temperateKm2": 976.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100070,
+   "key": "as-tha-terengganu",
+   "tropicalKm2": 11479.8,
+   "temperateKm2": 202.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100071,
+   "key": "as-tha-xaignabouri",
+   "tropicalKm2": 5194.9,
+   "temperateKm2": 9248.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100072,
+   "key": "as-chn-zhili",
+   "tropicalKm2": 0,
+   "temperateKm2": 73752,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100073,
+   "key": "as-chn-shandong",
+   "tropicalKm2": 0,
+   "temperateKm2": 46465.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100074,
+   "key": "as-chn-shanxi",
+   "tropicalKm2": 0,
+   "temperateKm2": 56292,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100075,
+   "key": "as-chn-henan",
+   "tropicalKm2": 0,
+   "temperateKm2": 51654.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100076,
+   "key": "as-chn-shaanxi",
+   "tropicalKm2": 0,
+   "temperateKm2": 95148.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100077,
+   "key": "as-chn-gansu",
+   "tropicalKm2": 0,
+   "temperateKm2": 16658.3,
+   "borealKm2": 260.7
+  },
+  {
+   "provinceId": 100078,
+   "key": "as-chn-qinghai",
+   "tropicalKm2": 0,
+   "temperateKm2": 146.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100079,
+   "key": "as-chn-jiangsu",
+   "tropicalKm2": 0,
+   "temperateKm2": 25720.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100080,
+   "key": "as-chn-anhui",
+   "tropicalKm2": 0,
+   "temperateKm2": 69455,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100081,
+   "key": "as-chn-jiangxi",
+   "tropicalKm2": 0,
+   "temperateKm2": 95110.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100082,
+   "key": "as-chn-zhejiang",
+   "tropicalKm2": 0,
+   "temperateKm2": 73669,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100083,
+   "key": "as-chn-fujian",
+   "tropicalKm2": 4113.3,
+   "temperateKm2": 94999.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100084,
+   "key": "as-chn-hubei",
+   "tropicalKm2": 0,
+   "temperateKm2": 98924.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100085,
+   "key": "as-chn-hunan",
+   "tropicalKm2": 0,
+   "temperateKm2": 115960.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100086,
+   "key": "as-chn-guangdong",
+   "tropicalKm2": 34463.1,
+   "temperateKm2": 84562.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100087,
+   "key": "as-chn-guangxi",
+   "tropicalKm2": 34905.9,
+   "temperateKm2": 125066.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100088,
+   "key": "as-chn-sichuan",
+   "tropicalKm2": 14593.6,
+   "temperateKm2": 154107.8,
+   "borealKm2": 613.9
+  },
+  {
+   "provinceId": 100089,
+   "key": "as-chn-yunnan",
+   "tropicalKm2": 79482.6,
+   "temperateKm2": 97857.6,
+   "borealKm2": 1409.5
+  },
+  {
+   "provinceId": 100090,
+   "key": "as-chn-guizhou",
+   "tropicalKm2": 117.7,
+   "temperateKm2": 121467.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100091,
+   "key": "as-chn-xinjiang",
+   "tropicalKm2": 0,
+   "temperateKm2": 7456.9,
+   "borealKm2": 1330
+  },
+  {
+   "provinceId": 100092,
+   "key": "as-chn-fengtian",
+   "tropicalKm2": 0,
+   "temperateKm2": 59355.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100093,
+   "key": "as-chn-jilin",
+   "tropicalKm2": 0,
+   "temperateKm2": 87607,
+   "borealKm2": 1335.7
+  },
+  {
+   "provinceId": 100094,
+   "key": "as-chn-heilongjiang",
+   "tropicalKm2": 0,
+   "temperateKm2": 252263.2,
+   "borealKm2": 8630.8
+  },
+  {
+   "provinceId": 100095,
+   "key": "as-chn-rehe",
+   "tropicalKm2": 0,
+   "temperateKm2": 81836.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100096,
+   "key": "as-chn-xing-an",
+   "tropicalKm2": 0,
+   "temperateKm2": 119746.4,
+   "borealKm2": 2601.7
+  },
+  {
+   "provinceId": 100097,
+   "key": "as-chn-inner-mongolia",
+   "tropicalKm2": 0,
+   "temperateKm2": 3504.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100098,
+   "key": "as-chn-khalkha-mongolia",
+   "tropicalKm2": 0,
+   "temperateKm2": 16814.7,
+   "borealKm2": 3999.5
+  },
+  {
+   "provinceId": 100099,
+   "key": "as-chn-western-mongolia",
+   "tropicalKm2": 0,
+   "temperateKm2": 1737.5,
+   "borealKm2": 871.4
+  },
+  {
+   "provinceId": 100100,
+   "key": "as-chn-eastern-and-gobi-mongolia",
+   "tropicalKm2": 0,
+   "temperateKm2": 1985,
+   "borealKm2": 1117.3
+  },
+  {
+   "provinceId": 100101,
+   "key": "as-tib-u-tsang",
+   "tropicalKm2": 1250.3,
+   "temperateKm2": 374.3,
+   "borealKm2": 744.9
+  },
+  {
+   "provinceId": 100103,
+   "key": "as-kor-hamgyong",
+   "tropicalKm2": 0,
+   "temperateKm2": 33023.3,
+   "borealKm2": 11548.1
+  },
+  {
+   "provinceId": 100104,
+   "key": "as-kor-pyongan",
+   "tropicalKm2": 0,
+   "temperateKm2": 35376.2,
+   "borealKm2": 774.8
+  },
+  {
+   "provinceId": 100105,
+   "key": "as-kor-hwanghae",
+   "tropicalKm2": 0,
+   "temperateKm2": 12482,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100106,
+   "key": "as-kor-gangwon",
+   "tropicalKm2": 0,
+   "temperateKm2": 17122.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100107,
+   "key": "as-kor-north-kangwon",
+   "tropicalKm2": 0,
+   "temperateKm2": 9725.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100108,
+   "key": "as-kor-gyeonggi",
+   "tropicalKm2": 0,
+   "temperateKm2": 6550.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100109,
+   "key": "as-kor-chungcheong",
+   "tropicalKm2": 0,
+   "temperateKm2": 9399,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100110,
+   "key": "as-kor-jeolla",
+   "tropicalKm2": 0,
+   "temperateKm2": 11810.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100111,
+   "key": "as-kor-gyeongsang",
+   "tropicalKm2": 0,
+   "temperateKm2": 22295.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100112,
+   "key": "as-jpn-kanto",
+   "tropicalKm2": 68.8,
+   "temperateKm2": 19648.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100113,
+   "key": "as-jpn-chubu",
+   "tropicalKm2": 209.9,
+   "temperateKm2": 61163.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100114,
+   "key": "as-jpn-kansai",
+   "tropicalKm2": 0,
+   "temperateKm2": 22813.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100115,
+   "key": "as-jpn-chugoku",
+   "tropicalKm2": 0,
+   "temperateKm2": 26854.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100116,
+   "key": "as-jpn-shikoku",
+   "tropicalKm2": 428.7,
+   "temperateKm2": 16084.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100117,
+   "key": "as-jpn-kyushu",
+   "tropicalKm2": 213.2,
+   "temperateKm2": 31724.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100118,
+   "key": "as-jpn-tohoku",
+   "tropicalKm2": 0,
+   "temperateKm2": 59019.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100119,
+   "key": "as-jpn-hokkaido",
+   "tropicalKm2": 0,
+   "temperateKm2": 64912.3,
+   "borealKm2": 1740.7
+  },
+  {
+   "provinceId": 100120,
+   "key": "as-jpn-ryukyu",
+   "tropicalKm2": 0,
+   "temperateKm2": 1674.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100121,
+   "key": "as-twn-taihoku",
+   "tropicalKm2": 4157.1,
+   "temperateKm2": 3308.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100122,
+   "key": "as-twn-taichung",
+   "tropicalKm2": 4927.6,
+   "temperateKm2": 4468.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100123,
+   "key": "as-twn-tainan",
+   "tropicalKm2": 5115.8,
+   "temperateKm2": 8593.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100124,
+   "key": "as-rus-tiflis",
+   "tropicalKm2": 0,
+   "temperateKm2": 2376.6,
+   "borealKm2": 143.2
+  },
+  {
+   "provinceId": 100125,
+   "key": "as-rus-kutais",
+   "tropicalKm2": 0,
+   "temperateKm2": 5099.2,
+   "borealKm2": 116.5
+  },
+  {
+   "provinceId": 100126,
+   "key": "as-rus-batum",
+   "tropicalKm2": 0,
+   "temperateKm2": 1142.6,
+   "borealKm2": 47.1
+  },
+  {
+   "provinceId": 100127,
+   "key": "as-rus-artvin",
+   "tropicalKm2": 0,
+   "temperateKm2": 2395.9,
+   "borealKm2": 252.5
+  },
+  {
+   "provinceId": 100128,
+   "key": "as-rus-kars",
+   "tropicalKm2": 0,
+   "temperateKm2": 2577.6,
+   "borealKm2": 1905.8
+  },
+  {
+   "provinceId": 100129,
+   "key": "as-rus-erivan",
+   "tropicalKm2": 0,
+   "temperateKm2": 8128.5,
+   "borealKm2": 290.6
+  },
+  {
+   "provinceId": 100131,
+   "key": "as-rus-baku",
+   "tropicalKm2": 0,
+   "temperateKm2": 7322.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100132,
+   "key": "as-rus-elisavetpol",
+   "tropicalKm2": 0,
+   "temperateKm2": 12626.9,
+   "borealKm2": 53.5
+  },
+  {
+   "provinceId": 100133,
+   "key": "as-rus-zakatala",
+   "tropicalKm2": 0,
+   "temperateKm2": 1458.4,
+   "borealKm2": 128.1
+  },
+  {
+   "provinceId": 100134,
+   "key": "as-rus-nakhchivan",
+   "tropicalKm2": 0,
+   "temperateKm2": 50.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100135,
+   "key": "as-rus-uralsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 24.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100136,
+   "key": "as-rus-turgai",
+   "tropicalKm2": 0,
+   "temperateKm2": 1122.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100137,
+   "key": "as-rus-akmolinsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 845.4,
+   "borealKm2": 244.2
+  },
+  {
+   "provinceId": 100138,
+   "key": "as-rus-semipalatinsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 25274.8,
+   "borealKm2": 2268.1
+  },
+  {
+   "provinceId": 100139,
+   "key": "as-rus-semirechye",
+   "tropicalKm2": 0,
+   "temperateKm2": 5918.9,
+   "borealKm2": 1139
+  },
+  {
+   "provinceId": 100140,
+   "key": "as-rus-kazakh-syr-darya",
+   "tropicalKm2": 489.7,
+   "temperateKm2": 900,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100141,
+   "key": "as-rus-uzbek-syr-darya",
+   "tropicalKm2": 0,
+   "temperateKm2": 357.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100143,
+   "key": "as-rus-osh",
+   "tropicalKm2": 0,
+   "temperateKm2": 5146.9,
+   "borealKm2": 684.4
+  },
+  {
+   "provinceId": 100147,
+   "key": "as-rus-kyrgyz-steppe",
+   "tropicalKm2": 0,
+   "temperateKm2": 1940.6,
+   "borealKm2": 584.4
+  },
+  {
+   "provinceId": 100148,
+   "key": "as-rus-pamir",
+   "tropicalKm2": 0,
+   "temperateKm2": 153.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100150,
+   "key": "as-rus-tobolsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 543273.1,
+   "borealKm2": 345508.4
+  },
+  {
+   "provinceId": 100151,
+   "key": "as-rus-omsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 51089.8,
+   "borealKm2": 6856.3
+  },
+  {
+   "provinceId": 100152,
+   "key": "as-rus-tomsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 342933.5,
+   "borealKm2": 67213.2
+  },
+  {
+   "provinceId": 100153,
+   "key": "as-rus-altai",
+   "tropicalKm2": 0,
+   "temperateKm2": 70179.1,
+   "borealKm2": 14386.1
+  },
+  {
+   "provinceId": 100154,
+   "key": "as-rus-yeniseysk",
+   "tropicalKm2": 0,
+   "temperateKm2": 1029511.9,
+   "borealKm2": 313612.9
+  },
+  {
+   "provinceId": 100155,
+   "key": "as-rus-irkutsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 601667.7,
+   "borealKm2": 202252.8
+  },
+  {
+   "provinceId": 100156,
+   "key": "as-rus-transbaikal",
+   "tropicalKm2": 0,
+   "temperateKm2": 416667,
+   "borealKm2": 118077.4
+  },
+  {
+   "provinceId": 100157,
+   "key": "as-rus-yakutsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 1437271.3,
+   "borealKm2": 958897.5
+  },
+  {
+   "provinceId": 100158,
+   "key": "as-rus-amur",
+   "tropicalKm2": 0,
+   "temperateKm2": 127414.9,
+   "borealKm2": 157441.9
+  },
+  {
+   "provinceId": 100159,
+   "key": "as-rus-primorye",
+   "tropicalKm2": 0,
+   "temperateKm2": 147677.4,
+   "borealKm2": 22268.4
+  },
+  {
+   "provinceId": 100160,
+   "key": "as-rus-khabarovsk",
+   "tropicalKm2": 0,
+   "temperateKm2": 309542.2,
+   "borealKm2": 286316.7
+  },
+  {
+   "provinceId": 100161,
+   "key": "as-rus-sakhalin",
+   "tropicalKm2": 0,
+   "temperateKm2": 26772.7,
+   "borealKm2": 34160.9
+  },
+  {
+   "provinceId": 100162,
+   "key": "as-rus-kamchatka",
+   "tropicalKm2": 0,
+   "temperateKm2": 763633.4,
+   "borealKm2": 21710.4
+  },
+  {
+   "provinceId": 100163,
+   "key": "as-rus-uriankhai",
+   "tropicalKm2": 0,
+   "temperateKm2": 47516.4,
+   "borealKm2": 34292.4
+  },
+  {
+   "provinceId": 100168,
+   "key": "as-buk-eastern-bukhara",
+   "tropicalKm2": 0,
+   "temperateKm2": 1034.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100169,
+   "key": "as-bin-bengal",
+   "tropicalKm2": 39292.2,
+   "temperateKm2": 779.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100170,
+   "key": "as-bin-eastern-bengal",
+   "tropicalKm2": 56512.7,
+   "temperateKm2": 8015.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100171,
+   "key": "as-bin-assam",
+   "tropicalKm2": 162036.7,
+   "temperateKm2": 32418.7,
+   "borealKm2": 69.5
+  },
+  {
+   "provinceId": 100172,
+   "key": "as-bin-bihar",
+   "tropicalKm2": 74819.4,
+   "temperateKm2": 1002.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100173,
+   "key": "as-bin-orissa",
+   "tropicalKm2": 72519.4,
+   "temperateKm2": 882,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100174,
+   "key": "as-bin-united-provinces",
+   "tropicalKm2": 101358.2,
+   "temperateKm2": 18943.3,
+   "borealKm2": 66.9
+  },
+  {
+   "provinceId": 100175,
+   "key": "as-bin-punjab",
+   "tropicalKm2": 3739.3,
+   "temperateKm2": 11589.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100176,
+   "key": "as-bin-west-punjab",
+   "tropicalKm2": 5190.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100178,
+   "key": "as-bin-north-west-frontier",
+   "tropicalKm2": 0,
+   "temperateKm2": 72.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100180,
+   "key": "as-bin-kashmir",
+   "tropicalKm2": 0,
+   "temperateKm2": 11097.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100181,
+   "key": "as-bin-azad-kashmir",
+   "tropicalKm2": 703.4,
+   "temperateKm2": 631.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100183,
+   "key": "as-bin-rajputana",
+   "tropicalKm2": 44894,
+   "temperateKm2": 217.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100184,
+   "key": "as-bin-central-provinces",
+   "tropicalKm2": 181132.4,
+   "temperateKm2": 931.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100185,
+   "key": "as-bin-bombay",
+   "tropicalKm2": 145043.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100186,
+   "key": "as-bin-madras",
+   "tropicalKm2": 108730.6,
+   "temperateKm2": 335.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100187,
+   "key": "as-bin-hyderabad",
+   "tropicalKm2": 42954.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100188,
+   "key": "as-bin-mysore",
+   "tropicalKm2": 81084.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100189,
+   "key": "as-bin-travancore-and-cochin",
+   "tropicalKm2": 30192.7,
+   "temperateKm2": 546.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100191,
+   "key": "as-bin-sikkim",
+   "tropicalKm2": 2821.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100192,
+   "key": "as-bin-burma",
+   "tropicalKm2": 189068.2,
+   "temperateKm2": 28722.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100193,
+   "key": "as-bin-shan-states",
+   "tropicalKm2": 88147.1,
+   "temperateKm2": 46873.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100194,
+   "key": "as-bin-frontier-divisions",
+   "tropicalKm2": 175493.4,
+   "temperateKm2": 16353.4,
+   "borealKm2": 75.7
+  },
+  {
+   "provinceId": 100196,
+   "key": "as-bin-goa",
+   "tropicalKm2": 1463.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100197,
+   "key": "as-cey-western-ceylon",
+   "tropicalKm2": 7222.2,
+   "temperateKm2": 204.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100198,
+   "key": "as-cey-central-ceylon",
+   "tropicalKm2": 12628.1,
+   "temperateKm2": 508.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100199,
+   "key": "as-cey-northern-ceylon",
+   "tropicalKm2": 26451.9,
+   "temperateKm2": 1398.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100200,
+   "key": "as-cey-southern-ceylon",
+   "tropicalKm2": 3199.3,
+   "temperateKm2": 850.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100201,
+   "key": "as-mal-straits-settlements",
+   "tropicalKm2": 1970.5,
+   "temperateKm2": 245.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100202,
+   "key": "as-mal-federated-malay-states",
+   "tropicalKm2": 53767.5,
+   "temperateKm2": 11825.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100203,
+   "key": "as-mal-johor",
+   "tropicalKm2": 14072.5,
+   "temperateKm2": 3114.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100204,
+   "key": "as-mal-british-north-borneo",
+   "tropicalKm2": 69211.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100205,
+   "key": "as-mal-brunei",
+   "tropicalKm2": 5382.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100206,
+   "key": "as-sar-sarawak",
+   "tropicalKm2": 118435.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100209,
+   "key": "as-fic-tonkin",
+   "tropicalKm2": 30260.9,
+   "temperateKm2": 39698.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100210,
+   "key": "as-fic-annam",
+   "tropicalKm2": 89256.5,
+   "temperateKm2": 25949.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100211,
+   "key": "as-fic-cochinchina",
+   "tropicalKm2": 35734.3,
+   "temperateKm2": 880,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100212,
+   "key": "as-fic-cambodia",
+   "tropicalKm2": 85034.4,
+   "temperateKm2": 13648.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100213,
+   "key": "as-fic-laos",
+   "tropicalKm2": 152760.4,
+   "temperateKm2": 42687.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100215,
+   "key": "as-dei-west-java",
+   "tropicalKm2": 34592.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100216,
+   "key": "as-dei-central-java",
+   "tropicalKm2": 23773.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100217,
+   "key": "as-dei-east-java",
+   "tropicalKm2": 28194.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100218,
+   "key": "as-dei-aceh",
+   "tropicalKm2": 43780.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100219,
+   "key": "as-dei-north-sumatra",
+   "tropicalKm2": 51677,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100220,
+   "key": "as-dei-west-sumatra",
+   "tropicalKm2": 24920.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100221,
+   "key": "as-dei-riau-and-jambi",
+   "tropicalKm2": 105116.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100222,
+   "key": "as-dei-south-sumatra",
+   "tropicalKm2": 87135.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100223,
+   "key": "as-dei-west-borneo",
+   "tropicalKm2": 131040.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100224,
+   "key": "as-dei-central-borneo",
+   "tropicalKm2": 137729.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100225,
+   "key": "as-dei-south-and-east-borneo",
+   "tropicalKm2": 210661.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100226,
+   "key": "as-dei-north-sulawesi",
+   "tropicalKm2": 18219.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100227,
+   "key": "as-dei-central-sulawesi",
+   "tropicalKm2": 56587.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100228,
+   "key": "as-dei-south-sulawesi",
+   "tropicalKm2": 60714.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100229,
+   "key": "as-dei-moluccas",
+   "tropicalKm2": 54522.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100230,
+   "key": "as-dei-bali-and-lombok",
+   "tropicalKm2": 15402.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100231,
+   "key": "as-dei-timor-and-flores",
+   "tropicalKm2": 33641.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100232,
+   "key": "as-dei-new-guinea",
+   "tropicalKm2": 309013.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100233,
+   "key": "as-phl-manila-and-central-luzon",
+   "tropicalKm2": 19252,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100234,
+   "key": "as-phl-northern-luzon",
+   "tropicalKm2": 58758.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100235,
+   "key": "as-phl-visayas",
+   "tropicalKm2": 63828.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100236,
+   "key": "as-phl-palawan",
+   "tropicalKm2": 10753.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100237,
+   "key": "as-phl-mindanao-and-sulu",
+   "tropicalKm2": 83670.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 100238,
+   "key": "as-ptm-timor",
+   "tropicalKm2": 11043,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200004,
+   "key": "af-bpo-zanzibar",
+   "tropicalKm2": 787.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200008,
+   "key": "af-pai-bissau-and-cacheu",
+   "tropicalKm2": 1651.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200009,
+   "key": "af-pai-bafata-and-gabu",
+   "tropicalKm2": 797.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200010,
+   "key": "af-pai-bolama-and-quinara",
+   "tropicalKm2": 1371.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200015,
+   "key": "af-sgg-rio-muni",
+   "tropicalKm2": 20367.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200016,
+   "key": "af-sgg-fernando-po",
+   "tropicalKm2": 802.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200021,
+   "key": "af-mad-antananarivo",
+   "tropicalKm2": 5831.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200022,
+   "key": "af-mad-fianarantsoa",
+   "tropicalKm2": 31869.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200023,
+   "key": "af-mad-toamasina",
+   "tropicalKm2": 51243.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200024,
+   "key": "af-mad-mahajanga",
+   "tropicalKm2": 36341.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200025,
+   "key": "af-mad-toliara",
+   "tropicalKm2": 17117.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200026,
+   "key": "af-mad-antsiranana",
+   "tropicalKm2": 30516.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200030,
+   "key": "af-bso-british-somaliland",
+   "tropicalKm2": 49.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200031,
+   "key": "af-its-banaadir-and-the-lower-shabelle",
+   "tropicalKm2": 2452.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200032,
+   "key": "af-its-hiiraan-bakool-and-bay",
+   "tropicalKm2": 44.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200034,
+   "key": "af-eri-hamasien",
+   "tropicalKm2": 136,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200035,
+   "key": "af-eri-barka-and-gash",
+   "tropicalKm2": 1164.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200038,
+   "key": "af-eth-tigray",
+   "tropicalKm2": 2530.8,
+   "temperateKm2": 478.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200039,
+   "key": "af-eth-amhara-and-begemder",
+   "tropicalKm2": 3721.8,
+   "temperateKm2": 5944.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200040,
+   "key": "af-eth-afar",
+   "tropicalKm2": 409.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200041,
+   "key": "af-eth-shewa-and-addis-ababa",
+   "tropicalKm2": 0,
+   "temperateKm2": 152.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200042,
+   "key": "af-eth-oromia",
+   "tropicalKm2": 30960,
+   "temperateKm2": 1252.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200043,
+   "key": "af-eth-sidamo-and-the-southern-provinces",
+   "tropicalKm2": 27262.9,
+   "temperateKm2": 910,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200045,
+   "key": "af-eth-ogaden",
+   "tropicalKm2": 1447.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200046,
+   "key": "af-eth-benishangul",
+   "tropicalKm2": 309.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200047,
+   "key": "af-eth-gambela",
+   "tropicalKm2": 3488.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200055,
+   "key": "af-egy-sohag-and-qena",
+   "tropicalKm2": 187.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200056,
+   "key": "af-egy-aswan-and-the-red-sea",
+   "tropicalKm2": 62.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200064,
+   "key": "af-sud-bahr-el-ghazal",
+   "tropicalKm2": 1141.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200065,
+   "key": "af-sud-equatoria",
+   "tropicalKm2": 874.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200066,
+   "key": "af-sud-upper-nile",
+   "tropicalKm2": 7027.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200069,
+   "key": "af-wad-wadai-and-ouaddai",
+   "tropicalKm2": 183.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200071,
+   "key": "af-sok-sokoto-and-gwandu",
+   "tropicalKm2": 46.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200072,
+   "key": "af-sok-kano",
+   "tropicalKm2": 72.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200073,
+   "key": "af-sok-zaria",
+   "tropicalKm2": 888.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200074,
+   "key": "af-sok-bauchi-and-adamawa",
+   "tropicalKm2": 859.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200075,
+   "key": "af-gea-tanga-and-the-usambara",
+   "tropicalKm2": 9766.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200076,
+   "key": "af-gea-kilimanjaro-and-moshi",
+   "tropicalKm2": 1963.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200077,
+   "key": "af-gea-arusha-and-the-maasai-steppe",
+   "tropicalKm2": 4682.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200078,
+   "key": "af-gea-dar-es-salaam-and-the-coast",
+   "tropicalKm2": 14115.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200079,
+   "key": "af-gea-morogoro-and-the-rufiji",
+   "tropicalKm2": 21784.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200080,
+   "key": "af-gea-dodoma-and-singida",
+   "tropicalKm2": 1814.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200081,
+   "key": "af-gea-tabora-and-kigoma",
+   "tropicalKm2": 50363.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200082,
+   "key": "af-gea-bukoba-mwanza-and-the-lake",
+   "tropicalKm2": 24921.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200083,
+   "key": "af-gea-iringa-mbeya-and-rukwa",
+   "tropicalKm2": 79358.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200084,
+   "key": "af-gea-lindi-mtwara-and-ruvuma",
+   "tropicalKm2": 45914.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200085,
+   "key": "af-gea-rwanda",
+   "tropicalKm2": 3411.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200086,
+   "key": "af-gea-burundi",
+   "tropicalKm2": 2933.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200087,
+   "key": "af-kam-southern-cameroons",
+   "tropicalKm2": 21145.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200088,
+   "key": "af-kam-northern-kamerun",
+   "tropicalKm2": 16254.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200089,
+   "key": "af-kam-central-kamerun",
+   "tropicalKm2": 54394.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200090,
+   "key": "af-kam-southern-kamerun",
+   "tropicalKm2": 118200.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200091,
+   "key": "af-tog-british-togoland",
+   "tropicalKm2": 8995,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200092,
+   "key": "af-tog-french-togoland-maritime-and-plateaux",
+   "tropicalKm2": 12695.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200093,
+   "key": "af-tog-french-togoland-centre",
+   "tropicalKm2": 10131.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200094,
+   "key": "af-tog-french-togoland-kara-and-savanes",
+   "tropicalKm2": 4694.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200100,
+   "key": "af-gsw-kaokoland",
+   "tropicalKm2": 303.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200101,
+   "key": "af-gsw-kavango-and-caprivi",
+   "tropicalKm2": 891.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200102,
+   "key": "af-cfs-leopoldville-and-bas-congo",
+   "tropicalKm2": 33559.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200103,
+   "key": "af-cfs-kwango-and-bandundu",
+   "tropicalKm2": 267817.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200104,
+   "key": "af-cfs-equateur",
+   "tropicalKm2": 341162.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200105,
+   "key": "af-cfs-orientale",
+   "tropicalKm2": 366165.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200106,
+   "key": "af-cfs-kasai",
+   "tropicalKm2": 293677.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200107,
+   "key": "af-cfs-katanga",
+   "tropicalKm2": 376523,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200108,
+   "key": "af-cfs-maniema",
+   "tropicalKm2": 116829.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200109,
+   "key": "af-cfs-north-kivu",
+   "tropicalKm2": 35420.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200110,
+   "key": "af-cfs-south-kivu",
+   "tropicalKm2": 37265.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200111,
+   "key": "af-ang-luanda",
+   "tropicalKm2": 9937.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200112,
+   "key": "af-ang-cuanza",
+   "tropicalKm2": 44082.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200113,
+   "key": "af-ang-malanje",
+   "tropicalKm2": 77322,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200114,
+   "key": "af-ang-uige-and-zaire",
+   "tropicalKm2": 55007.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200115,
+   "key": "af-ang-cabinda",
+   "tropicalKm2": 3486.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200116,
+   "key": "af-ang-benguela",
+   "tropicalKm2": 8057.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200117,
+   "key": "af-ang-huambo-and-bie",
+   "tropicalKm2": 56667.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200118,
+   "key": "af-ang-huila",
+   "tropicalKm2": 15293.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200119,
+   "key": "af-ang-namibe",
+   "tropicalKm2": 471.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200120,
+   "key": "af-ang-cunene",
+   "tropicalKm2": 2477.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200121,
+   "key": "af-ang-cuando-cubango",
+   "tropicalKm2": 43884.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200122,
+   "key": "af-ang-moxico",
+   "tropicalKm2": 119777.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200123,
+   "key": "af-ang-lunda",
+   "tropicalKm2": 159194.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200124,
+   "key": "af-moz-cabo-delgado",
+   "tropicalKm2": 12099.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200125,
+   "key": "af-moz-niassa",
+   "tropicalKm2": 36401,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200126,
+   "key": "af-moz-nampula",
+   "tropicalKm2": 16013.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200127,
+   "key": "af-moz-zambezia",
+   "tropicalKm2": 38512.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200128,
+   "key": "af-moz-tete",
+   "tropicalKm2": 9953.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200129,
+   "key": "af-moz-manica-and-sofala",
+   "tropicalKm2": 24077,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200130,
+   "key": "af-moz-inhambane",
+   "tropicalKm2": 6156.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200131,
+   "key": "af-moz-gaza",
+   "tropicalKm2": 686,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200133,
+   "key": "af-cra-nyasaland-northern-province",
+   "tropicalKm2": 12240.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200134,
+   "key": "af-cra-nyasaland-central-province",
+   "tropicalKm2": 5875.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200135,
+   "key": "af-cra-nyasaland-southern-province",
+   "tropicalKm2": 5223.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200136,
+   "key": "af-cra-northern-rhodesia-barotseland",
+   "tropicalKm2": 148461.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200137,
+   "key": "af-cra-northern-rhodesia-north-eastern",
+   "tropicalKm2": 62319.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200138,
+   "key": "af-cra-northern-rhodesia-central",
+   "tropicalKm2": 50204.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200139,
+   "key": "af-cra-northern-rhodesia-southern",
+   "tropicalKm2": 18765.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200140,
+   "key": "af-cra-southern-rhodesia-mashonaland",
+   "tropicalKm2": 19405.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200141,
+   "key": "af-cra-southern-rhodesia-matabeleland",
+   "tropicalKm2": 16694.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200142,
+   "key": "af-cra-southern-rhodesia-victoria-and-the-midlands",
+   "tropicalKm2": 11986.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200143,
+   "key": "af-hct-bechuanaland-ngamiland-and-chobe",
+   "tropicalKm2": 5469.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200148,
+   "key": "af-hct-swaziland",
+   "tropicalKm2": 2657.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200149,
+   "key": "af-cap-cape-peninsula-and-the-western-districts",
+   "tropicalKm2": 1312.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200150,
+   "key": "af-cap-eastern-cape-and-the-transkei",
+   "tropicalKm2": 15011.4,
+   "temperateKm2": 710.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200151,
+   "key": "af-cap-northern-cape-and-griqualand-west",
+   "tropicalKm2": 1041.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200152,
+   "key": "af-nat-natal-and-zululand",
+   "tropicalKm2": 21221.3,
+   "temperateKm2": 785.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200154,
+   "key": "af-zar-lydenburg-and-the-eastern-transvaal",
+   "tropicalKm2": 10992.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200155,
+   "key": "af-zar-zoutpansberg-and-the-northern-transvaal",
+   "tropicalKm2": 2869.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200156,
+   "key": "af-zar-potchefstroom-and-the-western-transvaal",
+   "tropicalKm2": 61.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200157,
+   "key": "af-orf-orange-free-state",
+   "tropicalKm2": 121.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200158,
+   "key": "af-bea-mombasa-and-the-coast",
+   "tropicalKm2": 4072.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200159,
+   "key": "af-bea-ukamba-and-nairobi",
+   "tropicalKm2": 6949.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200160,
+   "key": "af-bea-nyanza-and-the-western-province",
+   "tropicalKm2": 2730.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200161,
+   "key": "af-bea-rift-valley",
+   "tropicalKm2": 12225,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200162,
+   "key": "af-bea-northern-frontier-district",
+   "tropicalKm2": 727.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200163,
+   "key": "af-bea-buganda",
+   "tropicalKm2": 4982.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200164,
+   "key": "af-bea-eastern-province-of-uganda",
+   "tropicalKm2": 2186.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200165,
+   "key": "af-bea-northern-province-of-uganda",
+   "tropicalKm2": 1227.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200166,
+   "key": "af-bea-western-province-of-uganda",
+   "tropicalKm2": 7269.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200167,
+   "key": "af-bea-jubaland",
+   "tropicalKm2": 2939.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200168,
+   "key": "af-bwa-gold-coast-colony",
+   "tropicalKm2": 32472.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200169,
+   "key": "af-bwa-ashanti",
+   "tropicalKm2": 37447.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200170,
+   "key": "af-bwa-northern-territories-of-the-gold-coast",
+   "tropicalKm2": 12825,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200171,
+   "key": "af-bwa-gambia",
+   "tropicalKm2": 1623.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200172,
+   "key": "af-bwa-sierra-leone-colony",
+   "tropicalKm2": 82.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200173,
+   "key": "af-bwa-sierra-leone-protectorate",
+   "tropicalKm2": 38174.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200174,
+   "key": "af-bwa-lagos-colony",
+   "tropicalKm2": 970.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200175,
+   "key": "af-bwa-southern-nigeria-the-west",
+   "tropicalKm2": 46033.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200176,
+   "key": "af-bwa-southern-nigeria-the-east",
+   "tropicalKm2": 45700.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200177,
+   "key": "af-bwa-southern-nigeria-the-middle-belt",
+   "tropicalKm2": 38066.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200179,
+   "key": "af-bwa-northern-nigeria-the-niger-province",
+   "tropicalKm2": 3318.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200180,
+   "key": "af-fwa-senegal-the-communes-and-the-coast",
+   "tropicalKm2": 1851,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200181,
+   "key": "af-fwa-senegal-the-interior",
+   "tropicalKm2": 4406.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200185,
+   "key": "af-fwa-french-sudan-kayes-bamako-and-koulikoro",
+   "tropicalKm2": 77.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200187,
+   "key": "af-fwa-french-sudan-sikasso",
+   "tropicalKm2": 8608.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200189,
+   "key": "af-fwa-guinea-conakry-and-the-coast",
+   "tropicalKm2": 11486.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200190,
+   "key": "af-fwa-guinea-fouta-djallon",
+   "tropicalKm2": 2760.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200191,
+   "key": "af-fwa-guinea-the-middle-niger",
+   "tropicalKm2": 4509,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200192,
+   "key": "af-fwa-guinea-the-upper-niger",
+   "tropicalKm2": 20636,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200193,
+   "key": "af-fwa-guinea-faranah",
+   "tropicalKm2": 8144.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200194,
+   "key": "af-fwa-guinea-the-forest-region",
+   "tropicalKm2": 16378.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200195,
+   "key": "af-fwa-guinea-boke",
+   "tropicalKm2": 5193.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200196,
+   "key": "af-fwa-ivory-coast-the-south",
+   "tropicalKm2": 87106.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200197,
+   "key": "af-fwa-ivory-coast-the-north",
+   "tropicalKm2": 91303.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200200,
+   "key": "af-fwa-upper-volta-banfora",
+   "tropicalKm2": 637.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200202,
+   "key": "af-fwa-upper-volta-koudougou",
+   "tropicalKm2": 80,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200209,
+   "key": "af-fwa-upper-volta-gaoua",
+   "tropicalKm2": 325.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200211,
+   "key": "af-fwa-dahomey-the-coast",
+   "tropicalKm2": 5487.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200212,
+   "key": "af-fwa-dahomey-the-north",
+   "tropicalKm2": 49993.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200216,
+   "key": "af-fea-gabon-the-estuary-and-the-coast",
+   "tropicalKm2": 25853.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200217,
+   "key": "af-fea-gabon-the-interior",
+   "tropicalKm2": 181809.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200218,
+   "key": "af-fea-middle-congo-brazzaville-and-the-pool",
+   "tropicalKm2": 8475.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200219,
+   "key": "af-fea-middle-congo-the-north",
+   "tropicalKm2": 176768.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200220,
+   "key": "af-fea-middle-congo-the-south",
+   "tropicalKm2": 65519.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200221,
+   "key": "af-fea-ubangi-shari-the-west",
+   "tropicalKm2": 38426.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200222,
+   "key": "af-fea-ubangi-shari-the-centre",
+   "tropicalKm2": 2795.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200223,
+   "key": "af-fea-ubangi-shari-the-east",
+   "tropicalKm2": 20693.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200225,
+   "key": "af-fea-chad-the-south",
+   "tropicalKm2": 139.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200227,
+   "key": "af-alg-algiers-and-the-mitidja",
+   "tropicalKm2": 234.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200228,
+   "key": "af-alg-the-kabylie",
+   "tropicalKm2": 217.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200229,
+   "key": "af-alg-constantine-and-the-east",
+   "tropicalKm2": 488.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200234,
+   "key": "af-tun-tunis-and-the-sahel",
+   "tropicalKm2": 40.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200235,
+   "key": "af-tun-bizerte-and-the-north-west",
+   "tropicalKm2": 54.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200238,
+   "key": "af-mar-tangier-and-tetouan",
+   "tropicalKm2": 52.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200239,
+   "key": "af-mar-the-rif-and-the-eastern-zone",
+   "tropicalKm2": 65.1,
+   "temperateKm2": 3154.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200240,
+   "key": "af-mar-gharb-and-the-atlantic-plain",
+   "tropicalKm2": 357.4,
+   "temperateKm2": 1129,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200241,
+   "key": "af-mar-fez-and-meknes",
+   "tropicalKm2": 53.7,
+   "temperateKm2": 1327.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200242,
+   "key": "af-mar-casablanca-the-chaouia-and-tadla",
+   "tropicalKm2": 0,
+   "temperateKm2": 4337.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200243,
+   "key": "af-mar-marrakech-and-the-south",
+   "tropicalKm2": 0,
+   "temperateKm2": 280.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200247,
+   "key": "af-lbr-montserrado",
+   "tropicalKm2": 1980.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200248,
+   "key": "af-lbr-grand-bassa",
+   "tropicalKm2": 6631,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200249,
+   "key": "af-lbr-sinoe-grand-kru-and-grand-gedeh",
+   "tropicalKm2": 17900.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200250,
+   "key": "af-lbr-maryland",
+   "tropicalKm2": 5135.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200251,
+   "key": "af-lbr-nimba-and-bong",
+   "tropicalKm2": 7882,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 200252,
+   "key": "af-lbr-western-liberia",
+   "tropicalKm2": 14462.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300001,
+   "key": "am-usa-alaska",
+   "tropicalKm2": 0,
+   "temperateKm2": 643811.6,
+   "borealKm2": 379073.1
+  },
+  {
+   "provinceId": 300002,
+   "key": "am-usa-alabama",
+   "tropicalKm2": 36.3,
+   "temperateKm2": 93181.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300003,
+   "key": "am-usa-arkansas",
+   "tropicalKm2": 0,
+   "temperateKm2": 98349.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300004,
+   "key": "am-usa-arizona-territory",
+   "tropicalKm2": 0,
+   "temperateKm2": 30356.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300005,
+   "key": "am-usa-california",
+   "tropicalKm2": 0,
+   "temperateKm2": 102786.1,
+   "borealKm2": 14133
+  },
+  {
+   "provinceId": 300006,
+   "key": "am-usa-colorado",
+   "tropicalKm2": 0,
+   "temperateKm2": 51722.1,
+   "borealKm2": 38195.8
+  },
+  {
+   "provinceId": 300007,
+   "key": "am-usa-connecticut",
+   "tropicalKm2": 0,
+   "temperateKm2": 7995.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300008,
+   "key": "am-usa-district-of-columbia",
+   "tropicalKm2": 0,
+   "temperateKm2": 104.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300009,
+   "key": "am-usa-delaware",
+   "tropicalKm2": 0,
+   "temperateKm2": 1945,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300010,
+   "key": "am-usa-florida",
+   "tropicalKm2": 0,
+   "temperateKm2": 97817.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300011,
+   "key": "am-usa-georgia",
+   "tropicalKm2": 0,
+   "temperateKm2": 104796.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300013,
+   "key": "am-usa-iowa",
+   "tropicalKm2": 0,
+   "temperateKm2": 3954.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300014,
+   "key": "am-usa-idaho",
+   "tropicalKm2": 0,
+   "temperateKm2": 50713.3,
+   "borealKm2": 39797.7
+  },
+  {
+   "provinceId": 300015,
+   "key": "am-usa-illinois",
+   "tropicalKm2": 0,
+   "temperateKm2": 9430.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300016,
+   "key": "am-usa-indiana",
+   "tropicalKm2": 0,
+   "temperateKm2": 27113.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300017,
+   "key": "am-usa-kansas",
+   "tropicalKm2": 0,
+   "temperateKm2": 86.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300018,
+   "key": "am-usa-kentucky",
+   "tropicalKm2": 0,
+   "temperateKm2": 21137.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300019,
+   "key": "am-usa-louisiana",
+   "tropicalKm2": 0,
+   "temperateKm2": 75851.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300020,
+   "key": "am-usa-massachusetts",
+   "tropicalKm2": 0,
+   "temperateKm2": 15083.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300021,
+   "key": "am-usa-maryland",
+   "tropicalKm2": 0,
+   "temperateKm2": 9105.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300022,
+   "key": "am-usa-maine",
+   "tropicalKm2": 0,
+   "temperateKm2": 69060.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300023,
+   "key": "am-usa-michigan",
+   "tropicalKm2": 0,
+   "temperateKm2": 98827.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300024,
+   "key": "am-usa-minnesota",
+   "tropicalKm2": 0,
+   "temperateKm2": 88288.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300025,
+   "key": "am-usa-missouri",
+   "tropicalKm2": 0,
+   "temperateKm2": 61834.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300026,
+   "key": "am-usa-mississippi",
+   "tropicalKm2": 0,
+   "temperateKm2": 90161.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300027,
+   "key": "am-usa-montana",
+   "tropicalKm2": 0,
+   "temperateKm2": 47179.8,
+   "borealKm2": 52319.9
+  },
+  {
+   "provinceId": 300028,
+   "key": "am-usa-north-carolina",
+   "tropicalKm2": 0,
+   "temperateKm2": 88606.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300029,
+   "key": "am-usa-north-dakota",
+   "tropicalKm2": 0,
+   "temperateKm2": 1553.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300030,
+   "key": "am-usa-nebraska",
+   "tropicalKm2": 0,
+   "temperateKm2": 197.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300031,
+   "key": "am-usa-new-hampshire",
+   "tropicalKm2": 0,
+   "temperateKm2": 19360,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300032,
+   "key": "am-usa-new-jersey",
+   "tropicalKm2": 0,
+   "temperateKm2": 10970.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300033,
+   "key": "am-usa-new-mexico-territory",
+   "tropicalKm2": 0,
+   "temperateKm2": 33157.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300034,
+   "key": "am-usa-nevada",
+   "tropicalKm2": 0,
+   "temperateKm2": 2738.9,
+   "borealKm2": 501.3
+  },
+  {
+   "provinceId": 300035,
+   "key": "am-usa-new-york",
+   "tropicalKm2": 0,
+   "temperateKm2": 65089.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300036,
+   "key": "am-usa-ohio",
+   "tropicalKm2": 0,
+   "temperateKm2": 34463.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300037,
+   "key": "am-usa-oklahoma-territory-and-indian-territory",
+   "tropicalKm2": 0,
+   "temperateKm2": 24178.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300038,
+   "key": "am-usa-oregon",
+   "tropicalKm2": 0,
+   "temperateKm2": 104865.4,
+   "borealKm2": 6628.7
+  },
+  {
+   "provinceId": 300039,
+   "key": "am-usa-pennsylvania",
+   "tropicalKm2": 0,
+   "temperateKm2": 69916,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300040,
+   "key": "am-usa-rhode-island",
+   "tropicalKm2": 0,
+   "temperateKm2": 1731.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300041,
+   "key": "am-usa-south-carolina",
+   "tropicalKm2": 0,
+   "temperateKm2": 53624.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300042,
+   "key": "am-usa-south-dakota",
+   "tropicalKm2": 0,
+   "temperateKm2": 4987.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300043,
+   "key": "am-usa-tennessee",
+   "tropicalKm2": 0,
+   "temperateKm2": 54301.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300044,
+   "key": "am-usa-texas",
+   "tropicalKm2": 0,
+   "temperateKm2": 84708.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300045,
+   "key": "am-usa-utah",
+   "tropicalKm2": 0,
+   "temperateKm2": 31122.1,
+   "borealKm2": 4118.3
+  },
+  {
+   "provinceId": 300046,
+   "key": "am-usa-virginia",
+   "tropicalKm2": 0,
+   "temperateKm2": 52947.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300047,
+   "key": "am-usa-vermont",
+   "tropicalKm2": 0,
+   "temperateKm2": 16808.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300048,
+   "key": "am-usa-washington",
+   "tropicalKm2": 0,
+   "temperateKm2": 71174.8,
+   "borealKm2": 23575.5
+  },
+  {
+   "provinceId": 300049,
+   "key": "am-usa-wisconsin",
+   "tropicalKm2": 0,
+   "temperateKm2": 72800.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300050,
+   "key": "am-usa-west-virginia",
+   "tropicalKm2": 0,
+   "temperateKm2": 39177.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300051,
+   "key": "am-usa-wyoming",
+   "tropicalKm2": 0,
+   "temperateKm2": 14185.6,
+   "borealKm2": 38290.8
+  },
+  {
+   "provinceId": 300052,
+   "key": "am-can-ontario",
+   "tropicalKm2": 0,
+   "temperateKm2": 510022,
+   "borealKm2": 357989
+  },
+  {
+   "provinceId": 300053,
+   "key": "am-can-quebec",
+   "tropicalKm2": 0,
+   "temperateKm2": 715981.1,
+   "borealKm2": 499721.4
+  },
+  {
+   "provinceId": 300054,
+   "key": "am-can-nova-scotia",
+   "tropicalKm2": 0,
+   "temperateKm2": 44831.5,
+   "borealKm2": 29.4
+  },
+  {
+   "provinceId": 300055,
+   "key": "am-can-new-brunswick",
+   "tropicalKm2": 0,
+   "temperateKm2": 66219.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300056,
+   "key": "am-can-manitoba",
+   "tropicalKm2": 0,
+   "temperateKm2": 254419.2,
+   "borealKm2": 235988.8
+  },
+  {
+   "provinceId": 300057,
+   "key": "am-can-british-columbia",
+   "tropicalKm2": 0,
+   "temperateKm2": 258773.3,
+   "borealKm2": 523121.6
+  },
+  {
+   "provinceId": 300058,
+   "key": "am-can-prince-edward-island",
+   "tropicalKm2": 0,
+   "temperateKm2": 1147.9,
+   "borealKm2": 0.4
+  },
+  {
+   "provinceId": 300059,
+   "key": "am-can-yukon",
+   "tropicalKm2": 0,
+   "temperateKm2": 185987.5,
+   "borealKm2": 182812.1
+  },
+  {
+   "provinceId": 300060,
+   "key": "am-can-northwest-territories",
+   "tropicalKm2": 0,
+   "temperateKm2": 560430.5,
+   "borealKm2": 316586.6
+  },
+  {
+   "provinceId": 300061,
+   "key": "am-can-alberta-district",
+   "tropicalKm2": 0,
+   "temperateKm2": 265194.2,
+   "borealKm2": 216146.5
+  },
+  {
+   "provinceId": 300062,
+   "key": "am-can-saskatchewan-district",
+   "tropicalKm2": 0,
+   "temperateKm2": 73236.2,
+   "borealKm2": 269416.7
+  },
+  {
+   "provinceId": 300063,
+   "key": "am-nfd-newfoundland-and-labrador",
+   "tropicalKm2": 0,
+   "temperateKm2": 115890.9,
+   "borealKm2": 222381.6
+  },
+  {
+   "provinceId": 300064,
+   "key": "am-mex-aguascalientes",
+   "tropicalKm2": 0,
+   "temperateKm2": 873.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300065,
+   "key": "am-mex-baja-california",
+   "tropicalKm2": 3089.1,
+   "temperateKm2": 6476.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300066,
+   "key": "am-mex-campeche",
+   "tropicalKm2": 48386.7,
+   "temperateKm2": 54.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300067,
+   "key": "am-mex-chihuahua",
+   "tropicalKm2": 4254.3,
+   "temperateKm2": 60399.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300068,
+   "key": "am-mex-chiapas",
+   "tropicalKm2": 39746,
+   "temperateKm2": 12184.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300069,
+   "key": "am-mex-coahuila",
+   "tropicalKm2": 0,
+   "temperateKm2": 2932.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300070,
+   "key": "am-mex-colima",
+   "tropicalKm2": 106.8,
+   "temperateKm2": 4332.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300071,
+   "key": "am-mex-distrito-federal",
+   "tropicalKm2": 379.5,
+   "temperateKm2": 318.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300072,
+   "key": "am-mex-durango",
+   "tropicalKm2": 15265.6,
+   "temperateKm2": 33577.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300073,
+   "key": "am-mex-guerrero",
+   "tropicalKm2": 10730,
+   "temperateKm2": 21110.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300074,
+   "key": "am-mex-guanajuato",
+   "tropicalKm2": 1424,
+   "temperateKm2": 2872.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300075,
+   "key": "am-mex-hidalgo",
+   "tropicalKm2": 672.4,
+   "temperateKm2": 7593.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300076,
+   "key": "am-mex-jalisco",
+   "tropicalKm2": 12414.4,
+   "temperateKm2": 31515.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300077,
+   "key": "am-mex-mexico",
+   "tropicalKm2": 288,
+   "temperateKm2": 7906.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300078,
+   "key": "am-mex-michoacan",
+   "tropicalKm2": 1516.6,
+   "temperateKm2": 30898.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300079,
+   "key": "am-mex-morelos",
+   "tropicalKm2": 54.8,
+   "temperateKm2": 960.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300080,
+   "key": "am-mex-nayarit",
+   "tropicalKm2": 18257.6,
+   "temperateKm2": 2843.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300081,
+   "key": "am-mex-nuevo-leon",
+   "tropicalKm2": 71.2,
+   "temperateKm2": 10539.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300082,
+   "key": "am-mex-oaxaca",
+   "tropicalKm2": 24766.2,
+   "temperateKm2": 23358.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300083,
+   "key": "am-mex-puebla",
+   "tropicalKm2": 2742,
+   "temperateKm2": 8174.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300084,
+   "key": "am-mex-queretaro",
+   "tropicalKm2": 75.3,
+   "temperateKm2": 2549.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300085,
+   "key": "am-mex-quintana-roo",
+   "tropicalKm2": 38301.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300086,
+   "key": "am-mex-sinaloa",
+   "tropicalKm2": 35579.6,
+   "temperateKm2": 7701.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300087,
+   "key": "am-mex-san-luis-potosi",
+   "tropicalKm2": 1654.4,
+   "temperateKm2": 5772.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300088,
+   "key": "am-mex-sonora",
+   "tropicalKm2": 45173.7,
+   "temperateKm2": 13797.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300089,
+   "key": "am-mex-tabasco",
+   "tropicalKm2": 17155.7,
+   "temperateKm2": 1301.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300090,
+   "key": "am-mex-tamaulipas",
+   "tropicalKm2": 957.5,
+   "temperateKm2": 14817.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300091,
+   "key": "am-mex-tlaxcala",
+   "tropicalKm2": 0,
+   "temperateKm2": 540.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300092,
+   "key": "am-mex-veracruz",
+   "tropicalKm2": 22321.6,
+   "temperateKm2": 10245.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300093,
+   "key": "am-mex-yucatan",
+   "tropicalKm2": 31275.3,
+   "temperateKm2": 50.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300094,
+   "key": "am-mex-zacatecas",
+   "tropicalKm2": 832.9,
+   "temperateKm2": 5844.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300095,
+   "key": "am-gua-alta-verapaz",
+   "tropicalKm2": 6719.9,
+   "temperateKm2": 1483.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300096,
+   "key": "am-gua-baja-verapaz",
+   "tropicalKm2": 1506.6,
+   "temperateKm2": 769.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300097,
+   "key": "am-gua-chimaltenango",
+   "tropicalKm2": 1125.7,
+   "temperateKm2": 480.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300098,
+   "key": "am-gua-chiquimula",
+   "tropicalKm2": 1440.8,
+   "temperateKm2": 67.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300099,
+   "key": "am-gua-escuintla",
+   "tropicalKm2": 2310.9,
+   "temperateKm2": 719.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300100,
+   "key": "am-gua-guatemala",
+   "tropicalKm2": 1582.9,
+   "temperateKm2": 314.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300101,
+   "key": "am-gua-huehuetenango",
+   "tropicalKm2": 3592.6,
+   "temperateKm2": 2768.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300102,
+   "key": "am-gua-izabal",
+   "tropicalKm2": 5974,
+   "temperateKm2": 138.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300103,
+   "key": "am-gua-jalapa",
+   "tropicalKm2": 1168.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300104,
+   "key": "am-gua-jutiapa",
+   "tropicalKm2": 857,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300105,
+   "key": "am-gua-peten",
+   "tropicalKm2": 33615.9,
+   "temperateKm2": 376.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300106,
+   "key": "am-gua-el-progreso",
+   "tropicalKm2": 345.8,
+   "temperateKm2": 535.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300107,
+   "key": "am-gua-quiche",
+   "tropicalKm2": 3802,
+   "temperateKm2": 1976.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300108,
+   "key": "am-gua-quezaltenango",
+   "tropicalKm2": 708.8,
+   "temperateKm2": 529.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300109,
+   "key": "am-gua-retalhuleu",
+   "tropicalKm2": 695.9,
+   "temperateKm2": 284.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300110,
+   "key": "am-gua-sacatepequez",
+   "tropicalKm2": 446,
+   "temperateKm2": 162.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300111,
+   "key": "am-gua-san-marcos",
+   "tropicalKm2": 1193,
+   "temperateKm2": 1494.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300112,
+   "key": "am-gua-solola",
+   "tropicalKm2": 538.3,
+   "temperateKm2": 553.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300113,
+   "key": "am-gua-santa-rosa",
+   "tropicalKm2": 2246.7,
+   "temperateKm2": 325.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300114,
+   "key": "am-gua-suchitepequez",
+   "tropicalKm2": 1009.9,
+   "temperateKm2": 529.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300115,
+   "key": "am-gua-totonicapan",
+   "tropicalKm2": 177.1,
+   "temperateKm2": 809.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300116,
+   "key": "am-gua-zacapa",
+   "tropicalKm2": 855.9,
+   "temperateKm2": 671.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300117,
+   "key": "am-hon-atlantida",
+   "tropicalKm2": 2962.1,
+   "temperateKm2": 986.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300118,
+   "key": "am-hon-choluteca",
+   "tropicalKm2": 1327.6,
+   "temperateKm2": 889.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300119,
+   "key": "am-hon-colon",
+   "tropicalKm2": 7382.9,
+   "temperateKm2": 330.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300120,
+   "key": "am-hon-comayagua",
+   "tropicalKm2": 3248.8,
+   "temperateKm2": 749.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300121,
+   "key": "am-hon-copan",
+   "tropicalKm2": 1892.9,
+   "temperateKm2": 1047.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300122,
+   "key": "am-hon-cortes",
+   "tropicalKm2": 3070.7,
+   "temperateKm2": 458.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300123,
+   "key": "am-hon-el-paraiso",
+   "tropicalKm2": 4889,
+   "temperateKm2": 725.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300124,
+   "key": "am-hon-francisco-morazan",
+   "tropicalKm2": 4227.9,
+   "temperateKm2": 1702.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300125,
+   "key": "am-hon-gracias-a-dios",
+   "tropicalKm2": 11481.5,
+   "temperateKm2": 459.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300127,
+   "key": "am-hon-intibuca",
+   "tropicalKm2": 2649.9,
+   "temperateKm2": 301.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300128,
+   "key": "am-hon-lempira",
+   "tropicalKm2": 2529.6,
+   "temperateKm2": 1254.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300129,
+   "key": "am-hon-la-paz",
+   "tropicalKm2": 1710.3,
+   "temperateKm2": 462.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300130,
+   "key": "am-hon-ocotepeque",
+   "tropicalKm2": 1286.2,
+   "temperateKm2": 80.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300131,
+   "key": "am-hon-olancho",
+   "tropicalKm2": 19760.3,
+   "temperateKm2": 2430.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300132,
+   "key": "am-hon-santa-barbara",
+   "tropicalKm2": 3134.7,
+   "temperateKm2": 1408.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300133,
+   "key": "am-hon-valle",
+   "tropicalKm2": 170.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300134,
+   "key": "am-hon-yoro",
+   "tropicalKm2": 5684.4,
+   "temperateKm2": 1567.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300135,
+   "key": "am-sal-ahuachapan",
+   "tropicalKm2": 787,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300136,
+   "key": "am-sal-cabanas",
+   "tropicalKm2": 249.3,
+   "temperateKm2": 322.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300137,
+   "key": "am-sal-chalatenango",
+   "tropicalKm2": 165.8,
+   "temperateKm2": 745.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300138,
+   "key": "am-sal-cuscatlan",
+   "tropicalKm2": 341.2,
+   "temperateKm2": 75.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300139,
+   "key": "am-sal-la-libertad",
+   "tropicalKm2": 975.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300140,
+   "key": "am-sal-morazan",
+   "tropicalKm2": 874.4,
+   "temperateKm2": 226,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300141,
+   "key": "am-sal-la-paz",
+   "tropicalKm2": 678,
+   "temperateKm2": 31.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300142,
+   "key": "am-sal-santa-ana",
+   "tropicalKm2": 653.7,
+   "temperateKm2": 165.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300143,
+   "key": "am-sal-san-miguel",
+   "tropicalKm2": 166.8,
+   "temperateKm2": 446.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300144,
+   "key": "am-sal-sonsonate",
+   "tropicalKm2": 779.9,
+   "temperateKm2": 95.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300145,
+   "key": "am-sal-san-salvador",
+   "tropicalKm2": 231.8,
+   "temperateKm2": 54.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300146,
+   "key": "am-sal-san-vicente",
+   "tropicalKm2": 145.5,
+   "temperateKm2": 300.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300147,
+   "key": "am-sal-la-union",
+   "tropicalKm2": 84,
+   "temperateKm2": 315.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300148,
+   "key": "am-sal-usulutan",
+   "tropicalKm2": 424.6,
+   "temperateKm2": 228.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300149,
+   "key": "am-nic-atlantico-norte",
+   "tropicalKm2": 27505.9,
+   "temperateKm2": 202.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300150,
+   "key": "am-nic-atlantico-sur",
+   "tropicalKm2": 23028.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300151,
+   "key": "am-nic-boaco",
+   "tropicalKm2": 2480.9,
+   "temperateKm2": 67.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300152,
+   "key": "am-nic-carazo",
+   "tropicalKm2": 195.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300153,
+   "key": "am-nic-chinandega",
+   "tropicalKm2": 1266.7,
+   "temperateKm2": 747.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300154,
+   "key": "am-nic-chontales",
+   "tropicalKm2": 4904.7,
+   "temperateKm2": 131.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300155,
+   "key": "am-nic-esteli",
+   "tropicalKm2": 817.5,
+   "temperateKm2": 167,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300156,
+   "key": "am-nic-granada",
+   "tropicalKm2": 224,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300157,
+   "key": "am-nic-jinotega",
+   "tropicalKm2": 9215.1,
+   "temperateKm2": 68.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300158,
+   "key": "am-nic-leon",
+   "tropicalKm2": 1115.9,
+   "temperateKm2": 82.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300159,
+   "key": "am-nic-madriz",
+   "tropicalKm2": 399.1,
+   "temperateKm2": 83.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300160,
+   "key": "am-nic-managua",
+   "tropicalKm2": 157.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300161,
+   "key": "am-nic-masaya",
+   "tropicalKm2": 71.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300162,
+   "key": "am-nic-matagalpa",
+   "tropicalKm2": 6591.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300163,
+   "key": "am-nic-nueva-segovia",
+   "tropicalKm2": 2481.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300164,
+   "key": "am-nic-rivas",
+   "tropicalKm2": 439.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300165,
+   "key": "am-nic-rio-san-juan",
+   "tropicalKm2": 6145.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300166,
+   "key": "am-cos-alajuela",
+   "tropicalKm2": 7629.1,
+   "temperateKm2": 892,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300167,
+   "key": "am-cos-cartago",
+   "tropicalKm2": 3165,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300168,
+   "key": "am-cos-guanacaste",
+   "tropicalKm2": 5663.1,
+   "temperateKm2": 1450.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300169,
+   "key": "am-cos-heredia",
+   "tropicalKm2": 2291.4,
+   "temperateKm2": 168.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300170,
+   "key": "am-cos-limon",
+   "tropicalKm2": 8590.7,
+   "temperateKm2": 153.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300171,
+   "key": "am-cos-puntarenas",
+   "tropicalKm2": 6716.1,
+   "temperateKm2": 2554.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300172,
+   "key": "am-cos-san-jose",
+   "tropicalKm2": 4563.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300173,
+   "key": "am-bwi-blz-belize",
+   "tropicalKm2": 3063,
+   "temperateKm2": 69.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300174,
+   "key": "am-bwi-blz-cayo",
+   "tropicalKm2": 4640,
+   "temperateKm2": 406.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300175,
+   "key": "am-bwi-blz-corozal",
+   "tropicalKm2": 1447.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300176,
+   "key": "am-bwi-blz-orange-walk",
+   "tropicalKm2": 4606,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300177,
+   "key": "am-bwi-blz-stann-creek",
+   "tropicalKm2": 2325.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300178,
+   "key": "am-bwi-blz-toledo",
+   "tropicalKm2": 3647.7,
+   "temperateKm2": 66.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300179,
+   "key": "am-pan-panama",
+   "tropicalKm2": 5470.1,
+   "temperateKm2": 2980.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300180,
+   "key": "am-pan-colon",
+   "tropicalKm2": 2584.7,
+   "temperateKm2": 1383.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300181,
+   "key": "am-pan-chiriqui-and-bocas-del-toro",
+   "tropicalKm2": 7495.8,
+   "temperateKm2": 2025.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300182,
+   "key": "am-pan-veraguas-and-azero",
+   "tropicalKm2": 10373.4,
+   "temperateKm2": 3971.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300183,
+   "key": "am-pan-cocle",
+   "tropicalKm2": 2530.9,
+   "temperateKm2": 1689.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300184,
+   "key": "am-pan-darien-and-the-comarcas",
+   "tropicalKm2": 14307.5,
+   "temperateKm2": 7813.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300185,
+   "key": "am-col-amazonas",
+   "tropicalKm2": 107405.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300186,
+   "key": "am-col-antioquia",
+   "tropicalKm2": 47775.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300187,
+   "key": "am-col-arauca",
+   "tropicalKm2": 7009.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300188,
+   "key": "am-col-atlantico",
+   "tropicalKm2": 1074.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300189,
+   "key": "am-col-bolivar",
+   "tropicalKm2": 20319.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300190,
+   "key": "am-col-boyaca",
+   "tropicalKm2": 14591.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300191,
+   "key": "am-col-caldas",
+   "tropicalKm2": 5960.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300192,
+   "key": "am-col-caqueta",
+   "tropicalKm2": 86664.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300193,
+   "key": "am-col-casanare",
+   "tropicalKm2": 7457.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300194,
+   "key": "am-col-cauca",
+   "tropicalKm2": 15564.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300195,
+   "key": "am-col-cesar",
+   "tropicalKm2": 14325.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300196,
+   "key": "am-col-choco",
+   "tropicalKm2": 36896,
+   "temperateKm2": 169.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300197,
+   "key": "am-col-cordoba",
+   "tropicalKm2": 18913.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300198,
+   "key": "am-col-bogota",
+   "tropicalKm2": 15373.5,
+   "temperateKm2": 336,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300199,
+   "key": "am-col-guainia",
+   "tropicalKm2": 69993.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300200,
+   "key": "am-col-guaviare",
+   "tropicalKm2": 54346.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300201,
+   "key": "am-col-huila",
+   "tropicalKm2": 12580.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300202,
+   "key": "am-col-la-guajira",
+   "tropicalKm2": 4739.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300203,
+   "key": "am-col-magdalena",
+   "tropicalKm2": 13493.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300204,
+   "key": "am-col-meta",
+   "tropicalKm2": 46834.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300205,
+   "key": "am-col-narino",
+   "tropicalKm2": 17974.8,
+   "temperateKm2": 632.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300206,
+   "key": "am-col-norte-de-santander",
+   "tropicalKm2": 16976.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300207,
+   "key": "am-col-putumayo",
+   "tropicalKm2": 23837.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300208,
+   "key": "am-col-quindio",
+   "tropicalKm2": 1443.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300209,
+   "key": "am-col-risaralda",
+   "tropicalKm2": 2103,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300210,
+   "key": "am-col-santander",
+   "tropicalKm2": 22520.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300211,
+   "key": "am-col-sucre",
+   "tropicalKm2": 7860.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300212,
+   "key": "am-col-tolima",
+   "tropicalKm2": 17299.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300213,
+   "key": "am-col-valle-del-cauca",
+   "tropicalKm2": 9459.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300214,
+   "key": "am-col-vaupes",
+   "tropicalKm2": 51625.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300215,
+   "key": "am-col-vichada",
+   "tropicalKm2": 39967.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300216,
+   "key": "am-ven-distrito-capital",
+   "tropicalKm2": 241.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300217,
+   "key": "am-ven-anzoategui",
+   "tropicalKm2": 4227.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300218,
+   "key": "am-ven-apure",
+   "tropicalKm2": 11420.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300219,
+   "key": "am-ven-aragua",
+   "tropicalKm2": 1035.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300220,
+   "key": "am-ven-barinas",
+   "tropicalKm2": 12273.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300221,
+   "key": "am-ven-bolivar",
+   "tropicalKm2": 193485.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300222,
+   "key": "am-ven-carabobo",
+   "tropicalKm2": 2119.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300223,
+   "key": "am-ven-cojedes",
+   "tropicalKm2": 1624.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300224,
+   "key": "am-ven-falcon",
+   "tropicalKm2": 14115.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300225,
+   "key": "am-ven-guarico",
+   "tropicalKm2": 4713.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300226,
+   "key": "am-ven-lara",
+   "tropicalKm2": 10397.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300227,
+   "key": "am-ven-merida",
+   "tropicalKm2": 6809.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300228,
+   "key": "am-ven-miranda",
+   "tropicalKm2": 8455,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300229,
+   "key": "am-ven-monagas",
+   "tropicalKm2": 14572.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300230,
+   "key": "am-ven-nueva-esparta",
+   "tropicalKm2": 365.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300231,
+   "key": "am-ven-portuguesa",
+   "tropicalKm2": 4815.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300232,
+   "key": "am-ven-sucre",
+   "tropicalKm2": 7836.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300233,
+   "key": "am-ven-tachira",
+   "tropicalKm2": 8548.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300234,
+   "key": "am-ven-trujillo",
+   "tropicalKm2": 6043.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300235,
+   "key": "am-ven-yaracuy",
+   "tropicalKm2": 4962.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300236,
+   "key": "am-ven-zulia",
+   "tropicalKm2": 29307.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300238,
+   "key": "am-ven-vargas",
+   "tropicalKm2": 139.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300239,
+   "key": "am-ven-delta-amacuro",
+   "tropicalKm2": 31630.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300240,
+   "key": "am-ven-amazonas",
+   "tropicalKm2": 173117.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300241,
+   "key": "am-ecu-azuay",
+   "tropicalKm2": 3227,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300242,
+   "key": "am-ecu-bolivar",
+   "tropicalKm2": 2153.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300243,
+   "key": "am-ecu-carchi",
+   "tropicalKm2": 1402.1,
+   "temperateKm2": 157.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300244,
+   "key": "am-ecu-orellana",
+   "tropicalKm2": 20919.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300245,
+   "key": "am-ecu-esmeraldas",
+   "tropicalKm2": 10635.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300246,
+   "key": "am-ecu-canar",
+   "tropicalKm2": 1300.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300247,
+   "key": "am-ecu-guayas",
+   "tropicalKm2": 7753.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300248,
+   "key": "am-ecu-chimborazo",
+   "tropicalKm2": 2327.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300249,
+   "key": "am-ecu-imbabura",
+   "tropicalKm2": 1075.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300250,
+   "key": "am-ecu-loja",
+   "tropicalKm2": 6643.4,
+   "temperateKm2": 164.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300251,
+   "key": "am-ecu-manabi",
+   "tropicalKm2": 15492.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300252,
+   "key": "am-ecu-napo",
+   "tropicalKm2": 161.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300253,
+   "key": "am-ecu-el-oro",
+   "tropicalKm2": 2515.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300254,
+   "key": "am-ecu-pichincha",
+   "tropicalKm2": 3101.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300255,
+   "key": "am-ecu-los-rios",
+   "tropicalKm2": 4611.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300256,
+   "key": "am-ecu-morona-santiago",
+   "tropicalKm2": 17810.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300257,
+   "key": "am-ecu-santo-domingo-de-los-tsachilas",
+   "tropicalKm2": 1737.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300258,
+   "key": "am-ecu-santa-elena",
+   "tropicalKm2": 1006.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300259,
+   "key": "am-ecu-tungurahua",
+   "tropicalKm2": 7809.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300260,
+   "key": "am-ecu-sucumbios",
+   "tropicalKm2": 17074.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300262,
+   "key": "am-ecu-cotopaxi",
+   "tropicalKm2": 1938.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300263,
+   "key": "am-ecu-pastaza",
+   "tropicalKm2": 28992,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300264,
+   "key": "am-ecu-zamora-chinchipe",
+   "tropicalKm2": 6320.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300265,
+   "key": "am-pru-amazonas",
+   "tropicalKm2": 32154.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300266,
+   "key": "am-pru-ancash",
+   "tropicalKm2": 1635,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300267,
+   "key": "am-pru-apurimac",
+   "tropicalKm2": 1285.2,
+   "temperateKm2": 70.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300268,
+   "key": "am-pru-arequipa",
+   "tropicalKm2": 152.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300269,
+   "key": "am-pru-ayacucho",
+   "tropicalKm2": 3448.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300270,
+   "key": "am-pru-cajamarca",
+   "tropicalKm2": 16913,
+   "temperateKm2": 362.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300272,
+   "key": "am-pru-cusco",
+   "tropicalKm2": 36017.9,
+   "temperateKm2": 214.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300273,
+   "key": "am-pru-huanuco",
+   "tropicalKm2": 23015.6,
+   "temperateKm2": 52.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300274,
+   "key": "am-pru-huancavelica",
+   "tropicalKm2": 690.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300276,
+   "key": "am-pru-junin",
+   "tropicalKm2": 22780.7,
+   "temperateKm2": 166.5,
+   "borealKm2": 54.8
+  },
+  {
+   "provinceId": 300277,
+   "key": "am-pru-la-libertad",
+   "tropicalKm2": 5264.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300278,
+   "key": "am-pru-lambayeque",
+   "tropicalKm2": 1465.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300280,
+   "key": "am-pru-loreto",
+   "tropicalKm2": 371481.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300281,
+   "key": "am-pru-madre-de-dios",
+   "tropicalKm2": 80127.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300283,
+   "key": "am-pru-pasco",
+   "tropicalKm2": 17868.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300284,
+   "key": "am-pru-piura",
+   "tropicalKm2": 5580,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300285,
+   "key": "am-pru-puno",
+   "tropicalKm2": 13418.9,
+   "temperateKm2": 0,
+   "borealKm2": 81.7
+  },
+  {
+   "provinceId": 300286,
+   "key": "am-pru-san-martin",
+   "tropicalKm2": 49446.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300287,
+   "key": "am-pru-tumbes",
+   "tropicalKm2": 85.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300288,
+   "key": "am-pru-ucayali",
+   "tropicalKm2": 103394.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300289,
+   "key": "am-bol-el-beni",
+   "tropicalKm2": 134254.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300290,
+   "key": "am-bol-cochabamba",
+   "tropicalKm2": 30712.3,
+   "temperateKm2": 688.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300291,
+   "key": "am-bol-chuquisaca",
+   "tropicalKm2": 23577,
+   "temperateKm2": 689.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300292,
+   "key": "am-bol-la-paz",
+   "tropicalKm2": 73545.3,
+   "temperateKm2": 308.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300293,
+   "key": "am-bol-pando",
+   "tropicalKm2": 62989.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300295,
+   "key": "am-bol-potosi",
+   "tropicalKm2": 63.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300296,
+   "key": "am-bol-santa-cruz",
+   "tropicalKm2": 207184.6,
+   "temperateKm2": 205.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300297,
+   "key": "am-bol-tarija",
+   "tropicalKm2": 21532.5,
+   "temperateKm2": 45.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300298,
+   "key": "am-bol-acre",
+   "tropicalKm2": 153218.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300299,
+   "key": "am-chl-aisen-del-general-carlos-ibanez-del-campo",
+   "tropicalKm2": 5734.1,
+   "temperateKm2": 61115.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300300,
+   "key": "am-chl-antofagasta",
+   "tropicalKm2": 0,
+   "temperateKm2": 1705.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300302,
+   "key": "am-chl-la-araucania",
+   "tropicalKm2": 1619,
+   "temperateKm2": 22582.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300303,
+   "key": "am-chl-atacama",
+   "tropicalKm2": 0,
+   "temperateKm2": 845.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300304,
+   "key": "am-chl-bio-bio",
+   "tropicalKm2": 1892.4,
+   "temperateKm2": 10992.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300305,
+   "key": "am-chl-coquimbo",
+   "tropicalKm2": 117.5,
+   "temperateKm2": 9472.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300306,
+   "key": "am-chl-libertador-general-bernardo-o-higgins",
+   "tropicalKm2": 552.9,
+   "temperateKm2": 1144,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300307,
+   "key": "am-chl-los-lagos",
+   "tropicalKm2": 591.9,
+   "temperateKm2": 36229.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300308,
+   "key": "am-chl-los-rios",
+   "tropicalKm2": 135.4,
+   "temperateKm2": 6314.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300309,
+   "key": "am-chl-magallanes",
+   "tropicalKm2": 2153.1,
+   "temperateKm2": 13988.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300310,
+   "key": "am-chl-maule",
+   "tropicalKm2": 1673.4,
+   "temperateKm2": 4654.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300311,
+   "key": "am-chl-nuble",
+   "tropicalKm2": 467.9,
+   "temperateKm2": 4189.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300312,
+   "key": "am-chl-region-metropolitana-de-santiago",
+   "tropicalKm2": 325.5,
+   "temperateKm2": 2302.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300314,
+   "key": "am-chl-valparaiso",
+   "tropicalKm2": 0,
+   "temperateKm2": 4430.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300315,
+   "key": "am-chl-tacna",
+   "tropicalKm2": 162.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300316,
+   "key": "am-arg-salta",
+   "tropicalKm2": 50441.7,
+   "temperateKm2": 2839.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300317,
+   "key": "am-arg-buenos-aires",
+   "tropicalKm2": 3136,
+   "temperateKm2": 90.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300320,
+   "key": "am-arg-entre-rios",
+   "tropicalKm2": 16034,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300321,
+   "key": "am-arg-la-rioja",
+   "tropicalKm2": 46.1,
+   "temperateKm2": 69.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300322,
+   "key": "am-arg-santiago-del-estero",
+   "tropicalKm2": 6663.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300323,
+   "key": "am-arg-chaco",
+   "tropicalKm2": 17165.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300324,
+   "key": "am-arg-san-juan",
+   "tropicalKm2": 58.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300325,
+   "key": "am-arg-catamarca",
+   "tropicalKm2": 1776.9,
+   "temperateKm2": 107.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300326,
+   "key": "am-arg-la-pampa",
+   "tropicalKm2": 0,
+   "temperateKm2": 3287.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300327,
+   "key": "am-arg-mendoza",
+   "tropicalKm2": 1923.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300328,
+   "key": "am-arg-misiones",
+   "tropicalKm2": 25498.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300329,
+   "key": "am-arg-formosa",
+   "tropicalKm2": 13400,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300330,
+   "key": "am-arg-neuquen",
+   "tropicalKm2": 11121.4,
+   "temperateKm2": 10388.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300331,
+   "key": "am-arg-rio-negro",
+   "tropicalKm2": 7829.2,
+   "temperateKm2": 21343.2,
+   "borealKm2": 62
+  },
+  {
+   "provinceId": 300332,
+   "key": "am-arg-santa-fe",
+   "tropicalKm2": 11875,
+   "temperateKm2": 73.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300333,
+   "key": "am-arg-tucuman",
+   "tropicalKm2": 7887.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300334,
+   "key": "am-arg-chubut",
+   "tropicalKm2": 15626.9,
+   "temperateKm2": 13752,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300336,
+   "key": "am-arg-corrientes",
+   "tropicalKm2": 7348.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300337,
+   "key": "am-arg-cordoba",
+   "tropicalKm2": 782.6,
+   "temperateKm2": 291.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300338,
+   "key": "am-arg-jujuy",
+   "tropicalKm2": 10561.3,
+   "temperateKm2": 271.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300339,
+   "key": "am-arg-santa-cruz",
+   "tropicalKm2": 8786.4,
+   "temperateKm2": 2932.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300359,
+   "key": "am-pry-concepcion",
+   "tropicalKm2": 5665.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300360,
+   "key": "am-pry-alto-parana",
+   "tropicalKm2": 6846.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300363,
+   "key": "am-pry-amambay",
+   "tropicalKm2": 7905,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300364,
+   "key": "am-pry-canindeyu",
+   "tropicalKm2": 10952.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300365,
+   "key": "am-pry-presidente-hayes",
+   "tropicalKm2": 200.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300366,
+   "key": "am-pry-alto-paraguay",
+   "tropicalKm2": 13760.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300367,
+   "key": "am-pry-boqueron",
+   "tropicalKm2": 47476.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300368,
+   "key": "am-pry-san-pedro",
+   "tropicalKm2": 7942.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300369,
+   "key": "am-pry-cordillera",
+   "tropicalKm2": 182.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300370,
+   "key": "am-pry-guaira",
+   "tropicalKm2": 662.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300371,
+   "key": "am-pry-caaguazu",
+   "tropicalKm2": 4007.4,
+   "temperateKm2": 143.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300372,
+   "key": "am-pry-caazapa",
+   "tropicalKm2": 3855.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300373,
+   "key": "am-pry-itapua",
+   "tropicalKm2": 5483,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300375,
+   "key": "am-pry-paraguari",
+   "tropicalKm2": 427.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300377,
+   "key": "am-bra-amazonas",
+   "tropicalKm2": 1942210.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300378,
+   "key": "am-bra-para",
+   "tropicalKm2": 1231216.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300379,
+   "key": "am-bra-maranhao",
+   "tropicalKm2": 155610.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300380,
+   "key": "am-bra-piaui",
+   "tropicalKm2": 35826.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300381,
+   "key": "am-bra-ceara",
+   "tropicalKm2": 4582.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300382,
+   "key": "am-bra-rio-grande-do-norte",
+   "tropicalKm2": 302.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300383,
+   "key": "am-bra-paraiba",
+   "tropicalKm2": 80.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300384,
+   "key": "am-bra-pernambuco",
+   "tropicalKm2": 1778.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300385,
+   "key": "am-bra-alagoas",
+   "tropicalKm2": 154,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300386,
+   "key": "am-bra-sergipe",
+   "tropicalKm2": 631.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300387,
+   "key": "am-bra-bahia",
+   "tropicalKm2": 162022.3,
+   "temperateKm2": 154,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300388,
+   "key": "am-bra-espirito-santo",
+   "tropicalKm2": 33971.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300389,
+   "key": "am-bra-rio-de-janeiro",
+   "tropicalKm2": 31921.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300390,
+   "key": "am-bra-sao-paulo",
+   "tropicalKm2": 194900.5,
+   "temperateKm2": 1480,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300391,
+   "key": "am-bra-minas-gerais",
+   "tropicalKm2": 308577.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300392,
+   "key": "am-bra-goias",
+   "tropicalKm2": 155621.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300393,
+   "key": "am-bra-mato-grosso",
+   "tropicalKm2": 734479.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300394,
+   "key": "am-bra-parana",
+   "tropicalKm2": 124923.5,
+   "temperateKm2": 3470,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300395,
+   "key": "am-bra-santa-catarina",
+   "tropicalKm2": 41141.8,
+   "temperateKm2": 8760.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300396,
+   "key": "am-bra-rio-grande-do-sul",
+   "tropicalKm2": 36543.5,
+   "temperateKm2": 6160.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300397,
+   "key": "am-bwi-guy-essequibo",
+   "tropicalKm2": 60520.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300398,
+   "key": "am-bwi-guy-demerara",
+   "tropicalKm2": 134399,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300399,
+   "key": "am-bwi-guy-berbice",
+   "tropicalKm2": 1787.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300400,
+   "key": "am-sur-paramaribo-and-the-coast",
+   "tropicalKm2": 9088.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300401,
+   "key": "am-sur-nickerie",
+   "tropicalKm2": 4844,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300402,
+   "key": "am-sur-suriname-interior",
+   "tropicalKm2": 120379.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300403,
+   "key": "am-sur-marowijne",
+   "tropicalKm2": 4201.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300404,
+   "key": "am-fra-french-guiana",
+   "tropicalKm2": 81283.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300405,
+   "key": "am-cub-pinar-del-rio",
+   "tropicalKm2": 6897.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300406,
+   "key": "am-cub-la-habana",
+   "tropicalKm2": 3106.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300407,
+   "key": "am-cub-matanzas",
+   "tropicalKm2": 6297.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300408,
+   "key": "am-cub-santa-clara",
+   "tropicalKm2": 12133.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300409,
+   "key": "am-cub-camaguey",
+   "tropicalKm2": 19696.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300410,
+   "key": "am-cub-oriente",
+   "tropicalKm2": 22045.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300411,
+   "key": "am-cub-isle-of-pines",
+   "tropicalKm2": 981.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300412,
+   "key": "am-hti-l-artibonite",
+   "tropicalKm2": 1788.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300413,
+   "key": "am-hti-centre",
+   "tropicalKm2": 1132.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300414,
+   "key": "am-hti-grand-anse",
+   "tropicalKm2": 1633.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300415,
+   "key": "am-hti-nord",
+   "tropicalKm2": 1235.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300416,
+   "key": "am-hti-nord-est",
+   "tropicalKm2": 378.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300417,
+   "key": "am-hti-nippes",
+   "tropicalKm2": 386.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300418,
+   "key": "am-hti-nord-ouest",
+   "tropicalKm2": 821.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300419,
+   "key": "am-hti-ouest",
+   "tropicalKm2": 1756.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300420,
+   "key": "am-hti-sud",
+   "tropicalKm2": 575,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300421,
+   "key": "am-hti-sud-est",
+   "tropicalKm2": 981.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300422,
+   "key": "am-dom-santo-domingo",
+   "tropicalKm2": 4399.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300423,
+   "key": "am-dom-santiago",
+   "tropicalKm2": 6785.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300424,
+   "key": "am-dom-la-vega",
+   "tropicalKm2": 5802.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300425,
+   "key": "am-dom-azua",
+   "tropicalKm2": 9132,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300426,
+   "key": "am-dom-el-seibo",
+   "tropicalKm2": 5484.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300427,
+   "key": "am-bwi-jam-cornwall",
+   "tropicalKm2": 2930.9,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300428,
+   "key": "am-bwi-jam-middlesex",
+   "tropicalKm2": 3349.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300429,
+   "key": "am-bwi-jam-surrey",
+   "tropicalKm2": 1621.4,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300430,
+   "key": "am-bwi-tto-trinidad",
+   "tropicalKm2": 3236.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300431,
+   "key": "am-bwi-tto-tobago",
+   "tropicalKm2": 182.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 300469,
+   "key": "am-pri-puerto-rico",
+   "tropicalKm2": 4453.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400001,
+   "key": "oc-aus-new-south-wales",
+   "tropicalKm2": 2553.1,
+   "temperateKm2": 113069.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400002,
+   "key": "oc-aus-victoria",
+   "tropicalKm2": 5528.8,
+   "temperateKm2": 77257.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400003,
+   "key": "oc-aus-queensland",
+   "tropicalKm2": 22669.1,
+   "temperateKm2": 23406.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400004,
+   "key": "oc-aus-south-australia",
+   "tropicalKm2": 3935.5,
+   "temperateKm2": 2438.8,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400005,
+   "key": "oc-aus-western-australia",
+   "tropicalKm2": 2431.2,
+   "temperateKm2": 13508.7,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400006,
+   "key": "oc-aus-tasmania",
+   "tropicalKm2": 1509.3,
+   "temperateKm2": 30273.2,
+   "borealKm2": 448.2
+  },
+  {
+   "provinceId": 400007,
+   "key": "oc-aus-northern-territory",
+   "tropicalKm2": 462.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400008,
+   "key": "oc-aus-federal-capital-territory",
+   "tropicalKm2": 0,
+   "temperateKm2": 1323.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400012,
+   "key": "oc-nzl-northland",
+   "tropicalKm2": 0,
+   "temperateKm2": 227.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400013,
+   "key": "oc-nzl-auckland",
+   "tropicalKm2": 0,
+   "temperateKm2": 393.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400014,
+   "key": "oc-nzl-waikato",
+   "tropicalKm2": 0,
+   "temperateKm2": 5380.2,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400015,
+   "key": "oc-nzl-bay-of-plenty",
+   "tropicalKm2": 0,
+   "temperateKm2": 8565,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400016,
+   "key": "oc-nzl-gisborne",
+   "tropicalKm2": 0,
+   "temperateKm2": 3371.1,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400017,
+   "key": "oc-nzl-hawke-s-bay",
+   "tropicalKm2": 0,
+   "temperateKm2": 5279,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400018,
+   "key": "oc-nzl-taranaki",
+   "tropicalKm2": 0,
+   "temperateKm2": 66.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400019,
+   "key": "oc-nzl-manawatu-wanganui",
+   "tropicalKm2": 0,
+   "temperateKm2": 1877.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400020,
+   "key": "oc-nzl-wellington",
+   "tropicalKm2": 0,
+   "temperateKm2": 249.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400021,
+   "key": "oc-nzl-tasman",
+   "tropicalKm2": 0,
+   "temperateKm2": 6573.7,
+   "borealKm2": 510
+  },
+  {
+   "provinceId": 400022,
+   "key": "oc-nzl-nelson",
+   "tropicalKm2": 0,
+   "temperateKm2": 177.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400023,
+   "key": "oc-nzl-marlborough",
+   "tropicalKm2": 0,
+   "temperateKm2": 3108.6,
+   "borealKm2": 128
+  },
+  {
+   "provinceId": 400024,
+   "key": "oc-nzl-west-coast",
+   "tropicalKm2": 0,
+   "temperateKm2": 11391.7,
+   "borealKm2": 2355.4
+  },
+  {
+   "provinceId": 400025,
+   "key": "oc-nzl-canterbury",
+   "tropicalKm2": 0,
+   "temperateKm2": 1069.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400026,
+   "key": "oc-nzl-otago",
+   "tropicalKm2": 0,
+   "temperateKm2": 100.4,
+   "borealKm2": 166.9
+  },
+  {
+   "provinceId": 400027,
+   "key": "oc-nzl-southland",
+   "tropicalKm2": 0,
+   "temperateKm2": 2781.3,
+   "borealKm2": 3727.7
+  },
+  {
+   "provinceId": 400028,
+   "key": "oc-nzl-stewart-island",
+   "tropicalKm2": 0,
+   "temperateKm2": 1262.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400037,
+   "key": "oc-gng-sandaun-west-sepik",
+   "tropicalKm2": 30271,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400038,
+   "key": "oc-gng-east-sepik",
+   "tropicalKm2": 38129.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400039,
+   "key": "oc-gng-madang",
+   "tropicalKm2": 24758.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400040,
+   "key": "oc-gng-morobe",
+   "tropicalKm2": 25900.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400041,
+   "key": "oc-gng-eastern-highlands",
+   "tropicalKm2": 7406.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400042,
+   "key": "oc-gng-southern-highlands",
+   "tropicalKm2": 19666.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400043,
+   "key": "oc-gng-western-highlands",
+   "tropicalKm2": 6841.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400044,
+   "key": "oc-gng-chimbu",
+   "tropicalKm2": 5394.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400045,
+   "key": "oc-gng-enga",
+   "tropicalKm2": 6374.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400046,
+   "key": "oc-gng-manus",
+   "tropicalKm2": 1260.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400047,
+   "key": "oc-gng-new-ireland",
+   "tropicalKm2": 6182.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400048,
+   "key": "oc-gng-east-new-britain",
+   "tropicalKm2": 13364.6,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400049,
+   "key": "oc-gng-west-new-britain",
+   "tropicalKm2": 18724.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400050,
+   "key": "oc-gng-bougainville",
+   "tropicalKm2": 8131.1,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400051,
+   "key": "oc-bpo-papua-western",
+   "tropicalKm2": 67391.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400052,
+   "key": "oc-bpo-papua-gulf",
+   "tropicalKm2": 31087.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400053,
+   "key": "oc-bpo-papua-central",
+   "tropicalKm2": 13625.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400055,
+   "key": "oc-bpo-papua-northern-oro",
+   "tropicalKm2": 19924.7,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400056,
+   "key": "oc-bpo-papua-milne-bay",
+   "tropicalKm2": 8835,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400125,
+   "key": "oc-aut-krk-island",
+   "tropicalKm2": 0,
+   "temperateKm2": 381.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400126,
+   "key": "oc-aut-cres-and-losinj",
+   "tropicalKm2": 0,
+   "temperateKm2": 183.5,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400129,
+   "key": "oc-gap-fea-residual",
+   "tropicalKm2": 2092.2,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400130,
+   "key": "oc-gap-ott-residual",
+   "tropicalKm2": 0,
+   "temperateKm2": 12081.4,
+   "borealKm2": 44.2
+  },
+  {
+   "provinceId": 400131,
+   "key": "oc-gap-grc-residual",
+   "tropicalKm2": 0,
+   "temperateKm2": 2071.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400132,
+   "key": "oc-gap-aut-residual",
+   "tropicalKm2": 0,
+   "temperateKm2": 26.3,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400133,
+   "key": "oc-gap-gbr-residual",
+   "tropicalKm2": 0,
+   "temperateKm2": 668.1,
+   "borealKm2": 114.5
+  },
+  {
+   "provinceId": 400134,
+   "key": "oc-gap-rus-residual",
+   "tropicalKm2": 0,
+   "temperateKm2": 6430.3,
+   "borealKm2": 1249.3
+  },
+  {
+   "provinceId": 400135,
+   "key": "oc-gap-rom-residual",
+   "tropicalKm2": 0,
+   "temperateKm2": 4813.9,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400138,
+   "key": "oc-gap-chn-residual",
+   "tropicalKm2": 1139.9,
+   "temperateKm2": 7095.7,
+   "borealKm2": 175.5
+  },
+  {
+   "provinceId": 400139,
+   "key": "oc-gap-bea-residual",
+   "tropicalKm2": 83.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400142,
+   "key": "oc-gap-arg-residual",
+   "tropicalKm2": 1215.1,
+   "temperateKm2": 284.6,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400143,
+   "key": "oc-gap-can-residual",
+   "tropicalKm2": 0,
+   "temperateKm2": 2516,
+   "borealKm2": 2882.4
+  },
+  {
+   "provinceId": 400144,
+   "key": "oc-gap-phl-residual",
+   "tropicalKm2": 1328.3,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400145,
+   "key": "oc-gap-gng-residual",
+   "tropicalKm2": 290.5,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400146,
+   "key": "oc-gap-bpo-residual",
+   "tropicalKm2": 50.8,
+   "temperateKm2": 0,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400148,
+   "key": "oc-gap-aus-residual",
+   "tropicalKm2": 108.5,
+   "temperateKm2": 178.4,
+   "borealKm2": 0
+  },
+  {
+   "provinceId": 400149,
+   "key": "oc-gap-nzl-residual",
+   "tropicalKm2": 0,
+   "temperateKm2": 291.5,
+   "borealKm2": 110.5
+  }
+ ]
+}

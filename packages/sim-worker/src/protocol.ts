@@ -10,7 +10,11 @@
  * 18 (D-137): SAVE_RESULT returns and LOAD/PREVIEW_SAVE accept the stored save form
  * (`STORED_SAVE_PREFIX`, compressed in the worker); a canonical save is still accepted.
  */
-export const PROTOCOL_VERSION = 20 as const;
+/**
+ * 21 (D-143): province ownership as columns (`provinceOwnership`), the harvest column
+ * and the focused province's land section.
+ */
+export const PROTOCOL_VERSION = 21 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -1057,6 +1061,7 @@ export interface ProvinceEconomyTable {
   readonly controllerCountryId: readonly (number | null)[];
   readonly controlledSinceDay: readonly (number | null)[];
   readonly territoryTag: readonly (string | null)[];
+  readonly harvestFactor: readonly (number | null)[];
 }
 
 /** Encode province rows as a column table (rows ascending by id). */
@@ -1084,6 +1089,7 @@ export function encodeProvinceEconomyTable(
     controllerCountryId: rows.map((row) => row.controllerCountryId),
     controlledSinceDay: rows.map((row) => row.controlledSinceDay),
     territoryTag: rows.map((row) => row.territoryTag),
+    harvestFactor: rows.map((row) => row.harvestFactor),
   };
 }
 
@@ -1127,6 +1133,7 @@ export function provinceEconomyRows(
       controllerCountryId: table.controllerCountryId[index] ?? null,
       controlledSinceDay: table.controlledSinceDay[index] ?? null,
       territoryTag: table.territoryTag[index] ?? null,
+      harvestFactor: table.harvestFactor[index] ?? null,
     });
   });
   provinceRowsCache.set(table, rows);
@@ -1394,6 +1401,46 @@ export interface FocusProvinceSnapshot {
   readonly provinceId: number;
   readonly demography: DemographyIndicatorsSnapshot | null;
   readonly pyramid: PopulationPyramidSnapshot;
+  /** P5 (D-143): land, today's harvest and own consumption, and known deposits. */
+  readonly land: ProvinceLandSnapshot | null;
+}
+
+/** P5: one good's quantity today, physical units of the good. */
+export interface GoodQuantitySnapshot {
+  readonly goodId: number;
+  readonly quantity: number;
+}
+
+/** P5: a discovered deposit of the focused province (hidden deposits are never sent). */
+export interface DepositSnapshot {
+  readonly resource: string;
+  /** Unit of the stock (t, kg, m3, ...). */
+  readonly unit: string;
+  readonly remaining: number;
+  readonly initialStock: number;
+  /** Extraction quality, 0..1. */
+  readonly quality: number;
+  /** Day it was found; null when known in 1900. */
+  readonly discoveredOnDay: number | null;
+}
+
+/** P5 (D-143): the focused province's land, harvest, own consumption and deposits. */
+export interface ProvinceLandSnapshot {
+  readonly croplandHa: number;
+  readonly pastureHa: number;
+  readonly harvestYear: number;
+  /** This year's harvest weather factor, mean 1. */
+  readonly harvestFactor: number;
+  /** Land-using buildings (farms and ranches) and their levels. */
+  readonly farms: number;
+  readonly farmLevels: number;
+  /** Workers on cropland farms per hectare of cropland. */
+  readonly workersPerCroplandHa: number;
+  /** Food the province's farms make today (kept plus marketed), by good. */
+  readonly farmOutputToday: readonly GoodQuantitySnapshot[];
+  /** Of it, kept by the owner households before the market, by good. */
+  readonly keptToday: readonly GoodQuantitySnapshot[];
+  readonly deposits: readonly DepositSnapshot[];
 }
 
 export interface CountryDemographySnapshot {
@@ -1439,6 +1486,11 @@ export interface ProvinceEconomySnapshot {
   readonly controlledSinceDay: number | null;
   /** Dependent territory the province belongs to; null for a home province. */
   readonly territoryTag: string | null;
+  /**
+   * P5 (D-143 §3): this calendar year's harvest weather factor (mean 1), rounded to
+   * 0.01; null for a province with no cropland or grazing land.
+   */
+  readonly harvestFactor: number | null;
 }
 
 /**
@@ -1454,6 +1506,64 @@ export interface ProvinceOwnershipSnapshot {
   readonly controlledSinceDay: number | null;
   readonly claimantPolityIds: readonly number[];
   readonly specialStatus: string;
+}
+
+/**
+ * P5 (D-143): province ownership as columns. Row i is province `ids[i]` (ascending)
+ * owned by `owners[i]`; a province whose control, claims or status differ from the
+ * defaults (controlled by its owner, unclaimed, ordinary) is listed whole in
+ * `exceptions`. Repeating six fields for 1,689 provinces took a third of the snapshot.
+ * Read rows with `provinceOwnershipRows`.
+ */
+export interface ProvinceOwnershipTable {
+  readonly ids: readonly number[];
+  readonly owners: readonly number[];
+  readonly exceptions: readonly ProvinceOwnershipSnapshot[];
+}
+
+function isDefaultOwnership(row: ProvinceOwnershipSnapshot): boolean {
+  return (
+    row.controllerPolityId === row.ownerPolityId &&
+    row.controlledSinceDay === null &&
+    row.claimantPolityIds.length === 0 &&
+    row.specialStatus === "ordinary"
+  );
+}
+
+/** Encode ownership rows (ascending by province id) as a column table. */
+export function encodeProvinceOwnershipTable(rows: readonly ProvinceOwnershipSnapshot[]): ProvinceOwnershipTable {
+  return {
+    ids: rows.map((row) => row.provinceId),
+    owners: rows.map((row) => row.ownerPolityId),
+    exceptions: rows.filter((row) => !isDefaultOwnership(row)),
+  };
+}
+
+const ownershipRowsCache = new WeakMap<ProvinceOwnershipTable, readonly ProvinceOwnershipSnapshot[]>();
+
+/** Province ownership rows of a snapshot, decoded once per table (presentation cache). */
+export function provinceOwnershipRows(
+  snapshot: Pick<SimulationSnapshot, "provinceOwnership">,
+): readonly ProvinceOwnershipSnapshot[] {
+  const table = snapshot.provinceOwnership;
+  const cached = ownershipRowsCache.get(table);
+  if (cached !== undefined) return cached;
+  const exceptions = new Map(table.exceptions.map((row) => [row.provinceId, row] as const));
+  const rows = table.ids.map(
+    (id, index): ProvinceOwnershipSnapshot =>
+      exceptions.get(id) ??
+      Object.freeze({
+        provinceId: id,
+        ownerPolityId: table.owners[index] ?? 0,
+        controllerPolityId: table.owners[index] ?? 0,
+        controlledSinceDay: null,
+        claimantPolityIds: Object.freeze([]) as readonly number[],
+        specialStatus: "ordinary",
+      }),
+  );
+  Object.freeze(rows);
+  ownershipRowsCache.set(table, rows);
+  return rows;
 }
 
 
@@ -1545,7 +1655,8 @@ export interface SimulationSnapshot {
   /** P2 dependent territories (static), ascending by polity tag. */
   readonly territories: readonly TerritorySnapshot[];
   /** M12a permanent provincial ownership and effective control, ascending by id. */
-  readonly provinces: readonly ProvinceOwnershipSnapshot[];
+  /** M12a permanent provincial ownership and control (P5: as columns); see `provinceOwnershipRows`. */
+  readonly provinceOwnership: ProvinceOwnershipTable;
   readonly markets: readonly MarketSnapshot[];
   readonly goods: readonly GoodSnapshot[];
   /** P2 profession names, for per-province population (static). */
@@ -2862,6 +2973,35 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   );
 }
 
+function isGoodQuantityList(value: unknown): boolean {
+  return (
+    Array.isArray(value) &&
+    value.every((entry) => isRecord(entry) && isIntegerIn(entry.goodId, 0, 0xffff) && isFiniteNumber(entry.quantity) && entry.quantity >= 0)
+  );
+}
+
+function isProvinceLandSnapshot(value: unknown): value is ProvinceLandSnapshot {
+  if (!isRecord(value)) return false;
+  for (const field of ["croplandHa", "pastureHa", "harvestFactor", "farms", "farmLevels", "workersPerCroplandHa"] as const) {
+    if (!isFiniteNumber(value[field]) || (value[field] as number) < 0) return false;
+  }
+  if (!isIntegerIn(value.harvestYear, 1900, 2100)) return false;
+  if (!isGoodQuantityList(value.farmOutputToday) || !isGoodQuantityList(value.keptToday)) return false;
+  return (
+    Array.isArray(value.deposits) &&
+    value.deposits.every(
+      (deposit) =>
+        isRecord(deposit) &&
+        isString(deposit.resource, 32) &&
+        isString(deposit.unit, 32) &&
+        isFiniteNumber(deposit.remaining) &&
+        isFiniteNumber(deposit.initialStock) &&
+        isFiniteNumber(deposit.quality) &&
+        isNullableId(deposit.discoveredOnDay),
+    )
+  );
+}
+
 function isProvinceEconomyTable(value: unknown): value is ProvinceEconomyTable {
   if (!isRecord(value) || !isNumberArray(value.ids)) return false;
   const length = value.ids.length;
@@ -2884,6 +3024,14 @@ function isProvinceEconomyTable(value: unknown): value is ProvinceEconomyTable {
   for (const column of ["countryId", "marketId", "controllerCountryId", "controlledSinceDay"] as const) {
     const entries = value[column];
     if (!Array.isArray(entries) || entries.length !== length || !entries.every(isNullableId)) return false;
+  }
+  const harvest = value.harvestFactor;
+  if (
+    !Array.isArray(harvest) ||
+    harvest.length !== length ||
+    !harvest.every((entry) => entry === null || (typeof entry === "number" && Number.isFinite(entry) && entry > 0))
+  ) {
+    return false;
   }
   const tags = value.territoryTag;
   if (!Array.isArray(tags) || tags.length !== length) return false;
@@ -3085,6 +3233,7 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
     if (!isRecord(focusPyramid)) return false;
     if (!isFiniteNumberArray(focusPyramid.male) || focusPyramid.male.length !== 17) return false;
     if (!isFiniteNumberArray(focusPyramid.female) || focusPyramid.female.length !== 17) return false;
+    if (value.focusProvince.land !== null && !isProvinceLandSnapshot(value.focusProvince.land)) return false;
   }
   if (typeof value.constructionEnabled !== "boolean") return false;
   if (!Array.isArray(value.countries) || !value.countries.every(isCountrySnapshot)) return false;
@@ -3115,9 +3264,17 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
   if (!isProvinceEconomyTable(value.provinceTable)) return false;
   if (!Array.isArray(value.territories) || !value.territories.every(isTerritorySnapshot)) return false;
   if (!Array.isArray(value.professions)) return false;
+  const ownership = value.provinceOwnership as Partial<ProvinceOwnershipTable> | undefined;
   if (
-    !Array.isArray(value.provinces) ||
-    !value.provinces.every(isProvinceOwnershipSnapshot)
+    ownership === undefined ||
+    ownership === null ||
+    !Array.isArray(ownership.ids) ||
+    !Array.isArray(ownership.owners) ||
+    ownership.ids.length !== ownership.owners.length ||
+    !ownership.ids.every((id) => Number.isInteger(id)) ||
+    !ownership.owners.every((id) => Number.isInteger(id)) ||
+    !Array.isArray(ownership.exceptions) ||
+    !ownership.exceptions.every(isProvinceOwnershipSnapshot)
   ) {
     return false;
   }

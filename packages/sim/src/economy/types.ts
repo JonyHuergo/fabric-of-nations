@@ -12,6 +12,7 @@
  * they are not serialized into `World`.
  */
 
+import type { DepositInitialDef } from "./resourceState.js";
 import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
 import type { PopulationScenarioDef } from "../population/types.js";
 import type { ProvinceScenarioInput } from "../provinces/types.js";
@@ -122,7 +123,18 @@ export interface BuildingDef {
   requiredTechnologyId: Id | null;
   ownershipAllowed: ("private" | "state")[];
   isEssentialInfrastructure: boolean;
+  /**
+   * P5 (D-143 §1): the land this building farms. Its province's land of that kind is
+   * shared among such buildings by level, and output follows the land-and-labour
+   * production function (`economy/agriculture.ts`). Absent for buildings that use no
+   * land and for the legacy (pre-P5) definitions.
+   */
+  landUse?: LandUse;
 }
+
+/** P5 (D-143): the land kinds a building can farm (HYDE 3.3 cropland and grazing land). */
+export const LAND_USES = ["cropland", "pasture"] as const;
+export type LandUse = (typeof LAND_USES)[number];
 
 export interface EconomyDefinitions {
   dataVersion: string;
@@ -478,6 +490,22 @@ export interface FinancePeriodSummary {
    * (fixtures); retained through compaction.
    */
   closingValuations?: ClosingCurrencyValuation[];
+  /**
+   * P5 (D-143 §6): per-country closing balances (treasury cash, debt outstanding,
+   * household cash of the country's blocks) taken at the close, ascending country id.
+   * Reporting-only (the Ledger history); retained through compaction, so only the
+   * latest summary needs the account-level trial balance. Absent on summaries built
+   * without a world (fixtures).
+   */
+  countryClosingBalances?: ClosingCountryBalances[];
+}
+
+/** P5 (D-143 §6): one country's closing balances at a finance-period close, RUSD. */
+export interface ClosingCountryBalances {
+  readonly countryId: Id;
+  readonly treasuryCashRUSD: MoneyRUSD;
+  readonly debtOutstandingRUSD: MoneyRUSD;
+  readonly householdCashRUSD: MoneyRUSD;
 }
 
 /** P3 (D-141): one currency's RUSD valuation at a finance-period close. */
@@ -2079,4 +2107,6 @@ export interface EconomyScenarioDef {
   playerCountryId?: Id | null;
   /** P2b money coefficients (D-135); omitted means DEFAULT_MONEY_COEFFICIENTS. */
   moneyCoefficients?: MoneyCoefficients;
+  /** P5 natural-resource deposits (D-143 §4); omitted means none. */
+  deposits?: DepositInitialDef[];
 }

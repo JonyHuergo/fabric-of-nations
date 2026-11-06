@@ -24,7 +24,7 @@ import {
   UNCLAIMED_LAND,
   type Rgb,
 } from "./politicalPalette";
-import { provinceEconomyRows, type ProvinceEconomySnapshot } from "@century/sim-worker";
+import { provinceEconomyRows, provinceOwnershipRows, type ProvinceEconomySnapshot } from "@century/sim-worker";
 
 export type MapModeId =
   | "political"
@@ -33,7 +33,8 @@ export type MapModeId =
   | "density"
   | "urban"
   | "literacy"
-  | "unrest";
+  | "unrest"
+  | "harvest";
 
 export interface ProvinceAppearance {
   readonly fill: Rgb;
@@ -62,6 +63,8 @@ export interface ProvinceState {
   readonly urbanShare: number | null;
   readonly literacy: number | null;
   readonly unrest: number | null;
+  /** P5 (D-143): this year's harvest weather factor (1 = normal); null without farm land. */
+  readonly harvest: number | null;
 }
 
 /** The fields of a province the map reads; geometry is not among them. */
@@ -266,6 +269,8 @@ export const MAP_MODES: Readonly<Record<MapModeId, MapMode>> = {
   urban: sequentialMode("urban", "Towns", (state) => state.urbanShare, [0.05, 0.12, 0.25, 0.45], percent),
   literacy: sequentialMode("literacy", "Literacy", (state) => state.literacy, [0.1, 0.3, 0.55, 0.8], percent),
   unrest: sequentialMode("unrest", "Unrest", (state) => state.unrest, [0.05, 0.15, 0.3, 0.5], percent),
+  // P5 (D-143): this year's harvest against a normal year; darker is a better harvest.
+  harvest: sequentialMode("harvest", "Harvest", (state) => state.harvest, [0.85, 0.95, 1.05, 1.15], percent),
 };
 
 /** Approximate land area of a province from its bundle area (square degrees) at its label latitude. */
@@ -287,13 +292,13 @@ export function buildProvinceStates(
     readonly entries: readonly Pick<WorldCatalogEntry, "id" | "tag" | "market">[];
     readonly markets: readonly Pick<WorldCatalogMarket, "id" | "key">[];
   },
-  snapshot: Pick<SimulationSnapshot, "provinces" | "provinceTable" | "professions"> | null,
+  snapshot: Pick<SimulationSnapshot, "provinceOwnership" | "provinceTable" | "professions"> | null,
 ): readonly ProvinceState[] {
   const tagByPolityId = new Map<number, string>();
   for (const entry of catalog.entries) tagByPolityId.set(entry.id, entry.tag);
   for (const polity of provinceMap.futurePolities) tagByPolityId.set(polity.polityId, polity.tag);
   const ownership = new Map(
-    (snapshot?.provinces ?? []).map((entry) => [entry.provinceId, entry] as const),
+    (snapshot === null ? [] : provinceOwnershipRows(snapshot)).map((entry) => [entry.provinceId, entry] as const),
   );
   const economyById = new Map(
     ((snapshot === null ? [] : provinceEconomyRows(snapshot))).map((province) => [province.id, province] as const),
@@ -319,6 +324,7 @@ export function buildProvinceStates(
       urbanShare: populated ? Math.round(economy.urbanShare * 100) / 100 : null,
       literacy: populated ? Math.round(economy.literacy * 100) / 100 : null,
       unrest: populated ? Math.round(economy.unrest * 100) / 100 : null,
+      harvest: economy?.harvestFactor ?? null,
     };
   });
 }
@@ -409,7 +415,7 @@ export function dataLensFill(
   province: Pick<ProvinceMapProvince, "area" | "label">,
   economy: ProvinceEconomySnapshot | undefined,
 ): Rgb | null {
-  if (lens !== "density" && lens !== "urban" && lens !== "literacy" && lens !== "unrest") return null;
+  if (lens !== "density" && lens !== "urban" && lens !== "literacy" && lens !== "unrest" && lens !== "harvest") return null;
   const populated = economy !== undefined && economy.population > 0;
   const state: ProvinceState = {
     ownerTag: "",
@@ -420,6 +426,7 @@ export function dataLensFill(
     urbanShare: populated ? economy.urbanShare : null,
     literacy: populated ? economy.literacy : null,
     unrest: populated ? economy.unrest : null,
+    harvest: economy?.harvestFactor ?? null,
   };
   const context: MapDataContext = {
     provinces: [],

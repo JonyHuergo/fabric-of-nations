@@ -2170,6 +2170,40 @@
           "reduction": 0.02
         }
       ]
+    },
+    {
+      "id": 120,
+      "key": "geological-surveying",
+      "name": "Geological surveying",
+      "era": 1,
+      "description": "Geological surveying: systematic geological mapping and core drilling by a national survey. Makes hidden deposits of the first prospecting class findable (P5, D-143).",
+      "prerequisites": [],
+      "researchWork": 200000,
+      "effects": []
+    },
+    {
+      "id": 121,
+      "key": "geophysical-prospecting",
+      "name": "Geophysical prospecting",
+      "era": 2,
+      "description": "Geophysical prospecting: seismic refraction and reflection, gravity and magnetic surveys (from the 1920s). Makes deeper and buried deposits findable (P5, D-143).",
+      "prerequisites": [
+        120
+      ],
+      "researchWork": 400000,
+      "effects": []
+    },
+    {
+      "id": 122,
+      "key": "airborne-geophysics",
+      "name": "Airborne geophysics",
+      "era": 3,
+      "description": "Airborne geophysics: airborne magnetometry and radiometry and marine seismic surveys (from the 1950s). Makes remote, offshore and uranium deposits findable (P5, D-143).",
+      "prerequisites": [
+        121
+      ],
+      "researchWork": 650000,
+      "effects": []
     }
   ]
 }

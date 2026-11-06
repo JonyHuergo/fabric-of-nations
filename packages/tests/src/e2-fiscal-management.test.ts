@@ -236,11 +236,26 @@ describe("E2 welfare allocation, affordability, and reserve floor", () => {
     const scenario = fiscalScenario({ rate: 0.1, budget: 365_000, treasuryCash: 50_000 });
     const world = createEconomyWorld(scenario, { seed: SEED });
     runTicks(world, scenario, 31);
-    const firstSummary = JSON.stringify(world.finance.periodSummaries[0]);
+    const first = world.finance.periodSummaries[0]!;
+    // P5 (D-143 §6): only the latest summary keeps its account trial balance, so the
+    // first month is compacted by the next close. Its retained content — exact
+    // per-country fiscal totals, budget totals, flows, valuations and closing balances —
+    // must be what the month closed with.
+    const retained = (summary: typeof first) =>
+      JSON.stringify({
+        flows: summary.flowTotalsByKind,
+        budget: summary.countryBudgetTotals,
+        valuations: summary.closingValuations,
+        balances: summary.countryClosingBalances,
+      });
+    const firstRetained = retained(first);
+    const firstFiscal = governmentPeriodTotals(world.finance, first);
     const before = world.countries[0]!.fiscal.incomeTaxRate;
     applyCountryAction(world, fiscalAction(world, 0, { incomeTaxRate: before + 0.05 }));
     runTicks(world, scenario, 31);
-    expect(JSON.stringify(world.finance.periodSummaries[0])).toBe(firstSummary);
+    const closed = world.finance.periodSummaries[0]!;
+    expect(retained(closed)).toBe(firstRetained);
+    expect(governmentPeriodTotals(world.finance, closed)).toEqual(firstFiscal);
   });
 });
 
