@@ -155,9 +155,9 @@ The new identity retains the project's existing deep-ink `#0b1014`, brass `#e2bd
 - In-app splash/loading screen: full **FABRIC OF NATIONS** wordmark.
 - Reference wordmark: `docs/images/m13-brand-wordmark.png`.
 
-![Fabric of Nations application icon](../packages/app/assets/icon.png)
+![Fabric of Nations application icon](../../../packages/app/assets/icon.png)
 
-![Fabric of Nations wordmark](images/m13-brand-wordmark.png)
+![Fabric of Nations wordmark](../../images/m13-brand-wordmark.png)
 
 No native splash-image plugin is installed in this Expo SDK 58 project. The in-app loading screen carries the branded splash identity; native display metadata is configured through the application name and icon. No unrelated visual redesign was made.
 
@@ -241,39 +241,39 @@ Exported with `pnpm -F @century/app export:web`, served from `packages/app/dist-
 
 ### Main menu and browser identity
 
-![Fabric of Nations main menu](images/m13/m13-main-menu.png)
+![Fabric of Nations main menu](../../images/m13/m13-main-menu.png)
 
 ### Sources and licensing
 
-![Sources and licensing dialog](images/m13/m13-sources-licensing.png)
+![Sources and licensing dialog](../../images/m13/m13-sources-licensing.png)
 
 ### New campaign
 
-![New campaign screen](images/m13/m13-new-game.png)
+![New campaign screen](../../images/m13/m13-new-game.png)
 
 ### Country selection
 
-![Country selection](images/m13/m13-country-selection.png)
+![Country selection](../../images/m13/m13-country-selection.png)
 
 ### Campaign initialization and map rendering
 
-![Campaign world map](images/m13/m13-campaign.png)
+![Campaign world map](../../images/m13/m13-campaign.png)
 
 ### Save and load
 
-![Saved campaign](images/m13/m13-campaign-saved.png)
+![Saved campaign](../../images/m13/m13-campaign-saved.png)
 
-![Loaded campaign](images/m13/m13-campaign-loaded.png)
+![Loaded campaign](../../images/m13/m13-campaign-loaded.png)
 
 ### Pre-rebrand save compatibility
 
-![Pre-rebrand save recognized](images/m13/m13-legacy-save-menu.png)
+![Pre-rebrand save recognized](../../images/m13/m13-legacy-save-menu.png)
 
-![Pre-rebrand save loaded](images/m13/m13-legacy-save-loaded.png)
+![Pre-rebrand save loaded](../../images/m13/m13-legacy-save-loaded.png)
 
 ### Narrow layout
 
-![Narrow main menu](images/m13/m13-main-menu-narrow.png)
+![Narrow main menu](../../images/m13/m13-main-menu-narrow.png)
 
 The 390 px viewport wraps the wordmark onto two lines and reports no horizontal
 overflow; the full name remains fully visible.

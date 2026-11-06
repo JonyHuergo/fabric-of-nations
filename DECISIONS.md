@@ -7329,7 +7329,7 @@ accounts and per-entity rescans did the rest.
 
 **Status:** basis decided by the designer on 2026-11-03 (A1-A8 below); implemented the same
 day for review. **Amends:** D-122 §5 and implements D-130. Details, inventory, sources and
-conflicts: `docs/P2B_CALIBRATION_PLAN.md`; results: `P2B_COMPLETION_REPORT.md`.
+conflicts: `docs/archive/milestones/P2B_CALIBRATION_PLAN.md`; results: `docs/archive/completion-reports/P2B_COMPLETION_REPORT.md`.
 
 ### Context
 
@@ -7451,7 +7451,7 @@ the three fixes below found during P2b and implemented for review. **Amends:** D
 ## D-137 — Performance stage: measurement hooks, in-place phases, result detail, snapshot cache and save format 2
 
 **Status:** implemented on `perf/10x` for review; the 10x acceptance target is not reached
-(details in `PERF_COMPLETION_REPORT.md`). **Amends:** D-040 (save checksum), D-047
+(details in `docs/archive/completion-reports/PERF_COMPLETION_REPORT.md`). **Amends:** D-040 (save checksum), D-047
 (period-close staging), D-116 (rollback), D-120 (save compatibility), D-123
 (protocol/snapshot), D-133 (derived caches). **Acceptance basis:** the performance-stage
 brief: host-path day mean and p50 at most 1/10 of the recorded baseline over 92+ days,
@@ -7554,7 +7554,7 @@ faster, determinism, and identical outcomes where possible. The baseline is
   layout and a format break (D-120).
 - The acceptance benchmark improves from host day p50 2,190 to about 550 ms, save and load
   to about 1.0-1.3 s, and new game to about 0.64 s. The remaining distance to 10x is
-  measured and explained in `PERF_COMPLETION_REPORT.md`: most of it is fixed per-day work
+  measured and explained in `docs/archive/completion-reports/PERF_COMPLETION_REPORT.md`: most of it is fixed per-day work
   in settlement, market clearing, demography and needs, plus JavaScript deflate time on a
   15M-character canonical save, not a duplicate-validation or allocation bug that one more
   pass would remove.
@@ -7694,7 +7694,7 @@ campaign 63 ms (15.7×, the world is built at worker start); month starts 3.08�
 ordinary p50 (the ≤ 3× criterion, met after stage 1, is not met now because ordinary days
 improved more). Determinism, bit identity, staged = phase and the save round trip pass;
 1,337 tests pass. Details, the measured remaining costs and the proposed next steps are in
-`PERF_STAGE2_REPORT.md`. Per item 2 above, P3 stays blocked until 10× is reached or the
+`docs/archive/completion-reports/PERF_STAGE2_REPORT.md`. Per item 2 above, P3 stays blocked until 10× is reached or the
 designer accepts an exception.
 
 ### Designer decision (2026-11-04): performance stage accepted as complete
@@ -7702,7 +7702,7 @@ designer accepts an exception.
 The designer accepted the second performance stage as complete for now and **lifted the
 10× precondition of item 2 above**: P3 and the later Prosperity stages may start on the
 measured result (host day 6.6× mean / 7.2× p50, save 4.9×, load 4.4×, first campaign
-15.7×, month starts 3.08–3.53× the ordinary day; see `PERF_STAGE2_REPORT.md`). The
+15.7×, month starts 3.08–3.53× the ordinary day; see `docs/archive/completion-reports/PERF_STAGE2_REPORT.md`). The
 unmet targets and the proposed next steps stay recorded there as open performance work;
 new stages should not make the measured costs worse without saying so in their reports.
 

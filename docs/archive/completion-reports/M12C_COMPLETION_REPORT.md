@@ -3,7 +3,7 @@
 Status: implemented and visually reviewed. This report records the delivery, the
 exact verification commands and results, the design decisions and the known
 limitations. The committed province bundles, the code and
-[`docs/AFRICA_PROVINCIALIZATION.md`](docs/AFRICA_PROVINCIALIZATION.md) are
+[`docs/AFRICA_PROVINCIALIZATION.md`](../../AFRICA_PROVINCIALIZATION.md) are
 authoritative if they disagree with this report.
 
 ## 1. Architecture
@@ -239,21 +239,21 @@ The M12a/M12b rendering contract is reused without a fork:
 Visual review was performed on the exported web app at global and regional zoom.
 Screenshots:
 
-- [Global map](docs/images/m12c-africa-global.png)
-- [Egypt and the Nile](docs/images/m12c-africa-egypt-nile.png)
-- [Nile Delta](docs/images/m12c-africa-nile-delta.png)
-- [Maghreb](docs/images/m12c-africa-maghreb.png)
-- [Morocco zones and Spanish Sahara](docs/images/m12c-africa-morocco-zones.png)
-- [Libya](docs/images/m12c-africa-libya.png)
-- [West Africa](docs/images/m12c-africa-west-africa.png)
-- [Gold Coast and Togo](docs/images/m12c-africa-gold-coast.png)
-- [Central Africa](docs/images/m12c-africa-central-africa.png)
-- [East Africa](docs/images/m12c-africa-east-africa.png)
-- [Horn of Africa](docs/images/m12c-africa-horn.png)
-- [Southern Africa](docs/images/m12c-africa-southern-africa.png)
-- [Cape Colony](docs/images/m12c-africa-cape.png)
-- [Madagascar and the islands](docs/images/m12c-africa-madagascar.png)
-- [Province panel: Cairo](docs/images/m12c-africa-province.png)
+- [Global map](../../images/m12c-africa-global.png)
+- [Egypt and the Nile](../../images/m12c-africa-egypt-nile.png)
+- [Nile Delta](../../images/m12c-africa-nile-delta.png)
+- [Maghreb](../../images/m12c-africa-maghreb.png)
+- [Morocco zones and Spanish Sahara](../../images/m12c-africa-morocco-zones.png)
+- [Libya](../../images/m12c-africa-libya.png)
+- [West Africa](../../images/m12c-africa-west-africa.png)
+- [Gold Coast and Togo](../../images/m12c-africa-gold-coast.png)
+- [Central Africa](../../images/m12c-africa-central-africa.png)
+- [East Africa](../../images/m12c-africa-east-africa.png)
+- [Horn of Africa](../../images/m12c-africa-horn.png)
+- [Southern Africa](../../images/m12c-africa-southern-africa.png)
+- [Cape Colony](../../images/m12c-africa-cape.png)
+- [Madagascar and the islands](../../images/m12c-africa-madagascar.png)
+- [Province panel: Cairo](../../images/m12c-africa-province.png)
 
 Observed results:
 

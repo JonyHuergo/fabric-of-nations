@@ -88,13 +88,13 @@ node scripts/m11d/playtest.mjs --only=map --fresh
 
 All screenshots are in `docs/images/m11d/`; the main ones are:
 
-![Main menu](images/m11d/01-main-menu.png)
-![Selection](images/m11d/04-selection.png)
-![Austria-Hungary campaign](images/m11d/07-game-austria-hungary.png)
-![Wadai detail](images/m11d/10-selection-wadai.png)
-![Budget](images/m11d/40-budget.png)
-![Narrow layout](images/m11d/70-narrow-world.png)
-![Legacy save error](images/m11d/90-legacy-schema.png)
+![Main menu](../../images/m11d/01-main-menu.png)
+![Selection](../../images/m11d/04-selection.png)
+![Austria-Hungary campaign](../../images/m11d/07-game-austria-hungary.png)
+![Wadai detail](../../images/m11d/10-selection-wadai.png)
+![Budget](../../images/m11d/40-budget.png)
+![Narrow layout](../../images/m11d/70-narrow-world.png)
+![Legacy save error](../../images/m11d/90-legacy-schema.png)
 
 ## 3. Error inventory
 
@@ -290,11 +290,11 @@ remaining map defects reported from the running game:
    middle; microstates keep readable labels; off-screen labels are culled instead
    of being clipped at the map edge.
 
-![World map](images/m11d/fix-world.png)
-![Former Aouzou-Tibesti zone after the current-border split](images/m11d/fix-libya-border.png)
-![Former Karakoram-Siachen zone after the current-border split](images/m11d/fix-india-border.png)
-![East Prussia after the seam fix](images/m11d/fix-east-prussia.png)
-![Germany at regional zoom](images/m11d/fix-germany.png)
+![World map](../../images/m11d/fix-world.png)
+![Former Aouzou-Tibesti zone after the current-border split](../../images/m11d/fix-libya-border.png)
+![Former Karakoram-Siachen zone after the current-border split](../../images/m11d/fix-india-border.png)
+![East Prussia after the seam fix](../../images/m11d/fix-east-prussia.png)
+![Germany at regional zoom](../../images/m11d/fix-germany.png)
 
 Verification for this follow-up: `pnpm test` **897 passed / 88 suites**,
 `pnpm typecheck`, `pnpm lint`, `pnpm flags:check`, `pnpm flags:audit`,

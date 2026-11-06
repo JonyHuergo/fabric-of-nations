@@ -187,27 +187,27 @@ Ledger, Trade, Overview, loaded campaign). Machine-readable evidence:
 
 ### Money screen
 
-![RUSD Money screen](images/m14/m14-money.png)
+![RUSD Money screen](../../images/m14/m14-money.png)
 
 ### Budget
 
-![RUSD Budget screen](images/m14/m14-budget.png)
+![RUSD Budget screen](../../images/m14/m14-budget.png)
 
 ### Markets
 
-![RUSD Markets screen](images/m14/m14-markets.png)
+![RUSD Markets screen](../../images/m14/m14-markets.png)
 
 ### Ledger
 
-![RUSD Ledger screen](images/m14/m14-ledger.png)
+![RUSD Ledger screen](../../images/m14/m14-ledger.png)
 
 ### Trade
 
-![RUSD Trade screen](images/m14/m14-trade.png)
+![RUSD Trade screen](../../images/m14/m14-trade.png)
 
 ### Campaign top bar
 
-![RUSD campaign](images/m14/m14-campaign.png)
+![RUSD campaign](../../images/m14/m14-campaign.png)
 
 ---
 

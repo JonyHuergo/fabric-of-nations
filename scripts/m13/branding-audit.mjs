@@ -58,15 +58,13 @@ const ALLOWED_PATTERNS = [
 function isHistorical(relativePath) {
   const name = relativePath.split("/").pop() ?? "";
   return (
-    /^Century_GDD_v2/.test(name) ||
-    /^GDD_V2.*_CHANGE_REPORT\.md$/.test(name) ||
+    // D-145: GDD editions, change reports, completion reports and milestone records
+    // live in docs/archive/; the P4 and P5 completion reports stay at the root until
+    // those stages are accepted.
+    relativePath.startsWith("docs/archive/") ||
     /_COMPLETION_REPORT\.md$/.test(name) ||
     relativePath === "DECISIONS.md" ||
     relativePath.startsWith("docs/images/") ||
-    relativePath === "docs/M11D_PLAYTEST_REPORT.md" ||
-    relativePath === "docs/M11E_RUNTIME_ERRORS_REPORT.md" ||
-    relativePath === "docs/M13_REBRANDING_REPORT.md" ||
-    relativePath === "docs/M14_RUSD_RENAMING_REPORT.md" ||
     relativePath === "packages/tests/src/fixtures/century-era-save.json" ||
     relativePath === "packages/tests/src/architecture/naming-audits.test.ts" ||
     relativePath === "scripts/m13/branding-audit.mjs" ||
@@ -260,7 +258,7 @@ const agents = readFileSync(join(ROOT, "AGENTS.md"), "utf8");
 if (!/^#\s+Fabric of Nations\b/m.test(agents)) {
   errors.push("AGENTS.md title does not name Fabric of Nations");
 }
-if (!existsSync(join(ROOT, "docs/M13_REBRANDING_REPORT.md"))) {
+if (!existsSync(join(ROOT, "docs/archive/milestones/M13_REBRANDING_REPORT.md"))) {
   errors.push("the M13 rebranding report is missing");
 }
 

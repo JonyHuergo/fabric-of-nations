@@ -5439,7 +5439,7 @@ protocol; rejected actions leave state unchanged.
 ### 17C.11 Verification and deliberate limits
 
 The full non-benchmark Node correctness suite and all typechecks pass (**62 suites /
-663 tests**); exact commands/results are in `GDD_V2.12_CHANGE_REPORT.md`.
+663 tests**); exact commands/results are in `docs/archive/gdd-change-reports/GDD_V2.12_CHANGE_REPORT.md`.
 Benchmarks, performance measurements, campaigns, stress/soak runs, and device tests
 were deliberately not run under the no-benchmark restriction; no benchmark code,
 thresholds, or reports were modified.
@@ -5635,7 +5635,7 @@ actions use the validated worker protocol; rejected actions leave state unchange
 ### 17D.10 Verification and deliberate limits
 
 Non-benchmark typechecks, lint, the full correctness suite, and the worker-bundle
-check pass; exact commands/results are in `GDD_V2.13_CHANGE_REPORT.md`. Benchmarks,
+check pass; exact commands/results are in `docs/archive/gdd-change-reports/GDD_V2.13_CHANGE_REPORT.md`. Benchmarks,
 performance measurements, campaigns, stress/soak runs, and device tests were
 deliberately not run under the no-benchmark restriction; no existing benchmark
 threshold or report was modified.

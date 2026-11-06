@@ -48,16 +48,13 @@ const LEGACY_COMPATIBILITY_FILES = new Set([
 function isHistorical(relativePath) {
   const name = relativePath.split("/").pop() ?? "";
   return (
-    /^Century_GDD_v2/.test(name) ||
-    /^GDD_V2.*_CHANGE_REPORT\.md$/.test(name) ||
+    // D-145: GDD editions, change reports, completion reports and milestone records
+    // live in docs/archive/; the P4 and P5 completion reports stay at the root until
+    // those stages are accepted.
+    relativePath.startsWith("docs/archive/") ||
     /_COMPLETION_REPORT\.md$/.test(name) ||
     relativePath === "DECISIONS.md" ||
-    relativePath.startsWith("docs/images/") ||
-    relativePath === "docs/M11D_PLAYTEST_REPORT.md" ||
-    relativePath === "docs/M11E_RUNTIME_ERRORS_REPORT.md" ||
-    relativePath === "docs/M13_REBRANDING_REPORT.md" ||
-    relativePath === "docs/M14_RUSD_RENAMING_REPORT.md" ||
-    /^docs\/[EM]\d.*_REQUIREMENTS_MAP\.md$/.test(relativePath)
+    relativePath.startsWith("docs/images/")
   );
 }
 
@@ -236,7 +233,7 @@ const protocol = readFileSync(join(ROOT, "packages/sim-worker/src/protocol.ts"),
 // province focus command; 21: P5 (D-143) province ownership columns, harvest column and
 // province land (the m14 test pins the value).
 requireIncludes("worker protocol version", protocol, "PROTOCOL_VERSION = 21");
-if (!existsSync(join(ROOT, "docs/M14_RUSD_RENAMING_REPORT.md"))) {
+if (!existsSync(join(ROOT, "docs/archive/milestones/M14_RUSD_RENAMING_REPORT.md"))) {
   errors.push("the M14 renaming report is missing");
 }
 

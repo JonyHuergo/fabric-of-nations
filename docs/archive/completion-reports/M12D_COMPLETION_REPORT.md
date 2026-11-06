@@ -4,7 +4,7 @@ Status: implemented and visually reviewed. This report records the delivery, the
 exact verification commands and results, the design decisions and the known
 limitations. It includes the post-M12d addendum for historical and breakaway
 polities (D-107). The committed province bundles, the code and
-[`docs/AMERICAS_PROVINCIALIZATION.md`](docs/AMERICAS_PROVINCIALIZATION.md) are
+[`docs/AMERICAS_PROVINCIALIZATION.md`](../../AMERICAS_PROVINCIALIZATION.md) are
 authoritative if they disagree with this report.
 
 ## 1. Architecture
@@ -299,26 +299,26 @@ The M12a/M12b/M12c rendering contract is reused without a fork:
 Visual review was performed on the exported web app at global, continental,
 regional and maximum zoom. Screenshots:
 
-- [Global map](docs/images/m12d-americas-global.png)
-- [Canada and the northern United States](docs/images/m12d-americas-north-america.png)
-- [Eastern United States](docs/images/m12d-americas-united-states.png)
-- [Alaska](docs/images/m12d-americas-alaska.png)
-- [Greenland](docs/images/m12d-americas-greenland.png)
-- [Mexico and Central America](docs/images/m12d-americas-mexico-central-america.png)
-- [Panama and the isthmus](docs/images/m12d-americas-panama-isthmus.png)
-- [Cuba and the Greater Antilles](docs/images/m12d-americas-caribbean-cuba.png)
-- [Hispaniola and Puerto Rico](docs/images/m12d-americas-caribbean-greater-antilles.png)
-- [Trinidad and the Lesser Antilles](docs/images/m12d-americas-caribbean-lesser-antilles.png)
-- [Guadeloupe and the northern chain](docs/images/m12d-americas-caribbean-guadeloupe.png)
-- [Barbados and the Windwards](docs/images/m12d-americas-caribbean-barbados.png)
-- [The Guianas](docs/images/m12d-americas-guianas.png)
-- [The Andes](docs/images/m12d-americas-andes.png)
-- [Brazil and the Amazon](docs/images/m12d-americas-brazil-amazon.png)
-- [The Southern Cone](docs/images/m12d-americas-southern-cone.png)
-- [Patagonia and Tierra del Fuego](docs/images/m12d-americas-patagonia.png)
-- [The Falkland Islands](docs/images/m12d-americas-falklands.png)
-- [The Pacific coast](docs/images/m12d-americas-pacific-coast.png)
-- [Province panel: Panama](docs/images/m12d-americas-province.png)
+- [Global map](../../images/m12d-americas-global.png)
+- [Canada and the northern United States](../../images/m12d-americas-north-america.png)
+- [Eastern United States](../../images/m12d-americas-united-states.png)
+- [Alaska](../../images/m12d-americas-alaska.png)
+- [Greenland](../../images/m12d-americas-greenland.png)
+- [Mexico and Central America](../../images/m12d-americas-mexico-central-america.png)
+- [Panama and the isthmus](../../images/m12d-americas-panama-isthmus.png)
+- [Cuba and the Greater Antilles](../../images/m12d-americas-caribbean-cuba.png)
+- [Hispaniola and Puerto Rico](../../images/m12d-americas-caribbean-greater-antilles.png)
+- [Trinidad and the Lesser Antilles](../../images/m12d-americas-caribbean-lesser-antilles.png)
+- [Guadeloupe and the northern chain](../../images/m12d-americas-caribbean-guadeloupe.png)
+- [Barbados and the Windwards](../../images/m12d-americas-caribbean-barbados.png)
+- [The Guianas](../../images/m12d-americas-guianas.png)
+- [The Andes](../../images/m12d-americas-andes.png)
+- [Brazil and the Amazon](../../images/m12d-americas-brazil-amazon.png)
+- [The Southern Cone](../../images/m12d-americas-southern-cone.png)
+- [Patagonia and Tierra del Fuego](../../images/m12d-americas-patagonia.png)
+- [The Falkland Islands](../../images/m12d-americas-falklands.png)
+- [The Pacific coast](../../images/m12d-americas-pacific-coast.png)
+- [Province panel: Panama](../../images/m12d-americas-province.png)
 
 Observed results:
 

@@ -3,7 +3,7 @@
 Status: implemented and visually reviewed. This report records the delivery,
 the exact verification commands and results, the design decisions and the known
 limitations. The committed province bundles, code and
-[`docs/ASIA_PROVINCIALIZATION.md`](docs/ASIA_PROVINCIALIZATION.md) are
+[`docs/ASIA_PROVINCIALIZATION.md`](../../ASIA_PROVINCIALIZATION.md) are
 authoritative if they disagree with this report.
 
 ## 1. Architecture
@@ -150,20 +150,20 @@ The M12a rendering contract is reused without a fork:
 Visual review was performed on the exported web app at global and regional
 zoom. Screenshots:
 
-- [Global map](docs/images/m12b-asia-global.png)
-- [Anatolia and the Levant](docs/images/m12b-asia-anatolia-levant.png)
-- [Levant successor splits](docs/images/m12b-asia-levant-split.png)
-- [Punjab and Kashmir splits](docs/images/m12b-asia-punjab-kashmir.png)
-- [Persia](docs/images/m12b-asia-persia.png)
-- [India](docs/images/m12b-asia-india.png)
-- [China](docs/images/m12b-asia-china.png)
-- [Manchuria](docs/images/m12b-asia-manchuria.png)
-- [Japan and Korea](docs/images/m12b-asia-japan-korea.png)
-- [Korean split](docs/images/m12b-asia-korea-split.png)
-- [Indochina](docs/images/m12b-asia-indochina.png)
-- [Indonesia](docs/images/m12b-asia-indonesia.png)
-- [Siberia](docs/images/m12b-asia-siberia.png)
-- [Province panel: Bengal](docs/images/m12b-asia-province.png)
+- [Global map](../../images/m12b-asia-global.png)
+- [Anatolia and the Levant](../../images/m12b-asia-anatolia-levant.png)
+- [Levant successor splits](../../images/m12b-asia-levant-split.png)
+- [Punjab and Kashmir splits](../../images/m12b-asia-punjab-kashmir.png)
+- [Persia](../../images/m12b-asia-persia.png)
+- [India](../../images/m12b-asia-india.png)
+- [China](../../images/m12b-asia-china.png)
+- [Manchuria](../../images/m12b-asia-manchuria.png)
+- [Japan and Korea](../../images/m12b-asia-japan-korea.png)
+- [Korean split](../../images/m12b-asia-korea-split.png)
+- [Indochina](../../images/m12b-asia-indochina.png)
+- [Indonesia](../../images/m12b-asia-indonesia.png)
+- [Siberia](../../images/m12b-asia-siberia.png)
+- [Province panel: Bengal](../../images/m12b-asia-province.png)
 
 Observed results:
 

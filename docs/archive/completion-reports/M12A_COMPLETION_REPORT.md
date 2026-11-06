@@ -60,7 +60,7 @@ boundaries and provenance. The committed app bundle is
 
 The complete table (id, key, historical 1900 name, administrative affiliation,
 grouping and confidence) is in
-[`docs/EUROPE_PROVINCIALIZATION.md`](docs/EUROPE_PROVINCIALIZATION.md) §8.
+[`docs/EUROPE_PROVINCIALIZATION.md`](../../EUROPE_PROVINCIALIZATION.md) §8.
 
 ## 6. Historical administrative metadata implemented
 
@@ -186,11 +186,11 @@ Validation snapshots live in `packages/tests/src/m12a-provinces.test.ts`:
 - All map stroke widths are converted from screen pixels using
   `scale * viewScale`, so they stay visually constant and never become
   sub-pixel at country zoom.
-- Static verification render: [`docs/images/m12a-provinces-1900.png`](docs/images/m12a-provinces-1900.png).
-- Real exported-app verification: [`docs/images/m12a-game-map.png`](docs/images/m12a-game-map.png)
-  (global), [`docs/images/m12a-game-map-zoom.png`](docs/images/m12a-game-map-zoom.png)
+- Static verification render: [`docs/images/m12a-provinces-1900.png`](../../images/m12a-provinces-1900.png).
+- Real exported-app verification: [`docs/images/m12a-game-map.png`](../../images/m12a-game-map.png)
+  (global), [`docs/images/m12a-game-map-zoom.png`](../../images/m12a-game-map-zoom.png)
   (continental/country zoom) and
-  [`docs/images/m12a-game-map-province.png`](docs/images/m12a-game-map-province.png)
+  [`docs/images/m12a-game-map-province.png`](../../images/m12a-game-map-province.png)
   (Bavaria selected; province panel showing current owner, 1900 owner,
   administrative affiliation, status and notes).
 

@@ -123,7 +123,7 @@ Device performance is the designer's to test.
   population pool). The profile is now flat (no function above ~6%), so the remaining
   factor needs structural work — fewer per-day allocations and typed-array storage —
   which is best done while P2 rebuilds the population and building layout anyway.
-  Details: `P1_COMPLETION_REPORT.md`.
+  Details: `docs/archive/completion-reports/P1_COMPLETION_REPORT.md`.
 
 ### P2 — Provinces as the economic unit; national markets
 
@@ -163,7 +163,7 @@ otherwise; the 1900 world initialises for all 66 selectable countries; benchmark
 province scale reported; province panel and province-level lenses on a phone layout.
 
 **Status (2026-11-02).** Implemented for review (D-131 to D-134; report
-`P2_COMPLETION_REPORT.md`). The region layer is gone from the four packages; the 1900
+`docs/archive/completion-reports/P2_COMPLETION_REPORT.md`). The region layer is gone from the four packages; the 1900
 world is 1,687 provinces, 5,687 population blocks, 3,725 buildings and 63 customs
 territories with 168 generated routes, built from HYDE shares by
 `scripts/p2/build-province-scenario.mjs`; legal transfers conserve people, cash and
@@ -186,7 +186,7 @@ Acceptance: every money value traces to a source-table row and its conversion (t
 head, wage levels, fiscal stocks and flows with their sources.
 
 **Status (2026-11-03).** Implemented for review (D-135, D-136; plan
-`docs/P2B_CALIBRATION_PLAN.md`, report `P2B_COMPLETION_REPORT.md`). Source table
+`docs/archive/milestones/P2B_CALIBRATION_PLAN.md`, report `docs/archive/completion-reports/P2B_COMPLETION_REPORT.md`). Source table
 `historical/p2b/sources_1900.json` (137 rows), builder `scripts/p2b/build-money-calibration.mjs`
 (`--check`), province wage tables, building technique and scenario money coefficients
 (schema 29), 1900-world definitions, census occupation mix for the United States, and the
@@ -194,11 +194,11 @@ D-040 price rule amended to count opening stock only. **Accepted by the designer
 2026-11-04 (D-139)**, including the implemented price rule and the listed open items.
 
 **Performance stages (D-137, D-139).** Two bit-identical performance stages followed P2b
-(`PERF_COMPLETION_REPORT.md`, `PERF_STAGE2_REPORT.md`). Against the D-137 baseline the
+(`docs/archive/completion-reports/PERF_COMPLETION_REPORT.md`, `docs/archive/completion-reports/PERF_STAGE2_REPORT.md`). Against the D-137 baseline the
 host day is 6.6× (mean) / 7.2× (p50) faster, save 4.9×, load 4.4×, the first campaign
 15.7×. The 10× target was not fully met; the designer accepted the result as complete on
 2026-11-04 and lifted it as a precondition for P3. The open measurements and proposed next
-steps stay in `PERF_STAGE2_REPORT.md`.
+steps stay in `docs/archive/completion-reports/PERF_STAGE2_REPORT.md`.
 
 ### P3 — Local-currency display
 
@@ -213,7 +213,7 @@ Acceptance: every money label goes through the formatter (audit test); changing 
 display currency changes no world hash; a forced devaluation fixture shows local figures
 rising while RUSD figures are unchanged.
 
-**Status (2026-11-04).** Implemented for review (D-141; report `P3_COMPLETION_REPORT.md`).
+**Status (2026-11-04).** Implemented for review (D-141; report `docs/archive/completion-reports/P3_COMPLETION_REPORT.md`).
 Data `historical/p3/currencies_1900.json` (Director of the Mint, 1 January 1901, and the
 same report's 1900 country answers): 52 own currencies and the Maria Theresa thaler, 15
 adopted arrangements, paper currencies at their 1900 circulating rate; month-end closing
