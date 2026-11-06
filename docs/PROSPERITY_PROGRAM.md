@@ -1,7 +1,8 @@
 # Prosperity Program — peacetime economy and demography
 
 **Status:** P0–P2b accepted; the performance stages (D-137, D-139) accepted as complete on
-2026-11-04. P3 (D-141) and P4 (D-142) are implemented for review.\
+2026-11-04. P3 (D-141), P4 (D-142, with the natural-fertility ceiling of D-144) and P5a
+(D-143) are implemented for review.\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\
 **Goal:** a country that never goes to war and never engages in diplomacy must still be

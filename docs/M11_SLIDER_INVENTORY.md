@@ -1,8 +1,12 @@
-# M11 slider inventory
+# Slider inventory
 
-Complete player-facing numeric-control inventory for the M11 UI. Continuous or
-bounded numeric values use `SliderField` (slider + precise numeric field); the
-table also records deliberate exceptions.
+Complete player-facing numeric-control inventory, written for M11 and checked against
+the current screens (D-145). Continuous or bounded numeric values use `SliderField`
+(slider + precise numeric field); the table also records deliberate exceptions.
+
+Since P3 (D-141) a money slider is given the player's `MoneyFormat`: it moves in round
+units of the display currency and reports the amount back in RUSD, so the RUSD bounds
+below are the authoritative ones and the screen shows them converted.
 
 The authoritative action is sent on release (or on the numeric field's commit)
 through `APPLY_ACTION`. Slider ranges are UI subsets of the authoritative
@@ -24,7 +28,7 @@ validation; the worker remains the final validator.
 | Trade | Tariff rate (per good) | 0 | 100 | 0.5 | % | `set-trade-policy.tariffRates` (0–1) |
 | Trade | Monthly import quota (per good) | 0 | observed stock + 30 days capacity (or current quota) | 1% of max | good unit | `set-trade-policy.importQuotaQuantity` |
 | Politics | Administration funding | 0 | cash-limited ceiling (preview) | 1% of max | RUSD/yr | `set-institution-funding.annualRUSD` |
-| Technology | Education/research funding | 0 | cash-limited ceiling (preview) | 1% of max | RUSD/yr | `set-education-funding.annualRUSD` |
+| Technology | Education funding | 0 | cash-limited ceiling (preview) | 1% of max | RUSD/yr | `set-education-funding.annualRUSD` |
 | Technology | Research staff share | 0 | 1 | 0.01 | share | `set-research-staff-share.share` |
 | Labor | Annual training budget | 0 | practical max(treasury × 0.5, current × 2) | 1% of max | RUSD/yr | `set-training-budget.annualRUSD` |
 | Labor | Annual stipend per trainee | 0 | max(10,000; current × 2) | 1% of max | RUSD/yr | `set-training-stipend.annualRUSD` |
@@ -32,9 +36,9 @@ validation; the worker remains the final validator.
 | Labor | Health staff share of administration | 0 | 1 | 0.01 | share | `set-health-staff-share.share` |
 | Industry | Sector subsidy rate (5 sectors) | 0 | 100 | 0.5 | % | `set-industrial-policy.sectorSubsidyRates` |
 | Industry | Public-enterprise capital support (per enterprise) | 0 | treasury cash | 1% of max | RUSD | `support-public-enterprise.amountRUSD` |
-| Money | Currency parity | reference × 0.5 | reference × 1.5 | 1% of reference | RUSD/unit | `set-monetary-policy.parityRusdPerUnit` |
+| Money | Parity | reference × 0.5 | reference × 1.5 | 1% of reference | RUSD/unit | `set-monetary-policy.parityRusdPerUnit` |
 | Money | Reserve transfer (signed) | −reserves | treasury cash | 1% of range | RUSD | `set-monetary-policy.reserveTransferRUSD` |
-| War | Recruitment personnel | 1,000 | 25% of the recruiting region's population | 1,000 | soldiers | `recruit-army.personnel` |
+| War | Recruitment personnel | 1,000 | 25% of the recruiting province's population | 1,000 | soldiers | `recruit-army.personnel` |
 
 `SliderField` also provides threshold ticks, min/max labels, the live value,
 step buttons and the platform accessibility increment/decrement actions. The
@@ -44,8 +48,8 @@ numeric field accepts a typed value and clamps it to the slider range.
 
 ### Categorical / discrete
 
-- Country and territory selection (map/list), market selection, region and
-  project-type selection, army and deployment-region selection, target country,
+- Country and territory selection (map/list), market selection, province and
+  project-type selection, army and deployment-province selection, target country,
   casus belli.
 - Law proposals/repeals, technology/research selection, construction project
   type, public-enterprise selection.

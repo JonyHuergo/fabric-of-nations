@@ -1,7 +1,11 @@
-# Historical data provenance and licensing (M11)
+# Historical data provenance and licensing
 
 This document records what the 1900 world contains, where each class of value
-comes from, and what is intentionally approximate.
+comes from, and what is intentionally approximate. It was written for M11 and updated
+for P2 (D-118, D-119): simulation regions are gone, territory is made of provinces, and
+every market is a customs territory. Province geometry, the HYDE allocation and the
+customs audit are in [`PROVINCE_GEOGRAPHY.md`](./PROVINCE_GEOGRAPHY.md); sourced money
+and demography values are recorded in their decisions (D-135, D-141, D-142, D-143).
 
 ## 1. Scope and classification
 
@@ -11,8 +15,10 @@ comes from, and what is intentionally approximate.
   2022). CShapes is used only as a classification reference and is **not
   redistributed**.
 - Catalog: `packages/data/data/historical/m11/polities_1900.json`.
-- Contents: **67 states**, **66 dependent territories**, **20 markets**,
-  **133 regions**, **66 selectable states**.
+- Contents: **133 polities** (**67 states** and **66 dependent territories**),
+  **66 selectable states**, **1,687 provinces**, and one market per customs territory
+  (**63** in 1900: a national market by default, a shared one only where the 1900
+  customs audit records a union; D-119).
 
 | Status | Count in catalog | Selectable |
 |---|---|---|
@@ -26,17 +32,19 @@ comes from, and what is intentionally approximate.
 | autonomous-province | 3 (Egypt, Finland, Tibet) | no |
 | dependency | 3 (Iceland, Greenland, Faroes) | no |
 
-Exact counts are asserted in `packages/tests/src/m11-world.test.ts`. The
+Exact counts are asserted in `packages/tests/src/data/world-1900.test.ts`. The
 independence/de-facto-state reconciliation is in
 [`1900_CATALOG_COVERAGE.md`](./1900_CATALOG_COVERAGE.md).
 
 ### Why dependencies are not independent countries
 
-Colonies, protectorates and occupied territories keep their own population,
-buildings and market membership but are **regions of their sovereign country**.
-They are never marked independent and cannot be selected as the player country.
-Their status, sovereign and capital are visible in the picker and in the game's
-region panel. This is a deliberate model decision (D-087), not an omission.
+Colonies, protectorates and occupied territories keep their own population and
+buildings, but their land is **provinces of their sovereign country** with a
+colonial or protectorate administrative status, trading in their sovereign's customs
+territory (D-087 as amended by D-118 and D-119). They are never marked independent and
+cannot be selected as the player country. Their status, sovereign and capital are
+visible in the picker and on the map. This is a deliberate model decision, not an
+omission.
 
 Examples of documented semi-sovereign cases:
 
