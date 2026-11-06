@@ -11,6 +11,11 @@
  *   record; determinism and save round trip; validation rejects impossible states.
  * - The player's levers (sanitation research with public-health staff, contraception
  *   research) reach the levels.
+ *
+ * P4 was accepted on 2026-11-06 with the natural-fertility ceiling (D-144, D-146 B2).
+ * Every fertility level these tests read is the saturated level; the ceiling itself,
+ * its inverse refit and a deterministic year of births at the ceiling are tested in
+ * `population/fertility-ceiling.test.ts`.
  */
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
@@ -30,6 +35,8 @@ import {
   deserializeWorld,
   effectiveAdultMortality,
   effectiveChildMortality,
+  FERTILITY_NATURAL_CAP,
+  FERTILITY_NATURAL_KNEE,
   fertilityLevel,
   FOOD_FERTILITY_WEIGHT,
   FOOD_MORTALITY_WEIGHT_ADULT,
@@ -179,6 +186,29 @@ describe("P4 single-cause fixtures (D-142)", () => {
     // Mortality levels do not respond to literacy.
     expect(child(rising.block)).toBeCloseTo(child(control.block), 12);
     expect(adult(rising.block)).toBeCloseTo(adult(control.block), 12);
+  });
+
+  test("falling literacy raises TFR ever less near the natural-fertility ceiling and never past it (D-144)", () => {
+    // Revised for D-144 (accepted, D-146 B2): a block whose causes push its level above
+    // the knee keeps responding to a cause, with a shrinking step, and stays under the
+    // cap however far the cause moves.
+    const falling = fixture();
+    calibrateBlockDemography(falling.block, { fertilityLevel: 1.6, childMortality: 1, adultMortality: 1 }, NEUTRAL_DEMOGRAPHY_FACTORS, "test");
+    const cap = FERTILITY_NATURAL_CAP;
+    const levels: number[] = [];
+    for (let step = 0; step <= 10; step += 1) {
+      setLiteracy(falling.block, 0.5 - 0.05 * step);
+      monthly(falling.block);
+      levels.push(fertilityLevel(falling.block, NEUTRAL_DEMOGRAPHY_FACTORS));
+    }
+    for (let index = 1; index < levels.length; index += 1) {
+      expect(levels[index]!).toBeGreaterThan(levels[index - 1]!);
+      expect(levels[index]!).toBeLessThan(cap);
+    }
+    const firstStep = levels[1]! - levels[0]!;
+    const lastStep = levels[levels.length - 1]! - levels[levels.length - 2]!;
+    expect(levels[levels.length - 2]!).toBeGreaterThan(FERTILITY_NATURAL_KNEE);
+    expect(lastStep).toBeLessThan(firstStep);
   });
 
   test("TFR declines as the urban share rises; unsanitised towns raise mortality", () => {

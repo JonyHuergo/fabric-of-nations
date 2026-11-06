@@ -108,7 +108,7 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // land on the 1950 source total; D-124 forbids forcing a trajectory, so the
     // historical series is a validation target of the full simulation (P4 WPP
     // comparison report), not of this fixture. The fixture only documents that
-    // the gap exists and grows.
+    // the gap exists and grows. This restatement was accepted on 2026-11-06 (D-146 B4).
     expect(anchor1950).toBeGreaterThan(januaryFirstReference(1950));
     expect(anchor2000).toBeGreaterThan(anchor1950);
 

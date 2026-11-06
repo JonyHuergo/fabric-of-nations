@@ -23,10 +23,12 @@ import {
   FERTILITY_NATURAL_KNEE,
   fertilityLevel,
   inverseNaturalFertilitySaturation,
+  hashWorld,
   NEUTRAL_DEMOGRAPHY_FACTORS,
   naturalFertilitySaturation,
+  tick,
 } from "@century/sim";
-import { oneBlockScenario } from "../fixtures/m2.js";
+import { contextFor, makeInputs, oneBlockScenario } from "../fixtures/m2.js";
 
 /** Children per woman of a fertility level of 1 (the standard ASFR schedule). */
 const STANDARD_TFR = loadDemography1900("historical/p4/demography_1900.json").meta.standardTotalFertility;
@@ -149,5 +151,42 @@ describe("inverse saturation and residual fitting (D-144)", () => {
       expect(level).toBeLessThanOrEqual(FERTILITY_NATURAL_CAP);
       expect(() => assertValidBlockLevels(scaled, NEUTRAL_DEMOGRAPHY_FACTORS, "test")).not.toThrow();
     }
+  });
+
+  test("births over a simulated year follow the saturated level, never the raw product; deterministic (D-146 B6)", () => {
+    // One block against the same block with its causal product scaled 1,000-fold. Every
+    // day the extreme block's derived level stays at or below the cap, and its births
+    // relative to the base block follow the ratio of the two derived levels (births are
+    // proportional to the level), not the 1,000-fold raw product. Two runs of the extreme
+    // block give the same births, levels and world hash.
+    const scenario = oneBlockScenario({ 3: 40_000, 4: 40_000, 5: 40_000, 6: 40_000, 7: 40_000 });
+    const run = (multiple: number): { births: number; hash: string; meanLevel: number; maxLevel: number } => {
+      const world = createPopulationWorld(scenario, { seed: 7 });
+      const target = world.popBlocks[0]!;
+      calibrateBlockDemography(target, { fertilityLevel: 1, childMortality: 1, adultMortality: 1 }, NEUTRAL_DEMOGRAPHY_FACTORS, "test");
+      target.fertilityResidual *= multiple;
+      const context = contextFor(scenario, makeInputs([0]), false);
+      let births = 0;
+      let levelSum = 0;
+      let maxLevel = 0;
+      for (let day = 0; day < 365; day += 1) {
+        births += tick(world, context).population?.demography.blocks[0]?.births ?? 0;
+        const level = fertilityLevel(world.popBlocks[0]!, NEUTRAL_DEMOGRAPHY_FACTORS);
+        levelSum += level;
+        maxLevel = Math.max(maxLevel, level);
+      }
+      return { births, hash: hashWorld(world), meanLevel: levelSum / 365, maxLevel };
+    };
+    const base = run(1);
+    const extreme = run(1000);
+    expect(base.births).toBeGreaterThan(1_000);
+    expect(extreme.maxLevel).toBeLessThanOrEqual(FERTILITY_NATURAL_CAP);
+    expect(extreme.meanLevel).toBeGreaterThan(FERTILITY_NATURAL_KNEE);
+    // Births follow the level ratio within 2 % (daily integer rounding and the month-
+    // start level updates), far from the 1,000-fold raw ratio.
+    const expected = (extreme.meanLevel / base.meanLevel) * base.births;
+    expect(Math.abs(extreme.births / expected - 1)).toBeLessThan(0.02);
+    expect(extreme.births / base.births).toBeLessThan(FERTILITY_NATURAL_CAP / base.meanLevel + 0.05);
+    expect(run(1000)).toEqual(extreme);
   });
 });

@@ -257,7 +257,7 @@ describe("M5 historical scenario feasibility", () => {
     // market, so in those two markets the buyers bear the whole gap between capacity and
     // demand: they receive 99.28 % of the fish and livestock they pay for (99.86 % in
     // P4) while still eating their calories. The supply criterion is 99 %. Restated in
-    // P5 for designer review (P5 completion report).
+    // P5 and accepted by the designer on 2026-11-06 (D-146 B4).
     const needs = last.population!.needs;
     for (const block of needs.blocks) {
       if (block.population === 0) continue;
