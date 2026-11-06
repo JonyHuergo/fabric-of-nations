@@ -1,0 +1,1835 @@
+{
+ "description": "P5b (D-146): authored source rows for the 57-good catalogue of the 1900 world. 1900 US prices (converted to RUSD by the builder with the P2b CPI rows), 1900 output by country or territory (shares only, D-146 A5), and the evidence for the technologies countries know in 1900 (D-146 A9). Every value was read from the page image of the cited volume; locators give the book page and, for scanned PDFs, the PDF page. Status: sourced = read from the cited table; estimated = the source itself marks the value as an estimate; provisional = a project assumption with its reasoning.",
+ "decision": "D-146",
+ "sources": [
+  {
+   "id": "statab-1901",
+   "title": "Statistical Abstract of the United States: 1901 (Twenty-fourth number)",
+   "author": "U.S. Treasury Department, Bureau of Statistics",
+   "url": "https://www.census.gov/library/publications/1902/compendia/statab/24ed.html",
+   "accessDate": "2026-11-06",
+   "license": "Public domain (U.S. government work)",
+   "notes": "Read from the census.gov page scans (no text layer). Part 6 begins at book page 320."
+  },
+  {
+   "id": "bls-bulletin-39",
+   "title": "Bulletin of the Department of Labor No. 39 (March 1902): Course of Wholesale Prices, 1890 to 1901, Table II (average yearly prices)",
+   "author": "U.S. Department of Labor",
+   "url": "https://fraser.stlouisfed.org/files/docs/publications/bls/bls_v07_0039_1902.pdf",
+   "accessDate": "2026-11-06",
+   "license": "Public domain (U.S. government work)",
+   "notes": "FRASER scan; values read from the page images of Table II."
+  },
+  {
+   "id": "mineral-industry-1900",
+   "title": "The Mineral Industry, its Statistics, Technology and Trade in the United States and Other Countries to the End of 1900, Vol. IX",
+   "author": "Rothwell (founder), Struthers (ed.); Scientific Publishing Co., New York, 1901",
+   "url": "https://archive.org/details/gri_33125014726935",
+   "accessDate": "2026-11-06",
+   "license": "Public domain (published 1901; marked NOT_IN_COPYRIGHT)",
+   "notes": "PDF page = book page + 40."
+  },
+  {
+   "id": "mineral-industry-1901",
+   "title": "The Mineral Industry, its Statistics, Technology and Trade ... to the End of 1901, Vol. X",
+   "author": "Struthers (ed.); Engineering and Mining Journal, New York, 1902",
+   "url": "https://archive.org/details/gri_33125014726992",
+   "accessDate": "2026-11-06",
+   "license": "Public domain (published 1902)",
+   "notes": "Used for the 1900 columns of its world tables. PDF page = book page + 40 (front matter) for the pages cited."
+  },
+  {
+   "id": "commissioner-labor-1903",
+   "title": "Eighteenth Annual Report of the Commissioner of Labor, 1903: Cost of Living and Retail Prices of Food (1901 survey of 25,440 wage-earner families; detailed expenditures of 2,567 families)",
+   "author": "U.S. Department of Commerce and Labor, Bureau of Labor",
+   "url": "https://archive.org/details/costlivingandre00labogoog",
+   "accessDate": "2026-11-06",
+   "license": "Public domain (U.S. government work, 1904)",
+   "notes": "Table IV-R (pp. 508-509, PDF 625-626): average expenditure of families having each item; Table IV-P summary (text, p. 84): per cent of the 2,567 families having each item. The all-family average is their product."
+  },
+  {
+   "id": "usda-yearbook-1900",
+   "title": "Yearbook of the United States Department of Agriculture, 1900",
+   "author": "U.S. Department of Agriculture",
+   "url": "https://archive.org/details/yoa1900",
+   "accessDate": "2026-11-06",
+   "license": "Public domain (U.S. government work)",
+   "notes": "Statistics of sugar, Willett & Gray (cane) and Licht (beet)."
+  },
+  {
+   "id": "usgs-ds140",
+   "title": "Historical statistics for mineral and material commodities in the United States (Data Series 140)",
+   "author": "U.S. Geological Survey",
+   "url": "https://pubs.usgs.gov/publication/ds140",
+   "accessDate": "2026-11-06",
+   "license": "Public domain (U.S. government work)",
+   "notes": "Workbooks downloaded by hand (usgs.gov refuses scripted downloads); extracted to historical/p5b/ds140_1900_1990.json."
+  },
+  {
+   "id": "gold-standard-act-1900",
+   "title": "Gold Standard Act of March 14, 1900 (31 Stat. 45): the dollar of 25.8 grains of gold nine-tenths fine",
+   "author": "U.S. Congress",
+   "url": "https://www.loc.gov/item/llsl-v31/",
+   "accessDate": "2026-11-06",
+   "license": "Public domain",
+   "notes": "Statutory mint price $20.67183 per fine troy ounce; also the coining value of Statistical Abstract 1901 Table 87, footnote f ($20.6718)."
+  },
+  {
+   "id": "p5b-provisional",
+   "title": "P5b provisional rules",
+   "author": "Fabric of Nations",
+   "url": "packages/data/data/historical/p5b/sources_1900.json",
+   "accessDate": "2026-11-06",
+   "license": "Project data",
+   "notes": "Each provisional row states its reasoning; none is a historical observation."
+  }
+ ],
+ "units": [
+  {
+   "id": "kg-per-lb",
+   "value": 0.45359237,
+   "unit": "kg per avoirdupois pound",
+   "status": "sourced",
+   "sourceId": "p5b-provisional",
+   "note": "International yard and pound agreement (1959) definition."
+  },
+  {
+   "id": "kg-per-long-ton",
+   "value": 1016.0469088,
+   "unit": "kg per long ton (2,240 lb)",
+   "status": "sourced",
+   "sourceId": "p5b-provisional"
+  },
+  {
+   "id": "kg-per-short-ton",
+   "value": 907.18474,
+   "unit": "kg per short ton (2,000 lb)",
+   "status": "sourced",
+   "sourceId": "p5b-provisional"
+  },
+  {
+   "id": "g-per-troy-ounce",
+   "value": 31.1034768,
+   "unit": "g per troy ounce",
+   "status": "sourced",
+   "sourceId": "p5b-provisional"
+  },
+  {
+   "id": "litres-per-us-gallon",
+   "value": 3.785411784,
+   "unit": "L per US gallon",
+   "status": "sourced",
+   "sourceId": "p5b-provisional"
+  },
+  {
+   "id": "gallons-per-barrel-petroleum",
+   "value": 42,
+   "unit": "US gallons per barrel of petroleum",
+   "status": "sourced",
+   "sourceId": "statab-1901",
+   "locator": "Table 87, footnote m: 'Of 42 gallons'"
+  },
+  {
+   "id": "crude-oil-barrels-per-tonne",
+   "value": 7.33,
+   "unit": "barrels per metric ton of crude oil",
+   "status": "provisional",
+   "sourceId": "p5b-provisional",
+   "note": "Specific gravity about 0.86 (Pennsylvania crude about 0.80-0.82, Russian about 0.87); 1 / (0.159 m3 x 0.86 t/m3)."
+  },
+  {
+   "id": "kerosene-kg-per-litre",
+   "value": 0.8,
+   "unit": "kg per litre of refined illuminating oil",
+   "status": "provisional",
+   "sourceId": "p5b-provisional",
+   "note": "Water-white kerosene, specific gravity about 0.79-0.81."
+  },
+  {
+   "id": "m3-per-thousand-board-feet",
+   "value": 2.3597,
+   "unit": "m3 per thousand board feet (sawn)",
+   "status": "sourced",
+   "sourceId": "p5b-provisional",
+   "note": "1 board foot = 144 cubic inches = 2.3597 dm3."
+  },
+  {
+   "id": "kg-per-bushel-potatoes",
+   "value": 27.2155,
+   "unit": "kg per bushel of potatoes (60 lb)",
+   "status": "sourced",
+   "sourceId": "p5b-provisional",
+   "note": "Customary US bushel weight of potatoes, 60 lb."
+  },
+  {
+   "id": "kg-per-barrel-portland-cement",
+   "value": 172.365,
+   "unit": "kg per barrel of Portland cement (380 lb net)",
+   "status": "sourced",
+   "sourceId": "p5b-provisional",
+   "note": "US trade barrel of Portland cement, 380 lb net."
+  },
+  {
+   "id": "kg-per-thousand-common-brick",
+   "value": 2041,
+   "unit": "kg per thousand common bricks",
+   "status": "provisional",
+   "sourceId": "p5b-provisional",
+   "note": "About 4.5 lb per common brick."
+  },
+  {
+   "id": "nitrogen-share-sodium-nitrate",
+   "value": 0.1647,
+   "unit": "kg N per kg NaNO3",
+   "status": "sourced",
+   "sourceId": "p5b-provisional",
+   "note": "Molar mass ratio 14.007 / 84.995."
+  },
+  {
+   "id": "milk-equivalent-kg-per-kg-butter",
+   "value": 21,
+   "unit": "kg milk per kg butter",
+   "status": "provisional",
+   "sourceId": "p5b-provisional",
+   "note": "Milk-equivalent convention for butter (about 21-23 kg)."
+  },
+  {
+   "id": "milk-equivalent-kg-per-kg-cheese",
+   "value": 10,
+   "unit": "kg milk per kg cheese",
+   "status": "provisional",
+   "sourceId": "p5b-provisional",
+   "note": "Milk-equivalent convention for hard cheese (about 9-10 kg)."
+  },
+  {
+   "id": "kg-per-dozen-eggs",
+   "value": 0.68,
+   "unit": "kg per dozen eggs",
+   "status": "provisional",
+   "sourceId": "p5b-provisional",
+   "note": "About 57 g per egg in shell."
+  }
+ ],
+ "prices1900": [
+  {
+   "id": "price-bituminous-coal-mine",
+   "goodKey": "coal",
+   "sourceId": "statab-1901",
+   "locator": "Table 87, p. 359 (Part 6 PDF p. 40): bituminous coal, 1900, 212,513,912 short tons, spot value $221,133,513",
+   "unit": "USD per short ton",
+   "quantity": 212513912,
+   "valueUSD": 221133513,
+   "status": "sourced"
+  },
+  {
+   "id": "price-bituminous-coal-georges-creek",
+   "goodKey": "coal",
+   "role": "cross-check",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 466: coal, bituminous, Georges Creek, f.o.b. mine, 1900",
+   "unit": "USD per ton",
+   "value": 1.2,
+   "status": "sourced"
+  },
+  {
+   "id": "price-crude-petroleum",
+   "goodKey": "crude-oil",
+   "sourceId": "statab-1901",
+   "locator": "Table 87, p. 359: petroleum, 1900, 63,362,704 barrels, spot value $75,752,691",
+   "unit": "USD per barrel",
+   "quantity": 63362704,
+   "valueUSD": 75752691,
+   "status": "sourced"
+  },
+  {
+   "id": "price-crude-petroleum-pennsylvania",
+   "goodKey": "crude-oil",
+   "role": "cross-check",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 466: petroleum, crude, 1900",
+   "unit": "USD per barrel",
+   "value": 1.3521,
+   "status": "sourced"
+  },
+  {
+   "id": "value-natural-gas-us",
+   "goodKey": "natural-gas",
+   "sourceId": "statab-1901",
+   "locator": "Table 87, p. 359: natural gas, 1900, value $23,606,463 (no quantity published)",
+   "unit": "USD per year",
+   "value": 23606463,
+   "status": "sourced",
+   "note": "No 1900 volume exists in the source; the price needs a volume estimate (provisional, step 4)."
+  },
+  {
+   "id": "price-iron-ore-mines",
+   "goodKey": "iron-ore",
+   "sourceId": "statab-1901",
+   "locator": "Table 87, p. 359, footnote c: iron ore 1900, 27,553,161 long tons, value at mines $66,590,504",
+   "unit": "USD per long ton of ore",
+   "quantity": 27553161,
+   "valueUSD": 66590504,
+   "status": "sourced",
+   "note": "Ore, not Fe content; the builder divides by the ore grade."
+  },
+  {
+   "id": "price-copper-ingot",
+   "goodKey": "copper",
+   "sourceId": "statab-1901",
+   "locator": "Table 87, p. 359: copper, value at New York City, 1900, 606,117,166 lb, $98,494,039",
+   "unit": "USD per lb",
+   "quantity": 606117166,
+   "valueUSD": 98494039,
+   "status": "sourced"
+  },
+  {
+   "id": "price-aluminum-pittsburg",
+   "goodKey": "aluminium",
+   "sourceId": "statab-1901",
+   "locator": "Table 87, p. 359: aluminum, value at Pittsburg, 1900, 6,000,000 lb, $1,920,000",
+   "unit": "USD per lb",
+   "quantity": 6000000,
+   "valueUSD": 1920000,
+   "status": "sourced"
+  },
+  {
+   "id": "price-pig-iron-spot",
+   "goodKey": "steel",
+   "role": "input-reference",
+   "sourceId": "statab-1901",
+   "locator": "Table 87, p. 359: pig iron, spot value, 1900, 13,789,242 long tons, $259,944,000",
+   "unit": "USD per long ton",
+   "quantity": 13789242,
+   "valueUSD": 259944000,
+   "status": "sourced"
+  },
+  {
+   "id": "price-gold-mint",
+   "goodKey": "gold",
+   "sourceId": "gold-standard-act-1900",
+   "locator": "statutory mint price; Statistical Abstract 1901 Table 87 footnote f",
+   "unit": "USD per fine troy ounce",
+   "value": 20.67183,
+   "status": "sourced"
+  },
+  {
+   "id": "price-silver-commercial",
+   "goodKey": "silver",
+   "sourceId": "statab-1901",
+   "locator": "Table 87, p. 359, footnote e: silver, commercial value 1900 $35,741,140 for 57,647,000 troy ounces",
+   "unit": "USD per troy ounce",
+   "quantity": 57647000,
+   "valueUSD": 35741140,
+   "status": "sourced"
+  },
+  {
+   "id": "price-silver-us-average",
+   "goodKey": "silver",
+   "role": "cross-check",
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 315 (PDF 359), footnote a: average value 61.41 cents per ounce in 1900",
+   "unit": "USD per troy ounce",
+   "value": 0.6141,
+   "status": "sourced"
+  },
+  {
+   "id": "price-tin-pig",
+   "goodKey": "tin",
+   "sourceId": "statab-1901",
+   "locator": "Table 157, p. 453: tin, bars, blocks or pigs, year ending June 30, 1900 (foreign market value)",
+   "unit": "USD per lb",
+   "value": 0.2723,
+   "status": "sourced"
+  },
+  {
+   "id": "price-bauxite-us",
+   "goodKey": "bauxite",
+   "sourceId": "usgs-ds140",
+   "locator": "Bauxite sheet, 1900 unit value",
+   "unit": "USD per metric ton",
+   "value": 3.75,
+   "status": "sourced"
+  },
+  {
+   "id": "price-nitrate-liverpool",
+   "goodKey": "nitrates",
+   "sourceId": "mineral-industry-1901",
+   "locator": "p. 161 (PDF 201): price of 2,000 lb nitrogen at Liverpool in nitrate (12,779 lb), 1900",
+   "unit": "USD per 2,000 lb of nitrogen",
+   "value": 235.5,
+   "status": "sourced"
+  },
+  {
+   "id": "price-steel-billets-ds140",
+   "goodKey": "steel",
+   "sourceId": "usgs-ds140",
+   "locator": "Steel sheet, 1900 unit value",
+   "unit": "USD per metric ton",
+   "value": 35.5,
+   "status": "sourced"
+  },
+  {
+   "id": "price-cement-portland",
+   "goodKey": "construction-materials",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 469: cement, Portland, American, 1900",
+   "unit": "USD per barrel",
+   "value": 2.1583,
+   "status": "sourced"
+  },
+  {
+   "id": "price-brick-common",
+   "goodKey": "construction-materials",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 469: brick, common domestic, 1900",
+   "unit": "USD per thousand",
+   "value": 5.25,
+   "status": "sourced"
+  },
+  {
+   "id": "price-refined-petroleum-export",
+   "goodKey": "kerosene",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 466: petroleum, refined, for export, 1900",
+   "unit": "USD per gallon",
+   "value": 0.0854,
+   "status": "sourced"
+  },
+  {
+   "id": "price-sugar-granulated",
+   "goodKey": "sugar",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 460: sugar, granulated, 1900",
+   "unit": "USD per lb",
+   "value": 0.05332,
+   "status": "sourced"
+  },
+  {
+   "id": "price-coffee-rio-7",
+   "goodKey": "coffee-tea-cocoa",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 457: coffee, Rio No. 7, 1900",
+   "unit": "USD per lb",
+   "value": 0.0822,
+   "status": "sourced"
+  },
+  {
+   "id": "price-tea-formosa",
+   "goodKey": "coffee-tea-cocoa",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 460: tea, Formosa, fine, 1900",
+   "unit": "USD per lb",
+   "value": 0.2977,
+   "status": "sourced"
+  },
+  {
+   "id": "price-tobacco-leaf-export",
+   "goodKey": "tobacco",
+   "sourceId": "statab-1901",
+   "locator": "Table 159, p. 456: tobacco, leaf, export price, year ending June 30, 1900",
+   "unit": "USD per lb",
+   "value": 0.087,
+   "status": "sourced"
+  },
+  {
+   "id": "price-rubber-para",
+   "goodKey": "rubber",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 473: rubber, Para Island, fine, 1900",
+   "unit": "USD per lb",
+   "value": 0.9817,
+   "status": "sourced"
+  },
+  {
+   "id": "price-paper-news",
+   "goodKey": "paper",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 473: paper, news, 1900",
+   "unit": "USD per lb",
+   "value": 0.0281,
+   "status": "sourced"
+  },
+  {
+   "id": "price-lumber-spruce",
+   "goodKey": "timber",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 470: spruce, 1900",
+   "unit": "USD per thousand board feet",
+   "value": 17.375,
+   "status": "sourced"
+  },
+  {
+   "id": "price-lumber-yellow-pine",
+   "goodKey": "timber",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 470: pine, yellow, 1900",
+   "unit": "USD per thousand board feet",
+   "value": 20.7083,
+   "status": "sourced"
+  },
+  {
+   "id": "price-lumber-hemlock",
+   "goodKey": "timber",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 469: hemlock, 1900",
+   "unit": "USD per thousand board feet",
+   "value": 16.5,
+   "status": "sourced"
+  },
+  {
+   "id": "price-sulphuric-acid",
+   "goodKey": "chemicals",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 471: sulphuric acid, 66 degrees, 1900",
+   "unit": "USD per lb",
+   "value": 0.012,
+   "status": "sourced"
+  },
+  {
+   "id": "price-muriatic-acid",
+   "goodKey": "chemicals",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 471: muriatic acid, 20 degrees, 1900",
+   "unit": "USD per lb",
+   "value": 0.0135,
+   "status": "sourced"
+  },
+  {
+   "id": "price-alum",
+   "goodKey": "chemicals",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 471: alum, lump, 1900",
+   "unit": "USD per lb",
+   "value": 0.0175,
+   "status": "sourced"
+  },
+  {
+   "id": "price-butter-creamery-ny",
+   "goodKey": "dairy",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 457: butter, creamery, Elgin and other Western (New York market), 1900",
+   "unit": "USD per lb",
+   "value": 0.2245,
+   "status": "sourced"
+  },
+  {
+   "id": "price-cheese-ny",
+   "goodKey": "dairy",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 457: cheese, N.Y. State factory, 1900",
+   "unit": "USD per lb",
+   "value": 0.1128,
+   "status": "sourced"
+  },
+  {
+   "id": "price-eggs",
+   "goodKey": "dairy",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 457: eggs, new-laid, fancy, near-by, 1900",
+   "unit": "USD per dozen",
+   "value": 0.1977,
+   "status": "sourced"
+  },
+  {
+   "id": "price-potatoes",
+   "goodKey": "produce",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 460: vegetables, fresh, potatoes, Burbank, 1900",
+   "unit": "USD per bushel",
+   "value": 0.3736,
+   "status": "sourced"
+  },
+  {
+   "id": "price-beans",
+   "goodKey": "produce",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 457: beans, medium, choice, 1900",
+   "unit": "USD per bushel",
+   "value": 2.0969,
+   "status": "sourced"
+  }
+ ],
+ "outputs1900": {
+  "coal": {
+   "sourceId": "mineral-industry-1901",
+   "locator": "p. 128 (PDF 168): coal production of the chief countries of the world, 1900",
+   "unit": "metric tons",
+   "status": "sourced",
+   "total": 765158161,
+   "note": "Column sum equals the printed total. Africa includes an estimated 50,000 t for the Transvaal and the Orange Free State.",
+   "entries": [
+    [
+     "cap",
+     495839,
+     "estimated",
+     "Africa (Cape Colony, Natal; Transvaal and Orange Free State estimated)"
+    ],
+    [
+     "aus-home",
+     6367732,
+     "sourced",
+     "New South Wales 5,595,879, Queensland 505,252, Tasmania 51,549, Victoria 215,052"
+    ],
+    [
+     "nzl-home",
+     1111860,
+     "sourced"
+    ],
+    [
+     "aut-home",
+     39027929,
+     "sourced"
+    ],
+    [
+     "bel-home",
+     23462817,
+     "sourced"
+    ],
+    [
+     "can-home",
+     5088121,
+     "sourced",
+     "British Columbia and Territories 1,791,799; New Brunswick and Nova Scotia 3,296,322"
+    ],
+    [
+     "fra-home",
+     33404298,
+     "sourced"
+    ],
+    [
+     "deu-home",
+     149551058,
+     "sourced"
+    ],
+    [
+     "bin",
+     6216822,
+     "sourced"
+    ],
+    [
+     "ita-home",
+     479896,
+     "sourced"
+    ],
+    [
+     "jpn-home",
+     7429457,
+     "sourced"
+    ],
+    [
+     "rus-home",
+     15000000,
+     "estimated"
+    ],
+    [
+     "esp-home",
+     2582962,
+     "sourced",
+     "not including lignite"
+    ],
+    [
+     "swe-home",
+     252320,
+     "sourced"
+    ],
+    [
+     "gbr-home",
+     228772886,
+     "sourced"
+    ],
+    [
+     "usa-home",
+     243414164,
+     "sourced"
+    ],
+    [
+     "other",
+     2500000,
+     "estimated"
+    ]
+   ]
+  },
+  "crude-oil": {
+   "sourceId": "mineral-industry-1901",
+   "locator": "p. 504 (PDF 546): production of crude petroleum in the countries of the world, 1900",
+   "unit": "metric tons",
+   "status": "sourced",
+   "note": "The source excludes Roumania, Sumatra, Borneo, Java, South Africa and Peru.",
+   "entries": [
+    [
+     "aut-home",
+     349412,
+     "sourced",
+     "Austria 347,213 + Hungary 2,199"
+    ],
+    [
+     "can-home",
+     91139,
+     "sourced"
+    ],
+    [
+     "deu-home",
+     50464,
+     "sourced"
+    ],
+    [
+     "bin",
+     140034,
+     "sourced"
+    ],
+    [
+     "ita-home",
+     1683,
+     "sourced"
+    ],
+    [
+     "jpn-home",
+     64503,
+     "sourced"
+    ],
+    [
+     "rus-home",
+     10524919,
+     "sourced"
+    ],
+    [
+     "usa-home",
+     8262406,
+     "sourced"
+    ]
+   ]
+  },
+  "iron-ore": {
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 395 (PDF 439): production of pig iron and steel in the principal countries, 1900 (pig iron column; ore placed where the iron was smelted)",
+   "unit": "metric tons of pig iron",
+   "status": "provisional",
+   "note": "No world ore table by country in the volumes read; pig iron is the share proxy until an ore table is transcribed. Germany includes Luxembourg.",
+   "entries": [
+    [
+     "aut-home",
+     1350000,
+     "estimated"
+    ],
+    [
+     "bel-home",
+     1018507,
+     "sourced"
+    ],
+    [
+     "can-home",
+     87612,
+     "sourced"
+    ],
+    [
+     "fra-home",
+     2699424,
+     "sourced"
+    ],
+    [
+     "deu-home",
+     8351742,
+     "sourced",
+     "including Luxembourg"
+    ],
+    [
+     "ita-home",
+     20000,
+     "estimated"
+    ],
+    [
+     "rus-home",
+     2850000,
+     "estimated"
+    ],
+    [
+     "esp-home",
+     294118,
+     "sourced"
+    ],
+    [
+     "swe-home",
+     520600,
+     "sourced"
+    ],
+    [
+     "gbr-home",
+     9052107,
+     "sourced"
+    ],
+    [
+     "usa-home",
+     14099870,
+     "sourced"
+    ],
+    [
+     "other",
+     625000,
+     "estimated"
+    ]
+   ]
+  },
+  "steel": {
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 395 (PDF 439): production of pig iron and steel in the principal countries, 1900 (steel column)",
+   "unit": "metric tons",
+   "status": "sourced",
+   "total": 27182347,
+   "entries": [
+    [
+     "aut-home",
+     675000,
+     "estimated"
+    ],
+    [
+     "bel-home",
+     654827,
+     "sourced"
+    ],
+    [
+     "fra-home",
+     1624048,
+     "sourced"
+    ],
+    [
+     "deu-home",
+     6645869,
+     "sourced"
+    ],
+    [
+     "ita-home",
+     58000,
+     "estimated"
+    ],
+    [
+     "rus-home",
+     1500000,
+     "estimated"
+    ],
+    [
+     "esp-home",
+     150634,
+     "sourced"
+    ],
+    [
+     "swe-home",
+     291900,
+     "sourced"
+    ],
+    [
+     "gbr-home",
+     4800000,
+     "estimated"
+    ],
+    [
+     "usa-home",
+     10382069,
+     "sourced"
+    ],
+    [
+     "other",
+     400000,
+     "estimated"
+    ]
+   ]
+  },
+  "copper-ore": {
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 199 (PDF 239): the world's copper production, 1896-1900 (metric tons, 1900; Henry R. Merton & Co.)",
+   "unit": "metric tons of copper",
+   "status": "sourced",
+   "total": 492625,
+   "entries": [
+    [
+     "arg-home",
+     76,
+     "sourced"
+    ],
+    [
+     "aus-home",
+     23368,
+     "sourced",
+     "Australasia"
+    ],
+    [
+     "aut-home",
+     1377,
+     "sourced"
+    ],
+    [
+     "bol-home",
+     2134,
+     "sourced"
+    ],
+    [
+     "can-home",
+     8581,
+     "sourced"
+    ],
+    [
+     "cap",
+     6828,
+     "sourced",
+     "Cape Copper Co. 4,491 + Namaqua 2,337"
+    ],
+    [
+     "chl-home",
+     26111,
+     "sourced"
+    ],
+    [
+     "deu-home",
+     20635,
+     "sourced"
+    ],
+    [
+     "ita-home",
+     3048,
+     "sourced"
+    ],
+    [
+     "jpn-home",
+     28285,
+     "sourced"
+    ],
+    [
+     "mex-home",
+     22403,
+     "sourced"
+    ],
+    [
+     "nfd",
+     1930,
+     "sourced"
+    ],
+    [
+     "nor-home",
+     3998,
+     "sourced"
+    ],
+    [
+     "rus-home",
+     8128,
+     "sourced"
+    ],
+    [
+     "pru-home",
+     8352,
+     "sourced"
+    ],
+    [
+     "esp-home",
+     50203,
+     "sourced",
+     "Spain-Portugal 53,718 less Mason & Barry (Portugal) 3,515"
+    ],
+    [
+     "prt-home",
+     3515,
+     "sourced",
+     "Mason & Barry"
+    ],
+    [
+     "swe-home",
+     457,
+     "sourced"
+    ],
+    [
+     "gbr-home",
+     660,
+     "sourced"
+    ],
+    [
+     "usa-home",
+     272536,
+     "sourced"
+    ]
+   ]
+  },
+  "tin": {
+   "sourceId": "mineral-industry-1901",
+   "locator": "p. 638 (PDF 680): production of tin in the world, 1900",
+   "unit": "metric tons",
+   "status": "sourced",
+   "total": 83015,
+   "note": "Germany's 2,031 t is smelted from imported ore and is left out of mine shares. The printed 1900 total (83,015) is 2,000 t below the sum of the printed cells including Germany (85,015); the 1896-1899 rows sum to their totals. The cells are kept as printed; only shares are used.",
+   "entries": [
+    [
+     "aus-home",
+     2747,
+     "sourced",
+     "Australia 915 + Tasmania 1,832"
+    ],
+    [
+     "aut-home",
+     40,
+     "sourced"
+    ],
+    [
+     "dei",
+     18809,
+     "sourced",
+     "Banka and Billiton 18,234 + Singkep 575"
+    ],
+    [
+     "bol-home",
+     10245,
+     "sourced"
+    ],
+    [
+     "gbr-home",
+     4336,
+     "sourced"
+    ],
+    [
+     "jpn-home",
+     12,
+     "sourced"
+    ],
+    [
+     "mal",
+     46795,
+     "sourced",
+     "Straits Settlements"
+    ]
+   ]
+  },
+  "gold": {
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 314 (PDF 358): gold production of the world, 1900 (kilograms)",
+   "unit": "kg fine",
+   "status": "sourced",
+   "total": 385103.2,
+   "note": "The Transvaal's 1900 output fell from 109,782.6 kg (1899) during the war.",
+   "entries": [
+    [
+     "usa-home",
+     117610.6,
+     "sourced"
+    ],
+    [
+     "can-home",
+     42007.8,
+     "sourced"
+    ],
+    [
+     "nfd",
+     74.6,
+     "sourced"
+    ],
+    [
+     "mex-home",
+     14158.3,
+     "sourced"
+    ],
+    [
+     "central-america",
+     865.2,
+     "estimated"
+    ],
+    [
+     "arg-home",
+     112.8,
+     "sourced"
+    ],
+    [
+     "bol-home",
+     225.6,
+     "sourced"
+    ],
+    [
+     "bra-home",
+     3975.3,
+     "sourced"
+    ],
+    [
+     "chl-home",
+     1354.2,
+     "sourced"
+    ],
+    [
+     "col-home",
+     3462.7,
+     "sourced"
+    ],
+    [
+     "ecu-home",
+     300.9,
+     "sourced"
+    ],
+    [
+     "bwi",
+     3441.8,
+     "sourced",
+     "British Guiana"
+    ],
+    [
+     "sur",
+     785.0,
+     "sourced",
+     "Dutch Guiana"
+    ],
+    [
+     "fca",
+     2126.0,
+     "sourced",
+     "French Guiana"
+    ],
+    [
+     "pru-home",
+     1295.0,
+     "estimated"
+    ],
+    [
+     "ury-home",
+     61.0,
+     "sourced"
+    ],
+    [
+     "ven-home",
+     1530.0,
+     "sourced"
+    ],
+    [
+     "aut-home",
+     3065.6,
+     "estimated",
+     "Austria 57.7 + Hungary 3,007.9"
+    ],
+    [
+     "deu-home",
+     111.6,
+     "estimated"
+    ],
+    [
+     "ita-home",
+     113.3,
+     "estimated"
+    ],
+    [
+     "nor-home",
+     2.3,
+     "estimated"
+    ],
+    [
+     "prt-home",
+     0.2,
+     "estimated"
+    ],
+    [
+     "rus-home",
+     34744.0,
+     "sourced"
+    ],
+    [
+     "esp-home",
+     12.4,
+     "estimated"
+    ],
+    [
+     "swe-home",
+     106.2,
+     "estimated"
+    ],
+    [
+     "ott-home",
+     11.6,
+     "estimated"
+    ],
+    [
+     "gbr-home",
+     188.1,
+     "sourced"
+    ],
+    [
+     "zar-home",
+     10846.9,
+     "sourced",
+     "Transvaal"
+    ],
+    [
+     "eth-home",
+     626.0,
+     "estimated"
+    ],
+    [
+     "cra",
+     2468.0,
+     "sourced",
+     "Rhodesia"
+    ],
+    [
+     "sud",
+     84.0,
+     "estimated"
+    ],
+    [
+     "bwa",
+     1128.5,
+     "sourced",
+     "West Coast"
+    ],
+    [
+     "mad",
+     344.0,
+     "estimated"
+    ],
+    [
+     "bpo",
+     526.7,
+     "sourced",
+     "British Borneo"
+    ],
+    [
+     "chn-home",
+     6470.1,
+     "sourced"
+    ],
+    [
+     "dei",
+     827.3,
+     "sourced"
+    ],
+    [
+     "bin",
+     13936.6,
+     "sourced"
+    ],
+    [
+     "jpn-home",
+     1956.0,
+     "estimated"
+    ],
+    [
+     "kor-home",
+     2407.5,
+     "sourced"
+    ],
+    [
+     "mal",
+     511.6,
+     "sourced"
+    ],
+    [
+     "aus-home",
+     110549.8,
+     "sourced",
+     "Australasia (six states and New Zealand)"
+    ],
+    [
+     "other",
+     677.1,
+     "estimated"
+    ]
+   ]
+  },
+  "silver": {
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 315 (PDF 359): silver production of the world, 1900 (kilograms)",
+   "unit": "kg",
+   "status": "sourced",
+   "total": 5681363.0,
+   "entries": [
+    [
+     "usa-home",
+     1852564.4,
+     "sourced"
+    ],
+    [
+     "can-home",
+     138300.7,
+     "sourced"
+    ],
+    [
+     "mex-home",
+     1794167.9,
+     "sourced"
+    ],
+    [
+     "central-america",
+     45000,
+     "estimated"
+    ],
+    [
+     "arg-home",
+     11930,
+     "estimated"
+    ],
+    [
+     "bol-home",
+     324490.4,
+     "estimated"
+    ],
+    [
+     "chl-home",
+     179552.4,
+     "sourced"
+    ],
+    [
+     "col-home",
+     87089.0,
+     "sourced"
+    ],
+    [
+     "ecu-home",
+     251.9,
+     "estimated"
+    ],
+    [
+     "pru-home",
+     205000,
+     "estimated"
+    ],
+    [
+     "aut-home",
+     60582,
+     "estimated",
+     "Austria 39,564 + Hungary 21,018"
+    ],
+    [
+     "fra-home",
+     14500,
+     "estimated"
+    ],
+    [
+     "deu-home",
+     194187.6,
+     "estimated",
+     "from domestic ores"
+    ],
+    [
+     "grc-home",
+     40276.1,
+     "estimated"
+    ],
+    [
+     "ita-home",
+     33644.6,
+     "estimated"
+    ],
+    [
+     "nor-home",
+     4802,
+     "estimated"
+    ],
+    [
+     "rus-home",
+     5099.7,
+     "sourced"
+    ],
+    [
+     "srb-home",
+     570,
+     "estimated"
+    ],
+    [
+     "esp-home",
+     183802.0,
+     "sourced"
+    ],
+    [
+     "swe-home",
+     2290,
+     "estimated"
+    ],
+    [
+     "ott-home",
+     2033,
+     "estimated"
+    ],
+    [
+     "gbr-home",
+     5965.5,
+     "sourced"
+    ],
+    [
+     "dei",
+     45,
+     "estimated"
+    ],
+    [
+     "jpn-home",
+     56308.5,
+     "estimated"
+    ],
+    [
+     "aus-home",
+     437412.3,
+     "sourced",
+     "Australasia"
+    ],
+    [
+     "other",
+     1500,
+     "estimated",
+     "mostly China and Persia"
+    ]
+   ]
+  },
+  "bauxite": {
+   "sourceId": "mineral-industry-1901",
+   "locator": "p. 14 (PDF 54): production of bauxite in the principal countries, 1900",
+   "unit": "metric tons",
+   "status": "sourced",
+   "total": 88221,
+   "entries": [
+    [
+     "fra-home",
+     58530,
+     "sourced"
+    ],
+    [
+     "gbr-home",
+     5871,
+     "sourced"
+    ],
+    [
+     "usa-home",
+     23820,
+     "sourced"
+    ]
+   ]
+  },
+  "aluminium": {
+   "sourceId": "mineral-industry-1901",
+   "locator": "p. 20 (PDF 60): aluminum, world's production and commerce, 1900 (kilograms)",
+   "unit": "kg",
+   "status": "sourced",
+   "total": 7743219,
+   "entries": [
+    [
+     "che-home",
+     2500000,
+     "sourced"
+    ],
+    [
+     "gbr-home",
+     500000,
+     "sourced"
+    ],
+    [
+     "fra-home",
+     1500000,
+     "sourced"
+    ],
+    [
+     "usa-home",
+     3243219,
+     "sourced"
+    ]
+   ]
+  },
+  "nitrates": {
+   "sourceId": "mineral-industry-1901",
+   "locator": "p. 161 (PDF 201): world's production of ammonium sulphate and sodium nitrate, 1900 (exports from Chile)",
+   "unit": "metric tons of sodium nitrate",
+   "status": "sourced",
+   "entries": [
+    [
+     "chl-home",
+     1430000,
+     "sourced",
+     "exports from Chile, practically identical with production"
+    ]
+   ]
+  },
+  "sugar": {
+   "sourceId": "usda-yearbook-1900",
+   "locator": "p. 819 (PDF 908): sugar crop of the countries named, 1900-1901 (tons of 2,240 lb; Willett & Gray, Licht)",
+   "unit": "long tons",
+   "status": "sourced",
+   "note": "Several countries are given by exports only; British India's domestic sugar (gur) and China's are not covered (provisional in the builder).",
+   "entries": [
+    [
+     "usa-home",
+     651859,
+     "sourced",
+     "Louisiana 270,000 + Hawaiian Islands 306,000 cane, beet 75,859 (Yearbook text)"
+    ],
+    [
+     "pri",
+     85000,
+     "sourced"
+    ],
+    [
+     "cub-home",
+     600000,
+     "sourced"
+    ],
+    [
+     "bwi",
+     280000,
+     "sourced",
+     "Trinidad 50,000, Barbadoes 70,000, Jamaica 30,000, Antigua and St. Kitts 25,000 (exports for some), British Guiana 105,000"
+    ],
+    [
+     "fca",
+     70000,
+     "sourced",
+     "Martinique 35,000 (exports), Guadeloupe 35,000"
+    ],
+    [
+     "dwi",
+     13000,
+     "sourced",
+     "St. Croix"
+    ],
+    [
+     "hti-home",
+     25000,
+     "provisional",
+     "Haiti and San Domingo 50,000 split equally"
+    ],
+    [
+     "dom-home",
+     25000,
+     "provisional",
+     "Haiti and San Domingo 50,000 split equally"
+    ],
+    [
+     "dgc",
+     8000,
+     "sourced",
+     "Lesser Antilles not named above"
+    ],
+    [
+     "mex-home",
+     93000,
+     "sourced"
+    ],
+    [
+     "gua-home",
+     9000,
+     "sourced"
+    ],
+    [
+     "sal-home",
+     5000,
+     "sourced"
+    ],
+    [
+     "nic-home",
+     3500,
+     "sourced"
+    ],
+    [
+     "cos-home",
+     1500,
+     "sourced"
+    ],
+    [
+     "sur",
+     6000,
+     "sourced"
+    ],
+    [
+     "ven-home",
+     3000,
+     "sourced"
+    ],
+    [
+     "pru-home",
+     105000,
+     "sourced",
+     "exports"
+    ],
+    [
+     "arg-home",
+     70000,
+     "sourced"
+    ],
+    [
+     "bra-home",
+     178000,
+     "sourced"
+    ],
+    [
+     "bin",
+     15000,
+     "sourced",
+     "exports only"
+    ],
+    [
+     "tha-home",
+     7000,
+     "sourced"
+    ],
+    [
+     "dei",
+     710120,
+     "sourced",
+     "Java, exports"
+    ],
+    [
+     "phl",
+     30000,
+     "sourced",
+     "exports"
+    ],
+    [
+     "aus-home",
+     116650,
+     "sourced",
+     "Queensland 97,650 + New South Wales 19,000"
+    ],
+    [
+     "fji",
+     33000,
+     "sourced",
+     "exports"
+    ],
+    [
+     "egy",
+     95000,
+     "sourced"
+    ],
+    [
+     "bpo",
+     190000,
+     "sourced",
+     "Mauritius"
+    ],
+    [
+     "mad",
+     35000,
+     "sourced",
+     "Reunion (French Indian Ocean)"
+    ],
+    [
+     "esp-home",
+     33000,
+     "sourced"
+    ],
+    [
+     "deu-home",
+     1970000,
+     "sourced"
+    ],
+    [
+     "aut-home",
+     1095000,
+     "sourced"
+    ],
+    [
+     "fra-home",
+     1170000,
+     "sourced"
+    ],
+    [
+     "rus-home",
+     890000,
+     "sourced"
+    ],
+    [
+     "bel-home",
+     340000,
+     "sourced"
+    ],
+    [
+     "nld-home",
+     180000,
+     "sourced"
+    ],
+    [
+     "other-europe",
+     375000,
+     "sourced",
+     "other beet countries"
+    ]
+   ]
+  }
+ },
+ "technologyEvidence": [
+  {
+   "technologyKey": "steelmaking",
+   "countryTag": "AUT",
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 395 (PDF 439)",
+   "evidence": "Austria-Hungary steel 1900: 675,000 t (estimated)"
+  },
+  {
+   "technologyKey": "steelmaking",
+   "countryTag": "ITA",
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 395 (PDF 439)",
+   "evidence": "Italy steel 1900: 58,000 t (estimated)"
+  },
+  {
+   "technologyKey": "steelmaking",
+   "countryTag": "RUS",
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 395 (PDF 439)",
+   "evidence": "Russia steel 1900: 1,500,000 t (estimated)"
+  },
+  {
+   "technologyKey": "steelmaking",
+   "countryTag": "ESP",
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 395 (PDF 439)",
+   "evidence": "Spain steel 1900: 150,634 t"
+  },
+  {
+   "technologyKey": "steelmaking",
+   "countryTag": "SWE",
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 395 (PDF 439)",
+   "evidence": "Sweden steel 1900: 291,900 t"
+  },
+  {
+   "technologyKey": "electrical-generation",
+   "countryTag": "AUT",
+   "sourceId": "mineral-industry-1900",
+   "locator": "pp. 66-67 (PDF 106-107)",
+   "evidence": "Electrochemical (calcium carbide) works in operation: Jajce (Bosnian Electric Co., 8 x 1,000 HP turbines with Schuckert dynamos), Paternion (three-phase alternator), Meran"
+  },
+  {
+   "technologyKey": "electrical-generation",
+   "countryTag": "NOR",
+   "sourceId": "mineral-industry-1900",
+   "locator": "pp. 69, 71 (PDF 109, 111)",
+   "evidence": "Carbide works of 1,500 HP at Sarpsborg; carbide produced in Norway shipped via Hamburg and direct"
+  },
+  {
+   "technologyKey": "electrical-generation",
+   "countryTag": "SWE",
+   "sourceId": "mineral-industry-1900",
+   "locator": "p. 71 (PDF 111)",
+   "evidence": "Carbide produced in Sweden shipped via Hamburg and direct to South America and Australia"
+  },
+  {
+   "technologyKey": "electrical-generation",
+   "countryTag": "RUS",
+   "sourceId": "mineral-industry-1900",
+   "locator": "pp. 70, 73 (PDF 110, 113)",
+   "evidence": "Steam-powered electric carbide works at Zomskowice working in 1900"
+  }
+ ],
+ "notTaken": [
+  {
+   "technologyKey": "electrical-generation",
+   "countryTags": [
+    "ITA",
+    "ESP",
+    "CAN",
+    "ARG"
+   ],
+   "sourceId": "mineral-industry-1901",
+   "locator": "p. 74 (PDF 114)",
+   "reason": "Carbide works are listed only in the 1901 volume (works located, 1901); no 1900 production evidence was found, so D-146 A9 does not grant the technology."
+  },
+  {
+   "technologyKey": "chemical-fertilizer",
+   "countryTags": [
+    "RUS"
+   ],
+   "sourceId": "mineral-industry-1901",
+   "locator": "PDF 574",
+   "reason": "Five superphosphate makers reported in the 1901 volume; no 1900 evidence."
+  },
+  {
+   "technologyKey": "chemical-fertilizer",
+   "countryTags": [
+    "BEL",
+    "NLD",
+    "SWE",
+    "NOR",
+    "DNK",
+    "AUT",
+    "RUS",
+    "ESP"
+   ],
+   "sourceId": "mineral-industry-1901",
+   "locator": "p. 161 (PDF 201)",
+   "reason": "Ammonium sulphate given only as group totals; group rows do not show production by each member."
+  }
+ ],
+ "budget1901": {
+  "sourceId": "commissioner-labor-1903",
+  "unit": "USD per family per year",
+  "families": 2567,
+  "familySize": 5.31,
+  "familySizeLocator": "p. 76 (text): average size 5.31 persons",
+  "averageExpenditureAllPurposes": 768.54,
+  "averageFood": 326.9,
+  "note": "averageAmongHaving x sharePercent / 100 = all-family average. Rent and mortgage payments are excluded from P5b demand (housing is P6, C-17).",
+  "items": [
+   {
+    "item": "fuel",
+    "averageAmongHaving": 32.24,
+    "sharePercent": 99.96,
+    "locator": "Table IV-R total row p. 508 col. fuel, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   },
+   {
+    "item": "lighting",
+    "averageAmongHaving": 8.15,
+    "sharePercent": 100.0,
+    "locator": "Table IV-R total row p. 508 col. lighting, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   },
+   {
+    "item": "furniture-and-utensils",
+    "averageAmongHaving": 31.13,
+    "sharePercent": 84.53,
+    "locator": "Table IV-R total row p. 509, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   },
+   {
+    "item": "books-and-newspapers",
+    "averageAmongHaving": 8.82,
+    "sharePercent": 94.74,
+    "locator": "Table IV-R total row p. 509, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   },
+   {
+    "item": "amusements-and-vacation",
+    "averageAmongHaving": 17.44,
+    "sharePercent": 70.35,
+    "locator": "Table IV-R total row p. 509, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   },
+   {
+    "item": "intoxicating-liquors",
+    "averageAmongHaving": 24.53,
+    "sharePercent": 50.72,
+    "locator": "Table IV-R total row p. 509, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   },
+   {
+    "item": "tobacco",
+    "averageAmongHaving": 13.8,
+    "sharePercent": 79.2,
+    "locator": "Table IV-R total row p. 509, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   },
+   {
+    "item": "sickness-and-death",
+    "averageAmongHaving": 26.78,
+    "sharePercent": 76.7,
+    "locator": "Table IV-R total row p. 509, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   },
+   {
+    "item": "other-purposes",
+    "averageAmongHaving": 45.63,
+    "sharePercent": 98.91,
+    "locator": "Table IV-R total row p. 509, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   },
+   {
+    "item": "insurance-life",
+    "averageAmongHaving": 29.55,
+    "sharePercent": 65.8,
+    "locator": "Table IV-R total row p. 509, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   },
+   {
+    "item": "insurance-property",
+    "averageAmongHaving": 4.89,
+    "sharePercent": 31.4,
+    "locator": "Table IV-R total row p. 509, share from Table IV-P summary text; p. 84",
+    "status": "sourced"
+   }
+  ]
+ }
+}
