@@ -198,7 +198,7 @@ an unknown tag draws a stable data-error tone.
 The era takes saturation from the land as a whole, in the shader on the WebGL path and in
 `desaturate` on the SVG path, so a tag's colour never changes with the date.
 
-`m15-map-style.test.ts` requires neighbouring polities of different realms to differ by
+`map/style.test.ts` requires neighbouring polities of different realms to differ by
 at least 0.04 in OKLab, and 0.022 under simulated deuteranopia (Machado et al., 2009).
 Polities of one realm share a family deliberately and are separated by the boundary line.
 

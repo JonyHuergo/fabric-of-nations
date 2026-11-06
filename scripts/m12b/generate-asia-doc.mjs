@@ -303,7 +303,7 @@ node scripts/m12/build-provinces.mjs
 node scripts/m12b/build-asia-provinces.mjs
 node scripts/m12b/generate-asia-doc.mjs
 pnpm -F @century/app typecheck
-pnpm -F @century/tests test -- m12b-asia-provinces
+pnpm -F @century/tests test -- map/provinces-asia
 pnpm -F @century/app export:web
 node scripts/m12b/playtest-screenshot-asia.mjs
 \`\`\`

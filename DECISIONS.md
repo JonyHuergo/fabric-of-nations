@@ -8453,4 +8453,18 @@ The items the cleanup first left open were then resolved as follows:
   data, and no script in the repository produces them. Regenerating would therefore
   regress the map. Hand-editing the generated outputs is not allowed, so they wait for
   the M11d resolution step to be restored to the map pipeline, a map-data change of its
-  own.
+  own. The designer chose to leave it for now. `docs/MAP_DATA.md` §7,
+  `docs/HISTORICAL_DATA_PROVENANCE.md` §6 and the header of `build-boundaries.mjs` now
+  warn against running the map steps until then.
+- **Other generated documents.** The provincialization documents are also stale against
+  their generators. Rerun on the current data, the Europe, Asia and Africa generators
+  give different counts and lists (for example Europe 569 provinces, not 570), and the
+  Oceania generator stops with a TypeError. The documents were therefore not
+  regenerated.
+- **Stale test names.** Ten stale test-file references in current documents were
+  missed in step 6 and are now corrected: `MAP_DATA`, `MAP_RENDERING`,
+  `FONT_PROVENANCE`, `HISTORICAL_DATA_PROVENANCE`, `HISTORICAL_MAP_PROVENANCE` and the
+  four provincialization documents. The generator templates were corrected to match,
+  and each document had only that line edited. The GDD still names about 20 old test
+  files in its milestone acceptance sections. They are left as written, because GDD
+  edits need the designer.

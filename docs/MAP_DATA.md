@@ -194,7 +194,7 @@ Zoom:
 
 ## 6. Validation
 
-`packages/tests/src/m11c-geography.test.ts` checks:
+`packages/tests/src/map/polity-geography.test.ts` checks:
 
 - every catalog polity has one map entry, one provenance record and the
   1 January 1900 reference date;
@@ -222,6 +222,16 @@ outer/hole polygons so inland seas are not counted as unassigned land.
 
 ## 7. Updating
 
+> **Known issue (D-145 follow-up, 2026-11-06).** These steps no longer reproduce the
+> committed map data. `build-boundaries.mjs` writes `m11c-1900-boundaries-v1` and
+> omits the two `split-by-current-borders` dispute resolutions (Aouzou–Tibesti,
+> Karakoram–Siachen). Commit `1a2a68a` added those resolutions to the committed
+> `m11d-1900-boundaries-v2` data, and no script produces them.
+> `generate-provenance-doc.mjs` likewise omits the resolved-zones section. Running
+> the steps would regress the map, so do not run them until that step is back in the
+> pipeline. The committed outputs also keep some mis-encoded names (for example
+> `KlaipÄ—da`) until they can be regenerated.
+
 1. Edit the catalog's `geometry` crosswalk or the authored transfers in
    `scripts/m11/boundaries-1900-source.mjs`.
 2. Re-run `node scripts/m11/build-boundaries.mjs`.
@@ -230,7 +240,7 @@ outer/hole polygons so inland seas are not counted as unassigned land.
 5. Re-run `node scripts/m11/generate-provenance-doc.mjs`.
 6. Rebuild the worker bundle if the catalog changed
    (`pnpm -F @century/app build:worker`).
-7. Run `pnpm -F @century/tests test -- m11c-geography`.
+7. Run `pnpm -F @century/tests test -- map/polity-geography`.
 
 Do not hand-edit the generated modules. The build is deterministic for the same
 cache files and catalog.

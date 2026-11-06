@@ -536,7 +536,7 @@ node scripts/m12e/generate-oceania-doc.mjs
 node scripts/m12e/audit-successors.mjs
 node scripts/m12e/audit-global-land.mjs
 node scripts/m12e/playtest-screenshot-oceania.mjs
-pnpm -F @century/tests test -- m12e-oceania-provinces
+pnpm -F @century/tests test -- map/provinces-oceania
 pnpm -F @century/app typecheck
 pnpm -F @century/tests typecheck
 pnpm -F @century/sim-worker scenario:build

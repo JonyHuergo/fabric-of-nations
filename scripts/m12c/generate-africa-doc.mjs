@@ -378,7 +378,7 @@ ${ownerLines.join("\n")}
 node scripts/m12c/build-africa-provinces.mjs
 node scripts/m12c/generate-africa-doc.mjs
 pnpm -F @century/app typecheck
-pnpm -F @century/tests test -- m12c-africa-provinces
+pnpm -F @century/tests test -- map/provinces-africa
 pnpm -F @century/app export:web
 node scripts/m12c/playtest-screenshot-africa.mjs
 \`\`\`

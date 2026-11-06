@@ -6,6 +6,11 @@
  * Output: packages/data/data/historical/m11/boundaries_1900.json
  *
  * The output is deterministic. Run: node scripts/m11/build-boundaries.mjs
+ *
+ * KNOWN ISSUE (D-145 follow-up): this script writes m11c-1900-boundaries-v1 without the
+ * two "split-by-current-borders" dispute resolutions that commit 1a2a68a added to the
+ * committed m11d-1900-boundaries-v2 file, so running it regresses the map. Restore that
+ * step here before regenerating. See docs/MAP_DATA.md §7.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";

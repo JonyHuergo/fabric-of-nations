@@ -400,7 +400,7 @@ node scripts/m11/build-boundaries.mjs
 node scripts/m11/build-map.mjs
 node scripts/m11/audit-map.mjs
 node scripts/m11/generate-provenance-doc.mjs
-pnpm -F @century/tests test -- m11c-geography
+pnpm -F @century/tests test -- map/polity-geography
 \`\`\`
 
 The build cache (\`.cache-m11/\`) contains the one-time Natural Earth downloads;

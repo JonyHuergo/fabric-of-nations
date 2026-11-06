@@ -970,7 +970,7 @@ independent; 1900 population estimate 5100000; geometry SWE.
 
 ## 10. Verification
 
-- `pnpm test` includes `m12a-provinces.test.ts`: bundle/geometry validation,
+- `pnpm test` includes `map/provinces-europe.test.ts`: bundle/geometry validation,
   1900 ownership, historical subdivision presence, Austria-Hungary dissolution,
   German post-WWI/post-WWII/reunification, Russian fragmentation, Irish
   partition, save/load round-trip and deterministic hashing.

@@ -28,7 +28,7 @@ package is a dependency of the project.
 ## Files
 
 SHA-256 of each bundled file. All Latin and Latin Extended characters used by the
-catalogue and province names are present; `m16-design-tokens.test.ts` checks every
+catalogue and province names are present; `ui-shell/design-tokens.test.ts` checks every
 character of every map name against the font's own character map.
 
 | File | SHA-256 |
