@@ -1,0 +1,1641 @@
+{
+ "generator": "scripts/p5b/build-goods-1900.mjs",
+ "decision": "D-146",
+ "rusdPerUsd1900": 15.704,
+ "prices": {
+  "grain": {
+   "rusdPerUnit": 0.406417,
+   "rowIds": [],
+   "formula": "P2b reference price (unchanged)",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "livestock": {
+   "rusdPerUnit": 1.775789,
+   "rowIds": [],
+   "formula": "P2b reference price (unchanged)",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "fish": {
+   "rusdPerUnit": 1.775789,
+   "rowIds": [],
+   "formula": "P2b reference price (unchanged)",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "cotton": {
+   "rusdPerUnit": 3.338079,
+   "rowIds": [],
+   "formula": "P2b reference price (unchanged)",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "wool": {
+   "rusdPerUnit": 22.832809,
+   "rowIds": [],
+   "formula": "P2b reference price (unchanged)",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "textiles": {
+   "rusdPerUnit": 14.355196,
+   "rowIds": [],
+   "formula": "P2b reference price (unchanged)",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "clothing": {
+   "rusdPerUnit": 14.355196,
+   "rowIds": [],
+   "formula": "P2b reference price (unchanged)",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "food-products": {
+   "rusdPerUnit": 0.678591,
+   "rowIds": [],
+   "formula": "P2b reference price (unchanged)",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "dairy": {
+   "usdPerUnit1900": 0.0242183,
+   "rowIds": [
+    "price-butter-creamery-ny",
+    "price-cheese-ny",
+    "milk-equivalent-kg-per-kg-butter",
+    "milk-equivalent-kg-per-kg-cheese",
+    "kg-per-lb"
+   ],
+   "formula": "mean of butter and cheese prices per kg milk equivalent (eggs not priced; provisional weights 0.5/0.5)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "produce": {
+   "usdPerUnit1900": 0.0263916,
+   "rowIds": [
+    "price-potatoes",
+    "price-beans",
+    "kg-per-bushel-potatoes"
+   ],
+   "formula": "0.8 potatoes + 0.2 beans per kg (60 lb bushels; provisional weights)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "sugar": {
+   "usdPerUnit1900": 0.11755,
+   "rowIds": [
+    "price-sugar-granulated",
+    "kg-per-lb"
+   ],
+   "formula": "granulated sugar per kg",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "coffee-tea-cocoa": {
+   "usdPerUnit1900": 0.276239,
+   "rowIds": [
+    "price-coffee-rio-7",
+    "price-tea-formosa",
+    "kg-per-lb"
+   ],
+   "formula": "0.8 coffee (cocoa priced as coffee) + 0.2 tea per kg (weights by 1900 world output, provisional)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "tobacco": {
+   "usdPerUnit1900": 0.191802,
+   "rowIds": [
+    "price-tobacco-leaf-export",
+    "kg-per-lb"
+   ],
+   "formula": "leaf tobacco export price per kg",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "rubber": {
+   "usdPerUnit1900": 2.16428,
+   "rowIds": [
+    "price-rubber-para",
+    "kg-per-lb"
+   ],
+   "formula": "Para rubber, fine, New York, per kg",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "timber": {
+   "usdPerUnit1900": 7.71049,
+   "rowIds": [
+    "price-lumber-spruce",
+    "price-lumber-yellow-pine",
+    "price-lumber-hemlock",
+    "m3-per-thousand-board-feet"
+   ],
+   "formula": "mean of spruce, yellow pine and hemlock per thousand board feet / 2.3597 m3",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "paper": {
+   "usdPerUnit1900": 61.9499,
+   "rowIds": [
+    "price-paper-news",
+    "kg-per-lb"
+   ],
+   "formula": "news paper per t",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "coal": {
+   "usdPerUnit1900": 1.14702,
+   "rowIds": [
+    "price-bituminous-coal-mine",
+    "kg-per-short-ton"
+   ],
+   "formula": "bituminous coal spot value per metric ton",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "crude-oil": {
+   "usdPerUnit1900": 8.76331,
+   "rowIds": [
+    "price-crude-petroleum",
+    "crude-oil-barrels-per-tonne"
+   ],
+   "formula": "petroleum spot value per barrel x 7.33 barrels per t",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "natural-gas": {
+   "usdPerUnit1900": 1.61433,
+   "rowIds": [
+    "price-bituminous-coal-mine",
+    "kg-per-short-ton"
+   ],
+   "formula": "energy parity with bituminous coal: 1,000 m3 of gas (38 GJ) = 1.41 t of coal (27 GJ/t); no 1900 volume exists (provisional)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "iron-ore": {
+   "usdPerUnit1900": 4.32478,
+   "rowIds": [
+    "price-iron-ore-mines",
+    "kg-per-long-ton"
+   ],
+   "formula": "ore value at mines per metric ton / 0.55 Fe grade (provisional grade)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "copper-ore": {
+   "usdPerUnit1900": 179.126,
+   "rowIds": [
+    "price-copper-ingot",
+    "kg-per-lb"
+   ],
+   "formula": "copper price x 0.5 payable share of ore value (provisional)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "bauxite": {
+   "usdPerUnit1900": 3.75,
+   "rowIds": [
+    "price-bauxite-us"
+   ],
+   "formula": "DS-140 1900 unit value",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "nitrates": {
+   "usdPerUnit1900": 259.594,
+   "rowIds": [
+    "price-nitrate-liverpool",
+    "kg-per-short-ton"
+   ],
+   "formula": "price of 2,000 lb nitrogen in nitrate at Liverpool per metric ton N",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "uranium": {
+   "rusdPerUnit": 26000,
+   "rowIds": [],
+   "formula": "provisional placeholder: 1990 utility price of uranium about $10/lb U3O8; transcription from the Statistical Abstract 1992 pending",
+   "status": "provisional",
+   "basis": "1990-producer"
+  },
+  "tin": {
+   "usdPerUnit1900": 600.319,
+   "rowIds": [
+    "price-tin-pig",
+    "kg-per-lb"
+   ],
+   "formula": "tin bars and pigs per t",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "gold": {
+   "usdPerUnit1900": 664.615,
+   "rowIds": [
+    "price-gold-mint",
+    "g-per-troy-ounce"
+   ],
+   "formula": "statutory mint price per fine kg",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "silver": {
+   "usdPerUnit1900": 19.9335,
+   "rowIds": [
+    "price-silver-commercial",
+    "g-per-troy-ounce"
+   ],
+   "formula": "commercial value per kg",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "kerosene": {
+   "usdPerUnit1900": 28.2004,
+   "rowIds": [
+    "price-refined-petroleum-export",
+    "litres-per-us-gallon",
+    "kerosene-kg-per-litre"
+   ],
+   "formula": "refined petroleum for export per t",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "petrol": {
+   "usdPerUnit1900": 28.2004,
+   "rowIds": [
+    "price-refined-petroleum-export",
+    "litres-per-us-gallon",
+    "kerosene-kg-per-litre"
+   ],
+   "formula": "priced as kerosene per t until the naphtha export unit value is transcribed (provisional)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "fuel-oil": {
+   "usdPerUnit1900": 9.63964,
+   "rowIds": [
+    "price-crude-petroleum",
+    "crude-oil-barrels-per-tonne"
+   ],
+   "formula": "crude price per t x 1.1 until the residuum price is transcribed (provisional)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "electricity": {
+   "usdPerUnit1900": 10,
+   "rowIds": [],
+   "formula": "wholesale (generation) price, 1.0 cent per kWh: between bulk hydro power at Niagara (about $20 per HP-year, 0.3 cent per kWh) and central-station income per kWh sold (about 3.4 cents, mostly lighting at retail); every reference price is wholesale. Transcription of the 1902 census pending (provisional)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "steel": {
+   "usdPerUnit1900": 35.5,
+   "rowIds": [
+    "price-steel-billets-ds140"
+   ],
+   "formula": "DS-140 1900 steel unit value",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "copper": {
+   "usdPerUnit1900": 358.251,
+   "rowIds": [
+    "price-copper-ingot",
+    "kg-per-lb"
+   ],
+   "formula": "copper, New York, per t",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "aluminium": {
+   "usdPerUnit1900": 705.479,
+   "rowIds": [
+    "price-aluminum-pittsburg",
+    "kg-per-lb"
+   ],
+   "formula": "aluminum at Pittsburg per t",
+   "status": "sourced",
+   "basis": "1900-wholesale"
+  },
+  "chemicals": {
+   "usdPerUnit1900": 29.5419,
+   "rowIds": [
+    "price-sulphuric-acid",
+    "price-muriatic-acid",
+    "price-alum",
+    "kg-per-lb"
+   ],
+   "formula": "0.6 sulphuric acid + 0.2 muriatic acid + 0.2 alum per t (provisional weights)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "fertiliser": {
+   "usdPerUnit1900": 259.594,
+   "rowIds": [
+    "price-nitrate-liverpool",
+    "kg-per-short-ton"
+   ],
+   "formula": "nitrogen in nitrate at Liverpool per t N (provisional: fertiliser nutrient priced as nitrate N)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "plastics": {
+   "rusdPerUnit": 1300,
+   "rowIds": [],
+   "formula": "provisional placeholder: 1990 US plastics resins about $0.60/lb; transcription pending",
+   "status": "provisional",
+   "basis": "1990-producer"
+  },
+  "construction-materials": {
+   "usdPerUnit1900": 4.56215,
+   "rowIds": [
+    "price-cement-portland",
+    "price-brick-common",
+    "kg-per-barrel-portland-cement",
+    "kg-per-thousand-common-brick"
+   ],
+   "formula": "0.2 Portland cement + 0.8 common brick per t (weights by tonnage, provisional)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "machinery": {
+   "usdPerUnit1900": 111.571,
+   "rowIds": [
+    "price-steel-billets-ds140"
+   ],
+   "formula": "1.1 t steel per t at 35 % materials share of value (no tonnage price exists; provisional)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "electrical-equipment": {
+   "usdPerUnit1900": 480.43,
+   "rowIds": [
+    "price-copper-ingot",
+    "price-steel-billets-ds140",
+    "kg-per-lb"
+   ],
+   "formula": "0.4 t copper + 0.7 t steel per t at 35 % materials share (provisional)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "electronic-components": {
+   "rusdPerUnit": 1,
+   "rowIds": [],
+   "formula": "1 unit = 1 RUSD of 1990 components at producer prices",
+   "status": "sourced",
+   "basis": "defined-unit"
+  },
+  "motor-vehicles": {
+   "rusdPerUnit": 13000,
+   "rowIds": [],
+   "formula": "provisional placeholder: 1990 US factory wholesale value per vehicle; transcription pending",
+   "status": "provisional",
+   "basis": "1990-producer"
+  },
+  "aircraft": {
+   "rusdPerUnit": 400000,
+   "rowIds": [],
+   "formula": "provisional placeholder: 1990 civil aircraft value per t of airframe; transcription pending",
+   "status": "provisional",
+   "basis": "1990-producer"
+  },
+  "ships": {
+   "usdPerUnit1900": 38.9,
+   "rowIds": [],
+   "formula": "about GBP 8 per gross ton for a 1900 cargo steamer (secondary; provisional)",
+   "status": "provisional",
+   "basis": "1900-wholesale"
+  },
+  "armaments": {
+   "rusdPerUnit": 28581.3,
+   "rowIds": [],
+   "formula": "the 1900 world's M10 equipment price (historical/p2b/money_coefficients_1900.json), so a later procurement step and the good agree (D-146 A2; no 1900 production)",
+   "status": "sourced",
+   "basis": "defined-unit"
+  },
+  "household-goods": {
+   "rusdPerUnit": 15.704,
+   "rowIds": [],
+   "formula": "1 unit = 1 US dollar of 1900 furniture and housewares at wholesale",
+   "status": "sourced",
+   "basis": "defined-unit"
+  },
+  "appliances": {
+   "rusdPerUnit": 450,
+   "rowIds": [],
+   "formula": "provisional placeholder: 1990 producer value per major appliance; transcription pending",
+   "status": "provisional",
+   "basis": "1990-producer"
+  },
+  "radios": {
+   "rusdPerUnit": 40,
+   "rowIds": [],
+   "formula": "provisional placeholder: 1990 factory value per radio; transcription pending",
+   "status": "provisional",
+   "basis": "1990-producer"
+  },
+  "televisions": {
+   "rusdPerUnit": 300,
+   "rowIds": [],
+   "formula": "provisional placeholder: 1990 factory value per television; transcription pending",
+   "status": "provisional",
+   "basis": "1990-producer"
+  },
+  "computers": {
+   "rusdPerUnit": 2500,
+   "rowIds": [],
+   "formula": "provisional placeholder: 1990 factory value per personal computer; transcription pending",
+   "status": "provisional",
+   "basis": "1990-producer"
+  },
+  "mobile-phones": {
+   "rusdPerUnit": 600,
+   "rowIds": [],
+   "formula": "provisional placeholder: 1990 factory value per cellular phone; transcription pending",
+   "status": "provisional",
+   "basis": "1990-producer"
+  },
+  "pharmaceuticals": {
+   "rusdPerUnit": 0.15704,
+   "rowIds": [],
+   "formula": "1 dose-eq = 1 US cent of 1900 drugs at wholesale",
+   "status": "sourced",
+   "basis": "defined-unit"
+  },
+  "commerce": {
+   "rusdPerUnit": 1,
+   "rowIds": [],
+   "formula": "1 service unit = the service whose 1900 US price, x 15.704, is 1 RUSD (D-146 C-6)",
+   "status": "sourced",
+   "basis": "defined-unit"
+  },
+  "transport-services": {
+   "rusdPerUnit": 1,
+   "rowIds": [],
+   "formula": "1 service unit = the service whose 1900 US price, x 15.704, is 1 RUSD (D-146 C-6)",
+   "status": "sourced",
+   "basis": "defined-unit"
+  },
+  "communication": {
+   "rusdPerUnit": 1,
+   "rowIds": [],
+   "formula": "1 service unit = the service whose 1900 US price, x 15.704, is 1 RUSD (D-146 C-6)",
+   "status": "sourced",
+   "basis": "defined-unit"
+  },
+  "finance-services": {
+   "rusdPerUnit": 1,
+   "rowIds": [],
+   "formula": "1 service unit = the service whose 1900 US price, x 15.704, is 1 RUSD (D-146 C-6)",
+   "status": "sourced",
+   "basis": "defined-unit"
+  },
+  "personal-services": {
+   "rusdPerUnit": 1,
+   "rowIds": [],
+   "formula": "1 service unit = the service whose 1900 US price, x 15.704, is 1 RUSD (D-146 C-6)",
+   "status": "sourced",
+   "basis": "defined-unit"
+  }
+ },
+ "recipes": {
+  "dairy-farm": {
+   "outputPerTU": 73820.2,
+   "vaPerLevelDayUS": 19075,
+   "netValuePerUnitRUSD": 0.258399,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "market-garden": {
+   "outputPerTU": 46024.6,
+   "vaPerLevelDayUS": 19075,
+   "netValuePerUnitRUSD": 0.414453,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "sugar-estate": {
+   "outputPerTU": 12399.8,
+   "vaPerLevelDayUS": 22890.1,
+   "netValuePerUnitRUSD": 1.84601,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "beet-sugar-works": {
+   "outputPerTU": 13459.1,
+   "vaPerLevelDayUS": 24724.4,
+   "netValuePerUnitRUSD": 1.837,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "plantation": {
+   "outputPerTU": 4397.14,
+   "vaPerLevelDayUS": 19075,
+   "netValuePerUnitRUSD": 4.33806,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "tobacco-farm": {
+   "outputPerTU": 6332.89,
+   "vaPerLevelDayUS": 19075,
+   "netValuePerUnitRUSD": 3.01206,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "cotton-farm": {
+   "outputPerTU": 5714.38,
+   "vaPerLevelDayUS": 19075,
+   "netValuePerUnitRUSD": 3.33808,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "food-and-drink-works": {
+   "outputPerTU": 141558,
+   "vaPerLevelDayUS": 41729.5,
+   "netValuePerUnitRUSD": 0.294788,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "rubber-estate": {
+   "outputPerTU": 561.232,
+   "vaPerLevelDayUS": 19075,
+   "netValuePerUnitRUSD": 33.9878,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "synthetic-rubber-plant": {
+   "outputPerTU": 1249,
+   "vaPerLevelDayUS": 41729.5,
+   "netValuePerUnitRUSD": 33.4102,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "logging-camp": {
+   "outputPerTU": 272.254,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 121.085,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "paper-mill": {
+   "outputPerTU": 72.8028,
+   "vaPerLevelDayUS": 37347.7,
+   "netValuePerUnitRUSD": 512.998,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "coal-mine": {
+   "outputPerTU": 1830.13,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 18.0128,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "oil-field": {
+   "outputPerTU": 239.544,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 137.619,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "gas-field": {
+   "outputPerTU": 1300.36,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 25.3514,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "iron-mine": {
+   "outputPerTU": 485.388,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 67.9164,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "copper-mine": {
+   "outputPerTU": 11.8712,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 2776.96,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "bauxite-mine": {
+   "outputPerTU": 559.786,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 58.89,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "nitrate-works": {
+   "outputPerTU": 8.19509,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 4022.63,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "uranium-mine": {
+   "outputPerTU": 1.26792,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 26000,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "tin-mine": {
+   "outputPerTU": 3.51022,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 9391.38,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "gold-mine": {
+   "outputPerTU": 3.16556,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 10413.9,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "silver-mine": {
+   "outputPerTU": 106.097,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 310.715,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "oil-refinery": {
+   "outputPerTU": 100.913,
+   "vaPerLevelDayUS": 37347.7,
+   "netValuePerUnitRUSD": 370.097,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "coal-power-station": {
+   "outputPerTU": 405.134,
+   "vaPerLevelDayUS": 41729.5,
+   "netValuePerUnitRUSD": 103.002,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "oil-power-station": {
+   "outputPerTU": 630.246,
+   "vaPerLevelDayUS": 41729.5,
+   "netValuePerUnitRUSD": 66.2114,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "gas-power-station": {
+   "outputPerTU": 294.224,
+   "vaPerLevelDayUS": 41729.5,
+   "netValuePerUnitRUSD": 141.829,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "hydro-station": {
+   "outputPerTU": 265.725,
+   "vaPerLevelDayUS": 41729.5,
+   "netValuePerUnitRUSD": 157.04,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "nuclear-station": {
+   "outputPerTU": 256.252,
+   "vaPerLevelDayUS": 40041.9,
+   "netValuePerUnitRUSD": 156.26,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "steel-works": {
+   "outputPerTU": 78.0993,
+   "vaPerLevelDayUS": 35156.7,
+   "netValuePerUnitRUSD": 450.154,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "copper-smelter": {
+   "outputPerTU": 12.8793,
+   "vaPerLevelDayUS": 35156.7,
+   "netValuePerUnitRUSD": 2729.71,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "aluminium-works": {
+   "outputPerTU": 5.06234,
+   "vaPerLevelDayUS": 37347.7,
+   "netValuePerUnitRUSD": 7377.55,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "alkali-and-acid-works": {
+   "outputPerTU": 106.608,
+   "vaPerLevelDayUS": 36925.8,
+   "netValuePerUnitRUSD": 346.368,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "petrochemical-plant": {
+   "outputPerTU": 122.175,
+   "vaPerLevelDayUS": 36503.9,
+   "netValuePerUnitRUSD": 298.784,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "fertiliser-works": {
+   "outputPerTU": 64.0205,
+   "vaPerLevelDayUS": 37347.7,
+   "netValuePerUnitRUSD": 583.37,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "nitrogen-fixation-plant": {
+   "outputPerTU": 9.80085,
+   "vaPerLevelDayUS": 36503.9,
+   "netValuePerUnitRUSD": 3724.56,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "plastics-plant": {
+   "outputPerTU": 51.9997,
+   "vaPerLevelDayUS": 36503.9,
+   "netValuePerUnitRUSD": 702.002,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "cement-and-brick-works": {
+   "outputPerTU": 490.995,
+   "vaPerLevelDayUS": 32965.8,
+   "netValuePerUnitRUSD": 67.1408,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "synthetic-fibre-plant": {
+   "outputPerTU": 2645.5,
+   "vaPerLevelDayUS": 36503.9,
+   "netValuePerUnitRUSD": 13.7985,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "machine-works": {
+   "outputPerTU": 41.5283,
+   "vaPerLevelDayUS": 39538.6,
+   "netValuePerUnitRUSD": 952.087,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "electrical-works": {
+   "outputPerTU": 7.97643,
+   "vaPerLevelDayUS": 39116.7,
+   "netValuePerUnitRUSD": 4904.03,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "electronics-plant": {
+   "outputPerTU": 44076.6,
+   "vaPerLevelDayUS": 40041.9,
+   "netValuePerUnitRUSD": 0.908462,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "motor-works": {
+   "outputPerTU": 3.79369,
+   "vaPerLevelDayUS": 39538.6,
+   "netValuePerUnitRUSD": 10422.2,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "aircraft-works": {
+   "outputPerTU": 0.102962,
+   "vaPerLevelDayUS": 38272.9,
+   "netValuePerUnitRUSD": 371719,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "shipyard": {
+   "outputPerTU": 251.538,
+   "vaPerLevelDayUS": 37347.7,
+   "netValuePerUnitRUSD": 148.477,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "arsenal": {
+   "outputPerTU": 1.40249,
+   "vaPerLevelDayUS": 39538.6,
+   "netValuePerUnitRUSD": 28191.8,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "furniture-works": {
+   "outputPerTU": 4213.29,
+   "vaPerLevelDayUS": 37347.7,
+   "netValuePerUnitRUSD": 8.86424,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "appliance-works": {
+   "outputPerTU": 120.506,
+   "vaPerLevelDayUS": 39538.6,
+   "netValuePerUnitRUSD": 328.104,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "radio-works": {
+   "outputPerTU": 2597.38,
+   "vaPerLevelDayUS": 41729.5,
+   "netValuePerUnitRUSD": 16.066,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "television-works": {
+   "outputPerTU": 178.713,
+   "vaPerLevelDayUS": 41729.5,
+   "netValuePerUnitRUSD": 233.5,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "computer-works": {
+   "outputPerTU": 21.1471,
+   "vaPerLevelDayUS": 40041.9,
+   "netValuePerUnitRUSD": 1893.5,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "phone-works": {
+   "outputPerTU": 89.0335,
+   "vaPerLevelDayUS": 40041.9,
+   "netValuePerUnitRUSD": 449.74,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "pharmaceutical-works": {
+   "outputPerTU": 262741,
+   "vaPerLevelDayUS": 40041.9,
+   "netValuePerUnitRUSD": 0.152401,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "trading-house": {
+   "outputPerTU": 59372.3,
+   "vaPerLevelDayUS": 59256.8,
+   "netValuePerUnitRUSD": 0.998054,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "transport-company": {
+   "outputPerTU": 44969.6,
+   "vaPerLevelDayUS": 41729.5,
+   "netValuePerUnitRUSD": 0.927949,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "post-and-telegraph": {
+   "outputPerTU": 63638.6,
+   "vaPerLevelDayUS": 63638.6,
+   "netValuePerUnitRUSD": 1,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "bank-and-office": {
+   "outputPerTU": 69147.5,
+   "vaPerLevelDayUS": 68945.7,
+   "netValuePerUnitRUSD": 0.997081,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  },
+  "personal-services": {
+   "outputPerTU": 46111.3,
+   "vaPerLevelDayUS": 46111.3,
+   "netValuePerUnitRUSD": 1,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
+  }
+ },
+ "needs": {
+  "comfort:food-products": {
+   "quantityPerCapitaPerDay": 0.0297113,
+   "rusdPerCapitaPerDay": 0.0201618,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:tobacco": {
+   "quantityPerCapitaPerDay": 0.00367514,
+   "rusdPerCapitaPerDay": 0.0110697,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:timber": {
+   "quantityPerCapitaPerDay": 0.000053913,
+   "rusdPerCapitaPerDay": 0.00652806,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:paper": {
+   "quantityPerCapitaPerDay": 0.00000695944,
+   "rusdPerCapitaPerDay": 0.00677056,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:coal": {
+   "quantityPerCapitaPerDay": 0.00144965,
+   "rusdPerCapitaPerDay": 0.0261122,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:natural-gas": {
+   "quantityPerCapitaPerDay": 0.000195362,
+   "rusdPerCapitaPerDay": 0.0049527,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:kerosene": {
+   "quantityPerCapitaPerDay": 0.0000335504,
+   "rusdPerCapitaPerDay": 0.0148581,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:electricity": {
+   "quantityPerCapitaPerDay": 0.0000210252,
+   "rusdPerCapitaPerDay": 0.0033018,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:household-goods": {
+   "quantityPerCapitaPerDay": 0.00407309,
+   "rusdPerCapitaPerDay": 0.0639638,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:pharmaceuticals": {
+   "quantityPerCapitaPerDay": 0.158968,
+   "rusdPerCapitaPerDay": 0.0249643,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:commerce": {
+   "quantityPerCapitaPerDay": 0.177766,
+   "rusdPerCapitaPerDay": 0.177766,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:transport-services": {
+   "quantityPerCapitaPerDay": 0.124267,
+   "rusdPerCapitaPerDay": 0.124267,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:communication": {
+   "quantityPerCapitaPerDay": 0.0203117,
+   "rusdPerCapitaPerDay": 0.0203117,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:finance-services": {
+   "quantityPerCapitaPerDay": 0.0849934,
+   "rusdPerCapitaPerDay": 0.0849934,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "comfort:personal-services": {
+   "quantityPerCapitaPerDay": 0.209459,
+   "rusdPerCapitaPerDay": 0.209459,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:food-products": {
+   "quantityPerCapitaPerDay": 0.0297113,
+   "rusdPerCapitaPerDay": 0.0201618,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:tobacco": {
+   "quantityPerCapitaPerDay": 0.00367514,
+   "rusdPerCapitaPerDay": 0.0110697,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:timber": {
+   "quantityPerCapitaPerDay": 0.000053913,
+   "rusdPerCapitaPerDay": 0.00652806,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:paper": {
+   "quantityPerCapitaPerDay": 0.00000695944,
+   "rusdPerCapitaPerDay": 0.00677056,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:coal": {
+   "quantityPerCapitaPerDay": 0.00144965,
+   "rusdPerCapitaPerDay": 0.0261122,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:natural-gas": {
+   "quantityPerCapitaPerDay": 0.000195362,
+   "rusdPerCapitaPerDay": 0.0049527,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:kerosene": {
+   "quantityPerCapitaPerDay": 0.0000335504,
+   "rusdPerCapitaPerDay": 0.0148581,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:electricity": {
+   "quantityPerCapitaPerDay": 0.0000210252,
+   "rusdPerCapitaPerDay": 0.0033018,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:household-goods": {
+   "quantityPerCapitaPerDay": 0.00407309,
+   "rusdPerCapitaPerDay": 0.0639638,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:pharmaceuticals": {
+   "quantityPerCapitaPerDay": 0.158968,
+   "rusdPerCapitaPerDay": 0.0249643,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:commerce": {
+   "quantityPerCapitaPerDay": 0.177766,
+   "rusdPerCapitaPerDay": 0.177766,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:transport-services": {
+   "quantityPerCapitaPerDay": 0.124267,
+   "rusdPerCapitaPerDay": 0.124267,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:communication": {
+   "quantityPerCapitaPerDay": 0.0203117,
+   "rusdPerCapitaPerDay": 0.0203117,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:finance-services": {
+   "quantityPerCapitaPerDay": 0.0849934,
+   "rusdPerCapitaPerDay": 0.0849934,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  },
+  "luxury:personal-services": {
+   "quantityPerCapitaPerDay": 0.209459,
+   "rusdPerCapitaPerDay": 0.209459,
+   "rowIds": [
+    "commissioner-labor-1903",
+    "comfort-share-of-extra"
+   ],
+   "status": "provisional"
+  }
+ },
+ "budgetCategoryGoods": {
+  "fuel": {
+   "coal": 0.2,
+   "timber": 0.05,
+   "transport-services": 0.45,
+   "commerce": 0.3
+  },
+  "lighting": {
+   "kerosene": 0.45,
+   "natural-gas": 0.15,
+   "electricity": 0.1,
+   "commerce": 0.3
+  },
+  "furniture-and-utensils": {
+   "household-goods": 0.6,
+   "commerce": 0.3,
+   "transport-services": 0.1
+  },
+  "books-and-newspapers": {
+   "paper": 0.2,
+   "communication": 0.6,
+   "commerce": 0.2
+  },
+  "amusements-and-vacation": {
+   "personal-services": 1
+  },
+  "intoxicating-liquors": {
+   "food-products": 0.4,
+   "commerce": 0.4,
+   "personal-services": 0.2
+  },
+  "tobacco": {
+   "tobacco": 0.25,
+   "commerce": 0.75
+  },
+  "sickness-and-death": {
+   "pharmaceuticals": 0.3,
+   "personal-services": 0.7
+  },
+  "insurance-life": {
+   "finance-services": 1
+  },
+  "insurance-property": {
+   "finance-services": 1
+  },
+  "other-purposes": {
+   "personal-services": 0.5,
+   "transport-services": 0.3,
+   "commerce": 0.2
+  }
+ }
+}

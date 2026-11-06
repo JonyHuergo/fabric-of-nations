@@ -1,0 +1,4118 @@
+[
+ {
+  "id": 0,
+  "key": "subsistence-farm",
+  "name": "Subsistence Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 6000
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 3,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": true,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 0,
+    "quantity": 20
+   }
+  ],
+  "landUse": "cropland"
+ },
+ {
+  "id": 1,
+  "key": "commercial-farm",
+  "name": "Commercial Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 6250
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 3,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 0,
+    "quantity": 50
+   },
+   {
+    "goodId": 3,
+    "quantity": 5
+   }
+  ],
+  "landUse": "cropland",
+  "optionalInputs": [
+   {
+    "goodId": 35,
+    "quantityPerThroughputUnit": 12.5,
+    "outputElasticity": 0.2
+   }
+  ]
+ },
+ {
+  "id": 2,
+  "key": "ranch",
+  "name": "Ranch",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 1,
+    "quantityPerThroughputUnit": 4000
+   },
+   {
+    "goodId": 4,
+    "quantityPerThroughputUnit": 533.333333
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 1,
+    "quantity": 6.666667
+   },
+   {
+    "goodId": 0,
+    "quantity": 133.333333
+   }
+  ],
+  "landUse": "pasture"
+ },
+ {
+  "id": 3,
+  "key": "fishery",
+  "name": "Fishery",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 2,
+    "quantityPerThroughputUnit": 4800
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 5,
+    "quantity": 8
+   }
+  ]
+ },
+ {
+  "id": 4,
+  "key": "food-processing",
+  "name": "Food Processing Plant",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 4500.09
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 7,
+    "quantityPerThroughputUnit": 3150
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 5,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": true,
+  "sector": "food-processing",
+  "constructionMaterials": [
+   {
+    "goodId": 0,
+    "quantity": 250
+   },
+   {
+    "goodId": 5,
+    "quantity": 5
+   }
+  ]
+ },
+ {
+  "id": 5,
+  "key": "textile-mill",
+  "name": "Textile Mill",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 3,
+    "quantityPerThroughputUnit": 266.666667
+   },
+   {
+    "goodId": 4,
+    "quantityPerThroughputUnit": 50
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 275.362319
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 5,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "textiles",
+  "constructionMaterials": [
+   {
+    "goodId": 3,
+    "quantity": 100
+   },
+   {
+    "goodId": 4,
+    "quantity": 16.666667
+   }
+  ]
+ },
+ {
+  "id": 6,
+  "key": "workshop",
+  "name": "Workshop",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 866.666667
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 6,
+    "quantityPerThroughputUnit": 1733.333333
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 333.333333
+   },
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 666.666667
+   }
+  ],
+  "constructionCostRUSD": 9898736.67,
+  "constructionWorkers": 5,
+  "dailyUpkeepRUSDAtLevelOne": 813.59,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 5,
+    "quantity": 66.666667
+   }
+  ]
+ },
+ {
+  "id": 7,
+  "key": "warehouse",
+  "name": "Warehouse",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [],
+  "jobs": [],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 40,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [
+   {
+    "goodId": 0,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 1,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 2,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 3,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 4,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 5,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 6,
+    "quantity": 27215542
+   },
+   {
+    "goodId": 7,
+    "quantity": 27215542
+   }
+  ],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": true,
+  "sector": "storage",
+  "constructionMaterials": []
+ },
+ {
+  "id": 8,
+  "key": "commercial-farm-peasant",
+  "name": "Peasant Commercial Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 6250
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 3,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 0,
+    "quantity": 50
+   },
+   {
+    "goodId": 3,
+    "quantity": 5
+   }
+  ],
+  "landUse": "cropland",
+  "optionalInputs": [
+   {
+    "goodId": 35,
+    "quantityPerThroughputUnit": 12.5,
+    "outputElasticity": 0.2
+   }
+  ]
+ },
+ {
+  "id": 9,
+  "key": "workshop-peasant",
+  "name": "Peasant Workshop",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 866.666667
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 6,
+    "quantityPerThroughputUnit": 1733.333333
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 333.333333
+   },
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 666.666667
+   }
+  ],
+  "constructionCostRUSD": 7612230,
+  "constructionWorkers": 5,
+  "dailyUpkeepRUSDAtLevelOne": 625.66,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 5,
+    "quantity": 66.666667
+   }
+  ]
+ },
+ {
+  "id": 10,
+  "key": "mechanized-farm",
+  "name": "Mechanized Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 40000
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 13,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 1,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 0,
+    "quantity": 400
+   },
+   {
+    "goodId": 3,
+    "quantity": 26.666667
+   }
+  ],
+  "landUse": "cropland",
+  "optionalInputs": [
+   {
+    "goodId": 35,
+    "quantityPerThroughputUnit": 80,
+    "outputElasticity": 0.2
+   }
+  ]
+ },
+ {
+  "id": 11,
+  "key": "power-loom-mill",
+  "name": "Power Loom Mill",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 3,
+    "quantityPerThroughputUnit": 300
+   },
+   {
+    "goodId": 4,
+    "quantityPerThroughputUnit": 100
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 347.826087
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 12,
+  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 9,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "textiles",
+  "constructionMaterials": [
+   {
+    "goodId": 3,
+    "quantity": 150
+   },
+   {
+    "goodId": 4,
+    "quantity": 50
+   }
+  ]
+ },
+ {
+  "id": 12,
+  "key": "dairy-farm",
+  "name": "Dairy Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 22146
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 8,
+    "quantityPerThroughputUnit": 73820.2
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 5744.65
+   },
+   {
+    "goodId": 38,
+    "quantity": 156.599
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983674
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402223
+   }
+  ],
+  "landUse": "pasture"
+ },
+ {
+  "id": 13,
+  "key": "market-garden",
+  "name": "Market Garden",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 9,
+    "quantityPerThroughputUnit": 46024.6
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 5744.65
+   },
+   {
+    "goodId": 38,
+    "quantity": 156.599
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983674
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402223
+   }
+  ],
+  "landUse": "cropland"
+ },
+ {
+  "id": 14,
+  "key": "sugar-estate",
+  "name": "Sugar Estate",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 10,
+    "quantityPerThroughputUnit": 12399.8
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 4115702,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 169.14,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 6893.59
+   },
+   {
+    "goodId": 38,
+    "quantity": 187.919
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.18041
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0482668
+   }
+  ],
+  "landUse": "cropland",
+  "maxAbsLatitudeDeg": 32
+ },
+ {
+  "id": 15,
+  "key": "beet-sugar-works",
+  "name": "Beet Sugar Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 6.72953
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 10,
+    "quantityPerThroughputUnit": 13459.1
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 500
+   },
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 500
+   }
+  ],
+  "constructionCostRUSD": 5144630,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 211.42,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "food-processing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 8616.99
+   },
+   {
+    "goodId": 38,
+    "quantity": 234.899
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.47551
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0603335
+   }
+  ],
+  "landUse": "cropland"
+ },
+ {
+  "id": 16,
+  "key": "plantation",
+  "name": "Plantation (coffee, tea, cocoa)",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 11,
+    "quantityPerThroughputUnit": 4397.14
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 5744.65
+   },
+   {
+    "goodId": 38,
+    "quantity": 156.599
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983674
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402223
+   }
+  ],
+  "landUse": "cropland",
+  "maxAbsLatitudeDeg": 36
+ },
+ {
+  "id": 17,
+  "key": "tobacco-farm",
+  "name": "Tobacco Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 12,
+    "quantityPerThroughputUnit": 6332.89
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 5744.65
+   },
+   {
+    "goodId": 38,
+    "quantity": 156.599
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983674
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402223
+   }
+  ],
+  "landUse": "cropland"
+ },
+ {
+  "id": 18,
+  "key": "cotton-farm",
+  "name": "Cotton Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 3,
+    "quantityPerThroughputUnit": 5714.38
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 5744.65
+   },
+   {
+    "goodId": 38,
+    "quantity": 156.599
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983674
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402223
+   }
+  ],
+  "landUse": "cropland",
+  "maxAbsLatitudeDeg": 42
+ },
+ {
+  "id": 19,
+  "key": "food-and-drink-works",
+  "name": "Food and Drink Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 0,
+    "quantityPerThroughputUnit": 70778.9
+   },
+   {
+    "goodId": 9,
+    "quantityPerThroughputUnit": 28311.6
+   },
+   {
+    "goodId": 10,
+    "quantityPerThroughputUnit": 7077.89
+   },
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 42.4673
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 7,
+    "quantityPerThroughputUnit": 141558
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8683046,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 356.84,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "food-processing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 14543.7
+   },
+   {
+    "goodId": 38,
+    "quantity": 396.459
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.49035
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.10183
+   }
+  ]
+ },
+ {
+  "id": 20,
+  "key": "rubber-estate",
+  "name": "Rubber Estate",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 13,
+    "quantityPerThroughputUnit": 561.232
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 5744.65
+   },
+   {
+    "goodId": 38,
+    "quantity": 156.599
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983674
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402223
+   }
+  ],
+  "maxAbsLatitudeDeg": 15
+ },
+ {
+  "id": 21,
+  "key": "synthetic-rubber-plant",
+  "name": "Synthetic Rubber Plant",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 17,
+    "quantityPerThroughputUnit": 1.8735
+   },
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 0.999202
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 13,
+    "quantityPerThroughputUnit": 1249
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8683046,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 356.84,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 47,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 14543.7
+   },
+   {
+    "goodId": 38,
+    "quantity": 396.459
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.49035
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.10183
+   }
+  ]
+ },
+ {
+  "id": 22,
+  "key": "logging-camp",
+  "name": "Logging Camp and Sawmill",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 14,
+    "quantityPerThroughputUnit": 272.254
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "timber"
+ },
+ {
+  "id": 23,
+  "key": "paper-mill",
+  "name": "Paper Mill",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 14,
+    "quantityPerThroughputUnit": 218.408
+   },
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 109.204
+   },
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 10.9204
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 15,
+    "quantityPerThroughputUnit": 72.8028
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 900
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7771278,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 319.37,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13016.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 354.829
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.22885
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0911375
+   }
+  ]
+ },
+ {
+  "id": 24,
+  "key": "coal-mine",
+  "name": "Coal Mine",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 1830.13
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "coal"
+ },
+ {
+  "id": 25,
+  "key": "oil-field",
+  "name": "Oil Field",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 17,
+    "quantityPerThroughputUnit": 239.544
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "oil"
+ },
+ {
+  "id": 26,
+  "key": "gas-field",
+  "name": "Gas Field",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 18,
+    "quantityPerThroughputUnit": 1300.36
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "gas"
+ },
+ {
+  "id": 27,
+  "key": "iron-mine",
+  "name": "Iron Mine",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 19,
+    "quantityPerThroughputUnit": 485.388
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "iron"
+ },
+ {
+  "id": 28,
+  "key": "copper-mine",
+  "name": "Copper Mine",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 23.7423
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 20,
+    "quantityPerThroughputUnit": 11.8712
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "copper"
+ },
+ {
+  "id": 29,
+  "key": "bauxite-mine",
+  "name": "Bauxite Mine",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 21,
+    "quantityPerThroughputUnit": 559.786
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "bauxite"
+ },
+ {
+  "id": 30,
+  "key": "nitrate-works",
+  "name": "Nitrate Works (oficina)",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 24.5853
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 22,
+    "quantityPerThroughputUnit": 8.19509
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "nitrate"
+ },
+ {
+  "id": 31,
+  "key": "uranium-mine",
+  "name": "Uranium Mine",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 23,
+    "quantityPerThroughputUnit": 1.26792
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 124,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "uranium"
+ },
+ {
+  "id": 32,
+  "key": "tin-mine",
+  "name": "Tin Mine and Smelter",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 7.02044
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 24,
+    "quantityPerThroughputUnit": 3.51022
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "tin"
+ },
+ {
+  "id": 33,
+  "key": "gold-mine",
+  "name": "Gold Mine",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 0.158278
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 25,
+    "quantityPerThroughputUnit": 3.16556
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "gold"
+ },
+ {
+  "id": 34,
+  "key": "silver-mine",
+  "name": "Silver Mine",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 0.530483
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 26,
+    "quantityPerThroughputUnit": 106.097
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "mining",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ],
+  "extracts": "silver"
+ },
+ {
+  "id": 35,
+  "key": "oil-refinery",
+  "name": "Oil Refinery",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 17,
+    "quantityPerThroughputUnit": 173.988
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 27,
+    "quantityPerThroughputUnit": 100.913
+   },
+   {
+    "goodId": 28,
+    "quantityPerThroughputUnit": 22.6185
+   },
+   {
+    "goodId": 29,
+    "quantityPerThroughputUnit": 43.4971
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 900
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7771278,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 319.37,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "energy",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13016.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 354.829
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.22885
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0911375
+   }
+  ]
+ },
+ {
+  "id": 36,
+  "key": "coal-power-station",
+  "name": "Coal Power Station",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 1215.4
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 30,
+    "quantityPerThroughputUnit": 405.134
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8683046,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 356.84,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 15,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "energy",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 14543.7
+   },
+   {
+    "goodId": 38,
+    "quantity": 396.459
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.49035
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.10183
+   }
+  ]
+ },
+ {
+  "id": 37,
+  "key": "oil-power-station",
+  "name": "Oil Power Station",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 29,
+    "quantityPerThroughputUnit": 378.148
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 30,
+    "quantityPerThroughputUnit": 630.246
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8683046,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 356.84,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 15,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "energy",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 14543.7
+   },
+   {
+    "goodId": 38,
+    "quantity": 396.459
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.49035
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.10183
+   }
+  ]
+ },
+ {
+  "id": 38,
+  "key": "gas-power-station",
+  "name": "Gas Power Station",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 18,
+    "quantityPerThroughputUnit": 176.534
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 30,
+    "quantityPerThroughputUnit": 294.224
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8683046,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 356.84,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 15,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "energy",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 14543.7
+   },
+   {
+    "goodId": 38,
+    "quantity": 396.459
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.49035
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.10183
+   }
+  ]
+ },
+ {
+  "id": 39,
+  "key": "hydro-station",
+  "name": "Hydroelectric Station",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 30,
+    "quantityPerThroughputUnit": 265.725
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8683046,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 356.84,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 15,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "energy",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 14543.7
+   },
+   {
+    "goodId": 38,
+    "quantity": 396.459
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.49035
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.10183
+   }
+  ]
+ },
+ {
+  "id": 40,
+  "key": "nuclear-station",
+  "name": "Nuclear Power Station",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 23,
+    "quantityPerThroughputUnit": 0.00768756
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 30,
+    "quantityPerThroughputUnit": 256.252
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 600
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8331904,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 342.41,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 124,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "energy",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13955.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 380.426
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.38964
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0977122
+   }
+  ]
+ },
+ {
+  "id": 41,
+  "key": "steel-works",
+  "name": "Steel Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 156.199
+   },
+   {
+    "goodId": 19,
+    "quantityPerThroughputUnit": 82.0043
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 31,
+    "quantityPerThroughputUnit": 78.0993
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 950
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 50
+   }
+  ],
+  "constructionCostRUSD": 7315394,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 300.63,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 6,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 12252.9
+   },
+   {
+    "goodId": 38,
+    "quantity": 334.013
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.0981
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0857911
+   }
+  ]
+ },
+ {
+  "id": 42,
+  "key": "copper-smelter",
+  "name": "Copper Smelter and Refinery",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 19.3189
+   },
+   {
+    "goodId": 20,
+    "quantityPerThroughputUnit": 13.1369
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 32,
+    "quantityPerThroughputUnit": 12.8793
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 950
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 50
+   }
+  ],
+  "constructionCostRUSD": 7315394,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 300.63,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 12252.9
+   },
+   {
+    "goodId": 38,
+    "quantity": 334.013
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.0981
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0857911
+   }
+  ]
+ },
+ {
+  "id": 43,
+  "key": "aluminium-works",
+  "name": "Aluminium Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 3.0374
+   },
+   {
+    "goodId": 21,
+    "quantityPerThroughputUnit": 20.2493
+   },
+   {
+    "goodId": 30,
+    "quantityPerThroughputUnit": 111.371
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 33,
+    "quantityPerThroughputUnit": 5.06234
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 900
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7771278,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 319.37,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 15,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13016.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 354.829
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.22885
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0911375
+   }
+  ]
+ },
+ {
+  "id": 44,
+  "key": "alkali-and-acid-works",
+  "name": "Alkali and Acid Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 213.217
+   },
+   {
+    "goodId": 22,
+    "quantityPerThroughputUnit": 2.13217
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 106.608
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 850
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 50
+   }
+  ],
+  "constructionCostRUSD": 7683492.5,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 315.76,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 12869.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 350.82
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.20367
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.090108
+   }
+  ]
+ },
+ {
+  "id": 45,
+  "key": "petrochemical-plant",
+  "name": "Petrochemical Plant",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 17,
+    "quantityPerThroughputUnit": 146.61
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 122.175
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7595707,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 312.15,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 47,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 12722.4
+   },
+   {
+    "goodId": 38,
+    "quantity": 346.812
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.1785
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0890785
+   }
+  ]
+ },
+ {
+  "id": 46,
+  "key": "fertiliser-works",
+  "name": "Fertiliser Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 22,
+    "quantityPerThroughputUnit": 51.2164
+   },
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 32.0102
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 35,
+    "quantityPerThroughputUnit": 64.0205
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 900
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7771278,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 319.37,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 7,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13016.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 354.829
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.22885
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0911375
+   }
+  ]
+ },
+ {
+  "id": 47,
+  "key": "nitrogen-fixation-plant",
+  "name": "Nitrogen Fixation Plant",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 18,
+    "quantityPerThroughputUnit": 14.7013
+   },
+   {
+    "goodId": 30,
+    "quantityPerThroughputUnit": 19.6017
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 35,
+    "quantityPerThroughputUnit": 9.80085
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7595707,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 312.15,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 26,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 12722.4
+   },
+   {
+    "goodId": 38,
+    "quantity": 346.812
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.1785
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0890785
+   }
+  ]
+ },
+ {
+  "id": 48,
+  "key": "plastics-plant",
+  "name": "Plastics Plant",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 17,
+    "quantityPerThroughputUnit": 15.5999
+   },
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 62.3996
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 36,
+    "quantityPerThroughputUnit": 51.9997
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7595707,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 312.15,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 31,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 12722.4
+   },
+   {
+    "goodId": 38,
+    "quantity": 346.812
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.1785
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0890785
+   }
+  ]
+ },
+ {
+  "id": 49,
+  "key": "cement-and-brick-works",
+  "name": "Cement and Brick Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 122.749
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 37,
+    "quantityPerThroughputUnit": 490.995
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
+   }
+  ]
+ },
+ {
+  "id": 50,
+  "key": "synthetic-fibre-plant",
+  "name": "Synthetic Fibre Plant",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 3.1746
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 2645.5
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7595707,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 312.15,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 51,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "textiles",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 12722.4
+   },
+   {
+    "goodId": 38,
+    "quantity": 346.812
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.1785
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0890785
+   }
+  ]
+ },
+ {
+  "id": 51,
+  "key": "machine-works",
+  "name": "Machine Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 41.5283
+   },
+   {
+    "goodId": 31,
+    "quantityPerThroughputUnit": 45.6812
+   },
+   {
+    "goodId": 32,
+    "quantityPerThroughputUnit": 1.24585
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 38,
+    "quantityPerThroughputUnit": 41.5283
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 850
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 150
+   }
+  ],
+  "constructionCostRUSD": 8227162,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 338.1,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13780.1
+   },
+   {
+    "goodId": 38,
+    "quantity": 375.644
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.3596
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0964838
+   }
+  ]
+ },
+ {
+  "id": 52,
+  "key": "electrical-works",
+  "name": "Electrical Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 31,
+    "quantityPerThroughputUnit": 5.5835
+   },
+   {
+    "goodId": 32,
+    "quantityPerThroughputUnit": 3.19057
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 39,
+    "quantityPerThroughputUnit": 7.97643
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 150
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 50
+   }
+  ],
+  "constructionCostRUSD": 8139376.5,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 334.49,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 15,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13633
+   },
+   {
+    "goodId": 38,
+    "quantity": 371.636
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.33442
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0954543
+   }
+  ]
+ },
+ {
+  "id": 53,
+  "key": "electronics-plant",
+  "name": "Electronics Plant",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 32,
+    "quantityPerThroughputUnit": 0.440766
+   },
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 0.881533
+   },
+   {
+    "goodId": 36,
+    "quantityPerThroughputUnit": 0.881533
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 40,
+    "quantityPerThroughputUnit": 44076.6
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 600
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8331904,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 342.41,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 41,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13955.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 380.426
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.38964
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0977122
+   }
+  ]
+ },
+ {
+  "id": 54,
+  "key": "motor-works",
+  "name": "Motor Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 37.9369
+   },
+   {
+    "goodId": 13,
+    "quantityPerThroughputUnit": 189.684
+   },
+   {
+    "goodId": 31,
+    "quantityPerThroughputUnit": 3.79369
+   },
+   {
+    "goodId": 37,
+    "quantityPerThroughputUnit": 0.113811
+   },
+   {
+    "goodId": 38,
+    "quantityPerThroughputUnit": 0.379369
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 41,
+    "quantityPerThroughputUnit": 3.79369
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 850
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 150
+   }
+  ],
+  "constructionCostRUSD": 8227162,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 338.1,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 16,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13780.1
+   },
+   {
+    "goodId": 38,
+    "quantity": 375.644
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.3596
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0964838
+   }
+  ]
+ },
+ {
+  "id": 55,
+  "key": "aircraft-works",
+  "name": "Aircraft Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 33,
+    "quantityPerThroughputUnit": 0.0720733
+   },
+   {
+    "goodId": 38,
+    "quantityPerThroughputUnit": 0.0308886
+   },
+   {
+    "goodId": 40,
+    "quantityPerThroughputUnit": 2059.24
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 42,
+    "quantityPerThroughputUnit": 0.102962
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 700
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 150
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 150
+   }
+  ],
+  "constructionCostRUSD": 7963805.5,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 327.28,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 27,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13339
+   },
+   {
+    "goodId": 38,
+    "quantity": 363.619
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.28407
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0933953
+   }
+  ]
+ },
+ {
+  "id": 56,
+  "key": "shipyard",
+  "name": "Shipyard",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 14,
+    "quantityPerThroughputUnit": 75.4614
+   },
+   {
+    "goodId": 31,
+    "quantityPerThroughputUnit": 113.192
+   },
+   {
+    "goodId": 38,
+    "quantityPerThroughputUnit": 25.1538
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 43,
+    "quantityPerThroughputUnit": 251.538
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 900
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7771278,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 319.37,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13016.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 354.829
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.22885
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0911375
+   }
+  ]
+ },
+ {
+  "id": 57,
+  "key": "arsenal",
+  "name": "Arsenal",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 31,
+    "quantityPerThroughputUnit": 0.701244
+   },
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 0.0701244
+   },
+   {
+    "goodId": 38,
+    "quantityPerThroughputUnit": 0.0701244
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 44,
+    "quantityPerThroughputUnit": 1.40249
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 850
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 150
+   }
+  ],
+  "constructionCostRUSD": 8227162,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 338.1,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13780.1
+   },
+   {
+    "goodId": 38,
+    "quantity": 375.644
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.3596
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0964838
+   }
+  ]
+ },
+ {
+  "id": 58,
+  "key": "furniture-works",
+  "name": "Furniture and Housewares Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 1263.99
+   },
+   {
+    "goodId": 14,
+    "quantityPerThroughputUnit": 84.2659
+   },
+   {
+    "goodId": 31,
+    "quantityPerThroughputUnit": 0.842659
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 45,
+    "quantityPerThroughputUnit": 4213.29
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 900
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7771278,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 319.37,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13016.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 354.829
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.22885
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0911375
+   }
+  ]
+ },
+ {
+  "id": 59,
+  "key": "appliance-works",
+  "name": "Appliance Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 31,
+    "quantityPerThroughputUnit": 7.23038
+   },
+   {
+    "goodId": 36,
+    "quantityPerThroughputUnit": 1.20506
+   },
+   {
+    "goodId": 39,
+    "quantityPerThroughputUnit": 1.20506
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 46,
+    "quantityPerThroughputUnit": 120.506
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 850
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 150
+   }
+  ],
+  "constructionCostRUSD": 8227162,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 338.1,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 17,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13780.1
+   },
+   {
+    "goodId": 38,
+    "quantity": 375.644
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.3596
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0964838
+   }
+  ]
+ },
+ {
+  "id": 60,
+  "key": "radio-works",
+  "name": "Radio Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 36,
+    "quantityPerThroughputUnit": 2.59738
+   },
+   {
+    "goodId": 39,
+    "quantityPerThroughputUnit": 7.79214
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 47,
+    "quantityPerThroughputUnit": 2597.38
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8683046,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 356.84,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 23,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 14543.7
+   },
+   {
+    "goodId": 38,
+    "quantity": 396.459
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.49035
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.10183
+   }
+  ]
+ },
+ {
+  "id": 61,
+  "key": "television-works",
+  "name": "Television Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 36,
+    "quantityPerThroughputUnit": 0.893565
+   },
+   {
+    "goodId": 40,
+    "quantityPerThroughputUnit": 10722.8
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 48,
+    "quantityPerThroughputUnit": 178.713
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8683046,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 356.84,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 46,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 14543.7
+   },
+   {
+    "goodId": 38,
+    "quantity": 396.459
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.49035
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.10183
+   }
+  ]
+ },
+ {
+  "id": 62,
+  "key": "computer-works",
+  "name": "Computer Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 36,
+    "quantityPerThroughputUnit": 0.105735
+   },
+   {
+    "goodId": 40,
+    "quantityPerThroughputUnit": 12688.2
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 49,
+    "quantityPerThroughputUnit": 21.1471
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 600
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8331904,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 342.41,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 80,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13955.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 380.426
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.38964
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0977122
+   }
+  ]
+ },
+ {
+  "id": 63,
+  "key": "phone-works",
+  "name": "Mobile Phone Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 36,
+    "quantityPerThroughputUnit": 0.0178067
+   },
+   {
+    "goodId": 40,
+    "quantityPerThroughputUnit": 13355
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 50,
+    "quantityPerThroughputUnit": 89.0335
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 600
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8331904,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 342.41,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": 81,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13955.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 380.426
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.38964
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0977122
+   }
+  ]
+ },
+ {
+  "id": 64,
+  "key": "pharmaceutical-works",
+  "name": "Pharmaceutical Works",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 2.62741
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 51,
+    "quantityPerThroughputUnit": 262741
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 600
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8331904,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 342.41,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13955.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 380.426
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.38964
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0977122
+   }
+  ]
+ },
+ {
+  "id": 65,
+  "key": "trading-house",
+  "name": "Trading House",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 15,
+    "quantityPerThroughputUnit": 0.118745
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 52,
+    "quantityPerThroughputUnit": 59372.3
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 400
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 600
+   }
+  ],
+  "constructionCostRUSD": 12330118,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 506.72,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "services",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 20652.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 562.981
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 3.53635
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.144601
+   }
+  ]
+ },
+ {
+  "id": 66,
+  "key": "transport-company",
+  "name": "Railway and Shipping Company",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 16,
+    "quantityPerThroughputUnit": 179.878
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 53,
+    "quantityPerThroughputUnit": 44969.6
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8683046,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 356.84,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "services",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 14543.7
+   },
+   {
+    "goodId": 38,
+    "quantity": 396.459
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.49035
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.10183
+   }
+  ]
+ },
+ {
+  "id": 67,
+  "key": "post-and-telegraph",
+  "name": "Post and Telegraph Office",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 54,
+    "quantityPerThroughputUnit": 63638.6
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 300
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 700
+   }
+  ],
+  "constructionCostRUSD": 13241886,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 544.19,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "services",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 22179.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 604.611
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 3.79786
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.155294
+   }
+  ]
+ },
+ {
+  "id": 68,
+  "key": "bank-and-office",
+  "name": "Bank and Office",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 15,
+    "quantityPerThroughputUnit": 0.207443
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 55,
+    "quantityPerThroughputUnit": 69147.5
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 700
+   },
+   {
+    "professionId": 3,
+    "workersPerThroughputUnit": 150
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 150
+   }
+  ],
+  "constructionCostRUSD": 14346181.5,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 589.57,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "services",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 24029.1
+   },
+   {
+    "goodId": 38,
+    "quantity": 655.032
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 4.11457
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.168244
+   }
+  ]
+ },
+ {
+  "id": 69,
+  "key": "personal-services",
+  "name": "Personal and Recreation Services",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 56,
+    "quantityPerThroughputUnit": 46111.3
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 700
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 300
+   }
+  ],
+  "constructionCostRUSD": 9594814,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 394.31,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "services",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 16070.8
+   },
+   {
+    "goodId": 38,
+    "quantity": 438.089
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.75185
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.112523
+   }
+  ]
+ }
+]

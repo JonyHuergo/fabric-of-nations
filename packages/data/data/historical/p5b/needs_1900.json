@@ -1,0 +1,192 @@
+[
+ {
+  "tier": "subsistence",
+  "activationWealthMin": 0,
+  "items": [
+   {
+    "goodKey": "grain",
+    "quantityPerCapitaPerDay": 0.527
+   },
+   {
+    "goodKey": "food-products",
+    "quantityPerCapitaPerDay": 0.03
+   },
+   {
+    "goodKey": "fish",
+    "quantityPerCapitaPerDay": 0.03
+   },
+   {
+    "goodKey": "livestock",
+    "quantityPerCapitaPerDay": 0.03
+   }
+  ]
+ },
+ {
+  "tier": "basic",
+  "activationWealthMin": 0,
+  "items": [
+   {
+    "goodKey": "clothing",
+    "quantityPerCapitaPerDay": 0.01
+   }
+  ]
+ },
+ {
+  "tier": "comfort",
+  "activationWealthMin": 25,
+  "items": [
+   {
+    "goodKey": "food-products",
+    "quantityPerCapitaPerDay": 0.961845
+   },
+   {
+    "goodKey": "livestock",
+    "quantityPerCapitaPerDay": 0.284961
+   },
+   {
+    "goodKey": "fish",
+    "quantityPerCapitaPerDay": 0.07124
+   },
+   {
+    "goodKey": "clothing",
+    "quantityPerCapitaPerDay": 0.02803
+   },
+   {
+    "goodKey": "tobacco",
+    "quantityPerCapitaPerDay": 0.00367514
+   },
+   {
+    "goodKey": "timber",
+    "quantityPerCapitaPerDay": 0.000053913
+   },
+   {
+    "goodKey": "paper",
+    "quantityPerCapitaPerDay": 0.00000695944
+   },
+   {
+    "goodKey": "coal",
+    "quantityPerCapitaPerDay": 0.00144965
+   },
+   {
+    "goodKey": "natural-gas",
+    "quantityPerCapitaPerDay": 0.000195362
+   },
+   {
+    "goodKey": "kerosene",
+    "quantityPerCapitaPerDay": 0.0000335504
+   },
+   {
+    "goodKey": "electricity",
+    "quantityPerCapitaPerDay": 0.0000210252,
+    "requiredTechnologyKey": "electrical-generation"
+   },
+   {
+    "goodKey": "household-goods",
+    "quantityPerCapitaPerDay": 0.00407309
+   },
+   {
+    "goodKey": "pharmaceuticals",
+    "quantityPerCapitaPerDay": 0.158968
+   },
+   {
+    "goodKey": "commerce",
+    "quantityPerCapitaPerDay": 0.177766
+   },
+   {
+    "goodKey": "transport-services",
+    "quantityPerCapitaPerDay": 0.124267
+   },
+   {
+    "goodKey": "communication",
+    "quantityPerCapitaPerDay": 0.0203117
+   },
+   {
+    "goodKey": "finance-services",
+    "quantityPerCapitaPerDay": 0.0849934
+   },
+   {
+    "goodKey": "personal-services",
+    "quantityPerCapitaPerDay": 0.209459
+   }
+  ]
+ },
+ {
+  "tier": "luxury",
+  "activationWealthMin": 60,
+  "items": [
+   {
+    "goodKey": "livestock",
+    "quantityPerCapitaPerDay": 0.498681
+   },
+   {
+    "goodKey": "food-products",
+    "quantityPerCapitaPerDay": 0.588991
+   },
+   {
+    "goodKey": "textiles",
+    "quantityPerCapitaPerDay": 0.014015
+   },
+   {
+    "goodKey": "clothing",
+    "quantityPerCapitaPerDay": 0.014015
+   },
+   {
+    "goodKey": "tobacco",
+    "quantityPerCapitaPerDay": 0.00367514
+   },
+   {
+    "goodKey": "timber",
+    "quantityPerCapitaPerDay": 0.000053913
+   },
+   {
+    "goodKey": "paper",
+    "quantityPerCapitaPerDay": 0.00000695944
+   },
+   {
+    "goodKey": "coal",
+    "quantityPerCapitaPerDay": 0.00144965
+   },
+   {
+    "goodKey": "natural-gas",
+    "quantityPerCapitaPerDay": 0.000195362
+   },
+   {
+    "goodKey": "kerosene",
+    "quantityPerCapitaPerDay": 0.0000335504
+   },
+   {
+    "goodKey": "electricity",
+    "quantityPerCapitaPerDay": 0.0000210252,
+    "requiredTechnologyKey": "electrical-generation"
+   },
+   {
+    "goodKey": "household-goods",
+    "quantityPerCapitaPerDay": 0.00407309
+   },
+   {
+    "goodKey": "pharmaceuticals",
+    "quantityPerCapitaPerDay": 0.158968
+   },
+   {
+    "goodKey": "commerce",
+    "quantityPerCapitaPerDay": 0.177766
+   },
+   {
+    "goodKey": "transport-services",
+    "quantityPerCapitaPerDay": 0.124267
+   },
+   {
+    "goodKey": "communication",
+    "quantityPerCapitaPerDay": 0.0203117
+   },
+   {
+    "goodKey": "finance-services",
+    "quantityPerCapitaPerDay": 0.0849934
+   },
+   {
+    "goodKey": "personal-services",
+    "quantityPerCapitaPerDay": 0.209459
+   }
+  ]
+ }
+]

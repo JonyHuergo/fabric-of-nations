@@ -1,0 +1,22 @@
+{
+ "generator": "scripts/p5b/build-goods-1900.mjs",
+ "inputs": {
+  "sources": "d0271189020a91e479475eea2ecad1776e6e0541efb6d1812cddf2b39741212e",
+  "ds140": "83d931ecfb07b417b80e1c0391580d285e9df70ee9d22a5c43e042f458216e2d",
+  "p2bSources": "3f8f0205a661cbf08d72e0629bbdec080255d753d269d70079adabb43bb6d937",
+  "p2bCalibration": "5905a508c60c03359120f6a57311739d2d79abf6c90c9bcbc39f2f5cc97f0f0e",
+  "goods": "8cab27a9a9b2690ff3474695c7760b1927cf6a7eb38f25349c3fdb26f397242a",
+  "professions": "516bf9f8b0b9809bb3e3a8aca41309d3b34df876662b925a0444c74ff7496d49",
+  "needs": "5849dd4764a59a6b5e69173cee57ab826d75f98001b9d96236858c60c054e56c",
+  "definitions": "7396751b3a99a48c6fa6988dbda77bf17efad618d8923d7ababd20a517972184",
+  "technology": "cea2815feb6810c3fc7ab821b284cc372e8db8ad5d1af6639d1700b21f1a1ce4",
+  "moneyCoefficients": "a2232c0a1e3009436d76728104a016a06a1b31afe8061346ff6ed33f69cf9778",
+  "catalogue": "c7bd005ec71ed0500e790bd94fe613311a8c85b4cdb763469f6c60827dca50b0"
+ },
+ "outputs": {
+  "goods_1900.json": "cb815a2ea762ba758089193bf34e03c96d86ae720816ad43b07e85d1faabe667",
+  "buildings_definitions_1900.json": "bb07134fecf99b9d0210b000b7b2c93ee6d665a1610dce822e460a52eb5cb95f",
+  "needs_1900.json": "bd4b661cd9a27bcb7b2e302fda3be73be3a7df1f8ad9e24c7554151e487e56e6",
+  "calibration_1900.json": "3ac1a0a5cefe13afa0d971cacffc3032cd7d51b8ea3302912ca61a84da0385d0"
+ }
+}
