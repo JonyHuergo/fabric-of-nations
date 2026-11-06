@@ -339,3 +339,46 @@ describe("simulation isolation", () => {
     }
   });
 });
+
+// No-Mana Doctrine (AGENTS.md §3): no spendable pools in runtime source, and a raw-text
+// Math.random scan of sim, data, app and bench (stricter than the comment-stripped scan
+// above because it also reads comments and strings).
+describe("No-Mana Doctrine guard", () => {
+  test("runtime source contains no known forbidden spendable pools", () => {
+    const runtimeDirs = [
+      join(PACKAGES, "sim", "src"),
+      join(PACKAGES, "data", "src"),
+      join(PACKAGES, "app", "src"),
+      join(PACKAGES, "bench", "src"),
+    ];
+
+    const forbidden =
+      /\bresearchPoints\b|\bpoliticalPower(?:Points)?\b|\bpoliticalPoints\b|\bdiplomaticPoints\b|\badministrativeCapacityPoints\b|\bcommandPoints\b|\bwarScore\b|\bmana(?:Pool|Points)?\b/i;
+
+    for (const directory of runtimeDirs) {
+      for (const file of walk(directory, (path) => path.endsWith(".ts"))) {
+        const source = readFileSync(file, "utf8");
+        expect({ file: relative(ROOT, file), forbidden: forbidden.test(source) }).toEqual({
+          file: relative(ROOT, file),
+          forbidden: false,
+        });
+      }
+    }
+  });
+
+  test("no package source uses an ambient random stream", () => {
+    const sourceFiles = [
+      ...walk(join(PACKAGES, "sim", "src"), (path) => path.endsWith(".ts")),
+      ...walk(join(PACKAGES, "data", "src"), (path) => path.endsWith(".ts")),
+      ...walk(join(PACKAGES, "app", "src"), (path) => path.endsWith(".ts")),
+      ...walk(join(PACKAGES, "bench", "src"), (path) => path.endsWith(".ts")),
+    ];
+    for (const file of sourceFiles) {
+      const source = readFileSync(file, "utf8");
+      expect({ file: relative(ROOT, file), random: /\bMath\s*\.\s*random\s*\(/.test(source) }).toEqual({
+        file: relative(ROOT, file),
+        random: false,
+      });
+    }
+  });
+});

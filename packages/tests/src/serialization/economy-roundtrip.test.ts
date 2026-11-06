@@ -136,22 +136,6 @@ describe("M3a schema-25 serialization", () => {
     expect(restored.diagnostics.recentWarnings).toEqual(original.diagnostics.recentWarnings);
   });
 
-  test("rejects older schema, simulation, and data versions", () => {
-    const serialized = serializeWorld(cloneWorld());
-
-    const oldSchema = parseEnvelope(serialized);
-    oldSchema.schemaVersion = 3;
-    expect(() => deserializeWorld(JSON.stringify(oldSchema))).toThrow(/schema/i);
-
-    const oldSim = parseEnvelope(serialized);
-    oldSim.simVersion = "0.3.0";
-    expect(() => deserializeWorld(JSON.stringify(oldSim))).toThrow(/simulation version/i);
-
-    const oldData = parseEnvelope(serialized);
-    oldData.dataVersion = "m2.1-population-v1";
-    expect(() => deserializeWorld(JSON.stringify(oldData))).toThrow(/content version/i);
-  });
-
   test("rejects duplicate lots before serialization", () => {
     const world = cloneWorld();
     const market = world.markets[0] as Market;

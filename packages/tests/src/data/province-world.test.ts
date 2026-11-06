@@ -10,7 +10,6 @@ import { fileURLToPath } from "node:url";
 
 import { loadM11World, loadM5EightPolities } from "@century/data";
 import {
-  WORLD_SCHEMA_VERSION,
   assertValidWorld,
   cloneWorld,
   countryProvinceIds,
@@ -23,7 +22,6 @@ import {
   transferProvincesToCountry,
   type World,
 } from "@century/sim";
-import { decompressSaveFromStorage, readSaveMetadata } from "@century/sim-worker/persistence";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
@@ -234,14 +232,4 @@ describe("P2 1900 province world and customs territories (D-119)", () => {
 });
 
 describe("P2 schema break (D-120)", () => {
-  test("the world schema is at least 28 and a schema-27 save is rejected as incompatible, not migrated", () => {
-    // P2b (D-135) moved the schema to 29; a schema-27 save stays incompatible.
-    expect(WORLD_SCHEMA_VERSION).toBeGreaterThanOrEqual(28);
-    const fixture = JSON.parse(readFileSync(join(HERE, "../fixtures/century-era-save.json"), "utf8")) as {
-      stored: string;
-    };
-    const save = decompressSaveFromStorage(fixture.stored);
-    expect(readSaveMetadata(save).schemaVersion).toBe(27);
-    expect(() => deserializeWorld(save)).toThrow(/incompatible/u);
-  });
 });

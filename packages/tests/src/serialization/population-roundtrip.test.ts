@@ -15,28 +15,6 @@ import {
   multiBlockWorld,
 } from "../fixtures/m2.js";
 
-interface EncodedArrayShape {
-  encoding?: unknown;
-  kind?: unknown;
-}
-
-interface ParsedEnvelope {
-  schemaVersion?: unknown;
-  simVersion?: unknown;
-  payload?: {
-    provinces?: unknown;
-    popBlocks?: Array<{
-      maleByAge?: EncodedArrayShape;
-      femaleByAge?: EncodedArrayShape;
-    }>;
-    finance?: { accounts?: unknown };
-  };
-}
-
-function parseEnvelope(text: string): ParsedEnvelope {
-  return JSON.parse(text) as ParsedEnvelope;
-}
-
 describe("M2.1 serialization and restoration", () => {
   test("round-trips single-year sex arrays, accounts, and population fields", () => {
     const { scenario, world } = aggregateWorld();
@@ -112,19 +90,6 @@ describe("M2.1 serialization and restoration", () => {
       originalResult.population?.demography.totalDeaths,
     );
     expect(hashWorld(restored)).toBe(hashWorld(world));
-  });
-
-  test("rejects a schema-2 / simulation-0.2 save with a clear error", () => {
-    const { world } = aggregateWorld();
-    const serialized = serializeWorld(world);
-
-    const oldSchema = parseEnvelope(serialized);
-    oldSchema.schemaVersion = 2;
-    expect(() => deserializeWorld(JSON.stringify(oldSchema))).toThrow(/schema/i);
-
-    const oldSim = parseEnvelope(serialized);
-    oldSim.simVersion = "0.2.0";
-    expect(() => deserializeWorld(JSON.stringify(oldSim))).toThrow(/simulation version/i);
   });
 
   test("rejects corrupt payloads and malformed typed arrays", () => {

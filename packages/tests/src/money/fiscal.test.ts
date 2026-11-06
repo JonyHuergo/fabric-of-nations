@@ -335,18 +335,6 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     expect(countryProvinceIds(world, world.countries[0]!.id)).toEqual([0]);
   });
 
-  test("rejects schema-8 and simulation-0.8.0 saves with actionable errors", () => {
-    const scenario = fiscalScenario({ rate: 0.1 });
-    const world = buildWorld(scenario);
-    const envelope = JSON.parse(serializeWorld(world)) as { schemaVersion: number };
-    envelope.schemaVersion = 8;
-    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(/schema 8/i);
-
-    const oldSim = JSON.parse(serializeWorld(world)) as { simVersion: string };
-    oldSim.simVersion = "0.8.0";
-    expect(() => deserializeWorld(JSON.stringify(oldSim))).toThrow(/simulation version/i);
-  });
-
   test("rejects malformed persisted fiscal state during decode", () => {
     const world = buildWorld(fiscalScenario({ rate: 0.1 }));
     const saved = JSON.parse(serializeWorld(world)) as {

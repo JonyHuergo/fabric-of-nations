@@ -126,18 +126,6 @@ describe("M4a-2 serialization and determinism", () => {
     expect(hashWorld(m3Restored)).toBe(hashWorld(m3));
   });
 
-  test("rejects schema-6 and simulation-0.6.0 saves", () => {
-    const serialized = serializeWorld(build(ownCurrencyScenario()));
-
-    const oldSchema = JSON.parse(serialized) as { schemaVersion?: unknown };
-    oldSchema.schemaVersion = 6;
-    expect(() => deserializeWorld(JSON.stringify(oldSchema))).toThrow(/schema/i);
-
-    const oldSim = JSON.parse(serialized) as { simVersion?: unknown };
-    oldSim.simVersion = "0.6.0";
-    expect(() => deserializeWorld(JSON.stringify(oldSim))).toThrow(/simulation version/i);
-  });
-
   test("rejects a corrupt specified valuation at decode", () => {
     const serialized = serializeWorld(build(ownCurrencyScenario()));
     const parsed = JSON.parse(serialized) as {

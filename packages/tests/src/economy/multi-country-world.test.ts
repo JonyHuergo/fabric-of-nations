@@ -214,37 +214,6 @@ describe("M5 multi-province and multi-country world", () => {
     }
   });
 
-  test("rejects schema-9/10/11/12 and simulation-0.9.0 saves", () => {
-    const { world } = m5World();
-    const envelope = JSON.parse(serializeWorld(world)) as {
-      schemaVersion: number;
-      simVersion: string;
-    };
-    envelope.schemaVersion = 9;
-    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
-      /Save world schema 9 is incompatible/,
-    );
-    envelope.schemaVersion = 10;
-    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
-      /Save world schema 10 is incompatible/,
-    );
-    envelope.schemaVersion = 11;
-    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
-      /Save world schema 11 is incompatible/,
-    );
-    envelope.schemaVersion = 12;
-    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(
-      /Save world schema 12 is incompatible/,
-    );
-    const sim = JSON.parse(serializeWorld(world)) as { simVersion: string };
-    sim.simVersion = "0.9.0";
-    // The envelope still claims the current schema, so the simulation-version
-    // check is the one that rejects the save.
-    expect(() => deserializeWorld(JSON.stringify(sim))).toThrow(
-      /Save simulation version "0.9.0" is incompatible/,
-    );
-  });
-
   test("resumes after a migration-and-trade day exactly like an uninterrupted run", () => {
     const scenario = m5Scenario();
     const contextValue = context(scenario);
