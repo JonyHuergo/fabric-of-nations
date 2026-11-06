@@ -31,7 +31,6 @@
     "test": "pnpm -r --if-present test",
     "bench": "pnpm build && pnpm -F @century/bench start",
     "bench:campaign": "pnpm build && pnpm -F @century/bench campaign",
-    "bench:world": "pnpm run build:libs && pnpm -F @century/bench build && pnpm -F @century/bench world",
     "app:export": "pnpm -F @century/app export:web && pnpm -F @century/app export:ios && pnpm -F @century/app export:android",
     "ci": "pnpm lint && pnpm audit:branding && pnpm audit:monetary && pnpm run check:worker && pnpm run check:sim-deps && pnpm map:atlas:check && pnpm typecheck && pnpm test && pnpm bench && pnpm run app:export"
   },
