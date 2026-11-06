@@ -283,14 +283,14 @@ function panamanianIndependence1903(world: World): void {
   );
 }
 
-/** 1903: the Treaty of PetrÃ³polis cedes Acre to Brazil. */
+/** 1903: the Treaty of Petrópolis cedes Acre to Brazil. */
 function acreTransfer1903(world: World): void {
   transfer(
     world,
     idsOf("am-bol-acre"),
     53 as Id,
     "cession",
-    "Treaty of PetrÃ³polis cedes Acre to Brazil",
+    "Treaty of Petrópolis cedes Acre to Brazil",
     day(1903, 11, 17),
   );
 }

@@ -71,9 +71,9 @@ const asiaBundle = JSON.parse(readFileSync(ASIA_BUNDLE_PATH, "utf8"));
 // shared map feature to its African part so the audit measures African coverage
 // only:
 //  - OTT is clipped to Ottoman Libya; the rest of the empire is Europe/Asia.
-//  - FRA is clipped to RÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©union and Mayotte; metropolitan France, Corsica,
+//  - FRA is clipped to Réunion and Mayotte; metropolitan France, Corsica,
 //    French Guiana and the Antilles are the M12a/M12b scope.
-//  - PAI carries Cape Verde, Guinea-Bissau, SÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o TomÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© and PrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ncipe together with
+//  - PAI carries Cape Verde, Guinea-Bissau, São Tomé and Príncipe together with
 //    Portuguese India; the clip excludes Goa, Daman and Diu.
 //  - BPO carries Zanzibar, Pemba, Seychelles and Mauritius together with the
 //    Pacific islands that the M12b Asia build already scoped to the Maldives.

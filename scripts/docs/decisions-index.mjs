@@ -24,9 +24,9 @@ const END = "<!-- decisions-index:end -->";
 function entries(text) {
   const out = [];
   for (const line of text.split("\n")) {
-    // D-101 and D-102 carry a mis-encoded dash ("â€”") in their headings; entries are
-    // never edited, so the index accepts both separators and prints a plain dash.
-    const match = /^#{2,3} (D-(\d{3})) (?:—|â€”) (.+)$/.exec(line);
+    // Headings read "## D-NNN — Title". A heading with another separator is not indexed,
+    // so `--check` then reports that number as missing.
+    const match = /^#{2,3} (D-(\d{3})) — (.+)$/.exec(line);
     if (match) out.push({ id: match[1], number: Number(match[2]), title: match[3].trim() });
   }
   return out;

@@ -245,7 +245,7 @@ function box(west, south, east, north) {
  * map. The polygon is the German side; it is used to clip modern Polish
  * voivodeships so that Congress Poland and Austrian Galicia are excluded.
  *
- * Points: Baltic near Memel; Neman/SuwaÃ…â€ški frontier; East Prussian southern
+ * Points: Baltic near Memel; Neman/Suwałki frontier; East Prussian southern
  * frontier near Soldau/Neidenburg; Vistula near Thorn; Posen frontier west of
  * Kalisz and Konin; Silesian frontier; Austrian Silesian frontier.
  */
@@ -270,7 +270,7 @@ export const GERMANY_EAST_CLIP = [
   [5.0, 56.0],
 ];
 
-/** North Schleswig: modern Danish Jutland south of the KongeÃƒÂ¥, north of the 1920 border. */
+/** North Schleswig: modern Danish Jutland south of the Kongeå, north of the 1920 border. */
 export const NORTH_SCHLESWIG = box(8.3, 54.8, 9.9, 55.45);
 
 /** Eupen-Malmedy: the 1920 Belgian annexations from the German Empire. */
@@ -279,7 +279,7 @@ export const EUPEN_MALMEDY = box(5.95, 50.25, 6.35, 50.75);
 /** The Dodecanese, Ottoman in 1900 (Italy occupied them only in 1912). */
 export const DODECANESE = box(26.3, 35.3, 28.4, 37.2);
 
-/** SandÃ…Â¾ak of Novi Pazar, still Ottoman in 1900. */
+/** Sandžak of Novi Pazar, still Ottoman in 1900. */
 export const SANDZAK = box(19.4, 42.7, 20.6, 43.5);
 
 /** Cieszyn (Teschen) Silesia and Bielsko, Austrian before 1918. */
@@ -334,7 +334,7 @@ export const PATCHES = [
     confidence: "medium",
     sourceIds: ["treaty-versailles-1919", "karte-deutsches-reich-1900"],
     notes:
-      "The northern limit follows the KongeÃƒÂ¥ (1864 frontier); the southern limit is the modern Danish-German border. The exact 1864-1920 line is generalized.",
+      "The northern limit follows the Kongeå (1864 frontier); the southern limit is the modern Danish-German border. The exact 1864-1920 line is generalized.",
   },
   {
     id: "germany-eupen-malmedy",
@@ -360,13 +360,13 @@ export const PATCHES = [
   },
   {
     id: "germany-memel",
-    description: "Memel (KlaipÃ„â€”da) territory, German in 1900, Lithuanian from 1923.",
+    description: "Memel (Klaipėda) territory, German in 1900, Lithuanian from 1923.",
     to: "DEU",
     from: ["RUS"],
     include: [{ adm1: "LT-KL" }],
     confidence: "high",
     sourceIds: ["treaty-versailles-1919", "karte-deutsches-reich-1900"],
-    notes: "KlaipÃ„â€”da County closely matches the Memel Territory. The northern frontier along the Neman is a modern county boundary approximation.",
+    notes: "Klaipėda County closely matches the Memel Territory. The northern frontier along the Neman is a modern county boundary approximation.",
   },
   {
     id: "germany-prussian-east",
@@ -389,11 +389,11 @@ export const PATCHES = [
     confidence: "medium",
     sourceIds: ["eb1911-germany", "karte-deutsches-reich-1900", "historical-basemaps-1900"],
     notes:
-      "The modern voivodeships are clipped by the authored 1900 frontier. The line excludes Congress Poland (Kalisz, Konin, WÃ…â€šocÃ…â€šawek, CzÃ„â„¢stochowa) and Austrian Galicia, while keeping Thorn, Posen, Breslau and the East Prussian core. The frontier is generalized to about 10-20 km; LOW confidence applies to the immediate border strip.",
+      "The modern voivodeships are clipped by the authored 1900 frontier. The line excludes Congress Poland (Kalisz, Konin, Włocławek, Częstochowa) and Austrian Galicia, while keeping Thorn, Posen, Breslau and the East Prussian core. The frontier is generalized to about 10-20 km; LOW confidence applies to the immediate border strip.",
   },
   {
     id: "austria-galicia",
-    description: "Galicia and Lodomeria, the Austrian partition of Poland, including Lviv, Ternopil, Ivano-Frankivsk, KrakÃƒÂ³w and PrzemyÃ…â€ºl.",
+    description: "Galicia and Lodomeria, the Austrian partition of Poland, including Lviv, Ternopil, Ivano-Frankivsk, Kraków and Przemyśl.",
     to: "AUT",
     from: ["RUS"],
     include: [
@@ -422,7 +422,7 @@ export const PATCHES = [
   },
   {
     id: "austria-transylvania",
-    description: "Transylvania, the Banat, CriÃˆâ„¢ana and MaramureÃˆâ„¢, Hungarian until 1918.",
+    description: "Transylvania, the Banat, Crișana and Maramureș, Hungarian until 1918.",
     to: "AUT",
     from: ["ROM"],
     include: [
@@ -446,11 +446,11 @@ export const PATCHES = [
     confidence: "high",
     sourceIds: ["treaty-trianon-1920", "hammond-1912"],
     notes:
-      "The listed counties are the historical Transylvanian, Banat, CriÃˆâ„¢ana and MaramureÃˆâ„¢ counties. The 1900 Hungarian-Romanian border is approximated by the modern county boundaries.",
+      "The listed counties are the historical Transylvanian, Banat, Crișana and Maramureș counties. The 1900 Hungarian-Romanian border is approximated by the modern county boundaries.",
   },
   {
     id: "austria-vojvodina",
-    description: "Vojvodina (BÃƒÂ¡cska, Banat, Syrmia), Hungarian until 1918.",
+    description: "Vojvodina (Bácska, Banat, Syrmia), Hungarian until 1918.",
     to: "AUT",
     from: ["SRB"],
     include: [
@@ -520,7 +520,7 @@ export const PATCHES = [
   },
   {
     id: "serbia-sandzak",
-    description: "The SandÃ…Â¾ak of Novi Pazar, Ottoman until 1912.",
+    description: "The Sandžak of Novi Pazar, Ottoman until 1912.",
     to: "OTT",
     from: ["SRB"],
     include: [{ polygon: SANDZAK }],
@@ -532,13 +532,13 @@ export const PATCHES = [
   },
   {
     id: "montenegro-sandzak",
-    description: "Pljevlja, Bijelo Polje, Berane, Plav and RoÃ…Â¾aje, acquired by Montenegro only in 1912-13.",
+    description: "Pljevlja, Bijelo Polje, Berane, Plav and Rožaje, acquired by Montenegro only in 1912-13.",
     to: "OTT",
     from: ["MNT"],
     include: [{ adm1: "ME-03" }, { adm1: "ME-04" }, { adm1: "ME-13" }, { adm1: "ME-14" }, { adm1: "ME-17" }],
     confidence: "high",
     sourceIds: ["treaty-lausanne-1923", "hammond-1912"],
-    notes: "The five municipalities were Ottoman SandÃ…Â¾ak territory in 1900; the 1912-13 Montenegrin acquisitions are removed.",
+    notes: "The five municipalities were Ottoman Sandžak territory in 1900; the 1912-13 Montenegrin acquisitions are removed.",
   },
   {
     id: "greece-ottoman-new-lands",
@@ -687,7 +687,7 @@ export const PATCHES = [
   },
   {
     id: "french-india",
-    description: "Puducherry, Karaikal, MahÃƒÂ© and Yanam, French India in 1900.",
+    description: "Puducherry, Karaikal, Mahé and Yanam, French India in 1900.",
     to: "FIC",
     from: ["BIN"],
     include: [{ adm1: "IN-PY" }],
@@ -737,7 +737,7 @@ export const PATCHES = [
     confidence: "low",
     sourceIds: ["hammond-1912"],
     notes:
-      "The khanate's irrigated core along the Amu Darya is approximated by Xorazm, Karakalpakstan and DaÃ…Å¸oguz. The desert frontier with Bukhara and Persia was not a hard line.",
+      "The khanate's irrigated core along the Amu Darya is approximated by Xorazm, Karakalpakstan and Daşoguz. The desert frontier with Bukhara and Persia was not a hard line.",
   },
   {
     id: "bukhara-from-russia",
@@ -899,7 +899,7 @@ export const PATCHES = [
     confidence: "low",
     sourceIds: ["eb1911-wadai", "hammond-1912"],
     notes:
-      "The sultanate's core in OuaddaÃƒÂ¯, Wadi Fira, Batha and the Borkou/Ennedi approaches is approximated by modern Chadian regions. The northern Tibesti and the southern tributary zones are excluded; the frontier was not surveyed.",
+      "The sultanate's core in Ouaddaï, Wadi Fira, Batha and the Borkou/Ennedi approaches is approximated by modern Chadian regions. The northern Tibesti and the southern tributary zones are excluded; the frontier was not surveyed.",
   },
   {
     id: "darfur-from-anglo-egyptian-sudan",
@@ -918,7 +918,7 @@ export const PATCHES = [
   // ---------------------------------------------------------------------------
   {
     id: "bolivia-acre",
-    description: "Acre, Bolivian until the 1903 Treaty of PetrÃƒÂ³polis.",
+    description: "Acre, Bolivian until the 1903 Treaty of Petrópolis.",
     to: "BOL",
     from: ["BRA"],
     include: [{ adm1: "BR-AC" }],
@@ -986,7 +986,7 @@ export const PATCHES = [
 export const DISPUTED_AREAS = [
   {
     id: "aouzou-tibesti",
-    name: "Aouzouâ€“Tibesti frontier zone",
+    name: "Aouzou–Tibesti frontier zone",
     classification: "disputed-no-established-administration",
     referenceDate: "1900-01-01",
     confidence: "low",
@@ -1001,7 +1001,7 @@ export const DISPUTED_AREAS = [
       "No single power exercised continuous effective administration across the whole zone on 1 January 1900. French posts and columns did not control Tibesti; Ottoman authority was claimed and intermittently projected; local Toubou authority was the most direct administration.",
     sources: ["icj-libya-chad-1994", "icj-libya-chad-pleadings", "eb1911-tripoli", "hammond-1912"],
     notes:
-      "A cartographic uncertainty zone, not a state. The 1899 declaration is a sphere-of-influence line, not a boundary survey. The 1935 Franco-Italian agreement and the 1955 Franco-Libyan treaty are post-1900 and are not applied retroactively. The rectangle approximates the Aouzou strip (15â€“16Â°E) plus the Tibesti massif (16â€“19Â°E) north of 19.5Â°N, including BardaÃ¯ and Gouro. It is not a precise historical border.",
+      "A cartographic uncertainty zone, not a state. The 1899 declaration is a sphere-of-influence line, not a boundary survey. The 1935 Franco-Italian agreement and the 1955 Franco-Libyan treaty are post-1900 and are not applied retroactively. The rectangle approximates the Aouzou strip (15–16°E) plus the Tibesti massif (16–19°E) north of 19.5°N, including Bardaï and Gouro. It is not a precise historical border.",
   },
   {
     id: "siachen-kashmir",
@@ -1038,9 +1038,9 @@ export const TAG_BOUNDARY = {
   // Europe
   USA: ["direct-modern-verified", "high", "The 1900 United States external border (including Alaska and the annexed Hawaiian Islands) coincides with the modern Natural Earth outline. The Philippines, Puerto Rico, Guam and American Samoa are separate territories."],
   GBR: ["aggregate-modern-verified", "high", "The United Kingdom of Great Britain and Ireland in 1900 comprised the modern United Kingdom and the whole of Ireland. External borders are unchanged."],
-  DEU: ["reconstructed", "medium", "Reconstructed as the 1900 German Empire: modern Germany plus Alsace-Lorraine, northern Schleswig, Eupen-Malmedy, KlaipÃ„â€”da, Kaliningrad and the Prussian eastern provinces, clipped to the 1900 Russian/Austrian frontier. The eastern frontier strip is the least certain part."],
+  DEU: ["reconstructed", "medium", "Reconstructed as the 1900 German Empire: modern Germany plus Alsace-Lorraine, northern Schleswig, Eupen-Malmedy, Klaipėda, Kaliningrad and the Prussian eastern provinces, clipped to the 1900 Russian/Austrian frontier. The eastern frontier strip is the least certain part."],
   FRA: ["reconstructed", "high", "Modern France minus Alsace-Lorraine (Bas-Rhin, Haut-Rhin, Moselle). Belfort remained French and is retained."],
-  RUS: ["reconstructed", "medium", "The Russian Empire in 1900 included the Baltic provinces, Belarus, most of Ukraine, Bessarabia, Congress Poland, Finland (separate grand duchy), the Caucasus, Central Asia and Kars/Ardahan/Artvin. German Poland, KlaipÃ„â€”da, Galicia, Khiva and Bukhara are removed; Kars is added."],
+  RUS: ["reconstructed", "medium", "The Russian Empire in 1900 included the Baltic provinces, Belarus, most of Ukraine, Bessarabia, Congress Poland, Finland (separate grand duchy), the Caucasus, Central Asia and Kars/Ardahan/Artvin. German Poland, Klaipėda, Galicia, Khiva and Bukhara are removed; Kars is added."],
   JPN: ["direct-modern-verified", "high", "The Japanese home islands in 1900 (Honshu, Hokkaido, Kyushu, Shikoku, Okinawa and the Bonins) match the modern outline. Taiwan is a separate colony and Korea is independent."],
   ITA: ["reconstructed", "high", "Modern Italy minus Trentino/South Tyrol, Trieste and Gorizia, which were Austrian in 1900."],
   ESP: ["direct-modern-verified", "high", "Peninsular Spain and the Balearics were unchanged between 1900 and the modern outline; the African possessions are separate territories."],
@@ -1052,9 +1052,9 @@ export const TAG_BOUNDARY = {
   NOR: ["direct-modern-verified", "high", "Norway's external border was unchanged in 1900. Svalbard was terra nullius until 1920 but is included in the modern Norwegian outline; this is a known small over-assignment."],
   DNK: ["reconstructed", "high", "Modern Denmark minus North Schleswig, German from 1864 to 1920."],
   GRC: ["reconstructed", "medium", "The 1900 Kingdom of Greece comprised the Peloponnese, Attica, Thessaly (from 1881), the Ionian Islands, Euboea, the Cyclades and part of southern Epirus. Epirus, Macedonia, Thrace, the North Aegean and the Dodecanese are removed to the Ottoman Empire; Crete is separate."],
-  SRB: ["reconstructed", "high", "The 1900 Kingdom of Serbia excluded Vojvodina (Austria-Hungary) and the SandÃ…Â¾ak (Ottoman). Both are removed."],
-  MNT: ["reconstructed", "high", "The 1900 Principality of Montenegro excluded the Bay of Kotor (Austrian) and the SandÃ…Â¾ak municipalities acquired in 1912-13."],
-  ROM: ["reconstructed", "high", "The 1900 Kingdom of Romania comprised Wallachia and Moldavia plus northern Dobruja. Transylvania, the Banat, CriÃˆâ„¢ana, MaramureÃˆâ„¢ and southern Bukovina are removed to Austria-Hungary; southern Dobruja is added from Bulgaria."],
+  SRB: ["reconstructed", "high", "The 1900 Kingdom of Serbia excluded Vojvodina (Austria-Hungary) and the Sandžak (Ottoman). Both are removed."],
+  MNT: ["reconstructed", "high", "The 1900 Principality of Montenegro excluded the Bay of Kotor (Austrian) and the Sandžak municipalities acquired in 1912-13."],
+  ROM: ["reconstructed", "high", "The 1900 Kingdom of Romania comprised Wallachia and Moldavia plus northern Dobruja. Transylvania, the Banat, Crișana, Maramureș and southern Bukovina are removed to Austria-Hungary; southern Dobruja is added from Bulgaria."],
   BGR: ["reconstructed", "high", "The 1900 Principality of Bulgaria included Eastern Rumelia but not southern Dobruja, which was Romanian until 1913."],
   OTT: ["reconstructed", "medium", "The Ottoman Empire in 1900 included Anatolia, the Levant, Iraq, the Hejaz, Yemen, Albania, Macedonia and Kosovo, plus Libya. Kars/Ardahan/Artvin are Russian; northern Najd is Jabal Shammar; southern Yemen is British; Crete is autonomous."],
   LUX: ["direct-modern-verified", "high", "The Grand Duchy's external border was unchanged in 1900."],
@@ -1072,10 +1072,10 @@ export const TAG_BOUNDARY = {
   OMN: ["reconstructed", "medium", "Muscat and Oman included Gwadar on the Makran coast until 1958. Gwadar is added from British India."],
   ETH: ["direct-modern-verified", "medium", "The Ethiopian Empire's 1900 outline is broadly the modern one after Menelik II's expansion. The western and southern frontier zones were not surveyed; the modern outline is a defensible approximation."],
   LBR: ["direct-modern-verified", "low", "Liberia's 1900 boundary was larger than the modern one: France annexed frontier districts in 1892 and 1911. The modern outline is retained as a conservative de facto extent; the loss is not reconstructed."],
-  MAR: ["direct-modern-verified", "low", "Morocco's 1900 southern and south-eastern frontier was not delimited. The modern outline excludes the Tindouf/Colomb-BÃƒÂ©char claims and Western Sahara (separate Spanish territory); the modern border is a rough approximation."],
+  MAR: ["direct-modern-verified", "low", "Morocco's 1900 southern and south-eastern frontier was not delimited. The modern outline excludes the Tindouf/Colomb-Béchar claims and Western Sahara (separate Spanish territory); the modern border is a rough approximation."],
   ZAR: ["approximate", "low", "The Transvaal is approximated by the modern Gauteng, North West, Mpumalanga and Limpopo provinces. The 1900 republic's border differed from the modern provincial boundaries, especially in the west and south."],
   ORF: ["approximate", "low", "The Orange Free State is approximated by the modern Free State province. The 1900 republic's western boundary and the Basutoland border differed from the modern province."],
-  MEX: ["direct-modern-verified", "high", "Mexico's external border was unchanged after 1853; Quintana Roo was administered as part of YucatÃƒÂ¡n in 1900 but is Mexican territory."],
+  MEX: ["direct-modern-verified", "high", "Mexico's external border was unchanged after 1853; Quintana Roo was administered as part of Yucatán in 1900 but is Mexican territory."],
   GUA: ["direct-modern-verified", "medium", "Guatemala's external border with Mexico was fixed in 1882 and with British Honduras in 1859-1931; the modern outline is a close approximation."],
   HON: ["direct-modern-verified", "medium", "Honduras's borders with Nicaragua and El Salvador were settled in the early 20th century; the modern outline is a close approximation."],
   SAL: ["direct-modern-verified", "high", "El Salvador's external border was unchanged in 1900."],
@@ -1133,7 +1133,7 @@ export const TAG_BOUNDARY = {
   FIC: ["reconstructed", "medium", "French Indochina in 1900 comprised Tonkin, Annam, Cochinchina, Cambodia and Laos. The western Cambodian and Lao provinces ceded by Siam in 1904-07 are removed; French India is grouped here as a map aggregation."],
   MAD: ["aggregate-modern-verified", "high", "French Madagascar and the Comoros were French in 1900; the modern outlines are correct."],
   FSO: ["direct-modern-verified", "high", "French Somaliland's 1900 border was broadly the modern Djibouti outline."],
-  FCA: ["aggregate-modern-verified", "high", "The French Caribbean grouping (Guiana, Guadeloupe, Martinique, St Pierre and Miquelon, St BarthÃƒÂ©lemy, St Martin) was French in 1900."],
+  FCA: ["aggregate-modern-verified", "high", "The French Caribbean grouping (Guiana, Guadeloupe, Martinique, St Pierre and Miquelon, St Barthélemy, St Martin) was French in 1900."],
   FPO: ["aggregate-modern-verified", "high", "The French Pacific grouping (French Polynesia, New Caledonia, Wallis and Futuna, plus the French Southern Territories) was French in 1900. The southern Indian Ocean islands were administered from Madagascar; the grouping is a map aggregation."],
   GEA: ["reconstructed", "medium", "German East Africa in 1900 comprised Tanganyika, Rwanda, Burundi and the Kionga triangle, but not Zanzibar and Pemba. Zanzibar is removed to the British group; Kionga is added from Mozambique."],
   GSW: ["reconstructed", "high", "German South West Africa in 1900 excluded Walvis Bay, a British Cape enclave. Walvis Bay is removed."],
@@ -1145,16 +1145,16 @@ export const TAG_BOUNDARY = {
   CFS: ["direct-modern-verified", "medium", "The Congo Free State in 1900 covered the modern DRC. The external border was broadly the modern one; the eastern and southern frontiers were not fully surveyed."],
   ANG: ["direct-modern-verified", "medium", "Portuguese Angola in 1900 included Cabinda and the modern Angolan outline. The eastern frontier with the Congo Free State and Northern Rhodesia was not fully demarcated until the 20th century."],
   MOZ: ["reconstructed", "high", "Portuguese Mozambique in 1900 included the Kionga triangle, which is removed to German East Africa. The modern outline is otherwise correct."],
-  PAI: ["reconstructed", "medium", "The Portuguese colonial grouping includes Cape Verde, SÃƒÂ£o TomÃƒÂ© and PrÃƒÂ­ncipe, Portuguese Guinea and Portuguese India (Goa, Daman, Diu). Portuguese India was a separate colony; grouping it here is a map aggregation."],
+  PAI: ["reconstructed", "medium", "The Portuguese colonial grouping includes Cape Verde, São Tomé and Príncipe, Portuguese Guinea and Portuguese India (Goa, Daman, Diu). Portuguese India was a separate colony; grouping it here is a map aggregation."],
   PTM: ["direct-modern-verified", "high", "Portuguese Timor's 1900 border with the Dutch East Indies was the modern East Timor outline."],
   MAC: ["direct-modern-verified", "high", "Macao's 1900 territory was the Macao peninsula and the islands; the modern outline is correct."],
   ERI: ["direct-modern-verified", "high", "Italian Eritrea's 1900 borders were the modern Eritrean outline after the 1889-1900 delimitations."],
   ITS: ["reconstructed", "medium", "Italian Somaliland in 1900 excluded British Somaliland and Jubaland. British Somaliland is removed to the British protectorate; Jubaland is removed to British East Africa."],
   DEI: ["direct-modern-verified", "low", "The Dutch East Indies in 1900 comprised the modern Indonesian archipelago, but Dutch New Guinea was only nominally claimed and not effectively administered. The modern outline is retained with this caveat."],
   SUR: ["direct-modern-verified", "high", "Suriname's 1900 border was the modern one after the 1891 arbitration."],
-  DGC: ["aggregate-modern-verified", "high", "The Dutch Caribbean islands (Aruba, CuraÃƒÂ§ao, Sint Maarten, Bonaire, Saba, Sint Eustatius) were Dutch in 1900."],
+  DGC: ["aggregate-modern-verified", "high", "The Dutch Caribbean islands (Aruba, Curaçao, Sint Maarten, Bonaire, Saba, Sint Eustatius) were Dutch in 1900."],
   SAH: ["direct-modern-verified", "medium", "Spanish Sahara's 1900 coastal and northern boundary was established by the 1884-1900 agreements; the eastern and southern limit with French West Africa was not fully delimited. The modern Western Sahara outline is a rough approximation."],
-  SGG: ["direct-modern-verified", "high", "Spanish Guinea (Rio Muni and Fernando PÃƒÂ³) matches the modern Equatorial Guinea mainland and Bioko; AnnobÃƒÂ³n was also Spanish."],
+  SGG: ["direct-modern-verified", "high", "Spanish Guinea (Rio Muni and Fernando Pó) matches the modern Equatorial Guinea mainland and Bioko; Annobón was also Spanish."],
   PHL: ["aggregate-modern-verified", "medium", "The Philippine Islands were a United States territory in 1900; the modern archipelago is correct. The Sulu Sultanate's residual authority and the Moro resistance are not shown as separate polities."],
   PRI: ["direct-modern-verified", "high", "Puerto Rico was a United States territory in 1900; the modern outline is correct."],
   GUM: ["direct-modern-verified", "high", "Guam was a United States territory in 1900; the modern outline is correct."],
@@ -1168,7 +1168,7 @@ export const TAG_BOUNDARY = {
   FIN: ["reconstructed", "medium", "The Grand Duchy of Finland in 1900 included the Karelian Isthmus, Ladoga Karelia, Salla and Petsamo, which modern Finland lost to the USSR, and excluded Petsamo (acquired 1920). The modern Finnish outline is used as a base; the eastern cessions are not reconstructed. This is a known under-representation."],
   TWN: ["direct-modern-verified", "high", "Taiwan was a Japanese colony from 1895; the modern island outline is correct."],
   TIB: ["approximate", "low", "Tibet is reconstructed from the modern Tibet Autonomous Region only. Amdo (Qinghai) and Kham (Sichuan/Yunnan) are not separated; the polygon is a conservative core."],
-  KHI: ["approximate", "low", "The Khanate of Khiva is approximated by Xorazm, Karakalpakstan and DaÃ…Å¸oguz. The desert frontier was not a hard line."],
+  KHI: ["approximate", "low", "The Khanate of Khiva is approximated by Xorazm, Karakalpakstan and Daşoguz. The desert frontier was not a hard line."],
   BUK: ["approximate", "low", "The Emirate of Bukhara is approximated by Bukhara, Navoiy, Qashqadaryo, Surxondaryo, Khatlon, Dushanbe and the Republican Subordination districts. The Pamir and desert frontiers are uncertain."],
   SAR: ["direct-modern-verified", "high", "The Raj of Sarawak's 1900 territory matches the modern Malaysian state of Sarawak."],
 };
@@ -1198,7 +1198,7 @@ export const COMPONENTS = {
   DEU: [
     { name: "Prussia", adminStatus: "Kingdom of Prussia (constituent state)", confidence: "high", notes: "Included East Prussia, West Prussia, Posen, Pomerania, Silesia, Brandenburg, Saxony, Hanover, Schleswig-Holstein and the Rhineland." },
     { name: "Alsace-Lorraine", adminStatus: "Imperial territory (Reichsland)", confidence: "high", notes: "Annexed in 1871; included Bas-Rhin, Haut-Rhin and Moselle." },
-    { name: "Bavaria, Saxony, WÃƒÂ¼rttemberg, Baden and the smaller states", adminStatus: "Constituent monarchies and duchies", confidence: "high", notes: "Their external borders are those of the German Empire; internal state borders are not drawn on the political layer." },
+    { name: "Bavaria, Saxony, Württemberg, Baden and the smaller states", adminStatus: "Constituent monarchies and duchies", confidence: "high", notes: "Their external borders are those of the German Empire; internal state borders are not drawn on the political layer." },
   ],
   AUT: [
     { name: "Austria (Cisleithania)", adminStatus: "Austrian half of the Dual Monarchy", confidence: "high", notes: "Included Austria, Bohemia, Moravia, Austrian Silesia, Galicia, Bukovina, Carniola, the Littoral, Dalmatia and Bosnia-Herzegovina." },

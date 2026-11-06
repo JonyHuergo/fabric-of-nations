@@ -1382,7 +1382,7 @@ Static definitions:
 - [`source_notes.md`](../../packages/data/data/source_notes.md)
 - M5 historical sample: [`scenarios/m5_eight_polities.json`](../../packages/data/data/scenarios/m5_eight_polities.json),
   [`historical/countries_1900.json`](../../packages/data/data/historical/countries_1900.json),
-  [`historical/regions_1900.json`](./packages/data/data/historical/regions_1900.json),
+  `historical/regions_1900.json` (removed in P2, commit `593656e`),
   [`historical/markets_1900.json`](../../packages/data/data/historical/markets_1900.json),
   [`historical/pops_1900.json`](../../packages/data/data/historical/pops_1900.json),
   [`historical/buildings_1900.json`](../../packages/data/data/historical/buildings_1900.json),
