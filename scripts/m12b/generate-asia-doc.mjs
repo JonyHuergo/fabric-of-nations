@@ -203,7 +203,7 @@ ${futureRows}
 ## 7. Major historical transfers supported
 
 Reference snapshots are validation references, not forced outcomes. They are
-exercised by \`packages/tests/src/m12b-asia-provinces.test.ts\`.
+exercised by \`packages/tests/src/map/provinces-asia.test.ts\`.
 
 - **1918–1920**: the Ottoman Arab provinces transfer to the Syrian, Lebanese,
   Iraqi and Transjordanian successor polities; Hejaz and Yemen become

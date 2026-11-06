@@ -1344,6 +1344,7 @@ describe("M12e combined five-bundle catalogue", () => {
         OCEANIA.futurePolities.length,
     );
     expect(PROVINCE_MAP_1900.futurePolities.length).toBe(191);
+    expect(PROVINCE_MAP_1900.provinces.length).toBeGreaterThan(1500);
     expect(PROVINCE_MAP_1900.provinces.filter((province) => province.key.startsWith("oc-"))).toHaveLength(
       OCEANIA.provinces.length,
     );
@@ -1382,13 +1383,15 @@ describe("M12e persistence and determinism", () => {
     ).toEqual([57]);
   });
 
-  test("M12a-era, M12b-era, M12c-era and M12d-era saves still load", () => {
-    const cases: readonly [number, number][] = [
-      [66001, EUROPE.provinces.length],
-      [100239, EUROPE.provinces.length + ASIA.provinces.length],
+  test("worlds holding only the earlier continents' ownership records round-trip through a save", () => {
+    // Formerly also asserted, one cut-off each, by the Asia, Africa and Americas files.
+    const cases: readonly [number, number, number][] = [
+      [66001, EUROPE.provinces.length, 100001],
+      [100239, EUROPE.provinces.length + ASIA.provinces.length, 200001],
       [
         200260,
         EUROPE.provinces.length + ASIA.provinces.length + AFRICA.provinces.length,
+        300001,
       ],
       [
         300469,
@@ -1396,9 +1399,10 @@ describe("M12e persistence and determinism", () => {
           ASIA.provinces.length +
           AFRICA.provinces.length +
           AMERICAS.provinces.length,
+        400001,
       ],
     ];
-    for (const [maxId, expectedCount] of cases) {
+    for (const [maxId, expectedCount, firstExcludedId] of cases) {
       const world = referenceWorld();
       world.provinces.ownership = world.provinces.ownership.filter(
         (entry) => entry.provinceId <= maxId,
@@ -1406,7 +1410,9 @@ describe("M12e persistence and determinism", () => {
       const restored = deserializeWorld(serializeWorld(world));
       assertValidWorld(restored);
       expect(restored.provinces.ownership.length).toBe(expectedCount);
-      expect(restored.provinces.ownership.some((entry) => entry.provinceId >= 400001)).toBe(false);
+      expect(
+        restored.provinces.ownership.some((entry) => entry.provinceId >= firstExcludedId),
+      ).toBe(false);
     }
   });
 

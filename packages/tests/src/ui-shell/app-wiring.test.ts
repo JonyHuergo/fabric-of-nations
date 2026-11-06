@@ -10,6 +10,7 @@
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { WORLD_SCHEMA_VERSION } from "@century/sim";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const APP = resolve(HERE, "../../../app");
@@ -137,5 +138,187 @@ describe("E1 UI wiring", () => {
       const text = source(path);
       expect(text).not.toMatch(/\bGDP\b|(?<!not an )unemployment rate:|inflation rate:/);
     }
+  });
+});
+
+function lifecycleSource(path: string): string {
+  return readFileSync(join(APP, path), "utf8");
+}
+
+describe("campaign startup and autosave wiring", () => {
+  test("startup reads saved metadata and offers Continue or New Game", () => {
+    const provider = lifecycleSource("src/worker/SimulationProvider.tsx");
+    const app = lifecycleSource("App.tsx");
+    expect(provider).toContain("readStoredCampaign");
+    expect(provider).toContain('setStartup("menu")');
+    expect(provider).toContain("resumeSavedGame");
+    expect(provider).toContain("createGame");
+    expect(app).toContain("MainMenuScreen");
+    expect(app).toContain("CountrySelectionScreen");
+    expect(app).toContain("onNewGame");
+    expect(app).toContain("onContinue");
+    // D-114: saved games are listed, loaded and deleted from Load Game.
+    expect(app).toContain("LoadGameScreen");
+    expect(lifecycleSource("src/screens/LoadGameScreen.tsx")).toContain("Delete this saved game?");
+  });
+
+  test("campaigns save to their own slots; autosave debounce and failure feedback are present", () => {
+    const provider = lifecycleSource("src/worker/SimulationProvider.tsx");
+    // D-114 replaces the overwrite prompt: a new campaign starts a slot of its
+    // own, so saving it can never replace another campaign.
+    expect(provider).toContain("activeSlotIdRef.current = null");
+    expect(provider).toContain("slotId: activeSlotIdRef.current");
+    expect(provider).toContain("storeChainRef");
+    expect(provider).toContain("AutosaveScheduler");
+    expect(provider).toContain("requestAutosave");
+    expect(provider).toContain('kind === "autosave"');
+    expect(provider).toContain('"Autosave failed"');
+    expect(provider).toContain('"Autosaved"');
+  });
+
+  test("the storage adapter uses the current schema and the replace-safe SaveLibrary", () => {
+    const storage = lifecycleSource("src/storage/saveStorage.ts");
+    expect(storage).toContain("SaveLibrary");
+    expect(storage).toContain("readStoredCampaign");
+    // The app cannot import simulation internals, so its schema literal must be
+    // checked against the authoritative constant instead of pinning an old value.
+    const match = /SUPPORTED_SAVE_SCHEMA_VERSION\s*=\s*(\d+)/.exec(storage);
+    expect(match).not.toBeNull();
+    expect(Number(match?.[1])).toBe(WORLD_SCHEMA_VERSION);
+  });
+});
+
+/**
+ * Source-level wiring guards for platform paths that cannot be exercised in the
+ * Node test harness. These do not claim native-device behavior is verified; they
+ * prevent the WebView/AppState/error-boundary hooks from being silently removed.
+ */
+describe("app lifecycle wiring", () => {
+  test("native WebView process-failure callbacks route to the common error path", () => {
+    const nativeHost = lifecycleSource("src/worker/NativeWorkerHost.tsx");
+    expect(nativeHost).toContain("onRenderProcessGone");
+    expect(nativeHost).toContain("onContentProcessDidTerminate");
+    expect(nativeHost).toContain("onError(");
+    expect(nativeHost).toContain("restart()");
+    expect(nativeHost).toContain("key={reloadKey}");
+  });
+
+  test("provider pauses on backgrounding and resumes only through the lifecycle path", () => {
+    const provider = lifecycleSource("src/worker/SimulationProvider.tsx");
+    expect(provider).toContain("AppState.addEventListener");
+    expect(provider).toContain("document.visibilityState");
+    expect(provider).toContain("resumeOnVisibleRef");
+    expect(provider).toContain("restartWorker");
+    expect(provider).toContain("WorkerSupervisor");
+    expect(provider).toContain('setSaveStatus(null)');
+  });
+
+  test("every worker event is sequenced through the supervisor", () => {
+    const provider = lifecycleSource("src/worker/SimulationProvider.tsx");
+    expect(provider).toContain("supervisor.receive(event)");
+    expect(provider).not.toContain("handleEvent(event)");
+  });
+
+  test("player-facing copy does not retain obsolete milestone placeholders", () => {
+    const status = lifecycleSource("src/index.ts");
+    expect(status).toContain("playable-shell");
+    expect(status).not.toContain("placeholder");
+    expect(status).not.toContain("arrive in M7");
+    const politics = lifecycleSource("src/screens/PoliticsScreen.tsx");
+    expect(politics).not.toContain("depend on M9");
+    const war = lifecycleSource("src/screens/WarScreen.tsx");
+    expect(war).toContain("aged 18–45");
+  });
+
+  test("the app has a contained rendering-error fallback with retry", () => {
+    const app = lifecycleSource("App.tsx");
+    const boundary = lifecycleSource("src/components/AppErrorBoundary.tsx");
+    expect(app).toContain("AppErrorBoundary");
+    expect(boundary).toContain("getDerivedStateFromError");
+    expect(boundary).toContain("Retry rendering");
+  });
+});
+
+/**
+ * M11d provider lifecycle regression.
+ *
+ * Playtesting showed that finishing a save silently replaced the simulation
+ * worker: `handleEvent` closed over `savedCampaign`, so the worker-creation
+ * effect re-ran when the saved-campaign state changed, and the provider then
+ * re-created the campaign from day 0. The repository has no React renderer in
+ * the test environment, so this guard pins the structural invariants that make
+ * the regression impossible: the worker lifecycle depends only on the explicit
+ * restart epoch, and handlers are always reached through refs.
+ */
+function providerSource(): string {
+  return readFileSync(join(APP, "src/worker/SimulationProvider.tsx"), "utf8");
+}
+
+describe("M11d simulation provider lifecycle", () => {
+  test("the worker is only replaced by an explicit restart epoch", () => {
+    const source = providerSource();
+    expect(source).toContain("}, [webEpoch]);");
+    expect(source).toContain("}, [nativeEpoch]);");
+    // Handler identity must not be an effect dependency.
+    expect(source).not.toMatch(/\}, \[webEpoch, handleEvent/);
+    expect(source).not.toMatch(/\}, \[nativeEpoch, handleEvent/);
+    expect(source).toContain("onEvent: (event) => handleEventRef.current(event)");
+  });
+
+  test("the save envelope is read through a ref inside the event handler", () => {
+    const source = providerSource();
+    // D-114: the saved games replaced the single envelope, under the same rule.
+    expect(source).toContain("savesRef.current.length === 0");
+    expect(source).toContain("updateSaves([info.slot, ...savesRef.current");
+    // The old dependency array that made a completed save rebuild the worker.
+    expect(source).not.toContain("[savedCampaign, setRunningState]");
+    expect(source).not.toContain("[saves, setRunningState]");
+  });
+
+  test("a fresh campaign is only recreated after a real worker replacement", () => {
+    const source = providerSource();
+    // Recreate guard must compare against the snapshot's own player identity.
+    expect(source).toContain("snapshot.playerCountryId === desired");
+    expect(source).toContain("activePlayerCountryIdRef.current");
+  });
+
+  test("a startup storage error survives the worker READY event", () => {
+    const source = providerSource();
+    expect(source).toContain("startupStorageErrorRef.current === null");
+    expect(source).toContain("startupStorageErrorRef.current = message");
+    // READY must not unconditionally clear the error banner.
+    expect(source).not.toContain('if (event.type === "READY") setError(null);');
+  });
+});
+
+/**
+ * M11d slider accessibility regression.
+ *
+ * The web build rendered `role="slider"` with no announced value because React
+ * Native Web reads the flat `aria-value*` props and ignores the
+ * `accessibilityValue` object. Playtesting found the slider unusable with a
+ * screen reader even though the native accessibility value was set.
+ */
+describe("M11d slider accessibility", () => {
+  test("the slider exposes a value, range and text on the web", () => {
+    const source = readFileSync(join(APP, "src/components/Slider.tsx"), "utf8");
+    expect(source).toContain("accessibilityValue={{ min, max, now: value, text: display }}");
+    expect(source).toContain("aria-valuemin={min}");
+    expect(source).toContain("aria-valuemax={max}");
+    expect(source).toContain("aria-valuenow={value}");
+    expect(source).toContain("aria-valuetext={display}");
+    expect(source).toContain("accessibilityActions={[{ name: \"increment\" }, { name: \"decrement\" }]}");
+  });
+
+  test("toggle chips and navigation expose their active state", () => {
+    // React Native Web does not forward accessibilityState.selected for
+    // role="button"; without an explicit ARIA state the active filter, layer,
+    // speed or screen is visual-only.
+    const chips = readFileSync(join(APP, "src/components/ui.tsx"), "utf8");
+    expect(chips).toContain('"aria-pressed": active');
+    const shell = readFileSync(join(APP, "src/screens/GameShell.tsx"), "utf8");
+    expect(shell).toContain('"aria-current": active ? "page" : undefined');
+    const selection = readFileSync(join(APP, "src/screens/CountrySelectionScreen.tsx"), "utf8");
+    expect(selection).toContain('"aria-pressed": active');
   });
 });

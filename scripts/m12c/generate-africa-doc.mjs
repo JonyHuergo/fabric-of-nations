@@ -259,7 +259,7 @@ the transfer remains a single ordinary ownership change; see D-105.
 ## 7. Major historical transfers supported
 
 Reference snapshots are validation references, not forced outcomes. They are
-exercised by \`packages/tests/src/m12c-africa-provinces.test.ts\`.
+exercised by \`packages/tests/src/map/provinces-africa.test.ts\`.
 
 - **1903–1916**: Britain annexes the Sokoto Caliphate; France annexes Wadai; the
   Anglo-Egyptian Sudan annexes Darfur. The emirates and sultanates are separate

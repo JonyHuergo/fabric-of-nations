@@ -617,7 +617,7 @@ trims cross-owner overlaps in plan order.
 
 ## 6. Historical snapshots supported
 
-`packages/tests/src/m12d-americas-provinces.test.ts` exercises these references;
+`packages/tests/src/map/provinces-americas.test.ts` exercises these references;
 they are validation paths, not forced outcomes.
 
 | Reference | Result |

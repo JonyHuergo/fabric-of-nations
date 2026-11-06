@@ -365,7 +365,7 @@ Vemerana, Minerva and Hutt River entries. Historical entries own no province in
 **Hard acceptance criterion:** every piece of land on the M11c 1900 map belongs to
 a province, except Antarctica and a short, explicitly documented exception list.
 \`scripts/m12e/audit-global-land.mjs\` and
-\`packages/tests/src/m12e-oceania-provinces.test.ts\` prove it.
+\`packages/tests/src/map/provinces-oceania.test.ts\` prove it.
 
 ### 6.1 Method
 

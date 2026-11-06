@@ -177,7 +177,7 @@ ${futureRows}
 ## 7. Major historical transfers supported
 
 Reference snapshots are validation references, not forced outcomes. They are
-exercised by \`packages/tests/src/m12a-provinces.test.ts\`.
+exercised by \`packages/tests/src/map/provinces-europe.test.ts\`.
 
 - **1918–1920**: Austria-Hungary transfers Bohemia, Moravia, Austrian Silesia,
   Hultschin, Slovakia and Carpathian Ruthenia to Czechoslovakia; Galicia and

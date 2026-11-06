@@ -32,7 +32,7 @@ import {
   type Id,
   type World,
 } from "@century/sim";
-import { loadM11World, loadProvinceBundle } from "@century/data";
+import { loadM11World } from "@century/data";
 
 import {
   decodeProvinceGeometry,
@@ -43,7 +43,6 @@ import {
   pickProvinceAtPoint,
   planProvinceBorders,
 } from "../../../app/src/components/provinceRenderPlan.js";
-import { PROVINCE_MAP_1900 } from "../../../app/src/provinceMapBundle.js";
 import type { ProvinceMapData } from "../../../app/src/provinceCatalogTypes.js";
 import { politicalGeographyWorld } from "../fixtures/provinces.js";
 
@@ -57,12 +56,6 @@ const EUROPE = JSON.parse(
 ) as ProvinceMapData;
 const ASIA = JSON.parse(
   readFileSync(join(ROOT, "packages/data/data/map/provinces_asia_1900.json"), "utf8"),
-) as ProvinceMapData;
-const AMERICAS = JSON.parse(
-  readFileSync(join(ROOT, "packages/data/data/map/provinces_americas_1900.json"), "utf8"),
-) as ProvinceMapData;
-const OCEANIA = JSON.parse(
-  readFileSync(join(ROOT, "packages/data/data/map/provinces_oceania_1900.json"), "utf8"),
 ) as ProvinceMapData;
 const AUDIT = JSON.parse(
   readFileSync(join(ROOT, "packages/data/data/map/provinces_africa_1900_audit.json"), "utf8"),
@@ -1013,40 +1006,6 @@ describe("M12c Africa province inventory and geometry", () => {
       expect(BY_KEY.has(key)).toBe(true);
     }
   });
-
-  test("the combined Europe, Asia, Africa, Americas and Oceania catalogue has unique ids and one border list", () => {
-    const combined = loadProvinceBundle();
-    expect(combined.provinces.length).toBe(
-      EUROPE.provinces.length +
-        ASIA.provinces.length +
-        AFRICA.provinces.length +
-        AMERICAS.provinces.length +
-        OCEANIA.provinces.length,
-    );
-    expect(new Set(combined.provinces.map((province) => province.id)).size).toBe(
-      combined.provinces.length,
-    );
-    expect(new Set(combined.provinces.map((province) => province.key)).size).toBe(
-      combined.provinces.length,
-    );
-    expect(SCENARIO.provinces?.definitions.length).toBe(combined.provinces.length);
-    expect(PROVINCE_MAP_1900.provinces.length).toBe(combined.provinces.length);
-    expect(PROVINCE_MAP_1900.borders.length).toBe(
-      EUROPE.borders.length +
-        ASIA.borders.length +
-        AFRICA.borders.length +
-        AMERICAS.borders.length +
-        OCEANIA.borders.length,
-    );
-    expect(PROVINCE_MAP_1900.futurePolities.length).toBe(
-      EUROPE.futurePolities.length +
-        ASIA.futurePolities.length +
-        AFRICA.futurePolities.length +
-        AMERICAS.futurePolities.length +
-        OCEANIA.futurePolities.length,
-    );
-    expect(PROVINCE_MAP_1900.provinces.length).toBeGreaterThan(1500);
-  });
 });
 
 describe("M12c authoritative provincial ownership", () => {
@@ -1425,30 +1384,6 @@ describe("M12c persistence and determinism", () => {
     expect(ownerOf(restored, "af-mar-marrakech-and-the-south")).toBe(35);
     expect(controllerOf(restored, "af-mar-marrakech-and-the-south")).toBe(3);
     expect(ownershipOf(restored, "af-egy-cairo")?.claimantPolityIds).toEqual([1]);
-  });
-
-  test("an M12a-era save with only European ownership records still loads", () => {
-    const world = referenceWorld();
-    world.provinces.ownership = world.provinces.ownership.filter(
-      (entry) => entry.provinceId <= 66001,
-    );
-    const restored = deserializeWorld(serializeWorld(world));
-    assertValidWorld(restored);
-    expect(restored.provinces.ownership.length).toBe(EUROPE.provinces.length);
-    expect(restored.provinces.ownership.some((entry) => entry.provinceId >= 100001)).toBe(false);
-  });
-
-  test("an M12b-era save with only European and Asian ownership records still loads", () => {
-    const world = referenceWorld();
-    world.provinces.ownership = world.provinces.ownership.filter(
-      (entry) => entry.provinceId <= 100239,
-    );
-    const restored = deserializeWorld(serializeWorld(world));
-    assertValidWorld(restored);
-    expect(restored.provinces.ownership.length).toBe(
-      EUROPE.provinces.length + ASIA.provinces.length,
-    );
-    expect(restored.provinces.ownership.some((entry) => entry.provinceId >= 200001)).toBe(false);
   });
 
   test("identical sequences produce the identical world hash", () => {
