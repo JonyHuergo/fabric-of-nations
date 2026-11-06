@@ -7,15 +7,15 @@
   "countries": "ee8b3fe36d5a0462a3e3cabdf7f0bc7e9d2365d261fd0093bd880c066b2e224a",
   "buildingDefinitions": "5e62b41ef5937491165a68a29176dc61fe8f270644a2c1dbd337f0d529be3ae1",
   "geography": "a1479e70fa3741c486d60202becf170aeb1c26e297cc1713deeb706c79aaa22a",
-  "authoredDeposits": "dde612715badf23edadf53cd68d6ffd12f7ed72bd3ba6ffee4c6fdc2d610a2db",
+  "authoredDeposits": "987469f5ff2ad2bca301a20c5a5188fca10c1513a6004148306e165bf5a48137",
   "mrds": "2fe7b520aadfe6df78069461ad55793395d2f64d58f5641b0e2f4c41f5969e61",
   "forest": "1b6c7161a79e1aa2b148ff067b0c0ab5f789a50061227a4a0c4817f4057a557e",
-  "technology": "28a4e2df6efd781bb77da4de24f6d600bdac3c07d906b089c548e7cfc4ad85ea"
+  "technology": "cea2815feb6810c3fc7ab821b284cc372e8db8ad5d1af6639d1700b21f1a1ce4"
  },
  "outputs": {
-  "provinces_1900.json": "3451cf5db70c200235dd3d34f1c2f2dbe52078e82ad8c9716522279118df7507",
+  "provinces_1900.json": "db0176b871850a97e6e6d2da22cbe7d4f617dc941a0b31610afe15cb42996d10",
   "buildings_definitions_1900.json": "7396751b3a99a48c6fa6988dbda77bf17efad618d8923d7ababd20a517972184",
-  "deposits_1900.json": "9133465539eb23b054bf43ba5b65b5424a55323240047ab5ff2914088022249d",
+  "deposits_1900.json": "1d67787cf174454614c4cc823f47114a89183d3f079713c89bb555fca8cab7bc",
   "countries_1900.json": "1103f7cdd0541aeb488082813d79c8293c9a688620ebc446c9690417ea5c6542"
  },
  "land": {
@@ -31,8 +31,8 @@
    "cropland": 9.9708,
    "pasture": 2.737
   },
-  "croplandHa": 902336004,
-  "pastureHa": 1571931043,
+  "croplandHa": 902053401,
+  "pastureHa": 1571928318,
   "imputations": [
    {
     "provinceId": 3070,
@@ -63,8 +63,8 @@
     "landUse": "cropland",
     "farmJobs": 2000,
     "hectaresPerJob": 9.9708,
-    "basis": "world median",
-    "hectares": 19942,
+    "basis": "world median, bounded by half the authored land area (202 ha)",
+    "hectares": 89,
     "confidence": "low"
    },
    {
@@ -74,8 +74,8 @@
     "landUse": "pasture",
     "farmJobs": 1000,
     "hectaresPerJob": 2.737,
-    "basis": "world median",
-    "hectares": 2737,
+    "basis": "world median, bounded by half the authored land area (202 ha)",
+    "hectares": 12,
     "confidence": "low"
    },
    {
@@ -151,8 +151,8 @@
     "landUse": "cropland",
     "farmJobs": 12000,
     "hectaresPerJob": 8.0271,
-    "basis": "DEU median",
-    "hectares": 96325,
+    "basis": "DEU median, bounded by half the authored land area (33400 ha)",
+    "hectares": 16700,
     "confidence": "low"
    },
    {
@@ -162,17 +162,17 @@
     "landUse": "cropland",
     "farmJobs": 3000,
     "hectaresPerJob": 70.1083,
-    "basis": "USA median",
-    "hectares": 210325,
+    "basis": "USA median, bounded by half the authored land area (54400 ha)",
+    "hectares": 27200,
     "confidence": "low"
    }
   ]
  },
  "deposits": {
-  "authored": 221,
-  "fromMrds": 2266,
+  "authored": 243,
+  "fromMrds": 2252,
   "forests": 1347,
-  "total": 3834,
+  "total": 3842,
   "classStock": {
    "coal": {
     "S": 100000000,
@@ -259,28 +259,28 @@
   },
   "byResource": {
    "coal": {
-    "deposits": 73,
-    "known": 72,
-    "stock": 1855900000000,
-    "knownStock": 1755900000000
+    "deposits": 74,
+    "known": 73,
+    "stock": 1856900000000,
+    "knownStock": 1756900000000
    },
    "iron": {
-    "deposits": 423,
-    "known": 50,
-    "stock": 18553040000,
-    "knownStock": 11182600000
+    "deposits": 425,
+    "known": 56,
+    "stock": 19356940000,
+    "knownStock": 11986600000
    },
    "bauxite": {
     "deposits": 297,
-    "known": 11,
-    "stock": 18325000000,
-    "knownStock": 1717000000
+    "known": 12,
+    "stock": 18329500000,
+    "knownStock": 1722000000
    },
    "silver": {
-    "deposits": 322,
-    "known": 99,
-    "stock": 287176000,
-    "knownStock": 281553000
+    "deposits": 324,
+    "known": 103,
+    "stock": 287375000,
+    "knownStock": 281953000
    },
    "timber": {
     "deposits": 1347,
@@ -290,9 +290,9 @@
    },
    "copper": {
     "deposits": 526,
-    "known": 111,
-    "stock": 981565000,
-    "knownStock": 785050000
+    "known": 115,
+    "stock": 982195000,
+    "knownStock": 785700000
    },
    "tin": {
     "deposits": 155,
@@ -301,10 +301,10 @@
     "knownStock": 7190000
    },
    "gold": {
-    "deposits": 499,
-    "known": 120,
-    "stock": 70200800,
-    "knownStock": 67362100
+    "deposits": 501,
+    "known": 124,
+    "stock": 70234500,
+    "knownStock": 67396100
    },
    "gas": {
     "deposits": 24,
@@ -313,10 +313,10 @@
     "knownStock": 22000000
    },
    "oil": {
-    "deposits": 68,
-    "known": 16,
-    "stock": 127409000000,
-    "knownStock": 2077000000
+    "deposits": 69,
+    "known": 17,
+    "stock": 127410000000,
+    "knownStock": 2078000000
    },
    "uranium": {
     "deposits": 98,

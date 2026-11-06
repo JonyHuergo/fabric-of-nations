@@ -41,6 +41,9 @@
  *     (a province cannot farm more land than it has; Paris is 113 km²),
  *     `landSource` "imputed", confidence low. Day-0 output does not depend on the value
  *     (world creation normalises the technique, D-143 §1); it bounds later expansion.
+ *     P5b (D-146 C-7): where HYDE gives no land area (Guam, Pohnpei, Monaco), an authored
+ *     land area bounds the imputation: cropland and grazing land together are at most
+ *     half of it, split in proportion to their imputed needs, so both stay positive.
  *
  * Usage: node scripts/p5/build-p5-world.mjs [--check]
  */
@@ -158,6 +161,16 @@ function median(values) {
   return sorted.length % 2 === 1 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
 }
 
+/**
+ * P5b (D-146 C-7): land areas of provinces that HYDE 3.3 leaves without one, hectares.
+ * Present-day land areas (the islands' extent has not changed since 1900): Guam 544 km2
+ * (U.S. Census Bureau, 2010 Census land area); Pohnpei island 334 km2 (Federated States
+ * of Micronesia, Division of Statistics); Monaco 2.02 km2 (Principality of Monaco).
+ */
+const AUTHORED_LAND_AREA_HA = { "oc-gum-guam": 54400, "oc-gpn-caroline-pohnpei": 33400, "mco-monaco": 202 };
+/** Share of an authored land area that may be farmed (provisional; the rest is towns, forest, rock). */
+const AUTHORED_AREA_FARMABLE_SHARE = 0.5;
+
 function build() {
   const provinces = read(INPUTS.provinces);
   const buildings = read(INPUTS.buildings);
@@ -211,6 +224,39 @@ function build() {
   const imputations = [];
   const provincesOut = provinces.map((province) => {
     const out = { ...province, landSource: { cropland: "hyde-3.3", pasture: "hyde-3.3" } };
+    const authoredArea = AUTHORED_LAND_AREA_HA[province.key];
+    if (authoredArea !== undefined) {
+      // C-7: impute both kinds against the authored area together.
+      const needs = {};
+      for (const use of ["cropland", "pasture"]) {
+        const field = LAND_FIELD[use];
+        const farmJobs = jobs.get(`${province.id}:${use}`) ?? 0;
+        if (province[field] > 0 || !(farmJobs > 0)) continue;
+        const tag = countryOfProvince.get(province.id);
+        const countryMedian = median(perJob[use].get(tag) ?? []);
+        needs[use] = { farmJobs, haPerJob: countryMedian ?? worldMedian[use], basis: countryMedian === null ? "world median" : `${tag} median`, tag };
+      }
+      const wanted = Object.values(needs).reduce((total, need) => total + need.farmJobs * need.haPerJob, 0);
+      const farmable = authoredArea * AUTHORED_AREA_FARMABLE_SHARE;
+      const scale = wanted > farmable ? farmable / wanted : 1;
+      for (const [use, need] of Object.entries(needs)) {
+        const hectares = round(need.farmJobs * need.haPerJob * scale, 0);
+        out[LAND_FIELD[use]] = hectares;
+        out.landSource = { ...out.landSource, [use]: "imputed" };
+        imputations.push({
+          provinceId: province.id,
+          key: province.key,
+          country: need.tag ?? null,
+          landUse: use,
+          farmJobs: need.farmJobs,
+          hectaresPerJob: round(need.haPerJob, 4),
+          basis: `${need.basis}${scale < 1 ? `, bounded by half the authored land area (${String(authoredArea)} ha)` : ""}`,
+          hectares,
+          confidence: "low",
+        });
+      }
+      return out;
+    }
     for (const use of ["cropland", "pasture"]) {
       const field = LAND_FIELD[use];
       const farmJobs = jobs.get(`${province.id}:${use}`) ?? 0;

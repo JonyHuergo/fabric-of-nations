@@ -13802,8 +13802,8 @@
   "name": "Monaco",
   "territoryKey": "mco-home",
   "infrastructure": 0.48,
-  "arableLandHa": 19942,
-  "pastureHa": 2737,
+  "arableLandHa": 89,
+  "pastureHa": 12,
   "urbanShare": 0,
   "sourceIds": [
    "hyde-3.3",
@@ -43745,7 +43745,7 @@
   "name": "Micronesia (Pohnpei)",
   "territoryKey": "gpn",
   "infrastructure": 0.25,
-  "arableLandHa": 96325,
+  "arableLandHa": 16700,
   "pastureHa": 0,
   "urbanShare": 0,
   "sourceIds": [
@@ -43961,7 +43961,7 @@
   "name": "Guam",
   "territoryKey": "gum",
   "infrastructure": 0.25,
-  "arableLandHa": 210325,
+  "arableLandHa": 27200,
   "pastureHa": 0,
   "urbanShare": 0,
   "sourceIds": [

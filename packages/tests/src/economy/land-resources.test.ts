@@ -491,6 +491,12 @@ describe("P5 1900 deposits (D-121, D-143 §4)", () => {
     expect(find("as-rus-baku", "oil")?.discovered).toBe(true);
     expect(find("af-zar-pretoria-and-the-witwatersrand", "gold")?.discovered).toBe(true);
     expect(find("am-usa-minnesota", "iron")?.discovered).toBe(true);
+    // Revised for D-146 A10 (C-2): sourced 1900 producers that lacked a deposit.
+    expect(find("gbr-yorkshire", "iron")?.discovered).toBe(true); // Cleveland
+    expect(find("lux-luxembourg", "iron")?.discovered).toBe(true); // minette
+    expect(find("esp-bizkaia", "iron")?.discovered).toBe(true); // Bilbao
+    expect(find("deu-prussian-saxony", "copper")?.discovered).toBe(true); // Mansfeld
+    expect(find("as-kor-pyongan", "gold")?.discovered).toBe(true); // Unsan
     expect(find("am-usa-texas", "oil")?.requiredTechnologyId).toBe(technologyId("geological-surveying"));
     expect(find("as-ott-al-hasa", "oil")?.requiredTechnologyId).toBe(technologyId("geophysical-prospecting"));
     expect(find("as-rus-tobolsk", "gas")?.requiredTechnologyId).toBe(technologyId("airborne-geophysics"));

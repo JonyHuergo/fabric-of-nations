@@ -2204,6 +2204,31 @@
       ],
       "researchWork": 650000,
       "effects": []
+    },
+    {
+      "id": 123,
+      "key": "pipelines",
+      "name": "Pipelines",
+      "era": 2,
+      "description": "Pipelines: long-distance steel pipelines carry natural gas between markets, so gas can be traded (P5b, D-146 C-15).",
+      "prerequisites": [
+        6
+      ],
+      "researchWork": 400000,
+      "effects": []
+    },
+    {
+      "id": 124,
+      "key": "nuclear-power",
+      "name": "Nuclear power",
+      "era": 3,
+      "description": "Nuclear power: fission reactors generate electricity from uranium; unlocks uranium mines and nuclear power stations (P5b, D-146).",
+      "prerequisites": [
+        25,
+        39
+      ],
+      "researchWork": 650000,
+      "effects": []
     }
   ]
 }
