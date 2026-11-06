@@ -5,14 +5,16 @@
  * Each block's *levels* — multipliers of that pattern — are derived every day from
  * its fixed residuals and its current causes:
  *
- *   fertility = fertilityResidual × F(literacy of women 15–49, urban share,
- *               income ÷ subsistence, lagged child mortality, contraception, food)
+ *   fertility = S(fertilityResidual × F(literacy of women 15–49, urban share,
+ *               income ÷ subsistence, lagged child mortality, contraception, food))
  *   child     = childMortalityResidual × (1 + P_c × urban × (1 − sanitation))
  *               × H^1.5 × (1 + W_c × (1 − food))
  *   adult     = adultMortalityResidual × (1 + P_a × urban × (1 − sanitation))
  *               × H     × (1 + W_a × (1 − food))
  *
- * H is the country's combined health factor (technology × public health × hours,
+ * S is the natural-fertility saturation (D-144): identity up to the knee, then a
+ * tanh approach to the Hutterite cap, so causes cannot drive fertility past what any
+ * population has achieved. H is the country's combined health factor (technology × public health × hours,
  * M9/E5); sanitation and contraception are country causes; the rest is block state.
  * Residuals are fixed at world creation so the 1900 levels equal their sources; they
  * represent persistent factors the model does not simulate and never change. The
@@ -30,6 +32,8 @@ import {
   FERTILITY_INCOME_RATIO_MIN,
   FERTILITY_LEVEL_MAX,
   FERTILITY_LITERACY_COEFFICIENT,
+  FERTILITY_NATURAL_CAP,
+  FERTILITY_NATURAL_KNEE,
   FERTILITY_URBAN_DISCOUNT,
   FOOD_FERTILITY_WEIGHT,
   FOOD_MORTALITY_WEIGHT_ADULT,
@@ -137,6 +141,42 @@ export function fertilityCauseFactor(causes: FertilityCauses): number {
   return factor;
 }
 
+/**
+ * Natural-fertility saturation S (D-144): the fertility level of a causal product
+ * `raw` = residual × F. Identity up to `FERTILITY_NATURAL_KNEE`; above it
+ * KNEE + (CAP − KNEE) × tanh((raw − KNEE) / (CAP − KNEE)), continuous with slope 1 at
+ * the knee, strictly increasing and below `FERTILITY_NATURAL_CAP` (in floating point
+ * it reaches the cap only for raw far beyond it). A biological limit of the response,
+ * not a repair: `raw` itself is validated.
+ */
+export function naturalFertilitySaturation(raw: number): number {
+  if (!(raw >= 0) || !Number.isFinite(raw)) {
+    throw new RangeError(`raw fertility level ${String(raw)} is not finite and non-negative`);
+  }
+  if (raw <= FERTILITY_NATURAL_KNEE) return raw;
+  const width = FERTILITY_NATURAL_CAP - FERTILITY_NATURAL_KNEE;
+  return FERTILITY_NATURAL_KNEE + width * Math.tanh((raw - FERTILITY_NATURAL_KNEE) / width);
+}
+
+/**
+ * Inverse of `naturalFertilitySaturation`: the causal product that yields `level`.
+ * Used where a residual is fitted to a sourced level. A level at or above the cap
+ * cannot arise from causes and is rejected as an impossible state.
+ */
+export function inverseNaturalFertilitySaturation(level: number): number {
+  if (!(level >= 0) || !Number.isFinite(level)) {
+    throw new RangeError(`fertility level ${String(level)} is not finite and non-negative`);
+  }
+  if (level <= FERTILITY_NATURAL_KNEE) return level;
+  if (level >= FERTILITY_NATURAL_CAP) {
+    throw new RangeError(
+      `fertility level ${String(level)} is not below the natural-fertility cap ${String(FERTILITY_NATURAL_CAP)}`,
+    );
+  }
+  const width = FERTILITY_NATURAL_CAP - FERTILITY_NATURAL_KNEE;
+  return FERTILITY_NATURAL_KNEE + width * Math.atanh((level - FERTILITY_NATURAL_KNEE) / width);
+}
+
 /** Urban mortality factor: 1 + penalty × urban share × (1 − sanitation coverage). */
 export function urbanMortalityFactor(
   urbanShare: number,
@@ -162,9 +202,14 @@ function fertilityCausesOf(block: PopBlock, contraception: number): FertilityCau
   };
 }
 
-/** Fertility level of a block today: multiplier of the standard ASFR. */
+/**
+ * Fertility level of a block today: multiplier of the standard ASFR, the natural-
+ * fertility saturation of residual × F(causes) (D-142 §2, D-144).
+ */
 export function fertilityLevel(block: PopBlock, factors: DemographyCountryFactors): number {
-  return block.fertilityResidual * fertilityCauseFactor(fertilityCausesOf(block, factors.contraception));
+  return naturalFertilitySaturation(
+    block.fertilityResidual * fertilityCauseFactor(fertilityCausesOf(block, factors.contraception)),
+  );
 }
 
 /** Effective child (0–4) death-rate multiplier of a block today. */
@@ -240,7 +285,8 @@ export function sourcedLevelsOf(initial: PopBlockDemographyInitialDef | undefine
 
 /**
  * Fix a block's residuals so that, under the country's current factors and full food
- * sufficiency, its levels reproduce the sourced effective levels. Called once at world creation: population worlds with neutral factors,
+ * sufficiency, its levels reproduce the sourced effective levels (fertility through the
+ * inverse of the natural-fertility saturation, D-144). Called once at world creation: population worlds with neutral factors,
  * economy worlds again once their countries exist. Mutates only `block`.
  */
 export function calibrateBlockDemography(
@@ -263,8 +309,12 @@ export function calibrateBlockDemography(
     sourced.adultMortality /
     (factors.healthFactor *
       urbanMortalityFactor(block.urbanShare, factors.sanitationCoverage, URBAN_MORTALITY_PENALTY_ADULT));
+  // The residual reproduces the sourced level through the saturation (D-144): it is
+  // fitted to the inverse, which is the identity for every sourced 1900 level (all
+  // below the knee), and rejects a sourced level at or above the natural cap.
   block.fertilityResidual =
-    sourced.fertilityLevel / fertilityCauseFactor(fertilityCausesOf(block, factors.contraception));
+    inverseNaturalFertilitySaturation(sourced.fertilityLevel) /
+    fertilityCauseFactor(fertilityCausesOf(block, factors.contraception));
   assertValidBlockDemography(block, path);
   assertValidBlockLevels(block, factors, path);
 }

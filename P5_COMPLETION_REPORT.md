@@ -253,6 +253,12 @@ docs/p4/century-run.json`, then `node scripts/p4/wpp-comparison.mjs`
 - **Fertility rises with that collapse, through P4's causes.** Low literacy, few towns and high child mortality raise fertility. One block's causal fertility level passed P4's validated bound of 4 (a TFR near 19 for that block). That is a P4 modelling question for you: a bound, a saturating response, or nothing until the economy keeps towns alive. I did not clamp it.
 - **Comparison with WPP.** The run is no basis for one: the 1975 world has 1.75 billion people against 4.07, and a life expectancy of 29 against 58. The gap is economic: wages (P7), investment (P10), and jobs in mines, industry and services (P5b).
 
+**Addendum (2026-11-05): the 1993 stop is addressed by D-144.**
+- The designer chose a saturating response: the fertility level is now the natural-fertility saturation of the causal product, unchanged up to 1.7 (about 8.2 children per woman) and approaching 2.3 (about 11.1, the top of the Hutterite range) above it. The designer raised the cap from a first-draft 2.2 (about 10.6).
+- The 1993 block's raw 4.009 would now give 2.2995; the bound of 4 stays as the validation limit and is no longer reachable through causes.
+- Sourced 1900 levels (all ≤ 1.667) are unchanged.
+- Not yet re-verified by a century run (the designer reruns it after P10).
+
 ## 9. Assumptions, provisional values, limitations
 
 - **Provisional coefficients.** All are in `economy/constants.ts`: factor shares 0.6/0.4, reference 1,000 ha per level, weather σ 0.15, discovery hazard 1/120. The deposit class stocks are in `scripts/p5/build-p5-world.mjs`.

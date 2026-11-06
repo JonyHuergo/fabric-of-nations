@@ -249,6 +249,13 @@ stand-ins, generated levels, stable age structures and urban shares, built by
 causes and yearly history in the province panel and the Population ledger; tests
 `p4-demography`. WPP comparison: `docs/P4_WPP_COMPARISON.md`.
 
+**Amendment (2026-11-05, D-144).** The fertility level is now the natural-fertility
+saturation of residual × causes: unchanged up to 1.7 (about 8.2 children per woman), then a
+tanh approach to 2.3 (about 11.1, the top of the Hutterite range; the designer raised it
+from a first-draft 2.2). It answers the P5a century stop of
+1 February 1993 (fertility level 4.009); sourced 1900 levels are unchanged. Not yet
+re-verified by a century run.
+
 ### P5 — Land, agriculture, harvests, resources
 
 - Farm output: land × labour × machinery/fertiliser × technology with diminishing

@@ -7859,6 +7859,8 @@ and be influenced by the player.
 **Implements:** D-124, GDD §17J.2 (5), `docs/PROSPERITY_PROGRAM.md` §4 P4.
 **Supersedes:** the year-indexed world schedules as the level of fertility and mortality
 (D-026/D-027 inputs, GDD §6.6) and the M2 unmet-needs mortality terms.
+**Amended by:** D-144 (§2: the fertility level is the natural-fertility saturation of the
+causal product).
 
 ### Decision
 
@@ -8085,3 +8087,80 @@ catalogue of P6 forward (P6 keeps the linear-expenditure demand, saving and hous
     0..4). Households without farms still starve, so towns and literacy collapse (2.4 % urban,
     7 % women literate by 1993), and P4's causal fertility rises with them. Left for the
     designer (a bound, a saturating response, or the economy fix first); not clamped.
+    **Addressed by D-144** (natural-fertility saturation); not yet re-verified by a century run.
+
+## D-144 — P4: natural-fertility ceiling of the fertility level
+
+**Status:** implemented on 2026-11-05 on `prosperity/p5-land` at the designer's request;
+tests to be revised by the designer; not yet re-verified by a century run (the designer
+reruns the century after P10).
+**Amends:** D-142 §2 (fertility level). **Follows:** D-143 item 11.
+
+### Diagnosis
+
+The no-input century run on the P5a branch stopped on 1 February 1993 (day 34,058) when
+the P4 validator rejected a block's derived fertility level of 4.009
+(`FERTILITY_LEVEL_MAX` = 4). D-142 derives the level as residual × F(causes), a product of
+independent cause factors (literacy of women 15–49, urban share, income ÷ subsistence,
+lagged child mortality, contraception, food), and nothing bounded the product. Households
+without farms had starved for decades, so literacy (7 %), towns (2.4 %), income and child
+mortality all moved that block's factors the same way. A level of 4.0 is about 19 children
+per woman: above total fecundity (about 15.3, Bongaarts 1978) and far above any observed
+population (Hutterites about 10–11, Eaton & Mayer 1953). Independent multiplicative
+factors are reasonable near the observed range but compound without limit outside it,
+whereas real fertility saturates at its biological ceiling. Raising the bound would allow
+impossible fertility; clamping silently is forbidden (AGENTS.md).
+
+### Decision
+
+1. **Saturation.** The fertility level is derived as
+   - raw = residual × F(causes) (unchanged, D-142 §2);
+   - level = raw when raw ≤ KNEE;
+   - level = KNEE + (CAP − KNEE) × tanh((raw − KNEE) / (CAP − KNEE)) when raw > KNEE.
+
+   The function is continuous with slope 1 at the knee and strictly increasing, so a
+   rising cause still raises fertility, ever less as it nears the ceiling. It is applied
+   where the level is derived (`naturalFertilitySaturation` inside `fertilityLevel`), and
+   the level is still never stored.
+2. **Constants** (`population/constants.ts`, PROVISIONAL, P15 calibrates):
+   - `FERTILITY_NATURAL_KNEE` = 1.7 (multiplier of the standard ASFR, TFR 4.83): about
+     8.2 children per woman, the upper range of natural-fertility populations without
+     parity-specific control (Henry 1961). Every sourced 1900 province level is ≤ 1.667,
+     and the M2 and M5 world levels are 1.144.
+   - `FERTILITY_NATURAL_CAP` = 2.3: about 11.1 children per woman, the top of the
+     Hutterite range (about 10–11; Eaton & Mayer 1953), the highest recorded for a whole
+     population, with headroom for its upper estimates, and well below total fecundity
+     (about 15.3; Bongaarts 1978).
+   - **Cap revised by the designer, 2026-11-05:** the first draft of this decision set the
+     cap at 2.2 (about 10.6 children per woman, the central Hutterite figure). The
+     designer raised it to 2.3 before anything was committed, so the ceiling sits at the
+     top of the observed range rather than at its centre. The knee, the formula and the
+     validation bound are unchanged; the saturation band (CAP − KNEE) widens from 0.5 to
+     0.6, so above the knee the level rises slightly faster than in the draft (raw 2.5
+     gives 2.222 instead of 2.161).
+   - `FERTILITY_LEVEL_MAX` = 4 stays as the impossible-state validation bound; it is now
+     unreachable through causes.
+3. **Residual fitting.** `calibrateBlockDemography` fits the residual to the inverse of the
+   saturation (`inverseNaturalFertilitySaturation`, an atanh above the knee), so a block
+   reproduces its sourced level exactly through the saturated derivation. For every
+   sourced 1900 level the inverse is the identity, so the 1900 residuals and levels are
+   unchanged. A sourced level at or above the cap cannot arise from causes and is now
+   rejected as an impossible state (none exists in the data or fixtures).
+   `calibrateDemographyForCountries` reads the neutral-factor level through the same
+   saturation and refits through the inverse, so the round trip is exact.
+4. **Consistency.** Births (`population/demography.ts`), the indicators (TFR, crude birth
+   rate; `population/indicators.ts`), the yearly demography report, the snapshot's current
+   figures and the Population ledger all read `fertilityLevel`, so they all see the
+   saturated level. The snapshot's demography causes are the country inputs (health
+   factor, sanitation, contraception) and are unaffected. The profession fertility
+   multipliers apply after the saturation; all are 1 in the data.
+
+### Consequences
+
+- Whatever the causes, a block's fertility can no longer exceed about 11.1 children per
+  woman (2.3 × 4.83); the 1993 block's raw 4.009 now gives a level of 2.2995 (about 11.1).
+- The 1900 start, every sourced level and every world hash up to the first day a block's
+  raw level passes 1.7 are unchanged; no state, schema (32) or protocol (21) change.
+- The cause behind the 1993 stop, the collapse of towns and literacy in households without
+  farms, remains an economic problem for P5b–P10; the ceiling only keeps its demographic
+  response possible.

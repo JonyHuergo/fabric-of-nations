@@ -260,9 +260,34 @@ export const FOOD_FERTILITY_WEIGHT = 0.8;
  */
 
 /**
+ * Natural-fertility saturation of the fertility level (D-144, amending D-142 §2).
+ * Dimensionless multipliers of the standard ASFR (TFR 4.83). The causal product
+ * raw = residual × F(causes) passes unchanged up to the knee; above it the level
+ * approaches the cap smoothly:
+ *   level = KNEE + (CAP − KNEE) × tanh((raw − KNEE) / (CAP − KNEE)),
+ * continuous with slope 1 at the knee and strictly increasing, so a rising cause still
+ * raises fertility, saturating as real populations do.
+ * - KNEE 1.7 ≈ 8.2 children per woman: the upper range of natural-fertility
+ *   populations (no parity-specific control; Henry 1961). Every sourced 1900 province
+ *   level is ≤ 1.667, so the 1900 calibration is untouched.
+ * - CAP 2.3 ≈ 11.1 children per woman: the top of the Hutterite range of 1921–1950
+ *   (about 10–11 children per woman), the highest fertility recorded in a whole
+ *   population (Eaton & Mayer 1953), with headroom for its upper estimates; still
+ *   well below total fecundity, about 15.3 (Bongaarts 1978). Set to 2.3 by the
+ *   designer (first draft 2.2 ≈ 10.6; D-144).
+ * The saturation is applied wherever the level is derived and never stored.
+ * PROVISIONAL (P15 calibration).
+ */
+export const FERTILITY_NATURAL_KNEE = 1.7;
+export const FERTILITY_NATURAL_CAP = 2.3;
+
+/**
  * Validated range of the fertility level (multiplier of the standard ASFR) and of
  * the mortality levels (multipliers of the standard death rates). Values outside
- * are impossible states and are rejected, never clamped.
+ * are impossible states and are rejected, never clamped. Since D-144 a fertility
+ * level derived from causes stays below `FERTILITY_NATURAL_CAP`, so
+ * `FERTILITY_LEVEL_MAX` is unreachable through causes and remains only the
+ * impossible-state bound of validation (e.g. of sourced data).
  */
 export const FERTILITY_LEVEL_MAX = 4;
 export const MORTALITY_LEVEL_MIN = 1e-4;
