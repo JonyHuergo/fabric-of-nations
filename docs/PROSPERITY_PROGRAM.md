@@ -2,7 +2,8 @@
 
 **Status:** P0–P2b accepted; the performance stages (D-137, D-139) accepted as complete on
 2026-11-04. P3 (D-141), P4 (D-142, with the natural-fertility ceiling of D-144) and P5a
-(D-143) are implemented for review.\
+(D-143) accepted on 2026-11-06 (D-146). P5b (the goods catalogue and D-140) in progress
+(`docs/P5B_PLAN.md`).\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\
 **Goal:** a country that never goes to war and never engages in diplomacy must still be
@@ -279,6 +280,12 @@ consumption, deposits and discovery; implemented for review, D-143, report
 production; brought forward from P6, not started). P6 keeps the linear-expenditure
 demand, saving and housing. Data provenance: `docs/P5_LAND_AND_RESOURCES_PROVENANCE.md`.
 
+**Status (2026-11-06, D-146).** P5a is accepted, with data corrections made in P5b (cited
+deposits for sourced producers that lack one; cotton as its own farm). P5b is approved
+(`docs/P5B_PLAN.md`) and in progress. It also implements D-140 (gold and silver as
+monetary metal, metal-standard and paper currencies, currency switching), which was
+proposed during P3 and is now assigned here.
+
 ### P6 — Goods catalogue, Engel demand, housing
 
 - ~22 goods covering food (grain, meat, fish, processed food), fibres, timber, coal,
@@ -306,6 +313,13 @@ demand toward the cheaper good; housing conserved through construction and depre
 
 Acceptance: in a growing no-input economy the agricultural employment share falls;
 unemployment lowers wages; conservation of people through mobility; determinism.
+
+### P7b — Save storage backend (scheduled by D-146)
+
+Web saves already exceed Chrome's localStorage quota (about 5.24 M characters) and
+Android's AsyncStorage has a similar limit; P5b makes saves larger. After P7, a dedicated
+stage moves saves to a storage backend without that limit, keeping save integrity and the
+D-120 compatibility rules (older saves listed, never deleted).
 
 ### P8 — Infrastructure and market access
 
@@ -339,6 +353,14 @@ charts, and country AI covering tariffs, investment priorities and the new lever
 No-input and AI-only century runs reported against Maddison GDP per head, urbanisation,
 sectoral employment shares, life expectancy and TFR, with documented tolerance bands.
 Coefficients change only after diagnosing a structural cause (GDD §6.6).
+
+### Map-pipeline repair (scheduled by D-146)
+
+The 1900 map rebuild scripts (`scripts/m11/build-boundaries.mjs`, `build-map.mjs`) no
+longer reproduce the committed map: they lack the M11d dispute resolutions and would
+regress corrected geography (`docs/MAP_DATA.md` §7). A dedicated stage restores those
+steps to the pipeline so that a rebuild reproduces the committed data, then regenerates
+the stale generated map documents. Until it is done the map steps are not run.
 
 ## 5. Rollback guarantee (P1, D-116)
 

@@ -6651,6 +6651,10 @@ sanitation and calories eaten, starting from sourced 1900 levels per province; W
 validation target only.
 P5a (land, harvest weather, own consumption, deposits and prospecting; schema 32) is
 implemented for review on 2026-11-05 (D-143); the goods catalogue moves from P6 into P5b.
+On 2026-11-06 the designer accepted P3, P4 and P5a and approved the P5b plan (D-146):
+the 57-good catalogue, its recipes, extraction and 1900 production, together with D-140
+(money as metal and paper), which is assigned to P5b. A save storage-backend stage
+follows P7, and a map-pipeline repair stage is scheduled.
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair

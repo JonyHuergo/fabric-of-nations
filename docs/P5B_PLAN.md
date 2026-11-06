@@ -1,6 +1,7 @@
 # P5b plan — the 57-good catalogue
 
-**Status:** Phase 1 plan for the designer's approval (2026-11-06). Nothing is implemented.
+**Status:** approved by the designer on 2026-11-06 with the decisions of D-146 (applied below);
+Phase 2 in progress. D-140 (money as metal and paper) is part of P5b (§13).
 **Branch:** `prosperity/p5-land`. **Exception:** P3 (D-141), P4 (D-142, D-144) and P5a
 (D-143) are still under review; the designer accepted an AGENTS.md §7 exception so P5b can
 start before they are accepted.
@@ -15,20 +16,26 @@ chosen silently.
 
 ---
 
-## 0. Decisions needed before Phase 2
+## 0. Designer decisions (D-146, 2026-11-06)
 
-| # | Question | Recommendation | Section |
-|---|---|---|---|
-| D1 | Do armaments replace the money-only M10 equipment in P5b? | **Not in P5b.** Define the good and the arsenal; leave M10 as it is; do it in a later "state procurement" step together with D2. | §7.1 |
-| D2 | Do pharmaceuticals feed the E5 public-health service in P5b? | **Not in P5b.** Households buy pharmaceuticals; no mortality effect until the same later step. | §7.2 |
-| D3 | How do producers buy a good that cannot be stored (electricity)? | **Same-day allocation in production waves** (C-3, option A). | §10 |
-| D4 | Level of 1900 output: sourced quantity, or modelled demand placed by sourced shares? | **Modelled demand, placed by sourced country shares**; report the modelled ÷ sourced ratio per good (C-4). | §6, §10 |
-| D5 | Who buys capital goods (machinery, construction materials, electrical equipment, ships)? | **Maintenance inputs** replace part of the money upkeep (C-5). | §10 |
-| D6 | Gold and silver had a mostly monetary use in 1900 (D-140 is unassigned). | Size the mines to non-monetary demand and report the monetary share as uncovered; D-140 stays separate (C-11). | §10 |
-| D7 | Hydro power: a hydro-site data source with an unconfirmed licence. | Hydro stations only in provinces with an authored 1900 hydro plant until the licence is confirmed (C-12). | §2, §10 |
-| D8 | Gate technologies that only 7 countries know in 1900 (steelmaking, electrical generation, chemical fertilizer). | Countries with sourced 1900 output of the gated good start knowing the gate (C-1). | §10 |
+| # | Question | Decision |
+|---|---|---|
+| D1 | Armaments replace the money-only M10 equipment? | **No.** M10 stays money-only; armaments production and demand are deferred to a later stage (no 1900 arsenals). |
+| D2 | Pharmaceuticals feed E5 public health? | **No.** A household consumer good only; no mortality or public-health effect yet. |
+| D3 | Producers buying electricity | **Approved:** power stations produce first each day; electricity is sold and used the same day and never stored (§4.4). |
+| D4 | Level of 1900 output | **Approved:** world level from modelled demand, country shares from sourced output (§8). |
+| D5 | Buyers of capital goods | **Approved:** maintenance inputs bought with part of the money upkeep (§4.6). |
+| D6 | Gold and silver | **Deferred until D-140 is implemented within P5b** (§13); the production model is settled after it. |
+| D7 | Hydro | **Approved with change:** the Hoes et al. (2017) dataset is open and is used with attribution; hydro stations follow its province potential, not only 1900 plant provinces. |
+| D8 | Gates known by only 7 countries | **Approved:** countries with sourced 1900 production of the gated good start knowing the gate; no others. |
 
-Smaller resolutions (C-6 to C-22) are listed in §10. I will proceed with my recommendations unless you choose otherwise.
+Also decided (D-146):
+- the P5a data corrections (C-2, C-8);
+- the performance budget: ordinary day ≤ 450 ms and goods-scaled phases ≤ 2× (§5);
+- export-table estimates, marked provisional, where coffee, tea, cocoa, tobacco or rubber production cannot be sourced;
+- all of C-6 to C-22 as written (§10). On C-6, RUSD stays the 1990 Reference US Dollar.
+
+P3, P4 and P5a are accepted. The save-backend stage follows P7, and a map-pipeline repair stage is scheduled.
 
 ---
 
@@ -202,9 +209,11 @@ USGS blocks scripted downloads (HTTP 403). The MRDS and SAGE downloads still wor
 | Household budget, 1901 | 18th Annual Report of the Commissioner of Labor (1903), *Cost of Living and Retail Prices of Food* (fuel, light, furniture, tobacco, liquor, books and papers, sickness, amusements, insurance); P2b already uses its food and apparel rows | public domain | FRASER |
 | 1990 producer prices (later goods) | *Statistical Abstract of the United States 1992*; EIA *Annual Energy Review* and *Uranium Industry Annual*; Census *Current Industrial Reports* 1990 | public domain | archived Census PDFs ([UNT archive](https://webarchive.library.unt.edu/eot2008/20090103191340/http:/www.census.gov/prod/www/abs/statab1951-1994.htm)) |
 | 1990 prices, industry sources | MVMA *Facts & Figures* 1991; Aerospace Industries Association; Electronic Industries Association | © (single facts cited) | secondary |
-| Hydro-site potential | Hoes et al. (2017), *PLOS ONE* 12(2): e0171844 ([article](https://pmc.ncbi.nlm.nih.gov/articles/PMC5298288/)) | article CC BY 4.0; **dataset licence not confirmed** | D7 |
+| Hydro-site potential | Hoes et al. (2017), *PLOS ONE* 12(2): e0171844 ([article](https://pmc.ncbi.nlm.nih.gov/articles/PMC5298288/)) and its published site dataset | open (designer, D-146 A8, C8); attribution and licence recorded in the provenance document | province potential aggregated by an extraction script from a git-ignored cache |
 | Crop bands | province centroid latitude from the project's own province geometry | project data | derived |
 | Deposits | P5a tables (USGS MRDS, authored), plus authored rows for missing 1900 producers (C-2) | MRDS public domain; authored | as P5a |
+| Forest stock | SAGE potential vegetation (P5a) | open (designer, D-146 C2), with attribution | as P5a |
+| Monetary stocks 1900 (D-140) | Director of the Mint, *Annual Report 1901*: monetary systems and approximate stocks of money (gold, silver, uncovered paper) by country | public domain | the archive.org scan P3 already cites |
 
 ---
 
@@ -334,9 +343,9 @@ At 57 goods the price rows alone would be about 600 k.
 
 ---
 
-## 7. The two open designer decisions
+## 7. Armaments and pharmaceuticals (decided: D-146 A2, A3)
 
-### 7.1 D1 — Armaments and M10 equipment: recommend **not in P5b**
+### 7.1 D1 — Armaments and M10 equipment: **not in P5b** (decided)
 
 - **Today.** M10 recruitment and upkeep pay `equipmentPriceRUSD` and `equipmentDailyUpkeepRUSD` from the treasury to the system reserve, a money sink. Equipment exists the moment it is paid for.
 - **What replacing it means.**
@@ -353,7 +362,7 @@ At 57 goods the price rows alone would be about 600 k.
   
   If you prefer it in P5b, it is a self-contained step after the calibration (§11 step 6b), with its own M10 regression set.
 
-### 7.2 D2 — Pharmaceuticals and E5 public health: recommend **not in P5b**
+### 7.2 D2 — Pharmaceuticals and E5 public health: **not in P5b** (decided)
 
 - **Today.** E5's public-health service is staff (administration clerks). P4 mortality reads its coverage (D-142), and P4's tests are pending your revision.
 - **What feeding it means.** The service would buy pharmaceuticals, and its mortality effect would depend on doses delivered. That is a new causal term in P4.
@@ -462,10 +471,7 @@ If any of them fails because of P5b, I stop and report it with the cause, rather
   - **Proposal:** a later good with its 1990 price; no 1900 output (negligible value).
 - **C-11 Gold and silver (D6).** Most 1900 gold went to coinage and reserves.
   - **Proposal:** mines sized to non-monetary demand (jewellery, arts, photography); the monetary share is reported as uncovered until D-140.
-- **C-12 Hydro (D7).** The dataset licence is not confirmed.
-  - **Proposal:** hydro stations only in provinces with an authored 1900 hydro plant for now.
-  - With the licence confirmed, province hydro potential becomes a non-depleting capacity cap.
-  - Switzerland and Norway's 1900 power depends on it.
+- **C-12 Hydro (D7, decided).** The Hoes et al. (2017) data are open. Province hydro potential (MWh per year) is a non-depleting capacity cap on hydro stations in that province; 1900 hydro stations are placed by sourced electricity output inside it.
 - **C-13 Aircraft unit.** "Aircraft-eq." is undefined; it becomes 1 t of airframe empty weight.
 - **C-14 Timber.** Timber is a depleting deposit, and regrowth is not modelled. Stocks last centuries at 1900 rates; regrowth is for later.
 - **C-15 Gas.** Gas is local without pipelines, so it cannot be traded until the shipper knows *pipelines*.
@@ -504,15 +510,71 @@ The phone in landscape (844 × 390) is the design target. Colour, type and layou
 
 | Step | Work |
 |---|---|
-| 0 | Baseline `perfPhases` and `perfBench 92` on P5a; source fetch audit (§2) |
-| 1 | `historical/p5b/sources_1900.json` (prices, outputs, recipes, budget), with the price-trace test |
+| 0 | Decisions recorded (D-146), program and GDD status, P5a report correction (C10), SAGE closure (C2); test revisions B4–B6; source fetch audit (§2) |
+| 1 | `historical/p5b/sources_1900.json` (prices, outputs, recipes, budget, monetary stocks), with the price-trace test |
 | 2 | Definitions (57 goods, buildings, needs, two technologies, v13) and their validation tests |
 | 3 | Simulation: extraction, non-storable goods and waves, optional input, maintenance, need gating, sectors; schema 33 with save tests |
-| 4 | Generator `scripts/p5b/build-goods-1900.mjs` (`--check`): C-1 and C-2 data, placement, levels, technique, needs, warehouses, calibration and before/after report |
+| 3b | D-140 (§13): metal reserves, mint window, metal-standard valuation, suspension, currency switching |
+| 4 | Generator `scripts/p5b/build-goods-1900.mjs` (`--check`): C-1, C-2 and C-7 (Guam, Pohnpei, Monaco land) data, placement, levels, technique, needs, warehouses, hydro potential, gold and silver after D-140 (A7), calibration and before/after report |
 | 5 | Performance: measure, profile, optimise, re-verify hashes |
 | 6 | Worker snapshot and protocol 22; size tests |
-| 6b | Only if D1 or D2 is chosen for P5b |
-| 7 | App UI and playtest |
-| 8 | DECISIONS (D-146 onward), provenance `docs/P5B_GOODS_PROVENANCE.md`, program and GDD status lines, `P5B_COMPLETION_REPORT.md` |
+| 7 | App UI (markets, production, construction, money) and playtest |
+| 8 | DECISIONS (D-147 onward), provenance `docs/P5B_GOODS_PROVENANCE.md`, program and GDD status lines, `P5B_COMPLETION_REPORT.md` |
 
-`pnpm test`, `pnpm typecheck` and `pnpm bench` run after steps 3, 4, 5, 6 and 7. Files are LF. Commits go to `prosperity/p5-land` only; nothing is pushed. The 1900 map rebuild scripts (`build-boundaries.mjs`, `build-map.mjs`) and the century benchmark are not run. Generated `packages/app/src/generated` and `packages/sim-worker/src/generated` are only rebuilt by their scripts.
+- `pnpm test`, `pnpm typecheck` and `pnpm bench` run after steps 3, 3b, 4, 5, 6 and 7.
+- Files are LF.
+- Commits go to `prosperity/p5-land` only; nothing is pushed.
+- The 1900 map rebuild scripts (`build-boundaries.mjs`, `build-map.mjs`) and the century benchmark are not run.
+- Generated `packages/app/src/generated` and `packages/sim-worker/src/generated` are only rebuilt by their scripts.
+
+---
+
+## 13. D-140 within P5b — money as metal and paper (design)
+
+D-146 assigns D-140 to P5b, and requires it before the gold and silver model (A7) is settled. The designer's three requirements (D-140) and how P5b meets them:
+
+| Requirement | P5b mechanism |
+|---|---|
+| Gold and silver are goods: mined, traded, priced | Goods 25 and 26, mined from deposits through `extractFromDeposit`, traded between markets, priced by each market (§1.4). |
+| Every currency's value fluctuates; RUSD alone is constant | A metal-standard currency's value is its legal fine content × the market price of its metal in the issuer's market. A suspended or paper currency follows the E6b managed rule until P11 adds money demand and banks. |
+| A polity may give up its currency; an independent country may create one | Two player actions, `ADOPT_CURRENCY` and `ESTABLISH_CURRENCY`. |
+
+**13.1 State (schema 33).** `MonetaryCurrencyState` gains:
+- `standard`: `gold`, `silver` or `paper`;
+- `fineGramsPerUnit`: from P3's data, 0 for paper;
+- `metalReserveKg`: the physical monetary metal held by the authority, a conserved stock.
+
+The authority keeps E6b's accounts. Metal reserves are valued at the metal's market price in the monthly close.
+
+**13.2 Opening position.** Authorities are activated at world creation for every own currency with a sourced 1900 money stock. The opening values come from the Director of the Mint's 1901 table of monetary stocks (gold, silver, uncovered paper) by country:
+- metal reserves = the sourced gold or silver stock;
+- currency issued = the sourced stock of money ÷ the P3 opening valuation.
+
+Countries without a sourced stock keep an inactive authority and their fixed valuation, as now, and are reported.
+
+**13.3 Mint window.** The gold and silver points are flows, not a clamp. Once a day, in the issuer's home market:
+- **Buy.** When the metal's market price is at or below the mint price × (1 − mint charge), the authority buys the metal offered. It pays from its RUSD reserve cash, and the metal joins `metalReserveKg`.
+- **Sell.** When the price is at or above the mint price × (1 + export point), it sells metal from its reserve into the market.
+
+The mint price is the parity valuation ÷ fine content. The mint charge and the export point are provisional constants, sourced from the Mint report's coinage charges and the period's gold points. Both flows are ordinary market transactions, so goods and money are conserved.
+
+**13.4 Valuation.** After the market clears, a convertible metal-standard currency's `rusdPerUnit` = fine content × the metal's price in the issuer's market. The change is posted with E6b's revaluation entries. The mint window keeps the metal within the points while the authority's cash or metal lasts.
+
+**13.5 Suspension and paper.** When a convertible authority has no metal left to sell at the export point, convertibility is suspended (E6b already has the state). The currency then follows the managed rule (trade pressure and relative prices), the paper model until P11. Convertibility resumes when the metal reserve covers a documented number of days of mint sales.
+
+**13.6 Switching.** These are player actions; the AI does not switch in P5b.
+- `ADOPT_CURRENCY`: an `own` country redeems its circulation at the current valuation. Reserve metal and cash go to its treasury, the authority closes, and the arrangement becomes `adopted` of a chosen currency.
+- `ESTABLISH_CURRENCY`: an independent country with an `adopted` arrangement creates a currency. It chooses a gold, silver or paper standard; the fine content defaults to the value of the currency it used. The authority is funded from the treasury.
+
+Both actions are validated, previewed and reach the Money screen.
+
+**13.7 Gold and silver after D-140 (A7).** Mint purchases at the mint price become modelled demand, alongside jewellery and arts (luxury tier). The 1900 mine levels follow §8 with that demand; the world's 1900 coinage use is sourced from the Mint report. Any share of 1900 output left uncovered is reported, so A7 is settled on measured numbers.
+
+**13.8 Detail choices I will apply unless you say otherwise:**
+- the issuer's own market price is the metal price;
+- mint purchases are paid from the authority's RUSD reserve cash (an asset swap), not by new issue;
+- a suspended currency follows the managed rule;
+- switching is a player action only in P5b;
+- countries without a sourced 1900 money stock keep an inactive authority.
+
+Each is recorded in DECISIONS when implemented.

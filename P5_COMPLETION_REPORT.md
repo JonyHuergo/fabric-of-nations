@@ -1,6 +1,6 @@
 # P5a completion report — land, harvests, own consumption, resources
 
-**Branch:** `prosperity/p5-land` (from `main` at 4c75a52); not committed. **Decision:** D-143.
+**Branch:** `prosperity/p5-land` (from `main` at 4c75a52); committed as `d6d9362`. **Decision:** D-143. **Accepted** by the designer on 2026-11-06 (D-146), with the data corrections of D-146 A10.
 **Schema** 32, **worker protocol** 21, **map bridge protocol** 3. Data version unchanged
 (`m3-economy-v12`); three technologies added as content.
 
@@ -265,7 +265,7 @@ docs/p4/century-run.json`, then `node scripts/p4/wpp-comparison.mjs`
 - **Weather.** It is independent per province, so a national market averages it out; a correlated regional component is a possible later addition.
 - **Imputed land.** Guam, Pohnpei and Monaco have no HYDE land area, so their imputed cropland is unbounded (Guam 210k ha against a real area of about 54k ha).
 - **MRDS coverage.** It is about 85 % US records; outside the US the authored giants and the size classes carry the weight.
-- **SAGE potential vegetation.** No licence is stated (© University of Wisconsin). It is used with attribution; **please confirm before release.**
+- **SAGE potential vegetation.** Closed (D-146 C2): the designer confirmed the dataset is open; it is used with attribution.
 - **USGS downloads.** The USGS website refused automated downloads of its historical price and production series (HTTP 403). This matters for P5b prices.
 - **Bundle size.** The worker scenario grew 0.5 MB (5.33 → 5.84 MB) and the app worker bundle by about 430 KiB (deposits).
 - **Device behaviour** was not tested; device testing is yours.
@@ -285,9 +285,9 @@ It is a calibration of the size of P2b. Its price and production sources must mo
 ## 11. Open items for the designer
 
 1. The restated tests in §4.
-2. The SAGE licence.
+2. ~~The SAGE licence.~~ Closed by the designer (D-146 C2).
 3. The web save quota: a storage-backend change.
 4. Carried over from P4: the restated `m5-feasibility` and `m2-calibration` tests, and the Mitchell crude-death-rate table.
 5. Whether armaments replace the money-only military equipment, and whether pharmaceuticals feed public health, in P5b.
 6. The P4 fertility-level bound that stopped the century run in 1993 (§8).
-7. Commit: nothing is committed yet.
+7. ~~Commit.~~ Committed as `d6d9362` (corrected 2026-11-06, D-146 C10).
