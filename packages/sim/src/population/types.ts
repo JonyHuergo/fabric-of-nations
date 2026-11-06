@@ -55,6 +55,12 @@ export interface ProvinceEconomy {
    * the sourced 1900 wage table and read-only until the P7 labour market adjusts it.
    */
   wageRUSDPerYearByProfession: number[];
+  /**
+   * P5b (C-8): absolute latitude of the province's centroid in degrees (0..90), or null
+   * where no geometry was given (fixtures). Static geography; buildings with a
+   * `maxAbsLatitudeDeg` (crop bands) work only where it is at or below that limit.
+   */
+  absLatitudeDeg: number | null;
 }
 
 /** Authoritative population block state. */
@@ -131,6 +137,12 @@ export interface NeedItemDef {
   goodKey: string;
   /** Physical units per person per day. */
   quantityPerCapitaPerDay: number;
+  /**
+   * P5b (D-146, C-21): a technology that unlocks this item. The item is wanted by a
+   * block whose country knows it, or whenever the block's market holds stock of the
+   * good that morning (imports). Absent: always wanted.
+   */
+  requiredTechnologyKey?: string;
 }
 
 export interface NeedTierDef {
@@ -234,6 +246,8 @@ export interface ProvinceEconomyInitialDef {
   urbanShare?: Rate;
   /** P2b annual wage per worker by profession id, RUSD; defaults to empty (profession wages). */
   wageRUSDPerYearByProfession?: readonly number[];
+  /** P5b absolute centroid latitude in degrees; defaults to null (no crop-band limit). */
+  absLatitudeDeg?: number | null;
 }
 
 export interface PopulationScenarioDef {

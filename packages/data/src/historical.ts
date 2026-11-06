@@ -242,6 +242,8 @@ export interface HistoricalProvinceInput {
   readonly urbanShare?: number;
   /** P2b annual wage per worker by profession key, RUSD (D-135). */
   readonly wageRUSDPerYearByProfession?: Readonly<Record<string, number>>;
+  /** P5b (C-8): absolute latitude of the province's label point, degrees. */
+  readonly absLatitudeDeg?: number;
   readonly sourceIds: readonly string[];
   readonly calibrationStatus: "source-backed" | "provisional";
 }
@@ -304,6 +306,8 @@ export interface HistoricalBuildingInput {
   readonly operatingCashRUSD: number;
   /** P2b technique factor (D-135); defaults to 1. */
   readonly technique?: number;
+  /** P5b: id of the deposit an extraction building works (deposits file id). */
+  readonly depositId?: number;
   readonly status: "provisional" | "calibrated";
 }
 
@@ -1107,6 +1111,10 @@ function parseProvinces(value: unknown, errors: string[]): HistoricalProvinceInp
     if (urbanShare !== undefined && !(urbanShare >= 0 && urbanShare <= 1)) {
       errors.push(`${path}.urbanShare must be in 0..1`);
     }
+    const absLatitudeDeg = record.absLatitudeDeg === undefined ? undefined : numberField(record, "absLatitudeDeg", path, errors);
+    if (absLatitudeDeg !== undefined && !(absLatitudeDeg >= 0 && absLatitudeDeg <= 90)) {
+      errors.push(`${path}.absLatitudeDeg must be in 0..90`);
+    }
     const infrastructure =
       record.infrastructure === undefined
         ? undefined
@@ -1130,6 +1138,7 @@ function parseProvinces(value: unknown, errors: string[]): HistoricalProvinceInp
       ...(pastureHa === undefined ? {} : { pastureHa }),
       ...(urbanShare === undefined ? {} : { urbanShare }),
       ...(wages === undefined ? {} : { wageRUSDPerYearByProfession: wages }),
+      ...(absLatitudeDeg === undefined ? {} : { absLatitudeDeg }),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       calibrationStatus: status === "source-backed" ? "source-backed" : "provisional",
     };
@@ -1253,6 +1262,7 @@ function parseBuildings(value: unknown, errors: string[]): HistoricalBuildingInp
             if (!(technique > 0)) errors.push(`${path}.technique must be positive`);
             return { technique };
           })()),
+      ...(record.depositId === undefined ? {} : { depositId: numberField(record, "depositId", path, errors) }),
       status: status === "calibrated" ? "calibrated" : "provisional",
     };
   });
@@ -2415,6 +2425,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       ...(province.arableLandHa === undefined ? {} : { arableLandHa: province.arableLandHa }),
       ...(province.pastureHa === undefined ? {} : { pastureHa: province.pastureHa }),
       ...(province.urbanShare === undefined ? {} : { urbanShare: province.urbanShare }),
+      ...(province.absLatitudeDeg === undefined ? {} : { absLatitudeDeg: province.absLatitudeDeg }),
       ...(province.wageRUSDPerYearByProfession === undefined
         ? {}
         : {
@@ -2469,6 +2480,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
         operatingCashAccountId: HISTORICAL_BUILDING_ACCOUNT_BASE + index,
         initialOperatingCashRUSD: building.operatingCashRUSD,
         ...(building.technique === undefined ? {} : { technique: building.technique }),
+        ...(building.depositId === undefined ? {} : { depositId: building.depositId }),
       };
     },
   );

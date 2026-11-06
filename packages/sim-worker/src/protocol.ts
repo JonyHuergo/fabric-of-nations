@@ -99,7 +99,7 @@ export interface CancelConstructionActionDto {
 }
 
 /** Mirror of the validated E4 sector taxonomy size; the simulation is authoritative. */
-export const SNAPSHOT_SECTOR_COUNT = 5;
+export const SNAPSHOT_SECTOR_COUNT = 8;
 
 export interface SetConstructionPausedActionDto {
   readonly kind: "set-construction-paused";

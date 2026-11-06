@@ -8,7 +8,7 @@
  */
 
 import { cloneResourceState } from "./resourceState.js";
-import { runDiscoveryPhase, type DiscoveryPhaseResult } from "./resources.js";
+import { extractFromDeposit, runDiscoveryPhase, type DiscoveryPhaseResult } from "./resources.js";
 import {
   accumulateDemography,
   cloneDemographyReport,
@@ -52,7 +52,7 @@ import type { DayPhaseObserver, DayResultDetail } from "../population/types.js";
 import { buildBuildingCapacityIndex, computeBuildingCapacity } from "./production.js";
 import { runCountryAIPhase, type CountryAIPhaseResult } from "./ai.js";
 import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
-import { copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
+import { buildProvinceOwnerMap, copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
 import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
 import { runBusinessTaxPhase, type BusinessTaxPhaseResult } from "./businessTax.js";
@@ -104,6 +104,7 @@ import {
 } from "./labor.js";
 import {
   assertTechnologyStateMatchesDefinitions,
+  hasResearchedTechnology,
   runEducationPhase,
   type EducationPhaseResult,
 } from "./technology.js";
@@ -361,8 +362,35 @@ function accountByOwner(
 
 function needDefinitionsByTier(
   definitions: PopulationDefinitions,
-): Map<NeedTier, { activationWealthMin: number; items: readonly { goodKey: string; quantityPerCapitaPerDay: number }[] }> {
+): Map<
+  NeedTier,
+  {
+    activationWealthMin: number;
+    items: readonly { goodKey: string; quantityPerCapitaPerDay: number; requiredTechnologyKey?: string }[];
+  }
+> {
   return new Map(definitions.needs.map((tier) => [tier.tier, tier]));
+}
+
+/**
+ * P5b (D-146, C-21): whether a technology-gated need item is wanted in a province
+ * today — its owner knows the technology, or its market holds stock of the good.
+ */
+function needGate(world: World): (provinceId: Id, marketId: Id, technologyId: Id, goodId: Id) => boolean {
+  const owners = buildProvinceOwnerMap(world);
+  const countryById = new Map(world.countries.map((country) => [country.id, country]));
+  const stockByMarket = new Map<Id, Set<number>>();
+  for (const market of world.markets) {
+    const goods = new Set<number>();
+    for (const lot of market.stockLots) if (lot.quantity > 0) goods.add(lot.goodId);
+    stockByMarket.set(market.id, goods);
+  }
+  return (provinceId, marketId, technologyId, goodId) => {
+    if (stockByMarket.get(marketId)?.has(goodId) === true) return true;
+    const ownerId = owners.get(provinceId);
+    const owner = ownerId === undefined ? undefined : countryById.get(ownerId);
+    return owner !== undefined && hasResearchedTechnology(owner, technologyId);
+  };
 }
 
 function buildHouseholdDemand(
@@ -396,6 +424,11 @@ function buildHouseholdDemand(
   // goods in ascending id are listed once, so a block's present goods are visited in
   // that order instead of being sorted per block.
   const goodCount = economyDefinitions.goods.length;
+  // P5b (C-21): technology-gated need items.
+  const technologyByKey = new Map(
+    (economyDefinitions.technology?.technologies ?? []).map((technology) => [technology.key, technology.id]),
+  );
+  let gatedItems = false;
   const tierPlans = ([1, 3, 6] as const).map((tier) => {
     const needs = M3_TIER_NEEDS[tier].flatMap((needTier) => {
       const need = needByTier.get(needTier);
@@ -411,7 +444,18 @@ function buildHouseholdDemand(
                 `needs tier ${needTier} references unknown economy good ${JSON.stringify(item.goodKey)}`,
               );
             }
-            return { goodId: good.id, quantityPerCapitaPerDay: item.quantityPerCapitaPerDay };
+            let requiredTechnologyId: number | null = null;
+            if (item.requiredTechnologyKey !== undefined) {
+              const technology = technologyByKey.get(item.requiredTechnologyKey);
+              if (technology === undefined) {
+                throw new RangeError(
+                  `needs tier ${needTier} references unknown technology ${JSON.stringify(item.requiredTechnologyKey)}`,
+                );
+              }
+              requiredTechnologyId = technology;
+              gatedItems = true;
+            }
+            return { goodId: good.id, quantityPerCapitaPerDay: item.quantityPerCapitaPerDay, requiredTechnologyId };
           }),
         },
       ];
@@ -423,6 +467,9 @@ function buildHouseholdDemand(
   });
   const marketById = new Map(world.markets.map((market) => [market.id, market]));
   const householdIds = index.ownerAccountIds("popBlock", "household-cash");
+  // P5b (C-21): a gated item is wanted where the block's country knows its technology
+  // or the market holds stock of the good this morning.
+  const gate = gatedItems ? needGate(world) : null;
   const present = new Uint8Array(goodCount);
   const desiredByGood = new Float64Array(goodCount);
   const labelByGood: NeedTier[] = new Array<NeedTier>(goodCount);
@@ -457,6 +504,9 @@ function buildHouseholdDemand(
         if (block.wealthLevel < need.activationWealthMin) continue;
         for (let itemIndex = 0; itemIndex < need.items.length; itemIndex += 1) {
           const item = need.items[itemIndex] as (typeof need.items)[number];
+          if (gate !== null && item.requiredTechnologyId !== null && !gate(block.provinceId, marketId, item.requiredTechnologyId, item.goodId)) {
+            continue;
+          }
           let desired = item.quantityPerCapitaPerDay * population;
           if (kept !== undefined && need.needTier === "subsistence") {
             const keptQuantity = kept[item.goodId] ?? 0;
@@ -558,6 +608,27 @@ function productionTier(definition: BuildingDef, critical: ReadonlySet<Id>): 2 |
   return 5;
 }
 
+/**
+ * P5b (plan §4.2): commit the day's extraction of every market through
+ * `extractFromDeposit`. Production already capped each building at its deposit's
+ * remaining stock, so every request is met in full; anything else is an integrity
+ * failure, not a quantity to round away.
+ */
+function commitExtraction(world: World, results: readonly MarketDayResult[]): void {
+  for (const result of results) {
+    for (const building of result.production.buildings) {
+      const extraction = building.extraction;
+      if (extraction === undefined || !(extraction.quantity > 0)) continue;
+      const taken = extractFromDeposit(world, extraction.depositId, extraction.quantity);
+      if (Math.abs(taken - extraction.quantity) > quantityTolerance(extraction.quantity)) {
+        throw new RangeError(
+          `building ${String(building.buildingId)} extracted ${String(extraction.quantity)} but its deposit had ${String(taken)}`,
+        );
+      }
+    }
+  }
+}
+
 function buildProductionDemands(
   world: World,
   definitions: EconomyDefinitions,
@@ -596,12 +667,36 @@ function buildProductionDemands(
       inputs = [...definition.inputs].sort((left, right) => left.goodId - right.goodId);
       sortedInputsByDefinition.set(definition.id, inputs);
     }
-    if (inputs.length === 0) continue;
-    const desired = inputs.map((input) => ({
+    const hasExtras =
+      (definition.optionalInputs?.length ?? 0) > 0 || (definition.maintenanceInputs?.length ?? 0) > 0;
+    if (inputs.length === 0 && !hasExtras) continue;
+    const desired: { goodId: number; quantity: number; price: number; tier: 2 | 5 | null }[] = inputs.map((input) => ({
       goodId: input.goodId,
       quantity: input.quantityPerThroughputUnit * capacity.capacityTU,
       price: market.priceRUSD[input.goodId] ?? 0,
+      tier: null,
     }));
+    if (hasExtras) {
+      // P5b (D-146): optional inputs (fertiliser) for today's capacity and maintenance
+      // goods for the building's levels, both at the non-critical producer tier 5.
+      for (const item of definition.optionalInputs ?? []) {
+        desired.push({
+          goodId: item.goodId,
+          quantity: item.quantityPerThroughputUnit * capacity.capacityTU,
+          price: market.priceRUSD[item.goodId] ?? 0,
+          tier: 5,
+        });
+      }
+      for (const item of definition.maintenanceInputs ?? []) {
+        desired.push({
+          goodId: item.goodId,
+          quantity: item.quantityPerLevelPerDay * building.level,
+          price: market.priceRUSD[item.goodId] ?? 0,
+          tier: 5,
+        });
+      }
+      desired.sort((left, right) => left.goodId - right.goodId);
+    }
     let desiredCost = 0;
     for (const input of desired) desiredCost += input.quantity * input.price;
     let ratio = 1;
@@ -617,7 +712,7 @@ function buildProductionDemands(
       if (!(funded > 0)) continue;
       records.push({
         buyerBuildingId: building.id,
-        tier,
+        tier: input.tier ?? tier,
         goodId: input.goodId,
         desiredQuantity: input.quantity,
         fundedQuantity: funded,
@@ -1128,6 +1223,9 @@ function runMarketAttempt(
     }
     results.push(result);
   }
+  // P5b (plan §4.2): production limited every extraction to what its deposit had left;
+  // the takings now leave the deposits, through the only depletion path.
+  commitExtraction(world, results);
   observe?.("settlement");
   // The integrated day validated employment after migration and before the market
   // phase, so settlement does not repeat that full pass (D-137).

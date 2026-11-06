@@ -5,6 +5,7 @@
  */
 import { encodeWorld, hashEncodedWorld, type World } from "@century/sim";
 import { withoutPhase5 } from "./p5Encoding.js";
+import { withoutPhase5b } from "./p5bEncoding.js";
 
 export const P4_BLOCK_FIELDS = [
   "urbanShare",
@@ -19,7 +20,7 @@ export function prePhase4Digest(world: World): string {
   const encoded = encodeWorld(world) as unknown as Record<string, unknown> & {
     popBlocks: Record<string, unknown>[];
   };
-  const view: Record<string, unknown> = { ...withoutPhase5(encoded), schemaVersion: 30 };
+  const view: Record<string, unknown> = { ...withoutPhase5(withoutPhase5b(encoded)), schemaVersion: 30 };
   delete view.demography;
   view.popBlocks = encoded.popBlocks.map((block) => {
     const copy = { ...block };

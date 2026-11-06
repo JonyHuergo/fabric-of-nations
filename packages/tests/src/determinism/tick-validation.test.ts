@@ -46,6 +46,7 @@ import {
 } from "@century/sim";
 import { loadM5EightPolities } from "@century/data";
 import { GRAIN_ID, productionWorld, reservation } from "../fixtures/m3c.js";
+import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
 
 const SEED = 20_261_023;
 
@@ -76,7 +77,11 @@ const SEED = 20_261_023;
 // and are paid that part of their wage in kind (D-143 §2), and the schema is 32 with
 // `World.resources`; the M5 sample's farms have no land use (legacy definitions), so
 // land and weather do not act. The trajectory changes by design.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "d1580017f60be441";
+// P5b re-pins it (D-147): encoding only — the legacy M5 definitions have no extraction,
+// non-storable good, optional or maintenance input or gated need item, so removing the
+// P5b fields and restoring schema 32 and simulation 0.28.0 gives the P5 hash (asserted).
+const PRE_P5B_HASH_AFTER_22_TICKS = "d1580017f60be441";
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "20d33e7d949a27db";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {
@@ -106,6 +111,7 @@ describe("Batch 5 validation boundary and determinism", () => {
     const world = createEconomyWorld(scenario, { seed: SEED });
     runTicks(world, 22, contextFor(scenario));
     expect(world.dayIndex).toBe(22);
+    expect(prePhase5bDigest(world)).toBe(PRE_P5B_HASH_AFTER_22_TICKS);
     expect(hashWorld(world)).toBe(PRE_BATCH5_HASH_AFTER_22_TICKS);
   });
 

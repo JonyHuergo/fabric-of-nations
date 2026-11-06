@@ -499,10 +499,10 @@ describe("M11 slider ranges produce validated authoritative actions", () => {
     expect(validate({ ...base, kind: "set-health-staff-share", share: 0.5 })).toBe(true);
     expect(validate({ ...base, kind: "set-health-staff-share", share: -0.1 })).toBe(false);
     expect(
-      validate({ ...base, kind: "set-industrial-policy", sectorSubsidyRates: [0, 0.5, 0, 0, 1] }),
+      validate({ ...base, kind: "set-industrial-policy", sectorSubsidyRates: [0, 0.5, 0, 0, 1, 0, 0, 0] }),
     ).toBe(true);
     expect(
-      validate({ ...base, kind: "set-industrial-policy", sectorSubsidyRates: [0, 1.1, 0, 0, 0] }),
+      validate({ ...base, kind: "set-industrial-policy", sectorSubsidyRates: [0, 1.1, 0, 0, 0, 0, 0, 0] }),
     ).toBe(false);
     expect(
       validate({

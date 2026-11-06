@@ -77,7 +77,8 @@ describe("M9 worker protocol and snapshots", () => {
     expect(country.technology.researchedCount).toBe(0);
     expect(country.technology.activeProjectTechnologyId).toBeNull();
     expect(country.technology.mortalityFactor).toBe(1);
-    expect(country.technology.productivityBySector.length).toBe(5);
+    // P5b (D-146 C-16): eight sectors.
+    expect(country.technology.productivityBySector.length).toBe(8);
     expect(country.education.enabled).toBe(true);
     expect(country.education.academicPopulation).toBeGreaterThan(0);
     expect(country.education.fundedAnnualRUSD).toBe(M9_EDUCATION_FUNDING);

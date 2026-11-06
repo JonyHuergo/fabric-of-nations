@@ -140,6 +140,7 @@ function runToCompletion(f: Fixture, projectId: number): void {
   throw new Error("project did not complete");
 }
 
+/** P5b (D-146 C-16): eight sectors — the five E4 sectors, then mining, energy, services. */
 function policyAction(rates: readonly number[]): CountryAction {
   return {
     kind: "set-industrial-policy",
@@ -183,13 +184,17 @@ describe("E4 sector classification and construction materials", () => {
     expect(farm.materials.length).toBeGreaterThan(0);
     expect(farm.materials.every((material) => material.quantity > 0)).toBe(true);
     const sectors = snapshot.countries[COUNTRY]!.industrialPolicy.sectors;
-    expect(sectors).toHaveLength(5);
+    expect(sectors).toHaveLength(8);
     expect(sectors.map((sector) => sector.key)).toEqual([
       "agriculture",
       "food-processing",
       "textiles",
       "manufacturing",
       "storage",
+      // P5b (D-146 C-16)
+      "mining",
+      "energy",
+      "services",
     ]);
   });
 
@@ -319,7 +324,7 @@ describe("E4 sectoral production subsidy", () => {
   test("a validated policy pays verified output from cash and reports the exact split", () => {
     const f = fixture();
     run(f, 2);
-    const action = withDay(f, policyAction([0.1, 0, 0, 0, 0]));
+    const action = withDay(f, policyAction([0.1, 0, 0, 0, 0, 0, 0, 0]));
     expect(validateCountryAction(f.world, action, f.scenario.definitions).valid).toBe(true);
     const applied = applyCountryAction(f.world, action, f.scenario.definitions);
     expect(applied.changed).toBe(true);
@@ -367,7 +372,7 @@ describe("E4 sectoral production subsidy", () => {
     treasury.balanceRUSD -= drain;
     equity.balanceRUSD -= drain;
     assertValidWorld(f.world);
-    const action = withDay(f, policyAction([1, 0, 0, 0, 0]));
+    const action = withDay(f, policyAction([1, 0, 0, 0, 0, 0, 0, 0]));
     applyCountryAction(f.world, action, f.scenario.definitions);
     run(f, 1);
     expect(accountBalance(f.world, "country", COUNTRY, "treasury-cash")).toBeGreaterThanOrEqual(0);
@@ -386,8 +391,8 @@ describe("E4 sectoral production subsidy", () => {
     const before = hashWorld(f.world);
     const invalid = [
       withDay(f, policyAction([0.1, 0])),
-      withDay(f, policyAction([2, 0, 0, 0, 0])),
-      withDay(f, { ...policyAction([0.1, 0, 0, 0, 0]), source: "ai" }),
+      withDay(f, policyAction([2, 0, 0, 0, 0, 0, 0, 0])),
+      withDay(f, { ...policyAction([0.1, 0, 0, 0, 0, 0, 0, 0]), source: "ai" }),
     ];
     for (const action of invalid) {
       expect(validateCountryAction(f.world, action, f.scenario.definitions).valid).toBe(false);
@@ -491,7 +496,7 @@ describe("E4 integration, snapshots, and persistence", () => {
       country.industrialPolicy.sectors.map((sector) => sector.subsidyRate),
     );
     expect(industrial.valid).toBe(true);
-    expect(industrial.sectors).toHaveLength(5);
+    expect(industrial.sectors).toHaveLength(8);
     expect(() =>
       parseWorkerEvent({
         protocolVersion: PROTOCOL_VERSION,
@@ -505,7 +510,7 @@ describe("E4 integration, snapshots, and persistence", () => {
     const f = fixture();
     const projectId = startFarm(f);
     run(f, 5);
-    const policy = withDay(f, policyAction([0.05, 0.02, 0, 0, 0]));
+    const policy = withDay(f, policyAction([0.05, 0.02, 0, 0, 0, 0, 0, 0]));
     applyCountryAction(f.world, policy, f.scenario.definitions);
     run(f, 1);
     const saved = serializeWorld(f.world);
@@ -535,7 +540,7 @@ describe("E4 integration, snapshots, and persistence", () => {
       withDay(f, supportAction(buildingId, 500)),
       f.scenario.definitions,
     );
-    const policy = withDay(f, policyAction([0.1, 0, 0, 0, 0]));
+    const policy = withDay(f, policyAction([0.1, 0, 0, 0, 0, 0, 0, 0]));
     applyCountryAction(f.world, policy, f.scenario.definitions);
     run(f, 31);
     const month = f.world.finance.periodSummaries[0]!;

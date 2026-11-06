@@ -69,6 +69,7 @@ import {
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { constructionProgressFactor } from "./politics.js";
 import { hasResearchedTechnology } from "./technology.js";
+import { depositForNewBuilding } from "./resources.js";
 import { canonicalizeStockLots } from "./inventory.js";
 import type { MarketSettlementResult } from "./settlement.js";
 import { assertValidFinanceState } from "./validation.js";
@@ -325,6 +326,7 @@ function createCompletedBuilding(
   provinceId: Id,
   countryId: Id,
   dayIndex: Day,
+  depositId: Id | null,
 ): { building: BuildingInstance; operatingCashAccountId: Id; equityAccountId: Id } {
   const finance = world.finance;
   const country = world.countries.find((candidate) => candidate.id === countryId);
@@ -369,6 +371,7 @@ function createCompletedBuilding(
     operational: true,
     operatingCashAccountId: operatingCash.id,
     technique: inheritedTechnique(world, countryId, definitionId),
+    depositId,
   };
   world.buildings.push(building);
   world.buildings.sort((left, right) => left.id - right.id);
@@ -776,12 +779,21 @@ export function runConstructionPhase(
     if (!constructionMaterialsReady(project)) continue;
     const country = staged.countries.find((entry) => entry.id === project.countryId);
     if (country === undefined) throw new RangeError("missing completion country");
+    const definition = definitions.buildings.find((entry) => entry.id === project.definitionId);
+    // P5b: an extraction building works the province's richest discovered deposit of
+    // its kind at completion; without one it cannot be completed.
+    let depositId: Id | null = null;
+    if (definition?.extracts !== undefined) {
+      depositId = depositForNewBuilding(staged, definition.extracts, project.provinceId);
+      if (depositId === null) continue;
+    }
     const created = createCompletedBuilding(
       staged,
       project.definitionId,
       project.provinceId,
       project.countryId,
       dayIndex,
+      depositId,
     );
     const treasury = index.get("country", country.id, "treasury-cash");
     const wip = index.get("country", country.id, "construction-in-progress");
@@ -981,6 +993,18 @@ export function validateConstructionStart(
   // P5 (D-143 §1): a farm needs land of its kind in the province.
   if (definition.landUse !== undefined && !(provinceLandHa(province, definition.landUse) > 0)) {
     throw new RangeError(`province ${String(province.id)} has no ${definition.landUse} for this building`);
+  }
+  // P5b (plan §4.2): an extraction building needs a discovered deposit of its kind.
+  if (definition.extracts !== undefined && depositForNewBuilding(world, definition.extracts, province.id) === null) {
+    throw new RangeError(`province ${String(province.id)} has no discovered ${definition.extracts} deposit for this building`);
+  }
+  // P5b (C-8): crop bands — the province must lie within the building's latitude limit.
+  if (
+    definition.maxAbsLatitudeDeg !== undefined &&
+    province.absLatitudeDeg !== null &&
+    province.absLatitudeDeg > definition.maxAbsLatitudeDeg
+  ) {
+    throw new RangeError(`province ${String(province.id)} lies outside this building's latitude band`);
   }
   if (!world.profitDistribution.enabled) {
     throw new RangeError(

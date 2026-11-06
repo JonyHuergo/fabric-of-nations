@@ -91,6 +91,7 @@ import {
   type BuildingInstance,
   type DebtContract,
   type DebtHistoryAggregate,
+  type EconomyDefinitions,
   type EmploymentAssignment,
   type FinanceCorrection,
   type FinancePeriodBudgetTotals,
@@ -1313,6 +1314,41 @@ function assertValidBuilding(building: BuildingInstance): void {
     0,
     0xffff_ffff,
   );
+  // P5b: null, or the id of the deposit the building extracts (cross-checked against
+  // the deposits and the definition by `assertValidBuildingDeposits`).
+  if (record.depositId !== null) requireInteger(record.depositId, "world.buildings[].depositId", 0, 0xffff_ffff);
+}
+
+/**
+ * P5b (plan §4.2): every extraction building works an existing, discovered deposit of
+ * its definition's kind in its own province, and no other building names a deposit.
+ */
+export function assertValidBuildingDeposits(
+  buildings: readonly BuildingInstance[],
+  deposits: readonly { readonly id: number; readonly provinceId: number; readonly resource: string; readonly discovered: boolean }[],
+  definitions: EconomyDefinitions,
+): void {
+  const depositById = new Map(deposits.map((deposit) => [deposit.id, deposit]));
+  const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
+  for (const building of buildings) {
+    const extracts = definitionById.get(building.definitionId)?.extracts;
+    if (extracts === undefined) {
+      if (building.depositId !== null) {
+        throw new RangeError(`building ${String(building.id)} names a deposit but extracts nothing`);
+      }
+      continue;
+    }
+    if (building.depositId === null) throw new RangeError(`extraction building ${String(building.id)} has no deposit`);
+    const deposit = depositById.get(building.depositId);
+    if (deposit === undefined) throw new RangeError(`building ${String(building.id)} names unknown deposit ${String(building.depositId)}`);
+    if (deposit.provinceId !== building.provinceId) {
+      throw new RangeError(`building ${String(building.id)} extracts a deposit outside its province`);
+    }
+    if (deposit.resource !== extracts) {
+      throw new RangeError(`building ${String(building.id)} extracts ${extracts} from a ${deposit.resource} deposit`);
+    }
+    if (!deposit.discovered) throw new RangeError(`building ${String(building.id)} works a hidden deposit`);
+  }
 }
 
 function assertValidEmployment(assignment: EmploymentAssignment): void {

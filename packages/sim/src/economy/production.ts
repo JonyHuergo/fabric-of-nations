@@ -35,6 +35,8 @@ import {
   landPerLevelByProvince,
 } from "./agriculture.js";
 import { FARM_LABOUR_ELASTICITY } from "./constants.js";
+import { depositRemaining } from "./resourceState.js";
+import { findDeposit } from "./resources.js";
 import type {
   BuildingDef,
   BuildingInstance,
@@ -106,6 +108,12 @@ export interface BuildingProductionResult {
     /** P5 (D-143 §2): quantity the owner household kept; absent when none. */
     readonly ownConsumption?: number;
   }[];
+  /**
+   * P5b (plan §4.2): what an extraction building took from its deposit today, in the
+   * deposit's unit. The day commits it through `extractFromDeposit` after the market
+   * phase; production itself never changes the deposits.
+   */
+  readonly extraction?: { readonly depositId: number; readonly quantity: number };
 }
 
 export interface InventoryFlow {
@@ -298,6 +306,20 @@ function inputQuantity(
 ): number {
   const input = definition.inputs.find((candidate) => candidate.goodId === goodId);
   return input?.quantityPerThroughputUnit ?? 0;
+}
+
+/**
+ * P5b (D-146): whether a building may buy `goodId` — a recipe input, an optional
+ * input (fertiliser) or a maintenance good — and in which role.
+ */
+export function purchaseRole(
+  definition: BuildingDef,
+  goodId: number,
+): "input" | "optional" | "maintenance" | null {
+  if (inputQuantity(definition, goodId) > 0) return "input";
+  if ((definition.optionalInputs ?? []).some((item) => item.goodId === goodId)) return "optional";
+  if ((definition.maintenanceInputs ?? []).some((item) => item.goodId === goodId)) return "maintenance";
+  return null;
 }
 
 /**
@@ -496,7 +518,7 @@ export function computeBuildingCapacity(
     definition.landUse === undefined
       ? staffingRatio
       : farmFactor(index, building, definition.landUse, staffingRatio);
-  const capacityTU =
+  let capacityTU =
     definition.referenceThroughputPerDayAtLevelOne *
     building.level *
     building.condition *
@@ -513,6 +535,13 @@ export function computeBuildingCapacity(
     })();
   if (!Number.isFinite(capacityTU) || capacityTU < 0) {
     throw new RangeError(`building ${String(building.id)} has invalid capacity`);
+  }
+  // P5b (plan §4.2): an extraction building's output scales with its deposit's
+  // quality, and an exhausted deposit yields nothing (so nothing is bought for it).
+  if (definition.extracts !== undefined) {
+    const deposit = building.depositId === null ? undefined : findDeposit(world, building.depositId);
+    if (deposit === undefined) throw new RangeError(`extraction building ${String(building.id)} has no deposit`);
+    capacityTU = depositRemaining(deposit) > 0 ? capacityTU * deposit.quality : 0;
   }
 
   const desiredInputs = [...definition.inputs]
@@ -772,6 +801,11 @@ export function runProductionCore(
   opening: LotTable,
   reservations: ReservationColumns,
   applyOverflow: boolean,
+  /**
+   * P5b (D-146 A4): production waves. When given, only these buildings produce in this
+   * call (the others are left untouched); absent, every building of the market does.
+   */
+  onlyBuildings?: ReadonlySet<number>,
 ): ProductionCoreResult {
   const marketProvinceIdSet: ReadonlySet<number> =
     lookups.provinceIdsByMarket.get(market.id) ?? new Set(marketProvinceIds(world, market.id));
@@ -782,7 +816,9 @@ export function runProductionCore(
   const goodCount = goods.length;
   const goodKnown = new Uint8Array(goodCount);
   for (const good of goods) if (Number.isInteger(good.id) && good.id >= 0 && good.id < goodCount) goodKnown[good.id] = 1;
-  const openingByGood = deriveStockByGood(market, goodCount);
+  // P5b: a second production wave starts from the first wave's lots, not the market's.
+  const openingByGood =
+    onlyBuildings === undefined ? deriveStockByGood(market, goodCount) : stockByGoodOfTable(opening, goodCount);
   const ownerCount = opening.owners.length;
   const buildingIds = lookups.buildingIdsByMarket.get(market.id) ?? [];
   // Buyer slots: the market's buildings in ascending id order.
@@ -829,7 +865,7 @@ export function runProductionCore(
     if (buyerDefinition.outputs.length === 0) {
       throw new RangeError(`${path()} buyer has no production recipe`);
     }
-    if (inputQuantity(buyerDefinition, goodId) <= 0) {
+    if (purchaseRole(buyerDefinition, goodId) === null) {
       throw new RangeError(`${path()}.goodId is not an input of the buyer recipe`);
     }
     if (!marketProvinceIdSet.has(buyer.provinceId)) {
@@ -880,9 +916,13 @@ export function runProductionCore(
   const buildingResults: BuildingProductionResult[] = [];
   const uses: ReservationUseColumns = { buyer: [], good: [], seller: [], reserved: [], used: [] };
   const next = copyLotTable(opening);
+  // P5b (plan §4.2): stock left in each deposit for today's extraction, in building
+  // order; the day commits the takings through `extractFromDeposit`.
+  const depositLeft = new Map<number, number>();
 
   for (let buyerIndex = 0; buyerIndex < buildingIds.length; buyerIndex += 1) {
     const buildingId = buildingIds[buyerIndex] ?? 0;
+    if (onlyBuildings !== undefined && !onlyBuildings.has(buildingId)) continue;
     const building = buildingById.get(buildingId);
     if (building === undefined) throw new RangeError(`unknown building ${String(buildingId)}`);
     const definition = definitionsById.get(building.definitionId);
@@ -900,6 +940,29 @@ export function runProductionCore(
     }
     if (!Number.isFinite(executedTU) || executedTU < 0) {
       throw new RangeError(`building ${String(building.id)} has invalid executed throughput`);
+    }
+    // P5b: an extraction building takes no more than its deposit has left today.
+    const ownerIdForTechnology = provinceOwners.get(building.provinceId);
+    const ownerForTechnology =
+      ownerIdForTechnology === undefined ? undefined : lookups.countryById.get(ownerIdForTechnology);
+    const technologyFactor =
+      ownerForTechnology === undefined
+        ? 1
+        : technologyProductivityFactor(ownerForTechnology, definitions, definition.sector);
+    let extraction: { depositId: number; quantity: number } | undefined;
+    if (definition.extracts !== undefined && building.depositId !== null) {
+      const depositId = building.depositId;
+      let left = depositLeft.get(depositId);
+      if (left === undefined) {
+        const deposit = findDeposit(world, depositId);
+        left = deposit === undefined ? 0 : depositRemaining(deposit);
+      }
+      const extractedPerTU = (definition.outputs[0]?.quantityPerThroughputUnit ?? 0) * technologyFactor;
+      if (extractedPerTU * executedTU > left) executedTU = extractedPerTU > 0 ? left / extractedPerTU : 0;
+      // The last day of a deposit takes exactly what is left.
+      const quantity = executedTU * extractedPerTU >= left ? left : executedTU * extractedPerTU;
+      depositLeft.set(depositId, left - quantity);
+      extraction = { depositId, quantity };
     }
 
     for (const input of sortedInputs) {
@@ -959,21 +1022,76 @@ export function runProductionCore(
       usedByGood[input.goodId] = (usedByGood[input.goodId] ?? 0) + actualUsed;
     }
 
+    // P5b (D-146): optional inputs raise output with their fill; maintenance goods are
+    // consumed whole. Both are paid for as used, like recipe inputs.
+    let optionalFactor = 1;
+    const extraPurchases: { goodId: number; wanted: number; elasticity: number }[] = [];
+    for (const item of definition.optionalInputs ?? []) {
+      extraPurchases.push({ goodId: item.goodId, wanted: item.quantityPerThroughputUnit * executedTU, elasticity: item.outputElasticity });
+    }
+    for (const item of definition.maintenanceInputs ?? []) {
+      extraPurchases.push({ goodId: item.goodId, wanted: Number.POSITIVE_INFINITY, elasticity: 0 });
+    }
+    extraPurchases.sort((left, right) => left.goodId - right.goodId);
+    for (const purchase of extraPurchases) {
+      const group = buyerIndex * goodCount + purchase.goodId;
+      const reserved = reservedByBuyerGood[group] ?? 0;
+      const used = Math.min(reserved, purchase.wanted);
+      if (purchase.elasticity > 0) {
+        const fill = purchase.wanted > 0 ? Math.min(1, used / purchase.wanted) : 1;
+        optionalFactor *= 1 - purchase.elasticity + purchase.elasticity * fill;
+      }
+      let actualUsed = 0;
+      const head = groupHead[group] ?? -1;
+      if (head >= 0) {
+        let totalReserved = 0;
+        for (let item = head; item >= 0; item = groupNext[item] ?? -1) totalReserved += reservations.quantity[item] ?? 0;
+        for (let item = head; item >= 0; item = groupNext[item] ?? -1) {
+          const quantity = reservations.quantity[item] ?? 0;
+          const sellerId = reservations.seller[item] ?? 0;
+          let reservationUsed: number;
+          if (used <= tolerance(totalReserved)) reservationUsed = 0;
+          else if (used >= totalReserved - tolerance(totalReserved, used)) reservationUsed = quantity;
+          else reservationUsed = (used * quantity) / totalReserved;
+          reservationUsed = Math.min(quantity, Math.max(0, reservationUsed));
+          actualUsed += reservationUsed;
+          uses.buyer.push(building.id);
+          uses.good.push(purchase.goodId);
+          uses.seller.push(sellerId);
+          uses.reserved.push(quantity);
+          uses.used.push(reservationUsed);
+          const cell = purchase.goodId * ownerCount + (next.slotOf.get(sellerId) ?? 0);
+          if (next.present[cell] !== 1) throw new RangeError(`missing seller lot ${lotKey(purchase.goodId, sellerId)}`);
+          const current = next.quantity[cell] ?? 0;
+          const remaining = current - reservationUsed;
+          if (remaining < -tolerance(current, reservationUsed, reservedByGood[purchase.goodId] ?? 0)) {
+            throw new RangeError(`seller lot ${lotKey(purchase.goodId, sellerId)} would become negative`);
+          }
+          if (remaining <= 0) {
+            next.present[cell] = 0;
+            next.quantity[cell] = 0;
+          } else {
+            next.quantity[cell] = remaining;
+          }
+        }
+      }
+      inputResults.push({ goodId: purchase.goodId, reserved, used: actualUsed, released: Math.max(0, reserved - actualUsed) });
+      usedByGood[purchase.goodId] = (usedByGood[purchase.goodId] ?? 0) + actualUsed;
+    }
+
     const outputResults: BuildingProductionResult["outputs"][number][] = [];
     const sortedOutputs = sortedByGood(definition.outputs);
     // M9 technology: researched sector productivity increases physical output from
     // the same executed throughput (and therefore the same inputs). It does not
-    // change capacity, prices, or the input recipe.
-    const ownerId = provinceOwners.get(building.provinceId);
-    const owner = ownerId === undefined ? undefined : lookups.countryById.get(ownerId);
-    const technologyFactor =
-      owner === undefined
-        ? 1
-        : technologyProductivityFactor(owner, definitions, definition.sector);
+    // change capacity, prices, or the input recipe. (`technologyFactor` above.)
     const producerSlot = next.slotOf.get(building.id) ?? -1;
     const keptRow = lookups.ownConsumption?.byBuilding.get(building.id);
     for (const output of sortedOutputs) {
-      const produced = output.quantityPerThroughputUnit * executedTU * technologyFactor;
+      // The extracted good is exactly what left the deposit; optional inputs scale the rest.
+      const produced =
+        extraction !== undefined && output === definition.outputs[0]
+          ? extraction.quantity
+          : output.quantityPerThroughputUnit * executedTU * technologyFactor * optionalFactor;
       if (!Number.isFinite(produced) || produced < 0) {
         throw new RangeError(`building ${String(building.id)} produced an invalid output quantity`);
       }
@@ -1007,6 +1125,7 @@ export function runProductionCore(
       productivityFactor: capacity.productivityFactor,
       inputs: inputResults,
       outputs: outputResults,
+      ...(extraction === undefined ? {} : { extraction }),
     });
   }
 
@@ -1060,6 +1179,21 @@ export function runProductionCore(
   });
 
   return { buildings: buildingResults, uses, inventory, overflowLosses, lots: next };
+}
+
+/** Stock by good of a lot table, summed in slot order. */
+function stockByGoodOfTable(table: LotTable, goodCount: number): number[] {
+  const ownerCount = table.owners.length;
+  const totals = new Array<number>(goodCount).fill(0);
+  for (let goodId = 0; goodId < goodCount; goodId += 1) {
+    let total = 0;
+    for (let slot = 0; slot < ownerCount; slot += 1) {
+      const cell = goodId * ownerCount + slot;
+      if (table.present[cell] === 1) total += table.quantity[cell] ?? 0;
+    }
+    totals[goodId] = total;
+  }
+  return totals;
 }
 
 /** A recipe's items in ascending good order, memoised per item array (D-139). */

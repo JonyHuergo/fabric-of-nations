@@ -86,12 +86,45 @@ export function runDiscoveryPhase(world: World, dayIndex: DayIndex): DiscoveryPh
 }
 
 /**
+ * The deposit with `id` in the world's ascending-id deposit list (binary search), or
+ * undefined. P5b (D-146 A11): extraction looks deposits up every day.
+ */
+export function findDeposit(world: World, depositId: Id): Deposit | undefined {
+  const deposits = world.resources.deposits;
+  let low = 0;
+  let high = deposits.length - 1;
+  while (low <= high) {
+    const middle = (low + high) >> 1;
+    const candidate = deposits[middle] as Deposit;
+    if (candidate.id === depositId) return candidate;
+    if (candidate.id < depositId) low = middle + 1;
+    else high = middle - 1;
+  }
+  return undefined;
+}
+
+/**
+ * P5b (D-146, plan §4.2): the deposit a new extraction building in `provinceId` works —
+ * the discovered deposit of `resource` there with the most remaining stock (lowest id
+ * on a tie) — or null when the province has none.
+ */
+export function depositForNewBuilding(world: World, resource: Deposit["resource"], provinceId: Id): Id | null {
+  let best: Deposit | null = null;
+  for (const deposit of world.resources.deposits) {
+    if (deposit.provinceId !== provinceId || deposit.resource !== resource || !deposit.discovered) continue;
+    if (!(depositRemaining(deposit) > 0)) continue;
+    if (best === null || depositRemaining(deposit) > depositRemaining(best)) best = deposit;
+  }
+  return best === null ? null : best.id;
+}
+
+/**
  * Take up to `quantity` from a discovered deposit; returns what was taken
  * (min(quantity, remaining)). Rejects unknown or hidden deposits and invalid amounts.
  */
 export function extractFromDeposit(world: World, depositId: Id, quantity: number): number {
   if (!Number.isFinite(quantity) || quantity < 0) throw new RangeError("extraction quantity must be a finite non-negative number");
-  const deposit = world.resources.deposits.find((entry) => entry.id === depositId);
+  const deposit = findDeposit(world, depositId);
   if (deposit === undefined) throw new RangeError(`unknown deposit ${String(depositId)}`);
   if (!deposit.discovered) throw new RangeError(`deposit ${String(depositId)} has not been discovered`);
   const taken = Math.min(quantity, depositRemaining(deposit));

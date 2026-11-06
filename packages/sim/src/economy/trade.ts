@@ -31,6 +31,7 @@ import {
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { buildProvinceOwnerMap } from "./country.js";
 import { isConvertibilitySuspended } from "./monetary.js";
+import { hasResearchedTechnology } from "./technology.js";
 import {
   type AccountSubtype,
   type EconomyDefinitions,
@@ -575,6 +576,14 @@ function dispatchTrade(
           !(destinationPrice > 0)
         ) {
           throw new RangeError(`market price for good ${String(goodId)} is invalid`);
+        }
+        // P5b (D-146 A4, C-15): electricity and services are never shipped; natural gas
+        // only once the origin's customs administration knows pipelines.
+        if (good.tradeable === false) continue;
+        const tradeTechnology = good.tradeRequiresTechnologyId;
+        if (tradeTechnology !== undefined && tradeTechnology !== null) {
+          const originCountry = originAdminId === null ? undefined : countryById.get(originAdminId);
+          if (originCountry === undefined || !hasResearchedTechnology(originCountry, tradeTechnology)) continue;
         }
 
         if (dutiable && fxSuspended) {

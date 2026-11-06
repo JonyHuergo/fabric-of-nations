@@ -29,7 +29,7 @@
  * control, claims and special-status state plus the deterministic ownership and
  * control mutations.
  */
-export const SIM_VERSION = "0.28.0";
+export const SIM_VERSION = "0.29.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -78,8 +78,12 @@ export const SIM_VERSION = "0.28.0";
  * extraction and discovery) and `FinancePeriodSummary.countryClosingBalances`, and keeps
  * the account-level trial balance on the latest monthly summary only. Schema-31 worlds
  * are reported as incompatible (D-139 §3).
+ * P5b (schema 33, D-146) adds `BuildingInstance.depositId` (the deposit an extraction
+ * building works), `ProvinceEconomy.absLatitudeDeg` (crop bands) and three
+ * industrial-policy sectors (mining, energy, services). Schema-32 worlds are reported
+ * as incompatible.
  */
-export const WORLD_SCHEMA_VERSION = 32;
+export const WORLD_SCHEMA_VERSION = 33;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 2;

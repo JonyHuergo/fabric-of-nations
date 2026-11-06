@@ -12,13 +12,33 @@
  * they are not serialized into `World`.
  */
 
-import type { DepositInitialDef } from "./resourceState.js";
+import type { DepositInitialDef, ResourceKind } from "./resourceState.js";
 import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
 import type { PopulationScenarioDef } from "../population/types.js";
 import type { ProvinceScenarioInput } from "../provinces/types.js";
 
 export const GOOD_CATEGORIES = ["food", "raw", "industrial", "luxury", "service"] as const;
 export type GoodCategory = (typeof GOOD_CATEGORIES)[number];
+
+/**
+ * P5b (D-146, plan §1): the eight catalogue headings goods are grouped under in the
+ * market and production screens. Presentation only; no simulation rule reads it.
+ */
+export const GOOD_GROUPS = [
+  "food-agriculture",
+  "fibres-forest",
+  "mining",
+  "energy",
+  "industrial-materials",
+  "capital-equipment",
+  "consumer-manufactures",
+  "services",
+] as const;
+export type GoodGroup = (typeof GOOD_GROUPS)[number];
+
+/** P5b: how a good's reference price was derived (D-146 C-6). */
+export const PRICE_BASES = ["1900-wholesale", "1990-producer", "defined-unit"] as const;
+export type PriceBasis = (typeof PRICE_BASES)[number];
 
 export interface GoodDef {
   id: Id;
@@ -34,6 +54,24 @@ export interface GoodDef {
   /** Annual spoilage rate in 0..1. M3 uses 0 while spoilage is deferred. */
   spoilageRateAnnual: Rate;
   unitLabel: string;
+  /** P5b: catalogue heading (presentation). Absent in the legacy definitions. */
+  group?: GoodGroup;
+  /**
+   * P5b (D-146 A4): false for goods that cannot be held in stock (electricity,
+   * services). They get no storage capacity, so output not used the same day is lost
+   * as overflow, and producers buy them only from the same day's output (production
+   * waves, `market.ts`). Absent means storable.
+   */
+  storable?: boolean;
+  /** P5b: false for goods that are never shipped between markets. Absent means tradeable. */
+  tradeable?: boolean;
+  /**
+   * P5b (C-15): a technology the shipping building's country must know before the
+   * good can be shipped between markets (natural gas: pipelines). Absent or null: none.
+   */
+  tradeRequiresTechnologyId?: Id | null;
+  /** P5b: how the reference price was derived (provenance; no simulation rule reads it). */
+  priceBasis?: PriceBasis;
 }
 
 export const PROFESSION_STRATA = ["lower", "middle", "upper"] as const;
@@ -83,6 +121,10 @@ export const BUILDING_SECTORS = [
   "textiles",
   "manufacturing",
   "storage",
+  // P5b (D-146 C-16): extraction, power and services get their own industrial-policy rows.
+  "mining",
+  "energy",
+  "services",
 ] as const;
 export type BuildingSector = (typeof BUILDING_SECTORS)[number];
 
@@ -91,6 +133,30 @@ export interface ConstructionMaterialDef {
   goodId: Id;
   /** Physical units of the good required by the project. */
   quantity: number;
+}
+
+/**
+ * P5b (D-146 A6, plan §4.6): a good a building buys to maintain its plant, per level
+ * per day. Bought like an input (tier 5) and consumed whole; it does not limit
+ * production. Its value at the 1900 reference price was taken out of the money upkeep.
+ */
+export interface MaintenanceInputDef {
+  goodId: Id;
+  /** Physical units per building level per day. */
+  quantityPerLevelPerDay: number;
+}
+
+/**
+ * P5b (D-146, plan §4.5, C-9): an input that raises output when present but does not
+ * stop production when absent (fertiliser on farms). Output is multiplied by
+ * `1 - outputElasticity + outputElasticity * fill`, fill = used / wanted in 0..1.
+ */
+export interface OptionalInputDef {
+  goodId: Id;
+  /** Physical units per standard throughput unit at full use. */
+  quantityPerThroughputUnit: number;
+  /** Share of output that depends on the input, (0, 1). Provisional. */
+  outputElasticity: number;
 }
 
 export interface BuildingDef {
@@ -130,6 +196,23 @@ export interface BuildingDef {
    * land and for the legacy (pre-P5) definitions.
    */
   landUse?: LandUse;
+  /**
+   * P5b (D-146, plan §4.2): the deposit kind this building extracts. Each instance is
+   * tied to one discovered deposit of that kind in its province
+   * (`BuildingInstance.depositId`); its first output is the extracted good, in the
+   * deposit's unit, and depletion goes only through `extractFromDeposit`.
+   */
+  extracts?: ResourceKind;
+  /** P5b: optional yield inputs (fertiliser). Absent: none. */
+  optionalInputs?: OptionalInputDef[];
+  /** P5b: maintenance goods bought per level per day. Absent: none. */
+  maintenanceInputs?: MaintenanceInputDef[];
+  /**
+   * P5b (C-8): the highest absolute latitude, in degrees, of a province where this
+   * building can work (crop bands). Absent: no limit. Checked against
+   * `ProvinceEconomy.absLatitudeDeg` when both are present.
+   */
+  maxAbsLatitudeDeg?: number;
 }
 
 /** P5 (D-143): the land kinds a building can farm (HYDE 3.3 cropland and grazing land). */
@@ -178,6 +261,11 @@ export interface BuildingInstance {
    * the life of the building.
    */
   technique: number;
+  /**
+   * P5b (D-146, plan §4.2): the deposit an extraction building works, or null for a
+   * building that extracts nothing. Fixed for the life of the building.
+   */
+  depositId: Id | null;
 }
 
 /**
@@ -1833,6 +1921,8 @@ export interface BuildingInstanceInitialDef {  id: Id;
   initialOperatingCashRUSD: MoneyRUSD;
   /** P2b technique factor; defaults to 1 (the definition's reference technique). */
   technique?: number;
+  /** P5b: the deposit an extraction building works; defaults to null. */
+  depositId?: Id | null;
 }
 
 export interface MarketInitialDef {

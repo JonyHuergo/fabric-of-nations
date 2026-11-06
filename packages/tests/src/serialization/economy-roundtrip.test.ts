@@ -1,5 +1,6 @@
 ﻿import { prePhase4Digest } from "../fixtures/p4Encoding.js";
 import { prePhase5Digest } from "../fixtures/p5Encoding.js";
+import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
 import {
   WORLD_SCHEMA_VERSION,
   createEconomyWorld,
@@ -70,7 +71,11 @@ describe("M3a schema-25 serialization", () => {
     // P5 schema 32 (D-143): encoding only — the schema number and the empty
     // `World.resources`. Removing them reproduces the P4 digest.
     expect(prePhase5Digest(cloneWorld())).toBe("ba77ec857fa65fab");
-    expect(hashWorld(cloneWorld())).toBe("7d816ee4e04c0e72");
+    // P5b schema 33 (D-146): encoding only — the schema number, `depositId`,
+    // `absLatitudeDeg`, the three new sector rates and the simulation version 0.29.0.
+    // Removing them reproduces the P5 digest.
+    expect(prePhase5bDigest(cloneWorld())).toBe("7d816ee4e04c0e72");
+    expect(hashWorld(cloneWorld())).toBe("dcd33a3ff50ef2c9");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

@@ -155,8 +155,11 @@ describe("M14 monetary equivalence and determinism", () => {
   // Re-pinned for P5: farms' techniques absorb their 1900 land factor, the world carries
   // its sourced deposits, survey countries know geological surveying, three prospecting
   // technologies exist and the schema is 32 (D-143).
+  // Re-pinned for P5b step 3 (D-146, D-147): 22 added deposits (A10), bounded land in
+  // Guam, Pohnpei and Monaco (C-7), the pipelines and nuclear-power technologies, eight
+  // industrial-policy sectors and schema 33.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("f0fed81b4152b09d");
+    expect(hashWorld(world)).toBe("3b32d520c298985a");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {
@@ -167,7 +170,8 @@ describe("M14 monetary equivalence and determinism", () => {
     // P3 (D-141): schema 30 adds the month-end closing valuations.
     // P4 (D-142): schema 31 adds the block demography and the annual record.
     // P5 (D-143): schema 32 adds the deposits and the monthly closing balances.
-    expect(envelope.schemaVersion).toBe(32);
+    // P5b (D-146): schema 33 adds the deposit link, province latitude and three sectors.
+    expect(envelope.schemaVersion).toBe(33);
     expect(hasLegacyMonetaryKey(envelope.payload)).toBe(false);
     expect(save).toContain("balanceRUSD");
     expect(save).not.toMatch(/SUSD|Susd|susd/);

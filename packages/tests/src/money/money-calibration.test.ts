@@ -296,11 +296,12 @@ describe("P2b 1900 world", () => {
     expect(Math.abs(closing / opening - 1)).toBeLessThan(0.02);
   });
 
-  it("serializes the wage tables, techniques and money coefficients (schema 29, kept in 32)", () => {
+  it("serializes the wage tables, techniques and money coefficients (schema 29, kept in 33)", () => {
     // P3 (D-141) raised the schema to 30 (closing valuations) and P4 (D-142) to 31 (block
     // demography, annual record); the P2b fields are unchanged.
     // P5 (D-143) raised it to 32 (deposits, closing balances); the P2b fields are unchanged.
-    expect(WORLD_SCHEMA_VERSION).toBe(32);
+    // P5b (D-146) raised it to 33 (deposit link, province latitude, three sectors).
+    expect(WORLD_SCHEMA_VERSION).toBe(33);
     const restored = deserializeWorld(serializeWorld(world));
     expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(restored.moneyCoefficients).toEqual(world.moneyCoefficients);

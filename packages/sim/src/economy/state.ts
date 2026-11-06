@@ -46,6 +46,7 @@ import {
   createCountryAIState,
 } from "./aiState.js";
 import { canonicalizeStockLots } from "./inventory.js";
+import { assertValidBuildingDeposits } from "./validation.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import {
   assertValidProfitDistributionPolicy,
@@ -1364,6 +1365,7 @@ export function createEconomyWorld(
       operational: instance.operational,
       operatingCashAccountId: instance.operatingCashAccountId,
       technique: instance.technique ?? 1,
+      depositId: instance.depositId ?? null,
     });
   }
   world.finance.nextAccountId = nextAccountId;
@@ -1446,6 +1448,8 @@ export function createEconomyWorld(
     scenario.definitions.technology === undefined ? null : technologyIds,
     "scenario.deposits",
   );
+  // P5b (plan §4.2): extraction buildings work a discovered deposit of their kind.
+  assertValidBuildingDeposits(world.buildings, world.resources.deposits, scenario.definitions);
 
   assertValidWorld(world);
   return world;

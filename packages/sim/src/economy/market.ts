@@ -33,6 +33,7 @@ import {
   applyOverflowToTable,
   buildProductionLookups,
   reservationUseObjects,
+  purchaseRole,
   runProductionCore,
   storageCapacityOf,
   type InventoryFlow,
@@ -273,6 +274,8 @@ export interface MarketDayLookups {
   readonly blockById: ReadonlyMap<number, World["popBlocks"][number]>;
   /** Buildings, province membership and production capacities (shared with M3c). */
   readonly production: ProductionLookups;
+  /** P5b: ids of the goods that cannot be stored (production waves). */
+  readonly nonStorableGoods: ReadonlySet<number>;
 }
 
 export function buildMarketDayLookups(world: World, definitions: EconomyDefinitions): MarketDayLookups {
@@ -280,7 +283,8 @@ export function buildMarketDayLookups(world: World, definitions: EconomyDefiniti
   for (const block of world.popBlocks) {
     if (!blockById.has(block.id)) blockById.set(block.id, block);
   }
-  return { definitions, blockById, production: buildProductionLookups(world, definitions) };
+  const nonStorableGoods = new Set(definitions.goods.filter((good) => good.storable === false).map((good) => good.id));
+  return { definitions, blockById, production: buildProductionLookups(world, definitions), nonStorableGoods };
 }
 
 export interface MarketDayOptions extends PhaseValidationOptions {
@@ -467,13 +471,15 @@ function validateMarketDayInput(
     if (definition.outputs.length === 0) {
       throw new RangeError(`${path} buyer has no production recipe`);
     }
-    if (!definition.inputs.some((candidate) => candidate.goodId === demand.goodId)) {
+    const role = purchaseRole(definition, demand.goodId);
+    if (role === null) {
       throw new RangeError(`${path}.goodId is not an input of the buyer recipe`);
     }
     if (!isProductionTier(demand.tier)) {
       throw new RangeError(`${path}.tier must be 2 or 5`);
     }
-    const expectedTier = productionInputTier(definition, criticalGoods);
+    // P5b: optional and maintenance purchases are always non-critical (tier 5).
+    const expectedTier = role === "input" ? productionInputTier(definition, criticalGoods) : 5;
     if (demand.tier !== expectedTier) {
       throw new RangeError(
         `${path}.tier does not match the approved critical-input classification`,
@@ -593,6 +599,42 @@ function allocationOrderSorted(
       return;
     }
   }
+}
+
+/**
+ * P5b (D-146 A4): the production waves of one market day, or null when no producer
+ * has funded demand for a non-storable good (the single-wave path). The first wave is
+ * every building of the market that makes a non-storable good; the second, the rest.
+ */
+function productionWaves(
+  definitions: EconomyDefinitions,
+  marketId: number,
+  lookups: MarketDayLookups,
+  kind: Uint8Array,
+  goodOf: Int32Array,
+  funded: Float64Array,
+  householdCount: number,
+  demandCount: number,
+): { first: ReadonlySet<number>; second: ReadonlySet<number>; goods: readonly number[] } | null {
+  const nonStorable = lookups.nonStorableGoods;
+  if (nonStorable.size === 0) return null;
+  const goods = new Set<number>();
+  for (let index = householdCount; index < demandCount; index += 1) {
+    if (kind[index] !== 1) continue;
+    const goodId = goodOf[index] ?? 0;
+    if (nonStorable.has(goodId) && (funded[index] ?? 0) > 0) goods.add(goodId);
+  }
+  if (goods.size === 0) return null;
+  const definitionById = lookups.production.definitionById ?? new Map(definitions.buildings.map((entry) => [entry.id, entry]));
+  const first = new Set<number>();
+  const second = new Set<number>();
+  for (const buildingId of lookups.production.buildingIdsByMarket.get(marketId) ?? []) {
+    const building = lookups.production.buildingById.get(buildingId);
+    const definition = building === undefined ? undefined : definitionById.get(building.definitionId);
+    if (definition !== undefined && definition.outputs.some((output) => nonStorable.has(output.goodId))) first.add(buildingId);
+    else second.add(buildingId);
+  }
+  return { first, second, goods: [...goods].sort((left, right) => left - right) };
 }
 
 /** Run one deterministic market-day clearing phase. Returns transient pending results. */
@@ -900,15 +942,71 @@ export function runMarketDay(
         throw new RangeError("economy definitions do not match the world data/scenario identity");
       }
     }
-    const productionCore = runProductionCore(
-      world,
-      definitions,
-      market,
-      lookups.production,
-      opening,
-      inputColumns,
-      false,
-    );
+    // P5b (D-146 A4): goods that cannot be stored (electricity) have no opening stock,
+    // so producers that need them buy from the same day's output. Their producers run
+    // in a first wave; that output is allocated to producers' demand (Pass A2, tier
+    // order); then the other buildings produce. Without such demand the single wave
+    // below is exactly the former path.
+    const waves = productionWaves(definitions, market.id, lookups, kind, goodOf, funded, householdCount, demandCount);
+    let productionCore: ReturnType<typeof runProductionCore>;
+    if (waves === null) {
+      productionCore = runProductionCore(world, definitions, market, lookups.production, opening, inputColumns, false);
+    } else {
+      const firstColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
+      const secondColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
+      for (let index = 0; index < inputColumns.buyer.length; index += 1) {
+        const target = waves.first.has(inputColumns.buyer[index] ?? 0) ? firstColumns : secondColumns;
+        (target.buyer as number[]).push(inputColumns.buyer[index] ?? 0);
+        (target.good as number[]).push(inputColumns.good[index] ?? 0);
+        (target.seller as number[]).push(inputColumns.seller[index] ?? 0);
+        (target.quantity as number[]).push(inputColumns.quantity[index] ?? 0);
+      }
+      const first = runProductionCore(world, definitions, market, lookups.production, opening, firstColumns, false, waves.first);
+      // Pass A2: same-day output of non-storable goods to producers, tiers 2 then 5.
+      const sameDay = copyLotTable(first.lots);
+      const beforeA2 = resKind.length;
+      for (const tier of [2, 5] as const) {
+        for (const goodId of waves.goods) {
+          const candidates: number[] = [];
+          for (let index = householdCount; index < demandCount; index += 1) {
+            if (tierOf[index] !== tier || goodOf[index] !== goodId) continue;
+            if ((funded[index] ?? 0) - (fulfilled[index] ?? 0) > tolerance(funded[index] ?? 0)) candidates.push(index);
+          }
+          if (candidates.length === 0) continue;
+          allocate(candidates, (index) => (funded[index] ?? 0) - (fulfilled[index] ?? 0), goodId, sameDay, 0);
+        }
+      }
+      for (let index = beforeA2; index < resKind.length; index += 1) {
+        (secondColumns.buyer as number[]).push(resBuyer[index] ?? 0);
+        (secondColumns.good as number[]).push(resGood[index] ?? 0);
+        (secondColumns.seller as number[]).push(resSeller[index] ?? 0);
+        (secondColumns.quantity as number[]).push(resQuantity[index] ?? 0);
+      }
+      const second = runProductionCore(world, definitions, market, lookups.production, first.lots, secondColumns, false, waves.second);
+      productionCore = {
+        buildings: [...first.buildings, ...second.buildings].sort((left, right) => left.buildingId - right.buildingId),
+        uses: {
+          buyer: [...first.uses.buyer, ...second.uses.buyer],
+          good: [...first.uses.good, ...second.uses.good],
+          seller: [...first.uses.seller, ...second.uses.seller],
+          reserved: [...first.uses.reserved, ...second.uses.reserved],
+          used: [...first.uses.used, ...second.uses.used],
+        },
+        inventory: first.inventory.map((flow, index) => {
+          const later = second.inventory[index] ?? flow;
+          return {
+            goodId: flow.goodId,
+            openingStock: flow.openingStock,
+            production: flow.production + later.production,
+            usedAsInput: flow.usedAsInput + later.usedAsInput,
+            recordedLoss: flow.recordedLoss + later.recordedLoss,
+            closingStock: later.closingStock,
+          };
+        }),
+        overflowLosses: [...first.overflowLosses, ...second.overflowLosses],
+        lots: second.lots,
+      };
+    }
     const produced = productionCore.lots;
     if (options.validateWorld !== false) {
       const candidateLots = lotTableToLots(produced);

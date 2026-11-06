@@ -228,6 +228,7 @@ export type SerializedProvinceEconomy = {
   readonly pastureHa: number;
   readonly urbanShare: number;
   readonly wageRUSDPerYearByProfession: readonly number[];
+  readonly absLatitudeDeg: number | null;
 };
 
 /** Encoded financial account. */
@@ -907,6 +908,7 @@ export type SerializedBuilding = {
   readonly operational: boolean;
   readonly operatingCashAccountId: number;
   readonly technique: number;
+  readonly depositId: number | null;
 };
 
 /** Encoded employment assignment. */
@@ -1360,6 +1362,7 @@ export function encodeWorld(world: World): SerializedWorld {
       pastureHa: province.pastureHa,
       urbanShare: province.urbanShare,
       wageRUSDPerYearByProfession: [...province.wageRUSDPerYearByProfession],
+      absLatitudeDeg: province.absLatitudeDeg,
     })),
     countries: [...world.countries]
       .sort((left, right) => left.id - right.id)
@@ -1540,6 +1543,7 @@ export function encodeWorld(world: World): SerializedWorld {
         operational: building.operational,
         operatingCashAccountId: building.operatingCashAccountId,
         technique: building.technique,
+        depositId: building.depositId,
       })),
     employment: [...world.employment]
       .sort((left, right) => left.id - right.id)
@@ -1954,6 +1958,8 @@ function decodeProvinceEconomy(value: unknown, path: string): ProvinceEconomy {
     pastureHa: requireFiniteNumber(record.pastureHa, `${path}.pastureHa`),
     urbanShare: requireFiniteNumber(record.urbanShare, `${path}.urbanShare`),
     wageRUSDPerYearByProfession: wages,
+    absLatitudeDeg:
+      record.absLatitudeDeg === null ? null : requireFiniteNumber(record.absLatitudeDeg, `${path}.absLatitudeDeg`),
   };
 }
 
@@ -3756,6 +3762,7 @@ function decodeBuilding(value: unknown, path: string): BuildingInstance {
       `${path}.operatingCashAccountId`,
     ),
     technique: requireFiniteNumber(record.technique, `${path}.technique`),
+    depositId: record.depositId === null ? null : requireUint32(record.depositId, `${path}.depositId`),
   };
 }
 

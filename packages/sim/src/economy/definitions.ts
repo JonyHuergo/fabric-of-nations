@@ -15,10 +15,13 @@ import {
   requireString,
 } from "../validation.js";
 import { M3_DEFERRED_GOOD_KEYS } from "./constants.js";
+import { RESOURCE_KINDS } from "./resourceState.js";
 import {
   BUILDING_SECTORS,
   GOOD_CATEGORIES,
+  GOOD_GROUPS,
   LAND_USES,
+  PRICE_BASES,
   PROFESSION_STRATA,
   type BuildingDef,
   type BuildingSector,
@@ -69,8 +72,37 @@ function assertGood(value: unknown, path: string): GoodDef {
   if (!(GOOD_CATEGORIES as readonly string[]).includes(good.category)) {
     throw new RangeError(`${path}.category is not a valid good category`);
   }
-  if (good.category === "service") {
-    throw new RangeError(`${path}.category "service" is deferred from M3`);
+  // P5b (D-146): new optional catalogue fields.
+  if (record.group !== undefined) {
+    if (typeof record.group !== "string" || !(GOOD_GROUPS as readonly string[]).includes(record.group)) {
+      throw new RangeError(`${path}.group is not a catalogue group`);
+    }
+    good.group = record.group as NonNullable<GoodDef["group"]>;
+  }
+  for (const flag of ["storable", "tradeable"] as const) {
+    if (record[flag] !== undefined) {
+      if (typeof record[flag] !== "boolean") throw new TypeError(`${path}.${flag} must be a boolean`);
+      good[flag] = record[flag] as boolean;
+    }
+  }
+  if (record.tradeRequiresTechnologyId !== undefined && record.tradeRequiresTechnologyId !== null) {
+    good.tradeRequiresTechnologyId = requireInteger(
+      record.tradeRequiresTechnologyId,
+      `${path}.tradeRequiresTechnologyId`,
+      0,
+      0xffff_ffff,
+    );
+  }
+  if (record.priceBasis !== undefined) {
+    if (typeof record.priceBasis !== "string" || !(PRICE_BASES as readonly string[]).includes(record.priceBasis)) {
+      throw new RangeError(`${path}.priceBasis is not a price basis`);
+    }
+    good.priceBasis = record.priceBasis as NonNullable<GoodDef["priceBasis"]>;
+  }
+  // Services were deferred by M3 as non-storable outputs; P5b models them as goods that
+  // cannot be stored (D-146 A13, C-6), so a service must say so.
+  if (good.category === "service" && good.storable !== false) {
+    throw new RangeError(`${path}.category "service" requires storable: false (services cannot be stored)`);
   }
   if ((M3_DEFERRED_GOOD_KEYS as readonly string[]).includes(good.key)) {
     throw new RangeError(
@@ -300,6 +332,52 @@ function assertBuilding(
   if (landUse !== undefined && !(LAND_USES as readonly unknown[]).includes(landUse)) {
     throw new RangeError(`${path}.landUse must be one of ${LAND_USES.join(", ")}`);
   }
+  // P5b (D-146): extraction, optional and maintenance inputs, crop bands.
+  const extracts = record.extracts;
+  if (extracts !== undefined) {
+    if (typeof extracts !== "string" || !(RESOURCE_KINDS as readonly string[]).includes(extracts)) {
+      throw new RangeError(`${path}.extracts must be one of ${RESOURCE_KINDS.join(", ")}`);
+    }
+    if (outputs.length === 0) throw new RangeError(`${path} extracts a resource but has no output`);
+  }
+  const purchaseGoods = new Set<number>(inputGoods);
+  const optionalInputs =
+    record.optionalInputs === undefined ? undefined : requireArray(record.optionalInputs, `${path}.optionalInputs`);
+  for (let index = 0; index < (optionalInputs?.length ?? 0); index += 1) {
+    const at = `${path}.optionalInputs[${String(index)}]`;
+    const item = requireRecord(optionalInputs?.[index], at);
+    const goodId = requireInteger(item.goodId, `${at}.goodId`, 0, 0xffff_ffff);
+    if (!goodIds.has(goodId)) throw new RangeError(`${at} references unknown good ${String(goodId)}`);
+    if (purchaseGoods.has(goodId)) throw new RangeError(`${path}.optionalInputs repeats good ${String(goodId)}`);
+    purchaseGoods.add(goodId);
+    assertPositive(item.quantityPerThroughputUnit, `${at}.quantityPerThroughputUnit`);
+    const elasticity = requireFiniteNumber(item.outputElasticity, `${at}.outputElasticity`);
+    if (!(elasticity > 0 && elasticity < 1)) throw new RangeError(`${at}.outputElasticity must be in (0, 1)`);
+  }
+  const maintenanceInputs =
+    record.maintenanceInputs === undefined
+      ? undefined
+      : requireArray(record.maintenanceInputs, `${path}.maintenanceInputs`);
+  for (let index = 0; index < (maintenanceInputs?.length ?? 0); index += 1) {
+    const at = `${path}.maintenanceInputs[${String(index)}]`;
+    const item = requireRecord(maintenanceInputs?.[index], at);
+    const goodId = requireInteger(item.goodId, `${at}.goodId`, 0, 0xffff_ffff);
+    if (!goodIds.has(goodId)) throw new RangeError(`${at} references unknown good ${String(goodId)}`);
+    if (purchaseGoods.has(goodId)) throw new RangeError(`${path}.maintenanceInputs repeats good ${String(goodId)}`);
+    purchaseGoods.add(goodId);
+    assertPositive(item.quantityPerLevelPerDay, `${at}.quantityPerLevelPerDay`);
+  }
+  for (const item of outputs) {
+    const goodId = (item as { goodId: number }).goodId;
+    if (purchaseGoods.has(goodId)) throw new RangeError(`${path} cannot buy its own output good ${String(goodId)}`);
+  }
+  let maxAbsLatitudeDeg: number | undefined;
+  if (record.maxAbsLatitudeDeg !== undefined) {
+    maxAbsLatitudeDeg = requireFiniteNumber(record.maxAbsLatitudeDeg, `${path}.maxAbsLatitudeDeg`);
+    if (!(maxAbsLatitudeDeg > 0 && maxAbsLatitudeDeg <= 90)) {
+      throw new RangeError(`${path}.maxAbsLatitudeDeg must be in (0, 90]`);
+    }
+  }
   const building: BuildingDef = {
     id: requireInteger(record.id, `${path}.id`, 0, 0xffff_ffff),
     key: requireString(record.key, `${path}.key`, { minLength: 1 }),
@@ -333,6 +411,14 @@ function assertBuilding(
     ownershipAllowed: ownership as BuildingDef["ownershipAllowed"],
     isEssentialInfrastructure: record.isEssentialInfrastructure === true,
     ...(landUse === undefined ? {} : { landUse: landUse as LandUse }),
+    ...(extracts === undefined ? {} : { extracts: extracts as NonNullable<BuildingDef["extracts"]> }),
+    ...(optionalInputs === undefined
+      ? {}
+      : { optionalInputs: optionalInputs as NonNullable<BuildingDef["optionalInputs"]> }),
+    ...(maintenanceInputs === undefined
+      ? {}
+      : { maintenanceInputs: maintenanceInputs as NonNullable<BuildingDef["maintenanceInputs"]> }),
+    ...(maxAbsLatitudeDeg === undefined ? {} : { maxAbsLatitudeDeg }),
   };
   if (typeof record.isEssentialInfrastructure !== "boolean") {
     throw new TypeError(`${path}.isEssentialInfrastructure must be a boolean`);
@@ -420,6 +506,37 @@ export function assertValidEconomyDefinitions(definitions: EconomyDefinitions): 
     ),
   );
   assertUniqueIdsAndKeys(buildings, "economyDefinitions.buildings");
+
+  // P5b (D-146 A4): goods that cannot be stored get no storage; their producers run in
+  // the first production wave, so they may not need such a good themselves; optional
+  // and maintenance purchases come from stock, so they must be storable.
+  const nonStorable = new Set(goods.filter((good) => good.storable === false).map((good) => good.id));
+  if (nonStorable.size > 0) {
+    for (let index = 0; index < buildings.length; index += 1) {
+      const building = buildings[index] as BuildingDef;
+      const path = `economyDefinitions.buildings[${String(index)}]`;
+      for (const storage of building.storageCapacityByGood) {
+        if (nonStorable.has(storage.goodId)) {
+          throw new RangeError(`${path} stores good ${String(storage.goodId)}, which cannot be stored`);
+        }
+      }
+      const makesNonStorable = building.outputs.some((output) => nonStorable.has(output.goodId));
+      if (makesNonStorable && building.inputs.some((input) => nonStorable.has(input.goodId))) {
+        throw new RangeError(`${path} makes a non-storable good from a non-storable input`);
+      }
+      for (const item of [...(building.optionalInputs ?? []), ...(building.maintenanceInputs ?? [])]) {
+        if (nonStorable.has(item.goodId)) {
+          throw new RangeError(`${path} buys non-storable good ${String(item.goodId)} as an optional or maintenance input`);
+        }
+      }
+    }
+  }
+  for (const good of goods) {
+    if (good.tradeRequiresTechnologyId === undefined || good.tradeRequiresTechnologyId === null) continue;
+    if (technologyIds === null || !technologyIds.has(good.tradeRequiresTechnologyId)) {
+      throw new RangeError(`economyDefinitions.goods[${String(good.id)}].tradeRequiresTechnologyId references unknown technology`);
+    }
+  }
 
   if (technology !== undefined) {
     const professionKeys = new Set(professions.map((profession) => profession.key));

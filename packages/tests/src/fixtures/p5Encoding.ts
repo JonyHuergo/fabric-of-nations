@@ -5,6 +5,7 @@
  * own-consumption owner, no closed month), this reproduces the pre-P5 digest.
  */
 import { encodeWorld, hashEncodedWorld, type World } from "@century/sim";
+import { withoutPhase5b } from "./p5bEncoding.js";
 
 /** A copy of an encoded world with the P5 fields removed (schema left as is). */
 export function withoutPhase5<T extends Record<string, unknown>>(encoded: T): T {
@@ -25,6 +26,7 @@ export function withoutPhase5<T extends Record<string, unknown>>(encoded: T): T 
 }
 
 export function prePhase5Digest(world: World): string {
-  const encoded = encodeWorld(world) as unknown as Record<string, unknown>;
+  // P5b (D-146): the P5b fields are removed first, so the pre-P5 digest is unchanged.
+  const encoded = withoutPhase5b(encodeWorld(world) as unknown as Record<string, unknown>);
   return hashEncodedWorld({ ...withoutPhase5(encoded), schemaVersion: 31 });
 }

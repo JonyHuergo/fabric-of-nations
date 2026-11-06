@@ -73,6 +73,9 @@ function assertNeedTierDef(value: unknown, path: string): NeedTierDef {
       item.quantityPerCapitaPerDay,
       `${path}.items[${String(index)}].quantityPerCapitaPerDay`,
     );
+    if (item.requiredTechnologyKey !== undefined) {
+      requireString(item.requiredTechnologyKey, `${path}.items[${String(index)}].requiredTechnologyKey`, { minLength: 1 });
+    }
   }
   return {
     tier: tier as NeedTier,

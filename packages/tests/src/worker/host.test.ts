@@ -182,13 +182,14 @@ describe("M7 simulation worker host", () => {
       action: {
         kind: "set-industrial-policy",
         countryId: country.id,
-        sectorSubsidyRates: [0.1, 0, 0, 0, 0],
+        sectorSubsidyRates: [0.1, 0, 0, 0, 0, 0, 0, 0],
       },
     });
     expect(lastEvent(events, "ACTION_RESULT")?.accepted).toBe(true);
     const after = lastSnapshot(events).countries.find((entry) => entry.id === country.id)!;
     expect(after.industrialPolicy.sectors[0]?.subsidyRate).toBe(0.1);
-    expect(after.industrialPolicy.sectors).toHaveLength(5);
+    // P5b (D-146 C-16): eight sectors.
+    expect(after.industrialPolicy.sectors).toHaveLength(8);
 
     host.handleCommand({
       protocolVersion: PROTOCOL_VERSION,

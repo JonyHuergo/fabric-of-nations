@@ -1296,6 +1296,9 @@ function countrySnapshot(
     textiles: "Textiles",
     manufacturing: "Manufacturing",
     storage: "Storage",
+    mining: "Mining",
+    energy: "Energy",
+    services: "Services",
   };
   const industrialPolicy: SnapshotIndustrialPolicy = {
     sectors: BUILDING_SECTORS.map((key, index) => ({

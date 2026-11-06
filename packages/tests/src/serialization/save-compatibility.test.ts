@@ -67,7 +67,8 @@ const CASES: readonly VersionCase[] = [
   {
     world: "the M5 multi-country world",
     build: () => m5World().world,
-    schemas: [9, 10, 11, 12].map((version) => ({
+    // P5b (D-146, D-147): schema 32 (P5a) is incompatible with schema 33.
+    schemas: [9, 10, 11, 12, 32].map((version) => ({
       version,
       error: new RegExp(`Save world schema ${String(version)} is incompatible`),
     })),
