@@ -143,6 +143,8 @@ World level from modelled demand (D-146 A5); territory shares as below (D-148).
 - bauxite: sourced shares (p. 14 (PDF 54): production of bauxite in the principal countries, 1900)
 - nitrates: sourced shares (p. 161 (PDF 201): world's production of ammonium sulphate and sodium nitrate, 1900 (exports from Chile))
 - tin: sourced shares (p. 638 (PDF 680): production of tin in the world, 1900)
+- gold: sourced shares (p. 314 (PDF 358): gold production of the world, 1900 (kilograms))
+- silver: sourced shares (p. 315 (PDF 359): silver production of the world, 1900 (kilograms))
 - kerosene: sourced shares of crude-oil (p. 504 (PDF 546): production of crude petroleum in the countries of the world, 1900)
 - electricity: local demand (no sourced shares)
 - steel: sourced shares (p. 395 (PDF 439): production of pig iron and steel in the principal countries, 1900 (steel column))

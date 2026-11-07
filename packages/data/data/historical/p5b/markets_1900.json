@@ -74,7 +74,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-pri-puerto-rico-cement-and-brick-works",
-    "quantity": 427.158
+    "quantity": 427.57
    },
    {
     "goodKey": "grain",
@@ -119,7 +119,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-usa-arizona-territory-copper-mine",
-    "quantity": 71.808
+    "quantity": 71.868
    },
    {
     "goodKey": "grain",
@@ -244,17 +244,17 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "am-usa-illinois-alkali-and-acid-works",
-    "quantity": 87.561
+    "quantity": 88.76
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-usa-illinois-cement-and-brick-works",
-    "quantity": 3799.093
+    "quantity": 3810.309
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-usa-illinois-coal-mine",
-    "quantity": 25006.525
+    "quantity": 25016.93
    },
    {
     "goodKey": "grain",
@@ -264,7 +264,7 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "am-usa-illinois-copper-smelter",
-    "quantity": 54.685
+    "quantity": 54.731
    },
    {
     "goodKey": "cotton",
@@ -274,7 +274,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "am-usa-illinois-machine-works",
-    "quantity": 165.894
+    "quantity": 166.4
    },
    {
     "goodKey": "paper",
@@ -289,7 +289,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "am-usa-illinois-steel-works",
-    "quantity": 2025.856
+    "quantity": 2027.551
    },
    {
     "goodKey": "grain",
@@ -469,7 +469,7 @@
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "am-usa-michigan-iron-mine",
-    "quantity": 656.197
+    "quantity": 656.728
    },
    {
     "goodKey": "wool",
@@ -494,7 +494,7 @@
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "am-usa-minnesota-iron-mine",
-    "quantity": 7291.081
+    "quantity": 7296.977
    },
    {
     "goodKey": "wool",
@@ -559,7 +559,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-usa-montana-copper-mine",
-    "quantity": 80.784
+    "quantity": 80.851
    },
    {
     "goodKey": "grain",
@@ -584,7 +584,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-usa-nevada-copper-mine",
-    "quantity": 114.195
+    "quantity": 114.291
    },
    {
     "goodKey": "grain",
@@ -619,7 +619,7 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "am-usa-new-york-alkali-and-acid-works",
-    "quantity": 131.512
+    "quantity": 133.312
    },
    {
     "goodKey": "aluminium",
@@ -629,7 +629,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-usa-new-york-cement-and-brick-works",
-    "quantity": 5705.997
+    "quantity": 5722.843
    },
    {
     "goodKey": "grain",
@@ -639,17 +639,17 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "am-usa-new-york-copper-smelter",
-    "quantity": 82.133
+    "quantity": 82.203
    },
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "am-usa-new-york-iron-mine",
-    "quantity": 786.269
+    "quantity": 786.905
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "am-usa-new-york-machine-works",
-    "quantity": 249.162
+    "quantity": 249.923
    },
    {
     "goodKey": "paper",
@@ -664,7 +664,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "am-usa-new-york-steel-works",
-    "quantity": 3042.708
+    "quantity": 3045.254
    },
    {
     "goodKey": "grain",
@@ -694,7 +694,7 @@
    {
     "goodKey": "nitrates",
     "ownerBuildingKey": "am-usa-new-york-warehouse",
-    "quantity": 6.531
+    "quantity": 6.644
    },
    {
     "goodKey": "ships",
@@ -704,7 +704,7 @@
    {
     "goodKey": "tin",
     "ownerBuildingKey": "am-usa-new-york-warehouse",
-    "quantity": 42.058
+    "quantity": 42.093
    },
    {
     "goodKey": "grain",
@@ -734,7 +734,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-usa-ohio-cement-and-brick-works",
-    "quantity": 3312.02
+    "quantity": 3321.798
    },
    {
     "goodKey": "grain",
@@ -744,12 +744,12 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "am-usa-ohio-copper-smelter",
-    "quantity": 47.674
+    "quantity": 47.714
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "am-usa-ohio-machine-works",
-    "quantity": 144.625
+    "quantity": 145.067
    },
    {
     "goodKey": "crude-oil",
@@ -769,7 +769,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "am-usa-ohio-steel-works",
-    "quantity": 1766.126
+    "quantity": 1767.604
    },
    {
     "goodKey": "grain",
@@ -804,7 +804,7 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "am-usa-pennsylvania-alkali-and-acid-works",
-    "quantity": 108.648
+    "quantity": 110.135
    },
    {
     "goodKey": "aluminium",
@@ -814,12 +814,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-usa-pennsylvania-cement-and-brick-works",
-    "quantity": 4713.976
+    "quantity": 4727.893
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-usa-pennsylvania-coal-mine",
-    "quantity": 31258.156
+    "quantity": 31271.162
    },
    {
     "goodKey": "grain",
@@ -829,12 +829,12 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "am-usa-pennsylvania-copper-smelter",
-    "quantity": 67.854
+    "quantity": 67.911
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "am-usa-pennsylvania-machine-works",
-    "quantity": 205.844
+    "quantity": 206.472
    },
    {
     "goodKey": "crude-oil",
@@ -854,7 +854,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "am-usa-pennsylvania-steel-works",
-    "quantity": 2513.715
+    "quantity": 2515.818
    },
    {
     "goodKey": "grain",
@@ -939,12 +939,12 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-usa-utah-copper-mine",
-    "quantity": 71.808
+    "quantity": 71.868
    },
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "am-usa-utah-iron-mine",
-    "quantity": 416.765
+    "quantity": 417.102
    },
    {
     "goodKey": "grain",
@@ -984,7 +984,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-usa-west-virginia-coal-mine",
-    "quantity": 31258.156
+    "quantity": 31271.162
    },
    {
     "goodKey": "crude-oil",
@@ -1029,12 +1029,12 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-usa-wyoming-coal-mine",
-    "quantity": 21880.709
+    "quantity": 21889.814
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-phl-manila-and-central-luzon-cement-and-brick-works",
-    "quantity": 376.093
+    "quantity": 376.456
    },
    {
     "goodKey": "grain",
@@ -1059,7 +1059,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-phl-mindanao-and-sulu-cement-and-brick-works",
-    "quantity": 207.999
+    "quantity": 208.2
    },
    {
     "goodKey": "cotton",
@@ -1079,7 +1079,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-phl-northern-luzon-cement-and-brick-works",
-    "quantity": 231.833
+    "quantity": 232.057
    },
    {
     "goodKey": "grain",
@@ -1099,7 +1099,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-phl-visayas-cement-and-brick-works",
-    "quantity": 303.069
+    "quantity": 303.362
    },
    {
     "goodKey": "grain",
@@ -1411,7 +1411,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bea-buganda-cement-and-brick-works",
-    "quantity": 43.797
+    "quantity": 43.778
    },
    {
     "goodKey": "cotton",
@@ -1456,7 +1456,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bea-nyanza-and-the-western-province-cement-and-brick-works",
-    "quantity": 104.92
+    "quantity": 104.874
    },
    {
     "goodKey": "grain",
@@ -1471,7 +1471,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bea-rift-valley-cement-and-brick-works",
-    "quantity": 81.17
+    "quantity": 81.135
    },
    {
     "goodKey": "grain",
@@ -1481,7 +1481,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bea-ukamba-and-nairobi-cement-and-brick-works",
-    "quantity": 112.139
+    "quantity": 112.091
    },
    {
     "goodKey": "grain",
@@ -1521,7 +1521,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bpo-mauritius-cement-and-brick-works",
-    "quantity": 235.426
+    "quantity": 236.508
    },
    {
     "goodKey": "cotton",
@@ -1531,7 +1531,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bpo-pemba-cement-and-brick-works",
-    "quantity": 66.362
+    "quantity": 66.667
    },
    {
     "goodKey": "grain",
@@ -1546,7 +1546,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bpo-zanzibar-cement-and-brick-works",
-    "quantity": 61.826
+    "quantity": 62.111
    },
    {
     "goodKey": "grain",
@@ -1571,7 +1571,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bwa-gold-coast-colony-cement-and-brick-works",
-    "quantity": 212.17
+    "quantity": 212.556
    },
    {
     "goodKey": "grain",
@@ -1641,7 +1641,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bwa-southern-nigeria-the-east-cement-and-brick-works",
-    "quantity": 730.801
+    "quantity": 732.131
    },
    {
     "goodKey": "grain",
@@ -1666,7 +1666,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bwa-southern-nigeria-the-middle-belt-cement-and-brick-works",
-    "quantity": 316.539
+    "quantity": 317.116
    },
    {
     "goodKey": "grain",
@@ -1691,7 +1691,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-bwa-southern-nigeria-the-west-cement-and-brick-works",
-    "quantity": 342.489
+    "quantity": 343.113
    },
    {
     "goodKey": "grain",
@@ -1706,12 +1706,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-cap-cape-peninsula-and-the-western-districts-cement-and-brick-works",
-    "quantity": 108.598
+    "quantity": 108.556
    },
    {
     "goodKey": "copper",
     "ownerBuildingKey": "af-cap-cape-peninsula-and-the-western-districts-copper-smelter",
-    "quantity": 42.978
+    "quantity": 43.013
    },
    {
     "goodKey": "cotton",
@@ -1726,7 +1726,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-cap-eastern-cape-and-the-transkei-cement-and-brick-works",
-    "quantity": 174.246
+    "quantity": 174.179
    },
    {
     "goodKey": "grain",
@@ -1736,7 +1736,7 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "af-cap-eastern-cape-and-the-transkei-copper-smelter",
-    "quantity": 68.958
+    "quantity": 69.014
    },
    {
     "goodKey": "cotton",
@@ -1756,17 +1756,17 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-cap-northern-cape-and-griqualand-west-cement-and-brick-works",
-    "quantity": 22.232
+    "quantity": 22.224
    },
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "af-cap-northern-cape-and-griqualand-west-copper-mine",
-    "quantity": 11.668
+    "quantity": 11.678
    },
    {
     "goodKey": "copper",
     "ownerBuildingKey": "af-cap-northern-cape-and-griqualand-west-copper-smelter",
-    "quantity": 8.798
+    "quantity": 8.806
    },
    {
     "goodKey": "cotton",
@@ -1801,7 +1801,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-cra-northern-rhodesia-central-cement-and-brick-works",
-    "quantity": 59.775
+    "quantity": 61.855
    },
    {
     "goodKey": "grain",
@@ -1851,7 +1851,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-cra-southern-rhodesia-mashonaland-cement-and-brick-works",
-    "quantity": 81.188
+    "quantity": 84.014
    },
    {
     "goodKey": "grain",
@@ -1861,7 +1861,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-cra-southern-rhodesia-victoria-and-the-midlands-cement-and-brick-works",
-    "quantity": 83.247
+    "quantity": 86.144
    },
    {
     "goodKey": "cotton",
@@ -1876,7 +1876,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-hct-basutoland-the-lowlands-cement-and-brick-works",
-    "quantity": 95.8
+    "quantity": 95.758
    },
    {
     "goodKey": "grain",
@@ -1921,7 +1921,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-nat-natal-and-zululand-cement-and-brick-works",
-    "quantity": 102.31
+    "quantity": 102.266
    },
    {
     "goodKey": "grain",
@@ -1951,7 +1951,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-sud-blue-nile-and-sennar-cement-and-brick-works",
-    "quantity": 59.421
+    "quantity": 59.395
    },
    {
     "goodKey": "cotton",
@@ -1971,7 +1971,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-sud-equatoria-cement-and-brick-works",
-    "quantity": 41.124
+    "quantity": 41.106
    },
    {
     "goodKey": "grain",
@@ -1981,7 +1981,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-sud-kassala-and-the-red-sea-cement-and-brick-works",
-    "quantity": 73.347
+    "quantity": 73.315
    },
    {
     "goodKey": "cotton",
@@ -2001,7 +2001,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-sud-kordofan-cement-and-brick-works",
-    "quantity": 87.14
+    "quantity": 87.102
    },
    {
     "goodKey": "grain",
@@ -2046,7 +2046,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-bwi-brb-barbados-cement-and-brick-works",
-    "quantity": 118.389
+    "quantity": 120.452
    },
    {
     "goodKey": "grain",
@@ -2076,7 +2076,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-bwi-jam-cornwall-cement-and-brick-works",
-    "quantity": 168.774
+    "quantity": 171.716
    },
    {
     "goodKey": "cotton",
@@ -2091,7 +2091,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-bwi-jam-middlesex-cement-and-brick-works",
-    "quantity": 261.523
+    "quantity": 266.082
    },
    {
     "goodKey": "grain",
@@ -2121,7 +2121,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-bwi-tto-trinidad-cement-and-brick-works",
-    "quantity": 188.991
+    "quantity": 192.286
    },
    {
     "goodKey": "grain",
@@ -2171,7 +2171,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-bin-assam-coal-mine",
-    "quantity": 1.54
+    "quantity": 1.541
    },
    {
     "goodKey": "grain",
@@ -2201,7 +2201,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-bin-bengal-coal-mine",
-    "quantity": 176.015
+    "quantity": 176.095
    },
    {
     "goodKey": "grain",
@@ -2216,17 +2216,17 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-bin-bihar-alkali-and-acid-works",
-    "quantity": 16.963
+    "quantity": 17.106
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-bin-bihar-cement-and-brick-works",
-    "quantity": 6048.025
+    "quantity": 6057.389
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-bin-bihar-coal-mine",
-    "quantity": 1760.153
+    "quantity": 1760.945
    },
    {
     "goodKey": "grain",
@@ -2251,12 +2251,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-bin-bombay-alkali-and-acid-works",
-    "quantity": 15.267
+    "quantity": 15.396
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-bin-bombay-cement-and-brick-works",
-    "quantity": 5443.315
+    "quantity": 5451.743
    },
    {
     "goodKey": "grain",
@@ -2356,12 +2356,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-bin-madras-alkali-and-acid-works",
-    "quantity": 16.008
+    "quantity": 16.143
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-bin-madras-cement-and-brick-works",
-    "quantity": 5707.532
+    "quantity": 5716.369
    },
    {
     "goodKey": "grain",
@@ -2486,12 +2486,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-bin-united-provinces-alkali-and-acid-works",
-    "quantity": 24.877
+    "quantity": 25.088
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-bin-united-provinces-cement-and-brick-works",
-    "quantity": 8869.871
+    "quantity": 8883.605
    },
    {
     "goodKey": "grain",
@@ -2526,7 +2526,7 @@
    {
     "goodKey": "nitrates",
     "ownerBuildingKey": "as-bin-united-provinces-warehouse",
-    "quantity": 118.39
+    "quantity": 118.427
    },
    {
     "goodKey": "ships",
@@ -2546,7 +2546,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-cey-central-ceylon-cement-and-brick-works",
-    "quantity": 146.291
+    "quantity": 146.228
    },
    {
     "goodKey": "cotton",
@@ -2566,7 +2566,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-cey-northern-ceylon-cement-and-brick-works",
-    "quantity": 212.013
+    "quantity": 211.921
    },
    {
     "goodKey": "grain",
@@ -2596,7 +2596,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-cey-southern-ceylon-cement-and-brick-works",
-    "quantity": 94.499
+    "quantity": 94.458
    },
    {
     "goodKey": "cotton",
@@ -2616,7 +2616,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-cey-western-ceylon-cement-and-brick-works",
-    "quantity": 287.291
+    "quantity": 287.166
    },
    {
     "goodKey": "grain",
@@ -2701,7 +2701,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-mal-federated-malay-states-cement-and-brick-works",
-    "quantity": 278.709
+    "quantity": 278.707
    },
    {
     "goodKey": "grain",
@@ -2726,7 +2726,7 @@
    {
     "goodKey": "tin",
     "ownerBuildingKey": "as-mal-federated-malay-states-tin-mine",
-    "quantity": 19.496
+    "quantity": 19.512
    },
    {
     "goodKey": "cotton",
@@ -2746,7 +2746,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-mal-straits-settlements-cement-and-brick-works",
-    "quantity": 342.037
+    "quantity": 342.035
    },
    {
     "goodKey": "cotton",
@@ -2811,7 +2811,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "gbr-derbyshire-and-nottinghamshire-coal-mine",
-    "quantity": 17344.641
+    "quantity": 17352.45
    },
    {
     "goodKey": "grain",
@@ -3016,7 +3016,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "gbr-lancashire-and-cheshire-cement-and-brick-works",
-    "quantity": 1996.625
+    "quantity": 1995.815
    },
    {
     "goodKey": "grain",
@@ -3031,7 +3031,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "gbr-lancashire-and-cheshire-machine-works",
-    "quantity": 374.924
+    "quantity": 375.453
    },
    {
     "goodKey": "paper",
@@ -3046,7 +3046,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "gbr-lancashire-and-cheshire-steel-works",
-    "quantity": 922.773
+    "quantity": 923.54
    },
    {
     "goodKey": "grain",
@@ -3066,12 +3066,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "gbr-middlesex-and-london-cement-and-brick-works",
-    "quantity": 2483.81
+    "quantity": 2482.801
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "gbr-middlesex-and-london-machine-works",
-    "quantity": 466.407
+    "quantity": 467.065
    },
    {
     "goodKey": "paper",
@@ -3081,7 +3081,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "gbr-middlesex-and-london-steel-works",
-    "quantity": 1147.933
+    "quantity": 1148.887
    },
    {
     "goodKey": "textiles",
@@ -3121,7 +3121,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "gbr-northumberland-and-durham-coal-mine",
-    "quantity": 17344.641
+    "quantity": 17352.45
    },
    {
     "goodKey": "grain",
@@ -3146,7 +3146,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "gbr-south-wales-coal-mine",
-    "quantity": 19271.824
+    "quantity": 19280.5
    },
    {
     "goodKey": "grain",
@@ -3211,12 +3211,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "gbr-surrey-kent-and-sussex-alkali-and-acid-works",
-    "quantity": 219.065
+    "quantity": 219.265
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "gbr-surrey-kent-and-sussex-cement-and-brick-works",
-    "quantity": 3238.253
+    "quantity": 3236.938
    },
    {
     "goodKey": "grain",
@@ -3231,7 +3231,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "gbr-surrey-kent-and-sussex-machine-works",
-    "quantity": 608.075
+    "quantity": 608.933
    },
    {
     "goodKey": "paper",
@@ -3246,7 +3246,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "gbr-surrey-kent-and-sussex-steel-works",
-    "quantity": 1496.611
+    "quantity": 1497.855
    },
    {
     "goodKey": "grain",
@@ -3281,12 +3281,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "gbr-yorkshire-cement-and-brick-works",
-    "quantity": 1693.043
+    "quantity": 1692.356
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "gbr-yorkshire-coal-mine",
-    "quantity": 17344.641
+    "quantity": 17352.45
    },
    {
     "goodKey": "grain",
@@ -3296,7 +3296,7 @@
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "gbr-yorkshire-iron-mine",
-    "quantity": 4230.515
+    "quantity": 4233.936
    },
    {
     "goodKey": "timber",
@@ -3306,7 +3306,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "gbr-yorkshire-machine-works",
-    "quantity": 317.918
+    "quantity": 318.366
    },
    {
     "goodKey": "paper",
@@ -3321,7 +3321,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "gbr-yorkshire-steel-works",
-    "quantity": 782.467
+    "quantity": 783.118
    },
    {
     "goodKey": "grain",
@@ -3351,7 +3351,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "oc-bpo-papua-milne-bay-cement-and-brick-works",
-    "quantity": 3.785
+    "quantity": 3.802
    },
    {
     "goodKey": "cotton",
@@ -3366,7 +3366,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "oc-fji-central-division-cement-and-brick-works",
-    "quantity": 69.615
+    "quantity": 69.585
    },
    {
     "goodKey": "cotton",
@@ -3533,7 +3533,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-gea-bukoba-mwanza-and-the-lake-cement-and-brick-works",
-    "quantity": 256.735
+    "quantity": 256.722
    },
    {
     "goodKey": "grain",
@@ -3558,7 +3558,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-gea-burundi-cement-and-brick-works",
-    "quantity": 214.381
+    "quantity": 214.371
    },
    {
     "goodKey": "grain",
@@ -3613,7 +3613,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-gea-lindi-mtwara-and-ruvuma-cement-and-brick-works",
-    "quantity": 207.222
+    "quantity": 207.212
    },
    {
     "goodKey": "cotton",
@@ -3633,7 +3633,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-gea-rwanda-cement-and-brick-works",
-    "quantity": 202.79
+    "quantity": 202.78
    },
    {
     "goodKey": "grain",
@@ -3658,12 +3658,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-gsw-hereroland-cement-and-brick-works",
-    "quantity": 24.311
+    "quantity": 24.31
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-gsw-kavango-and-caprivi-cement-and-brick-works",
-    "quantity": 39.731
+    "quantity": 39.729
    },
    {
     "goodKey": "cotton",
@@ -3678,7 +3678,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-gsw-ovamboland-cement-and-brick-works",
-    "quantity": 110.438
+    "quantity": 110.433
    },
    {
     "goodKey": "grain",
@@ -3698,12 +3698,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-gsw-windhoek-and-the-khomas-highlands-cement-and-brick-works",
-    "quantity": 24.07
+    "quantity": 24.069
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-kam-central-kamerun-cement-and-brick-works",
-    "quantity": 376.131
+    "quantity": 376.112
    },
    {
     "goodKey": "grain",
@@ -3728,7 +3728,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-kam-northern-kamerun-cement-and-brick-works",
-    "quantity": 223.4
+    "quantity": 223.389
    },
    {
     "goodKey": "cotton",
@@ -3748,7 +3748,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-kam-southern-cameroons-cement-and-brick-works",
-    "quantity": 186.593
+    "quantity": 186.584
    },
    {
     "goodKey": "cotton",
@@ -3768,7 +3768,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-kam-southern-kamerun-cement-and-brick-works",
-    "quantity": 79.412
+    "quantity": 79.408
    },
    {
     "goodKey": "cotton",
@@ -3788,7 +3788,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-tog-british-togoland-cement-and-brick-works",
-    "quantity": 215.939
+    "quantity": 215.928
    },
    {
     "goodKey": "cotton",
@@ -3823,7 +3823,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-tog-french-togoland-kara-and-savanes-cement-and-brick-works",
-    "quantity": 32.02
+    "quantity": 32.018
    },
    {
     "goodKey": "cotton",
@@ -3843,7 +3843,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-tog-french-togoland-maritime-and-plateaux-cement-and-brick-works",
-    "quantity": 71.207
+    "quantity": 71.203
    },
    {
     "goodKey": "grain",
@@ -3903,7 +3903,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "deu-bavaria-cement-and-brick-works",
-    "quantity": 3820.268
+    "quantity": 3820.298
    },
    {
     "goodKey": "grain",
@@ -3913,7 +3913,7 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "deu-bavaria-copper-smelter",
-    "quantity": 50.91
+    "quantity": 50.953
    },
    {
     "goodKey": "timber",
@@ -3938,7 +3938,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "deu-bavaria-steel-works",
-    "quantity": 1547.573
+    "quantity": 1548.869
    },
    {
     "goodKey": "grain",
@@ -3971,9 +3971,14 @@
     "quantity": 23.264
    },
    {
+    "goodKey": "gold",
+    "ownerBuildingKey": "deu-bavaria-warehouse",
+    "quantity": 0.306
+   },
+   {
     "goodKey": "nitrates",
     "ownerBuildingKey": "deu-bavaria-warehouse",
-    "quantity": 3.74
+    "quantity": 3.754
    },
    {
     "goodKey": "ships",
@@ -3983,7 +3988,7 @@
    {
     "goodKey": "tin",
     "ownerBuildingKey": "deu-bavaria-warehouse",
-    "quantity": 26.922
+    "quantity": 26.945
    },
    {
     "goodKey": "grain",
@@ -4058,7 +4063,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "deu-hanover-cement-and-brick-works",
-    "quantity": 2681.611
+    "quantity": 2681.632
    },
    {
     "goodKey": "grain",
@@ -4068,7 +4073,7 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "deu-hanover-copper-smelter",
-    "quantity": 35.736
+    "quantity": 35.766
    },
    {
     "goodKey": "machinery",
@@ -4088,7 +4093,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "deu-hanover-steel-works",
-    "quantity": 1086.308
+    "quantity": 1087.218
    },
    {
     "goodKey": "grain",
@@ -4133,7 +4138,7 @@
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "deu-lorraine-iron-mine",
-    "quantity": 5857.385
+    "quantity": 5862.122
    },
    {
     "goodKey": "grain",
@@ -4228,7 +4233,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "deu-prussian-saxony-coal-mine",
-    "quantity": 1704.703
+    "quantity": 1705.083
    },
    {
     "goodKey": "grain",
@@ -4238,7 +4243,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "deu-prussian-saxony-copper-mine",
-    "quantity": 25.637
+    "quantity": 25.658
    },
    {
     "goodKey": "wool",
@@ -4263,12 +4268,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "deu-rhine-province-cement-and-brick-works",
-    "quantity": 5619.59
+    "quantity": 5619.635
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "deu-rhine-province-coal-mine",
-    "quantity": 2386.584
+    "quantity": 2387.116
    },
    {
     "goodKey": "grain",
@@ -4278,7 +4283,7 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "deu-rhine-province-copper-smelter",
-    "quantity": 74.888
+    "quantity": 74.951
    },
    {
     "goodKey": "timber",
@@ -4303,7 +4308,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "deu-rhine-province-steel-works",
-    "quantity": 2276.47
+    "quantity": 2278.377
    },
    {
     "goodKey": "grain",
@@ -4323,7 +4328,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "deu-saxony-cement-and-brick-works",
-    "quantity": 2634.912
+    "quantity": 2634.933
    },
    {
     "goodKey": "grain",
@@ -4348,7 +4353,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "deu-saxony-steel-works",
-    "quantity": 1067.391
+    "quantity": 1068.285
    },
    {
     "goodKey": "grain",
@@ -4408,7 +4413,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "deu-upper-silesia-coal-mine",
-    "quantity": 30684.654
+    "quantity": 30691.494
    },
    {
     "goodKey": "grain",
@@ -4448,7 +4453,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "deu-westphalia-coal-mine",
-    "quantity": 34094.06
+    "quantity": 34101.66
    },
    {
     "goodKey": "grain",
@@ -4523,7 +4528,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "oc-gng-eastern-highlands-cement-and-brick-works",
-    "quantity": 25.872
+    "quantity": 25.871
    },
    {
     "goodKey": "grain",
@@ -4548,7 +4553,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "oc-gng-madang-cement-and-brick-works",
-    "quantity": 27.708
+    "quantity": 27.707
    },
    {
     "goodKey": "cotton",
@@ -4563,7 +4568,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "oc-gng-morobe-cement-and-brick-works",
-    "quantity": 40.436
+    "quantity": 40.434
    },
    {
     "goodKey": "cotton",
@@ -4578,7 +4583,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "oc-gng-southern-highlands-cement-and-brick-works",
-    "quantity": 24.277
+    "quantity": 24.276
    },
    {
     "goodKey": "grain",
@@ -4831,7 +4836,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-alg-algiers-and-the-mitidja-cement-and-brick-works",
-    "quantity": 28.693
+    "quantity": 28.692
    },
    {
     "goodKey": "cotton",
@@ -4851,7 +4856,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-alg-constantine-and-the-east-cement-and-brick-works",
-    "quantity": 78.28
+    "quantity": 78.279
    },
    {
     "goodKey": "grain",
@@ -4881,7 +4886,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-alg-oran-and-the-west-cement-and-brick-works",
-    "quantity": 51.423
+    "quantity": 51.422
    },
    {
     "goodKey": "grain",
@@ -4931,7 +4936,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-fea-chad-the-south-cement-and-brick-works",
-    "quantity": 47.612
+    "quantity": 47.611
    },
    {
     "goodKey": "grain",
@@ -4961,7 +4966,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-fea-middle-congo-brazzaville-and-the-pool-cement-and-brick-works",
-    "quantity": 45.953
+    "quantity": 45.952
    },
    {
     "goodKey": "grain",
@@ -4976,7 +4981,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-fea-ubangi-shari-the-centre-cement-and-brick-works",
-    "quantity": 41.712
+    "quantity": 41.711
    },
    {
     "goodKey": "grain",
@@ -4996,7 +5001,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-fea-ubangi-shari-the-west-cement-and-brick-works",
-    "quantity": 51.507
+    "quantity": 51.506
    },
    {
     "goodKey": "cotton",
@@ -5016,7 +5021,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-fra-reunion-cement-and-brick-works",
-    "quantity": 76.079
+    "quantity": 76.078
    },
    {
     "goodKey": "grain",
@@ -5071,7 +5076,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-fwa-french-sudan-kayes-bamako-and-koulikoro-cement-and-brick-works",
-    "quantity": 121.852
+    "quantity": 121.85
    },
    {
     "goodKey": "grain",
@@ -5126,7 +5131,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-fwa-ivory-coast-the-south-cement-and-brick-works",
-    "quantity": 170.643
+    "quantity": 170.64
    },
    {
     "goodKey": "grain",
@@ -5191,7 +5196,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-fwa-senegal-the-communes-and-the-coast-cement-and-brick-works",
-    "quantity": 222.017
+    "quantity": 222.013
    },
    {
     "goodKey": "grain",
@@ -5201,7 +5206,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-fwa-senegal-the-interior-cement-and-brick-works",
-    "quantity": 128.402
+    "quantity": 128.4
    },
    {
     "goodKey": "grain",
@@ -5236,7 +5241,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-mad-antananarivo-cement-and-brick-works",
-    "quantity": 65.051
+    "quantity": 65.05
    },
    {
     "goodKey": "grain",
@@ -5251,7 +5256,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-mad-fianarantsoa-cement-and-brick-works",
-    "quantity": 66.786
+    "quantity": 66.785
    },
    {
     "goodKey": "grain",
@@ -5281,7 +5286,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-mad-toamasina-cement-and-brick-works",
-    "quantity": 43.235
+    "quantity": 43.234
    },
    {
     "goodKey": "cotton",
@@ -5331,7 +5336,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-tun-tunis-and-the-sahel-cement-and-brick-works",
-    "quantity": 81.368
+    "quantity": 81.367
    },
    {
     "goodKey": "grain",
@@ -5376,7 +5381,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-fca-miquelon-cement-and-brick-works",
-    "quantity": 171.686
+    "quantity": 171.683
    },
    {
     "goodKey": "grain",
@@ -5401,7 +5406,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-fic-annam-cement-and-brick-works",
-    "quantity": 262.134
+    "quantity": 262.13
    },
    {
     "goodKey": "grain",
@@ -5421,7 +5426,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-fic-cambodia-cement-and-brick-works",
-    "quantity": 93.668
+    "quantity": 93.667
    },
    {
     "goodKey": "grain",
@@ -5446,7 +5451,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-fic-cochinchina-cement-and-brick-works",
-    "quantity": 305.214
+    "quantity": 305.209
    },
    {
     "goodKey": "grain",
@@ -5471,7 +5476,7 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "as-fic-cochinchina-warehouse",
-    "quantity": 39.474
+    "quantity": 39.507
    },
    {
     "goodKey": "electrical-equipment",
@@ -5484,6 +5489,11 @@
     "quantity": 21.232
    },
    {
+    "goodKey": "gold",
+    "ownerBuildingKey": "as-fic-cochinchina-warehouse",
+    "quantity": 6.781
+   },
+   {
     "goodKey": "kerosene",
     "ownerBuildingKey": "as-fic-cochinchina-warehouse",
     "quantity": 1722.338
@@ -5491,7 +5501,7 @@
    {
     "goodKey": "nitrates",
     "ownerBuildingKey": "as-fic-cochinchina-warehouse",
-    "quantity": 2.572
+    "quantity": 2.581
    },
    {
     "goodKey": "ships",
@@ -5501,7 +5511,7 @@
    {
     "goodKey": "tin",
     "ownerBuildingKey": "as-fic-cochinchina-warehouse",
-    "quantity": 6.579
+    "quantity": 6.585
    },
    {
     "goodKey": "rubber",
@@ -5521,7 +5531,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-fic-tonkin-cement-and-brick-works",
-    "quantity": 324.522
+    "quantity": 324.517
    },
    {
     "goodKey": "grain",
@@ -5986,7 +5996,7 @@
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "fra-meurthe-et-moselle-iron-mine",
-    "quantity": 1431.367
+    "quantity": 1432.524
    },
    {
     "goodKey": "grain",
@@ -6036,12 +6046,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "fra-nord-cement-and-brick-works",
-    "quantity": 2816.733
+    "quantity": 2816.745
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "fra-nord-coal-mine",
-    "quantity": 3478.131
+    "quantity": 3478.525
    },
    {
     "goodKey": "grain",
@@ -6066,7 +6076,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "fra-nord-steel-works",
-    "quantity": 448.164
+    "quantity": 448.533
    },
    {
     "goodKey": "grain",
@@ -6101,7 +6111,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "fra-paris-cement-and-brick-works",
-    "quantity": 4160.129
+    "quantity": 4160.147
    },
    {
     "goodKey": "grain",
@@ -6126,7 +6136,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "fra-paris-steel-works",
-    "quantity": 661.909
+    "quantity": 662.454
    },
    {
     "goodKey": "grain",
@@ -6141,12 +6151,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "fra-pas-de-calais-cement-and-brick-works",
-    "quantity": 1226.89
+    "quantity": 1226.895
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "fra-pas-de-calais-coal-mine",
-    "quantity": 34781.313
+    "quantity": 34785.246
    },
    {
     "goodKey": "grain",
@@ -6171,7 +6181,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "fra-pas-de-calais-steel-works",
-    "quantity": 195.208
+    "quantity": 195.369
    },
    {
     "goodKey": "grain",
@@ -6211,7 +6221,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "fra-rhone-cement-and-brick-works",
-    "quantity": 1130.026
+    "quantity": 1130.031
    },
    {
     "goodKey": "grain",
@@ -6236,7 +6246,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "fra-rhone-steel-works",
-    "quantity": 179.796
+    "quantity": 179.944
    },
    {
     "goodKey": "grain",
@@ -6610,77 +6620,77 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-buk-bukhara-cement-and-brick-works",
-    "quantity": 98.35
+    "quantity": 98.723
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-buk-bukhara-commercial-farm-peasant",
-    "quantity": 35199.716
+    "quantity": 35158.985
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-buk-bukhara-cotton-farm",
-    "quantity": 7837.116
+    "quantity": 7872.681
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-buk-bukhara-subsistence-farm",
-    "quantity": 82900.059
+    "quantity": 82804.132
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-buk-eastern-bukhara-cotton-farm",
-    "quantity": 4762.553
+    "quantity": 4784.165
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-buk-eastern-bukhara-subsistence-farm",
-    "quantity": 61643.633
+    "quantity": 61572.303
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-khi-karakalpak-commercial-farm-peasant",
-    "quantity": 25599.793
+    "quantity": 25570.171
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-khi-karakalpak-subsistence-farm",
-    "quantity": 14879.498
+    "quantity": 14862.28
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-khi-khiva-cotton-farm",
-    "quantity": 3648.894
+    "quantity": 3665.453
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-khi-khiva-subsistence-farm",
-    "quantity": 14879.498
+    "quantity": 14862.28
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-khi-tashauz-cotton-farm",
-    "quantity": 5514.501
+    "quantity": 5539.526
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-khi-tashauz-subsistence-farm",
-    "quantity": 14879.498
+    "quantity": 14862.28
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-rus-akmolinsk-coal-mine",
-    "quantity": 1304.595
+    "quantity": 1299.778
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-akmolinsk-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-altai-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -6690,27 +6700,27 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-altai-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-rus-altai-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-amur-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-rus-baku-cotton-farm",
-    "quantity": 197523.344
+    "quantity": 197505.696
    },
    {
     "goodKey": "crude-oil",
     "ownerBuildingKey": "as-rus-baku-oil-field",
-    "quantity": 18904.726
+    "quantity": 18817.642
    },
    {
     "goodKey": "wool",
@@ -6720,27 +6730,27 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-baku-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-rus-baku-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-elisavetpol-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-erivan-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-fergana-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -6750,17 +6760,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-fergana-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-rus-fergana-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-irkutsk-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -6770,92 +6780,92 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-irkutsk-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-rus-irkutsk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-rus-kamchatka-logging-camp",
-    "quantity": 483.575
+    "quantity": 481.349
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-kamchatka-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-kazakh-syr-darya-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-khabarovsk-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-khojand-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-kutais-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-kyrgyz-steppe-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-omsk-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-rus-omsk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-osh-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-primorye-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-samarkand-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-semipalatinsk-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-semirechye-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-tiflis-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-rus-tiflis-cotton-farm",
-    "quantity": 433712.363
+    "quantity": 433673.613
    },
    {
     "goodKey": "wool",
@@ -6865,22 +6875,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-tiflis-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-rus-tiflis-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-tobolsk-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-rus-tobolsk-logging-camp",
-    "quantity": 457.45
+    "quantity": 455.344
    },
    {
     "goodKey": "wool",
@@ -6890,22 +6900,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-tobolsk-subsistence-farm",
-    "quantity": 247760.927
+    "quantity": 247474.234
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-rus-tobolsk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-rus-tomsk-coal-mine",
-    "quantity": 16773.363
+    "quantity": 16711.431
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-tomsk-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -6915,47 +6925,47 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-tomsk-subsistence-farm",
-    "quantity": 290234.219
+    "quantity": 289898.378
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-rus-tomsk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-transbaikal-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-rus-transcaspia-cotton-farm",
-    "quantity": 243795.965
+    "quantity": 243774.183
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-transcaspia-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-turgai-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-uralsk-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-uzbek-syr-darya-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-rus-uzbek-syr-darya-cotton-farm",
-    "quantity": 230371.383
+    "quantity": 230350.801
    },
    {
     "goodKey": "wool",
@@ -6965,32 +6975,32 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-uzbek-syr-darya-subsistence-farm",
-    "quantity": 206703.411
+    "quantity": 206464.227
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-rus-uzbek-syr-darya-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-rus-yakutsk-logging-camp",
-    "quantity": 1226.394
+    "quantity": 1220.751
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-yakutsk-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-yeniseysk-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-rus-yeniseysk-logging-camp",
-    "quantity": 748.207
+    "quantity": 744.764
    },
    {
     "goodKey": "wool",
@@ -7000,27 +7010,27 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-rus-yeniseysk-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-rus-yeniseysk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "oc-gap-rus-residual-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "oc-gap-rus-residual-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-alexandrovsk-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7030,37 +7040,37 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-alexandrovsk-subsistence-farm",
-    "quantity": 206703.411
+    "quantity": 206464.227
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-alexandrovsk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-arkhangelsk-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-astrakhan-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-belgorod-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-belgorod-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-blr-brest-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "wool",
@@ -7070,22 +7080,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-blr-gomel-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-blr-gomel-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-blr-grodno-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-blr-minsk-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7095,27 +7105,27 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-blr-minsk-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-blr-minsk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-blr-mogilev-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-blr-vitebsk-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-bryansk-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7125,47 +7135,47 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-bryansk-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-bryansk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "rus-chelyabinsk-alkali-and-acid-works",
-    "quantity": 21.758
+    "quantity": 21.958
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "rus-chelyabinsk-cement-and-brick-works",
-    "quantity": 10427.531
+    "quantity": 10434.026
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-chelyabinsk-commercial-farm",
-    "quantity": 274941.689
+    "quantity": 274623.543
    },
    {
     "goodKey": "copper",
     "ownerBuildingKey": "rus-chelyabinsk-copper-smelter",
-    "quantity": 9.091
+    "quantity": 9.056
    },
    {
     "goodKey": "electrical-equipment",
     "ownerBuildingKey": "rus-chelyabinsk-electrical-works",
-    "quantity": 0.688
+    "quantity": 0.682
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "rus-chelyabinsk-machine-works",
-    "quantity": 460.519
+    "quantity": 460.726
    },
    {
     "goodKey": "paper",
     "ownerBuildingKey": "rus-chelyabinsk-paper-mill",
-    "quantity": 5.338
+    "quantity": 5.315
    },
    {
     "goodKey": "wool",
@@ -7175,37 +7185,37 @@
    {
     "goodKey": "ships",
     "ownerBuildingKey": "rus-chelyabinsk-shipyard",
-    "quantity": 32.996
+    "quantity": 32.933
    },
    {
     "goodKey": "steel",
     "ownerBuildingKey": "rus-chelyabinsk-steel-works",
-    "quantity": 329.734
+    "quantity": 328.47
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-chelyabinsk-subsistence-farm",
-    "quantity": 1282693.592
+    "quantity": 1281209.338
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-chelyabinsk-textile-mill",
-    "quantity": 86102.079
+    "quantity": 86090.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-chuvash-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-dagestan-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-don-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7215,47 +7225,47 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-don-subsistence-farm",
-    "quantity": 206703.411
+    "quantity": 206464.227
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-don-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-est-harju-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-fin-finland-proper-subsistence-farm",
-    "quantity": 25039.601
+    "quantity": 25010.627
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-fin-hame-commercial-farm",
-    "quantity": 37694.993
+    "quantity": 37651.374
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-fin-hame-subsistence-farm",
-    "quantity": 45071.282
+    "quantity": 45019.128
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-fin-kuopio-subsistence-farm",
-    "quantity": 25039.601
+    "quantity": 25010.627
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-fin-kymi-subsistence-farm",
-    "quantity": 25039.601
+    "quantity": 25010.627
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "rus-fin-lapland-logging-camp",
-    "quantity": 142.016
+    "quantity": 142.017
    },
    {
     "goodKey": "timber",
@@ -7265,67 +7275,67 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-fin-oulu-subsistence-farm",
-    "quantity": 25039.601
+    "quantity": 25010.627
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-fin-uusimaa-subsistence-farm",
-    "quantity": 45071.282
+    "quantity": 45019.128
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-fin-vaasa-subsistence-farm",
-    "quantity": 25039.601
+    "quantity": 25010.627
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ivanovo-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ivanovo-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-kaluga-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "rus-kazan-alkali-and-acid-works",
-    "quantity": 33.716
+    "quantity": 34.026
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "rus-kazan-cement-and-brick-works",
-    "quantity": 16158.48
+    "quantity": 16168.544
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-kazan-commercial-farm",
-    "quantity": 413478.198
+    "quantity": 412999.747
    },
    {
     "goodKey": "copper",
     "ownerBuildingKey": "rus-kazan-copper-smelter",
-    "quantity": 14.087
+    "quantity": 14.033
    },
    {
     "goodKey": "electrical-equipment",
     "ownerBuildingKey": "rus-kazan-electrical-works",
-    "quantity": 1.066
+    "quantity": 1.056
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "rus-kazan-machine-works",
-    "quantity": 713.619
+    "quantity": 713.941
    },
    {
     "goodKey": "paper",
     "ownerBuildingKey": "rus-kazan-paper-mill",
-    "quantity": 8.271
+    "quantity": 8.237
    },
    {
     "goodKey": "wool",
@@ -7335,27 +7345,27 @@
    {
     "goodKey": "ships",
     "ownerBuildingKey": "rus-kazan-shipyard",
-    "quantity": 51.13
+    "quantity": 51.033
    },
    {
     "goodKey": "steel",
     "ownerBuildingKey": "rus-kazan-steel-works",
-    "quantity": 510.955
+    "quantity": 508.996
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-kazan-subsistence-farm",
-    "quantity": 1902804.051
+    "quantity": 1900602.243
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-kazan-textile-mill",
-    "quantity": 128726.871
+    "quantity": 128710.183
    },
    {
     "goodKey": "aluminium",
     "ownerBuildingKey": "rus-kazan-warehouse",
-    "quantity": 1.197
+    "quantity": 1.192
    },
    {
     "goodKey": "coffee-tea-cocoa",
@@ -7365,32 +7375,32 @@
    {
     "goodKey": "nitrates",
     "ownerBuildingKey": "rus-kazan-warehouse",
-    "quantity": 1.599
+    "quantity": 1.619
    },
    {
     "goodKey": "rubber",
     "ownerBuildingKey": "rus-kazan-warehouse",
-    "quantity": 2113.285
+    "quantity": 2104.467
    },
    {
     "goodKey": "tin",
     "ownerBuildingKey": "rus-kazan-warehouse",
-    "quantity": 5.123
+    "quantity": 5.104
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-kostroma-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-kuban-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "crude-oil",
     "ownerBuildingKey": "rus-kuban-oil-field",
-    "quantity": 15.124
+    "quantity": 15.054
    },
    {
     "goodKey": "wool",
@@ -7400,17 +7410,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-kuban-subsistence-farm",
-    "quantity": 247760.927
+    "quantity": 247474.234
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-kuban-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-kurgan-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "wool",
@@ -7420,72 +7430,72 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-kursk-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-kursk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-lipetsk-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-lipetsk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ltu-kaunas-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ltu-siauliai-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ltu-vilnius-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-lva-latgale-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-lva-riga-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-lva-vidzeme-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-lva-zemgale-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-mari-el-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-mda-bender-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-mda-kishinev-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7495,52 +7505,52 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-mda-kishinev-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-mda-kishinev-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-mordovia-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "rus-moscow-alkali-and-acid-works",
-    "quantity": 11.063
+    "quantity": 11.164
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "rus-moscow-cement-and-brick-works",
-    "quantity": 5301.855
+    "quantity": 5305.157
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-moscow-commercial-farm",
-    "quantity": 138536.51
+    "quantity": 138376.204
    },
    {
     "goodKey": "copper",
     "ownerBuildingKey": "rus-moscow-copper-smelter",
-    "quantity": 4.622
+    "quantity": 4.604
    },
    {
     "goodKey": "electrical-equipment",
     "ownerBuildingKey": "rus-moscow-electrical-works",
-    "quantity": 0.35
+    "quantity": 0.347
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "rus-moscow-machine-works",
-    "quantity": 234.15
+    "quantity": 234.255
    },
    {
     "goodKey": "paper",
     "ownerBuildingKey": "rus-moscow-paper-mill",
-    "quantity": 2.714
+    "quantity": 2.703
    },
    {
     "goodKey": "wool",
@@ -7550,27 +7560,27 @@
    {
     "goodKey": "ships",
     "ownerBuildingKey": "rus-moscow-shipyard",
-    "quantity": 16.777
+    "quantity": 16.745
    },
    {
     "goodKey": "steel",
     "ownerBuildingKey": "rus-moscow-steel-works",
-    "quantity": 167.652
+    "quantity": 167.01
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-moscow-subsistence-farm",
-    "quantity": 662583.386
+    "quantity": 661816.685
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-moscow-textile-mill",
-    "quantity": 42624.792
+    "quantity": 42619.266
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-nizhny-novgorod-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7580,22 +7590,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-nizhny-novgorod-subsistence-farm",
-    "quantity": 247760.927
+    "quantity": 247474.234
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-nizhny-novgorod-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-novgorod-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-olonets-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "wool",
@@ -7605,22 +7615,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-orel-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-orel-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-orenburg-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-orenburg-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "wool",
@@ -7630,17 +7640,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-penza-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-penza-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-perm-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7650,32 +7660,32 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-perm-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-perm-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-pol-kalisz-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "rus-pol-kielce-copper-mine",
-    "quantity": 8.443
+    "quantity": 8.411
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-pol-kielce-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-pol-lublin-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7685,17 +7695,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-pol-lublin-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-pol-lublin-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-pol-odz-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7705,52 +7715,52 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-pol-odz-subsistence-farm",
-    "quantity": 247760.927
+    "quantity": 247474.234
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-pol-odz-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-pol-siedlce-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "rus-pol-warsaw-alkali-and-acid-works",
-    "quantity": 14.66
+    "quantity": 14.795
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "rus-pol-warsaw-cement-and-brick-works",
-    "quantity": 7025.825
+    "quantity": 7030.201
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-pol-warsaw-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "copper",
     "ownerBuildingKey": "rus-pol-warsaw-copper-smelter",
-    "quantity": 6.125
+    "quantity": 6.102
    },
    {
     "goodKey": "electrical-equipment",
     "ownerBuildingKey": "rus-pol-warsaw-electrical-works",
-    "quantity": 0.463
+    "quantity": 0.459
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "rus-pol-warsaw-machine-works",
-    "quantity": 310.287
+    "quantity": 310.427
    },
    {
     "goodKey": "paper",
     "ownerBuildingKey": "rus-pol-warsaw-paper-mill",
-    "quantity": 3.596
+    "quantity": 3.581
    },
    {
     "goodKey": "wool",
@@ -7760,22 +7770,22 @@
    {
     "goodKey": "ships",
     "ownerBuildingKey": "rus-pol-warsaw-shipyard",
-    "quantity": 22.232
+    "quantity": 22.19
    },
    {
     "goodKey": "steel",
     "ownerBuildingKey": "rus-pol-warsaw-steel-works",
-    "quantity": 222.167
+    "quantity": 221.315
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-pol-warsaw-subsistence-farm",
-    "quantity": 331291.721
+    "quantity": 330908.37
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-pol-warsaw-textile-mill",
-    "quantity": 28984.858
+    "quantity": 28981.101
    },
    {
     "goodKey": "wool",
@@ -7785,17 +7795,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-pskov-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-pskov-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ryazan-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7805,17 +7815,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ryazan-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ryazan-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-saint-petersburg-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7825,17 +7835,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-saint-petersburg-subsistence-farm",
-    "quantity": 331291.721
+    "quantity": 330908.37
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-saint-petersburg-textile-mill",
-    "quantity": 28984.858
+    "quantity": 28981.101
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-samara-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7845,17 +7855,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-samara-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-samara-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-saratov-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7865,22 +7875,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-saratov-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-saratov-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-simbirsk-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-smolensk-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7890,17 +7900,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-smolensk-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-smolensk-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-stavropol-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7910,17 +7920,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-stavropol-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-stavropol-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-tambov-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7930,22 +7940,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-tambov-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-tambov-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-terek-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "crude-oil",
     "ownerBuildingKey": "rus-terek-oil-field",
-    "quantity": 170.143
+    "quantity": 169.359
    },
    {
     "goodKey": "wool",
@@ -7955,17 +7965,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-terek-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-terek-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-tsaritsyn-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -7975,12 +7985,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-tsaritsyn-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-tsaritsyn-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "wool",
@@ -7990,17 +8000,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-tula-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-tula-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-tver-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8010,22 +8020,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-tver-subsistence-farm",
-    "quantity": 206703.411
+    "quantity": 206464.227
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-tver-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-udmurt-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ufa-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8035,32 +8045,32 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ufa-subsistence-farm",
-    "quantity": 247760.927
+    "quantity": 247474.234
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ufa-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-chernigov-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ukr-chernigov-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "rus-ukr-donetsk-coal-mine",
-    "quantity": 16773.363
+    "quantity": 16711.431
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-donetsk-commercial-farm",
-    "quantity": 138536.51
+    "quantity": 138376.204
    },
    {
     "goodKey": "wool",
@@ -8070,17 +8080,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-donetsk-subsistence-farm",
-    "quantity": 496937.581
+    "quantity": 496362.555
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ukr-donetsk-textile-mill",
-    "quantity": 28984.858
+    "quantity": 28981.101
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-kharkov-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8090,17 +8100,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-kharkov-subsistence-farm",
-    "quantity": 290234.219
+    "quantity": 289898.378
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ukr-kharkov-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "rus-ukr-kherson-iron-mine",
-    "quantity": 1104.993
+    "quantity": 1100.792
    },
    {
     "goodKey": "wool",
@@ -8110,17 +8120,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-kherson-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ukr-kherson-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-kiev-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8130,17 +8140,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-kiev-subsistence-farm",
-    "quantity": 331291.721
+    "quantity": 330908.37
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ukr-kiev-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-odessa-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8150,17 +8160,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-odessa-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ukr-odessa-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-podolia-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8170,17 +8180,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-podolia-subsistence-farm",
-    "quantity": 290234.219
+    "quantity": 289898.378
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ukr-podolia-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-poltava-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8190,22 +8200,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-poltava-subsistence-farm",
-    "quantity": 247760.927
+    "quantity": 247474.234
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ukr-poltava-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-taurida-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-volhynia-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8215,22 +8225,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-volhynia-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ukr-volhynia-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "rus-ukr-yekaterinoslav-coal-mine",
-    "quantity": 1677.336
+    "quantity": 1671.143
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-yekaterinoslav-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8240,22 +8250,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ukr-yekaterinoslav-subsistence-farm",
-    "quantity": 372349.277
+    "quantity": 371918.417
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-ukr-yekaterinoslav-textile-mill",
-    "quantity": 28984.858
+    "quantity": 28981.101
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-ust-sysolsk-subsistence-farm",
-    "quantity": 41057.52
+    "quantity": 41010.011
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-vladimir-subsistence-farm",
-    "quantity": 82115.04
+    "quantity": 82020.022
    },
    {
     "goodKey": "wool",
@@ -8265,17 +8275,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-vologda-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-vologda-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-voronezh-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8285,17 +8295,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-voronezh-subsistence-farm",
-    "quantity": 206703.411
+    "quantity": 206464.227
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-voronezh-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-vyatka-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "wool",
@@ -8305,12 +8315,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-vyatka-subsistence-farm",
-    "quantity": 165645.86
+    "quantity": 165454.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-vyatka-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "wool",
@@ -8320,22 +8330,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-yaroslavl-subsistence-farm",
-    "quantity": 124588.357
+    "quantity": 124444.191
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-yaroslavl-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-yekaterinburg-commercial-farm",
-    "quantity": 68202.589
+    "quantity": 68123.67
    },
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "rus-yekaterinburg-iron-mine",
-    "quantity": 0.344
+    "quantity": 0.342
    },
    {
     "goodKey": "wool",
@@ -8345,12 +8355,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "rus-yekaterinburg-subsistence-farm",
-    "quantity": 206703.411
+    "quantity": 206464.227
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "rus-yekaterinburg-textile-mill",
-    "quantity": 14492.429
+    "quantity": 14490.55
    }
   ],
   "status": "calibrated",
@@ -8386,17 +8396,17 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-jpn-chubu-alkali-and-acid-works",
-    "quantity": 20.683
+    "quantity": 20.69
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-jpn-chubu-cement-and-brick-works",
-    "quantity": 4309.501
+    "quantity": 4309.492
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-chubu-commercial-farm",
-    "quantity": 683043.912
+    "quantity": 682995.146
    },
    {
     "goodKey": "copper-ore",
@@ -8406,22 +8416,22 @@
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-jpn-chubu-cotton-farm",
-    "quantity": 237529.426
+    "quantity": 237527.344
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-jpn-chubu-logging-camp",
-    "quantity": 658.364
+    "quantity": 658.168
    },
    {
     "goodKey": "crude-oil",
     "ownerBuildingKey": "as-jpn-chubu-oil-field",
-    "quantity": 73.132
+    "quantity": 73.11
    },
    {
     "goodKey": "paper",
     "ownerBuildingKey": "as-jpn-chubu-paper-mill",
-    "quantity": 4.752
+    "quantity": 4.75
    },
    {
     "goodKey": "wool",
@@ -8436,17 +8446,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-chubu-subsistence-farm",
-    "quantity": 3493050.393
+    "quantity": 3492801.007
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-jpn-chubu-textile-mill",
-    "quantity": 185810.349
+    "quantity": 185808.575
    },
    {
     "goodKey": "aluminium",
     "ownerBuildingKey": "as-jpn-chubu-warehouse",
-    "quantity": 0.895
+    "quantity": 0.894
    },
    {
     "goodKey": "electrical-equipment",
@@ -8456,22 +8466,22 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "as-jpn-chubu-warehouse",
-    "quantity": 565.119
+    "quantity": 565.117
    },
    {
     "goodKey": "nitrates",
     "ownerBuildingKey": "as-jpn-chubu-warehouse",
-    "quantity": 1.29
+    "quantity": 1.296
    },
    {
     "goodKey": "rubber",
     "ownerBuildingKey": "as-jpn-chubu-warehouse",
-    "quantity": 1432.147
+    "quantity": 1431.72
    },
    {
     "goodKey": "steel",
     "ownerBuildingKey": "as-jpn-chubu-warehouse",
-    "quantity": 56.347
+    "quantity": 56.331
    },
    {
     "goodKey": "sugar",
@@ -8481,7 +8491,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-chugoku-commercial-farm",
-    "quantity": 341521.956
+    "quantity": 341497.573
    },
    {
     "goodKey": "wool",
@@ -8491,22 +8501,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-chugoku-subsistence-farm",
-    "quantity": 1334979.346
+    "quantity": 1334884.036
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-jpn-chugoku-textile-mill",
-    "quantity": 61936.783
+    "quantity": 61936.192
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-jpn-hokkaido-coal-mine",
-    "quantity": 7951.177
+    "quantity": 7949.328
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-hokkaido-commercial-farm",
-    "quantity": 170760.978
+    "quantity": 170748.786
    },
    {
     "goodKey": "copper-ore",
@@ -8516,7 +8526,7 @@
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-jpn-hokkaido-logging-camp",
-    "quantity": 705.961
+    "quantity": 705.75
    },
    {
     "goodKey": "wool",
@@ -8526,27 +8536,27 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-hokkaido-subsistence-farm",
-    "quantity": 514795.976
+    "quantity": 514759.222
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-jpn-hokkaido-textile-mill",
-    "quantity": 31688.587
+    "quantity": 31688.284
    },
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-jpn-kansai-alkali-and-acid-works",
-    "quantity": 12.004
+    "quantity": 12.008
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-jpn-kansai-cement-and-brick-works",
-    "quantity": 2501.068
+    "quantity": 2501.063
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-kansai-commercial-farm",
-    "quantity": 341521.956
+    "quantity": 341497.573
    },
    {
     "goodKey": "copper-ore",
@@ -8556,7 +8566,7 @@
    {
     "goodKey": "paper",
     "ownerBuildingKey": "as-jpn-kansai-paper-mill",
-    "quantity": 2.758
+    "quantity": 2.757
    },
    {
     "goodKey": "wool",
@@ -8566,37 +8576,37 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-kansai-subsistence-farm",
-    "quantity": 1951571.044
+    "quantity": 1951431.711
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-jpn-kansai-textile-mill",
-    "quantity": 123873.566
+    "quantity": 123872.383
    },
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-jpn-kanto-alkali-and-acid-works",
-    "quantity": 15.776
+    "quantity": 15.781
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-jpn-kanto-cement-and-brick-works",
-    "quantity": 3287.039
+    "quantity": 3287.032
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-kanto-commercial-farm",
-    "quantity": 512282.934
+    "quantity": 512246.359
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-jpn-kanto-cotton-farm",
-    "quantity": 221888.111
+    "quantity": 221886.166
    },
    {
     "goodKey": "paper",
     "ownerBuildingKey": "as-jpn-kanto-paper-mill",
-    "quantity": 3.624
+    "quantity": 3.623
    },
    {
     "goodKey": "wool",
@@ -8611,42 +8621,42 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-kanto-subsistence-farm",
-    "quantity": 2669958.53
+    "quantity": 2669767.908
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-jpn-kanto-textile-mill",
-    "quantity": 155562.153
+    "quantity": 155560.667
    },
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-jpn-kyushu-alkali-and-acid-works",
-    "quantity": 12.79
+    "quantity": 12.795
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-jpn-kyushu-cement-and-brick-works",
-    "quantity": 2664.967
+    "quantity": 2664.961
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-jpn-kyushu-coal-mine",
-    "quantity": 7951.177
+    "quantity": 7949.328
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-kyushu-commercial-farm",
-    "quantity": 512282.934
+    "quantity": 512246.359
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-jpn-kyushu-cotton-farm",
-    "quantity": 147825.752
+    "quantity": 147824.457
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-jpn-kyushu-logging-camp",
-    "quantity": 342.776
+    "quantity": 342.673
    },
    {
     "goodKey": "paper",
@@ -8661,22 +8671,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-kyushu-subsistence-farm",
-    "quantity": 2158071.052
+    "quantity": 2157916.976
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-jpn-kyushu-textile-mill",
-    "quantity": 123873.566
+    "quantity": 123872.383
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-ryukyu-subsistence-farm",
-    "quantity": 101795.809
+    "quantity": 101788.541
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-shikoku-commercial-farm",
-    "quantity": 170760.978
+    "quantity": 170748.786
    },
    {
     "goodKey": "wool",
@@ -8686,32 +8696,32 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-shikoku-subsistence-farm",
-    "quantity": 1026683.46
+    "quantity": 1026610.16
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-jpn-shikoku-textile-mill",
-    "quantity": 61936.783
+    "quantity": 61936.192
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-tohoku-commercial-farm",
-    "quantity": 341521.956
+    "quantity": 341497.573
    },
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "as-jpn-tohoku-copper-mine",
-    "quantity": 18.406
+    "quantity": 18.415
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-jpn-tohoku-cotton-farm",
-    "quantity": 204543.185
+    "quantity": 204541.393
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-jpn-tohoku-logging-camp",
-    "quantity": 632.729
+    "quantity": 632.54
    },
    {
     "goodKey": "wool",
@@ -8721,62 +8731,62 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-jpn-tohoku-subsistence-farm",
-    "quantity": 1643275.212
+    "quantity": 1643157.891
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-jpn-tohoku-textile-mill",
-    "quantity": 93625.37
+    "quantity": 93624.476
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-twn-taichung-cement-and-brick-works",
-    "quantity": 45.099
+    "quantity": 45.108
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-twn-taichung-cotton-farm",
-    "quantity": 10681.281
+    "quantity": 10684.374
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-twn-taichung-subsistence-farm",
-    "quantity": 86535.889
+    "quantity": 86529.71
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-twn-taihoku-cement-and-brick-works",
-    "quantity": 54.317
+    "quantity": 54.328
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-twn-taihoku-commercial-farm-peasant",
-    "quantity": 48609.164
+    "quantity": 48605.693
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-twn-taihoku-cotton-farm",
-    "quantity": 5398.695
+    "quantity": 5400.258
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-twn-taihoku-subsistence-farm",
-    "quantity": 116242.238
+    "quantity": 116233.939
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-twn-tainan-cement-and-brick-works",
-    "quantity": 43.417
+    "quantity": 43.426
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-twn-tainan-cotton-farm",
-    "quantity": 8484.371
+    "quantity": 8486.828
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-twn-tainan-subsistence-farm",
-    "quantity": 86535.889
+    "quantity": 86529.71
    }
   ],
   "status": "calibrated",
@@ -8848,7 +8858,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-eri-hamasien-cement-and-brick-works",
-    "quantity": 95.291
+    "quantity": 95.29
    },
    {
     "goodKey": "grain",
@@ -8913,7 +8923,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-its-hiiraan-bakool-and-bay-cement-and-brick-works",
-    "quantity": 142.371
+    "quantity": 142.37
    },
    {
     "goodKey": "cotton",
@@ -8928,7 +8938,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-its-mudug-galguduud-and-bari-cement-and-brick-works",
-    "quantity": 143.965
+    "quantity": 143.964
    },
    {
     "goodKey": "cotton",
@@ -9008,7 +9018,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "ita-campania-cement-and-brick-works",
-    "quantity": 2130.493
+    "quantity": 2130.494
    },
    {
     "goodKey": "grain",
@@ -9078,7 +9088,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "ita-lazio-cement-and-brick-works",
-    "quantity": 1942.447
+    "quantity": 1942.448
    },
    {
     "goodKey": "grain",
@@ -9138,7 +9148,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "ita-lombardy-cement-and-brick-works",
-    "quantity": 3324.904
+    "quantity": 3324.905
    },
    {
     "goodKey": "grain",
@@ -9168,7 +9178,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "ita-lombardy-steel-works",
-    "quantity": 82.174
+    "quantity": 82.219
    },
    {
     "goodKey": "grain",
@@ -9188,12 +9198,12 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "ita-lombardy-warehouse",
-    "quantity": 90960.987
+    "quantity": 90961.864
    },
    {
     "goodKey": "copper",
     "ownerBuildingKey": "ita-lombardy-warehouse",
-    "quantity": 1.449
+    "quantity": 1.45
    },
    {
     "goodKey": "electrical-equipment",
@@ -9201,9 +9211,14 @@
     "quantity": 1.118
    },
    {
+    "goodKey": "gold",
+    "ownerBuildingKey": "ita-lombardy-warehouse",
+    "quantity": 0.311
+   },
+   {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "ita-lombardy-warehouse",
-    "quantity": 52.539
+    "quantity": 52.581
    },
    {
     "goodKey": "kerosene",
@@ -9213,7 +9228,7 @@
    {
     "goodKey": "nitrates",
     "ownerBuildingKey": "ita-lombardy-warehouse",
-    "quantity": 2.037
+    "quantity": 2.044
    },
    {
     "goodKey": "ships",
@@ -9228,7 +9243,7 @@
    {
     "goodKey": "tin",
     "ownerBuildingKey": "ita-lombardy-warehouse",
-    "quantity": 0.241
+    "quantity": 0.242
    },
    {
     "goodKey": "grain",
@@ -9481,87 +9496,87 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-sah-saguia-el-hamra-commercial-farm-peasant",
-    "quantity": 4028.583
+    "quantity": 4028.556
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-sah-saguia-el-hamra-cotton-farm",
-    "quantity": 1604.712
+    "quantity": 1604.749
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-sah-saguia-el-hamra-subsistence-farm",
-    "quantity": 2140.849
+    "quantity": 2140.835
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-sgg-fernando-po-cotton-farm",
-    "quantity": 596.483
+    "quantity": 596.496
    },
    {
     "goodKey": "rubber",
     "ownerBuildingKey": "af-sgg-fernando-po-rubber-estate",
-    "quantity": 115.341
+    "quantity": 115.338
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-sgg-rio-muni-cement-and-brick-works",
-    "quantity": 30.325
+    "quantity": 30.336
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-sgg-rio-muni-commercial-farm-peasant",
-    "quantity": 11280.032
+    "quantity": 11279.958
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-sgg-rio-muni-cotton-farm",
-    "quantity": 3896.711
+    "quantity": 3896.801
    },
    {
     "goodKey": "rubber",
     "ownerBuildingKey": "af-sgg-rio-muni-rubber-estate",
-    "quantity": 753.467
+    "quantity": 753.449
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-sgg-rio-muni-subsistence-farm",
-    "quantity": 6422.546
+    "quantity": 6422.504
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-albacete-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-alicante-subsistence-farm",
-    "quantity": 237382.301
+    "quantity": 237380.741
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-alicante-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-almeria-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "esp-asturias-coal-mine",
-    "quantity": 9531.115
+    "quantity": 9531.501
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-asturias-commercial-farm",
-    "quantity": 201012.559
+    "quantity": 201011.238
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "esp-asturias-logging-camp",
-    "quantity": 382.406
+    "quantity": 382.397
    },
    {
     "goodKey": "wool",
@@ -9571,27 +9586,27 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-asturias-subsistence-farm",
-    "quantity": 237382.301
+    "quantity": 237380.741
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-asturias-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-avila-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-badajoz-commercial-farm",
-    "quantity": 201012.559
+    "quantity": 201011.238
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "esp-badajoz-cotton-farm",
-    "quantity": 126005.123
+    "quantity": 126005.08
    },
    {
     "goodKey": "wool",
@@ -9601,12 +9616,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-badajoz-subsistence-farm",
-    "quantity": 237382.301
+    "quantity": 237380.741
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-badajoz-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "aluminium",
@@ -9626,7 +9641,7 @@
    {
     "goodKey": "nitrates",
     "ownerBuildingKey": "esp-badajoz-warehouse",
-    "quantity": 0.74
+    "quantity": 0.743
    },
    {
     "goodKey": "ships",
@@ -9641,7 +9656,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-baleares-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "chemicals",
@@ -9651,12 +9666,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "esp-barcelona-cement-and-brick-works",
-    "quantity": 1793.635
+    "quantity": 1794.31
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-barcelona-commercial-farm",
-    "quantity": 201012.559
+    "quantity": 201011.238
    },
    {
     "goodKey": "copper",
@@ -9666,7 +9681,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "esp-barcelona-machine-works",
-    "quantity": 77.526
+    "quantity": 77.554
    },
    {
     "goodKey": "paper",
@@ -9681,142 +9696,142 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "esp-barcelona-steel-works",
-    "quantity": 31.706
+    "quantity": 31.729
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-barcelona-subsistence-farm",
-    "quantity": 359782.548
+    "quantity": 359780.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-barcelona-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "esp-bizkaia-iron-mine",
-    "quantity": 86.579
+    "quantity": 86.647
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-bizkaia-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-burgos-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-caceres-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-cadiz-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-cantabria-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-castellon-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "esp-ciudad-real-cotton-farm",
-    "quantity": 91505.46
+    "quantity": 91505.429
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-ciudad-real-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-cordoba-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "esp-cuenca-logging-camp",
-    "quantity": 385.841
+    "quantity": 385.832
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-cuenca-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-gerona-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-gipuzkoa-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-granada-subsistence-farm",
-    "quantity": 237382.301
+    "quantity": 237380.741
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-granada-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "esp-guadalajara-logging-camp",
-    "quantity": 277.453
+    "quantity": 277.446
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-guadalajara-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "esp-huelva-copper-mine",
-    "quantity": 40.675
+    "quantity": 40.708
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-huelva-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "esp-huesca-logging-camp",
-    "quantity": 319.202
+    "quantity": 319.194
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-huesca-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-jaen-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "esp-la-coruna-cement-and-brick-works",
-    "quantity": 1045.602
+    "quantity": 1045.995
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-la-coruna-commercial-farm",
-    "quantity": 201012.559
+    "quantity": 201011.238
    },
    {
     "goodKey": "copper",
@@ -9826,7 +9841,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "esp-la-coruna-machine-works",
-    "quantity": 45.194
+    "quantity": 45.21
    },
    {
     "goodKey": "paper",
@@ -9841,57 +9856,57 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "esp-la-coruna-steel-works",
-    "quantity": 18.483
+    "quantity": 18.496
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-la-coruna-subsistence-farm",
-    "quantity": 237382.301
+    "quantity": 237380.741
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-la-coruna-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-la-rioja-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-las-palmas-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-leon-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-lerida-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-lugo-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "esp-madrid-alkali-and-acid-works",
-    "quantity": 15.683
+    "quantity": 15.682
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "esp-madrid-cement-and-brick-works",
-    "quantity": 1375.881
+    "quantity": 1376.399
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-madrid-commercial-farm",
-    "quantity": 201012.559
+    "quantity": 201011.238
    },
    {
     "goodKey": "copper",
@@ -9901,7 +9916,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "esp-madrid-machine-works",
-    "quantity": 59.47
+    "quantity": 59.491
    },
    {
     "goodKey": "paper",
@@ -9916,17 +9931,17 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "esp-madrid-steel-works",
-    "quantity": 24.321
+    "quantity": 24.339
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-madrid-subsistence-farm",
-    "quantity": 237382.301
+    "quantity": 237380.741
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-madrid-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "wool",
@@ -9936,17 +9951,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-malaga-subsistence-farm",
-    "quantity": 237382.301
+    "quantity": 237380.741
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-malaga-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-murcia-commercial-farm",
-    "quantity": 201012.559
+    "quantity": 201011.238
    },
    {
     "goodKey": "wool",
@@ -9956,52 +9971,52 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-murcia-subsistence-farm",
-    "quantity": 237382.301
+    "quantity": 237380.741
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-murcia-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-navarra-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-orense-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-palencia-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-pontevedra-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-salamanca-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-santa-cruz-de-tenerife-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-segovia-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-sevilla-commercial-farm",
-    "quantity": 201012.559
+    "quantity": 201011.238
    },
    {
     "goodKey": "wool",
@@ -10011,52 +10026,52 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-sevilla-subsistence-farm",
-    "quantity": 237382.301
+    "quantity": 237380.741
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-sevilla-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-tarragona-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-teruel-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "esp-toledo-cotton-farm",
-    "quantity": 93236.884
+    "quantity": 93236.852
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-toledo-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "esp-valencia-cement-and-brick-works",
-    "quantity": 1334.599
+    "quantity": 1335.101
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-valencia-commercial-farm",
-    "quantity": 201012.559
+    "quantity": 201011.238
    },
    {
     "goodKey": "copper",
     "ownerBuildingKey": "esp-valencia-copper-smelter",
-    "quantity": 0.574
+    "quantity": 0.575
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "esp-valencia-machine-works",
-    "quantity": 57.685
+    "quantity": 57.706
    },
    {
     "goodKey": "paper",
@@ -10071,37 +10086,37 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "esp-valencia-steel-works",
-    "quantity": 23.591
+    "quantity": 23.609
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-valencia-subsistence-farm",
-    "quantity": 359782.548
+    "quantity": 359780.185
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "esp-valencia-textile-mill",
-    "quantity": 33583.817
+    "quantity": 33583.783
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-valladolid-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-zamora-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "esp-zaragoza-cotton-farm",
-    "quantity": 95693.872
+    "quantity": 95693.839
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "esp-zaragoza-subsistence-farm",
-    "quantity": 118691.15
+    "quantity": 118690.371
    }
   ],
   "status": "calibrated",
@@ -10183,12 +10198,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-benguela-subsistence-farm",
-    "quantity": 19393.726
+    "quantity": 19393.724
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-ang-cuando-cubango-cotton-farm",
-    "quantity": 18108.774
+    "quantity": 18108.782
    },
    {
     "goodKey": "construction-materials",
@@ -10198,17 +10213,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-cuanza-commercial-farm-peasant",
-    "quantity": 31500.529
+    "quantity": 31500.525
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-cuanza-subsistence-farm",
-    "quantity": 37766.73
+    "quantity": 37766.725
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-ang-cunene-cotton-farm",
-    "quantity": 15333.213
+    "quantity": 15333.219
    },
    {
     "goodKey": "construction-materials",
@@ -10218,12 +10233,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-huambo-and-bie-commercial-farm-peasant",
-    "quantity": 31500.529
+    "quantity": 31500.525
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-huambo-and-bie-subsistence-farm",
-    "quantity": 76554.182
+    "quantity": 76554.172
    },
    {
     "goodKey": "aluminium",
@@ -10273,7 +10288,7 @@
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-ang-huila-cotton-farm",
-    "quantity": 16834.738
+    "quantity": 16834.746
    },
    {
     "goodKey": "rubber",
@@ -10283,22 +10298,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-huila-subsistence-farm",
-    "quantity": 19393.726
+    "quantity": 19393.724
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-ang-luanda-cement-and-brick-works",
-    "quantity": 104.514
+    "quantity": 104.515
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-luanda-subsistence-farm",
-    "quantity": 19393.726
+    "quantity": 19393.724
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-lunda-subsistence-farm",
-    "quantity": 19393.726
+    "quantity": 19393.724
    },
    {
     "goodKey": "construction-materials",
@@ -10308,17 +10323,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-malanje-subsistence-farm",
-    "quantity": 19393.726
+    "quantity": 19393.724
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-moxico-subsistence-farm",
-    "quantity": 19393.726
+    "quantity": 19393.724
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-ang-uige-and-zaire-cotton-farm",
-    "quantity": 10328.156
+    "quantity": 10328.16
    },
    {
     "goodKey": "rubber",
@@ -10328,7 +10343,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ang-uige-and-zaire-subsistence-farm",
-    "quantity": 19393.726
+    "quantity": 19393.724
    },
    {
     "goodKey": "rubber",
@@ -10338,27 +10353,27 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-moz-cabo-delgado-subsistence-farm",
-    "quantity": 20414.449
+    "quantity": 20414.446
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-moz-gaza-subsistence-farm",
-    "quantity": 20414.449
+    "quantity": 20414.446
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-moz-inhambane-cotton-farm",
-    "quantity": 3905.139
+    "quantity": 3905.141
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-moz-lourenco-marques-cotton-farm",
-    "quantity": 10680.48
+    "quantity": 10680.484
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-moz-lourenco-marques-subsistence-farm",
-    "quantity": 39808.175
+    "quantity": 39808.17
    },
    {
     "goodKey": "construction-materials",
@@ -10368,7 +10383,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-moz-manica-and-sofala-subsistence-farm",
-    "quantity": 20414.449
+    "quantity": 20414.446
    },
    {
     "goodKey": "construction-materials",
@@ -10378,12 +10393,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-moz-nampula-commercial-farm-peasant",
-    "quantity": 33805.446
+    "quantity": 33805.442
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-moz-nampula-cotton-farm",
-    "quantity": 11564.059
+    "quantity": 11564.064
    },
    {
     "goodKey": "rubber",
@@ -10393,7 +10408,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-moz-nampula-subsistence-farm",
-    "quantity": 39808.175
+    "quantity": 39808.17
    },
    {
     "goodKey": "rubber",
@@ -10403,7 +10418,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-moz-tete-subsistence-farm",
-    "quantity": 20414.449
+    "quantity": 20414.446
    },
    {
     "goodKey": "construction-materials",
@@ -10413,57 +10428,57 @@
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-moz-zambezia-cotton-farm",
-    "quantity": 6370.014
+    "quantity": 6370.017
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-moz-zambezia-subsistence-farm",
-    "quantity": 39808.175
+    "quantity": 39808.17
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-pai-bafata-and-gabu-cotton-farm",
-    "quantity": 3561.521
+    "quantity": 3561.522
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-pai-bissau-and-cacheu-commercial-farm-peasant",
-    "quantity": 14589.977
+    "quantity": 14589.975
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-pai-bissau-and-cacheu-cotton-farm",
-    "quantity": 7333.725
+    "quantity": 7333.729
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-pai-bissau-and-cacheu-subsistence-farm",
-    "quantity": 9691.665
+    "quantity": 9691.664
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-pai-bolama-and-quinara-cotton-farm",
-    "quantity": 3139.817
+    "quantity": 3139.818
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-bin-goa-commercial-farm",
-    "quantity": 12126.123
+    "quantity": 12126.121
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-bin-goa-commercial-farm-peasant",
-    "quantity": 12126.123
+    "quantity": 12126.121
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-bin-goa-cotton-farm",
-    "quantity": 23329.837
+    "quantity": 23329.847
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-bin-goa-subsistence-farm",
-    "quantity": 12530.005
+    "quantity": 12530.003
    },
    {
     "goodKey": "grain",
@@ -10473,7 +10488,7 @@
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-mac-macao-cotton-farm",
-    "quantity": 3962.524
+    "quantity": 3962.526
    },
    {
     "goodKey": "grain",
@@ -10483,12 +10498,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ptm-timor-commercial-farm-peasant",
-    "quantity": 4987.49
+    "quantity": 4987.489
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-ptm-timor-cotton-farm",
-    "quantity": 4797.796
+    "quantity": 4797.798
    },
    {
     "goodKey": "rubber",
@@ -10503,7 +10518,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-aveiro-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "copper-ore",
@@ -10513,7 +10528,7 @@
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "prt-beja-cotton-farm",
-    "quantity": 8584.221
+    "quantity": 8584.2
    },
    {
     "goodKey": "timber",
@@ -10523,7 +10538,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-beja-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "construction-materials",
@@ -10533,37 +10548,37 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-braga-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "prt-braganca-cotton-farm",
-    "quantity": 4635.615
+    "quantity": 4635.604
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "prt-braganca-logging-camp",
-    "quantity": 28.395
+    "quantity": 28.394
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-castelo-branco-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-coimbra-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "prt-evora-cotton-farm",
-    "quantity": 6241.357
+    "quantity": 6241.342
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-faro-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "timber",
@@ -10573,7 +10588,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-guarda-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "wool",
@@ -10583,12 +10598,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-leiria-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "prt-leiria-textile-mill",
-    "quantity": 48772.13
+    "quantity": 48772.129
    },
    {
     "goodKey": "construction-materials",
@@ -10598,7 +10613,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-lisboa-commercial-farm",
-    "quantity": 134957.285
+    "quantity": 134957.267
    },
    {
     "goodKey": "wool",
@@ -10608,22 +10623,22 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-lisboa-subsistence-farm",
-    "quantity": 164758.311
+    "quantity": 164758.29
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "prt-lisboa-textile-mill",
-    "quantity": 48772.13
+    "quantity": 48772.129
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-madeira-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "prt-portalegre-cotton-farm",
-    "quantity": 5008.823
+    "quantity": 5008.81
    },
    {
     "goodKey": "construction-materials",
@@ -10633,7 +10648,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-porto-commercial-farm",
-    "quantity": 134957.285
+    "quantity": 134957.267
    },
    {
     "goodKey": "paper",
@@ -10648,17 +10663,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-porto-subsistence-farm",
-    "quantity": 164758.311
+    "quantity": 164758.29
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "prt-porto-textile-mill",
-    "quantity": 48772.13
+    "quantity": 48772.129
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-santarem-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "construction-materials",
@@ -10673,12 +10688,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-setubal-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-viana-do-castelo-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "timber",
@@ -10688,12 +10703,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-vila-real-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "prt-viseu-subsistence-farm",
-    "quantity": 82379.153
+    "quantity": 82379.142
    }
   ],
   "status": "calibrated",
@@ -10819,7 +10834,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-dei-central-java-cement-and-brick-works",
-    "quantity": 1163.185
+    "quantity": 1163.477
    },
    {
     "goodKey": "grain",
@@ -10844,7 +10859,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-dei-east-java-cement-and-brick-works",
-    "quantity": 1228.305
+    "quantity": 1228.614
    },
    {
     "goodKey": "grain",
@@ -10869,12 +10884,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-dei-east-java-warehouse",
-    "quantity": 23.831
+    "quantity": 23.892
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-dei-east-java-warehouse",
-    "quantity": 25040.582
+    "quantity": 25041.999
    },
    {
     "goodKey": "electrical-equipment",
@@ -10889,7 +10904,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "as-dei-east-java-warehouse",
-    "quantity": 240.676
+    "quantity": 240.692
    },
    {
     "goodKey": "nitrates",
@@ -10984,7 +10999,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-dei-south-sumatra-cement-and-brick-works",
-    "quantity": 356.602
+    "quantity": 356.691
    },
    {
     "goodKey": "grain",
@@ -11029,7 +11044,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-dei-west-java-cement-and-brick-works",
-    "quantity": 1192.724
+    "quantity": 1193.023
    },
    {
     "goodKey": "grain",
@@ -11099,7 +11114,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "nld-noord-holland-cement-and-brick-works",
-    "quantity": 759.392
+    "quantity": 759.12
    },
    {
     "goodKey": "grain",
@@ -11144,7 +11159,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "nld-zuid-holland-cement-and-brick-works",
-    "quantity": 903.201
+    "quantity": 902.878
    },
    {
     "goodKey": "grain",
@@ -11208,7 +11223,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-cfs-equateur-cement-and-brick-works",
-    "quantity": 204.669
+    "quantity": 204.664
    },
    {
     "goodKey": "grain",
@@ -11243,7 +11258,7 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "af-cfs-equateur-warehouse",
-    "quantity": 15.916
+    "quantity": 15.93
    },
    {
     "goodKey": "electrical-equipment",
@@ -11268,12 +11283,12 @@
    {
     "goodKey": "tin",
     "ownerBuildingKey": "af-cfs-equateur-warehouse",
-    "quantity": 2.653
+    "quantity": 2.655
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-cfs-kasai-cement-and-brick-works",
-    "quantity": 246.291
+    "quantity": 246.286
    },
    {
     "goodKey": "grain",
@@ -11298,7 +11313,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-cfs-katanga-cement-and-brick-works",
-    "quantity": 182.388
+    "quantity": 182.384
    },
    {
     "goodKey": "grain",
@@ -11343,7 +11358,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-cfs-orientale-cement-and-brick-works",
-    "quantity": 267.943
+    "quantity": 267.937
    },
    {
     "goodKey": "grain",
@@ -11373,7 +11388,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "bel-antwerp-cement-and-brick-works",
-    "quantity": 361.491
+    "quantity": 361.495
    },
    {
     "goodKey": "machinery",
@@ -11383,7 +11398,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "bel-antwerp-steel-works",
-    "quantity": 125.026
+    "quantity": 125.13
    },
    {
     "goodKey": "grain",
@@ -11398,7 +11413,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "bel-east-flanders-cement-and-brick-works",
-    "quantity": 506.732
+    "quantity": 506.737
    },
    {
     "goodKey": "grain",
@@ -11428,7 +11443,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "bel-east-flanders-steel-works",
-    "quantity": 175.259
+    "quantity": 175.405
    },
    {
     "goodKey": "grain",
@@ -11453,12 +11468,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "bel-hainaut-cement-and-brick-works",
-    "quantity": 474.898
+    "quantity": 474.904
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "bel-hainaut-coal-mine",
-    "quantity": 4790.686
+    "quantity": 4791.364
    },
    {
     "goodKey": "grain",
@@ -11483,7 +11498,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "bel-hainaut-steel-works",
-    "quantity": 164.249
+    "quantity": 164.386
    },
    {
     "goodKey": "grain",
@@ -11498,7 +11513,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "bel-liege-coal-mine",
-    "quantity": 4790.686
+    "quantity": 4791.364
    },
    {
     "goodKey": "grain",
@@ -11513,7 +11528,7 @@
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "bel-luxembourg-iron-mine",
-    "quantity": 577.137
+    "quantity": 577.603
    },
    {
     "goodKey": "timber",
@@ -11543,7 +11558,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "bel-west-flanders-cement-and-brick-works",
-    "quantity": 369.273
+    "quantity": 369.277
    },
    {
     "goodKey": "grain",
@@ -11558,7 +11573,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "bel-west-flanders-steel-works",
-    "quantity": 127.718
+    "quantity": 127.824
    },
    {
     "goodKey": "grain",
@@ -11848,7 +11863,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "swe-dalarna-warehouse",
-    "quantity": 15269.279
+    "quantity": 15269.896
    },
    {
     "goodKey": "coffee-tea-cocoa",
@@ -11858,7 +11873,7 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "swe-dalarna-warehouse",
-    "quantity": 7.095
+    "quantity": 7.101
    },
    {
     "goodKey": "cotton",
@@ -11869,6 +11884,11 @@
     "goodKey": "electrical-equipment",
     "ownerBuildingKey": "swe-dalarna-warehouse",
     "quantity": 0.168
+   },
+   {
+    "goodKey": "gold",
+    "ownerBuildingKey": "swe-dalarna-warehouse",
+    "quantity": 0.292
    },
    {
     "goodKey": "kerosene",
@@ -11893,7 +11913,7 @@
    {
     "goodKey": "tin",
     "ownerBuildingKey": "swe-dalarna-warehouse",
-    "quantity": 1.182
+    "quantity": 1.183
    },
    {
     "goodKey": "grain",
@@ -11923,7 +11943,7 @@
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "swe-norrbotten-iron-mine",
-    "quantity": 257.268
+    "quantity": 257.476
    },
    {
     "goodKey": "timber",
@@ -11963,7 +11983,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "swe-skane-steel-works",
-    "quantity": 72.317
+    "quantity": 72.377
    },
    {
     "goodKey": "grain",
@@ -11993,7 +12013,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "swe-stockholm-steel-works",
-    "quantity": 57.234
+    "quantity": 57.282
    },
    {
     "goodKey": "grain",
@@ -12018,7 +12038,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "swe-varmland-steel-works",
-    "quantity": 59.748
+    "quantity": 59.798
    },
    {
     "goodKey": "grain",
@@ -12073,7 +12093,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "swe-vastra-gotaland-steel-works",
-    "quantity": 75.284
+    "quantity": 75.347
    },
    {
     "goodKey": "grain",
@@ -12162,7 +12182,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "nor-nordland-copper-mine",
-    "quantity": 5.105
+    "quantity": 5.109
    },
    {
     "goodKey": "grain",
@@ -12182,7 +12202,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "nor-nordland-warehouse",
-    "quantity": 6266.053
+    "quantity": 6266.069
    },
    {
     "goodKey": "coffee-tea-cocoa",
@@ -12198,6 +12218,11 @@
     "goodKey": "electrical-equipment",
     "ownerBuildingKey": "nor-nordland-warehouse",
     "quantity": 0.096
+   },
+   {
+    "goodKey": "gold",
+    "ownerBuildingKey": "nor-nordland-warehouse",
+    "quantity": 0.006
    },
    {
     "goodKey": "kerosene",
@@ -12514,7 +12539,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "grc-attica-commercial-farm-peasant",
-    "quantity": 153287.702
+    "quantity": 153287.703
    },
    {
     "goodKey": "wool",
@@ -12524,7 +12549,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "grc-attica-subsistence-farm",
-    "quantity": 368506.657
+    "quantity": 368506.66
    },
    {
     "goodKey": "textiles",
@@ -12904,7 +12929,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "rom-muntenia-warehouse",
-    "quantity": 216.034
+    "quantity": 216.033
    },
    {
     "goodKey": "cotton",
@@ -13110,12 +13135,12 @@
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-egy-alexandria-and-beheira-cotton-farm",
-    "quantity": 19848.886
+    "quantity": 19848.946
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-alexandria-and-beheira-subsistence-farm",
-    "quantity": 69870.224
+    "quantity": 69870.171
    },
    {
     "goodKey": "timber",
@@ -13125,7 +13150,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-aswan-and-the-red-sea-subsistence-farm",
-    "quantity": 23290.075
+    "quantity": 23290.057
    },
    {
     "goodKey": "construction-materials",
@@ -13135,12 +13160,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-cairo-commercial-farm-peasant",
-    "quantity": 39106.753
+    "quantity": 39106.724
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-cairo-subsistence-farm",
-    "quantity": 116450.373
+    "quantity": 116450.285
    },
    {
     "goodKey": "aluminium",
@@ -13150,12 +13175,17 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "af-egy-cairo-warehouse",
-    "quantity": 29613.137
+    "quantity": 29613.268
    },
    {
     "goodKey": "electrical-equipment",
     "ownerBuildingKey": "af-egy-cairo-warehouse",
     "quantity": 0.469
+   },
+   {
+    "goodKey": "gold",
+    "ownerBuildingKey": "af-egy-cairo-warehouse",
+    "quantity": 0.032
    },
    {
     "goodKey": "kerosene",
@@ -13170,12 +13200,12 @@
    {
     "goodKey": "nitrates",
     "ownerBuildingKey": "af-egy-cairo-warehouse",
-    "quantity": 0.444
+    "quantity": 0.446
    },
    {
     "goodKey": "rubber",
     "ownerBuildingKey": "af-egy-cairo-warehouse",
-    "quantity": 524.906
+    "quantity": 524.905
    },
    {
     "goodKey": "ships",
@@ -13190,12 +13220,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-dakahlia-and-damietta-subsistence-farm",
-    "quantity": 69870.224
+    "quantity": 69870.171
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-fayyum-and-beni-suef-subsistence-farm",
-    "quantity": 46580.149
+    "quantity": 46580.114
    },
    {
     "goodKey": "construction-materials",
@@ -13205,57 +13235,57 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-gharbia-and-menufia-commercial-farm-peasant",
-    "quantity": 39106.753
+    "quantity": 39106.724
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-egy-gharbia-and-menufia-cotton-farm",
-    "quantity": 26346.331
+    "quantity": 26346.411
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-gharbia-and-menufia-subsistence-farm",
-    "quantity": 164822.066
+    "quantity": 164821.942
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-egy-minya-and-asyut-cement-and-brick-works",
-    "quantity": 133.033
+    "quantity": 133.034
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-minya-and-asyut-commercial-farm-peasant",
-    "quantity": 39106.753
+    "quantity": 39106.724
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-egy-minya-and-asyut-cotton-farm",
-    "quantity": 13236.575
+    "quantity": 13236.615
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-minya-and-asyut-subsistence-farm",
-    "quantity": 93160.298
+    "quantity": 93160.228
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "af-egy-sharqia-and-the-canal-cotton-farm",
-    "quantity": 15223.023
+    "quantity": 15223.07
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-sharqia-and-the-canal-subsistence-farm",
-    "quantity": 69870.224
+    "quantity": 69870.171
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-egy-sohag-and-qena-cement-and-brick-works",
-    "quantity": 182.224
+    "quantity": 182.225
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-sohag-and-qena-commercial-farm-peasant",
-    "quantity": 39106.753
+    "quantity": 39106.724
    },
    {
     "goodKey": "timber",
@@ -13265,52 +13295,52 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-egy-sohag-and-qena-subsistence-farm",
-    "quantity": 93160.298
+    "quantity": 93160.228
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ott-misrata-and-the-gulf-coast-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "af-ott-tripoli-and-the-jefara-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-adana-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-al-hasa-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-ott-aleppo-cotton-farm",
-    "quantity": 81880.898
+    "quantity": 81880.83
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-aleppo-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-ott-ankara-cement-and-brick-works",
-    "quantity": 1461.718
+    "quantity": 1461.717
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-ankara-commercial-farm-peasant",
-    "quantity": 98441.153
+    "quantity": 98441.079
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-ott-ankara-cotton-farm",
-    "quantity": 76884.244
+    "quantity": 76884.18
    },
    {
     "goodKey": "paper",
@@ -13325,17 +13355,17 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-ankara-subsistence-farm",
-    "quantity": 234692.31
+    "quantity": 234692.133
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-asir-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-aydin-commercial-farm-peasant",
-    "quantity": 98441.153
+    "quantity": 98441.079
    },
    {
     "goodKey": "wool",
@@ -13345,7 +13375,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-aydin-subsistence-farm",
-    "quantity": 177362.885
+    "quantity": 177362.751
    },
    {
     "goodKey": "chemicals",
@@ -13360,7 +13390,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-baghdad-commercial-farm-peasant",
-    "quantity": 98441.153
+    "quantity": 98441.079
    },
    {
     "goodKey": "paper",
@@ -13375,32 +13405,32 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-baghdad-subsistence-farm",
-    "quantity": 177362.885
+    "quantity": 177362.751
    },
    {
     "goodKey": "textiles",
     "ownerBuildingKey": "as-ott-baghdad-textile-mill-p2b",
-    "quantity": 355451.623
+    "quantity": 355451.592
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-basra-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-damascus-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-diyarbekir-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-erzurum-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "wool",
@@ -13410,7 +13440,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-hejaz-subsistence-farm",
-    "quantity": 177362.885
+    "quantity": 177362.751
    },
    {
     "goodKey": "chemicals",
@@ -13420,17 +13450,17 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-ott-hudavendigar-cement-and-brick-works",
-    "quantity": 1675.005
+    "quantity": 1675.004
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-hudavendigar-commercial-farm-peasant",
-    "quantity": 98441.153
+    "quantity": 98441.079
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-ott-hudavendigar-cotton-farm",
-    "quantity": 52509.406
+    "quantity": 52509.362
    },
    {
     "goodKey": "timber",
@@ -13450,7 +13480,7 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-hudavendigar-subsistence-farm",
-    "quantity": 234692.31
+    "quantity": 234692.133
    },
    {
     "goodKey": "construction-materials",
@@ -13465,12 +13495,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-jerusalem-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-ott-kastamonu-logging-camp",
-    "quantity": 191.6
+    "quantity": 191.599
    },
    {
     "goodKey": "wool",
@@ -13480,62 +13510,62 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-kastamonu-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "cotton",
     "ownerBuildingKey": "as-ott-konya-cotton-farm",
-    "quantity": 62049.161
+    "quantity": 62049.109
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-ott-konya-logging-camp",
-    "quantity": 160.367
+    "quantity": 160.366
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-konya-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-lebanon-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-mamuret-ul-aziz-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-mosul-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-palestine-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-sivas-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-syrian-coast-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-trabzon-commercial-farm-peasant",
-    "quantity": 98441.153
+    "quantity": 98441.079
    },
    {
     "goodKey": "timber",
     "ownerBuildingKey": "as-ott-trabzon-logging-camp",
-    "quantity": 157.162
+    "quantity": 157.161
    },
    {
     "goodKey": "wool",
@@ -13545,27 +13575,27 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-trabzon-subsistence-farm",
-    "quantity": 177362.885
+    "quantity": 177362.751
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-transjordan-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-urfa-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-van-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-yemen-commercial-farm-peasant",
-    "quantity": 98441.153
+    "quantity": 98441.079
    },
    {
     "goodKey": "wool",
@@ -13575,12 +13605,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "as-ott-yemen-subsistence-farm",
-    "quantity": 471176.101
+    "quantity": 471175.746
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "oc-gap-ott-residual-commercial-farm-peasant",
-    "quantity": 98441.153
+    "quantity": 98441.079
    },
    {
     "goodKey": "wool",
@@ -13590,12 +13620,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "oc-gap-ott-residual-subsistence-farm",
-    "quantity": 177362.885
+    "quantity": 177362.751
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "ott-adrianople-commercial-farm-peasant",
-    "quantity": 98441.153
+    "quantity": 98441.079
    },
    {
     "goodKey": "wool",
@@ -13605,12 +13635,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "ott-adrianople-subsistence-farm",
-    "quantity": 177362.885
+    "quantity": 177362.751
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "ott-constantinople-commercial-farm-peasant",
-    "quantity": 98441.153
+    "quantity": 98441.079
    },
    {
     "goodKey": "wool",
@@ -13620,27 +13650,27 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "ott-constantinople-subsistence-farm",
-    "quantity": 177362.885
+    "quantity": 177362.751
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "ott-janina-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "ott-kosovo-subsistence-farm",
-    "quantity": 59120.962
+    "quantity": 59120.917
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "ott-monastir-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "ott-salonika-commercial-farm-peasant",
-    "quantity": 98441.153
+    "quantity": 98441.079
    },
    {
     "goodKey": "wool",
@@ -13650,12 +13680,12 @@
    {
     "goodKey": "grain",
     "ownerBuildingKey": "ott-salonika-subsistence-farm",
-    "quantity": 177362.885
+    "quantity": 177362.751
    },
    {
     "goodKey": "grain",
     "ownerBuildingKey": "ott-scutari-subsistence-farm",
-    "quantity": 118241.923
+    "quantity": 118241.834
    }
   ],
   "status": "calibrated",
@@ -13961,12 +13991,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-chn-henan-alkali-and-acid-works",
-    "quantity": 46.055
+    "quantity": 46.104
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-chn-henan-cement-and-brick-works",
-    "quantity": 20596.533
+    "quantity": 20600.79
    },
    {
     "goodKey": "grain",
@@ -14046,12 +14076,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-chn-jiangsu-alkali-and-acid-works",
-    "quantity": 60.841
+    "quantity": 60.905
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-chn-jiangsu-cement-and-brick-works",
-    "quantity": 27208.814
+    "quantity": 27214.438
    },
    {
     "goodKey": "grain",
@@ -14161,12 +14191,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-chn-shandong-alkali-and-acid-works",
-    "quantity": 57.342
+    "quantity": 57.403
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-chn-shandong-cement-and-brick-works",
-    "quantity": 25644.298
+    "quantity": 25649.599
    },
    {
     "goodKey": "grain",
@@ -14216,12 +14246,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "as-chn-sichuan-alkali-and-acid-works",
-    "quantity": 69.827
+    "quantity": 69.901
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-chn-sichuan-cement-and-brick-works",
-    "quantity": 31227.795
+    "quantity": 31234.25
    },
    {
     "goodKey": "grain",
@@ -14271,7 +14301,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-chn-sichuan-warehouse",
-    "quantity": 238378.317
+    "quantity": 238385.776
    },
    {
     "goodKey": "electrical-equipment",
@@ -14286,12 +14316,12 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "as-chn-sichuan-warehouse",
-    "quantity": 4819.814
+    "quantity": 4820.699
    },
    {
     "goodKey": "nitrates",
     "ownerBuildingKey": "as-chn-sichuan-warehouse",
-    "quantity": 5.027
+    "quantity": 5.05
    },
    {
     "goodKey": "rubber",
@@ -14396,7 +14426,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-tib-u-tsang-cement-and-brick-works",
-    "quantity": 52.561
+    "quantity": 52.566
    },
    {
     "goodKey": "grain",
@@ -14479,7 +14509,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-kor-gyeonggi-cement-and-brick-works",
-    "quantity": 821.486
+    "quantity": 823.022
    },
    {
     "goodKey": "grain",
@@ -14492,19 +14522,24 @@
     "quantity": 109108.935
    },
    {
+    "goodKey": "chemicals",
+    "ownerBuildingKey": "as-kor-gyeonggi-warehouse",
+    "quantity": 0.092
+   },
+   {
     "goodKey": "coal",
     "ownerBuildingKey": "as-kor-gyeonggi-warehouse",
-    "quantity": 766.1
+    "quantity": 767.764
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "as-kor-gyeonggi-warehouse",
-    "quantity": 135.317
+    "quantity": 135.559
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-kor-gyeongsang-cement-and-brick-works",
-    "quantity": 998.106
+    "quantity": 999.972
    },
    {
     "goodKey": "grain",
@@ -14549,7 +14584,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-kor-jeolla-cement-and-brick-works",
-    "quantity": 628.68
+    "quantity": 629.856
    },
    {
     "goodKey": "grain",
@@ -14574,7 +14609,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "as-kor-pyongan-cement-and-brick-works",
-    "quantity": 707.585
+    "quantity": 708.908
    },
    {
     "goodKey": "grain",
@@ -14669,7 +14704,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-per-azerbaijan-warehouse",
-    "quantity": 11940.959
+    "quantity": 11940.958
    },
    {
     "goodKey": "electrical-equipment",
@@ -15010,7 +15045,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-npl-eastern-nepal-warehouse",
-    "quantity": 263.676
+    "quantity": 263.675
    },
    {
     "goodKey": "machinery",
@@ -15090,7 +15125,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "as-tha-bangkok-warehouse",
-    "quantity": 368.644
+    "quantity": 368.643
    },
    {
     "goodKey": "machinery",
@@ -15391,7 +15426,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "af-eth-amhara-and-begemder-warehouse",
-    "quantity": 6410.487
+    "quantity": 6410.486
    },
    {
     "goodKey": "electrical-equipment",
@@ -15847,7 +15882,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-zar-lydenburg-and-the-eastern-transvaal-cement-and-brick-works",
-    "quantity": 62.472
+    "quantity": 67.304
    },
    {
     "goodKey": "cotton",
@@ -15867,7 +15902,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-zar-potchefstroom-and-the-western-transvaal-cement-and-brick-works",
-    "quantity": 48.785
+    "quantity": 52.559
    },
    {
     "goodKey": "cotton",
@@ -15882,7 +15917,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-zar-pretoria-and-the-witwatersrand-cement-and-brick-works",
-    "quantity": 161.922
+    "quantity": 174.448
    },
    {
     "goodKey": "grain",
@@ -15917,12 +15952,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "af-zar-pretoria-and-the-witwatersrand-warehouse",
-    "quantity": 0.892
+    "quantity": 1.306
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "af-zar-pretoria-and-the-witwatersrand-warehouse",
-    "quantity": 1441.513
+    "quantity": 1447.558
    },
    {
     "goodKey": "electrical-equipment",
@@ -15937,7 +15972,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "af-zar-pretoria-and-the-witwatersrand-warehouse",
-    "quantity": 16.011
+    "quantity": 17.137
    },
    {
     "goodKey": "paper",
@@ -15967,7 +16002,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "af-zar-zoutpansberg-and-the-northern-transvaal-cement-and-brick-works",
-    "quantity": 82.875
+    "quantity": 89.286
    },
    {
     "goodKey": "cotton",
@@ -16143,7 +16178,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-mex-baja-california-copper-mine",
-    "quantity": 7.39
+    "quantity": 7.396
    },
    {
     "goodKey": "cotton",
@@ -16163,7 +16198,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-mex-chihuahua-copper-mine",
-    "quantity": 0.769
+    "quantity": 0.77
    },
    {
     "goodKey": "timber",
@@ -16198,7 +16233,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-mex-guanajuato-cement-and-brick-works",
-    "quantity": 851.583
+    "quantity": 860.036
    },
    {
     "goodKey": "grain",
@@ -16208,7 +16243,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-mex-guanajuato-copper-mine",
-    "quantity": 3.768
+    "quantity": 3.771
    },
    {
     "goodKey": "grain",
@@ -16223,12 +16258,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "am-mex-guanajuato-warehouse",
-    "quantity": 6.632
+    "quantity": 7.554
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-mex-guanajuato-warehouse",
-    "quantity": 6438.956
+    "quantity": 6447.251
    },
    {
     "goodKey": "electrical-equipment",
@@ -16243,7 +16278,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "am-mex-guanajuato-warehouse",
-    "quantity": 151.887
+    "quantity": 153.335
    },
    {
     "goodKey": "rubber",
@@ -16273,7 +16308,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-mex-jalisco-cement-and-brick-works",
-    "quantity": 1008.024
+    "quantity": 1018.03
    },
    {
     "goodKey": "grain",
@@ -16318,7 +16353,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-mex-michoacan-cement-and-brick-works",
-    "quantity": 861.201
+    "quantity": 869.75
    },
    {
     "goodKey": "grain",
@@ -16373,7 +16408,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-mex-sonora-copper-mine",
-    "quantity": 18.068
+    "quantity": 18.083
    },
    {
     "goodKey": "cotton",
@@ -16408,7 +16443,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-mex-veracruz-cement-and-brick-works",
-    "quantity": 846.805
+    "quantity": 855.21
    },
    {
     "goodKey": "grain",
@@ -16987,7 +17022,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-col-antioquia-cement-and-brick-works",
-    "quantity": 208.706
+    "quantity": 213.114
    },
    {
     "goodKey": "grain",
@@ -17012,7 +17047,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-col-bogota-cement-and-brick-works",
-    "quantity": 299.959
+    "quantity": 306.294
    },
    {
     "goodKey": "grain",
@@ -17040,14 +17075,19 @@
     "quantity": 19389.824
    },
    {
+    "goodKey": "chemicals",
+    "ownerBuildingKey": "am-col-bogota-warehouse",
+    "quantity": 0.132
+   },
+   {
     "goodKey": "coal",
     "ownerBuildingKey": "am-col-bogota-warehouse",
-    "quantity": 181.956
+    "quantity": 184.345
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "am-col-bogota-warehouse",
-    "quantity": 32.079
+    "quantity": 32.722
    },
    {
     "goodKey": "grain",
@@ -17082,7 +17122,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-col-santander-cement-and-brick-works",
-    "quantity": 76.932
+    "quantity": 78.557
    },
    {
     "goodKey": "grain",
@@ -17097,7 +17137,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-col-valle-del-cauca-cement-and-brick-works",
-    "quantity": 159.576
+    "quantity": 162.947
    },
    {
     "goodKey": "cotton",
@@ -17176,12 +17216,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "am-ven-carabobo-warehouse",
-    "quantity": 0.669
+    "quantity": 0.727
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-ven-carabobo-warehouse",
-    "quantity": 1107.067
+    "quantity": 1107.791
    },
    {
     "goodKey": "electrical-equipment",
@@ -17196,7 +17236,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "am-ven-carabobo-warehouse",
-    "quantity": 25.73
+    "quantity": 25.891
    },
    {
     "goodKey": "paper",
@@ -17241,7 +17281,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-ven-lara-cement-and-brick-works",
-    "quantity": 181.154
+    "quantity": 182.331
    },
    {
     "goodKey": "grain",
@@ -17251,7 +17291,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-ven-miranda-cement-and-brick-works",
-    "quantity": 148.455
+    "quantity": 149.419
    },
    {
     "goodKey": "grain",
@@ -17281,7 +17321,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-ven-trujillo-cement-and-brick-works",
-    "quantity": 145.237
+    "quantity": 146.18
    },
    {
     "goodKey": "grain",
@@ -17291,7 +17331,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-ven-zulia-cement-and-brick-works",
-    "quantity": 130.755
+    "quantity": 131.604
    },
    {
     "goodKey": "cotton",
@@ -17477,7 +17517,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-pru-ancash-cement-and-brick-works",
-    "quantity": 195.309
+    "quantity": 196.212
    },
    {
     "goodKey": "grain",
@@ -17485,14 +17525,19 @@
     "quantity": 13475.482
    },
    {
+    "goodKey": "chemicals",
+    "ownerBuildingKey": "am-pru-ancash-warehouse",
+    "quantity": 0.049
+   },
+   {
     "goodKey": "coal",
     "ownerBuildingKey": "am-pru-ancash-warehouse",
-    "quantity": 245.455
+    "quantity": 246.387
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "am-pru-ancash-warehouse",
-    "quantity": 36.391
+    "quantity": 36.552
    },
    {
     "goodKey": "grain",
@@ -17502,7 +17547,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-pru-arequipa-copper-mine",
-    "quantity": 1.503
+    "quantity": 1.505
    },
    {
     "goodKey": "grain",
@@ -17522,7 +17567,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-pru-cajamarca-cement-and-brick-works",
-    "quantity": 200.997
+    "quantity": 201.927
    },
    {
     "goodKey": "cotton",
@@ -17537,12 +17582,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-pru-cusco-cement-and-brick-works",
-    "quantity": 206.769
+    "quantity": 207.725
    },
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-pru-cusco-copper-mine",
-    "quantity": 1.359
+    "quantity": 1.36
    },
    {
     "goodKey": "cotton",
@@ -17562,7 +17607,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-pru-huanuco-copper-mine",
-    "quantity": 5.475
+    "quantity": 5.48
    },
    {
     "goodKey": "grain",
@@ -17582,7 +17627,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-pru-moquegua-copper-mine",
-    "quantity": 2.845
+    "quantity": 2.847
    },
    {
     "goodKey": "grain",
@@ -17592,7 +17637,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-pru-puno-cement-and-brick-works",
-    "quantity": 247.553
+    "quantity": 248.699
    },
    {
     "goodKey": "grain",
@@ -17681,7 +17726,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-bol-cochabamba-warehouse",
-    "quantity": 899.445
+    "quantity": 899.484
    },
    {
     "goodKey": "electrical-equipment",
@@ -17751,7 +17796,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-bol-la-paz-copper-mine",
-    "quantity": 2.857
+    "quantity": 2.86
    },
    {
     "goodKey": "cotton",
@@ -17844,12 +17889,12 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-chl-antofagasta-copper-mine",
-    "quantity": 14.466
+    "quantity": 14.478
    },
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-chl-atacama-copper-mine",
-    "quantity": 3.872
+    "quantity": 3.875
    },
    {
     "goodKey": "construction-materials",
@@ -17884,7 +17929,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-chl-bio-bio-warehouse",
-    "quantity": 8935.596
+    "quantity": 8936.543
    },
    {
     "goodKey": "electrical-equipment",
@@ -17949,7 +17994,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-chl-libertador-general-bernardo-o-higgins-copper-mine",
-    "quantity": 14.466
+    "quantity": 14.478
    },
    {
     "goodKey": "cotton",
@@ -18029,7 +18074,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-chl-tacna-copper-mine",
-    "quantity": 1.491
+    "quantity": 1.492
    },
    {
     "goodKey": "construction-materials",
@@ -18632,7 +18677,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-bra-bahia-cement-and-brick-works",
-    "quantity": 995.2
+    "quantity": 998.653
    },
    {
     "goodKey": "grain",
@@ -18667,7 +18712,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-bra-minas-gerais-cement-and-brick-works",
-    "quantity": 1683.212
+    "quantity": 1689.051
    },
    {
     "goodKey": "grain",
@@ -18695,14 +18740,19 @@
     "quantity": 85356.152
    },
    {
+    "goodKey": "chemicals",
+    "ownerBuildingKey": "am-bra-minas-gerais-warehouse",
+    "quantity": 0.152
+   },
+   {
     "goodKey": "coal",
     "ownerBuildingKey": "am-bra-minas-gerais-warehouse",
-    "quantity": 1101.788
+    "quantity": 1105.307
    },
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "am-bra-minas-gerais-warehouse",
-    "quantity": 196.934
+    "quantity": 197.739
    },
    {
     "goodKey": "grain",
@@ -18742,7 +18792,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-bra-rio-de-janeiro-cement-and-brick-works",
-    "quantity": 785.98
+    "quantity": 788.706
    },
    {
     "goodKey": "grain",
@@ -18782,7 +18832,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-bra-sao-paulo-cement-and-brick-works",
-    "quantity": 1072.457
+    "quantity": 1076.177
    },
    {
     "goodKey": "grain",
@@ -19041,12 +19091,12 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-can-alberta-district-coal-mine",
-    "quantity": 3436.133
+    "quantity": 3443.703
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-can-british-columbia-coal-mine",
-    "quantity": 441.788
+    "quantity": 442.762
    },
    {
     "goodKey": "timber",
@@ -19066,7 +19116,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-can-new-brunswick-cement-and-brick-works",
-    "quantity": 100.639
+    "quantity": 103.41
    },
    {
     "goodKey": "grain",
@@ -19081,12 +19131,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-can-nova-scotia-cement-and-brick-works",
-    "quantity": 135.195
+    "quantity": 138.917
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "am-can-nova-scotia-coal-mine",
-    "quantity": 39.27
+    "quantity": 39.357
    },
    {
     "goodKey": "wool",
@@ -19111,7 +19161,7 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "am-can-nova-scotia-warehouse",
-    "quantity": 17.4
+    "quantity": 19.002
    },
    {
     "goodKey": "coffee-tea-cocoa",
@@ -19131,7 +19181,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "am-can-nova-scotia-warehouse",
-    "quantity": 58.263
+    "quantity": 59.792
    },
    {
     "goodKey": "rubber",
@@ -19156,7 +19206,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-can-ontario-cement-and-brick-works",
-    "quantity": 661.532
+    "quantity": 679.747
    },
    {
     "goodKey": "grain",
@@ -19166,7 +19216,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "am-can-ontario-copper-mine",
-    "quantity": 11.27
+    "quantity": 11.28
    },
    {
     "goodKey": "timber",
@@ -19201,7 +19251,7 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "am-can-quebec-cement-and-brick-works",
-    "quantity": 460.226
+    "quantity": 472.898
    },
    {
     "goodKey": "grain",
@@ -19261,12 +19311,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "oc-aus-new-south-wales-cement-and-brick-works",
-    "quantity": 385.57
+    "quantity": 417.587
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "oc-aus-new-south-wales-coal-mine",
-    "quantity": 1378.248
+    "quantity": 1386.475
    },
    {
     "goodKey": "grain",
@@ -19276,7 +19326,7 @@
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "oc-aus-new-south-wales-copper-mine",
-    "quantity": 10.022
+    "quantity": 10.03
    },
    {
     "goodKey": "cotton",
@@ -19311,7 +19361,7 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "oc-aus-new-south-wales-warehouse",
-    "quantity": 7.296
+    "quantity": 11.512
    },
    {
     "goodKey": "electrical-equipment",
@@ -19326,7 +19376,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "oc-aus-new-south-wales-warehouse",
-    "quantity": 37.222
+    "quantity": 40.359
    },
    {
     "goodKey": "paper",
@@ -19351,17 +19401,17 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "oc-aus-queensland-cement-and-brick-works",
-    "quantity": 146.668
+    "quantity": 158.847
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "oc-aus-queensland-coal-mine",
-    "quantity": 1378.248
+    "quantity": 1386.475
    },
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "oc-aus-queensland-copper-mine",
-    "quantity": 10.825
+    "quantity": 10.834
    },
    {
     "goodKey": "cotton",
@@ -19391,12 +19441,12 @@
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "oc-aus-victoria-cement-and-brick-works",
-    "quantity": 344.378
+    "quantity": 372.974
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "oc-aus-victoria-coal-mine",
-    "quantity": 61.255
+    "quantity": 61.621
    },
    {
     "goodKey": "cotton",
@@ -19426,12 +19476,12 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "oc-aus-western-australia-coal-mine",
-    "quantity": 0.919
+    "quantity": 0.924
    },
    {
     "goodKey": "copper-ore",
     "ownerBuildingKey": "oc-aus-western-australia-copper-mine",
-    "quantity": 9.844
+    "quantity": 9.852
    },
    {
     "goodKey": "grain",
@@ -19846,7 +19896,7 @@
    {
     "goodKey": "coal",
     "ownerBuildingKey": "aut-austrian-silesia-coal-mine",
-    "quantity": 26581.834
+    "quantity": 26583.978
    },
    {
     "goodKey": "grain",
@@ -19901,17 +19951,17 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "aut-bohemia-alkali-and-acid-works",
-    "quantity": 50.284
+    "quantity": 50.323
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "aut-bohemia-cement-and-brick-works",
-    "quantity": 5294.91
+    "quantity": 5296.212
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "aut-bohemia-coal-mine",
-    "quantity": 17721.222
+    "quantity": 17722.652
    },
    {
     "goodKey": "grain",
@@ -19921,7 +19971,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "aut-bohemia-machine-works",
-    "quantity": 231.874
+    "quantity": 231.927
    },
    {
     "goodKey": "paper",
@@ -19941,7 +19991,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "aut-bohemia-steel-works",
-    "quantity": 235.541
+    "quantity": 235.709
    },
    {
     "goodKey": "grain",
@@ -19966,7 +20016,7 @@
    {
     "goodKey": "copper",
     "ownerBuildingKey": "aut-bohemia-warehouse",
-    "quantity": 16.406
+    "quantity": 16.42
    },
    {
     "goodKey": "cotton",
@@ -19981,7 +20031,7 @@
    {
     "goodKey": "nitrates",
     "ownerBuildingKey": "aut-bohemia-warehouse",
-    "quantity": 3.027
+    "quantity": 3.041
    },
    {
     "goodKey": "rubber",
@@ -19991,7 +20041,7 @@
    {
     "goodKey": "tin",
     "ownerBuildingKey": "aut-bohemia-warehouse",
-    "quantity": 2.734
+    "quantity": 2.737
    },
    {
     "goodKey": "grain",
@@ -20241,17 +20291,17 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "aut-moravia-alkali-and-acid-works",
-    "quantity": 29.463
+    "quantity": 29.486
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "aut-moravia-cement-and-brick-works",
-    "quantity": 3102.466
+    "quantity": 3103.229
    },
    {
     "goodKey": "coal",
     "ownerBuildingKey": "aut-moravia-coal-mine",
-    "quantity": 206.748
+    "quantity": 206.764
    },
    {
     "goodKey": "grain",
@@ -20261,7 +20311,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "aut-moravia-machine-works",
-    "quantity": 135.862
+    "quantity": 135.894
    },
    {
     "goodKey": "paper",
@@ -20276,7 +20326,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "aut-moravia-steel-works",
-    "quantity": 138.011
+    "quantity": 138.11
    },
    {
     "goodKey": "grain",
@@ -20356,7 +20406,7 @@
    {
     "goodKey": "iron-ore",
     "ownerBuildingKey": "aut-styria-iron-mine",
-    "quantity": 594.916
+    "quantity": 595.397
    },
    {
     "goodKey": "wool",
@@ -20491,12 +20541,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "aut-vienna-alkali-and-acid-works",
-    "quantity": 38.379
+    "quantity": 38.409
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "aut-vienna-cement-and-brick-works",
-    "quantity": 4041.333
+    "quantity": 4042.327
    },
    {
     "goodKey": "grain",
@@ -20506,7 +20556,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "aut-vienna-machine-works",
-    "quantity": 176.977
+    "quantity": 177.018
    },
    {
     "goodKey": "paper",
@@ -20526,7 +20576,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "aut-vienna-steel-works",
-    "quantity": 179.776
+    "quantity": 179.905
    },
    {
     "goodKey": "grain",
@@ -20541,12 +20591,12 @@
    {
     "goodKey": "chemicals",
     "ownerBuildingKey": "aut-western-galicia-alkali-and-acid-works",
-    "quantity": 33.795
+    "quantity": 33.821
    },
    {
     "goodKey": "construction-materials",
     "ownerBuildingKey": "aut-western-galicia-cement-and-brick-works",
-    "quantity": 3558.573
+    "quantity": 3559.448
    },
    {
     "goodKey": "grain",
@@ -20556,7 +20606,7 @@
    {
     "goodKey": "machinery",
     "ownerBuildingKey": "aut-western-galicia-machine-works",
-    "quantity": 155.836
+    "quantity": 155.872
    },
    {
     "goodKey": "paper",
@@ -20571,7 +20621,7 @@
    {
     "goodKey": "steel",
     "ownerBuildingKey": "aut-western-galicia-steel-works",
-    "quantity": 158.301
+    "quantity": 158.414
    },
    {
     "goodKey": "grain",

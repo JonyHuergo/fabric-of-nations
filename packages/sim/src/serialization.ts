@@ -49,7 +49,7 @@ import { checksumOfJson, fnv1a32Hex, stableStringify } from "./hash.js";
 import { MONEY_COEFFICIENT_KEYS } from "./economy/constants.js";
 import type { MoneyCoefficients } from "./economy/types.js";
 import { canonicalizeStockLots } from "./economy/inventory.js";
-import { CASUS_BELLI, PEACE_TERMS } from "./economy/types.js";
+import { CASUS_BELLI, MONETARY_STANDARDS, PEACE_TERMS } from "./economy/types.js";
 import type {
   AccountCategory,
   AccountSubtype,
@@ -99,6 +99,7 @@ import type {
   PeaceTermKind,
   WarState,
   MonetaryCurrencyState,
+  MonetaryStandard,
   MonetaryState,
   PriceIndexState,
   TradeBlockReason,
@@ -779,6 +780,12 @@ export type SerializedMonetaryCurrencyState = {
   readonly lastMonthEndDay: number | null;
   readonly lastMonthExportsRUSD: number;
   readonly lastMonthImportsRUSD: number;
+  readonly standard: string;
+  readonly fineGramsPerUnit: number;
+  readonly metalReserveKg: number;
+  readonly metalReserveAccountId: number | null;
+  readonly convertible: boolean;
+  readonly lastMintSaleKg: number;
 };
 
 /** Encoded M10 army. */
@@ -1859,6 +1866,13 @@ export function encodeWorld(world: World): SerializedWorld {
           lastMonthEndDay: record.lastMonthEndDay,
           lastMonthExportsRUSD: record.lastMonthExportsRUSD,
           lastMonthImportsRUSD: record.lastMonthImportsRUSD,
+          // D-149 (schema 33): the metal standard.
+          standard: record.standard,
+          fineGramsPerUnit: record.fineGramsPerUnit,
+          metalReserveKg: record.metalReserveKg,
+          metalReserveAccountId: record.metalReserveAccountId,
+          convertible: record.convertible,
+          lastMintSaleKg: record.lastMintSaleKg,
         })),
       lastUpdateDay: world.monetary.lastUpdateDay,
     },
@@ -3044,7 +3058,26 @@ function decodeMonetaryCurrencyState(
       record.lastMonthImportsRUSD,
       `${path}.lastMonthImportsRUSD`,
     ),
+    standard: decodeMonetaryStandard(record.standard, `${path}.standard`),
+    fineGramsPerUnit: requireFiniteNumber(record.fineGramsPerUnit, `${path}.fineGramsPerUnit`),
+    metalReserveKg: requireFiniteNumber(record.metalReserveKg, `${path}.metalReserveKg`),
+    metalReserveAccountId: optionalAccount("metalReserveAccountId"),
+    convertible: decodeBoolean(record.convertible, `${path}.convertible`),
+    lastMintSaleKg: requireFiniteNumber(record.lastMintSaleKg, `${path}.lastMintSaleKg`),
   };
+}
+
+function decodeMonetaryStandard(value: unknown, path: string): MonetaryStandard {
+  const standard = requireString(value, path);
+  if (!(MONETARY_STANDARDS as readonly string[]).includes(standard)) {
+    throw new SaveFormatError(`${path} is invalid`);
+  }
+  return standard as MonetaryStandard;
+}
+
+function decodeBoolean(value: unknown, path: string): boolean {
+  if (typeof value !== "boolean") throw new SaveFormatError(`${path} must be a boolean`);
+  return value;
 }
 
 function decodeMonetaryState(value: unknown, path: string): MonetaryState {

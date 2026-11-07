@@ -13,7 +13,7 @@ import type { Id } from "../types.js";
 import type { World } from "../world.js";
 import { FX_MAX_RATIO, FX_MIN_RATIO, MAX_PRICE_INDEX_OBSERVATIONS } from "./constants.js";
 import { asRusdPerCurrencyUnit } from "./currency.js";
-import { MONETARY_REGIMES } from "./types.js";
+import { MONETARY_REGIMES, MONETARY_STANDARDS } from "./types.js";
 import type {
   MonetaryState,
   PriceIndexState,
@@ -267,6 +267,28 @@ export function assertValidMonetaryState(world: World, path = "world.monetary"):
         }
       }
     }
+    // D-149: the metal standard.
+    if (!(MONETARY_STANDARDS as readonly string[]).includes(record.standard)) {
+      throw new RangeError(`${entryPath}.standard is invalid`);
+    }
+    for (const field of ["fineGramsPerUnit", "metalReserveKg", "lastMintSaleKg"] as const) {
+      if (!Number.isFinite(record[field]) || record[field] < 0) {
+        throw new RangeError(`${entryPath}.${field} must be finite and non-negative`);
+      }
+    }
+    if (typeof record.convertible !== "boolean") throw new RangeError(`${entryPath}.convertible must be a boolean`);
+    if (record.standard === "paper") {
+      if (record.fineGramsPerUnit !== 0 || record.metalReserveKg !== 0 || record.metalReserveAccountId !== null || record.convertible || record.lastMintSaleKg !== 0) {
+        throw new RangeError(`${entryPath} paper currency carries metal state`);
+      }
+    } else {
+      if (!record.active) throw new RangeError(`${entryPath} a metal standard requires an active authority`);
+      if (!(record.fineGramsPerUnit > 0)) throw new RangeError(`${entryPath}.fineGramsPerUnit must be positive`);
+      const account = record.metalReserveAccountId === null ? undefined : accountsById.get(record.metalReserveAccountId);
+      if (account === undefined || account.subtype !== "monetary-metal-reserve" || account.ownerKind !== "country" || account.ownerId !== record.issuerCountryId) {
+        throw new RangeError(`${entryPath}.metalReserveAccountId must be the issuer's monetary-metal-reserve account`);
+      }
+    }
     if (record.active) {
       if (record.parityRusdPerUnit === null || record.referenceParityRusdPerUnit === null) {
         throw new RangeError(`${entryPath} active authority requires a parity`);
@@ -275,7 +297,16 @@ export function assertValidMonetaryState(world: World, path = "world.monetary"):
       if (valuation === null) {
         throw new RangeError(`${entryPath} active authority requires a specified valuation`);
       }
-      if (record.regime === "pegged") {
+      if (record.standard !== "paper") {
+        // D-149: a convertible metal currency floats with its metal's price (bounded by
+        // the price band); a suspended one follows the managed band.
+        if (!record.convertible) {
+          const reference = record.referenceParityRusdPerUnit;
+          if (valuation < reference * FX_MIN_RATIO - 1e-12 || valuation > reference * FX_MAX_RATIO + 1e-12) {
+            throw new RangeError(`${entryPath} suspended valuation is outside the managed band`);
+          }
+        }
+      } else if (record.regime === "pegged") {
         if (
           Math.abs(valuation - record.parityRusdPerUnit) >
           Math.abs(record.parityRusdPerUnit) * 1e-12

@@ -52,6 +52,7 @@ import type {
   RusdPerCurrencyUnit,
 } from "./types.js";
 import { MONETARY_REGIMES } from "./types.js";
+import { runMintWindow, type MintFlow } from "./mint.js";
 export {
   assertValidMonetaryState,
   assertValidPriceIndexState,
@@ -373,6 +374,15 @@ export function convertibilityState(
   if (record === null || !world.monetary.enabled) {
     return { state: "no-authority", coverMonths: Number.POSITIVE_INFINITY, reservesRUSD: 0 };
   }
+  if (record.active && record.standard !== "paper") {
+    // D-149: a metal currency is convertible while its mint sells metal at the export
+    // point; its RUSD cash only funds purchases.
+    return {
+      state: record.convertible ? "open" : "suspended",
+      coverMonths: authorityReserveCoverMonths(world, record),
+      reservesRUSD: authorityReservesRUSD(world, record),
+    };
+  }
   if (!record.active) {
     return {
       state: "inactive",
@@ -407,6 +417,8 @@ export interface MonetaryPhaseResult {
   readonly revaluationRUSD: number;
   readonly priceObservationCaptured: boolean;
   readonly postingIds: readonly number[];
+  /** D-149: the mint flows of the metal standards today (empty without one). */
+  readonly mintFlows: readonly MintFlow[];
 }
 
 function isMonthEnd(dayIndex: DayIndex): { year: number; month: number } | null {
@@ -462,6 +474,7 @@ export function runMonetaryPhase(
     revaluationRUSD: 0,
     priceObservationCaptured: false,
     postingIds: [],
+    mintFlows: [],
   };
   if (!world.monetary.enabled) return empty;
   if (world.monetary.lastUpdateDay === dayIndex) return empty;
@@ -471,6 +484,8 @@ export function runMonetaryPhase(
   const managed: Id[] = [];
   const entries: JournalEntryInput[] = [];
   let revaluationRUSD = 0;
+  const mintFlows: MintFlow[] = [];
+  const dealerSpent = new Map<Id, number>();
 
   for (const record of [...world.monetary.currencies].sort(
     (left, right) => left.currencyId - right.currencyId,
@@ -478,13 +493,50 @@ export function runMonetaryPhase(
     if (!record.active || record.issuerCountryId === null) continue;
     const country = world.countries.find((candidate) => candidate.id === record.issuerCountryId);
     if (country === undefined) continue;
-    const valuation = currencyValuationOf(world, record.currencyId);
+    let valuation = currencyValuationOf(world, record.currencyId);
     if (valuation === null) continue;
 
+    // D-149: the mint window, the reserve measured at the day's metal price, then a
+    // convertible metal currency is worth its fine content at that price.
+    if (record.standard !== "paper") {
+      const flow = runMintWindow(world, economyDefinitions, record, entries, dealerSpent);
+      if (flow !== null) {
+        mintFlows.push(flow);
+        const price = flow.marketPriceRUSDPerKg;
+        if (record.metalReserveAccountId !== null) {
+          const booked = accountBalanceRUSD(world, record.metalReserveAccountId) + flow.boughtRUSD - flow.soldRUSD;
+          const delta = record.metalReserveKg * price - booked;
+          if (Math.abs(delta) > MONEY_TOLERANCE_RUSD * Math.max(1, Math.abs(booked))) {
+            entries.push({
+              transactionKind: "metal-revaluation",
+              lines: [
+                { accountId: record.metalReserveAccountId, side: delta > 0 ? "debit" : "credit", amountRUSD: Math.abs(delta) },
+                { accountId: record.equityAccountId ?? 0, side: delta > 0 ? "credit" : "debit", amountRUSD: Math.abs(delta) },
+              ],
+              sourceEntityId: record.issuerCountryId,
+              targetEntityId: null,
+            });
+          }
+        }
+        if (record.convertible && price > 0) {
+          const next = (record.fineGramsPerUnit / 1000) * price;
+          if (Math.abs(next - valuation) > Math.abs(valuation) * 1e-12) {
+            revaluationRUSD += applyRevaluation(record, record.currencyIssuedUnits * (next - valuation), dayIndex, entries);
+            setCurrencyValuation(world, record.currencyId, asRusdPerCurrencyUnit(next), dayIndex, "market");
+            record.parityRusdPerUnit = asRusdPerCurrencyUnit(next);
+            valuation = asRusdPerCurrencyUnit(next);
+          }
+        }
+      }
+    }
+
     // Managed exchange-rate rule: a documented, bounded response to realized trade and
-    // relative prices. Pegged valuations never drift.
+    // relative prices. Pegged valuations never drift. A suspended metal currency follows
+    // it too (D-149, plan §13.5).
+    const followsManagedRule =
+      record.standard === "paper" ? record.regime === "managed" : !record.convertible;
     if (
-      record.regime === "managed" &&
+      followsManagedRule &&
       record.lastManagedUpdateDay !== dayIndex
     ) {
       const exports = record.lastMonthExportsRUSD;
@@ -538,6 +590,7 @@ export function runMonetaryPhase(
     revaluationRUSD,
     priceObservationCaptured,
     postingIds: postings.map((posting) => posting.id),
+    mintFlows,
   };
 }
 
@@ -684,6 +737,14 @@ export function validateMonetaryPolicy(
     throw new RangeError(`${path}: country ${String(country.id)} has no issued-currency authority`);
   }
   assertMonetaryRegime(input.regime, `${path}.regime`);
+  if (record.standard !== "paper") {
+    // D-149: a metal currency's value is set by its fine content and the mint window;
+    // only the treasury's reserve cash can be moved. Changing the standard itself is a
+    // currency change (ADOPT_CURRENCY / ESTABLISH_CURRENCY).
+    if (input.regime !== record.regime || input.parityRusdPerUnit !== null || input.currencyConversionRUSD !== 0) {
+      throw new RangeError(`${path}: a ${record.standard}-standard currency allows only reserve transfers`);
+    }
+  }
   if (input.regime === "managed" && !managedRegimeEnabled(country, definitions)) {
     throw new RangeError(
       `${path}: the managed exchange-rate regime requires an enacted currency law`,

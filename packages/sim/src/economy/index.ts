@@ -68,6 +68,16 @@ export {
   type MonetaryPolicyInput,
   type MonetaryPolicyResult,
 } from "./monetary.js";
+/** D-140 / D-149: the mint window of metal-standard currencies. */
+export {
+  homeMetalPrice,
+  issuerHomeMarketId,
+  metalGoodId,
+  mintPriceRUSDPerKg,
+  mintStandingOffers,
+  type MintFlow,
+  type MintStandingOffer,
+} from "./mint.js";
 /**
  * M4b period close. Only the public close operation and its result type are
  * exported; the internal `period-close` posting helper stays module-private so

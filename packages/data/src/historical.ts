@@ -58,6 +58,7 @@ import {
   type MarketInitialDef,
   type MarketMetaDef,
   type MonetaryArrangement,
+  type MonetaryCurrencyInput,
   type MoneyCoefficients,
   type NeedTierDef,
   type PoliticsDefinitions,
@@ -128,6 +129,11 @@ export interface HistoricalScenarioFiles {
   readonly demography?: string;
   /** P5 (D-143 §4) natural-resource deposits, built by scripts/p5/build-p5-world.mjs. */
   readonly deposits?: string;
+  /**
+   * D-140 / D-149: the 1900 metal-standard authorities (sourced money stocks and capped
+   * treasury funding), built by scripts/p5b/build-goods-1900.mjs. Requires `currencies`.
+   */
+  readonly monetary?: string;
 }
 
 export interface HistoricalScenarioDefinitions {
@@ -734,6 +740,9 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
       ...(files.deposits === undefined
         ? {}
         : { deposits: stringField(files, "deposits", "meta.files", errors) }),
+      ...(files.monetary === undefined
+        ? {}
+        : { monetary: stringField(files, "monetary", "meta.files", errors) }),
     },
     definitions: {
       goods: stringField(definitions, "goods", "meta.definitions", errors),
@@ -2530,7 +2539,8 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     return {
       id: market.id,
       provinceIds: [...market.provinceIds].sort((left, right) => left - right),
-      priceRUSD: goods.map((good) => good.basePrice1900RUSD * market.initialPriceMultiplier),
+      // D-149: monetary gold and silver open at their reference price everywhere.
+      priceRUSD: goods.map((good) => good.basePrice1900RUSD * (good.internationalPrice === true ? 1 : market.initialPriceMultiplier)),
       stockLots: market.stockLots.map((lot) => {
         const good = goodByKey.get(lot.goodKey);
         const ownerBuildingId = buildingIdByKey.get(lot.ownerBuildingKey);
@@ -2643,7 +2653,11 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     // E6b: the sample enables the monetary system so the player can establish a
     // reserve-backed authority; its currency valuations are explicitly unavailable, so
     // no authority is active and no historical exchange rate is invented (D-080).
-    monetary: {},
+    // D-149: with a monetary file, the 1900 metal-standard authorities are active.
+    monetary:
+      data.meta.files.monetary === undefined || data.currencyTable === undefined
+        ? {}
+        : { currencies: readMetalAuthorities(data.meta.files.monetary, data, data.currencyTable) },
     // M10: the sample enables the military system with no initial armies, wars, or
     // occupations, so the player can recruit, declare war, and negotiate (D-081).
     military: {},
@@ -2663,6 +2677,63 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
  * P5 (D-143 §4): the scenario's deposits. Each row's `requiredTechnologyKey` resolves to
  * a technology id; the simulation validates provinces, stocks, quality and uniqueness.
  */
+/**
+ * D-149: the 1900 metal-standard authorities. Each row gives a country's sourced money
+ * stock on 1 January 1901 in US dollars (Director of the Mint) and its capped treasury
+ * funding in RUSD; the P3 currency table gives the standard, the fine content, the
+ * metal's dollar value per gram and the unit's circulating dollar value:
+ *   metal reserve [kg] = the standard metal's stock [USD] / (USD per fine g × 1000);
+ *   circulation [units] = (gold + silver + uncovered paper) [USD] / USD per unit.
+ */
+function readMetalAuthorities(file: string, data: HistoricalData, table: CurrencyTable1900): MonetaryCurrencyInput[] {
+  const raw = readJson<unknown>(file);
+  const errors: string[] = [];
+  const root = assertRecord(raw, file, errors);
+  const rows = Array.isArray(root.authorities) ? root.authorities : [];
+  if (!Array.isArray(root.authorities)) errors.push(`${file}.authorities must be an array`);
+  const countryByTag = new Map(data.countries.map((country) => [country.tag, country]));
+  const inputs: MonetaryCurrencyInput[] = [];
+  rows.forEach((value: unknown, index: number) => {
+    const path = `${file}.authorities[${String(index)}]`;
+    const row = assertRecord(value, path, errors);
+    const tag = typeof row.countryTag === "string" ? row.countryTag : "";
+    const country = countryByTag.get(tag);
+    const parity = table.currencies.find((currency) => currency.issuerTag === tag);
+    const arrangement = table.arrangements.find((entry) => entry.tag === tag);
+    if (country === undefined || parity === undefined || arrangement?.kind !== "own") {
+      errors.push(`${path}.countryTag ${JSON.stringify(tag)} is not a country with its own currency`);
+      return;
+    }
+    if (parity.standard === "paper") {
+      errors.push(`${path}: ${tag} has a paper currency; only metal standards are activated`);
+      return;
+    }
+    const usd = (field: string): number => {
+      const v = row[field];
+      if (typeof v !== "number" || !Number.isFinite(v) || v < 0) {
+        errors.push(`${path}.${field} must be a finite non-negative number`);
+        return 0;
+      }
+      return v;
+    };
+    const gold = usd("goldUSD");
+    const silver = usd("silverUSD");
+    const paper = usd("uncoveredPaperUSD");
+    const funding = usd("reserveFundingRUSD");
+    const metalUsd = parity.standard === "gold" ? gold : silver;
+    inputs.push({
+      currencyId: country.id,
+      standard: parity.standard,
+      fineGramsPerUnit: parity.fineGramsPerUnit,
+      metalReserveKg: metalUsd / (table.metalUsdPerFineGram[parity.standard] * 1000),
+      currencyIssuedUnits: (gold + silver + paper) / parity.circulatingUsdPerUnit,
+      reserveFundingRUSD: funding,
+    });
+  });
+  if (errors.length > 0) throw new HistoricalDataError(errors);
+  return inputs.sort((left, right) => left.currencyId - right.currencyId);
+}
+
 function readDeposits(file: string, definitions: EconomyDefinitions): DepositInitialDef[] {
   const rows = readJson<unknown>(file);
   if (!Array.isArray(rows)) throw new HistoricalDataError([`${file} must be a JSON array`]);

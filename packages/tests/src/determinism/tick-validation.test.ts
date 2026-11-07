@@ -83,7 +83,9 @@ const SEED = 20_261_023;
 const PRE_P5B_HASH_AFTER_22_TICKS = "d1580017f60be441";
 // Data m3-economy-v13 (D-148) re-pins it again: the content version in the encoding
 // only; the proof restores m3-economy-v12 and still gives the P5 hash (asserted).
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "9485e83c870c0402";
+// D-149 adds the (paper, empty) monetary-standard fields to every authority record;
+// the proof strips them and still gives the P5 hash.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "1b0c4a1e37334b84";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

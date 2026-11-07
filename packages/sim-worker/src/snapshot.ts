@@ -60,6 +60,7 @@ import {
   convertibilityState,
   derivePriceIndexes,
   monetaryCurrencyForCountry,
+  mintPriceRUSDPerKg,
   priceIndexCoverage,
   priceIndexInflation,
   IMPLEMENTED_LAW_SLOTS,
@@ -1720,6 +1721,11 @@ function monetarySnapshot(
         country.monetary.kind !== "own"
           ? "adopted-or-shared-currency"
           : "monetary-system-disabled",
+      standard: "paper",
+      fineGramsPerUnit: 0,
+      metalReserveKg: 0,
+      metalReserveValueRUSD: 0,
+      mintPriceRUSDPerKg: null,
     };
   }
   const valuation = world.currencyValuations.find(
@@ -1749,6 +1755,14 @@ function monetarySnapshot(
       : record.parityRusdPerUnit === null
         ? "no-declared-parity"
         : "not-established",
+    standard: record.standard,
+    fineGramsPerUnit: roundDisplay(record.fineGramsPerUnit, 6),
+    metalReserveKg: roundDisplay(record.metalReserveKg, 3),
+    metalReserveValueRUSD: roundDisplay(
+      world.finance.accounts.find((account) => account.id === record.metalReserveAccountId)?.balanceRUSD ?? 0,
+      2,
+    ),
+    mintPriceRUSDPerKg: record.standard === "paper" ? null : roundDisplay(mintPriceRUSDPerKg(record), 2),
   };
 }
 

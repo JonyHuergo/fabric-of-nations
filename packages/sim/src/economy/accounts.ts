@@ -115,6 +115,7 @@ const SUBTYPE_CATEGORY: Readonly<Record<AccountSubtype, AccountCategory>> = {
   "external-equity": "equity",
   "military-income": "revenue",
   "military-expense": "expense",
+  "monetary-metal-reserve": "asset",
 };
 
 const SUBTYPE_OWNER_KINDS: Readonly<
@@ -166,6 +167,7 @@ const SUBTYPE_OWNER_KINDS: Readonly<
   "external-equity": ["system"],
   "military-income": ["popBlock"],
   "military-expense": ["country"],
+  "monetary-metal-reserve": ["country"],
 };
 
 const ACCOUNT_SUBTYPE_SET: ReadonlySet<string> = new Set<string>(ACCOUNT_SUBTYPES);
@@ -324,6 +326,11 @@ export const SEMANTIC_LINE_RULES: Readonly<
   "fx-issuance": [],
   "fx-redemption": [],
   "fx-revaluation": [],
+  // D-149: the seller of metal to the mint earns sales revenue; the dealer that buys
+  // reserve metal expenses it like any bought good; a revaluation has no flow.
+  "mint-purchase": [{ subtype: "sales-revenue", side: "credit" }],
+  "mint-sale": [{ subtype: "input-expense", side: "debit" }],
+  "metal-revaluation": [],
   "military-pay": [
     { subtype: "military-expense", side: "debit" },
     { subtype: "military-income", side: "credit" },
@@ -1142,6 +1149,73 @@ export function assertMonetaryPostingStructure(
   } else if (systemAccounts !== 0) {
     throw new RangeError(`${path} ${kind} must not reference system accounts`);
   }
+}
+
+/**
+ * Enforce the required legs of the D-140 mint kinds (D-149).
+ *
+ * - `mint-purchase`: the authority pays reserve cash for metal taken into its reserve;
+ *   the seller building receives operating cash and earns sales revenue. Four equal legs:
+ *   `monetary-metal-reserve` debit, `monetary-reserve-cash` credit (one country), building
+ *   `operating-cash` debit, `sales-revenue` credit (one building).
+ * - `mint-sale`: a dealer building pays operating cash for reserve metal (input expense);
+ *   the authority receives reserve cash and gives up metal. Four equal legs: building
+ *   `input-expense` debit, `operating-cash` credit; `monetary-reserve-cash` debit,
+ *   `monetary-metal-reserve` credit.
+ * - `metal-revaluation`: two equal legs, `monetary-metal-reserve` and `monetary-equity`
+ *   on opposite sides (one country); no cash moves.
+ */
+export function assertMintPostingStructure(
+  kind: "mint-purchase" | "mint-sale" | "metal-revaluation",
+  lines: readonly JournalLine[],
+  accounts: ReadonlyMap<Id, FinancialAccount>,
+  path = "journal posting",
+): void {
+  const patterns: Readonly<Record<string, readonly (readonly string[])[]>> = {
+    "mint-purchase": [["monetary-metal-reserve:debit", "monetary-reserve-cash:credit", "operating-cash:debit", "sales-revenue:credit"]],
+    "mint-sale": [["input-expense:debit", "operating-cash:credit", "monetary-reserve-cash:debit", "monetary-metal-reserve:credit"]],
+    "metal-revaluation": [
+      ["monetary-metal-reserve:debit", "monetary-equity:credit"],
+      ["monetary-metal-reserve:credit", "monetary-equity:debit"],
+    ],
+  };
+  const expectedLines = kind === "metal-revaluation" ? 2 : 4;
+  if (lines.length !== expectedLines) {
+    throw new RangeError(`${path} ${kind} must contain exactly ${String(expectedLines)} lines`);
+  }
+  const totals = new Map<string, number>();
+  const countryIds = new Set<Id>();
+  const buildingIds = new Set<Id>();
+  let amount = 0;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) throw new RangeError(`${path}.lines[${String(index)}] is missing`);
+    if (!Number.isFinite(line.amountRUSD) || !(line.amountRUSD > 0)) {
+      throw new RangeError(`${path}.lines[${String(index)}] requires a strictly positive finite amount`);
+    }
+    const account = accounts.get(line.accountId);
+    if (account === undefined) {
+      throw new RangeError(`${path}.lines[${String(index)}] references unknown account ${String(line.accountId)}`);
+    }
+    if (account.ownerKind === "country" && account.ownerId !== null) countryIds.add(account.ownerId);
+    else if (account.ownerKind === "building" && account.ownerId !== null) buildingIds.add(account.ownerId);
+    else throw new RangeError(`${path} ${kind} may only reference country and building accounts`);
+    if (index === 0) amount = line.amountRUSD;
+    if (Math.abs(line.amountRUSD - amount) > toleranceMoney(amount, line.amountRUSD)) {
+      throw new RangeError(`${path} ${kind} legs must carry equal amounts`);
+    }
+    const key = `${account.subtype}:${line.side}`;
+    totals.set(key, (totals.get(key) ?? 0) + line.amountRUSD);
+  }
+  if (countryIds.size !== 1) throw new RangeError(`${path} ${kind} must reference exactly one country authority`);
+  if (buildingIds.size !== (kind === "metal-revaluation" ? 0 : 1)) {
+    throw new RangeError(`${path} ${kind} must reference ${kind === "metal-revaluation" ? "no" : "exactly one"} building`);
+  }
+  const actual = [...totals.keys()].sort();
+  const matches = (patterns[kind] ?? []).some(
+    (pattern) => pattern.length === actual.length && pattern.slice().sort().every((key, index) => key === actual[index]),
+  );
+  if (!matches) throw new RangeError(`${path} ${kind} legs do not match the required structure`);
 }
 
 /**

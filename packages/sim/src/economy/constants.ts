@@ -188,6 +188,35 @@ export const FX_PARITY_COOLDOWN_DAYS = 180;
  */
 export const FX_MIN_RESERVE_COVER_MONTHS = 0.5;
 
+/**
+ * D-140 / D-149 mint window (`mint.ts`). PROVISIONAL, documented values.
+ *
+ * MINT_CHARGE (fraction of the mint price, dimensionless): the mint buys metal at
+ * mint price x (1 - charge). Bank of England buying price for standard gold in 1900:
+ * 77s 9d per ounce against the coinage value 77s 10.5d, 0.16 %; rounded to 0.2 %.
+ * Provisional: one charge for every mint and both metals.
+ */
+export const MINT_CHARGE = 0.002;
+/**
+ * MINT_EXPORT_POINT (fraction of the mint price): the mint sells reserve metal when the
+ * metal's price in the issuer's market reaches mint price x (1 + point). The 1900
+ * London-New York gold points lay about 0.5 % either side of par (freight, insurance,
+ * interest). Provisional: one point for every mint and both metals.
+ */
+export const MINT_EXPORT_POINT = 0.005;
+/**
+ * MINT_MAX_DAILY_SALE_SHARE (fraction of the metal reserve per day): the most the mint
+ * sells in one day at the export point, so a reserve drains over weeks, not at once.
+ * Structural, provisional: 1/30.
+ */
+export const MINT_MAX_DAILY_SALE_SHARE = 1 / 30;
+/**
+ * MINT_RESUME_SALE_DAYS (days): a suspended metal currency becomes convertible again
+ * when its reserve covers this many days of its last daily sale and the metal's price is
+ * back below the export point (plan §13.5). Provisional.
+ */
+export const MINT_RESUME_SALE_DAYS = 30;
+
 // M10 (D-081). Provisional strategic constants; none is calibrated.
 /** Maximum army formations in one world. */
 export const MAX_ARMIES = 200;

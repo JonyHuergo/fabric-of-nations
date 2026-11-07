@@ -1,7 +1,7 @@
 /**
  * P5b (D-146) re-pin evidence: the encoding of a world without the P5b fields
- * (`BuildingInstance.depositId`, `ProvinceEconomy.absLatitudeDeg` and the three new
- * industrial-policy sectors) under the previous schema number. For a world whose
+ * (`BuildingInstance.depositId`, `ProvinceEconomy.absLatitudeDeg`, the three new
+ * industrial-policy sectors and, D-149, the monetary standard fields) under the previous schema number. For a world whose
  * behaviour P5b does not change (no extraction building, no non-storable good, no
  * optional or maintenance input, no gated need item, every new sector rate 0), this
  * reproduces the pre-P5b digest.
@@ -34,6 +34,19 @@ export function withoutPhase5b<T extends Record<string, unknown>>(encoded: T): T
       delete copy.absLatitudeDeg;
       return copy;
     });
+  }
+  const monetary = view.monetary as { currencies?: Record<string, unknown>[] } | undefined;
+  if (monetary !== undefined && Array.isArray(monetary.currencies)) {
+    // D-149: the metal-standard fields; a legacy world's authorities are all paper.
+    view.monetary = {
+      ...monetary,
+      currencies: monetary.currencies.map((record) => {
+        if (record.standard !== "paper") throw new Error("withoutPhase5b: a currency has a metal standard");
+        const copy = { ...record };
+        for (const field of ["standard", "fineGramsPerUnit", "metalReserveKg", "metalReserveAccountId", "convertible", "lastMintSaleKg"]) delete copy[field];
+        return copy;
+      }),
+    };
   }
   if (Array.isArray(view.countries)) {
     view.countries = (view.countries as Record<string, unknown>[]).map((country) => {

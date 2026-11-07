@@ -96,7 +96,18 @@ const INPUTS = {
   mapAmericas: join(DATA, "map/provinces_americas_1900.json"),
   mapAsia: join(DATA, "map/provinces_asia_1900.json"),
   mapOceania: join(DATA, "map/provinces_oceania_1900.json"),
+  p3Currencies: join(DATA, "historical/p3/currencies_1900.json"),
 };
+
+/**
+ * D-149 (designer: "treasury, capped"): the most of its opening treasury a country pays
+ * into its mint's reserve cash. Provisional, dimensionless.
+ */
+const MINT_FUNDING_TREASURY_SHARE = 0.25;
+/** The simulation's MINT_MAX_DAILY_SALE_SHARE (economy/constants.ts), for warehouse sizing. */
+const MINT_MAX_DAILY_SALE_SHARE = 1 / 30;
+/** The simulation's MINT_CHARGE (economy/constants.ts): the mint buys at price x (1 - charge). */
+const MINT_CHARGE = 0.002;
 
 const readText = (path) => readFileSync(path, "utf8").replace(/\r\n/g, "\n");
 const read = (path) => JSON.parse(readText(path));
@@ -286,6 +297,8 @@ function build() {
       priceBasis: priceTrace[key].basis,
     };
     if (!storable) record.storable = false;
+    // D-149: monetary gold and silver open at their reference price in every market.
+    if (key === "gold" || key === "silver") record.internationalPrice = true;
     if (!tradeable) record.tradeable = false;
     if (tradeTechnology !== null) {
       const tech = technologyByKey.get(tradeTechnology);
@@ -549,6 +562,62 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
 
   const markets = read(INPUTS.p2bMarkets);
   const rowValue = (id) => p2bRow(id);
+  // D-149: the 1900 metal-standard authorities (Director of the Mint, 1 January 1901).
+  // A row that is one simulated country with its own gold or silver currency (P3) is
+  // activated; aggregates, dependencies and paper currencies are reported, not split.
+  const p3 = read(INPUTS.p3Currencies);
+  const marketOfCountryTag = new Map(markets.map((market) => [market.customsCountryTag, market]));
+  const mintRows = [];
+  const mintNotActivated = [];
+  for (const [key, name, , gold, silverFull, silverLimited, paper] of src.monetaryStocks1901.rows) {
+    const country = p3.countries.find((entry) => entry.tag === key);
+    const standard = country?.currency?.standard;
+    if (country === undefined || country.arrangement !== "own" || (standard !== "gold" && standard !== "silver")) {
+      mintNotActivated.push({ key, name, reason: country === undefined ? "not one simulated country (aggregate or dependency)" : country.arrangement !== "own" ? "no own currency" : `${standard} currency (only metal standards are activated)` });
+      continue;
+    }
+    const usdPerGram = p3.metals[standard].usdPerFineGram;
+    const metalUSD = (standard === "gold" ? gold : silverFull + silverLimited) * 1e6;
+    mintRows.push({ countryTag: key, standard, goldUSD: gold * 1e6, silverUSD: (silverFull + silverLimited) * 1e6, uncoveredPaperUSD: paper * 1e6, metalReserveKg: metalUSD / (usdPerGram * 1000) });
+  }
+
+  // D-149 "treasury, capped" (designer, 2026-11-07): each mint opens with one year of its
+  // country's sourced 1900 output of its standard metal at the reference price, at most
+  // MINT_FUNDING_TREASURY_SHARE of its opening treasury (the P5 treasury, so the cap does
+  // not depend on the placement it sizes); the treasury pays it. The mint's purchases of
+  // that cash over a year are the modelled 1900 demand of the gold and silver mines
+  // (plan §13.7), in the mint's home market.
+  const territoryOfCountry = new Map();
+  for (const country of grantedCountries) {
+    for (const id of country.provinceIds) {
+      const territory = provinces.find((province) => province.id === id)?.territoryKey;
+      if (territory !== undefined) territoryOfCountry.set(territory, country.tag);
+    }
+  }
+  for (const row of mintRows) {
+    const country = oldCountries.find((entry) => entry.tag === row.countryTag);
+    const output = src.outputs1900[row.standard].entries
+      .filter(([territory]) => territoryOfCountry.get(territory) === row.countryTag)
+      .reduce((acc, [, kg]) => acc + kg, 0);
+    const price = goods[gid(row.standard)].basePrice1900RUSD;
+    row.ownOutputKg1900 = output;
+    row.ownOutputValueRUSD = output * price;
+    row.treasuryCapRUSD = MINT_FUNDING_TREASURY_SHARE * (country?.initialTreasuryCashRUSD ?? 0);
+    row.reserveFundingRUSD = round(Math.min(row.ownOutputValueRUSD, row.treasuryCapRUSD), 2);
+    row.mintDemandKgPerDay = row.reserveFundingRUSD / 365 / (price * (1 - MINT_CHARGE));
+  }
+  const mintDemand = new Map();
+  for (const row of mintRows) {
+    const market = markets.find((entry) => entry.customsCountryTag === row.countryTag);
+    const country = grantedCountries.find((entry) => entry.tag === row.countryTag);
+    const home = provinces.find((province) => province.id === country?.provinceIds[0])?.territoryKey;
+    if (market === undefined || home === undefined || !(row.mintDemandKgPerDay > 0)) continue;
+    const key = `${market.key}|${home}`;
+    const goodsDemand = mintDemand.get(key) ?? new Map();
+    goodsDemand.set(gid(row.standard), (goodsDemand.get(gid(row.standard)) ?? 0) + row.mintDemandKgPerDay);
+    mintDemand.set(key, goodsDemand);
+  }
+
   const placement = placeCatalogue({
     goods,
     definitions,
@@ -568,6 +637,7 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
     workingAgeShare: p2bCalibration.workingAgeShare,
     fertiliser: { gateKey: "chemical-fertilizer" },
     round,
+    extraDemand: mintDemand,
     territoryCoverage: new Map(Object.entries(p2bCalibration.territories).map(([key, territory]) => [key, { gdp: territory.population * territory.gdpPerHeadRUSD.value, shareBefore: territory.coveredShareOfGdp }])),
     rows: {
       laborShareAgriculture: rowValue("labour-share-agriculture"),
@@ -583,7 +653,20 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
   });
 
   // B7: warehouse capacity per level and good (C-19). The eight P2b goods keep the P2b
-  // capacity; every other storable good gets the placement's capacity, rounded up.
+  // capacity; every other storable good gets the placement's capacity, rounded up. Gold
+  // and silver also hold 5 days of the largest daily mint sale per warehouse level of the
+  // mint's home market (D-149: the dealer stores what the mint sells).
+  const warehouseLevelsOf = (market) => read(INPUTS.p2bBuildings)
+    .filter((row) => row.definitionKey === "warehouse" && market.provinceIds.includes(row.provinceId))
+    .reduce((acc, row) => acc + row.level, 0);
+  for (const row of mintRows) {
+    const market = marketOfCountryTag.get(row.countryTag);
+    const levels = market === undefined ? 0 : warehouseLevelsOf(market);
+    if (!(levels > 0)) continue;
+    const goodId = gid(row.standard);
+    const needed = (rowValue("storage-headroom-days") * row.metalReserveKg * MINT_MAX_DAILY_SALE_SHARE) / levels;
+    placement.warehouseCapacity.set(goodId, Math.max(placement.warehouseCapacity.get(goodId) ?? 0, needed));
+  }
   for (const definition of definitions) {
     if (definition.storageCapacityByGood.length === 0) continue;
     const kept = new Map(definition.storageCapacityByGood.map((item) => [item.goodId, item.quantity]));
@@ -617,6 +700,31 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
       sourceIds: [...new Set([...country.sourceIds, "p5b-catalogue"])],
     };
   });
+  const authorities = mintRows.map((row) => ({
+    countryTag: row.countryTag,
+    standard: row.standard,
+    goldUSD: row.goldUSD,
+    silverUSD: row.silverUSD,
+    uncoveredPaperUSD: row.uncoveredPaperUSD,
+    reserveFundingRUSD: row.reserveFundingRUSD,
+    trace: {
+      metalReserveKg: row.metalReserveKg,
+      ownOutputKg1900: row.ownOutputKg1900,
+      ownOutputValueRUSD: row.ownOutputValueRUSD,
+      treasuryCapRUSD: row.treasuryCapRUSD,
+      capped: row.ownOutputValueRUSD > row.treasuryCapRUSD,
+      mintDemandKgPerDay: row.mintDemandKgPerDay,
+    },
+  }));
+  const monetaryFile = {
+    description: "D-140 / D-149: the 1900 metal-standard authorities. Money stocks on 1 January 1901 in US dollars (Director of the Mint, 1901, pp. 42-43; sources_1900.json monetaryStocks1901); reserve funding = min(one year of the country's sourced 1900 output of its standard metal x reference price, MINT_FUNDING_TREASURY_SHARE x opening treasury) in RUSD. The loader derives fine content, metal kg and circulation from the P3 currency table.",
+    generator: "scripts/p5b/build-goods-1900.mjs",
+    treasuryShare: MINT_FUNDING_TREASURY_SHARE,
+    authorities,
+    notActivated: mintNotActivated,
+  };
+  calibration.monetary = { treasuryShare: MINT_FUNDING_TREASURY_SHARE, authorities, notActivated: mintNotActivated };
+
   // Routes: P2b rule 15 with the new coverage.
   const routeRows = read(INPUTS.p2bRoutes).map((route) => {
     const smaller = Math.min(placement.coveredByMarket.get(route.marketAKey) ?? 0, placement.coveredByMarket.get(route.marketBKey) ?? 0);
@@ -682,6 +790,7 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
       "buildings_1900.json": json(placement.buildingRows),
       "markets_1900.json": json(marketRows),
       "trade_routes_1900.json": json(routeRows),
+      "monetary_1900.json": json(monetaryFile),
     },
   };
 }

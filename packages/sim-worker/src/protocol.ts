@@ -1008,6 +1008,16 @@ export interface SnapshotMonetaryAuthority {
   readonly lastMonthImportsRUSD: number;
   /** Why the authority is not operating, or null. */
   readonly blockedReason: string | null;
+  /** D-149: the currency's standard (`paper` without an authority). */
+  readonly standard: "gold" | "silver" | "paper";
+  /** D-149: legal fine metal per unit, grams; 0 for paper. */
+  readonly fineGramsPerUnit: number;
+  /** D-149: the mint's monetary metal, kg fine. */
+  readonly metalReserveKg: number;
+  /** D-149: that metal at today's price in the issuer's market, RUSD. */
+  readonly metalReserveValueRUSD: number;
+  /** D-149: the mint price, RUSD per kg fine; null for paper. */
+  readonly mintPriceRUSDPerKg: number | null;
 }
 
 /** M11 constitutional status exposed to the app. */

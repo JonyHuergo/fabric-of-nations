@@ -546,6 +546,9 @@ function build() {
     demography: "historical/p4/demography_1900.json",
     // P5 (D-143): natural-resource deposits (authored, USGS MRDS, SAGE/HYDE forest).
     deposits: "historical/p5/deposits_1900.json",
+    // D-140 / D-149: the 1900 metal-standard authorities (Director of the Mint money
+    // stocks, treasury-funded mint cash), built by scripts/p5b/build-goods-1900.mjs.
+    monetary: "historical/p5b/monetary_1900.json",
   };
   meta.definitions = {
     ...meta.definitions,

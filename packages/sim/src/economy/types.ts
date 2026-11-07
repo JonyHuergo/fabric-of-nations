@@ -72,6 +72,12 @@ export interface GoodDef {
   tradeRequiresTechnologyId?: Id | null;
   /** P5b: how the reference price was derived (provenance; no simulation rule reads it). */
   priceBasis?: PriceBasis;
+  /**
+   * P5b (D-149): a good whose opening price is its reference price in every market
+   * (monetary gold and silver, arbitraged between mints), not the reference price x the
+   * market's price level. Read by the scenario builders; absent means false.
+   */
+  internationalPrice?: boolean;
 }
 
 export const PROFESSION_STRATA = ["lower", "middle", "upper"] as const;
@@ -391,6 +397,9 @@ export const ACCOUNT_SUBTYPES = [
   "external-equity",
   "military-income",
   "military-expense",
+  // D-140 / D-149: an authority's monetary metal (gold or silver), measured at the
+  // metal's market price in the issuer's market; a non-cash asset.
+  "monetary-metal-reserve",
 ] as const;
 export type AccountSubtype = (typeof ACCOUNT_SUBTYPES)[number];
 
@@ -463,6 +472,12 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "fx-revaluation",
   "military-pay",
   "military-procurement",
+  // D-140 / D-149: the mint window. A purchase pays a seller building for metal taken
+  // into the authority's reserve; a sale takes a dealer's cash for reserve metal; a
+  // revaluation measures the reserve at the day's metal price.
+  "mint-purchase",
+  "mint-sale",
+  "metal-revaluation",
 ] as const;
 
 /**
@@ -1799,6 +1814,15 @@ export const MONETARY_REGIMES = ["pegged", "managed"] as const;
 export type MonetaryRegime = (typeof MONETARY_REGIMES)[number];
 
 /**
+ * D-140 / D-149: what backs a currency. A `gold` or `silver` currency is worth its legal
+ * fine content at the metal's price in the issuer's market while it is convertible (the
+ * mint window keeps the metal near the mint price while the reserve's cash or metal
+ * lasts); a `paper` currency, or a suspended metal one, follows the E6b rules.
+ */
+export const MONETARY_STANDARDS = ["gold", "silver", "paper"] as const;
+export type MonetaryStandard = (typeof MONETARY_STANDARDS)[number];
+
+/**
  * E6b per-currency monetary-authority state (D-080).
  *
  * The authority is a reserve-backed currency board: it holds RUSD reserves, issues its
@@ -1836,6 +1860,18 @@ export interface MonetaryCurrencyState {
   /** Realized exports/imports of the most recently completed month, RUSD. */
   lastMonthExportsRUSD: MoneyRUSD;
   lastMonthImportsRUSD: MoneyRUSD;
+  /** D-149: the standard; `paper` for every legacy or dormant authority. */
+  standard: MonetaryStandard;
+  /** D-149: legal fine metal per currency unit, grams; 0 for paper. */
+  fineGramsPerUnit: number;
+  /** D-149: monetary metal held by the authority, kg fine; a conserved physical stock. */
+  metalReserveKg: number;
+  /** D-149: the metal reserve's asset account; null for paper authorities. */
+  metalReserveAccountId: Id | null;
+  /** D-149: true while the mint window sells metal at the export point (convertible). */
+  convertible: boolean;
+  /** D-149: metal sold on the last day with a sale, kg (the resumption rule's scale). */
+  lastMintSaleKg: number;
 }
 
 /** Authoritative E6b monetary-system state. */
@@ -1860,6 +1896,16 @@ export interface MonetaryCurrencyInput {
   currencyIssuedUnits?: number;
   /** Opening RUSD cash of the external counterparty. Must cover its opening holding. */
   externalCashRUSD?: MoneyRUSD;
+  /**
+   * D-149: a metal standard. The opening circulation is then backed by the metal reserve
+   * (measured at the metal's opening price) and the treasury's reserve funding, not by
+   * external cash; `externalCashRUSD` must be absent.
+   */
+  standard?: MonetaryStandard;
+  /** D-149: legal fine metal per unit, grams (required with a metal standard). */
+  fineGramsPerUnit?: number;
+  /** D-149: opening monetary metal, kg fine (required with a metal standard). */
+  metalReserveKg?: number;
 }
 
 /** Scenario input for the E6b monetary system; omitted means disabled. */

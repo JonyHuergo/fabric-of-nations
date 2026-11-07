@@ -29,8 +29,8 @@
  *     of costs. Farms that can buy fertiliser on day 0 keep their technique; the others
  *     divide it by (1 - e), so the day-0 harvest is unchanged (C-9).
  *
- * Gold and silver mines are not placed until D-140 (D-146 A7); arsenals are not placed
- * (A2); hydro stations wait for the Hoes et al. potential (A8).
+ * Gold and silver mines are sized by the D-140 mints' purchases (D-149, plan §13.7);
+ * arsenals are not placed (A2); hydro stations wait for the Hoes et al. potential (A8).
  */
 
 const AGGREGATE_KEYS = new Set(["other", "other-europe"]);
@@ -42,8 +42,6 @@ export const NOT_PLACED_1900 = {
   "petrochemical-plant": "gated by petrochemicals",
   "nitrogen-fixation-plant": "gated by nitrogen fixation",
   "food-and-drink-works": "1900 processed food is made by the P2b food-processing building",
-  "gold-mine": "settled after D-140 (D-146 A7)",
-  "silver-mine": "settled after D-140 (D-146 A7)",
   arsenal: "armaments stay money-only in M10 (D-146 A2)",
 };
 /** The P2b basic producer of an existing good, for a market with demand and no producer (P2b 10b). */
@@ -74,6 +72,7 @@ export function placeCatalogue(ctx) {
   const {
     goods, definitions, oldDefinitions, needs, oldNeeds, professions, provinces, pops, countries, oldCountries,
     markets, buildings, deposits, sources, technology, rows, workingAgeShare, fertiliser, round, territoryCoverage,
+    extraDemand = new Map(),
   } = ctx;
   const goodById = new Map(goods.map((good) => [good.id, good]));
   const goodByKey = new Map(goods.map((good) => [good.key, good]));
@@ -236,7 +235,14 @@ export function placeCatalogue(ctx) {
     }
     return demand;
   };
+  // Households, plus D-149 mint purchases (one year of each mint's cash, in its home
+  // market): the modelled demand of the gold and silver mines (plan §13.7).
   const newHouseholds = householdDemand(needs);
+  for (const [key, goodsDemand] of extraDemand) {
+    const row = newHouseholds.get(key) ?? new Map();
+    newHouseholds.set(key, row);
+    for (const [goodId, quantity] of goodsDemand) row.set(goodId, (row.get(goodId) ?? 0) + quantity);
+  }
   const oldHouseholds = householdDemand(oldNeeds);
 
   // 2. The P2b producers: their 1900 output by good (old definitions, old countries).

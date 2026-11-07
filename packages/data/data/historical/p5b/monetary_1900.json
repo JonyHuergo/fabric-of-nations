@@ -1,0 +1,442 @@
+{
+ "description": "D-140 / D-149: the 1900 metal-standard authorities. Money stocks on 1 January 1901 in US dollars (Director of the Mint, 1901, pp. 42-43; sources_1900.json monetaryStocks1901); reserve funding = min(one year of the country's sourced 1900 output of its standard metal x reference price, MINT_FUNDING_TREASURY_SHARE x opening treasury) in RUSD. The loader derives fine content, metal kg and circulation from the P3 currency table.",
+ "generator": "scripts/p5b/build-goods-1900.mjs",
+ "treasuryShare": 0.25,
+ "authorities": [
+  {
+   "countryTag": "USA",
+   "standard": "gold",
+   "goldUSD": 1110800000,
+   "silverUSD": 655800000,
+   "uncoveredPaperUSD": 428460000,
+   "reserveFundingRUSD": 659384246.62,
+   "trace": {
+    "metalReserveKg": 1671345.2256,
+    "ownOutputKg1900": 117610.6,
+    "ownOutputValueRUSD": 1227513593.26,
+    "treasuryCapRUSD": 659384246.6175,
+    "capped": true,
+    "mintDemandKgPerDay": 173.43442982203283
+   }
+  },
+  {
+   "countryTag": "AUT",
+   "standard": "gold",
+   "goldUSD": 229400000,
+   "silverUSD": 73800000,
+   "uncoveredPaperUSD": 68100000,
+   "reserveFundingRUSD": 31995973.76,
+   "trace": {
+    "metalReserveKg": 345162.5808,
+    "ownOutputKg1900": 3065.6,
+    "ownOutputValueRUSD": 31995973.76,
+    "treasuryCapRUSD": 178384301.615,
+    "capped": false,
+    "mintDemandKgPerDay": 8.415735580750543
+   }
+  },
+  {
+   "countryTag": "BEL",
+   "standard": "gold",
+   "goldUSD": 17800000,
+   "silverUSD": 35000000,
+   "uncoveredPaperUSD": 94400000,
+   "reserveFundingRUSD": 0,
+   "trace": {
+    "metalReserveKg": 26782.4496,
+    "ownOutputKg1900": 0,
+    "ownOutputValueRUSD": 0,
+    "treasuryCapRUSD": 35744076.2175,
+    "capped": false,
+    "mintDemandKgPerDay": 0
+   }
+  },
+  {
+   "countryTag": "CAN",
+   "standard": "gold",
+   "goldUSD": 20000000,
+   "silverUSD": 5000000,
+   "uncoveredPaperUSD": 40500000,
+   "reserveFundingRUSD": 24122952.25,
+   "trace": {
+    "metalReserveKg": 30092.64,
+    "ownOutputKg1900": 42007.8,
+    "ownOutputValueRUSD": 438439609.38000005,
+    "treasuryCapRUSD": 24122952.2525,
+    "capped": true,
+    "mintDemandKgPerDay": 6.3449354311219235
+   }
+  },
+  {
+   "countryTag": "GBR",
+   "standard": "gold",
+   "goldUSD": 511000000,
+   "silverUSD": 116800000,
+   "uncoveredPaperUSD": 117600000,
+   "reserveFundingRUSD": 233372512.29,
+   "trace": {
+    "metalReserveKg": 768866.952,
+    "ownOutputKg1900": 22359.899999999998,
+    "ownOutputValueRUSD": 233372512.29,
+    "treasuryCapRUSD": 251296698.685,
+    "capped": false,
+    "mintDemandKgPerDay": 61.38276553106212
+   }
+  },
+  {
+   "countryTag": "ZAR",
+   "standard": "gold",
+   "goldUSD": 29200000,
+   "silverUSD": 1200000,
+   "uncoveredPaperUSD": 0,
+   "reserveFundingRUSD": 1183869.58,
+   "trace": {
+    "metalReserveKg": 43935.254400000005,
+    "ownOutputKg1900": 10846.9,
+    "ownOutputValueRUSD": 113210179.99,
+    "treasuryCapRUSD": 1183869.575,
+    "capped": true,
+    "mintDemandKgPerDay": 0.3113870958298411
+   }
+  },
+  {
+   "countryTag": "BGR",
+   "standard": "gold",
+   "goldUSD": 1200000,
+   "silverUSD": 5000000,
+   "uncoveredPaperUSD": 2100000,
+   "reserveFundingRUSD": 0,
+   "trace": {
+    "metalReserveKg": 1805.5584000000001,
+    "ownOutputKg1900": 0,
+    "ownOutputValueRUSD": 0,
+    "treasuryCapRUSD": 1046682.08,
+    "capped": false,
+    "mintDemandKgPerDay": 0
+   }
+  },
+  {
+   "countryTag": "CUB",
+   "standard": "gold",
+   "goldUSD": 2000000,
+   "silverUSD": 1500000,
+   "uncoveredPaperUSD": 0,
+   "reserveFundingRUSD": 0,
+   "trace": {
+    "metalReserveKg": 3009.264,
+    "ownOutputKg1900": 0,
+    "ownOutputValueRUSD": 0,
+    "treasuryCapRUSD": 987794.0475,
+    "capped": false,
+    "mintDemandKgPerDay": 0
+   }
+  },
+  {
+   "countryTag": "DNK",
+   "standard": "gold",
+   "goldUSD": 14700000,
+   "silverUSD": 5900000,
+   "uncoveredPaperUSD": 6400000,
+   "reserveFundingRUSD": 0,
+   "trace": {
+    "metalReserveKg": 22118.0904,
+    "ownOutputKg1900": 0,
+    "ownOutputValueRUSD": 0,
+    "treasuryCapRUSD": 11325908.8525,
+    "capped": false,
+    "mintDemandKgPerDay": 0
+   }
+  },
+  {
+   "countryTag": "FRA",
+   "standard": "gold",
+   "goldUSD": 810600000,
+   "silverUSD": 421200000,
+   "uncoveredPaperUSD": 199200000,
+   "reserveFundingRUSD": 25779637,
+   "trace": {
+    "metalReserveKg": 1219654.6992000001,
+    "ownOutputKg1900": 2470,
+    "ownOutputValueRUSD": 25779637,
+    "treasuryCapRUSD": 147871661.575,
+    "capped": false,
+    "mintDemandKgPerDay": 6.780684656985203
+   }
+  },
+  {
+   "countryTag": "DEU",
+   "standard": "gold",
+   "goldUSD": 721100000,
+   "silverUSD": 208399999.99999997,
+   "uncoveredPaperUSD": 177400000,
+   "reserveFundingRUSD": 1164780.36,
+   "trace": {
+    "metalReserveKg": 1084990.1352000001,
+    "ownOutputKg1900": 111.6,
+    "ownOutputValueRUSD": 1164780.3599999999,
+    "treasuryCapRUSD": 258237526.475,
+    "capped": false,
+    "mintDemandKgPerDay": 0.30636615697147723
+   }
+  },
+  {
+   "countryTag": "ITA",
+   "standard": "gold",
+   "goldUSD": 98000000,
+   "silverUSD": 43900000,
+   "uncoveredPaperUSD": 174900000,
+   "reserveFundingRUSD": 1182523.43,
+   "trace": {
+    "metalReserveKg": 147453.93600000002,
+    "ownOutputKg1900": 113.3,
+    "ownOutputValueRUSD": 1182523.43,
+    "treasuryCapRUSD": 110736555.8775,
+    "capped": false,
+    "mintDemandKgPerDay": 0.31103302495401763
+   }
+  },
+  {
+   "countryTag": "JPN",
+   "standard": "gold",
+   "goldUSD": 41700000,
+   "silverUSD": 29100000,
+   "uncoveredPaperUSD": 80400000,
+   "reserveFundingRUSD": 20414967.6,
+   "trace": {
+    "metalReserveKg": 62743.1544,
+    "ownOutputKg1900": 1956,
+    "ownOutputValueRUSD": 20414967.6,
+    "treasuryCapRUSD": 86487665.8375,
+    "capped": false,
+    "mintDemandKgPerDay": 5.369643396381805
+   }
+  },
+  {
+   "countryTag": "NLD",
+   "standard": "gold",
+   "goldUSD": 32900000,
+   "silverUSD": 52200000,
+   "uncoveredPaperUSD": 41200000,
+   "reserveFundingRUSD": 16827736.33,
+   "trace": {
+    "metalReserveKg": 49502.3928,
+    "ownOutputKg1900": 1612.3,
+    "ownOutputValueRUSD": 16827736.330000002,
+    "treasuryCapRUSD": 30632098.6125,
+    "capped": false,
+    "mintDemandKgPerDay": 4.426112498970544
+   }
+  },
+  {
+   "countryTag": "NOR",
+   "standard": "gold",
+   "goldUSD": 9800000,
+   "silverUSD": 2500000,
+   "uncoveredPaperUSD": 7800000,
+   "reserveFundingRUSD": 24005.33,
+   "trace": {
+    "metalReserveKg": 14745.393600000001,
+    "ownOutputKg1900": 2.3,
+    "ownOutputValueRUSD": 24005.329999999998,
+    "treasuryCapRUSD": 7568785.1025,
+    "capped": false,
+    "mintDemandKgPerDay": 0.006313997858731162
+   }
+  },
+  {
+   "countryTag": "ROM",
+   "standard": "gold",
+   "goldUSD": 7700000,
+   "silverUSD": 900000,
+   "uncoveredPaperUSD": 14100000,
+   "reserveFundingRUSD": 0,
+   "trace": {
+    "metalReserveKg": 11585.6664,
+    "ownOutputKg1900": 0,
+    "ownOutputValueRUSD": 0,
+    "treasuryCapRUSD": 1778146.77,
+    "capped": false,
+    "mintDemandKgPerDay": 0
+   }
+  },
+  {
+   "countryTag": "RUS",
+   "standard": "gold",
+   "goldUSD": 724300000,
+   "silverUSD": 102500000,
+   "uncoveredPaperUSD": 0,
+   "reserveFundingRUSD": 77202632.44,
+   "trace": {
+    "metalReserveKg": 1089804.9576,
+    "ownOutputKg1900": 34744,
+    "ownOutputValueRUSD": 362626602.40000004,
+    "treasuryCapRUSD": 77202632.4425,
+    "capped": true,
+    "mintDemandKgPerDay": 20.306209325785932
+   }
+  },
+  {
+   "countryTag": "SWE",
+   "standard": "gold",
+   "goldUSD": 15700000,
+   "silverUSD": 6800000,
+   "uncoveredPaperUSD": 28900000,
+   "reserveFundingRUSD": 1108420.02,
+   "trace": {
+    "metalReserveKg": 23622.722400000002,
+    "ownOutputKg1900": 106.2,
+    "ownOutputValueRUSD": 1108420.02,
+    "treasuryCapRUSD": 17764820.7075,
+    "capped": false,
+    "mintDemandKgPerDay": 0.2915419880857606
+   }
+  },
+  {
+   "countryTag": "CHE",
+   "standard": "gold",
+   "goldUSD": 24000000,
+   "silverUSD": 10700000,
+   "uncoveredPaperUSD": 20500000,
+   "reserveFundingRUSD": 0,
+   "trace": {
+    "metalReserveKg": 36111.168,
+    "ownOutputKg1900": 0,
+    "ownOutputValueRUSD": 0,
+    "treasuryCapRUSD": 20420539.845,
+    "capped": false,
+    "mintDemandKgPerDay": 0
+   }
+  },
+  {
+   "countryTag": "OTT",
+   "standard": "gold",
+   "goldUSD": 50000000,
+   "silverUSD": 40000000,
+   "uncoveredPaperUSD": 0,
+   "reserveFundingRUSD": 121070.36,
+   "trace": {
+    "metalReserveKg": 75231.6,
+    "ownOutputKg1900": 11.6,
+    "ownOutputValueRUSD": 121070.36,
+    "treasuryCapRUSD": 28406883.6975,
+    "capped": false,
+    "mintDemandKgPerDay": 0.03184451093968759
+   }
+  },
+  {
+   "countryTag": "CHN",
+   "standard": "silver",
+   "goldUSD": 0,
+   "silverUSD": 750000000,
+   "uncoveredPaperUSD": 0,
+   "reserveFundingRUSD": 0,
+   "trace": {
+    "metalReserveKg": 36010019.64636542,
+    "ownOutputKg1900": 0,
+    "ownOutputValueRUSD": 0,
+    "treasuryCapRUSD": 193468429.0525,
+    "capped": false,
+    "mintDemandKgPerDay": 0
+   }
+  },
+  {
+   "countryTag": "MEX",
+   "standard": "silver",
+   "goldUSD": 8600000,
+   "silverUSD": 106000000,
+   "uncoveredPaperUSD": 54000000,
+   "reserveFundingRUSD": 8714699.77,
+   "trace": {
+    "metalReserveKg": 5089416.110019646,
+    "ownOutputKg1900": 1794167.9,
+    "ownOutputValueRUSD": 561637348.5765,
+    "treasuryCapRUSD": 8714699.77,
+    "capped": true,
+    "mintDemandKgPerDay": 76.42511941262984
+   }
+  },
+  {
+   "countryTag": "THA",
+   "standard": "silver",
+   "goldUSD": 20000000,
+   "silverUSD": 193000000,
+   "uncoveredPaperUSD": 2100000,
+   "reserveFundingRUSD": 0,
+   "trace": {
+    "metalReserveKg": 9266578.388998035,
+    "ownOutputKg1900": 0,
+    "ownOutputValueRUSD": 0,
+    "treasuryCapRUSD": 1793433.0375,
+    "capped": false,
+    "mintDemandKgPerDay": 0
+   }
+  }
+ ],
+ "notActivated": [
+  {
+   "key": "AUS+NZL",
+   "name": "Australasia",
+   "reason": "not one simulated country (aggregate or dependency)"
+  },
+  {
+   "key": "cap",
+   "name": "Cape Colony",
+   "reason": "not one simulated country (aggregate or dependency)"
+  },
+  {
+   "key": "bin",
+   "name": "India",
+   "reason": "not one simulated country (aggregate or dependency)"
+  },
+  {
+   "key": "egy",
+   "name": "Egypt",
+   "reason": "not one simulated country (aggregate or dependency)"
+  },
+  {
+   "key": "fin",
+   "name": "Finland",
+   "reason": "not one simulated country (aggregate or dependency)"
+  },
+  {
+   "key": "GRC",
+   "name": "Greece",
+   "reason": "paper currency (only metal standards are activated)"
+  },
+  {
+   "key": "HTI",
+   "name": "Haiti",
+   "reason": "paper currency (only metal standards are activated)"
+  },
+  {
+   "key": "PRT",
+   "name": "Portugal",
+   "reason": "paper currency (only metal standards are activated)"
+  },
+  {
+   "key": "SRB",
+   "name": "Servia",
+   "reason": "paper currency (only metal standards are activated)"
+  },
+  {
+   "key": "south-american-states",
+   "name": "South American States (except Bolivia and Colombia)",
+   "reason": "not one simulated country (aggregate or dependency)"
+  },
+  {
+   "key": "ESP",
+   "name": "Spain",
+   "reason": "paper currency (only metal standards are activated)"
+  },
+  {
+   "key": "central-american-states",
+   "name": "Central American States",
+   "reason": "not one simulated country (aggregate or dependency)"
+  },
+  {
+   "key": "straits",
+   "name": "Straits Settlements (with Aden, Perim, Ceylon, Hongkong, Labuan)",
+   "reason": "not one simulated country (aggregate or dependency)"
+  }
+ ]
+}

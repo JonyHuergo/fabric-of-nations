@@ -73,6 +73,7 @@ import {
   type TradeDispatchResult,
 } from "./trade.js";
 import { runMonetaryPhase, type MonetaryPhaseResult } from "./monetary.js";
+import { mintStandingOffers } from "./mint.js";
 import { runMilitaryPhase, type MilitaryPhaseResult } from "./military.js";
 import {
   runProfitDistributionPhase,
@@ -1197,7 +1198,10 @@ function runMarketAttempt(
   }
   const results: MarketDayResult[] = [];
   const fulfilledByRecord = new Float64Array(household.count).fill(Number.NaN);
+  // D-149: the mints' standing offers enter their home markets' price formation.
+  const mintOffers = mintStandingOffers(world, definitions);
   for (const market of [...world.markets].sort((left, right) => left.id - right.id)) {
+    const offers = mintOffers.get(market.id);
     const result = runMarketDay(
       world,
       definitions,
@@ -1210,6 +1214,7 @@ function runMarketAttempt(
           productionByMarket.get(market.id) ?? [],
         ),
         householdColumns: householdColumnsOf(market.id),
+        ...(offers === undefined ? {} : { mintOffers: offers }),
       },
       { validateWorld: false, lookups, detail },
     );

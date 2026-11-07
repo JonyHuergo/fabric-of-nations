@@ -87,6 +87,7 @@ import type {
   MonetaryCurrencyState,
   ProfessionDef,
 } from "./types.js";
+import { MONETARY_STANDARDS } from "./types.js";
 
 function professionIds(scenario: EconomyScenarioDef): Map<number, ProfessionDef> {
   return new Map(scenario.definitions.professions.map((profession) => [profession.id, profession]));
@@ -783,6 +784,32 @@ function assertValidMonetaryInputs(scenario: EconomyScenarioDef): void {
     if (!Number.isFinite(units) || units < 0) {
       throw new RangeError(`${path}.currencyIssuedUnits must be finite and non-negative`);
     }
+    const standard = input.standard ?? "paper";
+    if (!(MONETARY_STANDARDS as readonly string[]).includes(standard)) {
+      throw new RangeError(`${path}.standard must be one of ${MONETARY_STANDARDS.join(", ")}`);
+    }
+    if (standard !== "paper") {
+      // D-149: a metal standard is backed by its metal reserve and the treasury's
+      // funding, not by external cash.
+      if (input.externalCashRUSD !== undefined) {
+        throw new RangeError(`${path}.externalCashRUSD is not used by a metal standard`);
+      }
+      const fine = input.fineGramsPerUnit;
+      if (fine === undefined || !Number.isFinite(fine) || !(fine > 0)) {
+        throw new RangeError(`${path}.fineGramsPerUnit must be positive for a metal standard`);
+      }
+      const metal = input.metalReserveKg;
+      if (metal === undefined || !Number.isFinite(metal) || metal < 0) {
+        throw new RangeError(`${path}.metalReserveKg must be finite and non-negative for a metal standard`);
+      }
+      if (!scenario.definitions.goods.some((good) => good.key === standard)) {
+        throw new RangeError(`${path}.standard ${standard} needs a good of that key`);
+      }
+      continue;
+    }
+    if (input.fineGramsPerUnit !== undefined || input.metalReserveKg !== undefined) {
+      throw new RangeError(`${path} gives metal fields to a paper currency`);
+    }
     const externalCash = input.externalCashRUSD ?? units * parity;
     if (!Number.isFinite(externalCash) || externalCash < 0) {
       throw new RangeError(`${path}.externalCashRUSD must be finite and non-negative`);
@@ -1238,6 +1265,12 @@ export function createEconomyWorld(
           lastMonthEndDay: null,
           lastMonthExportsRUSD: 0,
           lastMonthImportsRUSD: 0,
+          standard: "paper",
+          fineGramsPerUnit: 0,
+          metalReserveKg: 0,
+          metalReserveAccountId: null,
+          convertible: false,
+          lastMintSaleKg: 0,
         });
         continue;
       }
@@ -1254,6 +1287,11 @@ export function createEconomyWorld(
           : null;
       const input = inputByCurrency.get(currency.id);
       const active = input !== undefined;
+      const standard = input?.standard ?? "paper";
+      // D-149: only a metal authority gets a metal-reserve account, so paper and legacy
+      // authorities keep their accepted account sets.
+      const metalReserveAccountId =
+        active && standard !== "paper" ? allocate("country", issuerCountryId, "monetary-metal-reserve") : null;
       const parity = active
         ? (input.parityRusdPerUnit ?? scenarioValuation)
         : scenarioValuation;
@@ -1265,6 +1303,25 @@ export function createEconomyWorld(
         }        const funding = input.reserveFundingRUSD ?? 0;
         const units = input.currencyIssuedUnits ?? 0;
         const holdingValue = units * parity;
+        if (standard !== "paper" && metalReserveAccountId !== null) {
+          // D-149: the circulation is backed by the metal reserve, measured at the metal's
+          // opening (international) price, and the treasury's funding. The external
+          // counterparty holds the currency with no cash; the authority's equity is the
+          // balancing item (negative where money exceeds metal and cash: the uncovered
+          // paper and token coin of 1900).
+          const metalGood = scenario.definitions.goods.find((good) => good.key === standard);
+          if (metalGood === undefined) throw new RangeError(`no ${standard} good for currency ${String(currency.id)}`);
+          const metalValue = (input.metalReserveKg ?? 0) * metalGood.basePrice1900RUSD;
+          if (funding > 0) opening.push({ accountId: reserveAccountId, balanceRUSD: funding });
+          if (metalValue > 0) opening.push({ accountId: metalReserveAccountId, balanceRUSD: metalValue });
+          const equity = funding + metalValue - holdingValue;
+          if (equity !== 0) opening.push({ accountId: equityAccountId, balanceRUSD: equity });
+          if (holdingValue > 0) {
+            opening.push({ accountId: liabilityAccountId, balanceRUSD: holdingValue });
+            opening.push({ accountId: externalCurrencyAccountId, balanceRUSD: holdingValue });
+            opening.push({ accountId: externalEquityAccountId, balanceRUSD: holdingValue });
+          }
+        } else {
         const externalCash = input.externalCashRUSD ?? holdingValue;
         // The external counterparty buys the opening circulation with RUSD, so those
         // reserves join the treasury capitalization on the authority's balance sheet:
@@ -1290,6 +1347,7 @@ export function createEconomyWorld(
           opening.push({ accountId: externalCashAccountId, balanceRUSD: externalCash });
           opening.push({ accountId: externalEquityAccountId, balanceRUSD: externalCash });
         }
+        }
       }
       const brandedParity = parity === null ? null : asRusdPerCurrencyUnit(parity);
       monetaryRecords.push({
@@ -1311,6 +1369,12 @@ export function createEconomyWorld(
         lastMonthEndDay: null,
         lastMonthExportsRUSD: 0,
         lastMonthImportsRUSD: 0,
+        standard: active ? standard : "paper",
+        fineGramsPerUnit: active && standard !== "paper" ? (input.fineGramsPerUnit ?? 0) : 0,
+        metalReserveKg: active && standard !== "paper" ? (input.metalReserveKg ?? 0) : 0,
+        metalReserveAccountId,
+        convertible: active && standard !== "paper",
+        lastMintSaleKg: 0,
       });
     }
     world.monetary = {

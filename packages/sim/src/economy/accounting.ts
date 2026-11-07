@@ -35,6 +35,7 @@ import {
   assertDebtPostingStructure,
   assertTradePostingStructure,
   assertOwnerCapitalInjectionStructure,
+  assertMintPostingStructure,
   assertMonetaryPostingStructure,
   assertMilitaryPostingStructure,
   semanticJournalLineViolation,
@@ -288,6 +289,9 @@ function validatePostingLines(
     transactionKind === "fx-revaluation"
   ) {
     assertMonetaryPostingStructure(transactionKind, lines, accounts);
+  }
+  if (transactionKind === "mint-purchase" || transactionKind === "mint-sale" || transactionKind === "metal-revaluation") {
+    assertMintPostingStructure(transactionKind, lines, accounts);
   }
   if (transactionKind === "military-pay" || transactionKind === "military-procurement") {
     assertMilitaryPostingStructure(transactionKind, lines, accounts);

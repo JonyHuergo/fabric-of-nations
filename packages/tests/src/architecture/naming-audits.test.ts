@@ -162,8 +162,11 @@ describe("M14 monetary equivalence and determinism", () => {
   // placement (6,434 buildings, opening stock of every good, warehouse capacities), the
   // A9 technology grants, fiscal values and route capacities from the new coverage, and
   // data version m3-economy-v13.
+  // Re-pinned for D-140 (D-149), by design: 23 metal-standard authorities with their
+  // 1900 metal reserves, circulation and treasury-funded mint cash; gold and silver open
+  // at their reference price in every market; gold and silver mines sized by the mints.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("be0061e21aad1018");
+    expect(hashWorld(world)).toBe("80d03b72d5728848");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {

@@ -179,7 +179,8 @@
       "moneyCoefficients": "historical/p2b/money_coefficients_1900.json",
       "currencies": "historical/p3/currencies_1900.json",
       "demography": "historical/p4/demography_1900.json",
-      "deposits": "historical/p5/deposits_1900.json"
+      "deposits": "historical/p5/deposits_1900.json",
+      "monetary": "historical/p5b/monetary_1900.json"
     },
     "definitions": {
       "goods": "historical/p5b/goods_1900.json",

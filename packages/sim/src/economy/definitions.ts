@@ -99,6 +99,10 @@ function assertGood(value: unknown, path: string): GoodDef {
     }
     good.priceBasis = record.priceBasis as NonNullable<GoodDef["priceBasis"]>;
   }
+  if (record.internationalPrice !== undefined) {
+    if (typeof record.internationalPrice !== "boolean") throw new RangeError(`${path}.internationalPrice must be a boolean`);
+    if (record.internationalPrice) good.internationalPrice = true;
+  }
   // Services were deferred by M3 as non-storable outputs; P5b models them as goods that
   // cannot be stored (D-146 A13, C-6), so a service must say so.
   if (good.category === "service" && good.storable !== false) {

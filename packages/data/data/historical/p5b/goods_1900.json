@@ -336,7 +336,8 @@
   "spoilageRateAnnual": 0,
   "unitLabel": "kg",
   "group": "mining",
-  "priceBasis": "1900-wholesale"
+  "priceBasis": "1900-wholesale",
+  "internationalPrice": true
  },
  {
   "id": 26,
@@ -349,7 +350,8 @@
   "spoilageRateAnnual": 0,
   "unitLabel": "kg",
   "group": "mining",
-  "priceBasis": "1900-wholesale"
+  "priceBasis": "1900-wholesale",
+  "internationalPrice": true
  },
  {
   "id": 27,

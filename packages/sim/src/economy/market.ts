@@ -9,6 +9,7 @@
  * transient.
  */
 
+import type { MintStandingOffer } from "./mint.js";
 import { assertValidDayIndex, isTerminalDayIndex } from "../calendar.js";
 import { QUANTITY_TOLERANCE } from "../population/constants.js";
 import type { NeedTierDef } from "../population/types.js";
@@ -88,6 +89,12 @@ export interface MarketDayInput {
    * are validated exactly as records are, with the same paths and messages.
    */
   readonly householdColumns?: HouseholdDemandColumns;
+  /**
+   * D-149: the standing offers of the mints whose home is this market. Their demand is
+   * added to the metal's funded demand and their supply to its sellable supply in the
+   * price update only; the purchases and sales themselves run in the monetary phase.
+   */
+  readonly mintOffers?: readonly MintStandingOffer[];
 }
 
 /** Household demand records in columns, row `i` being record `i` (D-139). */
@@ -635,6 +642,46 @@ function productionWaves(
     else second.add(buildingId);
   }
   return { first, second, goods: [...goods].sort((left, right) => left - right) };
+}
+
+/**
+ * D-149: the funded demand and sellable supply of a metal once the issuer's mint has bid
+ * or offered. The price rule is change = clamp(KAPPA x (D - S) / max(D, S, EPSILON));
+ * the mint's quantity is the one that makes the rule move the price to its target (the
+ * buy point from below, the export point from above, no change between them), within the
+ * mint's capacity. The flows are what the mint stands ready to trade, not a price clamp:
+ * without cash or metal the price moves freely.
+ */
+export function mintAdjustedFlows(
+  price: number,
+  funded: number,
+  supply: number,
+  offer: MintStandingOffer,
+): { readonly funded: number; readonly supply: number } {
+  const target = price < offer.buyPrice ? offer.buyPrice : price > offer.sellPrice ? offer.sellPrice : price;
+  const change = Math.max(-M3_PRICE_MAX_DAILY_CHANGE, Math.min(M3_PRICE_MAX_DAILY_CHANGE, target / price - 1));
+  const x = change / M3_PRICE_KAPPA; // the imbalance that gives this change
+  if (x === 0) {
+    // Between the points: take up excess supply or meet excess demand, so the price stays.
+    if (supply > funded) return { funded: funded + Math.min(offer.buyCapacity, supply - funded), supply };
+    return { funded, supply: supply + Math.min(offer.sellCapacity, funded - supply) };
+  }
+  if (x > 0) {
+    // Demand D' with (D' - S) / max(D', S, EPS) = x.
+    let wanted: number;
+    if (x >= 1) wanted = Number.POSITIVE_INFINITY;
+    else if (supply + x * M3_PRICE_EPSILON <= M3_PRICE_EPSILON) wanted = Math.max(supply + x * M3_PRICE_EPSILON, supply);
+    else wanted = supply / (1 - x);
+    const bid = Math.max(0, Math.min(offer.buyCapacity, wanted - funded));
+    return { funded: funded + bid, supply };
+  }
+  // Supply S' with (D - S') / max(D, S', EPS) = x (x < 0).
+  let wanted: number;
+  if (x <= -1) wanted = Number.POSITIVE_INFINITY;
+  else if (funded - x * M3_PRICE_EPSILON <= M3_PRICE_EPSILON) wanted = Math.max(funded - x * M3_PRICE_EPSILON, funded);
+  else wanted = funded / (1 + x);
+  const ask = Math.max(0, Math.min(offer.sellCapacity, wanted - supply));
+  return { funded, supply: supply + ask };
 }
 
 /** Run one deterministic market-day clearing phase. Returns transient pending results. */
@@ -1248,6 +1295,23 @@ export function runMarketDay(
         (intermediate?.openingStock ?? 0) + (intermediate?.production ?? 0) - (inputFundedByGood[good.id] ?? 0),
       );
     });
+    for (const offer of input.mintOffers ?? []) {
+      if (
+        !(offer.goodId >= 0 && offer.goodId < goodCount) ||
+        !(offer.buyCapacity >= 0) || !Number.isFinite(offer.buyCapacity) ||
+        !(offer.sellCapacity >= 0) || !Number.isFinite(offer.sellCapacity)
+      ) {
+        throw new RangeError(`market ${String(market.id)} has an invalid mint offer`);
+      }
+      const adjusted = mintAdjustedFlows(
+        market.priceRUSD[offer.goodId] ?? 0,
+        priceFundedByGood[offer.goodId] ?? 0,
+        sellableSupplyByGood[offer.goodId] ?? 0,
+        offer,
+      );
+      priceFundedByGood[offer.goodId] = adjusted.funded;
+      sellableSupplyByGood[offer.goodId] = adjusted.supply;
+    }
     const priceUpdates = updateMarketPrices(
       market,
       definitions.goods,

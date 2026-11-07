@@ -9,7 +9,8 @@
  * 2. **Arrangements.** The P3 world and the pre-P3 world (one own currency per country) run
  *    side by side; `simulatedQuantitiesDigest` (every account balance keyed by owner and
  *    subtype, and all non-monetary state with account ids removed) is identical every day.
- * Node diagnostic; nothing is persisted.
+ * The D-149 metal authorities are left out of all three (they make valuations act on
+ * money by design). Node diagnostic; nothing is persisted.
  */
 
 import {
@@ -47,7 +48,10 @@ export function p3EquivalenceScenarios(): {
 } {
   const data = loadHistoricalData("scenarios/m11_world_1900.json");
   const provinces = loadM11Provinces();
-  const withParities = { ...buildM5HistoricalScenario(data), provinces };
+  // D-149: the 1900 metal-standard authorities make valuations act on simulated money
+  // by design (mint flows, revaluation), so P3's claim is checked on the P3 data alone:
+  // every variant keeps the monetary system enabled with no active authority.
+  const withParities = { ...buildM5HistoricalScenario(data), provinces, monetary: {} };
   const withoutValuations: EconomyScenarioDef = {
     ...withParities,
     currencyValuations: (withParities.currencyValuations ?? []).map((valuation) => ({
