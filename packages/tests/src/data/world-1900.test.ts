@@ -338,6 +338,27 @@ describe("M11 country selection and persistence", () => {
     expect(restored.scenarioId).toBe(world.scenarioId);
   });
 
+  test("protocol 22: snapshots stay bounded for several players and a focused market (plan section 6)", () => {
+    const scenario = loadM11World();
+    for (const tag of ["GBR", "USA", "DEU"]) {
+      const { host, events } = newHost(scenario);
+      host.handleCommand({ protocolVersion: PROTOCOL_VERSION, type: "CREATE_GAME", commandId: "create", playerCountryId: tagId(scenario, tag) });
+      const own = (lastEvent(events) as unknown as { snapshot: SimulationSnapshot }).snapshot;
+      expect(JSON.stringify(own).length).toBeLessThan(700_000);
+      // Only the player's markets carry prices, and only goods present there.
+      for (const market of own.markets) {
+        if (market.detail === "summary") expect(market.prices).toEqual([]);
+        for (const row of market.prices) expect(row.stockQuantity > 0 || row.dailyProductionCapacity > 0).toBe(true);
+      }
+      // Focusing the largest other market adds its prices and stays inside the bound.
+      const largest = [...own.markets].filter((market) => market.detail === "summary").sort((left, right) => right.provinceIds.length - left.provinceIds.length)[0]!;
+      host.handleCommand({ protocolVersion: PROTOCOL_VERSION, type: "SET_MARKET_FOCUS", commandId: "focus", marketId: largest.id });
+      const focused = (lastEvent(events) as unknown as { snapshot: SimulationSnapshot }).snapshot;
+      expect(focused.markets.find((market) => market.id === largest.id)?.detail).toBe("full");
+      expect(JSON.stringify(focused).length).toBeLessThan(700_000);
+    }
+  });
+
   test("snapshots stay bounded and markets never fall back to an opaque id", () => {
     const scenario = loadM11World();
     const { host, events } = newHost(scenario);

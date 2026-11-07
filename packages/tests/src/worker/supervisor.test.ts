@@ -303,6 +303,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
           metalReserveValueRUSD: 0,
           mintPriceRUSDPerKg: null,
         },
+        resources: [],
       },
     ],
     provinceTable: encodeProvinceEconomyTable(
@@ -349,12 +350,10 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         kind: "national",
         memberCountryIds: [0],
         provinceIds: [0],
+        detail: "full",
         prices: [
           {
             goodId: 0,
-            goodKey: "grain",
-            goodName: "Grain",
-            unitLabel: "kg",
             priceRUSD: 1,
             stockQuantity: 10,
             dailyProductionCapacity: 5,
@@ -364,7 +363,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         infrastructure: 0.5,
       },
     ],
-    goods: [{ id: 0, key: "grain", name: "Grain", unitLabel: "kg", category: "food" }],
+    goods: [{ id: 0, key: "grain", name: "Grain", unitLabel: "kg", category: "food", group: null, storable: true, tradeable: true }],
     needTiers: [],
     projectTypes: [],
     technologyEraNames: [],

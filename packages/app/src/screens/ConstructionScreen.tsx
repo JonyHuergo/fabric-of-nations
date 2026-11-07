@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import {
   countryById,
@@ -9,12 +9,24 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { ActionButton, Headline, Pill, Section, StatRow } from "../components/ui";
-import { colors, fonts, radii, spacing, themedSheet } from "../theme";
+import { ActionButton, Disclosure, Headline, Pill, Section, StatRow } from "../components/ui";
+import { TOUCH_TARGET, colors, fonts, radii, spacing, themedSheet, type as textType } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 import { provinceEconomyRows, type ProvinceEconomySnapshot } from "@century/sim-worker";
 import { provinceDisplayName } from "../provinceNames";
 import { useMoney } from "../format/useMoney";
+
+/** Player-facing sector headings of the project types (P5b, plan section 11.3). */
+const SECTOR_LABELS: Readonly<Record<string, string>> = {
+  agriculture: "Agriculture",
+  "food-processing": "Food processing",
+  textiles: "Textiles",
+  manufacturing: "Manufacturing",
+  mining: "Mining",
+  energy: "Energy",
+  services: "Services",
+  logistics: "Storage and logistics",
+};
 
 /** Quick picks: a country's most populous provinces, keeping the current pick in view (P2). */
 function mostPopulousProvinces(
@@ -38,7 +50,8 @@ export function ConstructionScreen({
   readonly countryId: number | null;
 }) {
   const money = useMoney();
-  const { applyAction, busy, running, connection } = useSimulation();
+  const { applyAction, busy, running, connection, setProvinceFocus } = useSimulation();
+  const [typeQuery, setTypeQuery] = useState("");
   const country = countryById(snapshot, countryId);
   const [definitionId, setDefinitionId] = useState<number | null>(null);
   const [provinceId, setProvinceId] = useState<number | null>(null);
@@ -58,6 +71,11 @@ export function ConstructionScreen({
         : (mostPopulousProvinces(snapshot, country.id, null)[0]?.id ?? country.provinceIds[0] ?? null),
     );
   }, [countryId, snapshot.projectTypes, country]);
+
+  // The target province's known deposits come with the province focus (P5 land snapshot).
+  useEffect(() => {
+    if (provinceId !== null) setProvinceFocus(provinceId);
+  }, [provinceId, setProvinceFocus]);
 
   if (country === null) {
     return (
@@ -170,16 +188,55 @@ export function ConstructionScreen({
         {snapshot.projectTypes.length === 0 ? (
           <Text style={styles.empty}>No public project types are available in this data set.</Text>
         ) : (
-          <View style={styles.typeList}>
-            {snapshot.projectTypes.map((type) => (
-              <Pill
-                key={type.definitionId}
-                label={`${type.name} · ${money.format(type.constructionCostRUSD)}`}
-                active={definitionId === type.definitionId}
-                onPress={() => setDefinitionId(type.definitionId)}
-                disabled={!isPlayerCountry || busy}
+          <View>
+            <View style={styles.searchWrap}>
+              <TextInput
+                value={typeQuery}
+                onChangeText={setTypeQuery}
+                placeholder="Search project types"
+                placeholderTextColor={colors.faint}
+                style={styles.search}
+                accessibilityLabel="Search project types"
+                autoCorrect={false}
+                autoCapitalize="none"
               />
-            ))}
+            </View>
+            {(() => {
+              const researched = new Set(
+                country.technology.statuses.filter((status) => status.status === "researched").map((status) => status.technologyId),
+              );
+              const needle = typeQuery.trim().toLowerCase();
+              const sectors = [...new Set(snapshot.projectTypes.map((type) => type.sector))];
+              return sectors.map((sector) => {
+                const types = snapshot.projectTypes.filter(
+                  (type) => type.sector === sector && (needle.length === 0 || type.name.toLowerCase().includes(needle)),
+                );
+                if (types.length === 0) return null;
+                return (
+                  <Disclosure
+                    key={`${sector}:${needle.length > 0 ? "search" : "browse"}`}
+                    title={`${SECTOR_LABELS[sector] ?? sector} · ${String(types.length)}`}
+                    initiallyOpen={needle.length > 0 || types.some((type) => type.definitionId === definitionId)}
+                  >
+                    <View style={styles.typeList}>
+                      {types.map((type) => {
+                        const technology = snapshot.technologyCatalog.find((entry) => entry.unlockedBuildingKeys.includes(type.key));
+                        const locked = technology !== undefined && !researched.has(technology.technologyId);
+                        return (
+                          <Pill
+                            key={type.definitionId}
+                            label={locked ? `${type.name} · needs ${technology.name}` : `${type.name} · ${money.format(type.constructionCostRUSD)}`}
+                            active={definitionId === type.definitionId}
+                            onPress={() => setDefinitionId(type.definitionId)}
+                            disabled={!isPlayerCountry || busy || locked}
+                          />
+                        );
+                      })}
+                    </View>
+                  </Disclosure>
+                );
+              });
+            })()}
           </View>
         )}
         <Text style={styles.inputLabel}>Target province (most populous)</Text>
@@ -194,6 +251,19 @@ export function ConstructionScreen({
             />
           ))}
         </View>
+        {selectedType !== null && selectedType.sector === "mining" ? (
+          <Text style={styles.depositNote}>
+            {(() => {
+              const land = snapshot.focusProvince?.provinceId === provinceId ? snapshot.focusProvince?.land : null;
+              const deposits = land?.deposits ?? [];
+              if (land === null || land === undefined) return "Known deposits of the province appear here once it is selected.";
+              if (deposits.length === 0) return "No known deposit in this province: a mine needs a discovered deposit of its resource.";
+              return `Known deposits: ${deposits
+                .map((deposit) => `${deposit.resource} ${formatQuantity(deposit.remaining)} ${deposit.unit} left (quality ${formatRate(deposit.quality)})`)
+                .join(" · ")}`;
+            })()}
+          </Text>
+        ) : null}
         {selectedType === null ? null : (
           <>
             <StatRow
@@ -400,4 +470,14 @@ const styles = themedSheet(() => ({
     gap: spacing.sm,
     marginTop: spacing.sm,
   },
+  searchWrap: {
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.xs,
+    backgroundColor: colors.surface,
+  },
+  search: { ...textType.body, minHeight: TOUCH_TARGET, color: colors.text },
+  depositNote: { ...textType.small, lineHeight: 17, marginTop: spacing.xs },
 }));

@@ -60,6 +60,8 @@ import {
   convertibilityState,
   derivePriceIndexes,
   monetaryCurrencyForCountry,
+  RESOURCE_KINDS,
+  RESOURCE_UNITS,
   mintPriceRUSDPerKg,
   priceIndexCoverage,
   priceIndexInflation,
@@ -188,6 +190,8 @@ export interface SnapshotRuntimeState {
   readonly focusCountryId?: number | null;
   /** P4 presentation-only focused province whose pyramid is included. */
   readonly focusProvinceId?: number | null;
+  /** Protocol 22: presentation-only focused market whose prices are included. */
+  readonly focusMarketId?: number | null;
   /** M11 static polity/market metadata from the scenario. */
   readonly countryMeta?: readonly CountryMetaDef[];
   readonly marketMeta?: readonly MarketMetaDef[];
@@ -384,7 +388,8 @@ function projectTypeSnapshots(definitions: EconomyDefinitions): readonly Snapsho
         definition.constructionCostRUSD > 0 &&
         Number.isInteger(definition.constructionWorkers) &&
         definition.constructionWorkers > 0 &&
-        definition.requiredTechnologyId === null &&
+        // P5b: gated types are offered too; construction enforces the gate and the
+        // screen shows the technology a locked type needs (plan section 11.3).
         definition.resourceRequirements.length === 0,
     )
     .sort((left, right) => left.id - right.id)
@@ -1426,6 +1431,7 @@ function countrySnapshot(
     trade: tradePolicySnapshot(world, country),
     priceIndex: countryPriceIndexSnapshot(world, country, build?.priceIndexes),
     monetary: monetarySnapshot(world, country),
+    resources: countryResources(world, provinceIds),
     military: countryMilitarySnapshot(world, country),
   };
 }
@@ -1695,6 +1701,27 @@ function currenciesSnapshot(world: World): readonly SnapshotCurrency[] {
             : null,
       };
     });
+}
+
+/** P5b: discovered deposits of the country's provinces, summed by resource. */
+function countryResources(
+  world: World,
+  provinceIds: ReadonlySet<number>,
+): CountrySnapshot["resources"] {
+  const byResource = new Map<string, { remaining: number; extracted: number }>();
+  for (const deposit of world.resources.deposits) {
+    if (!deposit.discovered || !provinceIds.has(deposit.provinceId)) continue;
+    const entry = byResource.get(deposit.resource) ?? { remaining: 0, extracted: 0 };
+    entry.remaining += deposit.initialStock - deposit.extracted;
+    entry.extracted += deposit.extracted;
+    byResource.set(deposit.resource, entry);
+  }
+  return RESOURCE_KINDS.filter((resource) => byResource.has(resource)).map((resource) => ({
+    resource,
+    unit: RESOURCE_UNITS[resource],
+    remaining: roundDisplay(byResource.get(resource)!.remaining, 3),
+    extracted: roundDisplay(byResource.get(resource)!.extracted, 3),
+  }));
 }
 
 function monetarySnapshot(
@@ -2008,6 +2035,9 @@ function goodsSnapshots(definitions: EconomyDefinitions): readonly GoodSnapshot[
       name: good.name,
       unitLabel: good.unitLabel,
       category: good.category,
+      group: good.group ?? null,
+      storable: good.storable !== false,
+      tradeable: good.tradeable !== false,
     }));
 }
 
@@ -2016,6 +2046,8 @@ function marketSnapshots(
   definitions: EconomyDefinitions,
   capacityByMarket: CapacityMaps["byMarket"],
   marketMeta: ReadonlyMap<number, MarketMetaDef>,
+  /** Protocol 22: markets with prices; null = every market, every good (legacy). */
+  fullMarketIds: ReadonlySet<number> | null,
 ): readonly MarketSnapshot[] {
   const goods = [...definitions.goods].sort((left, right) => left.id - right.id);
   const countryByProvince = new Map<number, number>();
@@ -2060,15 +2092,19 @@ function marketSnapshots(
         kind: meta?.kind ?? "unspecified",
         provinceIds: [...marketProvinceIds(world, market.id)].sort((left, right) => left - right),
         memberCountryIds: members,
-        prices: goods.map((good) => ({
-          goodId: good.id,
-          goodKey: good.key,
-          goodName: good.name,
-          unitLabel: good.unitLabel,
-          priceRUSD: market.priceRUSD[good.id] ?? 0,
-          stockQuantity: stockByGood.get(good.id) ?? 0,
-          dailyProductionCapacity: roundDisplay(capacity?.get(good.id) ?? 0, 3),
-        })),
+        detail: fullMarketIds === null || fullMarketIds.has(market.id) ? ("full" as const) : ("summary" as const),
+        prices:
+          fullMarketIds !== null && !fullMarketIds.has(market.id)
+            ? []
+            : goods
+                .map((good) => ({
+                  goodId: good.id,
+                  priceRUSD: market.priceRUSD[good.id] ?? 0,
+                  stockQuantity: stockByGood.get(good.id) ?? 0,
+                  dailyProductionCapacity: roundDisplay(capacity?.get(good.id) ?? 0, 3),
+                }))
+                // Only goods present here (bounded snapshots); legacy lists every good.
+                .filter((row) => fullMarketIds === null || row.stockQuantity > 0 || row.dailyProductionCapacity > 0),
         customsCountryId: market.customsCountryId,
         infrastructure: roundDisplay(marketInfrastructureQuality(world, market), 3),
       };
@@ -2426,6 +2462,22 @@ export function buildSimulationSnapshot(
   // scenarios without static metadata keep the pre-M11 "all countries" behavior
   // used by existing fixtures and tests.
   const boundedDetail = (runtime.countryMeta?.length ?? 0) > 0;
+  // Protocol 22 (plan §6): market prices for the player's markets, the focus country's
+  // and the focused market only; every market and good in legacy scenarios.
+  let fullMarketIds: Set<number> | null = null;
+  if (boundedDetail) {
+    fullMarketIds = new Set<number>();
+    const marketOfProvince = new Map(world.provinceEconomies.map((province) => [province.id, province.marketId]));
+    for (const countryId of [playerCountryId, focusCountryId]) {
+      if (countryId === null) continue;
+      for (const provinceId of countryProvinceIds(world, countryId)) {
+        const marketId = marketOfProvince.get(provinceId);
+        if (marketId !== null && marketId !== undefined) fullMarketIds.add(marketId);
+      }
+    }
+    const focusMarketId = runtime.focusMarketId ?? null;
+    if (focusMarketId !== null && world.markets.some((market) => market.id === focusMarketId)) fullMarketIds.add(focusMarketId);
+  }
   const detailCountryIds = new Set<number>();
   if (boundedDetail) {
     if (playerCountryId !== null) detailCountryIds.add(playerCountryId);
@@ -2499,7 +2551,7 @@ export function buildSimulationSnapshot(
     ),
     territories: staticSections.territories,
     provinceOwnership: encodeProvinceOwnershipTable(provinceSnapshots(world)),
-    markets: marketSnapshots(world, definitions, capacities.byMarket, marketMetaById),
+    markets: marketSnapshots(world, definitions, capacities.byMarket, marketMetaById, fullMarketIds),
     goods: staticSections.goods,
     professions: staticSections.professions,
     needTiers: staticSections.needTiers,

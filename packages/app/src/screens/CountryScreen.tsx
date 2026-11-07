@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import {
   buildEconomicExplanations,
@@ -13,11 +14,84 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { Badge, Headline, Notice, Section, StatRow } from "../components/ui";
+import { Badge, Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
 import { CountryFlag } from "../components/CountryFlag";
-import { colors, fonts, radii, spacing, themedSheet, type } from "../theme";
+import { TOUCH_TARGET, colors, fonts, radii, spacing, themedSheet, type } from "../theme";
 import { statusLabel } from "../components/WorldMap";
 import { useMoney } from "../format/useMoney";
+import { groupOf, goodsByGroup, matchesSearch } from "../format/goods";
+
+/** The resource a mined good comes from (P5b extraction buildings). */
+const RESOURCE_OF_GOOD: Readonly<Record<string, string>> = {
+  coal: "coal",
+  "crude-oil": "oil",
+  "natural-gas": "gas",
+  "iron-ore": "iron",
+  "copper-ore": "copper",
+  bauxite: "bauxite",
+  tin: "tin",
+  gold: "gold",
+  silver: "silver",
+  nitrates: "nitrate",
+  uranium: "uranium",
+  timber: "timber",
+};
+
+/** Production capacity by good: every good, grouped and searchable (plan section 11.2). */
+function ProductionList({
+  snapshot,
+  capacity,
+  resources,
+}: {
+  readonly snapshot: SimulationSnapshot;
+  readonly capacity: readonly { readonly goodId: number; readonly dailyCapacity: number }[];
+  readonly resources: readonly { readonly resource: string; readonly unit: string; readonly remaining: number; readonly extracted: number }[];
+}) {
+  const [query, setQuery] = useState("");
+  const byGood = new Map(capacity.map((entry) => [entry.goodId, entry.dailyCapacity]));
+  const groups = goodsByGroup(snapshot.goods)
+    .map((group) => ({ ...group, goods: group.goods.filter((good) => matchesSearch(good, query)) }))
+    .filter((group) => group.goods.length > 0);
+  return (
+    <View>
+      <View style={styles.searchWrap}>
+        <TextInput
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Search goods"
+          placeholderTextColor={colors.faint}
+          style={styles.search}
+          accessibilityLabel="Search production by good"
+          autoCorrect={false}
+          autoCapitalize="none"
+        />
+      </View>
+      {groups.map((group) => {
+        const made = group.goods.filter((good) => (byGood.get(good.id) ?? 0) > 0);
+        return (
+          <Disclosure key={`${group.key}:${query.trim().length > 0 ? "search" : "browse"}`} title={`${groupOf(group.goods[0]!).label} · ${String(made.length)} made`} initiallyOpen={query.trim().length > 0}>
+            {made.length === 0 ? <Text style={styles.empty}>Nothing in this group is made here.</Text> : null}
+            {made.map((good) => {
+              const resource = resources.find((entry) => entry.resource === RESOURCE_OF_GOOD[good.key]);
+              return (
+                <StatRow
+                  key={good.id}
+                  label={good.name}
+                  value={`${formatQuantity(byGood.get(good.id) ?? 0)} ${good.unitLabel}/day`}
+                  detail={
+                    resource === undefined
+                      ? "estimated capacity"
+                      : `known stock ${formatQuantity(resource.remaining)} ${resource.unit} · extracted since 1900 ${formatQuantity(resource.extracted)} ${resource.unit}`
+                  }
+                />
+              );
+            })}
+          </Disclosure>
+        );
+      })}
+    </View>
+  );
+}
 
 export function CountryScreen({
   snapshot,
@@ -208,20 +282,8 @@ export function CountryScreen({
         {capacity.length === 0 ? (
           <Text style={styles.empty}>No operational production capacity is recorded.</Text>
         ) : (
-          capacity.slice(0, 8).map((entry) => (
-            <StatRow
-              key={entry.goodId}
-              label={entry.goodName}
-              value={`${formatQuantity(entry.dailyCapacity)} ${entry.unitLabel}/day`}
-              detail={`${entry.category} · estimated capacity`}
-            />
-          ))
+          <ProductionList snapshot={snapshot} capacity={capacity} resources={country.resources} />
         )}
-        {capacity.length > 8 ? (
-          <Text style={styles.note}>
-            {String(capacity.length - 8)} more goods with capacity are in the snapshot.
-          </Text>
-        ) : null}
       </Section>
 
       <Section folded
@@ -385,6 +447,15 @@ const styles = themedSheet(() => ({
   },
   goodMain: { flex: 1, paddingRight: spacing.sm },
   goodName: { color: colors.text, fontSize: 13, fontFamily: fonts.sansSemiBold },
+  searchWrap: {
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.xs,
+    backgroundColor: colors.surface,
+  },
+  search: { ...type.body, minHeight: TOUCH_TARGET, color: colors.text },
   goodDetail: { color: colors.faint, fontFamily: fonts.sans, fontSize: 11, marginTop: 2 },
   goodPrice: {
     color: colors.accent,

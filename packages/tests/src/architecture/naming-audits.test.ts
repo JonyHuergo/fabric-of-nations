@@ -206,7 +206,9 @@ describe("M14 current documentation and protocol", () => {
     // 19: country currency link and valuation history in the snapshot (D-141).
     // 20: demography in the snapshot and the province focus command (D-142).
     // 21: province ownership columns, harvest column and province land (D-143).
-    expect(PROTOCOL_VERSION).toBe(21);
+    // 22: sparse market prices, compact price rows, goods groups, SET_MARKET_FOCUS,
+    //     metal-standard and currency actions, country resources (P5b, D-151).
+    expect(PROTOCOL_VERSION).toBe(22);
   });
 
   test("the monetary terminology audit passes", () => {

@@ -1,17 +1,102 @@
-import { StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import {
   essentialGoodIds,
   formatQuantity,
   marketForCountry,
   sortedMarkets,
+  type CountrySnapshot,
+  type MarketSnapshot,
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { Badge, Button, DataRow, Disclosure, Divider, Headline, Notice, Panel } from "../components/ui";
-import { colors, radii, spacing, themedSheet, type } from "../theme";
+import { Badge, Button, Chip, DataRow, Disclosure, Divider, Headline, Notice, Panel } from "../components/ui";
+import { TOUCH_TARGET, colors, radii, spacing, themedSheet, type } from "../theme";
 import { provinceEconomyRows } from "@century/sim-worker";
 import { useMoney } from "../format/useMoney";
+import { GOOD_GROUPS, goodsByGroup, makersOf, matchesSearch } from "../format/goods";
+import { useSimulation } from "../worker/SimulationProvider";
+
+/** One market's goods: grouped, searchable; goods not traded there fold away (plan section 11.1). */
+function MarketGoods({
+  snapshot,
+  market,
+  country,
+  query,
+  groupKey,
+}: {
+  readonly snapshot: SimulationSnapshot;
+  readonly market: MarketSnapshot;
+  readonly country: CountrySnapshot | null;
+  readonly query: string;
+  readonly groupKey: string;
+}) {
+  const money = useMoney();
+  const [explained, setExplained] = useState<number | null>(null);
+  if (market.detail === "summary") {
+    return <Text style={styles.loading}>Loading prices for this market...</Text>;
+  }
+  const essential = new Set(essentialGoodIds(snapshot));
+  const rowByGood = new Map(market.prices.map((row) => [row.goodId, row]));
+  const groups = goodsByGroup(snapshot.goods).filter((group) => groupKey === "all" || group.key === groupKey);
+  const searching = query.trim().length > 0;
+  const shown = groups
+    .map((group) => ({ ...group, goods: group.goods.filter((good) => matchesSearch(good, query)) }))
+    .filter((group) => group.goods.length > 0);
+  if (shown.length === 0) return <Text style={styles.loading}>No good matches this search.</Text>;
+  return (
+    <View>
+      {shown.map((group) => {
+        const traded = group.goods.filter((good) => rowByGood.has(good.id));
+        const absent = group.goods.filter((good) => !rowByGood.has(good.id));
+        return (
+          <Disclosure
+            // Remounted when a search starts or ends, so matches open (initiallyOpen).
+            key={`${group.key}:${searching ? "search" : "browse"}:${groupKey}`}
+            title={`${group.label} · ${String(traded.length)} traded`}
+            initiallyOpen={searching || groupKey !== "all"}
+          >
+            {traded.map((good) => {
+              const row = rowByGood.get(good.id)!;
+              return (
+                <DataRow
+                  key={good.id}
+                  title={`${good.name}${essential.has(good.id) ? " · essential" : ""}`}
+                  value={money.price(row.priceRUSD)}
+                  valueTone="accent"
+                  note={`per ${good.unitLabel} · stock ${formatQuantity(row.stockQuantity)} · capacity/day ${formatQuantity(row.dailyProductionCapacity)}`}
+                />
+              );
+            })}
+            {absent.length === 0 ? null : (
+              <Disclosure
+                key={searching ? "search" : "browse"}
+                title={`${String(absent.length)} not traded here`}
+                initiallyOpen={searching}
+              >
+                {absent.map((good) => (
+                  <Pressable
+                    key={good.id}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${good.name}: what makes it`}
+                    onPress={() => setExplained(explained === good.id ? null : good.id)}
+                    style={styles.absentRow}
+                  >
+                    <Text style={styles.absentName}>{good.name}</Text>
+                    {explained === good.id ? (
+                      <Text style={styles.absentNote}>{makersOf(snapshot, country, good.id)}</Text>
+                    ) : null}
+                  </Pressable>
+                ))}
+              </Disclosure>
+            )}
+          </Disclosure>
+        );
+      })}
+    </View>
+  );
+}
 
 function marketKindLabel(kind: string): string {
   switch (kind) {
@@ -35,10 +120,12 @@ export function MarketsScreen({
   readonly countryId: number | null;
   readonly onShowOnMap?: (marketId: number) => void;
 }) {
-  const money = useMoney();
+  const { setMarketFocus } = useSimulation();
+  const [query, setQuery] = useState("");
+  const [groupKey, setGroupKey] = useState("all");
   const country = snapshot.countrySummaries.find((entry) => entry.id === countryId) ?? null;
+  const countryDetail = snapshot.countries.find((entry) => entry.id === countryId) ?? null;
   const homeMarket = marketForCountry(snapshot, country);
-  const essential = new Set(essentialGoodIds(snapshot));
   const countryById = new Map(snapshot.countrySummaries.map((entry) => [entry.id, entry]));
   const provinceById = new Map(provinceEconomyRows(snapshot).map((entry) => [entry.id, entry]));
   const currencyByCountry = new Map(
@@ -55,9 +142,27 @@ export function MarketsScreen({
         <Headline
           label="Home market"
           value={homeMarket.name}
-          detail={`${String(homeMarket.prices.length)} goods · ${String(homeMarket.memberCountryIds.length)} member ${homeMarket.memberCountryIds.length === 1 ? "country" : "countries"}`}
+          detail={`${String(homeMarket.prices.length)} of ${String(snapshot.goods.length)} goods traded · ${String(homeMarket.memberCountryIds.length)} member ${homeMarket.memberCountryIds.length === 1 ? "country" : "countries"}`}
         />
       )}
+      <View style={styles.searchWrap}>
+        <TextInput
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Search goods"
+          placeholderTextColor={colors.faint}
+          style={styles.search}
+          accessibilityLabel="Search goods"
+          autoCorrect={false}
+          autoCapitalize="none"
+        />
+      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+        <Chip label="All" active={groupKey === "all"} onPress={() => setGroupKey("all")} />
+        {GOOD_GROUPS.map((group) => (
+          <Chip key={group.key} label={group.label} active={groupKey === group.key} onPress={() => setGroupKey(group.key)} />
+        ))}
+      </ScrollView>
       <Panel
         title="Markets and prices"
         subtitle={`${country?.name ?? "No country selected"} · each market clears once per economic day. Prices are bounded daily adjustments, not equilibrium prices.`}
@@ -172,21 +277,18 @@ export function MarketsScreen({
               )}
 
               <Divider />
-              {market.prices.map((price) => (
-                <DataRow
-                  key={price.goodId}
-                  title={`${price.goodName}${essential.has(price.goodId) ? " · essential" : ""}`}
-                  value={money.price(price.priceRUSD)}
-                  valueTone="accent"
-                  note={`per ${price.unitLabel} · stock ${formatQuantity(price.stockQuantity)} · capacity/day ${formatQuantity(price.dailyProductionCapacity)}`}
-                />
-              ))}
+              <MarketGoods snapshot={snapshot} market={market} country={countryDetail} query={query} groupKey={groupKey} />
             </View>
           );
+          // Opening another market asks the worker for its prices (protocol 22).
           return isHome ? (
             card
           ) : (
-            <Disclosure key={market.id} title={`${market.name} · ${String(members.length)}`}>
+            <Disclosure
+              key={market.id}
+              title={`${market.name} · ${String(members.length)}`}
+              onToggle={(open) => setMarketFocus(open ? market.id : null)}
+            >
               {card}
             </Disclosure>
           );
@@ -232,4 +334,18 @@ const styles = themedSheet(() => ({
   provinceText: { ...type.tiny, lineHeight: 15 },
   marketActions: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.sm, flexWrap: "wrap" },
   actionHint: { ...type.tiny, flexShrink: 1 },
+  searchWrap: {
+    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.xs,
+    backgroundColor: colors.surface,
+  },
+  search: { ...type.body, minHeight: TOUCH_TARGET, color: colors.text },
+  chips: { gap: spacing.xs, paddingBottom: spacing.sm },
+  loading: { ...type.small, color: colors.muted, paddingVertical: spacing.sm },
+  absentRow: { minHeight: TOUCH_TARGET, justifyContent: "center", paddingVertical: 4 },
+  absentName: { ...type.body, color: colors.text },
+  absentNote: { ...type.tiny, lineHeight: 15, marginTop: 2 },
 }));

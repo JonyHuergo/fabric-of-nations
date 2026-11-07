@@ -85,6 +85,8 @@ export interface SimulationContextValue {
   readonly setFocus: (countryId: number) => void;
   /** P4: ask the worker to include one province's population pyramid in snapshots. */
   readonly setProvinceFocus: (provinceId: number | null) => void;
+  /** Protocol 22: the market whose prices the snapshots carry in full (null clears). */
+  readonly setMarketFocus: (marketId: number | null) => void;
   readonly start: () => void;
   readonly pause: () => void;
   readonly step: () => void;
@@ -228,6 +230,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
   const focusRequestRef = useRef<number | null>(null);
   /** P4: province whose pyramid the worker was last asked for. */
   const provinceFocusRef = useRef<number | null>(null);
+  const marketFocusRef = useRef<number | null>(null);
   const activePlayerCountryIdRef = useRef<number | null>(null);
   const pendingActionsRef = useRef(
     new Map<
@@ -497,6 +500,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             activePlayerCountryIdRef.current = event.snapshot.playerCountryId;
             focusRequestRef.current = null;
             provinceFocusRef.current = null;
+            marketFocusRef.current = null;
             // A successful load replaces the unreadable-save diagnosis.
             startupStorageErrorRef.current = null;
             setError(null);
@@ -554,6 +558,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
             pendingActionsRef.current.clear();
             focusRequestRef.current = null;
             provinceFocusRef.current = null;
+            marketFocusRef.current = null;
             activePlayerCountryIdRef.current = event.snapshot.playerCountryId;
             startupStorageErrorRef.current = null;
             // A new campaign saves to a slot of its own: no other save is at risk.
@@ -880,6 +885,20 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
     [nextCommandId, send],
   );
 
+  const setMarketFocus = useCallback(
+    (marketId: number | null) => {
+      if (marketFocusRef.current === marketId) return;
+      marketFocusRef.current = marketId;
+      send({
+        protocolVersion: PROTOCOL_VERSION,
+        type: "SET_MARKET_FOCUS",
+        commandId: nextCommandId("market-focus"),
+        marketId,
+      });
+    },
+    [nextCommandId, send],
+  );
+
   /** Return the campaign in play to its last save. */
   const loadGame = useCallback(() => {
     const slotId = activeSlotIdRef.current;
@@ -1123,6 +1142,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       createGame,
       setFocus,
       setProvinceFocus,
+      setMarketFocus,
       start,
       pause,
       step,
@@ -1156,6 +1176,7 @@ export function SimulationProvider({ children }: { readonly children: ReactNode 
       createGame,
       setFocus,
       setProvinceFocus,
+      setMarketFocus,
       start,
       pause,
       step,

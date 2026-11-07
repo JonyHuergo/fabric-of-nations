@@ -4,6 +4,7 @@ import { Text, TextInput, View } from "react-native";
 import {
   RUSD_UNIT_NAME,
   countryById,
+  formatQuantity,
   previewMonetaryPolicy,
   type SimulationSnapshot,
 } from "@century/sim-worker";
@@ -13,6 +14,7 @@ import { ActionButton, Disclosure, Headline, Notice, Pill, Section, StatRow } fr
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 import { useMoney } from "../format/useMoney";
+import { CurrencyChange } from "./CurrencyChange";
 
 function percent(value: number): string {
   return `${(value * 100).toFixed(2)}%`;
@@ -198,6 +200,32 @@ export function MoneyScreen({
       <Text style={styles.heading}>Currency and exchange rate</Text>
       {monetary.hasAuthority ? (
         <>
+          <StatRow
+            label="Standard"
+            value={
+              monetary.standard === "paper"
+                ? "paper"
+                : `${monetary.standard} · ${monetary.fineGramsPerUnit.toFixed(4)} g fine per unit`
+            }
+          />
+          {monetary.standard === "paper" ? null : (
+            <>
+              <StatRow
+                label="Mint's metal"
+                value={`${formatQuantity(monetary.metalReserveKg)} kg (${money.format(monetary.metalReserveValueRUSD)})`}
+              />
+              <StatRow
+                label="Mint price"
+                value={monetary.mintPriceRUSDPerKg === null ? "none" : `${money.format(monetary.mintPriceRUSDPerKg)} per kg`}
+              />
+              <Text style={styles.help}>
+                The unit is worth its {monetary.standard} content at the market price. The
+                mint buys {monetary.standard} offered below the mint price and sells it above
+                the export point while its cash and metal last; with no metal left it suspends
+                convertibility.
+              </Text>
+            </>
+          )}
           <StatRow label="Regime" value={monetary.regime} />
           <StatRow label="Status" value={monetary.active ? "established" : "not established"} />
           <StatRow label="Parity" value={rate(monetary.parityRusdPerUnit)} />
@@ -241,6 +269,7 @@ export function MoneyScreen({
               : "No authority has been established yet. Declare a parity and transfer reserves from the treasury to establish one."}
         </Notice>
       )}
+      {isPlayerCountry ? <CurrencyChange snapshot={snapshot} country={country} canAct={canAct} /> : null}
       <Notice title={`RUSD — ${RUSD_UNIT_NAME}`} tone="info">
         RUSD is Fabric of Nations' standard unit of economic measurement: one RUSD has
         the purchasing power of one US dollar of 1990. It allows currencies, prices,

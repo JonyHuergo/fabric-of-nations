@@ -202,10 +202,13 @@ export function Disclosure({
   title,
   children,
   initiallyOpen = false,
+  onToggle,
 }: {
   readonly title: string;
   readonly children: ReactNode;
   readonly initiallyOpen?: boolean;
+  /** Called with the new state when the user opens or closes it. */
+  readonly onToggle?: (open: boolean) => void;
 }) {
   const [open, setOpen] = useState(initiallyOpen);
   return (
@@ -213,7 +216,11 @@ export function Disclosure({
       <Pressable
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        onPress={() => setOpen((value) => !value)}
+        onPress={() => {
+          const next = !open;
+          setOpen(next);
+          onToggle?.(next);
+        }}
         style={styles.disclosureHead}
       >
         <Text style={styles.disclosureTitle}>{title}</Text>

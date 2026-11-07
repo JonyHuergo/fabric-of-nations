@@ -232,7 +232,7 @@ const protocol = readFileSync(join(ROOT, "packages/sim-worker/src/protocol.ts"),
 // valuation history in the snapshot; 20: P4 (D-142) demography in the snapshot and the
 // province focus command; 21: P5 (D-143) province ownership columns, harvest column and
 // province land (the m14 test pins the value).
-requireIncludes("worker protocol version", protocol, "PROTOCOL_VERSION = 21");
+requireIncludes("worker protocol version", protocol, "PROTOCOL_VERSION = 22");
 if (!existsSync(join(ROOT, "docs/archive/milestones/M14_RUSD_RENAMING_REPORT.md"))) {
   errors.push("the M14 renaming report is missing");
 }

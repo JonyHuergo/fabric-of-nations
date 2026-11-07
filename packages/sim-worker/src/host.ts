@@ -96,6 +96,8 @@ export class SimulationHost {
   private focusCountryId: number | null = null;
   /** P4 presentation-only focused province (its pyramid is included in snapshots). */
   private focusProvinceId: number | null = null;
+  /** Protocol 22: presentation-only market whose prices the snapshot carries. */
+  private focusMarketId: number | null = null;
   /**
    * D-139: the world is still exactly `createEconomyWorld(baseScenario, seed)` as
    * built at startup: never ticked, acted on, loaded or used for a campaign.
@@ -153,6 +155,7 @@ export class SimulationHost {
       achievedDaysPerSecond: this.achievedDaysPerSecond,
       focusCountryId: this.focusCountryId,
       focusProvinceId: this.focusProvinceId,
+      focusMarketId: this.focusMarketId,
       ...(this.scenario.countryMeta === undefined ? {} : { countryMeta: this.scenario.countryMeta }),
       ...(this.scenario.marketMeta === undefined ? {} : { marketMeta: this.scenario.marketMeta }),
       ...(this.scenario.territoryMeta === undefined ? {} : { territoryMeta: this.scenario.territoryMeta }),
@@ -232,6 +235,9 @@ export class SimulationHost {
         return;
       case "SET_PROVINCE_FOCUS":
         this.setProvinceFocus(command.commandId, command.provinceId);
+        return;
+      case "SET_MARKET_FOCUS":
+        this.setMarketFocus(command.commandId, command.marketId);
         return;
       case "CREATE_GAME":
         this.createGame(command.commandId, command.playerCountryId);
@@ -431,6 +437,19 @@ export class SimulationHost {
   }
 
   /**
+   * Protocol 22: presentation-only market focus. It never mutates simulation state; it
+   * only decides which other market's prices the snapshots carry in full.
+   */
+  private setMarketFocus(commandId: string, marketId: number | null): void {
+    if (marketId !== null && !this.world.markets.some((market) => market.id === marketId)) {
+      this.emitError(commandId, "invalid_focus", `market ${String(marketId)} is not registered`);
+      return;
+    }
+    this.focusMarketId = marketId;
+    this.emitSnapshot("SNAPSHOT", commandId);
+  }
+
+  /**
    * P4: presentation-only province focus. It never mutates simulation state; it only
    * decides which province's population pyramid the snapshots carry.
    */
@@ -498,6 +517,7 @@ export class SimulationHost {
     this.runner = createRollbackRunner(world, { worldJustValidated: true });
     this.focusCountryId = null;
     this.focusProvinceId = null;
+    this.focusMarketId = null;
     this.lastSnapshotMs = this.clock();
     this.emitEvent({
       protocolVersion: PROTOCOL_VERSION,

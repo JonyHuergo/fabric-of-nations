@@ -14,7 +14,7 @@
  * 21 (D-143): province ownership as columns (`provinceOwnership`), the harvest column
  * and the focused province's land section.
  */
-export const PROTOCOL_VERSION = 21 as const;
+export const PROTOCOL_VERSION = 22 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -330,6 +330,13 @@ export type WorkerCommand =
       readonly type: "SET_FOCUS";
       readonly commandId: string;
       readonly countryId: number;
+    }
+  | {
+      readonly protocolVersion: typeof PROTOCOL_VERSION;
+      readonly type: "SET_MARKET_FOCUS";
+      readonly commandId: string;
+      /** Protocol 22: the market whose prices the snapshot carries in full; null clears it. */
+      readonly marketId: number | null;
     }
   | {
       readonly protocolVersion: typeof PROTOCOL_VERSION;
@@ -1297,6 +1304,16 @@ export interface CountrySnapshot {
   /** E6b monetary authority, exchange-rate, and convertibility state. */
   readonly monetary: SnapshotMonetaryAuthority;
   /**
+   * P5b (plan §11.2): the country's known natural resources by kind: remaining stock of
+   * its discovered deposits and the amount extracted from them since 1900.
+   */
+  readonly resources: readonly {
+    readonly resource: string;
+    readonly unit: string;
+    readonly remaining: number;
+    readonly extracted: number;
+  }[];
+  /**
    * M10 armies and casualties for this country. `deaths` and `captured` are
    * cumulative (authoritative casualty records); `wounded` is the current roster
    * count, not a historical total.
@@ -1607,13 +1624,21 @@ export interface GoodSnapshot {
   readonly name: string;
   readonly unitLabel: string;
   readonly category: string;
+  /** P5b: catalogue heading (one of eight), or null for legacy definitions. */
+  readonly group: string | null;
+  /** P5b: false for electricity and services. */
+  readonly storable: boolean;
+  /** P5b: false for goods never shipped between markets. */
+  readonly tradeable: boolean;
 }
 
+/**
+ * Protocol 22 (plan §6): a compact price row. The good's key, name and unit are in
+ * `snapshot.goods`; a market in `full` detail lists only the goods present there (stock
+ * or production capacity), the others are "not traded here".
+ */
 export interface MarketPriceSnapshot {
   readonly goodId: number;
-  readonly goodKey: string;
-  readonly goodName: string;
-  readonly unitLabel: string;
   readonly priceRUSD: number;
   readonly stockQuantity: number;
   /** Estimated daily output capacity of buildings in this market, not demand. */
@@ -1630,6 +1655,11 @@ export interface MarketSnapshot {
   readonly provinceIds: readonly number[];
   /** Countries with at least one province in this market, ascending. */
   readonly memberCountryIds: readonly number[];
+  /**
+   * Protocol 22: `full` for the player's markets, the focus country's and the focused
+   * market (`SET_MARKET_FOCUS`); `summary` markets carry no prices.
+   */
+  readonly detail: "full" | "summary";
   readonly prices: readonly MarketPriceSnapshot[];
   /** E6a customs administration of this market, or null. */
   readonly customsCountryId: number | null;
@@ -2431,6 +2461,16 @@ export function parseWorkerCommand(value: unknown): WorkerCommand {
         commandId,
         countryId: requireInteger(record.countryId, "command.countryId", 0, 0xffff_ffff),
       };
+    case "SET_MARKET_FOCUS":
+      return {
+        protocolVersion: PROTOCOL_VERSION,
+        type,
+        commandId,
+        marketId:
+          record.marketId === null
+            ? null
+            : requireInteger(record.marketId, "command.marketId", 0, 0xffff_ffff),
+      };
     case "SET_PROVINCE_FOCUS":
       return {
         protocolVersion: PROTOCOL_VERSION,
@@ -3183,13 +3223,12 @@ function isMarketSnapshot(value: unknown): value is MarketSnapshot {
   if (!isString(value.label, 256)) return false;
   if (!isNumberArray(value.provinceIds)) return false;
   if (!Array.isArray(value.prices)) return false;
+  if (value.detail !== "full" && value.detail !== "summary") return false;
+  if (value.detail === "summary" && value.prices.length > 0) return false;
   return value.prices.every((price) => {
     if (!isRecord(price)) return false;
     return (
       isIntegerIn(price.goodId, 0, 0xffff_ffff) &&
-      isString(price.goodKey, 64) &&
-      isString(price.goodName, 256) &&
-      isString(price.unitLabel, 64) &&
       isFiniteNumber(price.priceRUSD) &&
       isFiniteNumber(price.stockQuantity) &&
       isFiniteNumber(price.dailyProductionCapacity) &&
