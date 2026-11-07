@@ -216,10 +216,14 @@
    "basis": "1900-wholesale"
   },
   "uranium": {
-   "rusdPerUnit": 26000,
-   "rowIds": [],
-   "formula": "provisional placeholder: 1990 utility price of uranium about $10/lb U3O8; transcription from the Statistical Abstract 1992 pending",
-   "status": "provisional",
+   "rusdPerUnit": 40816.7,
+   "rowIds": [
+    "price1990-uranium",
+    "kg-per-lb",
+    "u-kg-per-kg-u3o8"
+   ],
+   "formula": "1990 delivered price per lb U3O8 / 0.45359 kg / 0.848 kg U per kg U3O8, per t U",
+   "status": "sourced",
    "basis": "1990-producer"
   },
   "tin": {
@@ -389,16 +393,21 @@
    "basis": "defined-unit"
   },
   "motor-vehicles": {
-   "rusdPerUnit": 13000,
-   "rowIds": [],
-   "formula": "provisional placeholder: 1990 US factory wholesale value per vehicle; transcription pending",
-   "status": "provisional",
+   "rusdPerUnit": 11588.3,
+   "rowIds": [
+    "price1990-passenger-car"
+   ],
+   "formula": "1990 import unit value of new passenger cars (customs value; no factory value per vehicle in the abstract)",
+   "status": "secondary",
    "basis": "1990-producer"
   },
   "aircraft": {
-   "rusdPerUnit": 400000,
-   "rowIds": [],
-   "formula": "provisional placeholder: 1990 civil aircraft value per t of airframe; transcription pending",
+   "rusdPerUnit": 710653,
+   "rowIds": [
+    "price1990-large-transport",
+    "large-transport-empty-t"
+   ],
+   "formula": "1990 value per civil large transport / assumed mean empty weight 60 t (C-13: 1 aircraft-eq. = 1 t of airframe; the weight is provisional)",
    "status": "provisional",
    "basis": "1990-producer"
   },
@@ -424,37 +433,47 @@
    "basis": "defined-unit"
   },
   "appliances": {
-   "rusdPerUnit": 450,
-   "rowIds": [],
-   "formula": "provisional placeholder: 1990 producer value per major appliance; transcription pending",
+   "rusdPerUnit": 415.493,
+   "rowIds": [
+    "price1990-major-appliances"
+   ],
+   "formula": "1989 retail value per major appliance (eight appliances together); no producer value per unit in the abstract",
    "status": "provisional",
    "basis": "1990-producer"
   },
   "radios": {
-   "rusdPerUnit": 40,
-   "rowIds": [],
-   "formula": "provisional placeholder: 1990 factory value per radio; transcription pending",
+   "rusdPerUnit": 28.7265,
+   "rowIds": [
+    "price1990-radio"
+   ],
+   "formula": "1989 retail value per radio",
    "status": "provisional",
    "basis": "1990-producer"
   },
   "televisions": {
-   "rusdPerUnit": 300,
-   "rowIds": [],
-   "formula": "provisional placeholder: 1990 factory value per television; transcription pending",
-   "status": "provisional",
+   "rusdPerUnit": 311.62,
+   "rowIds": [
+    "price1990-color-tv"
+   ],
+   "formula": "1989 colour TV factory sales / units shipped",
+   "status": "secondary",
    "basis": "1990-producer"
   },
   "computers": {
-   "rusdPerUnit": 2500,
-   "rowIds": [],
-   "formula": "provisional placeholder: 1990 factory value per personal computer; transcription pending",
-   "status": "provisional",
+   "rusdPerUnit": 3317.52,
+   "rowIds": [
+    "price1990-personal-computer"
+   ],
+   "formula": "1990 personal computer factory revenue / unit shipments (end-user dollars)",
+   "status": "secondary",
    "basis": "1990-producer"
   },
   "mobile-phones": {
-   "rusdPerUnit": 600,
-   "rowIds": [],
-   "formula": "provisional placeholder: 1990 factory value per cellular phone; transcription pending",
+   "rusdPerUnit": 617.021,
+   "rowIds": [
+    "price1990-cellular-phone"
+   ],
+   "formula": "1989 retail value per cellular telephone",
    "status": "provisional",
    "basis": "1990-producer"
   },
@@ -769,9 +788,9 @@
    "status": "provisional"
   },
   "uranium-mine": {
-   "outputPerTU": 1.26792,
+   "outputPerTU": 0.807655,
    "vaPerLevelDayUS": 32965.8,
-   "netValuePerUnitRUSD": 26000,
+   "netValuePerUnitRUSD": 40816.7,
    "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
    "rowIds": [
     "labour-share-agriculture",
@@ -895,9 +914,9 @@
    "status": "provisional"
   },
   "nuclear-station": {
-   "outputPerTU": 256.252,
+   "outputPerTU": 256.983,
    "vaPerLevelDayUS": 40041.9,
-   "netValuePerUnitRUSD": 156.26,
+   "netValuePerUnitRUSD": 155.815,
    "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
    "rowIds": [
     "labour-share-agriculture",
@@ -1091,9 +1110,9 @@
    "status": "provisional"
   },
   "motor-works": {
-   "outputPerTU": 3.79369,
+   "outputPerTU": 4.38805,
    "vaPerLevelDayUS": 39538.6,
-   "netValuePerUnitRUSD": 10422.2,
+   "netValuePerUnitRUSD": 9010.5,
    "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
    "rowIds": [
     "labour-share-agriculture",
@@ -1105,9 +1124,9 @@
    "status": "provisional"
   },
   "aircraft-works": {
-   "outputPerTU": 0.102962,
+   "outputPerTU": 0.056088,
    "vaPerLevelDayUS": 38272.9,
-   "netValuePerUnitRUSD": 371719,
+   "netValuePerUnitRUSD": 682372,
    "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
    "rowIds": [
     "labour-share-agriculture",
@@ -1161,9 +1180,9 @@
    "status": "provisional"
   },
   "appliance-works": {
-   "outputPerTU": 120.506,
+   "outputPerTU": 134.67,
    "vaPerLevelDayUS": 39538.6,
-   "netValuePerUnitRUSD": 328.104,
+   "netValuePerUnitRUSD": 293.597,
    "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
    "rowIds": [
     "labour-share-agriculture",
@@ -1175,9 +1194,9 @@
    "status": "provisional"
   },
   "radio-works": {
-   "outputPerTU": 2597.38,
+   "outputPerTU": 8707.26,
    "vaPerLevelDayUS": 41729.5,
-   "netValuePerUnitRUSD": 16.066,
+   "netValuePerUnitRUSD": 4.79249,
    "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
    "rowIds": [
     "labour-share-agriculture",
@@ -1189,9 +1208,9 @@
    "status": "provisional"
   },
   "television-works": {
-   "outputPerTU": 178.713,
+   "outputPerTU": 170.241,
    "vaPerLevelDayUS": 41729.5,
-   "netValuePerUnitRUSD": 233.5,
+   "netValuePerUnitRUSD": 245.12,
    "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
    "rowIds": [
     "labour-share-agriculture",
@@ -1203,9 +1222,9 @@
    "status": "provisional"
   },
   "computer-works": {
-   "outputPerTU": 21.1471,
+   "outputPerTU": 14.7701,
    "vaPerLevelDayUS": 40041.9,
-   "netValuePerUnitRUSD": 1893.5,
+   "netValuePerUnitRUSD": 2711.02,
    "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
    "rowIds": [
     "labour-share-agriculture",
@@ -1217,9 +1236,9 @@
    "status": "provisional"
   },
   "phone-works": {
-   "outputPerTU": 89.0335,
+   "outputPerTU": 85.7868,
    "vaPerLevelDayUS": 40041.9,
-   "netValuePerUnitRUSD": 449.74,
+   "netValuePerUnitRUSD": 466.761,
    "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
    "rowIds": [
     "labour-share-agriculture",

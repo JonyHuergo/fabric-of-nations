@@ -165,8 +165,10 @@ describe("M14 monetary equivalence and determinism", () => {
   // Re-pinned for D-140 (D-149), by design: 23 metal-standard authorities with their
   // 1900 metal reserves, circulation and treasury-funded mint cash; gold and silver open
   // at their reference price in every market; gold and silver mines sized by the mints.
+  // Re-pinned for the 1990 reference prices of later goods (Statistical Abstract 1992,
+  // D-148 transcriptions): their opening market prices change; no 1900 producer.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("80d03b72d5728848");
+    expect(hashWorld(world)).toBe("5ab72a0a3534f480");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {

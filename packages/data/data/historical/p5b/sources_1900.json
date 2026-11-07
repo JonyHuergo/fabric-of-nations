@@ -91,6 +91,15 @@
    "accessDate": "2026-11-07",
    "license": "Public domain (U.S. government work, 1901)",
    "notes": "Book pp. 42-43 (PDF 48-49). US dollars. Read from the page images; every column sums to the printed total (uncovered paper 3,033.46 against 3,033.4 printed, the US entry carrying an extra digit)."
+  },
+  {
+   "id": "statab-1992",
+   "title": "Statistical Abstract of the United States 1992 (112th edition)",
+   "author": "U.S. Bureau of the Census",
+   "url": "https://webarchive.library.unt.edu/eot2008/20090103191340/http:/www.census.gov/prod/www/abs/statab1951-1994.htm",
+   "accessDate": "2026-11-07",
+   "license": "Public domain (U.S. government work)",
+   "notes": "Read from the page images of the archived scans; the tables cite EIA, Dataquest, the Electronic Industries Association, Dealerscope Merchandising, MVMA and the International Trade Administration."
   }
  ],
  "units": [
@@ -217,6 +226,22 @@
    "status": "provisional",
    "sourceId": "p5b-provisional",
    "note": "About 57 g per egg in shell."
+  },
+  {
+   "id": "u-kg-per-kg-u3o8",
+   "value": 0.848,
+   "unit": "kg U per kg U3O8",
+   "status": "derived",
+   "sourceId": "p5b-provisional",
+   "note": "Uranium share of U3O8 by mass (3 x 238.03 / 842.08)."
+  },
+  {
+   "id": "large-transport-empty-t",
+   "value": 60,
+   "unit": "t empty airframe per large transport",
+   "status": "provisional",
+   "sourceId": "p5b-provisional",
+   "note": "Assumed mean empty weight of the 1990 US large-transport deliveries (Boeing 737/757/767/747, MD-80/MD-11 mix); engineering estimate, provisional (C-13 unit)."
   }
  ],
  "prices1900": [
@@ -2222,5 +2247,93 @@
     0
    ]
   ]
- }
+ },
+ "prices1990": [
+  {
+   "id": "price1990-uranium",
+   "goodKey": "uranium",
+   "sourceId": "statab-1992",
+   "locator": "p. 578, table 945 (EIA, Uranium Industry Annual): uranium concentrate, delivered price, 1990",
+   "unit": "USD per lb U3O8",
+   "valueUSD": 15.7,
+   "quantity": 1,
+   "status": "sourced"
+  },
+  {
+   "id": "price1990-personal-computer",
+   "goodKey": "computers",
+   "sourceId": "statab-1992",
+   "locator": "p. 754, table 1273 (Dataquest): personal computer factory revenue and unit shipments, 1990",
+   "unit": "USD per computer",
+   "valueUSD": 22024000000,
+   "quantity": 6638700,
+   "status": "secondary",
+   "note": "Revenue in if-sold end-user dollars."
+  },
+  {
+   "id": "price1990-color-tv",
+   "goodKey": "televisions",
+   "sourceId": "statab-1992",
+   "locator": "p. 756, table 1278 (EIA): colour TV receivers factory sales 1989; table 1279 (Dealerscope): colour TV shipments 1989",
+   "unit": "USD per receiver",
+   "valueUSD": 6530000000,
+   "quantity": 20955000,
+   "status": "secondary",
+   "note": "1989, the latest year with both value and units; used for 1990."
+  },
+  {
+   "id": "price1990-radio",
+   "goodKey": "radios",
+   "sourceId": "statab-1992",
+   "locator": "p. 756, table 1279 (Dealerscope): radios, shipments and retail value, 1989",
+   "unit": "USD per radio",
+   "valueUSD": 815000000,
+   "quantity": 28371000,
+   "status": "provisional",
+   "note": "Retail value (median price x units), 1989; no factory value per unit in the abstract."
+  },
+  {
+   "id": "price1990-cellular-phone",
+   "goodKey": "mobile-phones",
+   "sourceId": "statab-1992",
+   "locator": "p. 756, table 1279 (Dealerscope): cellular telephones, shipments and retail value, 1989",
+   "unit": "USD per telephone",
+   "valueUSD": 667000000,
+   "quantity": 1081000,
+   "status": "provisional",
+   "note": "Retail value, 1989."
+  },
+  {
+   "id": "price1990-major-appliances",
+   "goodKey": "appliances",
+   "sourceId": "statab-1992",
+   "locator": "p. 756, table 1279 (Dealerscope): major appliances (air conditioners, refrigerators, microwave ovens, electric and gas ranges, freezers, dryers, washers), shipments and retail value, 1989",
+   "unit": "USD per appliance",
+   "valueUSD": 16225000000,
+   "quantity": 39050000,
+   "status": "provisional",
+   "note": "Retail value, 1989; the eight major appliances together."
+  },
+  {
+   "id": "price1990-passenger-car",
+   "goodKey": "motor-vehicles",
+   "sourceId": "statab-1992",
+   "locator": "p. 605, table 1000: import value and number of new passenger cars imported, 1990",
+   "unit": "USD per car",
+   "valueUSD": 45716000000,
+   "quantity": 3945000,
+   "status": "secondary",
+   "note": "Customs (import) unit value; no factory value per vehicle in the table."
+  },
+  {
+   "id": "price1990-large-transport",
+   "goodKey": "aircraft",
+   "sourceId": "statab-1992",
+   "locator": "p. 630, table 1049 (International Trade Administration): civil large transports, units and value of shipments, 1990",
+   "unit": "USD per aircraft",
+   "valueUSD": 22215000000,
+   "quantity": 521,
+   "status": "sourced"
+  }
+ ]
 }

@@ -1928,7 +1928,7 @@
   "outputs": [
    {
     "goodId": 23,
-    "quantityPerThroughputUnit": 1.26792
+    "quantityPerThroughputUnit": 0.807655
    }
   ],
   "jobs": [
@@ -2469,13 +2469,13 @@
   "inputs": [
    {
     "goodId": 23,
-    "quantityPerThroughputUnit": 0.00768756
+    "quantityPerThroughputUnit": 0.00770949
    }
   ],
   "outputs": [
    {
     "goodId": 30,
-    "quantityPerThroughputUnit": 256.252
+    "quantityPerThroughputUnit": 256.983
    }
   ],
   "jobs": [
@@ -3408,29 +3408,29 @@
   "inputs": [
    {
     "goodId": 5,
-    "quantityPerThroughputUnit": 37.9369
+    "quantityPerThroughputUnit": 43.8805
    },
    {
     "goodId": 13,
-    "quantityPerThroughputUnit": 189.684
+    "quantityPerThroughputUnit": 219.403
    },
    {
     "goodId": 31,
-    "quantityPerThroughputUnit": 3.79369
+    "quantityPerThroughputUnit": 4.38805
    },
    {
     "goodId": 37,
-    "quantityPerThroughputUnit": 0.113811
+    "quantityPerThroughputUnit": 0.131642
    },
    {
     "goodId": 38,
-    "quantityPerThroughputUnit": 0.379369
+    "quantityPerThroughputUnit": 0.438805
    }
   ],
   "outputs": [
    {
     "goodId": 41,
-    "quantityPerThroughputUnit": 3.79369
+    "quantityPerThroughputUnit": 4.38805
    }
   ],
   "jobs": [
@@ -3475,21 +3475,21 @@
   "inputs": [
    {
     "goodId": 33,
-    "quantityPerThroughputUnit": 0.0720733
+    "quantityPerThroughputUnit": 0.0392616
    },
    {
     "goodId": 38,
-    "quantityPerThroughputUnit": 0.0308886
+    "quantityPerThroughputUnit": 0.0168264
    },
    {
     "goodId": 40,
-    "quantityPerThroughputUnit": 2059.24
+    "quantityPerThroughputUnit": 1121.76
    }
   ],
   "outputs": [
    {
     "goodId": 42,
-    "quantityPerThroughputUnit": 0.102962
+    "quantityPerThroughputUnit": 0.056088
    }
   ],
   "jobs": [
@@ -3747,21 +3747,21 @@
   "inputs": [
    {
     "goodId": 31,
-    "quantityPerThroughputUnit": 7.23038
+    "quantityPerThroughputUnit": 8.08018
    },
    {
     "goodId": 36,
-    "quantityPerThroughputUnit": 1.20506
+    "quantityPerThroughputUnit": 1.3467
    },
    {
     "goodId": 39,
-    "quantityPerThroughputUnit": 1.20506
+    "quantityPerThroughputUnit": 1.3467
    }
   ],
   "outputs": [
    {
     "goodId": 46,
-    "quantityPerThroughputUnit": 120.506
+    "quantityPerThroughputUnit": 134.67
    }
   ],
   "jobs": [
@@ -3815,17 +3815,17 @@
   "inputs": [
    {
     "goodId": 36,
-    "quantityPerThroughputUnit": 2.59738
+    "quantityPerThroughputUnit": 8.70726
    },
    {
     "goodId": 39,
-    "quantityPerThroughputUnit": 7.79214
+    "quantityPerThroughputUnit": 26.1218
    }
   ],
   "outputs": [
    {
     "goodId": 47,
-    "quantityPerThroughputUnit": 2597.38
+    "quantityPerThroughputUnit": 8707.26
    }
   ],
   "jobs": [
@@ -3879,17 +3879,17 @@
   "inputs": [
    {
     "goodId": 36,
-    "quantityPerThroughputUnit": 0.893565
+    "quantityPerThroughputUnit": 0.851205
    },
    {
     "goodId": 40,
-    "quantityPerThroughputUnit": 10722.8
+    "quantityPerThroughputUnit": 10214.5
    }
   ],
   "outputs": [
    {
     "goodId": 48,
-    "quantityPerThroughputUnit": 178.713
+    "quantityPerThroughputUnit": 170.241
    }
   ],
   "jobs": [
@@ -3943,17 +3943,17 @@
   "inputs": [
    {
     "goodId": 36,
-    "quantityPerThroughputUnit": 0.105735
+    "quantityPerThroughputUnit": 0.0738503
    },
    {
     "goodId": 40,
-    "quantityPerThroughputUnit": 12688.2
+    "quantityPerThroughputUnit": 8862.04
    }
   ],
   "outputs": [
    {
     "goodId": 49,
-    "quantityPerThroughputUnit": 21.1471
+    "quantityPerThroughputUnit": 14.7701
    }
   ],
   "jobs": [
@@ -4011,17 +4011,17 @@
   "inputs": [
    {
     "goodId": 36,
-    "quantityPerThroughputUnit": 0.0178067
+    "quantityPerThroughputUnit": 0.0171574
    },
    {
     "goodId": 40,
-    "quantityPerThroughputUnit": 13355
+    "quantityPerThroughputUnit": 12868
    }
   ],
   "outputs": [
    {
     "goodId": 50,
-    "quantityPerThroughputUnit": 89.0335
+    "quantityPerThroughputUnit": 85.7868
    }
   ],
   "jobs": [

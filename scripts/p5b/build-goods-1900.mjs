@@ -166,6 +166,12 @@ function build() {
     if (row === undefined) throw new Error(`unknown price row ${id}`);
     return row.valueUSD !== undefined ? row.valueUSD / row.quantity : row.value;
   };
+  /** A 1990 producer price row (Statistical Abstract 1992): USD of 1990 = RUSD per unit. */
+  const price1990 = (id) => {
+    const row = (src.prices1990 ?? []).find((entry) => entry.id === id);
+    if (row === undefined) throw new Error(`unknown 1990 price row ${id}`);
+    return { value: row.valueUSD / row.quantity, status: row.status };
+  };
   const ds = (sheet, year, column) => {
     const table = ds140.tables.find((entry) => entry.sheet === sheet);
     const value = table?.values?.[String(year)]?.[column];
@@ -227,7 +233,8 @@ function build() {
     bauxite: () => usd1900("bauxite", priceRow("price-bauxite-us"), ["price-bauxite-us"], "DS-140 1900 unit value"),
     nitrates: () => usd1900("nitrates", priceRow("price-nitrate-liverpool") / (unit("kg-per-short-ton") / 1000), ["price-nitrate-liverpool", "kg-per-short-ton"],
       "price of 2,000 lb nitrogen in nitrate at Liverpool per metric ton N"),
-    uranium: () => rusd1990("uranium", 26000, [], "provisional placeholder: 1990 utility price of uranium about $10/lb U3O8; transcription from the Statistical Abstract 1992 pending", "provisional"),
+    uranium: () => rusd1990("uranium", (price1990("price1990-uranium").value / unit("kg-per-lb") / unit("u-kg-per-kg-u3o8")) * 1000,
+      ["price1990-uranium", "kg-per-lb", "u-kg-per-kg-u3o8"], "1990 delivered price per lb U3O8 / 0.45359 kg / 0.848 kg U per kg U3O8, per t U", "sourced"),
     tin: () => usd1900("tin", perLbToPerT(priceRow("price-tin-pig")), ["price-tin-pig", "kg-per-lb"], "tin bars and pigs per t"),
     gold: () => usd1900("gold", priceRow("price-gold-mint") * (1000 / unit("g-per-troy-ounce")), ["price-gold-mint", "g-per-troy-ounce"], "statutory mint price per fine kg"),
     silver: () => usd1900("silver", priceRow("price-silver-commercial") * (1000 / unit("g-per-troy-ounce")), ["price-silver-commercial", "g-per-troy-ounce"], "commercial value per kg"),
@@ -254,17 +261,20 @@ function build() {
     "electrical-equipment": () => usd1900("electrical-equipment", (0.4 * copperUsdPerT + 0.7 * steelUsdPerT) / 0.35, ["price-copper-ingot", "price-steel-billets-ds140", "kg-per-lb"],
       "0.4 t copper + 0.7 t steel per t at 35 % materials share (provisional)", "provisional"),
     "electronic-components": () => defined("electronic-components", 1, "1 unit = 1 RUSD of 1990 components at producer prices"),
-    "motor-vehicles": () => rusd1990("motor-vehicles", 13000, [], "provisional placeholder: 1990 US factory wholesale value per vehicle; transcription pending", "provisional"),
-    aircraft: () => rusd1990("aircraft", 400000, [], "provisional placeholder: 1990 civil aircraft value per t of airframe; transcription pending", "provisional"),
+    "motor-vehicles": () => rusd1990("motor-vehicles", price1990("price1990-passenger-car").value, ["price1990-passenger-car"],
+      "1990 import unit value of new passenger cars (customs value; no factory value per vehicle in the abstract)", "secondary"),
+    aircraft: () => rusd1990("aircraft", price1990("price1990-large-transport").value / unit("large-transport-empty-t"), ["price1990-large-transport", "large-transport-empty-t"],
+      "1990 value per civil large transport / assumed mean empty weight 60 t (C-13: 1 aircraft-eq. = 1 t of airframe; the weight is provisional)", "provisional"),
     ships: () => usd1900("ships", 38.9, [], "about GBP 8 per gross ton for a 1900 cargo steamer (secondary; provisional)", "provisional"),
     armaments: () => defined("armaments", moneyCoefficientValue(moneyCoefficients, "equipmentPriceRUSD"),
       "the 1900 world's M10 equipment price (historical/p2b/money_coefficients_1900.json), so a later procurement step and the good agree (D-146 A2; no 1900 production)"),
     "household-goods": () => defined("household-goods", rusdPerUsd1900, "1 unit = 1 US dollar of 1900 furniture and housewares at wholesale"),
-    appliances: () => rusd1990("appliances", 450, [], "provisional placeholder: 1990 producer value per major appliance; transcription pending", "provisional"),
-    radios: () => rusd1990("radios", 40, [], "provisional placeholder: 1990 factory value per radio; transcription pending", "provisional"),
-    televisions: () => rusd1990("televisions", 300, [], "provisional placeholder: 1990 factory value per television; transcription pending", "provisional"),
-    computers: () => rusd1990("computers", 2500, [], "provisional placeholder: 1990 factory value per personal computer; transcription pending", "provisional"),
-    "mobile-phones": () => rusd1990("mobile-phones", 600, [], "provisional placeholder: 1990 factory value per cellular phone; transcription pending", "provisional"),
+    appliances: () => rusd1990("appliances", price1990("price1990-major-appliances").value, ["price1990-major-appliances"],
+      "1989 retail value per major appliance (eight appliances together); no producer value per unit in the abstract", "provisional"),
+    radios: () => rusd1990("radios", price1990("price1990-radio").value, ["price1990-radio"], "1989 retail value per radio", "provisional"),
+    televisions: () => rusd1990("televisions", price1990("price1990-color-tv").value, ["price1990-color-tv"], "1989 colour TV factory sales / units shipped", "secondary"),
+    computers: () => rusd1990("computers", price1990("price1990-personal-computer").value, ["price1990-personal-computer"], "1990 personal computer factory revenue / unit shipments (end-user dollars)", "secondary"),
+    "mobile-phones": () => rusd1990("mobile-phones", price1990("price1990-cellular-phone").value, ["price1990-cellular-phone"], "1989 retail value per cellular telephone", "provisional"),
     pharmaceuticals: () => defined("pharmaceuticals", rusdPerUsd1900 / 100, "1 dose-eq = 1 US cent of 1900 drugs at wholesale"),
   };
   for (const key of ["commerce", "transport-services", "communication", "finance-services", "personal-services"]) {
@@ -839,7 +849,7 @@ if (CHECK) {
 /** docs/P5B_GOODS_PROVENANCE.md: every good's reference price with its rows (generated). */
 function goodsProvenance(goods, calibration, sources) {
   const rowCitation = new Map();
-  for (const row of [...sources.prices1900, ...sources.units]) rowCitation.set(row.id, `${row.sourceId ?? ""}${row.locator ? `, ${row.locator}` : ""}`);
+  for (const row of [...sources.prices1900, ...(sources.prices1990 ?? []), ...sources.units]) rowCitation.set(row.id, `${row.sourceId ?? ""}${row.locator ? `, ${row.locator}` : ""}`);
   const sourceTitle = new Map(sources.sources.map((source) => [source.id, `${source.title}${source.licence ?? source.license ? ` (${source.licence ?? source.license})` : ""}`]));
   const lines = [];
   lines.push("# P5b goods provenance");

@@ -1,7 +1,7 @@
 {
  "generator": "scripts/p5b/build-goods-1900.mjs",
  "inputs": {
-  "sources": "0c1d9db72bd2d2b78f700a2a49ffda1efd34b27970c198e95ee0487d8830351d",
+  "sources": "5d4606c2542952072dc9a65b30a4961cb9dbbe760b8fdedeb0e6c90f21d6fea3",
   "ds140": "83d931ecfb07b417b80e1c0391580d285e9df70ee9d22a5c43e042f458216e2d",
   "p2bSources": "3f8f0205a661cbf08d72e0629bbdec080255d753d269d70079adabb43bb6d937",
   "p2bCalibration": "5905a508c60c03359120f6a57311739d2d79abf6c90c9bcbc39f2f5cc97f0f0e",
@@ -28,10 +28,10 @@
   "p3Currencies": "d4a02309b7ef9f597bb6322504bab66c8d1e34d2ff6e6bfab740eba05aaddfeb"
  },
  "outputs": {
-  "goods_1900.json": "98a7fe398a3346452ba4549a8e1d1dc92e41bdab2677cba2e1b65430a074e0ef",
-  "buildings_definitions_1900.json": "c4989243230d49854cbb8c17b6110d9ef1f1c33135ac73907bf7247a5c7067ad",
+  "goods_1900.json": "3c56a10e5e29e652a882ad93a5db81bbce3b3b5fe96f85d15c9fecf0ca6ceca6",
+  "buildings_definitions_1900.json": "af425950b85a1f654e8d7728e9e9c9e555115670c1a1ad6988d17c70c381c0fb",
   "needs_1900.json": "6db641c93294141ac0b48eecf97e31efba3fcfff31d0045cba400a2ea52cfdb9",
-  "calibration_1900.json": "f1913b311a5dfb3fb351c05623e62eb777d9c0b6cb8c1d09ced5bc18e8c8c342",
+  "calibration_1900.json": "bf5794337d599489a0687ae5f5161ac036ef79443b6ccf583615f933dd46a668",
   "provinces_1900.json": "95ff72e4e49989904dd9b8a459d365b0a6d0b25d9ec8305486a4cd8d6917c11b",
   "countries_1900.json": "94b8c61d97031c97db702be1e827dcc02ad75736c001c513226a1452fd45a43b",
   "buildings_1900.json": "d4f90befb0940751aa3034a2565e8df8b8a6f473a44d301e2d63655abe4f74eb",

@@ -8728,6 +8728,17 @@ C-9, C-19, C-22.
 - Open for the designer: route capacity and freight funding with about 45 traded goods;
   fertiliser calibration; the residual cap leaving Japanese, Spanish and Portuguese
   households short of services; coverage below the plan's estimate.
+- Transcribed after this step (2026-11-07): 1990 reference prices of later goods from the
+  Statistical Abstract of the United States 1992 (`sources_1900.json` `prices1990`, read from
+  the page images): uranium $15.70/lb U3O8 delivered (table 945, EIA) = 40,817 RUSD per t U;
+  personal computer $3,318 (table 1273, Dataquest, 1990); colour television $312 (1989 EIA
+  factory sales / units, tables 1278-1279); radio $28.7, cellular telephone $617 and a major
+  appliance $415 (1989 retail value per unit, table 1279; provisional, no producer value per
+  unit); passenger car $11,588 (1990 import unit value, table 1000); aircraft 710,653 RUSD
+  per t (1990 civil large transports $42.6 M each, table 1049, over an assumed 60 t mean
+  empty weight, provisional). Plastics resins and the other placeholders (naphtha and
+  residuum, 1902 electricity, export-table crops, cotton by country, hydro potential) remain
+  provisional.
 - Also in this step: `docs/P5B_GOODS_PROVENANCE.md` (generated: every reference price with
   its rows and status, sources and placement basis); the Director of the Mint's 1901 table
   of monetary stocks transcribed into `sources_1900.json` `monetaryStocks1901` for D-140
