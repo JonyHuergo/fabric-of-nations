@@ -366,11 +366,19 @@ export class SimulationHost {
       dayIndex: this.world.dayIndex,
       source: "player",
     } as CountryAction;
-    const validation = validateCountryAction(
+    let validation = validateCountryAction(
       this.world,
       command,
       this.scenario.definitions,
     );
+    // D-150: only an independent country may establish its own currency (country
+    // status is scenario metadata, which the simulation does not hold).
+    if (action.kind === "establish-currency") {
+      const status = this.scenario.countryMeta?.find((meta) => meta.countryId === action.countryId)?.status;
+      if (status !== undefined && status !== "independent") {
+        validation = { valid: false, errors: [...validation.errors, `only an independent country can establish a currency (status: ${status})`] };
+      }
+    }
     if (!validation.valid) {
       this.emitEvent({
         protocolVersion: PROTOCOL_VERSION,

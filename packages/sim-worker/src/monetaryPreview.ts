@@ -116,3 +116,73 @@ export function previewMonetaryPolicy(
     notes,
   };
 }
+
+/** D-140 / D-150: what adopting another currency will do (an estimate from the snapshot). */
+export interface AdoptCurrencyPreview {
+  readonly valid: boolean;
+  readonly errors: readonly string[];
+  /** Circulation redeemed at the current valuation, RUSD. */
+  readonly redeemedRUSD: number;
+  /** The authority's reserve cash returned to the treasury now, RUSD. */
+  readonly reserveCashToTreasuryRUSD: number;
+  /** Metal the closed authority will sell off in its home market, kg fine. */
+  readonly metalToSellKg: number;
+  readonly notes: readonly string[];
+}
+
+export function previewAdoptCurrency(
+  snapshot: SimulationSnapshot,
+  country: CountrySnapshot,
+  currencyId: number,
+): AdoptCurrencyPreview {
+  const errors: string[] = [];
+  const state: SnapshotMonetaryAuthority = country.monetary;
+  if (snapshot.playerCountryId !== country.id) errors.push("Only the player-controlled country may change its currency.");
+  if (country.monetaryArrangement !== "own") errors.push("This country already uses another country's currency.");
+  if (currencyId === country.currencyId) errors.push("Choose a currency other than your own.");
+  const notes = [
+    "Your currency leaves use: its circulation is redeemed at today's value.",
+    "The reserve's cash returns to the treasury at once.",
+  ];
+  if (state.metalReserveKg > 0) notes.push("The reserve's metal is sold in your home market over the following weeks; the proceeds go to the treasury.");
+  return {
+    valid: errors.length === 0,
+    errors,
+    redeemedRUSD: state.active ? state.liabilityRUSD : 0,
+    reserveCashToTreasuryRUSD: state.reserveCashRUSD,
+    metalToSellKg: state.metalReserveKg,
+    notes,
+  };
+}
+
+/** D-140 / D-150: what establishing an own currency will do (an estimate). */
+export interface EstablishCurrencyPreview {
+  readonly valid: boolean;
+  readonly errors: readonly string[];
+  /** The new unit's value, RUSD per unit: the value of the currency in use. */
+  readonly valuationRusdPerUnit: number | null;
+  readonly treasuryAfterRUSD: number;
+  readonly notes: readonly string[];
+}
+
+export function previewEstablishCurrency(
+  snapshot: SimulationSnapshot,
+  country: CountrySnapshot,
+  proposed: { readonly standard: "gold" | "silver" | "paper"; readonly reserveFundingRUSD: number },
+): EstablishCurrencyPreview {
+  const errors: string[] = [];
+  if (snapshot.playerCountryId !== country.id) errors.push("Only the player-controlled country may change its currency.");
+  if (country.monetaryArrangement !== "adopted") errors.push("This country already issues its own currency.");
+  if (!finite(proposed.reserveFundingRUSD) || proposed.reserveFundingRUSD < 0) errors.push("The reserve funding must be zero or more.");
+  else if (proposed.reserveFundingRUSD > country.treasuryCashRUSD) errors.push("The reserve funding exceeds the treasury's cash.");
+  const valuation = snapshot.currencies?.find((currency) => currency.id === country.currencyId)?.rusdPerUnit ?? null;
+  const notes = ["The new unit starts at the value of the currency you use now; nothing circulates at first."];
+  if (proposed.standard !== "paper") notes.push(`Its ${proposed.standard} content is set from today's ${proposed.standard} price; it becomes convertible once the mint holds ${proposed.standard}.`);
+  return {
+    valid: errors.length === 0,
+    errors,
+    valuationRusdPerUnit: valuation,
+    treasuryAfterRUSD: Math.max(0, country.treasuryCashRUSD - (finite(proposed.reserveFundingRUSD) ? proposed.reserveFundingRUSD : 0)),
+    notes,
+  };
+}

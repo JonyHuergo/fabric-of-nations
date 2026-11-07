@@ -53,6 +53,7 @@ import type {
 } from "./types.js";
 import { MONETARY_REGIMES } from "./types.js";
 import { runMintWindow, type MintFlow } from "./mint.js";
+import { runDemonetisation } from "./currencyActions.js";
 export {
   assertValidMonetaryState,
   assertValidPriceIndexState,
@@ -490,6 +491,11 @@ export function runMonetaryPhase(
   for (const record of [...world.monetary.currencies].sort(
     (left, right) => left.currencyId - right.currencyId,
   )) {
+    // D-150: a closed authority sells off the metal it still holds.
+    if (!record.active && record.standard !== "paper") {
+      runDemonetisation(world, economyDefinitions, record, entries, dealerSpent);
+      continue;
+    }
     if (!record.active || record.issuerCountryId === null) continue;
     const country = world.countries.find((candidate) => candidate.id === record.issuerCountryId);
     if (country === undefined) continue;

@@ -68,6 +68,17 @@ export {
   type MonetaryPolicyInput,
   type MonetaryPolicyResult,
 } from "./monetary.js";
+/** D-140 / D-150: adopting and establishing currencies (player actions). */
+export {
+  adoptCurrencyEffect,
+  applyAdoptCurrency,
+  applyEstablishCurrency,
+  validateAdoptCurrency,
+  validateEstablishCurrency,
+  type AdoptCurrencyEffect,
+  type AdoptCurrencyInput,
+  type EstablishCurrencyInput,
+} from "./currencyActions.js";
 /** D-140 / D-149: the mint window of metal-standard currencies. */
 export {
   homeMetalPrice,

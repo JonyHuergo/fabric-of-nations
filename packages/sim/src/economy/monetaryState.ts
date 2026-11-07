@@ -282,7 +282,11 @@ export function assertValidMonetaryState(world: World, path = "world.monetary"):
         throw new RangeError(`${entryPath} paper currency carries metal state`);
       }
     } else {
-      if (!record.active) throw new RangeError(`${entryPath} a metal standard requires an active authority`);
+      // D-150: a closed authority may still hold metal it is selling off (after an
+      // adoption): nothing circulates and it is not convertible.
+      if (!record.active && (record.currencyIssuedUnits !== 0 || record.convertible)) {
+        throw new RangeError(`${entryPath} a closed metal authority must have no circulation and no convertibility`);
+      }
       if (!(record.fineGramsPerUnit > 0)) throw new RangeError(`${entryPath}.fineGramsPerUnit must be positive`);
       const account = record.metalReserveAccountId === null ? undefined : accountsById.get(record.metalReserveAccountId);
       if (account === undefined || account.subtype !== "monetary-metal-reserve" || account.ownerKind !== "country" || account.ownerId !== record.issuerCountryId) {

@@ -250,6 +250,22 @@ export interface SetMonetaryPolicyActionDto {
   readonly currencyConversionRUSD: number;
 }
 
+/** D-140 / D-150: give up the country's own currency for another registered currency. */
+export interface AdoptCurrencyActionDto {
+  readonly kind: "adopt-currency";
+  readonly countryId: number;
+  readonly currencyId: number;
+}
+
+/** D-140 / D-150: an independent country using another's currency creates its own. */
+export interface EstablishCurrencyActionDto {
+  readonly kind: "establish-currency";
+  readonly countryId: number;
+  readonly standard: "gold" | "silver" | "paper";
+  readonly name: string | null;
+  readonly reserveFundingRUSD: number;
+}
+
 /** Every action the player UI may request. */
 export type CountryActionDto =
   | FiscalPolicyActionDto
@@ -273,6 +289,8 @@ export type CountryActionDto =
   | SetHealthStaffShareActionDto
   | SetTradePolicyActionDto
   | SetMonetaryPolicyActionDto
+  | AdoptCurrencyActionDto
+  | EstablishCurrencyActionDto
   | DeclareWarActionDto
   | OfferPeaceActionDto
   | AcceptPeaceActionDto
@@ -2204,6 +2222,31 @@ function parseAction(value: unknown): CountryActionDto {
       importQuotaQuantity,
       exportRestricted,
     };
+  }
+  if (kind === "adopt-currency") {
+    return {
+      kind: "adopt-currency",
+      countryId,
+      currencyId: requireInteger(record.currencyId, "command.action.currencyId", 0, 0xffff_ffff),
+    };
+  }
+  if (kind === "establish-currency") {
+    const standard = requireString(record.standard, "command.action.standard");
+    if (standard !== "gold" && standard !== "silver" && standard !== "paper") {
+      throw new ProtocolError("invalid_action", 'command.action.standard must be "gold", "silver" or "paper"');
+    }
+    let name: string | null = null;
+    if (record.name !== null && record.name !== undefined) {
+      name = requireString(record.name, "command.action.name");
+      if (name.trim().length === 0 || name.length > 64) {
+        throw new ProtocolError("invalid_action", "command.action.name must be 1 to 64 characters");
+      }
+    }
+    const reserveFundingRUSD = requireFiniteNumber(record.reserveFundingRUSD, "command.action.reserveFundingRUSD");
+    if (reserveFundingRUSD < 0) {
+      throw new ProtocolError("invalid_action", "command.action.reserveFundingRUSD must be non-negative");
+    }
+    return { kind: "establish-currency", countryId, standard, name, reserveFundingRUSD };
   }
   if (kind === "set-monetary-policy") {
     const regime = requireString(record.regime, "command.action.regime");

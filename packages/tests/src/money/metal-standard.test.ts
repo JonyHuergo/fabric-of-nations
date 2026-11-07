@@ -12,6 +12,7 @@
 
 import { loadM11World } from "@century/data";
 import {
+  applyCountryAction,
   convertibilityState,
   createEconomyWorld,
   createRollbackRunner,
@@ -25,6 +26,7 @@ import {
   runTicksWithRollback,
   serializeWorld,
   tick,
+  validateCountryAction,
   type EconomyScenarioDef,
   type MonetaryCurrencyState,
   type World,
@@ -187,4 +189,62 @@ describe("D-140 mint window (D-149)", () => {
     expect(hashWorld(restored)).toBe(hashWorld(runs[0]!));
     expect(authority(restored, "USA").metalReserveKg).toBe(authority(runs[0]!, "USA").metalReserveKg);
   }, 600_000);
+});
+
+describe("D-140 currency actions (D-150)", () => {
+  test("adopting: circulation redeemed, reserve cash to the treasury, metal sold off; cash conserved", () => {
+    const world = fresh();
+    const usa = world.countries.find((country) => country.tag === "USA")!;
+    const gbp = world.countries.find((country) => country.tag === "GBR")!.monetary.currencyId;
+    const record = authority(world, "USA");
+    const treasuryBefore = balance(world, usa.treasuryAccountId);
+    const reserveBefore = balance(world, record.reserveAccountId);
+    const kgBefore = record.metalReserveKg;
+    const cashBefore = designatedCashTotal(world.finance);
+    const action = { kind: "adopt-currency" as const, countryId: usa.id, dayIndex: world.dayIndex, source: "player" as const, currencyId: gbp };
+    expect(validateCountryAction(world, action, scenario.definitions).valid).toBe(true);
+    expect(validateCountryAction(world, { ...action, source: "ai" }, scenario.definitions).valid).toBe(false);
+    applyCountryAction(world, action, scenario.definitions);
+    expect(usa.monetary).toEqual({ kind: "adopted", currencyId: gbp });
+    expect(record.active).toBe(false);
+    expect(record.currencyIssuedUnits).toBe(0);
+    expect(balance(world, record.liabilityAccountId)).toBeCloseTo(0, 2);
+    expect(balance(world, usa.treasuryAccountId) - treasuryBefore).toBeCloseTo(reserveBefore, 2);
+    expect(designatedCashTotal(world.finance)).toBeCloseTo(cashBefore, 0);
+    expect(record.metalReserveKg).toBe(kgBefore);
+    expect(convertibilityState(world, usa.id).state).toBe("no-authority");
+    const runner = createRollbackRunner(world);
+    runTicksWithRollback(runner, 2, context);
+    expect(authority(runner.world, "USA").metalReserveKg).toBeLessThan(kgBefore);
+  }, 300_000);
+
+  test("establishing: a new currency at the old unit's value, funded by the treasury", () => {
+    const ausId = fresh().countries.find((country) => country.tag === "AUS")!.id;
+    const world = createEconomyWorld({ ...scenario, playerCountryId: ausId }, { seed: SEED });
+    const adopter = world.countries.find((country) => country.monetary.kind === "adopted" && country.tag === "AUS")!;
+    const used = adopter.monetary.currencyId;
+    const treasuryBefore = balance(world, adopter.treasuryAccountId);
+    const action = {
+      kind: "establish-currency" as const,
+      countryId: adopter.id,
+      dayIndex: world.dayIndex,
+      source: "player" as const,
+      standard: "gold" as const,
+      name: "Australian pound",
+      reserveFundingRUSD: treasuryBefore / 10,
+    };
+    expect(validateCountryAction(world, action, scenario.definitions).errors).toEqual([]);
+    applyCountryAction(world, action, scenario.definitions);
+    expect(adopter.monetary).toEqual({ kind: "own", currencyId: adopter.id });
+    const record = world.monetary.currencies.find((entry) => entry.currencyId === adopter.id)!;
+    expect(record.active).toBe(true);
+    expect(record.standard).toBe("gold");
+    expect(valuation(world, adopter.id)).toBeCloseTo(valuation(world, used), 12);
+    expect(record.fineGramsPerUnit).toBeCloseTo((valuation(world, used) / scenario.definitions.goods[goldId]!.basePrice1900RUSD) * 1000, 9);
+    expect(balance(world, record.reserveAccountId)).toBeCloseTo(treasuryBefore / 10, 2);
+    expect(balance(world, adopter.treasuryAccountId)).toBeCloseTo(treasuryBefore * 0.9, 2);
+    expect(world.currencies.find((currency) => currency.id === adopter.id)?.name).toBe("Australian pound");
+    const restored = deserializeWorld(serializeWorld(world));
+    expect(hashWorld(restored)).toBe(hashWorld(world));
+  }, 300_000);
 });

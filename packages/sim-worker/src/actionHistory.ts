@@ -77,6 +77,13 @@ export type PlayerActionRequest =
       readonly reserveTransferRUSD: number;
       readonly currencyConversionRUSD: number;
     }
+  | { readonly kind: "adopt-currency"; readonly currencyId: number }
+  | {
+      readonly kind: "establish-currency";
+      readonly standard: "gold" | "silver" | "paper";
+      readonly name: string | null;
+      readonly reserveFundingRUSD: number;
+    }
   | { readonly kind: "declare-war"; readonly targetCountryId: number; readonly casusBelli: string }
   | { readonly kind: "offer-peace"; readonly warId: number; readonly terms: string }
   | { readonly kind: "accept-peace"; readonly warId: number; readonly offerId: number }
@@ -183,6 +190,10 @@ export function describePlayerAction(action: PlayerActionRequest | null, money: 
       return `recruit ${action.personnel} soldiers in province ${action.provinceId}`;
     case "deploy-army":
       return `deploy army ${action.armyId} to province ${action.targetProvinceId}`;
+    case "adopt-currency":
+      return `adopt currency ${action.currencyId}`;
+    case "establish-currency":
+      return `establish ${action.name ?? "an own"} ${action.standard}-standard currency, reserve funding ${money.format(action.reserveFundingRUSD)}`;
     case "set-monetary-policy":
       return `${action.regime} monetary policy, parity ${
         action.parityRusdPerUnit === null ? "unchanged" : action.parityRusdPerUnit.toFixed(6)

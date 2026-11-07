@@ -24,6 +24,12 @@
  */
 
 import {
+  applyAdoptCurrency,
+  applyEstablishCurrency,
+  validateAdoptCurrency,
+  validateEstablishCurrency,
+} from "./currencyActions.js";
+import {
   assertValidDayIndex,
   dayIndexToCivilDate,
   daysInYear,
@@ -121,6 +127,7 @@ import type {
   FinancialAccount,
   IndustrialPolicy,
   MonetaryRegime,
+  MonetaryStandard,
   CasusBelli,
   PeaceTermKind,
 } from "./types.js";
@@ -400,6 +407,26 @@ export interface SetMonetaryPolicyAction {
 }
 
 /** Every implemented country action. */
+/** D-140 / D-150: give up the country's own currency for another registered currency. */
+export interface AdoptCurrencyAction {
+  readonly kind: "adopt-currency";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly currencyId: Id;
+}
+
+/** D-140 / D-150: create an own currency on a gold, silver or paper standard. */
+export interface EstablishCurrencyAction {
+  readonly kind: "establish-currency";
+  readonly countryId: Id;
+  readonly dayIndex: Day;
+  readonly source: "player" | "ai";
+  readonly standard: MonetaryStandard;
+  readonly name: string | null;
+  readonly reserveFundingRUSD: number;
+}
+
 export type CountryAction =
   | SetFiscalPolicyAction
   | IssueDebtAction
@@ -422,6 +449,8 @@ export type CountryAction =
   | SetHealthStaffShareAction
   | SetTradePolicyAction
   | SetMonetaryPolicyAction
+  | AdoptCurrencyAction
+  | EstablishCurrencyAction
   | DeclareWarAction
   | OfferPeaceAction
   | AcceptPeaceAction
@@ -904,6 +933,8 @@ export function validateCountryAction(
     action.kind !== "set-health-staff-share" &&
     action.kind !== "set-trade-policy" &&
     action.kind !== "set-monetary-policy" &&
+    action.kind !== "adopt-currency" &&
+    action.kind !== "establish-currency" &&
     action.kind !== "declare-war" &&
     action.kind !== "offer-peace" &&
     action.kind !== "accept-peace" &&
@@ -1243,6 +1274,19 @@ export function validateCountryAction(
       } catch (error) {
         errors.push(errorMessage(error));
       }
+    } else if (action.kind === "adopt-currency" || action.kind === "establish-currency") {
+      // D-150: currency changes are player actions only in P5b.
+      if (action.source === "ai") errors.push("the AI does not change currencies in P5b");
+      const found =
+        action.kind === "adopt-currency"
+          ? validateAdoptCurrency(world, { countryId: country.id, currencyId: action.currencyId })
+          : validateEstablishCurrency(world, definitions, {
+              countryId: country.id,
+              standard: action.standard,
+              name: action.name,
+              reserveFundingRUSD: action.reserveFundingRUSD,
+            });
+      for (const error of found) errors.push(error);
     } else if (action.kind === "set-health-staff-share") {
       if (action.source === "ai") {
         errors.push("AI health policy is not implemented in E5");
@@ -1937,6 +1981,34 @@ export function applyCountryAction(
         currencyIssuedUnits: result.currencyIssuedUnits,
         revaluationRUSD: result.revaluationRUSD,
       },
+      changed: true,
+    };
+  }
+
+  if (action.kind === "adopt-currency" || action.kind === "establish-currency") {
+    if (action.kind === "adopt-currency") {
+      applyAdoptCurrency(world, { countryId: country.id, currencyId: action.currencyId }, action.dayIndex);
+    } else {
+      if (definitions === undefined) throw new RangeError("establish-currency requires the validated economy definitions");
+      applyEstablishCurrency(world, definitions, {
+        countryId: country.id,
+        standard: action.standard,
+        name: action.name,
+        reserveFundingRUSD: action.reserveFundingRUSD,
+      }, action.dayIndex);
+    }
+    assertValidWorld(world);
+    return {
+      countryId: country.id,
+      dayIndex: action.dayIndex,
+      kind: action.kind,
+      previousFiscal,
+      fiscal: { ...country.fiscal },
+      previousDebt,
+      debt: { ...country.debt },
+      debtContract: null,
+      principalPaidRUSD: 0,
+      constructionProject: null,
       changed: true,
     };
   }
