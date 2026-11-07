@@ -112,8 +112,13 @@ export const MIGRATION_MONTHLY_INFLOW_CAP_FRACTION = 0.01;
  * persisted state.
  */
 
-/** Hard cap on in-transit consignments retained in authoritative state. */
-export const MAX_TRADE_SHIPMENTS = 512;
+/**
+ * Hard cap on in-transit consignments retained in authoritative state. E6a sized it at
+ * 512 for eight goods; P5b (D-148) trades about 45 goods, and at 512 the 1900 world hit
+ * the cap within days (every later consignment was refused as "capacity"), so the
+ * bound is scaled by eight to 4,096. Structural limit (state size), provisional.
+ */
+export const MAX_TRADE_SHIPMENTS = 4096;
 
 /** Hard cap on the per-day blocked-shipment diagnostics retained for explanation. */
 export const MAX_TRADE_BLOCKED_DIAGNOSTICS = 64;

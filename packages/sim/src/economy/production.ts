@@ -635,10 +635,27 @@ function assertReservationShape(
  * map version). Per good, the positive lots in ascending owner order lose the
  * overflow pro rata; the floating residual goes to the last lots with headroom.
  */
+/** Ids of the goods that cannot be stored (P5b), cached per definitions object. */
+const nonStorableCache = new WeakMap<EconomyDefinitions, ReadonlySet<number>>();
+export function nonStorableGoodIds(definitions: EconomyDefinitions): ReadonlySet<number> {
+  let ids = nonStorableCache.get(definitions);
+  if (ids === undefined) {
+    ids = new Set(definitions.goods.filter((good) => good.storable === false).map((good) => good.id));
+    nonStorableCache.set(definitions, ids);
+  }
+  return ids;
+}
+
 export function applyOverflowToTable(
   table: LotTable,
   capacityByGood: readonly number[],
   goodCount: number,
+  /**
+   * P5b (D-146 A4, D-148): goods that cannot be stored. Whatever is left of them is lost
+   * in full, including a remainder inside the float tolerance, so no lot of a
+   * non-storable good survives the day.
+   */
+  nonStorableGoods?: ReadonlySet<number>,
 ): OverflowLoss[] {
   const overflowLosses: OverflowLoss[] = [];
   const ownerCount = table.owners.length;
@@ -655,17 +672,19 @@ export function applyOverflowToTable(
         total += quantity;
       }
     }
-    const capacity = capacityByGood[goodId] ?? 0;
-    if (total <= capacity + tolerance(total, capacity)) continue;
+    const clearAll = nonStorableGoods !== undefined && nonStorableGoods.has(goodId) && total > 0;
+    const capacity = clearAll ? 0 : (capacityByGood[goodId] ?? 0);
+    if (!clearAll && total <= capacity + tolerance(total, capacity)) continue;
     const overflow = total - capacity;
     amounts.length = 0;
     let lost = 0;
     for (const slot of slots) {
-      const amount = ((table.quantity[base + slot] ?? 0) * overflow) / total;
+      // A non-storable good loses every lot whole (no proportional rounding).
+      const amount = clearAll ? (table.quantity[base + slot] ?? 0) : ((table.quantity[base + slot] ?? 0) * overflow) / total;
       amounts.push(amount);
       lost += amount;
     }
-    let residual = overflow - lost;
+    let residual = clearAll ? 0 : overflow - lost;
     for (let index = slots.length - 1; index >= 0 && residual > tolerance(residual); index -= 1) {
       const quantity = table.quantity[base + (slots[index] ?? 0)] ?? 0;
       const headroom = quantity - (amounts[index] ?? 0);
@@ -741,7 +760,7 @@ export function applyOverflowLosses(
   if (market === undefined) throw new RangeError("M3 overflow requires a market");
   const table = lotTableFromLots(market.stockLots, [], definitions.goods.length);
   const capacityByGood = storageCapacityOf(world, definitions, market.id, options.lookups);
-  const losses = applyOverflowToTable(table, capacityByGood, definitions.goods.length);
+  const losses = applyOverflowToTable(table, capacityByGood, definitions.goods.length, nonStorableGoodIds(definitions));
   const canonicalLots = lotTableToLots(table);
   if (options.validateWorld !== false) {
     const candidateWorld: World = {
@@ -979,6 +998,9 @@ export function runProductionCore(
       if (head >= 0) {
         let totalReserved = 0;
         for (let item = head; item >= 0; item = groupNext[item] ?? -1) totalReserved += reservations.quantity[item] ?? 0;
+        // A use inside the float tolerance of the reservation takes nothing from any lot
+        // (below), so it is nothing in total too (P5b: a recipe whose other input ran out).
+        if (used <= tolerance(totalReserved)) used = 0;
         actualUsed = 0;
         for (let item = head; item >= 0; item = groupNext[item] ?? -1) {
           const quantity = reservations.quantity[item] ?? 0;
@@ -1133,7 +1155,7 @@ export function runProductionCore(
     ? storageCapacityOf(world, definitions, market.id, lookups)
     : new Array<number>(goodCount).fill(0);
   const overflowLosses = applyOverflow
-    ? applyOverflowToTable(next, capacityByGood, goodCount)
+    ? applyOverflowToTable(next, capacityByGood, goodCount, nonStorableGoodIds(definitions))
     : [];
   const lossByGood = new Array<number>(goodCount).fill(0);
   for (const loss of overflowLosses) {

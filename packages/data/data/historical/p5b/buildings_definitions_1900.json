@@ -19,7 +19,7 @@
   ],
   "constructionCostRUSD": 3429750,
   "constructionWorkers": 3,
-  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": null,
@@ -35,7 +35,17 @@
     "quantity": 20
    }
   ],
-  "landUse": "cropland"
+  "landUse": "cropland",
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983683
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402227
+   }
+  ]
  },
  {
   "id": 1,
@@ -57,7 +67,7 @@
   ],
   "constructionCostRUSD": 6859510,
   "constructionWorkers": 3,
-  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": null,
@@ -81,8 +91,18 @@
   "optionalInputs": [
    {
     "goodId": 35,
-    "quantityPerThroughputUnit": 12.5,
+    "quantityPerThroughputUnit": 0.0125,
     "outputElasticity": 0.2
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96737
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804454
    }
   ]
  },
@@ -110,7 +130,7 @@
   ],
   "constructionCostRUSD": 3429750,
   "constructionWorkers": 4,
-  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": null,
@@ -130,7 +150,17 @@
     "quantity": 133.333333
    }
   ],
-  "landUse": "pasture"
+  "landUse": "pasture",
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983683
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402227
+   }
+  ]
  },
  {
   "id": 3,
@@ -152,7 +182,7 @@
   ],
   "constructionCostRUSD": 3429750,
   "constructionWorkers": 4,
-  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": null,
@@ -166,6 +196,16 @@
    {
     "goodId": 5,
     "quantity": 8
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983683
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402227
    }
   ]
  },
@@ -194,7 +234,7 @@
   ],
   "constructionCostRUSD": 6859510,
   "constructionWorkers": 5,
-  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": null,
@@ -212,6 +252,16 @@
    {
     "goodId": 5,
     "quantity": 5
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96737
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804454
    }
   ]
  },
@@ -244,7 +294,7 @@
   ],
   "constructionCostRUSD": 6859510,
   "constructionWorkers": 5,
-  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": null,
@@ -262,6 +312,16 @@
    {
     "goodId": 4,
     "quantity": 16.666667
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96737
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804454
    }
   ]
  },
@@ -294,7 +354,7 @@
   ],
   "constructionCostRUSD": 9898736.67,
   "constructionWorkers": 5,
-  "dailyUpkeepRUSDAtLevelOne": 813.59,
+  "dailyUpkeepRUSDAtLevelOne": 406.8,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": null,
@@ -309,6 +369,16 @@
     "goodId": 5,
     "quantity": 66.666667
    }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.839
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.116087
+   }
   ]
  },
  {
@@ -321,7 +391,7 @@
   "jobs": [],
   "constructionCostRUSD": 6859510,
   "constructionWorkers": 40,
-  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
   "storageCapacityByGood": [
    {
     "goodId": 0,
@@ -354,6 +424,178 @@
    {
     "goodId": 7,
     "quantity": 27215542
+   },
+   {
+    "goodId": 8,
+    "quantity": 9621810
+   },
+   {
+    "goodId": 9,
+    "quantity": 6134130
+   },
+   {
+    "goodId": 10,
+    "quantity": 7180210
+   },
+   {
+    "goodId": 11,
+    "quantity": 214053
+   },
+   {
+    "goodId": 12,
+    "quantity": 66761
+   },
+   {
+    "goodId": 13,
+    "quantity": 3882
+   },
+   {
+    "goodId": 14,
+    "quantity": 2706
+   },
+   {
+    "goodId": 15,
+    "quantity": 145
+   },
+   {
+    "goodId": 16,
+    "quantity": 83155
+   },
+   {
+    "goodId": 17,
+    "quantity": 3988
+   },
+   {
+    "goodId": 18,
+    "quantity": 1
+   },
+   {
+    "goodId": 19,
+    "quantity": 1271
+   },
+   {
+    "goodId": 20,
+    "quantity": 86
+   },
+   {
+    "goodId": 21,
+    "quantity": 86
+   },
+   {
+    "goodId": 22,
+    "quantity": 406
+   },
+   {
+    "goodId": 23,
+    "quantity": 1
+   },
+   {
+    "goodId": 24,
+    "quantity": 68
+   },
+   {
+    "goodId": 25,
+    "quantity": 1
+   },
+   {
+    "goodId": 26,
+    "quantity": 1
+   },
+   {
+    "goodId": 27,
+    "quantity": 2307
+   },
+   {
+    "goodId": 28,
+    "quantity": 518
+   },
+   {
+    "goodId": 29,
+    "quantity": 995
+   },
+   {
+    "goodId": 31,
+    "quantity": 1344
+   },
+   {
+    "goodId": 32,
+    "quantity": 89
+   },
+   {
+    "goodId": 33,
+    "quantity": 24
+   },
+   {
+    "goodId": 34,
+    "quantity": 51
+   },
+   {
+    "goodId": 35,
+    "quantity": 15
+   },
+   {
+    "goodId": 36,
+    "quantity": 1
+   },
+   {
+    "goodId": 37,
+    "quantity": 14459
+   },
+   {
+    "goodId": 38,
+    "quantity": 1297
+   },
+   {
+    "goodId": 39,
+    "quantity": 2
+   },
+   {
+    "goodId": 40,
+    "quantity": 1
+   },
+   {
+    "goodId": 41,
+    "quantity": 1
+   },
+   {
+    "goodId": 42,
+    "quantity": 1
+   },
+   {
+    "goodId": 43,
+    "quantity": 51
+   },
+   {
+    "goodId": 44,
+    "quantity": 1
+   },
+   {
+    "goodId": 45,
+    "quantity": 73795
+   },
+   {
+    "goodId": 46,
+    "quantity": 1
+   },
+   {
+    "goodId": 47,
+    "quantity": 1
+   },
+   {
+    "goodId": 48,
+    "quantity": 1
+   },
+   {
+    "goodId": 49,
+    "quantity": 1
+   },
+   {
+    "goodId": 50,
+    "quantity": 1
+   },
+   {
+    "goodId": 51,
+    "quantity": 2887730
    }
   ],
   "resourceRequirements": [],
@@ -364,7 +606,17 @@
   ],
   "isEssentialInfrastructure": true,
   "sector": "storage",
-  "constructionMaterials": []
+  "constructionMaterials": [],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96737
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804454
+   }
+  ]
  },
  {
   "id": 8,
@@ -386,7 +638,7 @@
   ],
   "constructionCostRUSD": 3429750,
   "constructionWorkers": 3,
-  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": null,
@@ -410,8 +662,18 @@
   "optionalInputs": [
    {
     "goodId": 35,
-    "quantityPerThroughputUnit": 12.5,
+    "quantityPerThroughputUnit": 0.0125,
     "outputElasticity": 0.2
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983683
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402227
    }
   ]
  },
@@ -444,7 +706,7 @@
   ],
   "constructionCostRUSD": 7612230,
   "constructionWorkers": 5,
-  "dailyUpkeepRUSDAtLevelOne": 625.66,
+  "dailyUpkeepRUSDAtLevelOne": 312.83,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": null,
@@ -458,6 +720,16 @@
    {
     "goodId": 5,
     "quantity": 66.666667
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.18323
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0892719
    }
   ]
  },
@@ -481,7 +753,7 @@
   ],
   "constructionCostRUSD": 6859510,
   "constructionWorkers": 13,
-  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": 1,
@@ -505,8 +777,18 @@
   "optionalInputs": [
    {
     "goodId": 35,
-    "quantityPerThroughputUnit": 80,
+    "quantityPerThroughputUnit": 0.08,
     "outputElasticity": 0.2
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96737
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804454
    }
   ]
  },
@@ -539,7 +821,7 @@
   ],
   "constructionCostRUSD": 6859510,
   "constructionWorkers": 12,
-  "dailyUpkeepRUSDAtLevelOne": 563.8,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": 9,
@@ -557,6 +839,16 @@
    {
     "goodId": 4,
     "quantity": 50
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96737
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804454
    }
   ]
  },
@@ -1970,11 +2262,15 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 2.49035
+    "quantityPerLevelPerDay": 1.24518
    },
    {
     "goodId": 38,
-    "quantityPerLevelPerDay": 0.10183
+    "quantityPerLevelPerDay": 0.0509151
+   },
+   {
+    "goodId": 39,
+    "quantityPerLevelPerDay": 0.0236483
    }
   ]
  },
@@ -2030,11 +2326,15 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 2.49035
+    "quantityPerLevelPerDay": 1.24518
    },
    {
     "goodId": 38,
-    "quantityPerLevelPerDay": 0.10183
+    "quantityPerLevelPerDay": 0.0509151
+   },
+   {
+    "goodId": 39,
+    "quantityPerLevelPerDay": 0.0236483
    }
   ]
  },
@@ -2090,11 +2390,15 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 2.49035
+    "quantityPerLevelPerDay": 1.24518
    },
    {
     "goodId": 38,
-    "quantityPerLevelPerDay": 0.10183
+    "quantityPerLevelPerDay": 0.0509151
+   },
+   {
+    "goodId": 39,
+    "quantityPerLevelPerDay": 0.0236483
    }
   ]
  },
@@ -2145,11 +2449,15 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 2.49035
+    "quantityPerLevelPerDay": 1.24518
    },
    {
     "goodId": 38,
-    "quantityPerLevelPerDay": 0.10183
+    "quantityPerLevelPerDay": 0.0509151
+   },
+   {
+    "goodId": 39,
+    "quantityPerLevelPerDay": 0.0236483
    }
   ]
  },
@@ -2209,11 +2517,15 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 2.38964
+    "quantityPerLevelPerDay": 1.19482
    },
    {
     "goodId": 38,
-    "quantityPerLevelPerDay": 0.0977122
+    "quantityPerLevelPerDay": 0.0488561
+   },
+   {
+    "goodId": 39,
+    "quantityPerLevelPerDay": 0.022692
    }
   ]
  },
@@ -2421,17 +2733,13 @@
   "inputs": [
    {
     "goodId": 16,
-    "quantityPerThroughputUnit": 213.217
-   },
-   {
-    "goodId": 22,
-    "quantityPerThroughputUnit": 2.13217
+    "quantityPerThroughputUnit": 172.59
    }
   ],
   "outputs": [
    {
     "goodId": 34,
-    "quantityPerThroughputUnit": 106.608
+    "quantityPerThroughputUnit": 86.295
    }
   ],
   "jobs": [
@@ -2478,6 +2786,13 @@
    {
     "goodId": 38,
     "quantityPerLevelPerDay": 0.090108
+   }
+  ],
+  "optionalInputs": [
+   {
+    "goodId": 22,
+    "quantityPerThroughputUnit": 1.7259,
+    "outputElasticity": 0.05
    }
   ]
  },
@@ -2792,12 +3107,8 @@
   ],
   "maintenanceInputs": [
    {
-    "goodId": 37,
-    "quantityPerLevelPerDay": 1.96735
-   },
-   {
     "goodId": 38,
-    "quantityPerLevelPerDay": 0.0804447
+    "quantityPerLevelPerDay": 0.160889
    }
   ]
  },
@@ -2873,21 +3184,17 @@
   "inputs": [
    {
     "goodId": 16,
-    "quantityPerThroughputUnit": 41.5283
+    "quantityPerThroughputUnit": 35.275
    },
    {
     "goodId": 31,
-    "quantityPerThroughputUnit": 45.6812
-   },
-   {
-    "goodId": 32,
-    "quantityPerThroughputUnit": 1.24585
+    "quantityPerThroughputUnit": 38.8025
    }
   ],
   "outputs": [
    {
     "goodId": 38,
-    "quantityPerThroughputUnit": 41.5283
+    "quantityPerThroughputUnit": 35.275
    }
   ],
   "jobs": [
@@ -2925,11 +3232,19 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 2.3596
+    "quantityPerLevelPerDay": 4.7192
+   }
+  ],
+  "optionalInputs": [
+   {
+    "goodId": 24,
+    "quantityPerThroughputUnit": 0.176375,
+    "outputElasticity": 0.05
    },
    {
-    "goodId": 38,
-    "quantityPerLevelPerDay": 0.0964838
+    "goodId": 32,
+    "quantityPerThroughputUnit": 1.05825,
+    "outputElasticity": 0.05
    }
   ]
  },
@@ -2998,6 +3313,18 @@
    {
     "goodId": 38,
     "quantityPerLevelPerDay": 0.0954543
+   }
+  ],
+  "optionalInputs": [
+   {
+    "goodId": 13,
+    "quantityPerThroughputUnit": 79.7643,
+    "outputElasticity": 0.05
+   },
+   {
+    "goodId": 24,
+    "quantityPerThroughputUnit": 0.0398822,
+    "outputElasticity": 0.05
    }
   ]
  },
@@ -3118,7 +3445,7 @@
   ],
   "constructionCostRUSD": 8227162,
   "constructionWorkers": 4,
-  "dailyUpkeepRUSDAtLevelOne": 338.1,
+  "dailyUpkeepRUSDAtLevelOne": 676.21,
   "storageCapacityByGood": [],
   "resourceRequirements": [],
   "requiredTechnologyId": 16,
@@ -3138,16 +3465,7 @@
     "quantity": 375.644
    }
   ],
-  "maintenanceInputs": [
-   {
-    "goodId": 37,
-    "quantityPerLevelPerDay": 2.3596
-   },
-   {
-    "goodId": 38,
-    "quantityPerLevelPerDay": 0.0964838
-   }
-  ]
+  "maintenanceInputs": []
  },
  {
   "id": 55,
@@ -3213,11 +3531,7 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 2.28407
-   },
-   {
-    "goodId": 38,
-    "quantityPerLevelPerDay": 0.0933953
+    "quantityPerLevelPerDay": 4.56814
    }
   ]
  },
@@ -3281,11 +3595,7 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 2.22885
-   },
-   {
-    "goodId": 38,
-    "quantityPerLevelPerDay": 0.0911375
+    "quantityPerLevelPerDay": 4.4577
    }
   ]
  },
@@ -3349,11 +3659,7 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 2.3596
-   },
-   {
-    "goodId": 38,
-    "quantityPerLevelPerDay": 0.0964838
+    "quantityPerLevelPerDay": 4.7192
    }
   ]
  },
@@ -3365,21 +3671,17 @@
   "inputs": [
    {
     "goodId": 5,
-    "quantityPerThroughputUnit": 1263.99
+    "quantityPerThroughputUnit": 1248.29
    },
    {
     "goodId": 14,
-    "quantityPerThroughputUnit": 84.2659
-   },
-   {
-    "goodId": 31,
-    "quantityPerThroughputUnit": 0.842659
+    "quantityPerThroughputUnit": 83.2191
    }
   ],
   "outputs": [
    {
     "goodId": 45,
-    "quantityPerThroughputUnit": 4213.29
+    "quantityPerThroughputUnit": 4160.96
    }
   ],
   "jobs": [
@@ -3422,6 +3724,18 @@
    {
     "goodId": 38,
     "quantityPerLevelPerDay": 0.0911375
+   }
+  ],
+  "optionalInputs": [
+   {
+    "goodId": 31,
+    "quantityPerThroughputUnit": 0.832191,
+    "outputElasticity": 0.05
+   },
+   {
+    "goodId": 33,
+    "quantityPerThroughputUnit": 0.0416096,
+    "outputElasticity": 0.05
    }
   ]
  },
@@ -3933,11 +4247,22 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 2.49035
+    "quantityPerLevelPerDay": 0.996141
    },
    {
     "goodId": 38,
-    "quantityPerLevelPerDay": 0.10183
+    "quantityPerLevelPerDay": 0.0814642
+   },
+   {
+    "goodId": 43,
+    "quantityPerLevelPerDay": 0.233652
+   }
+  ],
+  "optionalInputs": [
+   {
+    "goodId": 13,
+    "quantityPerThroughputUnit": 22.4848,
+    "outputElasticity": 0.05
    }
   ]
  },
@@ -3988,11 +4313,15 @@
   "maintenanceInputs": [
    {
     "goodId": 37,
-    "quantityPerLevelPerDay": 3.79786
+    "quantityPerLevelPerDay": 1.89893
    },
    {
     "goodId": 38,
-    "quantityPerLevelPerDay": 0.155294
+    "quantityPerLevelPerDay": 0.0776469
+   },
+   {
+    "goodId": 39,
+    "quantityPerLevelPerDay": 0.0360643
    }
   ]
  },

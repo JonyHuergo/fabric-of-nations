@@ -437,6 +437,8 @@ describe("M11 map data", () => {
 describe("M11 slider ranges produce validated authoritative actions", () => {
   const scenario = loadM11World();
   const world = createEconomyWorld(scenario, { seed: 9 });
+  /** One value per good of the 1900 catalogue (the trade-policy arrays are per good). */
+  const perGood = <T,>(value: T): T[] => scenario.definitions.goods.map(() => value);
   const countryId = tagId(scenario, "USA");
 
   function validate(action: CountryAction): boolean {
@@ -508,18 +510,19 @@ describe("M11 slider ranges produce validated authoritative actions", () => {
       validate({
         ...base,
         kind: "set-trade-policy",
-        tariffRates: [0.5, 0, 0, 0, 0, 0, 0, 0],
-        importQuotaQuantity: [null, null, null, null, null, null, null, null],
-        exportRestricted: [false, false, false, false, false, false, false, false],
+        // P5b (D-148): one entry per good of the 57-good catalogue.
+        tariffRates: perGood(0).map((rate, goodId) => (goodId === 0 ? 0.5 : rate)),
+        importQuotaQuantity: perGood(null),
+        exportRestricted: perGood(false),
       }),
     ).toBe(true);
     expect(
       validate({
         ...base,
         kind: "set-trade-policy",
-        tariffRates: [-0.01, 0, 0, 0, 0, 0, 0, 0],
-        importQuotaQuantity: [null, null, null, null, null, null, null, null],
-        exportRestricted: [false, false, false, false, false, false, false, false],
+        tariffRates: perGood(0).map((rate, goodId) => (goodId === 0 ? -0.01 : rate)),
+        importQuotaQuantity: perGood(null),
+        exportRestricted: perGood(false),
       }),
     ).toBe(false);
     expect(

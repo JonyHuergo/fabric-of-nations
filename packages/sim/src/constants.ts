@@ -112,9 +112,11 @@ export const SAVE_FORMAT_VERSION = 2;
  * content (1900 catalog, markets, provinces, populations) and changes the
  * scenario-level metadata contract; the existing definitions' meanings are
  * unchanged, but the world content is incompatible with v11 saves, so it bumps
- * the content version to `m3-economy-v12` (D-086/D-088).
+ * the content version to `m3-economy-v12` (D-086/D-088). P5b replaces the eight goods
+ * with the 57-good catalogue (goods, buildings, need items, two technologies), so it
+ * bumps the content version to `m3-economy-v13` (D-146, D-148).
  */
-export const DEFAULT_DATA_VERSION = "m3-economy-v12";
+export const DEFAULT_DATA_VERSION = "m3-economy-v13";
 
 /** Scenario identifier used by a world created without an explicit scenario. */
 export const DEFAULT_SCENARIO_ID = "m3-empty";

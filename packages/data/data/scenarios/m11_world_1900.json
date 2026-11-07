@@ -1,7 +1,7 @@
 {
   "meta": {
     "scenarioId": "m11-world-1900",
-    "dataVersion": "m3-economy-v12",
+    "dataVersion": "m3-economy-v13",
     "status": "provisional",
     "description": "Authored 1900 world for M11/M11b country selection: 67 polities (66 selectable), 66 dependent territories, and 20 documented markets. Population totals are rounded historical estimates; occupation composition, market grouping, building levels, fiscal and technology starts are provisional authored inputs; map geometry is Natural Earth 1:50m aggregated with an explicit 1900 crosswalk. Polities without reliable 1900 polygon data use marker-only map approximations. Not a full historical reconstruction.",
     "startDayIndex": 0,
@@ -110,6 +110,14 @@
         "accessDate": "2026-11-03",
         "license": "Project authored from cited sources",
         "notes": "Wages, prices, budgets, techniques and levels re-derived from the cited 1900 sources in sources_1900.json and converted with the Minneapolis Fed CPI (15.704 RUSD per 1900 dollar); trace in calibration_1900.json (D-135)."
+      },
+      {
+        "id": "p5b-catalogue",
+        "title": "P5b 57-good catalogue and 1900 placement (scripts/p5b/build-goods-1900.mjs)",
+        "url": "packages/data/data/historical/p5b/sources_1900.json",
+        "accessDate": "2026-11-06",
+        "license": "Project authored from cited sources",
+        "notes": "1900 prices, output shares, the 1901 budget and technology evidence in sources_1900.json; placement, levels and techniques from modelled demand (D-146 A5); trace in calibration_1900.json (D-148)."
       }
     ],
     "ageStructures": {
@@ -160,12 +168,12 @@
       }
     },
     "files": {
-      "countries": "historical/p5/countries_1900.json",
-      "provinces": "historical/p5/provinces_1900.json",
-      "markets": "historical/p2b/markets_1900.json",
-      "tradeRoutes": "historical/p2b/trade_routes_1900.json",
+      "countries": "historical/p5b/countries_1900.json",
+      "provinces": "historical/p5b/provinces_1900.json",
+      "markets": "historical/p5b/markets_1900.json",
+      "tradeRoutes": "historical/p5b/trade_routes_1900.json",
       "populations": "historical/p2b/pops_1900.json",
-      "buildings": "historical/p2b/buildings_1900.json",
+      "buildings": "historical/p5b/buildings_1900.json",
       "employment": "historical/p2b/employment_1900.json",
       "calibration": "historical/p2b/calibration_targets_1900.json",
       "moneyCoefficients": "historical/p2b/money_coefficients_1900.json",
@@ -174,10 +182,10 @@
       "deposits": "historical/p5/deposits_1900.json"
     },
     "definitions": {
-      "goods": "historical_1900_goods.json",
+      "goods": "historical/p5b/goods_1900.json",
       "professions": "historical_1900_professions.json",
-      "buildings": "historical/p5/buildings_definitions_1900.json",
-      "needs": "historical_1900_needs.json",
+      "buildings": "historical/p5b/buildings_definitions_1900.json",
+      "needs": "historical/p5b/needs_1900.json",
       "demography": "demography.json",
       "technology": "technology.json"
     },

@@ -1150,6 +1150,7 @@ export function runMarketDay(
       finalLots,
       storageCapacityOf(world, definitions, market.id, lookups.production),
       goodCount,
+      lookups.nonStorableGoods,
     );
     const closingLots = lotTableToLots(finalLots);
     if (options.validateWorld !== false) {

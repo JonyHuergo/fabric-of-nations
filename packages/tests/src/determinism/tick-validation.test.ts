@@ -81,7 +81,9 @@ const SEED = 20_261_023;
 // non-storable good, optional or maintenance input or gated need item, so removing the
 // P5b fields and restoring schema 32 and simulation 0.28.0 gives the P5 hash (asserted).
 const PRE_P5B_HASH_AFTER_22_TICKS = "d1580017f60be441";
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "20d33e7d949a27db";
+// Data m3-economy-v13 (D-148) re-pins it again: the content version in the encoding
+// only; the proof restores m3-economy-v12 and still gives the P5 hash (asserted).
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "9485e83c870c0402";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

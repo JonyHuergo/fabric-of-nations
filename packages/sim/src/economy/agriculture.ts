@@ -232,11 +232,15 @@ export function planOwnConsumption(
     const owner = ownerId === undefined ? undefined : lookups.countryById.get(ownerId);
     const technologyFactor =
       owner === undefined ? 1 : technologyProductivityFactor(owner, definitions, definition.sector);
+    // P5b (D-146 C-9, D-148): optional inputs are bought after this plan is made, so the
+    // household plans on the output it is sure of, the harvest without them (fill 0).
+    let guaranteedOptionalFactor = 1;
+    for (const item of definition.optionalInputs ?? []) guaranteedOptionalFactor *= 1 - item.outputElasticity;
     const output = new Float64Array(goodCount);
     let any = false;
     for (const item of definition.outputs) {
       if (!subsistenceGoods.has(item.goodId)) continue;
-      const quantity = item.quantityPerThroughputUnit * capacity.capacityTU * technologyFactor;
+      const quantity = item.quantityPerThroughputUnit * capacity.capacityTU * technologyFactor * guaranteedOptionalFactor;
       if (quantity > 0) {
         output[item.goodId] = quantity;
         any = true;

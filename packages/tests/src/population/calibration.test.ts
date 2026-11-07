@@ -130,7 +130,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // P5b schema 33 (D-147): encoding only — removing the P5b fields and restoring
     // schema 32 and simulation 0.28.0 reproduces the P5 digest.
     expect(prePhase5bDigest(world)).toBe("25dd311842cb4d96");
-    expect(hashWorld(world)).toBe("fad60acb6e922b75");
+    // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
+    // above restores m3-economy-v12 and still gives the P5 digest.
+    expect(hashWorld(world)).toBe("2a0c4e6417cc51e6");
     const restored = deserializeWorld(serializeWorld(world));
     expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(tick(restored).advanced).toBe(false);
@@ -349,7 +351,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // P5b schema 33 (D-147): encoding only — removing the P5b fields and restoring
     // schema 32 and simulation 0.28.0 reproduces the P5 digest.
     expect(prePhase5bDigest(world)).toBe("03cbedcb11ce7e19");
-    expect(hashWorld(world)).toBe("acda304091427942");
+    // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
+    // above restores m3-economy-v12 and still gives the P5 digest.
+    expect(hashWorld(world)).toBe("96854a837daea17d");
   });
 });
 

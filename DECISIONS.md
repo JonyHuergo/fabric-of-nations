@@ -8609,3 +8609,127 @@ Approvals"), on the plan `docs/P5B_PLAN.md` and the open-items list of the same 
 - Data (also D-146 A10, C-7): 22 cited deposits added to `p5/deposits_authored_1900.json`
   for sourced 1900 producers without one; Guam, Pohnpei and Monaco land bounded by an
   authored land area; technologies *pipelines* (123) and *nuclear power* (124).
+
+## D-148 — P5b stage B: placement and calibration of the 1900 catalogue, data version v13
+
+**Status:** implemented on 2026-11-07 on `prosperity/p5-land` under D-146 (P5b step 4,
+first part). Provisional values throughout; calibration is reported, not claimed.
+**Implements:** `docs/P5B_PLAN.md` §1.10, §3, §8; D-146 A5, A6, A9, A12, C-1, C-8,
+C-9, C-19, C-22.
+
+### Decision
+
+1. **Generator.** `scripts/p5b/build-goods-1900.mjs` (with `placement.mjs`) now writes the
+   scenario tables the 1900 world reads: `p5b/provinces_1900.json` (P5 provinces plus
+   `absLatitudeDeg` = |label latitude| of `data/map/provinces_*.json`), `countries_1900.json`
+   (P5 countries plus the A9 grants of `sources_1900.json` `technologyEvidence`: steelmaking
+   for AUT, ITA, RUS, ESP, SWE; electrical generation for AUT, NOR, RUS, SWE; plus the
+   fiscal values recomputed from the new coverage by the P2b rule 14), `buildings_1900.json`,
+   `markets_1900.json`, `trade_routes_1900.json` (P2b rule 15 with the new coverage) and
+   `docs/P5B_BEFORE_AFTER.md`. `scripts/p2/build-province-scenario.mjs` points the 1900
+   scenario at them; populations, wages and money coefficients stay P2b. `--check` covers
+   every output including the report.
+2. **Placement (A5).** Demand by market and territory = households (need tiers at the
+   opening wealth; gated items where the country knows the gate) + every building's recipe
+   inputs, maintenance goods and counted optional inputs. Placement is iterated (Jacobi,
+   12 rounds to 1e-10) because maintenance links every good. A good's world level is its
+   modelled demand; territory shares are the sourced 1900 shares (aggregate rows dropped,
+   Central America split by population) or, for kerosene, copper and machinery, the shares
+   of crude oil, copper ore and steel (1900 refining, smelting and machine building sat
+   there; provisional). Goods without shares are made where demanded; demand a territory
+   cannot host goes to its market's other territories, then worldwide by province weight
+   (coffee, tea and cocoa, rubber, timber; provisional until the A12 export tables).
+   Inside a territory: one province per level needed, at most four, by discovered deposit
+   stock x quality (the largest deposit is worked), land in the crop band, or urban
+   population. A tradeable good's territory target below one level joins the larger
+   targets of its market, else worldwide (minimum size; 6,434 buildings, 2.0x P2b).
+3. **Existing producers.** The P2b buildings keep their keys and owners; their output is
+   scaled by the ratio of new to P2b modelled demand in their market (plan §8.5 read as:
+   the P2b need quantities of grain, meat and fish are kept; their producers follow demand
+   like every other good). Cotton moves from the commercial farms to cotton farms inside the
+   42° band at the P2b territories' joint-cotton shares until the USDA table is transcribed
+   (C-8). Changed technology factors (A9) re-solve the technique at unchanged output.
+4. **Levels and techniques** follow D-135 A3 at market prices and territory wages, including
+   the professions' productivity modifiers and, for extraction, the deposit's quality. The
+   P2b workforce cap (95 %) is applied to all buildings. Plan §8's residual rule caps the new
+   sectors of territories whose P2b coverage was at least 80 % at GDP minus the P2b value
+   added (11 territories, including Japan 0.52, Russia 0.84, Spain 0.63, Portugal 0.09);
+   the lost output is reported, not reallocated, and a building capped to nothing is
+   not built.
+5. **Optional inputs and day 0.** Fertiliser demand is counted (and stocked) only in
+   markets where some country knows chemical fertiliser; elsewhere farms' techniques are
+   divided by (1 − e) so the day-0 harvest is unchanged (C-9). Minor materials are optional
+   inputs with elasticity 0.05, so one missing import does not stop a works: tin and copper
+   in machine works; rubber and tin in electrical works; steel and aluminium in housewares;
+   rubber in transport companies; nitrates in alkali works. These are the 1900 buyers of
+   rubber, aluminium and tin; ships and electrical equipment are bought as maintenance by
+   transport companies, power stations and post and telegraph offices.
+6. **Maintenance (A6).** The P2b definitions buy half their upkeep as machinery and
+   construction materials; new definitions use their mix without their own outputs or
+   inputs (a definition with none left keeps a money-only upkeep).
+7. **Needs.** Dairy, produce, sugar and coffee-tea-cocoa take 80.4 % of the comfort and
+   luxury processed-food value, split by the 1901 food-article weights (Commissioner of
+   Labor 1903, p. 651; transcribed into `sources_1900.json` `foodArticles1901`): the four
+   groups (4,627 of 10,000) against bread, condiments and other food (1,131), which stay
+   processed food. Total spending at reference prices is unchanged. Gas lighting is town
+   gas from coal (the lighting budget's 0.15 share goes to coal, not natural gas).
+8. **Stocks and storage.** Opening stock follows D-136 for every storable good (one day of
+   producer demand, held by the market's producers); a market that makes none of a good its
+   producers or households buy opens with one day of it held by its largest warehouse
+   (merchant stock). Warehouse capacity per level and good (C-19) = the largest, over
+   markets, of 5 days of output, producer demand or merchant stock per warehouse level; the
+   eight P2b goods keep the P2b capacity.
+9. **Not placed in 1900:** gold and silver mines (A7, after D-140), arsenals (A2), hydro
+   stations (A8 data not yet extracted), synthetic rubber, petrochemical and nitrogen
+   fixation plants (gated), and the food-and-drink works (processed food is the P2b
+   building).
+10. **Simulation fixes found by the 1900 world** (legacy-neutral): a farm household plans its
+    kept food on the output it is sure of (optional fill 0), so it never keeps more than it
+    produced; a good that cannot be stored loses every lot whole at day end (a remainder
+    inside the float tolerance had survived and been reserved twice the next day); a recipe
+    input whose use falls inside the float tolerance of its reservation counts as no use
+    (the reconcile check had failed); `MAX_TRADE_SHIPMENTS` 512 → 4,096 (the eight-good
+    bound was reached within days, refusing every later consignment).
+11. **Data version `m3-economy-v13`** (C-22): `DATA_PACKAGE_VERSION`, `DEFAULT_DATA_VERSION`,
+    `technology.json`, `politics.json` and every scenario. `fixtures/p5bEncoding.ts` also
+    restores `m3-economy-v12`, so the legacy digest re-pins stay encoding-only (asserted
+    beside each re-pin).
+
+### Measured (Node; `docs/P5B_BEFORE_AFTER.md`)
+
+- Covered value added 482 → 605 bn RUSD: 46.5 % → 58.4 % of world GDP (United States
+  40 → 54 %, United Kingdom 27 → 34 %, Germany 51 → 68 %, France 44 → 57 %, British India
+  21 → 21 %). The plan's estimate of 75–90 % is not reached: the 1901 worker budget carries
+  little service spending, and government and housing are outside coverage. 18 of 134
+  territories exceed 100 % (microstates and colonies with sourced sugar or worldwide-pooled
+  coffee and rubber).
+- Modelled ÷ sourced 1900 output: coal 0.89, crude oil 0.72, sugar 0.84, tin 0.48, copper
+  ore 0.42, bauxite 0.41, steel 0.34, nitrates 0.25, iron ore (pig iron) 0.21, aluminium
+  0.00 (no 1900 buyer of size), gold and silver 0 (A7).
+- 92-day run of the 1900 world: no failure. Food gluts (grain, meat, fish and wool at the
+  price floor in about 55 markets) and the clothing shortage match the P5a baseline
+  measured on the previous commit. New: machinery (41 markets), construction materials
+  (16) and fertiliser (63) reach the price ceiling. Machinery and construction materials
+  are short where they are imported: per-route capacity (P2b rule) and freight funding
+  refuse consignments while exporters accumulate stock. Fertiliser is bid for by every
+  commercial farm but made only for the gate markets. These are calibration items for the
+  designer (route capacity, fertiliser rate and elasticity); no clamp hides them.
+- Ordinary day (perfPhases days 2–5): 564 ms against the 450 ms budget (A11); step 4.
+
+### Consequences
+
+- Tests: the 1900 file-map test expects the P5b tables; the slider test passes one
+  trade-policy entry per good; the data-version re-pins (calibration, tick validation,
+  replay) keep their encoding-only proof. The snapshot bound (700k) fails until protocol 22
+  (plan §6) and is left as the acceptance test.
+- Open for the designer: route capacity and freight funding with about 45 traded goods;
+  fertiliser calibration; the residual cap leaving Japanese, Spanish and Portuguese
+  households short of services; coverage below the plan's estimate.
+- Also in this step: `docs/P5B_GOODS_PROVENANCE.md` (generated: every reference price with
+  its rows and status, sources and placement basis); the Director of the Mint's 1901 table
+  of monetary stocks transcribed into `sources_1900.json` `monetaryStocks1901` for D-140
+  (every column reproduces the printed total); regression tests for the kept-food plan and
+  the non-storable clearing (`economy/goods-catalogue.test.ts`); the M7 bench compared the
+  stored save (D-137) with its canonical text and expected the legacy gzip prefix, so
+  `pnpm bench` had stopped there since D-137 — it now times the canonical save and checks
+  the stored prefix.

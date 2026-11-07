@@ -525,15 +525,17 @@ function build() {
   // The runtime reads the P2b calibration of these tables (D-135), built from the P2
   // outputs by scripts/p2b/build-money-calibration.mjs, and the 1900-world definitions.
   meta.files = {
-    // P5 (D-143): the P2b countries with the national geological surveys of 1900.
-    countries: "historical/p5/countries_1900.json",
-    // P5 (D-143): the P2b provinces with land use and imputed land, built by
-    // scripts/p5/build-p5-world.mjs.
-    provinces: "historical/p5/provinces_1900.json",
-    markets: "historical/p2b/markets_1900.json",
-    tradeRoutes: "historical/p2b/trade_routes_1900.json",
+    // P5b (D-148): the P5 countries with the 1900 technology grants (D-146 A9) and the
+    // fiscal values of the new coverage, built by scripts/p5b/build-goods-1900.mjs.
+    countries: "historical/p5b/countries_1900.json",
+    // P5b (D-148): the P5 provinces (land use, imputed land) with their latitude.
+    provinces: "historical/p5b/provinces_1900.json",
+    // P5b (D-148): the P2b markets with the opening stock of every good, the P2b routes
+    // with the capacity of the new coverage, and the 57-good buildings.
+    markets: "historical/p5b/markets_1900.json",
+    tradeRoutes: "historical/p5b/trade_routes_1900.json",
     populations: "historical/p2b/pops_1900.json",
-    buildings: "historical/p2b/buildings_1900.json",
+    buildings: "historical/p5b/buildings_1900.json",
     employment: "historical/p2b/employment_1900.json",
     calibration: "historical/p2b/calibration_targets_1900.json",
     moneyCoefficients: "historical/p2b/money_coefficients_1900.json",
@@ -547,11 +549,11 @@ function build() {
   };
   meta.definitions = {
     ...meta.definitions,
-    goods: "historical_1900_goods.json",
+    // P5b (D-146, D-148): the 57-good catalogue, its buildings and need items.
+    goods: "historical/p5b/goods_1900.json",
     professions: "historical_1900_professions.json",
-    // P5 (D-143): the P2b definitions with each farm's land use.
-    buildings: "historical/p5/buildings_definitions_1900.json",
-    needs: "historical_1900_needs.json",
+    buildings: "historical/p5b/buildings_definitions_1900.json",
+    needs: "historical/p5b/needs_1900.json",
   };
   meta.countryMeta = meta.countryMeta.map((entry) => {
     const out = {};
@@ -605,6 +607,14 @@ function build() {
         accessDate: "2026-11-03",
         license: "Project authored from cited sources",
         notes: "Wages, prices, budgets, techniques and levels re-derived from the cited 1900 sources in sources_1900.json and converted with the Minneapolis Fed CPI (15.704 RUSD per 1900 dollar); trace in calibration_1900.json (D-135).",
+      },
+      {
+        id: "p5b-catalogue",
+        title: "P5b 57-good catalogue and 1900 placement (scripts/p5b/build-goods-1900.mjs)",
+        url: "packages/data/data/historical/p5b/sources_1900.json",
+        accessDate: "2026-11-06",
+        license: "Project authored from cited sources",
+        notes: "1900 prices, output shares, the 1901 budget and technology evidence in sources_1900.json; placement, levels and techniques from modelled demand (D-146 A5); trace in calibration_1900.json (D-148).",
       },
       {
         id: "goa-census-1900",

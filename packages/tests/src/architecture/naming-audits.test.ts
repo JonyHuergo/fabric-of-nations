@@ -158,8 +158,12 @@ describe("M14 monetary equivalence and determinism", () => {
   // Re-pinned for P5b step 3 (D-146, D-147): 22 added deposits (A10), bounded land in
   // Guam, Pohnpei and Monaco (C-7), the pipelines and nuclear-power technologies, eight
   // industrial-policy sectors and schema 33.
+  // Re-pinned for P5b stage B (D-148), by design: the 57-good catalogue, its 1900
+  // placement (6,434 buildings, opening stock of every good, warehouse capacities), the
+  // A9 technology grants, fiscal values and route capacities from the new coverage, and
+  // data version m3-economy-v13.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("3b32d520c298985a");
+    expect(hashWorld(world)).toBe("be0061e21aad1018");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {

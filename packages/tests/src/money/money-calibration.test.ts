@@ -221,18 +221,21 @@ describe("P2b traceability of every money value", () => {
 describe("P2b 1900 world", () => {
   it("reads the calibrated tables and the 1900-world definitions", () => {
     const meta = readJson<{ meta: { files: Record<string, string>; definitions: Record<string, string> } }>("scenarios/m11_world_1900.json").meta;
-    for (const key of ["markets", "tradeRoutes", "populations", "buildings", "employment", "calibration", "moneyCoefficients"]) {
+    for (const key of ["populations", "employment", "calibration", "moneyCoefficients"]) {
       expect(meta.files[key]).toMatch(/^historical\/p2b\//);
     }
-    // P5 (D-143): the provinces (land use, imputed land), the countries (starting survey
-    // knowledge) and the building definitions (land use) are the P2b tables with the P5
-    // overlay of scripts/p5/build-p5-world.mjs; every P2b value in them is unchanged.
-    expect(meta.files.provinces).toBe("historical/p5/provinces_1900.json");
-    expect(meta.files.countries).toBe("historical/p5/countries_1900.json");
-    expect(meta.definitions.goods).toBe("historical_1900_goods.json");
-    expect(meta.definitions.buildings).toBe("historical/p5/buildings_definitions_1900.json");
+    // P5b (D-148): the markets (opening stock of every good), routes (capacity from the
+    // new coverage), buildings (57-good placement), provinces (P5 land plus latitude),
+    // countries (P5 surveys plus the A9 grants and the new fiscal values) and the goods,
+    // buildings and needs definitions are built by scripts/p5b/build-goods-1900.mjs from
+    // the P2b and P5 tables; populations, wages and money coefficients stay P2b.
+    for (const key of ["markets", "tradeRoutes", "buildings", "provinces", "countries"]) {
+      expect(meta.files[key]).toBe(`historical/p5b/${key === "tradeRoutes" ? "trade_routes" : key}_1900.json`);
+    }
+    expect(meta.definitions.goods).toBe("historical/p5b/goods_1900.json");
+    expect(meta.definitions.buildings).toBe("historical/p5b/buildings_definitions_1900.json");
     expect(meta.definitions.professions).toBe("historical_1900_professions.json");
-    expect(meta.definitions.needs).toBe("historical_1900_needs.json");
+    expect(meta.definitions.needs).toBe("historical/p5b/needs_1900.json");
   });
 
   it("initialises every selectable country with territory, population, wages and a treasury", () => {

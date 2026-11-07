@@ -56,7 +56,9 @@ describe("determinism", () => {
     // P5b schema 33 (D-147): encoding only — removing the P5b fields and restoring
     // schema 32 and simulation 0.28.0 reproduces the P5 digest.
     expect(prePhase5bDigest(world)).toBe("8f7987a7a6119c7d");
-    expect(hashWorld(world)).toBe("91bee36b6b8e27d1");
+    // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
+    // above restores m3-economy-v12 and still gives the P5 digest.
+    expect(hashWorld(world)).toBe("88433b30fbb759be");
   });
 
   test("a one-year economic simulation is deterministic and save/resume safe", () => {

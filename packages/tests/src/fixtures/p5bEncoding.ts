@@ -12,11 +12,14 @@ import { encodeWorld, hashEncodedWorld, type World } from "@century/sim";
 const PRE_P5B_SECTOR_COUNT = 5;
 /** The simulation version before P5b (encoded in every world). */
 const PRE_P5B_SIM_VERSION = "0.28.0";
+/** The content version before P5b (encoded in every world; D-148 bumped it to v13). */
+const PRE_P5B_DATA_VERSION = "m3-economy-v12";
 
 /** A copy of an encoded world with the P5b fields removed (schema left as is). */
 export function withoutPhase5b<T extends Record<string, unknown>>(encoded: T): T {
   const view: Record<string, unknown> = { ...encoded };
   if (typeof view.simVersion === "string") view.simVersion = PRE_P5B_SIM_VERSION;
+  if (typeof view.dataVersion === "string") view.dataVersion = PRE_P5B_DATA_VERSION;
   if (Array.isArray(view.buildings)) {
     view.buildings = (view.buildings as Record<string, unknown>[]).map((building) => {
       const copy = { ...building };

@@ -75,7 +75,9 @@ describe("M3a schema-25 serialization", () => {
     // `absLatitudeDeg`, the three new sector rates and the simulation version 0.29.0.
     // Removing them reproduces the P5 digest.
     expect(prePhase5bDigest(cloneWorld())).toBe("7d816ee4e04c0e72");
-    expect(hashWorld(cloneWorld())).toBe("dcd33a3ff50ef2c9");
+    // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
+    // above restores m3-economy-v12 and still gives the P5 digest.
+    expect(hashWorld(cloneWorld())).toBe("e33dd890a6d41eda");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

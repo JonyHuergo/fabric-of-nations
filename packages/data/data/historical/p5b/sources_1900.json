@@ -82,6 +82,15 @@
    "accessDate": "2026-11-06",
    "license": "Project data",
    "notes": "Each provisional row states its reasoning; none is a historical observation."
+  },
+  {
+   "id": "mint-1901-stocks",
+   "title": "Annual Report of the Director of the Mint for the fiscal year ended June 30, 1901: Monetary systems and approximate stocks of money, in the aggregate and per capita, in the principal countries of the world on January 1, 1901",
+   "author": "U.S. Treasury, Bureau of the Mint",
+   "url": "https://archive.org/details/annualreportofdi1901unit_h3l5",
+   "accessDate": "2026-11-07",
+   "license": "Public domain (U.S. government work, 1901)",
+   "notes": "Book pp. 42-43 (PDF 48-49). US dollars. Read from the page images; every column sums to the printed total (uncovered paper 3,033.46 against 3,033.4 printed, the US entry carrying an extra digit)."
   }
  ],
  "units": [
@@ -1065,29 +1074,29 @@
     ],
     [
      "sur",
-     785.0,
+     785,
      "sourced",
      "Dutch Guiana"
     ],
     [
      "fca",
-     2126.0,
+     2126,
      "sourced",
      "French Guiana"
     ],
     [
      "pru-home",
-     1295.0,
+     1295,
      "estimated"
     ],
     [
      "ury-home",
-     61.0,
+     61,
      "sourced"
     ],
     [
      "ven-home",
-     1530.0,
+     1530,
      "sourced"
     ],
     [
@@ -1118,7 +1127,7 @@
     ],
     [
      "rus-home",
-     34744.0,
+     34744,
      "sourced"
     ],
     [
@@ -1149,18 +1158,18 @@
     ],
     [
      "eth-home",
-     626.0,
+     626,
      "estimated"
     ],
     [
      "cra",
-     2468.0,
+     2468,
      "sourced",
      "Rhodesia"
     ],
     [
      "sud",
-     84.0,
+     84,
      "estimated"
     ],
     [
@@ -1171,7 +1180,7 @@
     ],
     [
      "mad",
-     344.0,
+     344,
      "estimated"
     ],
     [
@@ -1197,7 +1206,7 @@
     ],
     [
      "jpn-home",
-     1956.0,
+     1956,
      "estimated"
     ],
     [
@@ -1228,7 +1237,7 @@
    "locator": "p. 315 (PDF 359): silver production of the world, 1900 (kilograms)",
    "unit": "kg",
    "status": "sourced",
-   "total": 5681363.0,
+   "total": 5681363,
    "entries": [
     [
      "usa-home",
@@ -1267,7 +1276,7 @@
     ],
     [
      "col-home",
-     87089.0,
+     87089,
      "sourced"
     ],
     [
@@ -1324,7 +1333,7 @@
     ],
     [
      "esp-home",
-     183802.0,
+     183802,
      "sourced"
     ],
     [
@@ -1763,7 +1772,7 @@
    {
     "item": "lighting",
     "averageAmongHaving": 8.15,
-    "sharePercent": 100.0,
+    "sharePercent": 100,
     "locator": "Table IV-R total row p. 508 col. lighting, share from Table IV-P summary text; p. 84",
     "status": "sourced"
    },
@@ -1830,6 +1839,388 @@
     "locator": "Table IV-R total row p. 509, share from Table IV-P summary text; p. 84",
     "status": "sourced"
    }
+  ]
+ },
+ "foodArticles1901": {
+  "sourceId": "commissioner-labor-1903",
+  "locator": "Part II, Retail prices of food, p. 651 (PDF 804), text: relative importance of articles of food on the basis of the reported expenditures of the 2,567 families, total food = 10,000",
+  "unit": "parts of 10,000 of food expenditure",
+  "status": "sourced",
+  "note": "Read from the page image; the weights sum to 10,000. Used to give dairy, produce, sugar and coffee-tea-cocoa their share of the households food budget (D-148).",
+  "weights": {
+   "fresh-beef": 1531,
+   "salt-beef": 161,
+   "fresh-hog-products": 429,
+   "salt-hog-products": 425,
+   "other-meat": 299,
+   "poultry": 290,
+   "fish": 245,
+   "eggs": 514,
+   "milk": 652,
+   "butter": 880,
+   "cheese": 80,
+   "lard": 286,
+   "tea": 162,
+   "coffee": 328,
+   "sugar": 482,
+   "molasses": 52,
+   "flour-and-meal": 513,
+   "bread": 381,
+   "rice": 63,
+   "potatoes": 395,
+   "other-vegetables": 577,
+   "fruit": 505,
+   "vinegar-pickles-condiments": 126,
+   "other-food": 624
+  }
+ },
+ "monetaryStocks1901": {
+  "sourceId": "mint-1901-stocks",
+  "locator": "pp. 42-43 (PDF 48-49): monetary systems and approximate stocks of money on January 1, 1901",
+  "unit": "millions of US dollars",
+  "status": "sourced",
+  "columns": [
+   "key",
+   "name",
+   "standard",
+   "goldUSDm",
+   "silverFullTenderUSDm",
+   "silverLimitedTenderUSDm",
+   "uncoveredPaperUSDm"
+  ],
+  "totals": {
+   "gold": 4906.7,
+   "silverFullTender": 2909.2,
+   "silverLimitedTender": 931.9,
+   "silver": 3841.1,
+   "uncoveredPaper": 3033.4
+  },
+  "note": "Keys are country tags where the row is one simulated country, territory keys for dependencies, and descriptive keys for the two aggregates (not split; their countries keep an inactive authority, D-140 plan 13.2).",
+  "rows": [
+   [
+    "USA",
+    "United States",
+    "gold",
+    1110.8,
+    568.9,
+    86.9,
+    428.46
+   ],
+   [
+    "AUT",
+    "Austria-Hungary",
+    "gold",
+    229.4,
+    0,
+    73.8,
+    68.1
+   ],
+   [
+    "BEL",
+    "Belgium",
+    "gold",
+    17.8,
+    30.6,
+    4.4,
+    94.4
+   ],
+   [
+    "AUS+NZL",
+    "Australasia",
+    "gold",
+    128.6,
+    0,
+    6.1,
+    0
+   ],
+   [
+    "CAN",
+    "Canada",
+    "gold",
+    20,
+    0,
+    5,
+    40.5
+   ],
+   [
+    "cap",
+    "Cape Colony",
+    "gold",
+    37.5,
+    0,
+    1,
+    0
+   ],
+   [
+    "GBR",
+    "Great Britain",
+    "gold",
+    511,
+    0,
+    116.8,
+    117.6
+   ],
+   [
+    "bin",
+    "India",
+    "gold",
+    43.4,
+    469.7,
+    0,
+    33.9
+   ],
+   [
+    "ZAR",
+    "South African Republic",
+    "gold",
+    29.2,
+    0,
+    1.2,
+    0
+   ],
+   [
+    "BGR",
+    "Bulgaria",
+    "gold",
+    1.2,
+    2.5,
+    2.5,
+    2.1
+   ],
+   [
+    "CUB",
+    "Cuba",
+    "gold",
+    2,
+    0,
+    1.5,
+    0
+   ],
+   [
+    "DNK",
+    "Denmark",
+    "gold",
+    14.7,
+    0,
+    5.9,
+    6.4
+   ],
+   [
+    "egy",
+    "Egypt",
+    "gold",
+    30,
+    0,
+    6.4,
+    0
+   ],
+   [
+    "fin",
+    "Finland",
+    "gold",
+    4.1,
+    0,
+    0.4,
+    9.5
+   ],
+   [
+    "FRA",
+    "France",
+    "gold",
+    810.6,
+    361.9,
+    59.3,
+    199.2
+   ],
+   [
+    "DEU",
+    "Germany",
+    "gold",
+    721.1,
+    80.8,
+    127.6,
+    177.4
+   ],
+   [
+    "GRC",
+    "Greece",
+    "gold",
+    0.4,
+    0.5,
+    1,
+    28.8
+   ],
+   [
+    "HTI",
+    "Haiti",
+    "gold",
+    1.3,
+    1,
+    1.5,
+    3.5
+   ],
+   [
+    "ITA",
+    "Italy",
+    "gold",
+    98,
+    16,
+    27.9,
+    174.9
+   ],
+   [
+    "JPN",
+    "Japan",
+    "gold",
+    41.7,
+    0,
+    29.1,
+    80.4
+   ],
+   [
+    "NLD",
+    "Netherlands",
+    "gold",
+    32.9,
+    48.5,
+    3.7,
+    41.2
+   ],
+   [
+    "NOR",
+    "Norway",
+    "gold",
+    9.8,
+    0,
+    2.5,
+    7.8
+   ],
+   [
+    "PRT",
+    "Portugal",
+    "gold",
+    6.3,
+    0,
+    42.6,
+    73.6
+   ],
+   [
+    "ROM",
+    "Roumania",
+    "gold",
+    7.7,
+    0,
+    0.9,
+    14.1
+   ],
+   [
+    "RUS",
+    "Russia",
+    "gold",
+    724.3,
+    0,
+    102.5,
+    0
+   ],
+   [
+    "SRB",
+    "Servia",
+    "gold",
+    1.3,
+    0,
+    1.7,
+    4
+   ],
+   [
+    "south-american-states",
+    "South American States (except Bolivia and Colombia)",
+    "gold",
+    72,
+    4,
+    16.2,
+    1130.7
+   ],
+   [
+    "ESP",
+    "Spain",
+    "gold",
+    79.1,
+    0,
+    173.7,
+    165.3
+   ],
+   [
+    "SWE",
+    "Sweden",
+    "gold",
+    15.7,
+    0,
+    6.8,
+    28.9
+   ],
+   [
+    "CHE",
+    "Switzerland",
+    "gold",
+    24,
+    0,
+    10.7,
+    20.5
+   ],
+   [
+    "OTT",
+    "Turkey",
+    "gold",
+    50,
+    30,
+    10,
+    0
+   ],
+   [
+    "central-american-states",
+    "Central American States",
+    "silver",
+    2.2,
+    5.8,
+    0.3,
+    26.1
+   ],
+   [
+    "CHN",
+    "China",
+    "silver",
+    0,
+    750,
+    0,
+    0
+   ],
+   [
+    "MEX",
+    "Mexico",
+    "silver",
+    8.6,
+    106,
+    0,
+    54
+   ],
+   [
+    "THA",
+    "Siam",
+    "silver",
+    20,
+    193,
+    0,
+    2.1
+   ],
+   [
+    "straits",
+    "Straits Settlements (with Aden, Perim, Ceylon, Hongkong, Labuan)",
+    "silver",
+    0,
+    240,
+    2,
+    0
+   ]
   ]
  }
 }

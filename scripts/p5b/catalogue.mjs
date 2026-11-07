@@ -71,6 +71,15 @@ export const GOODS = [
 ];
 
 /**
+ * Maintenance of electrical plant (power stations, post and telegraph): electrical
+ * equipment, the rest as the default mix (provisional; D-146 A6, D-148).
+ */
+/** Output elasticity of a minor optional material (D-148, provisional). */
+const MINOR_INPUT_ELASTICITY = 0.05;
+
+const ELECTRICAL_MAINTENANCE = { "electrical-equipment": 0.5, machinery: 0.25, "construction-materials": 0.25 };
+
+/**
  * New building definitions. Recipes are per unit of the first output (`perOutput`):
  * inputs, further joint outputs and optional inputs are physical units per unit of the
  * main output; the builder sizes the main output per throughput unit (1,000 jobs) so
@@ -79,7 +88,16 @@ export const GOODS = [
  *
  * Fields: key, name, sector, main output, inputs {good: perOutput}, jobs {profession:
  * share}, gate (technology key or null), extracts, landUse, maxAbsLatitudeDeg,
- * jointOutputs {good: perOutput}, optionalInputs {good: [perOutput, elasticity]}.
+ * jointOutputs {good: perOutput}, optionalInputs {good: [perOutput, elasticity]},
+ * maintenanceMix {good: share of the maintenance value} where it differs from
+ * MAINTENANCE_MIX.
+ *
+ * Minor materials are optional inputs (bought when the market has them; output falls by
+ * MINOR_INPUT_ELASTICITY when it has none), so one missing import does not stop a works
+ * (D-148). 1900 buyers (D-148, provisional quantities): rubber goes to belting, hose and tyres
+ * (transport companies, 0.5 g per service unit, about 1.7 % of its value; world 1900 use was about 53 kt) and to cable insulation (electrical works,
+ * 10 kg per t); aluminium to cooking utensils (housewares, 10 g per unit, about 1 % of
+ * its value); tin to bearing metal and solder (machine and electrical works, 5 kg per t).
  */
 export const BUILDINGS = [
   // Food and agriculture
@@ -111,16 +129,16 @@ export const BUILDINGS = [
   // Energy (refinery joint yields: Census 1900 refining is about 58 % illuminating oil,
   // 13 % naphtha and gasoline, the rest fuel oil, residuum and lubricants; provisional)
   { key: "oil-refinery", name: "Oil Refinery", sector: "energy", output: "kerosene", inputs: { "crude-oil": 1 / 0.58 }, jointOutputs: { petrol: 0.13 / 0.58, "fuel-oil": 0.25 / 0.58 }, jobs: { laborers: 0.9, clerks: 0.1 } },
-  { key: "coal-power-station", name: "Coal Power Station", sector: "energy", output: "electricity", inputs: { coal: 3 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation" },
-  { key: "oil-power-station", name: "Oil Power Station", sector: "energy", output: "electricity", inputs: { "fuel-oil": 0.6 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation" },
-  { key: "gas-power-station", name: "Gas Power Station", sector: "energy", output: "electricity", inputs: { "natural-gas": 0.6 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation" },
-  { key: "hydro-station", name: "Hydroelectric Station", sector: "energy", output: "electricity", inputs: {}, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation" },
-  { key: "nuclear-station", name: "Nuclear Power Station", sector: "energy", output: "electricity", inputs: { uranium: 0.00003 }, jobs: { laborers: 0.6, clerks: 0.2, academics: 0.2 }, gate: "nuclear-power" },
+  { key: "coal-power-station", name: "Coal Power Station", sector: "energy", output: "electricity", inputs: { coal: 3 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation", maintenanceMix: ELECTRICAL_MAINTENANCE },
+  { key: "oil-power-station", name: "Oil Power Station", sector: "energy", output: "electricity", inputs: { "fuel-oil": 0.6 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation", maintenanceMix: ELECTRICAL_MAINTENANCE },
+  { key: "gas-power-station", name: "Gas Power Station", sector: "energy", output: "electricity", inputs: { "natural-gas": 0.6 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation", maintenanceMix: ELECTRICAL_MAINTENANCE },
+  { key: "hydro-station", name: "Hydroelectric Station", sector: "energy", output: "electricity", inputs: {}, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation", maintenanceMix: ELECTRICAL_MAINTENANCE },
+  { key: "nuclear-station", name: "Nuclear Power Station", sector: "energy", output: "electricity", inputs: { uranium: 0.00003 }, jobs: { laborers: 0.6, clerks: 0.2, academics: 0.2 }, gate: "nuclear-power", maintenanceMix: ELECTRICAL_MAINTENANCE },
   // Industrial materials
   { key: "steel-works", name: "Steel Works", sector: "manufacturing", output: "steel", inputs: { "iron-ore": 1.05, coal: 2 }, jobs: { laborers: 0.95, clerks: 0.05 }, gate: "steelmaking" },
   { key: "copper-smelter", name: "Copper Smelter and Refinery", sector: "manufacturing", output: "copper", inputs: { "copper-ore": 1.02, coal: 1.5 }, jobs: { laborers: 0.95, clerks: 0.05 } },
   { key: "aluminium-works", name: "Aluminium Works", sector: "manufacturing", output: "aluminium", inputs: { bauxite: 4, electricity: 22, coal: 0.6 }, jobs: { laborers: 0.9, clerks: 0.1 }, gate: "electrical-generation" },
-  { key: "alkali-and-acid-works", name: "Alkali and Acid Works", sector: "manufacturing", output: "chemicals", inputs: { coal: 2, nitrates: 0.02 }, jobs: { laborers: 0.85, clerks: 0.1, academics: 0.05 } },
+  { key: "alkali-and-acid-works", name: "Alkali and Acid Works", sector: "manufacturing", output: "chemicals", inputs: { coal: 2 }, optionalInputs: { nitrates: [0.02, MINOR_INPUT_ELASTICITY] }, jobs: { laborers: 0.85, clerks: 0.1, academics: 0.05 } },
   { key: "petrochemical-plant", name: "Petrochemical Plant", sector: "manufacturing", output: "chemicals", inputs: { "crude-oil": 1.2 }, jobs: { laborers: 0.8, clerks: 0.1, academics: 0.1 }, gate: "petrochemicals" },
   { key: "fertiliser-works", name: "Fertiliser Works", sector: "manufacturing", output: "fertiliser", inputs: { nitrates: 0.8, chemicals: 0.5 }, jobs: { laborers: 0.9, clerks: 0.1 }, gate: "chemical-fertilizer" },
   { key: "nitrogen-fixation-plant", name: "Nitrogen Fixation Plant", sector: "manufacturing", output: "fertiliser", inputs: { "natural-gas": 1.5, electricity: 2 }, jobs: { laborers: 0.8, clerks: 0.1, academics: 0.1 }, gate: "nitrogen-fixation" },
@@ -128,15 +146,15 @@ export const BUILDINGS = [
   { key: "cement-and-brick-works", name: "Cement and Brick Works", sector: "manufacturing", output: "construction-materials", inputs: { coal: 0.25 }, jobs: { laborers: 1 } },
   { key: "synthetic-fibre-plant", name: "Synthetic Fibre Plant", sector: "textiles", output: "textiles", inputs: { chemicals: 0.0012 }, jobs: { laborers: 0.8, clerks: 0.1, academics: 0.1 }, gate: "synthetic-fibers" },
   // Capital and transport equipment
-  { key: "machine-works", name: "Machine Works", sector: "manufacturing", output: "machinery", inputs: { steel: 1.1, copper: 0.03, coal: 1 }, jobs: { laborers: 0.85, clerks: 0.15 } },
-  { key: "electrical-works", name: "Electrical Works", sector: "manufacturing", output: "electrical-equipment", inputs: { copper: 0.4, steel: 0.7 }, jobs: { laborers: 0.8, clerks: 0.15, academics: 0.05 }, gate: "electrical-generation" },
+  { key: "machine-works", name: "Machine Works", sector: "manufacturing", output: "machinery", inputs: { steel: 1.1, coal: 1 }, optionalInputs: { copper: [0.03, MINOR_INPUT_ELASTICITY], tin: [0.005, MINOR_INPUT_ELASTICITY] }, jobs: { laborers: 0.85, clerks: 0.15 } },
+  { key: "electrical-works", name: "Electrical Works", sector: "manufacturing", output: "electrical-equipment", inputs: { copper: 0.4, steel: 0.7 }, optionalInputs: { rubber: [10, MINOR_INPUT_ELASTICITY], tin: [0.005, MINOR_INPUT_ELASTICITY] }, jobs: { laborers: 0.8, clerks: 0.15, academics: 0.05 }, gate: "electrical-generation" },
   { key: "electronics-plant", name: "Electronics Plant", sector: "manufacturing", output: "electronic-components", inputs: { chemicals: 0.00002, plastics: 0.00002, copper: 0.00001 }, jobs: { laborers: 0.6, clerks: 0.2, academics: 0.2 }, gate: "transistors" },
   { key: "motor-works", name: "Motor Works", sector: "manufacturing", output: "motor-vehicles", inputs: { steel: 1.0, rubber: 50, machinery: 0.1, textiles: 10, "construction-materials": 0.03 }, jobs: { laborers: 0.85, clerks: 0.15 }, gate: "internal-combustion" },
   { key: "aircraft-works", name: "Aircraft Works", sector: "manufacturing", output: "aircraft", inputs: { aluminium: 0.7, machinery: 0.3, "electronic-components": 20000 }, jobs: { laborers: 0.7, clerks: 0.15, academics: 0.15 }, gate: "air-transport" },
   { key: "shipyard", name: "Shipyard", sector: "manufacturing", output: "ships", inputs: { steel: 0.45, machinery: 0.1, timber: 0.3 }, jobs: { laborers: 0.9, clerks: 0.1 } },
   { key: "arsenal", name: "Arsenal", sector: "manufacturing", output: "armaments", inputs: { steel: 0.5, chemicals: 0.05, machinery: 0.05 }, jobs: { laborers: 0.85, clerks: 0.15 } },
   // Consumer manufactures
-  { key: "furniture-works", name: "Furniture and Housewares Works", sector: "manufacturing", output: "household-goods", inputs: { timber: 0.02, textiles: 0.3, steel: 0.0002 }, jobs: { laborers: 0.9, clerks: 0.1 } },
+  { key: "furniture-works", name: "Furniture and Housewares Works", sector: "manufacturing", output: "household-goods", inputs: { timber: 0.02, textiles: 0.3 }, optionalInputs: { steel: [0.0002, MINOR_INPUT_ELASTICITY], aluminium: [0.00001, MINOR_INPUT_ELASTICITY] }, jobs: { laborers: 0.9, clerks: 0.1 } },
   { key: "appliance-works", name: "Appliance Works", sector: "manufacturing", output: "appliances", inputs: { steel: 0.06, "electrical-equipment": 0.01, plastics: 0.01 }, jobs: { laborers: 0.85, clerks: 0.15 }, gate: "refrigeration" },
   { key: "radio-works", name: "Radio Works", sector: "manufacturing", output: "radios", inputs: { "electrical-equipment": 0.003, plastics: 0.001 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "radio" },
   { key: "television-works", name: "Television Works", sector: "manufacturing", output: "televisions", inputs: { "electronic-components": 60, plastics: 0.005 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "television" },
@@ -145,8 +163,8 @@ export const BUILDINGS = [
   { key: "pharmaceutical-works", name: "Pharmaceutical Works", sector: "manufacturing", output: "pharmaceuticals", inputs: { chemicals: 0.00001 }, jobs: { laborers: 0.6, clerks: 0.2, academics: 0.2 } },
   // Services (jobs from the five current professions; P7 adds the rest)
   { key: "trading-house", name: "Trading House", sector: "services", output: "commerce", inputs: { paper: 0.000002 }, jobs: { clerks: 0.6, laborers: 0.4 } },
-  { key: "transport-company", name: "Railway and Shipping Company", sector: "services", output: "transport-services", inputs: { coal: 0.004 }, jobs: { laborers: 0.8, clerks: 0.2 } },
-  { key: "post-and-telegraph", name: "Post and Telegraph Office", sector: "services", output: "communication", inputs: {}, jobs: { clerks: 0.7, laborers: 0.3 } },
+  { key: "transport-company", name: "Railway and Shipping Company", sector: "services", output: "transport-services", inputs: { coal: 0.004 }, optionalInputs: { rubber: [0.0005, MINOR_INPUT_ELASTICITY] }, jobs: { laborers: 0.8, clerks: 0.2 }, maintenanceMix: { ships: 0.4, machinery: 0.4, "construction-materials": 0.2 } },
+  { key: "post-and-telegraph", name: "Post and Telegraph Office", sector: "services", output: "communication", inputs: {}, jobs: { clerks: 0.7, laborers: 0.3 }, maintenanceMix: ELECTRICAL_MAINTENANCE },
   { key: "bank-and-office", name: "Bank and Office", sector: "services", output: "finance-services", inputs: { paper: 0.000003 }, jobs: { clerks: 0.7, capitalists: 0.15, academics: 0.15 } },
   { key: "personal-services", name: "Personal and Recreation Services", sector: "services", output: "personal-services", inputs: {}, jobs: { laborers: 0.7, clerks: 0.3 } },
 ];

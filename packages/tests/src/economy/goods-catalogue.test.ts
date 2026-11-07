@@ -16,16 +16,20 @@
  */
 
 import {
+  applyOverflowToTable,
   assertValidEconomyDefinitions,
   createEconomyWorld,
   depositRemaining,
   deserializeWorld,
   hashWorld,
+  lotTableFromLots,
+  lotTableToLots,
   serializeWorld,
   tick,
   type EconomyScenarioDef,
   type World,
 } from "@century/sim";
+import { loadM3SmallEconomy } from "@century/data";
 import { economyTickContext, totalCash } from "../fixtures/m3e.js";
 import {
   FOOD_PRODUCTS_ID,
@@ -294,5 +298,55 @@ describe("P5b optional and maintenance inputs (plan §4.5, §4.6)", () => {
       .reduce((total, entry) => total + entry.quantity, 0);
     expect(paid).toBeCloseTo(used, 9);
     expect(totalCash(world)).toBeCloseTo(cashBefore, 6);
+  });
+});
+
+describe("P5b regressions found by the 1900 world (D-148)", () => {
+  test("a farm household plans its kept food on the harvest without optional inputs", () => {
+    // The 1900 world failed on day 0 with "keeps more than it produced": the plan used
+    // the full capacity, the harvest without fertiliser was (1 - e) of it. The M3 small
+    // economy's farms belong to a household (P5 own consumption); with land and a
+    // fertiliser-like optional input nobody stocks, the day runs and kept + marketed =
+    // the harvest (1 - e of capacity).
+    const scenario = JSON.parse(JSON.stringify(loadM3SmallEconomy())) as EconomyScenarioDef;
+    const farms = scenario.definitions.buildings as unknown as {
+      landUse?: string;
+      optionalInputs?: unknown[];
+      outputs: { goodId: number; quantityPerThroughputUnit: number }[];
+    }[];
+    // A small harvest, so the household keeps all of it (as 1900 subsistence farms do).
+    for (const index of [0, 1]) for (const output of farms[index]!.outputs) output.quantityPerThroughputUnit *= 0.001;
+    farms[0]!.landUse = "cropland";
+    farms[1]!.landUse = "cropland";
+    farms[2]!.landUse = "pasture";
+    farms[0]!.optionalInputs = [{ goodId: TEXTILES_ID, quantityPerThroughputUnit: 0.1, outputElasticity: 0.2 }];
+    const province = scenario.population.provinceEconomies[0] as { arableLandHa?: number; pastureHa?: number };
+    province.arableLandHa = 1_000_000;
+    province.pastureHa = 1_000_000;
+    const world = createEconomyWorld(scenario, { seed: 5 });
+    const result = tick(world, { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions }, detail: "full" });
+    const economy = result.economy!;
+    expect(economy.ownConsumption.some((entry) => entry.buildingId === world.buildings[0]!.id)).toBe(true);
+    const farm = economy.market.production.buildings.find((entry) => entry.buildingId === world.buildings[0]!.id)!;
+    for (const output of farm.outputs) expect(output.ownConsumption ?? 0).toBeLessThanOrEqual(output.quantity + (output.ownConsumption ?? 0));
+  });
+
+  test("a good that cannot be stored loses every lot whole, even a remainder inside the tolerance", () => {
+    // A remainder below the float tolerance had survived the day and was reserved twice
+    // (Pass A from stock, Pass A2 from the same seller's output) the next day.
+    const table = lotTableFromLots(
+      [
+        { goodId: 0, ownerBuildingId: 1, quantity: 1e-12 },
+        { goodId: 0, ownerBuildingId: 2, quantity: 3.5 },
+        { goodId: 1, ownerBuildingId: 1, quantity: 1e-12 },
+      ],
+      [],
+      2,
+    );
+    const losses = applyOverflowToTable(table, [0, 0], 2, new Set([0]));
+    expect(lotTableToLots(table).filter((lot) => lot.goodId === 0)).toEqual([]);
+    expect(losses.filter((loss) => loss.goodId === 0).reduce((total, loss) => total + loss.quantity, 0)).toBe(3.5 + 1e-12);
+    // A storable good keeps the former rule: a remainder inside the tolerance stays.
+    expect(lotTableToLots(table).filter((lot) => lot.goodId === 1)).toHaveLength(1);
   });
 });

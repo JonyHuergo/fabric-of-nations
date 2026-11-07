@@ -8,7 +8,7 @@
     "quantityPerCapitaPerDay": 0.527
    },
    {
-    "goodKey": "food-products",
+    "goodKey": "livestock",
     "quantityPerCapitaPerDay": 0.03
    },
    {
@@ -16,7 +16,7 @@
     "quantityPerCapitaPerDay": 0.03
    },
    {
-    "goodKey": "livestock",
+    "goodKey": "food-products",
     "quantityPerCapitaPerDay": 0.03
    }
   ]
@@ -36,10 +36,6 @@
   "activationWealthMin": 25,
   "items": [
    {
-    "goodKey": "food-products",
-    "quantityPerCapitaPerDay": 0.961845
-   },
-   {
     "goodKey": "livestock",
     "quantityPerCapitaPerDay": 0.284961
    },
@@ -50,6 +46,26 @@
    {
     "goodKey": "clothing",
     "quantityPerCapitaPerDay": 0.02803
+   },
+   {
+    "goodKey": "food-products",
+    "quantityPerCapitaPerDay": 0.188928
+   },
+   {
+    "goodKey": "dairy",
+    "quantityPerCapitaPerDay": 0.633652
+   },
+   {
+    "goodKey": "produce",
+    "quantityPerCapitaPerDay": 0.403968
+   },
+   {
+    "goodKey": "sugar",
+    "quantityPerCapitaPerDay": 0.0327906
+   },
+   {
+    "goodKey": "coffee-tea-cocoa",
+    "quantityPerCapitaPerDay": 0.0128039
    },
    {
     "goodKey": "tobacco",
@@ -65,11 +81,7 @@
    },
    {
     "goodKey": "coal",
-    "quantityPerCapitaPerDay": 0.00144965
-   },
-   {
-    "goodKey": "natural-gas",
-    "quantityPerCapitaPerDay": 0.000195362
+    "quantityPerCapitaPerDay": 0.0017246
    },
    {
     "goodKey": "kerosene",
@@ -119,16 +131,32 @@
     "quantityPerCapitaPerDay": 0.498681
    },
    {
-    "goodKey": "food-products",
-    "quantityPerCapitaPerDay": 0.588991
-   },
-   {
     "goodKey": "textiles",
     "quantityPerCapitaPerDay": 0.014015
    },
    {
     "goodKey": "clothing",
     "quantityPerCapitaPerDay": 0.014015
+   },
+   {
+    "goodKey": "food-products",
+    "quantityPerCapitaPerDay": 0.115691
+   },
+   {
+    "goodKey": "dairy",
+    "quantityPerCapitaPerDay": 0.38802
+   },
+   {
+    "goodKey": "produce",
+    "quantityPerCapitaPerDay": 0.247372
+   },
+   {
+    "goodKey": "sugar",
+    "quantityPerCapitaPerDay": 0.0200795
+   },
+   {
+    "goodKey": "coffee-tea-cocoa",
+    "quantityPerCapitaPerDay": 0.00784053
    },
    {
     "goodKey": "tobacco",
@@ -144,11 +172,7 @@
    },
    {
     "goodKey": "coal",
-    "quantityPerCapitaPerDay": 0.00144965
-   },
-   {
-    "goodKey": "natural-gas",
-    "quantityPerCapitaPerDay": 0.000195362
+    "quantityPerCapitaPerDay": 0.0017246
    },
    {
     "goodKey": "kerosene",

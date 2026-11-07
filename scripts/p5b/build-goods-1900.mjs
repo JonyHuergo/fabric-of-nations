@@ -19,7 +19,14 @@
  *   buildings_definitions_1900.json  P5 definitions plus the new buildings
  *   needs_1900.json                  P2b tiers plus the new goods' need items
  *   calibration_1900.json            every derived value with its rows and formula
+ *   provinces_1900.json              P5 provinces with absLatitudeDeg (crop bands, C-8)
+ *   countries_1900.json              P5 countries with the A9 technology grants and the
+ *                                    fiscal values recomputed from the new coverage (§8.6)
+ *   buildings_1900.json              P2b buildings re-solved plus the new 1900 buildings
+ *   markets_1900.json                P2b markets with the opening stock of every good
+ *   trade_routes_1900.json           P2b routes with capacity from the new coverage
  *   build_report.json                input and output checksums, counts
+ *   docs/P5B_BEFORE_AFTER.md         coverage and output before and after (report)
  *
  * Method (docs/P5B_PLAN.md §1, §8; D-146):
  *  1. Reference prices. 1900 goods: 1900 US price in USD per sim unit (from the cited
@@ -34,7 +41,12 @@
  *     a year (P2b rows); half of it is bought as maintenance goods (A6).
  *  3. Needs. The P2b tiers are kept; the 1901 budget's non-food, non-apparel, non-rent
  *     categories become comfort and luxury items (half each, as P2b split the extra
- *     food), at reference prices per person per day.
+ *     food), at reference prices per person per day. Dairy, produce, sugar and coffee,
+ *     tea and cocoa take their share of the comfort and luxury processed-food value by
+ *     the 1901 food-article weights (D-148).
+ *  4. Placement (scripts/p5b/placement.mjs, D-148): levels from modelled demand, shares
+ *     from the sourced 1900 output; then warehouses (C-19), opening stock (D-136 rule),
+ *     the workforce cap, fiscal values and route capacities from the new coverage.
  *
  * Usage: node scripts/p5b/build-goods-1900.mjs [--check]
  */
@@ -51,6 +63,7 @@ import {
   MAINTENANCE_MIX,
   MAINTENANCE_SHARE_OF_UPKEEP,
 } from "./catalogue.mjs";
+import { NOT_PLACED_1900, placeCatalogue } from "./placement.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const DATA = join(ROOT, "packages/data/data");
@@ -69,6 +82,20 @@ const INPUTS = {
   technology: join(DATA, "technology.json"),
   moneyCoefficients: join(DATA, "historical/p2b/money_coefficients_1900.json"),
   catalogue: join(ROOT, "scripts/p5b/catalogue.mjs"),
+  placement: join(ROOT, "scripts/p5b/placement.mjs"),
+  // Stage B (placement): the P2b/P5 province world.
+  p5Provinces: join(DATA, "historical/p5/provinces_1900.json"),
+  p5Countries: join(DATA, "historical/p5/countries_1900.json"),
+  deposits: join(DATA, "historical/p5/deposits_1900.json"),
+  p2bPops: join(DATA, "historical/p2b/pops_1900.json"),
+  p2bMarkets: join(DATA, "historical/p2b/markets_1900.json"),
+  p2bBuildings: join(DATA, "historical/p2b/buildings_1900.json"),
+  p2bRoutes: join(DATA, "historical/p2b/trade_routes_1900.json"),
+  mapEurope: join(DATA, "map/provinces_1900.json"),
+  mapAfrica: join(DATA, "map/provinces_africa_1900.json"),
+  mapAmericas: join(DATA, "map/provinces_americas_1900.json"),
+  mapAsia: join(DATA, "map/provinces_asia_1900.json"),
+  mapOceania: join(DATA, "map/provinces_oceania_1900.json"),
 };
 
 const readText = (path) => readFileSync(path, "utf8").replace(/\r\n/g, "\n");
@@ -81,6 +108,16 @@ const round = (value, digits) => {
 };
 /** Six significant digits: prices span 1e-1 to 1e5 RUSD. */
 const sig = (value) => Number(value.toPrecision(6));
+
+/**
+ * A maintenance mix without the goods the building makes (the validator forbids buying
+ * one's own output); the other shares are renormalised.
+ */
+function maintenanceMixWithout(mix, outputs) {
+  const kept = Object.entries(mix).filter(([key]) => !outputs.includes(key));
+  const total = kept.reduce((acc, [, share]) => acc + share, 0);
+  return kept.map(([key, share]) => [key, share / total]);
+}
 
 /** A money coefficient of the P2b file (a bare number or a traced { value }). */
 function moneyCoefficientValue(file, key) {
@@ -271,20 +308,30 @@ function build() {
   const jobsPerLevel = p2bRow("jobs-per-level");
   const depreciation = p2bRow("depreciation-rate");
   const definitions = p5Definitions.map((definition) => ({ ...definition }));
+  const priceRusd = (key) => goodByKey.get(key).basePrice1900RUSD;
   // C-8: cotton becomes its own crop; the commercial farms grow grain only.
   for (const definition of definitions) {
     if (["commercial-farm", "commercial-farm-peasant", "mechanized-farm"].includes(definition.key)) {
       definition.outputs = definition.outputs.filter((output) => output.goodId !== gid("cotton"));
       definition.optionalInputs = [{
         goodId: gid("fertiliser"),
-        quantityPerThroughputUnit: round(FERTILISER_OPTIONAL.perOutput * (definition.outputs[0]?.quantityPerThroughputUnit ?? 0), 6),
+        // kg N per kg of grain -> t N (the fertiliser unit) per kg of grain.
+        quantityPerThroughputUnit: sig((FERTILISER_OPTIONAL.perOutput / 1000) * (definition.outputs[0]?.quantityPerThroughputUnit ?? 0)),
         outputElasticity: FERTILISER_OPTIONAL.outputElasticity,
       }];
     }
   }
+  // D-146 A6: the P2b definitions also buy half their money upkeep as maintenance goods.
+  for (const definition of definitions) {
+    const upkeep = definition.dailyUpkeepRUSDAtLevelOne;
+    const maintenanceValueDay = upkeep * MAINTENANCE_SHARE_OF_UPKEEP;
+    definition.dailyUpkeepRUSDAtLevelOne = round(upkeep - maintenanceValueDay, 2);
+    definition.maintenanceInputs = Object.entries(MAINTENANCE_MIX)
+      .map(([key, share]) => ({ goodId: gid(key), quantityPerLevelPerDay: sig((maintenanceValueDay * share) / priceRusd(key)) }))
+      .sort((left, right) => left.goodId - right.goodId);
+  }
   const recipeTrace = {};
   let nextId = Math.max(...definitions.map((definition) => definition.id)) + 1;
-  const priceRusd = (key) => goodByKey.get(key).basePrice1900RUSD;
   for (const spec of BUILDINGS) {
     const jobs = Object.entries(spec.jobs).map(([key, share]) => {
       const profession = professionByKey.get(key);
@@ -295,7 +342,11 @@ function build() {
     const referenceWageBillYear = jobs.reduce((total, job) => total + job.workersPerThroughputUnit * professionByKey.get(job.key).baseWage1900RUSDPerYear, 0);
     const constructionCostRUSD = round(referenceWageBillYear * p2bRow("capital-per-job-years"), 2);
     const totalUpkeepDay = (constructionCostRUSD * depreciation) / 365;
-    const maintenanceValueDay = totalUpkeepDay * MAINTENANCE_SHARE_OF_UPKEEP;
+    // Maintenance goods exclude the building's outputs and recipe inputs (the validator
+    // forbids buying a good twice or buying one's own output); with none left, the whole
+    // upkeep stays money.
+    const maintenanceMix = maintenanceMixWithout(spec.maintenanceMix ?? MAINTENANCE_MIX, [spec.output, ...Object.keys(spec.jointOutputs ?? {}), ...Object.keys(spec.inputs), ...Object.keys(spec.optionalInputs ?? {})]);
+    const maintenanceValueDay = maintenanceMix.length === 0 ? 0 : totalUpkeepDay * MAINTENANCE_SHARE_OF_UPKEEP;
     const vaPerLevelDay = usWageBillDay / laborShare(spec.sector) + totalUpkeepDay;
     let netPerUnit = priceRusd(spec.output);
     for (const [key, perOutput] of Object.entries(spec.jointOutputs ?? {})) netPerUnit += priceRusd(key) * perOutput;
@@ -329,10 +380,17 @@ function build() {
       constructionMaterials: Object.entries(CONSTRUCTION_MATERIAL_MIX)
         .map(([key, share]) => ({ goodId: gid(key), quantity: sig((constructionCostRUSD * CONSTRUCTION_MATERIAL_SHARE * share) / priceRusd(key)) }))
         .sort((left, right) => left.goodId - right.goodId),
-      maintenanceInputs: Object.entries(MAINTENANCE_MIX)
+      maintenanceInputs: maintenanceMix
         .map(([key, share]) => ({ goodId: gid(key), quantityPerLevelPerDay: sig((maintenanceValueDay * share) / priceRusd(key)) }))
         .sort((left, right) => left.goodId - right.goodId),
     };
+    // Minor materials (D-148): bought when the market has them, sized per main output
+    // like the recipe; not in the value-added solve (their cost is under 5 % of output).
+    if (spec.optionalInputs !== undefined) {
+      definition.optionalInputs = Object.entries(spec.optionalInputs)
+        .map(([key, [perOutput, elasticity]]) => ({ goodId: gid(key), quantityPerThroughputUnit: sig(perOutput * outputPerTU), outputElasticity: elasticity }))
+        .sort((left, right) => left.goodId - right.goodId);
+    }
     if (spec.landUse !== undefined) definition.landUse = spec.landUse;
     if (spec.extracts !== undefined) definition.extracts = spec.extracts;
     if (spec.maxAbsLatitudeDeg !== undefined) definition.maxAbsLatitudeDeg = spec.maxAbsLatitudeDeg;
@@ -363,7 +421,9 @@ function build() {
   // delivered city price in 1901).
   const CATEGORY_GOODS = {
     fuel: { coal: 0.2, timber: 0.05, "transport-services": 0.45, commerce: 0.3 },
-    lighting: { kerosene: 0.45, "natural-gas": 0.15, electricity: 0.1, commerce: 0.3 },
+    // Gas lighting in 1900 was town gas made from coal (D-148); natural gas was a local
+    // fuel of a few US states with no household demand modelled here.
+    lighting: { kerosene: 0.45, coal: 0.15, electricity: 0.1, commerce: 0.3 },
     "furniture-and-utensils": { "household-goods": 0.6, commerce: 0.3, "transport-services": 0.1 },
     "books-and-newspapers": { paper: 0.2, communication: 0.6, commerce: 0.2 },
     "amusements-and-vacation": { "personal-services": 1 },
@@ -395,6 +455,40 @@ function build() {
     }
   }
 
+  // D-148: dairy, produce, sugar and coffee-tea-cocoa take their share of the comfort and
+  // luxury processed-food value by the 1901 food-article weights (Commissioner of Labor
+  // 1903, p. 651): the four groups against bread, condiments and other food, which stay
+  // processed food. Grain, meat and fish quantities are unchanged; total spending at
+  // reference prices is unchanged.
+  const articles = src.foodArticles1901.weights;
+  const FOOD_GROUPS = {
+    dairy: ["eggs", "milk", "butter", "cheese"],
+    produce: ["potatoes", "other-vegetables", "fruit"],
+    sugar: ["sugar", "molasses"],
+    "coffee-tea-cocoa": ["tea", "coffee"],
+  };
+  const PROCESSED_KEPT = ["bread", "vinegar-pickles-condiments", "other-food"];
+  const groupWeight = Object.fromEntries(Object.entries(FOOD_GROUPS).map(([key, list]) => [key, list.reduce((acc, item) => acc + articles[item], 0)]));
+  const newFoodWeight = Object.values(groupWeight).reduce((acc, value) => acc + value, 0);
+  const keptWeight = PROCESSED_KEPT.reduce((acc, item) => acc + articles[item], 0);
+  const carvedShare = newFoodWeight / (newFoodWeight + keptWeight);
+  const foodTrace = { carvedShareOfProcessedFood: carvedShare, groupWeights: groupWeight, keptWeight, rowIds: ["commissioner-labor-1903"], status: "provisional", tiers: {} };
+  for (const tierName of ["comfort", "luxury"]) {
+    const tier = needs.find((entry) => entry.tier === tierName);
+    const processed = tier.items.find((item) => item.goodKey === "food-products");
+    const value = processed.quantityPerCapitaPerDay * priceRusd("food-products");
+    const carved = value * carvedShare;
+    processed.quantityPerCapitaPerDay = sig(processed.quantityPerCapitaPerDay * (1 - carvedShare));
+    const added = {};
+    for (const [key, weight] of Object.entries(groupWeight)) {
+      const quantity = sig((carved * weight) / newFoodWeight / priceRusd(key));
+      tier.items.push({ goodKey: key, quantityPerCapitaPerDay: quantity });
+      added[key] = quantity;
+    }
+    foodTrace.tiers[tierName] = { processedFoodValueRUSD: sig(value), carvedRUSD: sig(carved), added };
+  }
+  for (const tier of needs) tier.items.sort((left, right) => gid(left.goodKey) - gid(right.goodKey));
+
   const calibration = {
     generator: "scripts/p5b/build-goods-1900.mjs",
     decision: "D-146",
@@ -402,17 +496,213 @@ function build() {
     prices: priceTrace,
     recipes: recipeTrace,
     needs: needsTrace,
+    foodArticles: foodTrace,
     budgetCategoryGoods: CATEGORY_GOODS,
   };
+  const stageB = placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p5Definitions, p2b, p2bRow, technology, src, calibration, gid });
   return {
     "goods_1900.json": json(goods),
     "buildings_definitions_1900.json": json(definitions),
     "needs_1900.json": json(needs),
     "calibration_1900.json": json(calibration),
+    ...stageB.outputs,
   };
 }
 
+/**
+ * Stage B (D-148): overlays (latitude, A9 grants), placement, warehouses, opening stock,
+ * fiscal values and route capacities. Mutates `definitions` (warehouse capacity) and
+ * `calibration` (placement report and coverage).
+ */
+function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p5Definitions, p2bRow, technology, src, calibration, gid }) {
+  const p2bCalibration = read(INPUTS.p2bCalibration);
+  // B1: provinces with |label latitude| (crop bands, C-8).
+  const labelLatitude = new Map();
+  for (const key of ["mapEurope", "mapAfrica", "mapAmericas", "mapAsia", "mapOceania"]) {
+    for (const province of read(INPUTS[key]).provinces) {
+      if (Array.isArray(province.label)) labelLatitude.set(province.id, Math.abs(province.label[1]));
+    }
+  }
+  const provinces = read(INPUTS.p5Provinces).map((province) => {
+    const latitude = labelLatitude.get(province.id);
+    if (latitude === undefined) throw new Error(`province ${province.id} has no map label`);
+    return { ...province, absLatitudeDeg: round(latitude, 3) };
+  });
+  // B2: countries with sourced 1900 production of a gated good know its gate (A9, C-1).
+  const oldCountries = read(INPUTS.p5Countries);
+  const technologyKeys = new Set(technology.technologies.map((entry) => entry.key));
+  const grants = new Map();
+  for (const evidence of src.technologyEvidence) {
+    if (!technologyKeys.has(evidence.technologyKey)) throw new Error(`unknown technology ${evidence.technologyKey}`);
+    if (!oldCountries.some((country) => country.tag === evidence.countryTag)) throw new Error(`unknown country ${evidence.countryTag}`);
+    const list = grants.get(evidence.countryTag) ?? [];
+    if (!list.includes(evidence.technologyKey)) list.push(evidence.technologyKey);
+    grants.set(evidence.countryTag, list);
+  }
+  const technologyOrder = new Map(technology.technologies.map((entry, index) => [entry.key, index]));
+  const grantedCountries = oldCountries.map((country) => {
+    const added = (grants.get(country.tag) ?? []).filter((key) => !country.technology.researchedTechnologyKeys.includes(key));
+    if (added.length === 0) return country;
+    const keys = [...country.technology.researchedTechnologyKeys, ...added].sort((left, right) => technologyOrder.get(left) - technologyOrder.get(right));
+    return { ...country, technology: { ...country.technology, researchedTechnologyKeys: keys }, sourceIds: [...new Set([...country.sourceIds, "p5b-catalogue"])] };
+  });
+
+  const markets = read(INPUTS.p2bMarkets);
+  const rowValue = (id) => p2bRow(id);
+  const placement = placeCatalogue({
+    goods,
+    definitions,
+    oldDefinitions: p5Definitions,
+    needs,
+    oldNeeds,
+    professions,
+    provinces,
+    pops: read(INPUTS.p2bPops),
+    countries: grantedCountries,
+    oldCountries,
+    markets,
+    buildings: read(INPUTS.p2bBuildings),
+    deposits: read(INPUTS.deposits),
+    sources: src,
+    technology,
+    workingAgeShare: p2bCalibration.workingAgeShare,
+    fertiliser: { gateKey: "chemical-fertilizer" },
+    round,
+    territoryCoverage: new Map(Object.entries(p2bCalibration.territories).map(([key, territory]) => [key, { gdp: territory.population * territory.gdpPerHeadRUSD.value, shareBefore: territory.coveredShareOfGdp }])),
+    rows: {
+      laborShareAgriculture: rowValue("labour-share-agriculture"),
+      laborShareManufacturing: rowValue("labour-share-manufacturing"),
+      maxInitialEmploymentShare: rowValue("max-initial-employment-share"),
+      workingCapitalDays: rowValue("working-capital-days"),
+      openingStockDays: rowValue("opening-stock-days"),
+      storageHeadroomDays: rowValue("storage-headroom-days"),
+      // Plan §8: territories whose P2b coverage was at least 80 % of GDP cap new sectors
+      // at the residual (provisional rule, D-148).
+      residualCapCoverage: 0.8,
+    },
+  });
+
+  // B7: warehouse capacity per level and good (C-19). The eight P2b goods keep the P2b
+  // capacity; every other storable good gets the placement's capacity, rounded up.
+  for (const definition of definitions) {
+    if (definition.storageCapacityByGood.length === 0) continue;
+    const kept = new Map(definition.storageCapacityByGood.map((item) => [item.goodId, item.quantity]));
+    definition.storageCapacityByGood = goods
+      .filter((good) => good.storable !== false)
+      .map((good) => ({ goodId: good.id, quantity: kept.get(good.id) ?? Math.max(1, Math.ceil(sig(placement.warehouseCapacity.get(good.id) ?? 0))) }));
+  }
+
+  // Markets: the opening stock of every storable good (D-136 rule, B8).
+  const marketRows = markets.map((market) => ({
+    ...market,
+    stockLots: placement.lotsByMarket.get(market.key),
+    sourceIds: [...new Set([...market.sourceIds, "p5b-catalogue"])],
+  }));
+
+  // §8.6: fiscal values that scale with covered value added, recomputed (P2b rule 14).
+  const revenueShare = rowValue("us-gov-revenue-share-1902");
+  const educationShare = rowValue("us-school-revenue-1900") / rowValue("us-gdp-1900");
+  const adminShare = (revenueShare - educationShare) * rowValue("administration-share-of-noneducation-revenue");
+  const debtRatio = rowValue("us-gov-debt-1902") / rowValue("us-gdp-1902");
+  const money = (value) => round(value, 2);
+  const countryRows = grantedCountries.map((country) => {
+    const covered = placement.coveredByCountry.get(country.tag) ?? 0;
+    const revenue = revenueShare * covered;
+    return {
+      ...country,
+      initialTreasuryCashRUSD: money((revenue * rowValue("treasury-cash-months")) / 12),
+      debt: { ...country.debt, maxOutstandingPrincipalRUSD: Math.max(1, money(debtRatio * covered)) },
+      politics: { ...country.politics, institutionFundingRUSDPerYear: money(adminShare * covered) },
+      technology: { ...country.technology, educationFundingRUSDPerYear: money(educationShare * covered) },
+      sourceIds: [...new Set([...country.sourceIds, "p5b-catalogue"])],
+    };
+  });
+  // Routes: P2b rule 15 with the new coverage.
+  const routeRows = read(INPUTS.p2bRoutes).map((route) => {
+    const smaller = Math.min(placement.coveredByMarket.get(route.marketAKey) ?? 0, placement.coveredByMarket.get(route.marketBKey) ?? 0);
+    return { ...route, baseCapacityRUSDPerDay: money(Math.max(1, (smaller / 365) * rowValue("route-capacity-share"))), sourceIds: [...new Set([...route.sourceIds, "p5b-catalogue"])] };
+  });
+
+  // Coverage before (P2b) and after.
+  const coverage = { territories: {}, countries: {}, world: {} };
+  let worldBefore = 0;
+  let worldAfter = 0;
+  let worldGdp = 0;
+  for (const [key, territory] of Object.entries(p2bCalibration.territories)) {
+    const gdp = territory.population * territory.gdpPerHeadRUSD.value;
+    const before = territory.coveredValueAddedRUSDPerYear;
+    const after = placement.coveredByTerritory.get(key) ?? 0;
+    worldBefore += before;
+    worldAfter += after;
+    worldGdp += gdp;
+    coverage.territories[key] = {
+      gdpRUSDPerYear: gdp,
+      coveredBeforeRUSDPerYear: before,
+      coveredAfterRUSDPerYear: after,
+      shareBefore: gdp > 0 ? before / gdp : 0,
+      shareAfter: gdp > 0 ? after / gdp : 0,
+      jobsAfter: placement.jobsByTerritory[key] ?? {},
+    };
+  }
+  for (const [tag, entry] of Object.entries(p2bCalibration.countries)) {
+    coverage.countries[tag] = { coveredBeforeRUSDPerYear: entry.coveredValueAddedRUSDPerYear, coveredAfterRUSDPerYear: placement.coveredByCountry.get(tag) ?? 0 };
+  }
+  coverage.world = { gdpRUSDPerYear: worldGdp, coveredBeforeRUSDPerYear: worldBefore, coveredAfterRUSDPerYear: worldAfter, shareBefore: worldBefore / worldGdp, shareAfter: worldAfter / worldGdp };
+
+  // Modelled / sourced output per good (A5 report).
+  const sourcedOutput = {};
+  for (const [key, entry] of Object.entries(src.outputs1900)) {
+    const good = goods.find((candidate) => candidate.key === key);
+    if (good === undefined) continue;
+    const toSimUnit = OUTPUT_UNIT_TO_SIM[entry.unit];
+    const total = entry.entries.reduce((acc, [territory, value]) => acc + (AGGREGATE_OUTPUT_KEYS.has(territory) ? 0 : value), 0);
+    const modelledPerYear = (placement.worldOutput.get(good.id) ?? 0) * 365;
+    sourcedOutput[key] = {
+      sourcedPerYearSimUnits: toSimUnit === undefined ? null : total * toSimUnit.factor,
+      conversion: toSimUnit?.note ?? `no conversion from ${entry.unit}`,
+      modelledPerYear,
+      modelledOverSourced: toSimUnit === undefined ? null : modelledPerYear / (total * toSimUnit.factor),
+      note: "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand",
+    };
+  }
+  calibration.placement = {
+    method: "scripts/p5b/placement.mjs (D-148)",
+    notPlaced1900: NOT_PLACED_1900,
+    grants: Object.fromEntries([...grants].sort((left, right) => left[0].localeCompare(right[0]))),
+    ...placement.report,
+    modelledOverSourced: sourcedOutput,
+    warehouseCapacityPerLevel: Object.fromEntries([...placement.warehouseCapacity].map(([goodId, value]) => [goods[goodId].key, value])),
+  };
+  calibration.coverage = coverage;
+
+  return {
+    outputs: {
+      "provinces_1900.json": json(provinces),
+      "countries_1900.json": json(countryRows),
+      "buildings_1900.json": json(placement.buildingRows),
+      "markets_1900.json": json(marketRows),
+      "trade_routes_1900.json": json(routeRows),
+    },
+  };
+}
+
+const AGGREGATE_OUTPUT_KEYS = new Set(["other", "other-europe"]);
+/** Unit of a sourced output table -> simulation unit of the good (report only). */
+const OUTPUT_UNIT_TO_SIM = {
+  "metric tons": { factor: 1, note: "metric tons = t" },
+  "metric tons of pig iron": { factor: 1, note: "pig iron t ~ t Fe of ore (about 0.93 Fe in pig iron; report only)" },
+  "metric tons of copper": { factor: 1, note: "t Cu" },
+  "kg fine": { factor: 1, note: "kg" },
+  kg: { factor: 1, note: "kg" },
+  "metric tons of sodium nitrate": { factor: 0.1647, note: "t NaNO3 x 0.1647 N" },
+  "long tons": { factor: 1016.047, note: "long tons x 1,016.047 kg" },
+};
+
 const outputs = build();
+const DOC = join(ROOT, "docs/P5B_BEFORE_AFTER.md");
+const docText = beforeAfterReport(JSON.parse(outputs["calibration_1900.json"]));
+const PROVENANCE = join(ROOT, "docs/P5B_GOODS_PROVENANCE.md");
+const provenanceText = goodsProvenance(JSON.parse(outputs["goods_1900.json"]), JSON.parse(outputs["calibration_1900.json"]), read(INPUTS.sources));
 const inputSums = Object.fromEntries(Object.entries(INPUTS).map(([key, path]) => [key, sha256(readText(path))]));
 outputs["build_report.json"] = json({
   generator: "scripts/p5b/build-goods-1900.mjs",
@@ -422,6 +712,8 @@ outputs["build_report.json"] = json({
 
 if (CHECK) {
   const stale = Object.entries(outputs).filter(([name, text]) => !existsSync(join(OUT, name)) || readText(join(OUT, name)) !== text);
+  if (!existsSync(DOC) || readText(DOC) !== docText) stale.push(["docs/P5B_BEFORE_AFTER.md"]);
+  if (!existsSync(PROVENANCE) || readText(PROVENANCE) !== provenanceText) stale.push(["docs/P5B_GOODS_PROVENANCE.md"]);
   if (stale.length > 0) {
     console.error(`P5b outputs are stale: ${stale.map(([name]) => name).join(", ")}; run node scripts/p5b/build-goods-1900.mjs`);
     process.exit(1);
@@ -430,5 +722,126 @@ if (CHECK) {
 } else {
   mkdirSync(OUT, { recursive: true });
   for (const [name, text] of Object.entries(outputs)) writeFileSync(join(OUT, name), text);
-  console.log(`wrote ${Object.keys(outputs).length} files to ${OUT}`);
+  writeFileSync(DOC, docText);
+  writeFileSync(PROVENANCE, provenanceText);
+  console.log(`wrote ${Object.keys(outputs).length} files to ${OUT}, docs/P5B_BEFORE_AFTER.md and docs/P5B_GOODS_PROVENANCE.md`);
+}
+
+/** docs/P5B_GOODS_PROVENANCE.md: every good's reference price with its rows (generated). */
+function goodsProvenance(goods, calibration, sources) {
+  const rowCitation = new Map();
+  for (const row of [...sources.prices1900, ...sources.units]) rowCitation.set(row.id, `${row.sourceId ?? ""}${row.locator ? `, ${row.locator}` : ""}`);
+  const sourceTitle = new Map(sources.sources.map((source) => [source.id, `${source.title}${source.licence ?? source.license ? ` (${source.licence ?? source.license})` : ""}`]));
+  const lines = [];
+  lines.push("# P5b goods provenance");
+  lines.push("");
+  lines.push("Generated by `node scripts/p5b/build-goods-1900.mjs` from `packages/data/data/historical/p5b/sources_1900.json` and the builder's trace (`calibration_1900.json`); do not edit by hand. Reference prices are RUSD per simulation unit: a 1900 good's 1900 US price × 15.704 (CPI 1990 / CPI 1900, D-130); a later good's 1990 US producer price; a defined unit's definition (D-146 C-6). Status `provisional` marks a weight, conversion or placeholder still to be sourced.");
+  lines.push("");
+  lines.push("## Reference prices");
+  lines.push("");
+  lines.push("| Id | Good | Unit | Group | Reference price (RUSD) | Basis | Status | Formula | Rows |");
+  lines.push("|---:|---|---|---|---:|---|---|---|---|");
+  for (const good of goods) {
+    const trace = calibration.prices[good.key] ?? {};
+    lines.push(`| ${good.id} | ${good.name} | ${good.unitLabel} | ${good.group} | ${good.basePrice1900RUSD} | ${good.priceBasis} | ${trace.status ?? "—"} | ${(trace.formula ?? "").replace(/\|/g, "/")} | ${(trace.rowIds ?? []).join(", ") || "—"} |`);
+  }
+  lines.push("");
+  lines.push("## Source rows");
+  lines.push("");
+  const used = new Set(Object.values(calibration.prices).flatMap((trace) => trace.rowIds ?? []));
+  for (const id of [...used].sort()) lines.push(`- \`${id}\`: ${rowCitation.get(id) ?? "P2b row (historical/p2b/sources_1900.json)"}`);
+  lines.push("");
+  lines.push("## Sources");
+  lines.push("");
+  for (const [id, title] of [...sourceTitle].sort((left, right) => left[0].localeCompare(right[0]))) lines.push(`- \`${id}\`: ${title}`);
+  lines.push("");
+  lines.push("## 1900 placement basis");
+  lines.push("");
+  lines.push("World level from modelled demand (D-146 A5); territory shares as below (D-148).");
+  lines.push("");
+  for (const [key, entry] of Object.entries(calibration.placement.goods)) if (entry.basis) lines.push(`- ${key}: ${entry.basis}`);
+  lines.push("");
+  return `${lines.join("\n")}\n`;
+}
+
+/** docs/P5B_BEFORE_AFTER.md from the calibration trace (generated; do not edit by hand). */
+function beforeAfterReport(calibration) {
+  const pct = (value) => (value === null || value === undefined || !Number.isFinite(value) ? "—" : `${(100 * value).toFixed(1)} %`);
+  const bn = (value) => (value / 1e9).toLocaleString("en-US", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+  const num = (value) => (value === null || value === undefined ? "—" : Number(value.toPrecision(4)).toLocaleString("en-US"));
+  const { coverage, placement } = calibration;
+  const lines = [];
+  lines.push("# P5b before and after — covered GDP and 1900 output");
+  lines.push("");
+  lines.push("Generated by `node scripts/p5b/build-goods-1900.mjs` from `packages/data/data/historical/p5b/calibration_1900.json`; do not edit by hand. \"Before\" is the P2b/P5 world (8 goods); \"after\" is the P5b world (57 goods) with the placement of D-148. Values are RUSD per year at opening prices (value added of the represented sectors).");
+  lines.push("");
+  lines.push("## World");
+  lines.push("");
+  lines.push("| | Before | After |");
+  lines.push("|---|---:|---:|");
+  lines.push(`| Covered value added (bn RUSD) | ${bn(coverage.world.coveredBeforeRUSDPerYear)} | ${bn(coverage.world.coveredAfterRUSDPerYear)} |`);
+  lines.push(`| Share of GDP (${bn(coverage.world.gdpRUSDPerYear)} bn) | ${pct(coverage.world.shareBefore)} | ${pct(coverage.world.shareAfter)} |`);
+  lines.push("");
+  lines.push("## Covered share of GDP by territory");
+  lines.push("");
+  lines.push("Territories above 100 % after P5b are listed first; then the largest economies.");
+  lines.push("");
+  lines.push("| Territory | GDP (bn RUSD) | Before | After |");
+  lines.push("|---|---:|---:|---:|");
+  const territories = Object.entries(coverage.territories);
+  const over = territories.filter(([, entry]) => entry.shareAfter > 1).sort((left, right) => right[1].shareAfter - left[1].shareAfter);
+  const largest = territories.filter(([, entry]) => !(entry.shareAfter > 1)).sort((left, right) => right[1].gdpRUSDPerYear - left[1].gdpRUSDPerYear).slice(0, 30);
+  for (const [key, entry] of [...over, ...largest]) lines.push(`| ${key} | ${bn(entry.gdpRUSDPerYear)} | ${pct(entry.shareBefore)} | ${pct(entry.shareAfter)} |`);
+  lines.push("");
+  lines.push(`${over.length} of ${territories.length} territories are above 100 % after P5b (plan §8: the overshoot comes mostly from the P2b farm-gate demand, a D-135 distortion left to P6).`);
+  lines.push("");
+  lines.push("## Modelled ÷ sourced 1900 output (D-146 A5)");
+  lines.push("");
+  lines.push("| Good | Sourced per year | Modelled per year | Modelled ÷ sourced | Conversion |");
+  lines.push("|---|---:|---:|---:|---|");
+  for (const [key, entry] of Object.entries(placement.modelledOverSourced)) {
+    lines.push(`| ${key} | ${num(entry.sourcedPerYearSimUnits)} | ${num(entry.modelledPerYear)} | ${entry.modelledOverSourced === null ? "—" : entry.modelledOverSourced.toFixed(2)} | ${entry.conversion} |`);
+  }
+  lines.push("");
+  lines.push("## World balance at opening prices (per day)");
+  lines.push("");
+  lines.push("Output against modelled demand (households, recipe inputs, maintenance, fertiliser). Joint products (refinery petrol and fuel oil, ranch wool) and goods with no 1900 producer show the gaps.");
+  lines.push("");
+  lines.push("| Good | Demand | Output | Output ÷ demand | Placement basis |");
+  lines.push("|---|---:|---:|---:|---|");
+  for (const [key, entry] of Object.entries(placement.worldBalance)) {
+    lines.push(`| ${key} | ${num(entry.demandPerDay)} | ${num(entry.outputPerDay)} | ${entry.outputOverDemand === null ? "—" : entry.outputOverDemand.toFixed(3)} | ${placement.goods[key]?.basis ?? (["grain", "livestock", "fish", "wool", "textiles", "clothing", "food-products"].includes(key) ? "P2b producers" : "joint output only (no 1900 buyer)")} |`);
+  }
+  lines.push("");
+  lines.push("## Residual cap (plan §8)");
+  lines.push("");
+  lines.push("Territories whose P2b coverage was at least 80 % of GDP: the new sectors are capped at GDP minus the value added of the P2b sectors. The output they would have made is not reallocated; their markets import it or go short.");
+  lines.push("");
+  lines.push("| Territory | P2b share | Factor | Largest output lost per day |");
+  lines.push("|---|---:|---:|---|");
+  for (const [key, entry] of Object.entries(placement.residualCap ?? {})) {
+    const lost = Object.entries(entry.outputLostPerDay).sort((left, right) => right[1] - left[1]).slice(0, 4).map(([good, value]) => `${good} ${num(value)}`).join(", ");
+    lines.push(`| ${key} | ${pct(entry.shareBefore)} | ${entry.factor.toFixed(3)} | ${lost} |`);
+  }
+  lines.push("");
+  lines.push("## Not placed in 1900");
+  lines.push("");
+  for (const [key, reason] of Object.entries(placement.notPlaced1900)) lines.push(`- \`${key}\`: ${reason}.`);
+  lines.push("");
+  lines.push("## Sourced producers that could not host the producer");
+  lines.push("");
+  let any = false;
+  for (const [key, entry] of Object.entries(placement.goods)) {
+    for (const item of entry.unplaced ?? []) {
+      any = true;
+      lines.push(`- ${key}: ${item.territory ?? "world"} — ${item.reason}${item.sourcedShare === undefined ? "" : ` (sourced ${num(item.sourcedShare)})`}${item.quantity === undefined ? "" : ` (${num(item.quantity)} per day)`}.`);
+    }
+  }
+  if (!any) lines.push("None.");
+  lines.push("");
+  lines.push("## Technology grants (D-146 A9)");
+  lines.push("");
+  for (const [tag, keys] of Object.entries(placement.grants)) lines.push(`- ${tag}: ${keys.join(", ")}`);
+  lines.push("");
+  return `${lines.join("\n")}\n`;
 }

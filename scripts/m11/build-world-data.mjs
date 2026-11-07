@@ -19,7 +19,7 @@ const ROOT = resolve(HERE, "..", "..");
 const DATA = resolve(ROOT, "packages/data/data");
 const CATALOG_PATH = resolve(DATA, "historical/m11/polities_1900.json");
 const OUT_DIR = resolve(DATA, "historical/m11");
-const DATA_VERSION = "m3-economy-v12";
+const DATA_VERSION = "m3-economy-v13";
 const SCENARIO_ID = "m11-world-1900";
 
 const catalog = JSON.parse(readFileSync(CATALOG_PATH, "utf8"));

@@ -11,8 +11,10 @@ import {
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
 import {
+  canonicalSaveOf,
   compressSaveForStorage,
   decompressSaveFromStorage,
+  STORED_SAVE_PREFIX,
 } from "@century/sim-worker/persistence";
 import { loadM5EightPolities } from "@century/data";
 
@@ -118,6 +120,10 @@ export function runM7Benchmarks(): boolean {
     }
   }
   if (save.length === 0) throw new Error("M7 worker produced no save");
+  // D-137 made SAVE_RESULT carry the stored (compressed) form; the compression timing
+  // below starts from the canonical save, as before (the bench had compared a stored
+  // save with its canonical text since then and stopped here; fixed in D-148).
+  save = canonicalSaveOf(save);
 
   const compressionSamples: number[] = [];
   let stored = "";
@@ -156,7 +162,8 @@ export function runM7Benchmarks(): boolean {
     tickStats.p95Ms > 0 &&
     snapshotBytes > 0 &&
     save.length > 0 &&
-    stored.startsWith("century-save-gzip1:") &&
+    // D-137 stored form (the legacy gzip prefix is read but no longer written).
+    stored.startsWith(STORED_SAVE_PREFIX) &&
     stored.length < save.length &&
     compressionStats.averageMs > 0;
   console.log(`M7 worker benchmark gates: ${valid ? "PASS" : "FAIL"}`);
