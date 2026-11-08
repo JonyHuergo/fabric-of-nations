@@ -170,8 +170,11 @@ describe("M14 monetary equivalence and determinism", () => {
   // Re-pinned on 2026-11-08, by design (D-148 additions, D-152): province hydro potential
   // (RiverATLAS) and 72 hydro stations, cotton at the USDA 1901 shares, petrol and fuel
   // oil at their 1900 export values, jewellery (good 57) with 44 jewellers, 6,299 buildings.
+  // Re-pinned on 2026-11-08, by design (D-148 additions, item 9): coffee-tea-cocoa, tobacco
+  // and rubber placed at their recorded 1900 producers under the A12 coverage rule instead
+  // of worldwide pooling; 6,168 buildings and the warehouse capacities that follow.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("361b93de28dfa214");
+    expect(hashWorld(world)).toBe("ad9e28862dfb28c0");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {

@@ -14,7 +14,11 @@
  *     oil shares (1900 refining sat on the oil fields). Otherwise each territory makes its
  *     own demand; demand a territory cannot make (no deposit, no land in the crop band)
  *     goes to the other territories of its market and then to every territory that can
- *     make it, by province weight (provisional until the export tables are transcribed).
+ *     make it, by province weight. The A12 crops (coffee-tea-cocoa, tobacco, rubber) use the
+ *     recorded 1900 output of `crops1900` when the coverage rule passes (A12_MIN_COVERAGE):
+ *     producers named without a figure make their own demand, the rest of world demand goes
+ *     to the recorded producers in proportion to their kg against the world estimate, and
+ *     the unrecorded share keeps the local-and-pooled rule (D-148 additions, item 9).
  *  3. Inside a territory the output goes to at most four provinces (one per level needed) by discovered deposit
  *     stock x quality (extraction, the largest deposit worked), cropland or grazing land
  *     inside the crop band (farms) or urban population (everything else); one building per
@@ -63,12 +67,75 @@ const SHARE_PROXY = {
   copper: "copper-ore",
   machinery: "steel",
 };
+/**
+ * D-146 A12 crops (D-148 additions, item 9): the good each transcribed crop of
+ * `sources_1900.json` `crops1900` belongs to. Coffee, tea and cocoa are one good and are
+ * combined by kilogram.
+ */
+const A12_CROP_GOOD = { coffee: "coffee-tea-cocoa", tea: "coffee-tea-cocoa", cocoa: "coffee-tea-cocoa", tobacco: "tobacco", rubber: "rubber" };
+/**
+ * Coverage rule (D-148 additions, item 9; provisional): an A12 good uses its sourced
+ * territory shares only when the recorded producers that can host its producer in the 1900
+ * world hold at least this share of the world estimate (dimensionless, kg / kg). Below it the
+ * shares would move more than a quarter of world output to the wrong producers, so the good
+ * keeps the local-and-pooled rule and the shortfall is reported.
+ */
+const A12_MIN_COVERAGE = 0.75;
 /** Most provinces one territory spreads a new producer over (D-148, provisional). */
 const MAX_PROVINCES_PER_TERRITORY = 4;
 /** Smallest territory target of a tradeable good, in levels (D-148, provisional). */
 const MIN_LEVELS = 1;
 const ITERATIONS = 60;
 const CONVERGENCE = 1e-10;
+
+/**
+ * Recorded 1900 output of the A12 goods (kg per year) by territory, with the world estimates
+ * and the self-supplied producers of `crops1900` (D-148 additions, item 9). Per crop and
+ * territory a production row wins over export or receipt rows; a crop's world figure is its
+ * world estimate, or the recorded sum where none exists (tea), and never less than the
+ * recorded sum. `batch1` keeps the first transcription set for the before-and-after report.
+ */
+export function a12Records(crops) {
+  const byGood = new Map();
+  const cropRows = new Map();
+  for (const entry of crops?.entries ?? []) {
+    const goodKey = A12_CROP_GOOD[entry.crop];
+    if (goodKey === undefined) throw new Error(`crops1900: unknown crop ${entry.crop}`);
+    if (!(Number.isFinite(entry.kg) && entry.kg > 0)) throw new Error(`crops1900: ${entry.crop} ${entry.territory} needs a positive kg`);
+    const key = `${entry.crop}|${entry.territory}`;
+    const list = cropRows.get(key) ?? [];
+    list.push(entry);
+    cropRows.set(key, list);
+  }
+  const chosen = (rows, maxBatch) => {
+    const inBatch = rows.filter((row) => row.batch <= maxBatch);
+    const production = inBatch.filter((row) => row.kind === "production");
+    return (production.length > 0 ? production : inBatch).reduce((acc, row) => acc + row.kg, 0);
+  };
+  for (const [key, rows] of [...cropRows].sort((left, right) => left[0].localeCompare(right[0]))) {
+    const [crop, territory] = key.split("|");
+    const goodKey = A12_CROP_GOOD[crop];
+    if (!byGood.has(goodKey)) byGood.set(goodKey, { goodKey, recorded: new Map(), crops: {}, selfSupplied: new Set() });
+    const good = byGood.get(goodKey);
+    good.crops[crop] ??= { recordedKg: 0, recordedBatch1Kg: 0, worldKg: 0, territories: 0 };
+    const kg = chosen(rows, Infinity);
+    good.recorded.set(territory, (good.recorded.get(territory) ?? 0) + kg);
+    good.crops[crop].recordedKg += kg;
+    good.crops[crop].recordedBatch1Kg += chosen(rows, 1);
+    good.crops[crop].territories += 1;
+  }
+  for (const good of byGood.values()) {
+    for (const [crop, entry] of Object.entries(good.crops)) {
+      const estimate = crops.worldEstimates?.[crop]?.kg;
+      if (estimate !== null && estimate !== undefined && !(Number.isFinite(estimate) && estimate > 0)) throw new Error(`crops1900: world estimate of ${crop} must be positive`);
+      entry.worldEstimateKg = estimate ?? null;
+      entry.worldKg = Math.max(estimate ?? 0, entry.recordedKg);
+    }
+    good.worldKg = Object.values(good.crops).reduce((acc, entry) => acc + entry.worldKg, 0);
+    for (const crop of Object.keys(good.crops)) for (const territory of crops.selfSupplied?.[crop]?.territories ?? []) good.selfSupplied.add(territory);
+  }
+  return byGood;
+}
 
 export function placeCatalogue(ctx) {
   const {
@@ -292,6 +359,7 @@ export function placeCatalogue(ctx) {
   /** entries: key -> { province, definition, market, capacityTU, deposit, origin } */
   let entries = new Map();
   const report = { goods: {}, iterations: 0 };
+  const a12 = a12Records(sources.crops1900);
   const entryKey = (provinceId, definitionKey, suffix = "") => `${provinceId}|${definitionKey}${suffix}`;
   const levelContinuous = (entry) => {
     const tf = techFactor(countryOf.get(entry.province.id), entry.definition.sector);
@@ -467,28 +535,19 @@ export function placeCatalogue(ctx) {
       const shares = sources.outputs1900[shareKey];
       let basis = shares === undefined ? null : `sourced shares${shareKey === good.key ? "" : ` of ${shareKey}`} (${shares.locator})`;
       const targets = new Map();
-      if (shares !== undefined) {
-        const list = [];
-        for (const [territory, value] of shares.entries) {
-          if (AGGREGATE_KEYS.has(territory) || !(value > 0)) continue;
-          if (territory === "central-america") {
-            const weight = CENTRAL_AMERICA.reduce((acc, key) => acc + (territoryPopulation.get(key) ?? 0), 0);
-            for (const member of CENTRAL_AMERICA) list.push([member, (value * (territoryPopulation.get(member) ?? 0)) / weight]);
-          } else list.push([territory, value]);
-        }
-        const feasible = list.filter(([territory]) => definitionFor(territory, good.id) !== undefined);
-        for (const [territory, value] of list) {
-          if (!feasible.some(([key]) => key === territory)) entryReport.unplaced.push({ territory, sourcedShare: value, reason: territoryProvinces.has(territory) ? "no province can host the producer (deposit, land or technology)" : "territory not in the 1900 world" });
-        }
-        const sum = feasible.reduce((acc, [, value]) => acc + value, 0);
-        for (const [territory, value] of feasible) targets.set(territory, (targets.get(territory) ?? 0) + (total * value) / sum);
-      } else {
-        basis = "local demand (no sourced shares)";
+      /**
+       * Each territory makes `scale` x its own demand of the good (territories in `skip`
+       * excepted); demand a territory cannot make goes to its market's other territories
+       * that can, then worldwide by province weight. Returns the basis text.
+       */
+      const placeLocally = (scale, skip) => {
+        let text = "local demand (no sourced shares)";
         const pooledByMarket = new Map();
         for (const [key, row] of [...demand].sort((left, right) => left[0].localeCompare(right[0]))) {
-          const quantity = row.get(good.id) ?? 0;
+          const quantity = (row.get(good.id) ?? 0) * scale;
           if (!(quantity > 0)) continue;
           const [marketKey, territory] = key.split("|");
+          if (skip.has(territory)) continue;
           if (definitionFor(territory, good.id) !== undefined) targets.set(territory, (targets.get(territory) ?? 0) + quantity);
           else pooledByMarket.set(marketKey, (pooledByMarket.get(marketKey) ?? 0) + quantity);
         }
@@ -512,9 +571,76 @@ export function placeCatalogue(ctx) {
           else {
             for (const territory of able) targets.set(territory, (targets.get(territory) ?? 0) + (worldPool * weightOf(territory)) / sum);
             entryReport.pooledWorldwidePerDay = worldPool;
-            basis += "; demand without a local producer placed worldwide by province weight (provisional)";
+            text += "; demand without a local producer placed worldwide by province weight (provisional)";
           }
         }
+        return text;
+      };
+      const crop = a12.get(good.key);
+      // A12 crops (D-148 additions, item 9): recorded producers that can host the producer.
+      const cropFeasible = crop === undefined ? [] : [...crop.recorded].filter(([territory]) => definitionFor(territory, good.id) !== undefined);
+      const cropFeasibleKg = cropFeasible.reduce((acc, [, kg]) => acc + kg, 0);
+      const cropCoverage = crop === undefined ? null : cropFeasibleKg / crop.worldKg;
+      if (crop !== undefined) {
+        const recordedKg = [...crop.recorded.values()].reduce((acc, kg) => acc + kg, 0);
+        const batch1Kg = Object.values(crop.crops).reduce((acc, entry) => acc + entry.recordedBatch1Kg, 0);
+        entryReport.a12 = {
+          worldKgPerYear: crop.worldKg,
+          recordedKgPerYear: recordedKg,
+          hostableRecordedKgPerYear: cropFeasibleKg,
+          coverage: cropCoverage,
+          coverageAllRecorded: recordedKg / crop.worldKg,
+          coverageBatch1: batch1Kg / crop.worldKg,
+          minCoverage: A12_MIN_COVERAGE,
+          usesSourcedShares: cropCoverage >= A12_MIN_COVERAGE,
+          crops: crop.crops,
+        };
+        for (const [territory, kg] of crop.recorded) {
+          if (definitionFor(territory, good.id) === undefined) entryReport.unplaced.push({ territory, sourcedShare: kg / crop.worldKg, reason: territoryProvinces.has(territory) ? "no province can host the producer (land, crop band or technology)" : "territory not in the 1900 world" });
+        }
+      }
+      if (crop !== undefined && cropCoverage >= A12_MIN_COVERAGE) {
+        // 1. Producers the sources name but do not record make their own demand.
+        const self = new Set();
+        let selfPerDay = 0;
+        for (const territory of [...crop.selfSupplied].sort()) {
+          if (definitionFor(territory, good.id) === undefined) continue;
+          let own = 0;
+          for (const [key, row] of demand) if (key.split("|")[1] === territory) own += row.get(good.id) ?? 0;
+          self.add(territory);
+          if (!(own > 0)) continue;
+          targets.set(territory, (targets.get(territory) ?? 0) + own);
+          selfPerDay += own;
+        }
+        // 2. The rest of world demand: recorded kg / world estimate to each recorded producer.
+        const rest = total - selfPerDay;
+        for (const [territory, kg] of cropFeasible) targets.set(territory, (targets.get(territory) ?? 0) + (rest * kg) / crop.worldKg);
+        // 3. The share no recorded producer holds keeps the local-and-pooled rule.
+        const residualScale = 1 - cropFeasibleKg / crop.worldKg;
+        const residualText = residualScale > 0 ? placeLocally(residualScale, self) : null;
+        entryReport.a12.selfSuppliedPerDay = selfPerDay;
+        entryReport.a12.selfSuppliedTerritories = [...self];
+        entryReport.a12.sharesPerDay = rest - rest * residualScale;
+        entryReport.a12.residualPerDay = rest * residualScale;
+        basis = `sourced 1900 shares (A12, crops1900): recorded producers hold ${(100 * cropCoverage).toFixed(1)} % of the world estimate (rule: at least ${100 * A12_MIN_COVERAGE} %)${self.size > 0 ? `; ${[...self].join(", ")} make their own demand (no statistics)` : ""}${residualText === null ? "" : `; the remaining ${(100 * residualScale).toFixed(1)} % by ${residualText}`}`;
+      } else if (shares !== undefined) {
+        const list = [];
+        for (const [territory, value] of shares.entries) {
+          if (AGGREGATE_KEYS.has(territory) || !(value > 0)) continue;
+          if (territory === "central-america") {
+            const weight = CENTRAL_AMERICA.reduce((acc, key) => acc + (territoryPopulation.get(key) ?? 0), 0);
+            for (const member of CENTRAL_AMERICA) list.push([member, (value * (territoryPopulation.get(member) ?? 0)) / weight]);
+          } else list.push([territory, value]);
+        }
+        const feasible = list.filter(([territory]) => definitionFor(territory, good.id) !== undefined);
+        for (const [territory, value] of list) {
+          if (!feasible.some(([key]) => key === territory)) entryReport.unplaced.push({ territory, sourcedShare: value, reason: territoryProvinces.has(territory) ? "no province can host the producer (deposit, land or technology)" : "territory not in the 1900 world" });
+        }
+        const sum = feasible.reduce((acc, [, value]) => acc + value, 0);
+        for (const [territory, value] of feasible) targets.set(territory, (targets.get(territory) ?? 0) + (total * value) / sum);
+      } else {
+        basis = placeLocally(1, new Set());
+        if (crop !== undefined) basis += `; A12: recorded producers hold ${(100 * cropCoverage).toFixed(1)} % of the world estimate, below the ${100 * A12_MIN_COVERAGE} % rule, so the sourced shares are not used`;
       }
       entryReport.basis = basis;
       const placedTargets = consolidate(good, targets, entryReport);

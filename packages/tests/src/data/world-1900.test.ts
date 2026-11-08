@@ -308,6 +308,60 @@ describe("P5b 1900 world: hydro stations and jewellery (C-12, D-152)", () => {
   });
 });
 
+describe("P5b 1900 world: A12 crops at their recorded 1900 producers (D-148 additions, item 9)", () => {
+  const p5b = (file: string) => JSON.parse(readFileSync(join(DATA_ROOT, "historical/p5b", file), "utf8")) as unknown;
+  const sources = p5b("sources_1900.json") as {
+    crops1900: { entries: { crop: string; territory: string; kind: string; kg: number; as: string; batch: number }[] };
+    units: { id: string; value: number }[];
+  };
+  const calibration = p5b("calibration_1900.json") as {
+    placement: { goods: Record<string, { a12?: { coverage: number; minCoverage: number; usesSourcedShares: boolean } }> };
+  };
+  const provinces = p5b("provinces_1900.json") as { id: number; territoryKey: string }[];
+  const buildings = p5b("buildings_1900.json") as { provinceId: number; definitionKey: string; level: number }[];
+  const territoryOf = new Map(provinces.map((province) => [province.id, province.territoryKey]));
+  const levelsIn = (definitionKey: string) => {
+    const levels = new Map<string, number>();
+    for (const building of buildings.filter((row) => row.definitionKey === definitionKey)) {
+      const territory = territoryOf.get(building.provinceId)!;
+      levels.set(territory, (levels.get(territory) ?? 0) + building.level);
+    }
+    return levels;
+  };
+
+  test("the USDA 1900 tobacco rows reproduce the printed total", () => {
+    const kgPerLb = sources.units.find((row) => row.id === "kg-per-lb")!.value;
+    const rows = sources.crops1900.entries.filter((entry) => entry.crop === "tobacco" && entry.kind === "production");
+    expect(rows).toHaveLength(33);
+    const pounds = rows.reduce((acc, row) => acc + row.kg / kgPerLb, 0);
+    expect(Math.abs(pounds - 2_201_193_000)).toBeLessThan(1);
+  });
+
+  test("each A12 good passes the coverage rule and is placed by its sourced shares", () => {
+    for (const key of ["coffee-tea-cocoa", "tobacco", "rubber"]) {
+      const a12 = calibration.placement.goods[key]?.a12;
+      expect(a12).toBeDefined();
+      expect(a12!.coverage).toBeGreaterThanOrEqual(a12!.minCoverage);
+      expect(a12!.usesSourcedShares).toBe(true);
+    }
+  });
+
+  test("plantations, tobacco farms and rubber estates stand where 1900 grew the crops", () => {
+    const plantations = levelsIn("plantation");
+    for (const territory of ["bra-home", "bin", "chn-home", "dei", "cey", "ven-home", "col-home", "gua-home"]) {
+      expect(plantations.get(territory) ?? 0).toBeGreaterThan(0);
+    }
+    // Brazil, the largest recorded coffee producer, has the most plantation levels.
+    expect(Math.max(...plantations.values())).toBe(plantations.get("bra-home"));
+    const tobacco = levelsIn("tobacco-farm");
+    for (const territory of ["usa-home", "bin", "rus-home", "aut-home", "chn-home", "cub-home"]) {
+      expect(tobacco.get(territory) ?? 0).toBeGreaterThan(0);
+    }
+    const rubber = levelsIn("rubber-estate");
+    for (const territory of ["bra-home", "cfs", "bwa"]) expect(rubber.get(territory) ?? 0).toBeGreaterThan(0);
+  });
+});
+
 describe("M11 country selection and persistence", () => {
   test.each([
     ["USA", "Americas"],

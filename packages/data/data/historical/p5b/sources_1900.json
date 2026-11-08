@@ -154,6 +154,78 @@
    "accessDate": "2026-11-08",
    "license": "Public domain (U.S. government publication, 1901)",
    "notes": "PDF page = book page + 6. Quotes the Brazilian Review (Rio de Janeiro) of July 1900. Read from the page images."
+  },
+  {
+   "id": "usda-yearbook-1905",
+   "title": "Yearbook of the United States Department of Agriculture 1905: total tobacco crop of countries named, 1900-1904",
+   "author": "U.S. Department of Agriculture (1906)",
+   "url": "https://archive.org/details/yoa1905",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government work)",
+   "notes": "pp. 714-715 = PDF 788-789. Read from the page images."
+  },
+  {
+   "id": "usda-yearbook-1906",
+   "title": "Yearbook of the United States Department of Agriculture 1906: tobacco crop of countries named, 1901-1905 (headnote)",
+   "author": "U.S. Department of Agriculture (1907)",
+   "url": "https://archive.org/details/yoa1906",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government work)",
+   "notes": "p. 605 = PDF 650. Read from the page image."
+  },
+  {
+   "id": "bot-foreign-abstract-30",
+   "title": "Statistical Abstract for the principal and other Foreign Countries in each year from 1892 to 1902, Thirtieth Number: China and Japan, principal articles exported",
+   "author": "Board of Trade, Commercial, Labour and Statistical Department (1904)",
+   "url": "https://archive.org/details/statisticalabstr2930grea",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (UK Parliamentary paper of 1904, Crown copyright expired)",
+   "notes": "Bound with no. 29; no. 30, p. 159 = PDF 537 (China), p. 163 = PDF 541 (Japan). Verifies the OCR text cached earlier. Read from the page images."
+  },
+  {
+   "id": "ukers-coffee-1922",
+   "title": "All About Coffee, chapter on the world's commercial coffees (coffee exports by country, 1900)",
+   "author": "William H. Ukers (New York: The Tea and Coffee Trade Journal Company, 1922)",
+   "url": "https://archive.org/details/allaboutcoffee00ukeruoft",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (published 1922 in the United States; the author died in 1945)",
+   "notes": "pp. 192-194 = PDF 240, 243-244. Read from the page images."
+  },
+  {
+   "id": "iba-venezuela-1904",
+   "title": "Venezuela: geographical sketch, natural resources, laws, economic conditions, actual development, prospects of future growth",
+   "author": "International Bureau of the American Republics, Washington (1904)",
+   "url": "https://archive.org/details/venezuelageograp00inte",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government publication, 1904)",
+   "notes": "PDF page = book page + 32 (pp. 148 and 528 = PDF 180 and 606). Read from the page images."
+  },
+  {
+   "id": "baker-cocoa-1899-1904",
+   "title": "Cocoa and Chocolate: a short history of their production and use (1899 and 1904 editions)",
+   "author": "Walter Baker & Co., Dorchester, Mass.",
+   "url": "https://archive.org/details/cocoaandchocola02compgoog (1899); https://archive.org/details/cu31924073241881 (1904)",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (published 1899 and 1904 in the United States)",
+   "notes": "1899 ed. p. 7 = PDF 13; 1904 ed. p. 8 = PDF 12. Read from the page images."
+  },
+  {
+   "id": "india-rubber-world-1901-02",
+   "title": "The India Rubber World, vol. 23, no. 5 (1 February 1901): American consumption of rubber for 1900; the Congo and Antwerp",
+   "author": "India Rubber Publishing Co., New York",
+   "url": "https://archive.org/details/sim_rubber-world_1901-02-01_23_5",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (published 1901 in the United States)",
+   "notes": "pp. 136 and 146 (PDF 6 and 16). Read from the page images."
+  },
+  {
+   "id": "census-manufactures-1900",
+   "title": "Twelfth Census of the United States (1900), Volume VII, Manufactures Part 1: United States by industries, table 1 (comparative summary by specified industries)",
+   "author": "U.S. Census Office (1902)",
+   "url": "https://www2.census.gov/library/publications/decennial/1900/volume-7/volume-7-p7.pdf",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government work)",
+   "notes": "Read from the page images (PDF 9, 12 and 13 of the part file)."
   }
  ],
  "units": [
@@ -320,6 +392,22 @@
    "status": "provisional",
    "sourceId": "p5b-provisional",
    "note": "No 1900 census figure transcribed (the Twelfth Census of manufactures' jewelry industry is not cached). Planning value: bullion about half the wholesale value of gold and silver wares, the rest the jewellers' work, other materials and margin."
+  },
+  {
+   "id": "kg-per-picul",
+   "value": 60.478982666666674,
+   "unit": "kg per picul (133 1/3 lb, Chinese Maritime Customs)",
+   "status": "sourced",
+   "sourceId": "p5b-provisional",
+   "note": "The customs picul of 133 1/3 avoirdupois pounds."
+  },
+  {
+   "id": "kg-per-kin",
+   "value": 0.6,
+   "unit": "kg per kin (Japan)",
+   "status": "sourced",
+   "sourceId": "p5b-provisional",
+   "note": "Japanese Weights and Measures Act of 1891: 1 kin = 160 monme = 600 g."
   }
  ],
  "prices1900": [
@@ -2632,7 +2720,27 @@
   "steamEngineHorsepower": 1379941,
   "waterWheelHorsepower": 438472,
   "otherHorsepower": 26635,
-  "status": "sourced"
+  "status": "sourced",
+  "options": {
+   "sourceId": "census-electric-1902",
+   "status": "sourced",
+   "waterOnlyPrivateStations": {
+    "locator": "p. 48 (PDF 71), table 40, private stations using water power exclusively, 1902",
+    "stations": 278,
+    "incomeFromSaleOfCurrentUSD": 3771862,
+    "arcLightingUSD": 425586,
+    "incandescentLightingUSD": 1487483,
+    "allOtherElectricServiceUSD": 1858793,
+    "outputKWh": 248749668,
+    "centsPerKWh": 1.5163284559640096
+   },
+   "motorRates": {
+    "locator": "p. 39 (PDF 58)",
+    "note": "Average power rate about 10 cents per kWh without discounts (range 2-15 cents); Niagara Falls 3 cents per kWh, or a flat $35 per horsepower a year up to 10 hp, $30 up to 25 hp and $25 above 25 hp. Motor service was somewhat over 12 % of private stations' gross income.",
+    "niagaraLargeUSDPerHPYear": 25
+   },
+   "note": "The census does not split kWh between lighting and power (D-148 additions, item 10). Not applied: the reference price stays 1.0 cent until the designer decides."
+  }
  },
  "industrialArts1900": {
   "sourceId": "mint-1901-arts",
@@ -2846,10 +2954,60 @@
     "total": 16997695
    },
    "note": "Both columns reproduce their printed totals. New metal = domestic bullion + foreign material (gold 78.9 %, silver 86.4 %); melted coin (monetary stock) and old material are not new metal."
+  },
+  "census1900": {
+   "sourceId": "census-manufactures-1900",
+   "locator": "Volume VII, Manufactures Part 1, table 1, comparative summary by specified industries, 1900 rows",
+   "status": "sourced",
+   "columns": [
+    "industry",
+    "name",
+    "valueOfProductsUSD",
+    "costOfMaterialsUSD",
+    "page"
+   ],
+   "rows": [
+    [
+     "jewelry",
+     "Jewelry",
+     46501181,
+     22356067,
+     "p. 10 (PDF 9)"
+    ],
+    [
+     "silversmithing",
+     "Silversmithing",
+     2936462,
+     1229158,
+     "p. 14 (PDF 13)"
+    ],
+    [
+     "silverware",
+     "Silverware",
+     10569121,
+     4554487,
+     "p. 14 (PDF 13)"
+    ],
+    [
+     "plated-ware",
+     "Plated and britannia ware",
+     12608770,
+     5875312,
+     "p. 13 (PDF 12)"
+    ]
+   ],
+   "totals": {
+    "valueOfProductsUSD": 72615534,
+    "costOfMaterialsUSD": 34015024,
+    "materialsShare": 0.4684262736400176
+   },
+   "usMetalUSD": 23761100,
+   "metalShareUpperBound": 0.32721786498189215,
+   "note": "All materials (gold, silver, stones, base metal, fuel) are 46.8 % of the value of products of the four industries. The Mint's US industrial consumption of 1900 (gold $16,667,500 plus silver at its commercial value $7,093,600, gross of old material) is 32.7 % of that value; part of it went to watch cases, dentistry, gold leaf and other trades, so the metal share of jewellery and plate is at most about 0.33. Not applied: 'jewellery-metal-share-of-value' stays 0.5 until the designer decides (D-152 addition)."
   }
  },
  "crops1900": {
-  "description": "D-146 A12: 1900 figures for coffee, tea, cocoa, tobacco and rubber by producer, kg. Production where the source gives it, otherwise exports (marked). Transcribed but NOT used for placement until the main producers missing here are covered (the builder still pools these goods worldwide by province weight).",
+  "description": "D-146 A12: 1900 figures for coffee, tea, cocoa, tobacco and rubber by producer, kg. Production where the source gives it, otherwise exports or market receipts (marked; status 'estimated' where exports of another year, half a year or a mean of two estimates stand for 1900). When a territory has both a production and an export row for a crop, placement uses the production row. worldEstimates give each crop's world figure for the coverage rule; selfSupplied lists producers that the sources name but do not record. Batch 1 is the first set of 2026-11-08; batch 2 closes the A12 gaps. Placement rule: scripts/p5b/placement.mjs (D-148 additions, item 9).",
   "entries": [
    {
     "crop": "tea",
@@ -2859,7 +3017,8 @@
     "as": "197,460,664 lb",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 44, p. 246 (PDF 886): tea in India (including native states), 1900, production 197,460,664 lb on 522,487 acres",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "coffee",
@@ -2869,7 +3028,8 @@
     "as": "21,582,003 lb",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 45, p. 247 (PDF 887): coffee in India, 1900, production 21,582,003 lb (footnote d: imperfect, no returns from several Nilgiri plantations)",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "tea",
@@ -2879,7 +3039,8 @@
     "as": "149,264,603 lb",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 21, p. 59 (PDF 699): Ceylon exports, 1900, tea 149,264,603 lb (production not stated, p. 246 note a)",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "cocoa",
@@ -2889,7 +3050,8 @@
     "as": "33,697 cwt",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 21, p. 59 (PDF 699): Ceylon exports, 1900, cocoa 33,697 cwt",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "coffee",
@@ -2899,7 +3061,8 @@
     "as": "9,396 + 496 cwt",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 21, p. 59 (PDF 699): Ceylon exports, 1900, coffee, plantation 9,396 cwt and native 496 cwt",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "tobacco",
@@ -2909,7 +3072,8 @@
     "as": "42,523 cwt",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 21, p. 59 (PDF 699): Ceylon exports, 1900, tobacco unmanufactured 42,523 cwt",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "cocoa",
@@ -2919,7 +3083,8 @@
     "as": "1,200,794 lb",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 21, p. 117 (PDF 757): Gold Coast exports, 1900, cocoa 1,200,794 lb",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "coffee",
@@ -2929,7 +3094,8 @@
     "as": "83,201 lb",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 21, p. 117 (PDF 757): Gold Coast exports, 1900, coffee 83,201 lb",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "rubber",
@@ -2939,7 +3105,8 @@
     "as": "3,452,440 lb",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 21, p. 117 (PDF 757): Gold Coast exports, 1900, rubber (African) 3,452,440 lb",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "cocoa",
@@ -2949,7 +3116,8 @@
     "as": "23,450 cwt",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 21, p. 133 (PDF 773): Jamaica exports, year ended 31 March 1901, cocoa 23,450 cwt",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "coffee",
@@ -2959,7 +3127,8 @@
     "as": "85,907 cwt",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 21, p. 133 (PDF 773): Jamaica exports, year ended 31 March 1901, coffee 85,907 cwt",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "cocoa",
@@ -2969,7 +3138,8 @@
     "as": "34,790,682 lb",
     "sourceId": "colonial-abstract-38",
     "locator": "No. 21, p. 141 (PDF 781): Trinidad (with Tobago) exports, 1900, cocoa 34,790,682 lb",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "coffee",
@@ -2979,7 +3149,8 @@
     "as": "31,544 + 11,422 (parchment) + 151 (cherry) thousand kg + 7,917,722 kg government",
     "sourceId": "koloniaal-verslag-1901",
     "locator": "Bijlage DDD, PDF p. 537: general exports 1900 (thousands of kg), coffee hulled 31,544, in parchment 11,422, dried cherry 151; PDF p. 536 footnote j: government-account coffee 7,917,722 kg. Parchment counted at 0.8 and cherry at 0.5 of hulled weight (provisional).",
-    "status": "estimated"
+    "status": "estimated",
+    "batch": 1
    },
    {
     "crop": "tea",
@@ -2989,7 +3160,8 @@
     "as": "7,634 thousand kg",
     "sourceId": "koloniaal-verslag-1901",
     "locator": "Bijlage DDD, PDF p. 538: general exports 1900, tea 7,634 thousand kg",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "cocoa",
@@ -2999,7 +3171,8 @@
     "as": "1,342 thousand kg",
     "sourceId": "koloniaal-verslag-1901",
     "locator": "Bijlage DDD, PDF p. 536: general exports 1900, cocoa 1,342 thousand kg",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "tobacco",
@@ -3009,7 +3182,8 @@
     "as": "52,398 + 1,613 thousand kg",
     "sourceId": "koloniaal-verslag-1901",
     "locator": "Bijlage DDD, PDF p. 538: general exports 1900, tobacco for the European market 52,398 and for the native market 1,613 thousand kg",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "coffee",
@@ -3019,7 +3193,8 @@
     "as": "8,973,825 bags of 60 kg",
     "sourceId": "brazil-handbook-1901",
     "locator": "p. 134 (PDF 140): coffee exported, crop year 1899-1900, Rio de Janeiro 3,294,987 and Santos 5,678,838 bags of 60 kg (= 8,973,825, p. 134 text; 'the ports through which the whole trade is practically carried on')",
-    "status": "sourced"
+    "status": "sourced",
+    "batch": 1
    },
    {
     "crop": "rubber",
@@ -3029,15 +3204,676 @@
     "as": "25,374 long tons",
     "sourceId": "brazil-handbook-1901",
     "locator": "p. 135 (PDF 141): entries of rubber to Para, 25,374 English tons 'in 1899-1900' (the sentence names the fiscal years 1897-98 and 1898-99; shipments 1898-99 were 25,246 tons)",
-    "status": "estimated"
+    "status": "estimated",
+    "batch": 1
+   },
+   {
+    "crop": "coffee",
+    "territory": "mex-home",
+    "kind": "exports",
+    "kg": 21914968.81197932,
+    "as": "48,314,236 lb",
+    "sourceId": "ukers-coffee-1922",
+    "locator": "p. 193 (PDF 243): coffee exports from Mexico by destination, calendar year 1900, total 48,314,236 lb (the destinations sum to the total)",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "coffee",
+    "territory": "gua-home",
+    "kind": "exports",
+    "kg": 33104281.55672176,
+    "as": "72,982,448 lb",
+    "sourceId": "ukers-coffee-1922",
+    "locator": "p. 192 (PDF 240): coffee exports from Guatemala by destination, 1900, total 72,982,448 lb (the destinations sum to the total)",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "coffee",
+    "territory": "sal-home",
+    "kind": "exports",
+    "kg": 21114884.48801424,
+    "as": "46,550,352 lb (January-June 1900)",
+    "sourceId": "ukers-coffee-1922",
+    "locator": "p. 192 (PDF 240): coffee exports from Salvador, first six months of 1900 (a consular report), total 46,550,352 lb (the destinations sum to the total). Half a year only: a lower bound for 1900",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "coffee",
+    "territory": "cos-home",
+    "kind": "exports",
+    "kg": 16100739.713100351,
+    "as": "35,496,055 lb",
+    "sourceId": "ukers-coffee-1922",
+    "locator": "p. 193 (PDF 243): 'In 1900 total shipments were 35,496,055 pounds' (Costa Rica; crop years ending September 30)",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "coffee",
+    "territory": "col-home",
+    "kind": "exports",
+    "kg": 29312764.17086171,
+    "as": "56,787,078 + 7,836,505 lb (year to June 1899)",
+    "sourceId": "ukers-coffee-1922",
+    "locator": "p. 192 (PDF 240): coffee exports from Colombia, fiscal year ending June 30, 1899: Barranquilla 56,787,078 lb (consular report) plus Cartagena 7,836,505 lb (footnote). 1899, not 1900",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "coffee",
+    "territory": "dom-home",
+    "kind": "exports",
+    "kg": 1323005.1125729901,
+    "as": "2,916,727 lb",
+    "sourceId": "ukers-coffee-1922",
+    "locator": "p. 194 (PDF 244): coffee exports from the Dominican Republic, 1900, total 2,916,727 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "coffee",
+    "territory": "pri",
+    "kind": "exports",
+    "kg": 5514431.3042588,
+    "as": "12,157,240 lb (fiscal 1900-01)",
+    "sourceId": "ukers-coffee-1922",
+    "locator": "p. 194 (PDF 244): coffee exports from Porto Rico, fiscal year 1900-01, total 12,157,240 lb (the crop after the hurricane of 1899)",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "coffee",
+    "territory": "ven-home",
+    "kind": "production",
+    "kg": 46000000,
+    "as": "about 1,000,000 bags of 46 kg",
+    "sourceId": "iba-venezuela-1904",
+    "locator": "p. 148 (PDF 180): 'Venezuela produces annually about 1,000,000 bags of coffee' (abstract of the Venezuelan delegates' report to the Coffee Congress, 1902); p. 528 (PDF 606): 1 coffee bag = 46 kilos",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "tea",
+    "territory": "chn-home",
+    "kind": "exports",
+    "kg": 83644065.96053201,
+    "as": "863,000 + 200,000 + 317,000 + 3,027 piculs",
+    "sourceId": "bot-foreign-abstract-30",
+    "locator": "No. 20, p. 159 (PDF 537): China (exclusive of Hong Kong), domestic produce exported, 1900: tea black 863,000, green 200,000, brick 317,000, tablet 3,027 piculs (includes exports to Corea). Picul = 133 1/3 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tea",
+    "territory": "jpn-home",
+    "kind": "exports",
+    "kg": 27531600,
+    "as": "45,886,000 kin",
+    "sourceId": "bot-foreign-abstract-30",
+    "locator": "No. 20, p. 163 (PDF 541): Japan, domestic produce exported, 1900: tea 45,886,000 kin (the years are marked: 'the figures include the foreign trade of Formosa'). Kin = 0.6 kg",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "cocoa",
+    "territory": "ecu-home",
+    "kind": "exports",
+    "kg": 18597287.17,
+    "as": "mean of 33,500,000 and 48,500,000 lb",
+    "sourceId": "baker-cocoa-1899-1904",
+    "locator": "1899 ed. p. 7 (PDF 13): Guayaquil about 33,500,000 lb; 1904 ed. p. 8 (PDF 12): about 48,500,000 lb. The two 'recent estimates' bracket 1900; the mean is used",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "cocoa",
+    "territory": "ven-home",
+    "kind": "exports",
+    "kg": 7937866.475000001,
+    "as": "mean of 15,000,000 and 20,000,000 lb",
+    "sourceId": "baker-cocoa-1899-1904",
+    "locator": "1899 ed. p. 7 (PDF 13): Venezuela 'nearly 15,000,000' lb; 1904 ed. p. 8 (PDF 12): 'over 20,000,000' lb; mean",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "cocoa",
+    "territory": "bra-home",
+    "kind": "exports",
+    "kg": 15875732.950000001,
+    "as": "35,000,000 lb (about 1903)",
+    "sourceId": "baker-cocoa-1899-1904",
+    "locator": "1904 ed. p. 8 (PDF 12): Brazil about 35,000,000 lb (the 1899 edition names Para and Bahia without a figure)",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "cocoa",
+    "territory": "pai",
+    "kind": "exports",
+    "kg": 13970284.84365822,
+    "as": "mean of 17,000,000 and 47,000,000 lb (the African crop) less the Gold Coast's 1,200,794 lb",
+    "sourceId": "baker-cocoa-1899-1904",
+    "locator": "1899 ed. p. 7: the African crop 'over 17,000,000' lb; 1904 ed. p. 8: 'over 47,000,000' lb; mean, less the Gold Coast's recorded 1900 exports (colonial abstract no. 38); the rest placed at Sao Tome and Principe, the chief African grower (provisional)",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "rubber",
+    "territory": "cfs",
+    "kind": "receipts",
+    "kg": 5686087.43998449,
+    "as": "12,535,677 lb (arrivals at Antwerp)",
+    "sourceId": "india-rubber-world-1901-02",
+    "locator": "p. 136: 'the arrivals of rubber at Antwerp during 1900 - largely from the Congo and adjacent territory - amounted to 12,535,677 pounds'. Antwerp arrivals stand for the Congo Free State's exports",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "rubber",
+    "territory": "bwa",
+    "kind": "exports",
+    "kg": 270491.64518684003,
+    "as": "596,332 lb",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 113 (PDF 753): Lagos exports, 1900, rubber 596,332 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "usa-home",
+    "kind": "production",
+    "kg": 369380678.54765004,
+    "as": "814,345,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: United States, continental 814,345,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "pri",
+    "kind": "production",
+    "kg": 2721554.22,
+    "as": "6,000,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Porto Rico 6,000,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "can-home",
+    "kind": "production",
+    "kg": 5110625.23279,
+    "as": "11,267,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Canada 11,267,000 (Ontario 3,504,000 and other 7,763,000; census) lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "cub-home",
+    "kind": "production",
+    "kg": 24675424.928,
+    "as": "54,400,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Cuba 54,400,000 (unofficial estimate) lb",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "gua-home",
+    "kind": "production",
+    "kg": 515734.52469000005,
+    "as": "1,137,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Guatemala 1,137,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "mex-home",
+    "kind": "production",
+    "kg": 9343549.22963,
+    "as": "20,599,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Mexico 20,599,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "bra-home",
+    "kind": "production",
+    "kg": 24947580.35,
+    "as": "55,000,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Brazil 55,000,000 (average production) lb",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "aut-home",
+    "kind": "production",
+    "kg": 65218418.14334001,
+    "as": "143,782,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Austria-Hungary 143,782,000 (Austria 11,682,000, Hungary 132,100,000) lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "bel-home",
+    "kind": "production",
+    "kg": 4809893.49148,
+    "as": "10,604,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Belgium 10,604,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "bgr-home",
+    "kind": "production",
+    "kg": 3154281.3409800003,
+    "as": "6,954,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Bulgaria 6,954,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "dnk-home",
+    "kind": "production",
+    "kg": 166921.99216,
+    "as": "368,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Denmark 368,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "fra-home",
+    "kind": "production",
+    "kg": 22759904.34949,
+    "as": "50,177,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: France 50,177,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "deu-home",
+    "kind": "production",
+    "kg": 34790081.18663,
+    "as": "76,699,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Germany 76,699,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "grc-home",
+    "kind": "production",
+    "kg": 6350293.180000001,
+    "as": "14,000,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Greece 14,000,000 (average production) lb",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "ita-home",
+    "kind": "production",
+    "kg": 6211947.50715,
+    "as": "13,695,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Italy 13,695,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "nld-home",
+    "kind": "production",
+    "kg": 1464649.76273,
+    "as": "3,229,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Netherlands 3,229,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "rom-home",
+    "kind": "production",
+    "kg": 4010210.14317,
+    "as": "8,841,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Roumania 8,841,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "rus-home",
+    "kind": "production",
+    "kg": 69675870.36333,
+    "as": "153,609,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Russia 153,609,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "srb-home",
+    "kind": "production",
+    "kg": 916710.17977,
+    "as": "2,021,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Servia 2,021,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "swe-home",
+    "kind": "production",
+    "kg": 792879.46276,
+    "as": "1,748,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Sweden 1,748,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "bin",
+    "kind": "production",
+    "kg": 200034235.17000002,
+    "as": "441,000,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: British India 441,000,000 (average production) lb",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "dei",
+    "kind": "production",
+    "kg": 42146895.83566,
+    "as": "92,918,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Dutch East Indies 92,918,000 (Borneo 880,000, Java 47,922,000, Sumatra 44,116,000) lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "jpn-home",
+    "kind": "production",
+    "kg": 40674081.410270005,
+    "as": "89,671,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Japan 89,671,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "twn",
+    "kind": "production",
+    "kg": 363781.08074,
+    "as": "802,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Formosa 802,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "phl",
+    "kind": "production",
+    "kg": 15921092.187,
+    "as": "35,100,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Philippine Islands 35,100,000 (unofficial estimate) lb",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "ott-home",
+    "kind": "production",
+    "kg": 29937096.42,
+    "as": "66,000,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Turkey 66,000,000 (average production; including European Turkey) lb",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "alg",
+    "kind": "production",
+    "kg": 7732389.131390001,
+    "as": "17,047,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Algeria 17,047,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "cap",
+    "kind": "production",
+    "kg": 2267961.85,
+    "as": "5,000,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Cape of Good Hope 5,000,000 (unofficial estimate) lb",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "bpo",
+    "kind": "production",
+    "kg": 13607.7711,
+    "as": "30,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Mauritius 30,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "nat",
+    "kind": "production",
+    "kg": 1249646.9793500002,
+    "as": "2,755,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Natal 2,755,000 lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "orf-home",
+    "kind": "production",
+    "kg": 340194.2775,
+    "as": "750,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Orange River Colony 750,000 (marked c: an estimate) lb",
+    "status": "estimated",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "aus-home",
+    "kind": "production",
+    "kg": 739809.15547,
+    "as": "1,631,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Australia 1,631,000 (New South Wales 744,000, Victoria 153,000, Queensland 734,000) lb",
+    "status": "sourced",
+    "batch": 2
+   },
+   {
+    "crop": "tobacco",
+    "territory": "fji",
+    "kind": "production",
+    "kg": 6350.293180000001,
+    "as": "14,000 lb",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Fiji 14,000 lb",
+    "status": "sourced",
+    "batch": 2
    }
   ],
   "coverage": {
-   "coffee": "Brazil, Dutch East Indies, India, Ceylon, Jamaica, Gold Coast. Missing: Venezuela, Colombia, Central America, Mexico, Haiti, Puerto Rico, Cuba (the Brazil handbook, p. 104, gives all America outside Brazil 426.8 M lb in 1898).",
-   "tea": "India, Ceylon, Dutch East Indies. Missing: China and Japan (the Board of Trade foreign-countries abstract is cached as OCR text only), and their domestic crops.",
-   "cocoa": "Trinidad, Jamaica, Ceylon, Gold Coast, Dutch East Indies. Missing: Ecuador, Brazil (Bahia), Venezuela, Sao Tome.",
-   "tobacco": "Ceylon and the Dutch East Indies (exports). Missing: the large producers that consumed their own crop (United States, India, China, Russia, Austria-Hungary, Turkey) and Cuba and the Philippines.",
-   "rubber": "Brazil and the Gold Coast. Missing: the Congo Free State, Lagos and other West African colonies, Peru and Bolivia (via Para), Central America."
+   "coffee": "Recorded: Brazil, Dutch East Indies, India, Ceylon, Jamaica, Gold Coast (batch 1); Mexico, Guatemala, Salvador (half year), Costa Rica, Colombia (1899), Venezuela (estimate), Porto Rico, Dominican Republic (batch 2). Missing: Haiti, Nicaragua, Cuba, Arabia, Abyssinia and East Africa.",
+   "tea": "Recorded: India, Ceylon, Dutch East Indies (batch 1); China and Japan exports (batch 2). Domestic crops of China and Japan: self-supplied.",
+   "cocoa": "Recorded: Trinidad, Jamaica, Ceylon, Gold Coast, Dutch East Indies (batch 1); Ecuador, Venezuela, Brazil, Sao Tome (Baker estimates, batch 2). Missing: Haiti, Santo Domingo, Grenada, Surinam, Cuba, Colombia, Peru.",
+   "tobacco": "Recorded: the USDA 1900 table (33 territories, batch 2) and Ceylon's exports. China, Persia, Central America except Guatemala and the West Indies except Cuba and Porto Rico: self-supplied (no statistics).",
+   "rubber": "Recorded: Brazil (Para receipts, which include Peruvian and Bolivian rubber shipped down the Amazon), the Gold Coast (batch 1); the Congo via Antwerp and Lagos (batch 2). Missing: Centrals (Central America, Mexico, Colombia, Ecuador, Peruvian caucho), Angola, the French and German colonies, the East Indies."
+  },
+  "worldEstimates": {
+   "coffee": {
+    "kg": 955303310.0213126,
+    "as": "1,960,619,288 lb (all America) + 145,464,000 lb (Asia and Africa), 1898",
+    "kind": "production",
+    "sourceId": "brazil-handbook-1901",
+    "locator": "p. 104 (PDF 110): 'In 1898 the production of Brazil was estimated at 1,533,840,000 pounds ... out of a total production of 1,960,619,288 pounds for all America, while Asia and Africa produced only 145,464,000 pounds' (citing the Bulletin of the Bureau of American Republics, vol. VI, no. 11, 1899)",
+    "status": "estimated",
+    "note": "The 1898 crop stands for 1900 (provisional)."
+   },
+   "tea": {
+    "kg": null,
+    "as": "sum of the recorded producers",
+    "kind": "exports",
+    "sourceId": null,
+    "locator": null,
+    "status": "estimated",
+    "note": "No world total was found. The recorded producers (India's crop; the exports of Ceylon, China, Japan with Formosa, and the Dutch East Indies) are the tea of world trade in 1900; the domestic crops of China and Japan, which no source records, are self-supplied (selfSupplied.tea). Coverage of tea is therefore 1 by construction."
+   },
+   "cocoa": {
+    "kg": 91172066.37,
+    "as": "mean of 150,000,000 and 252,000,000 lb",
+    "kind": "exports",
+    "sourceId": "baker-cocoa-1899-1904",
+    "locator": "1899 ed. p. 7 (PDF 13): crude cocoa exported from the tropics 'about 150,000,000 pounds per annum'; 1904 ed. p. 8 (PDF 12): 'about 252,000,000 pounds per annum'; the mean brackets 1900",
+    "status": "estimated"
+   },
+   "tobacco": {
+    "kg": 998444349.6974101,
+    "as": "2,201,193,000 lb",
+    "kind": "production",
+    "sourceId": "usda-yearbook-1905",
+    "locator": "p. 715 (PDF 789): total tobacco crop of countries named, 1900, 2,201,193,000 lb (the country rows and the continental subtotals reproduce the printed totals)",
+    "status": "sourced",
+    "note": "Countries named only: the 1906 Yearbook's headnote to the same table (p. 605, PDF 650) gives no statistics for China, Persia, Central America (except Guatemala) and the West Indies (except Cuba and Porto Rico), and says South America (especially Brazil) is understated (selfSupplied.tobacco)."
+   },
+   "rubber": {
+    "kg": 39591283.8483008,
+    "as": "20,031 + 18,935 long tons",
+    "kind": "consumption",
+    "sourceId": "india-rubber-world-1901-02",
+    "locator": "p. 146: Henry A. Gould Co.'s deliveries for consumption, 1900: United States 20,031 (Paras 12,889, Centrals 1,883, Africans 4,804, East Indian 455) and Europe 18,935 (Paras 10,122, Centrals 2,143, Africans 5,821, East Indian 849) tons; the grades reproduce the printed totals. Long tons: 'The long ton of 2240 pounds is the unit' (same page, of Morse's tables)",
+    "status": "estimated",
+    "note": "World deliveries for consumption stand for world output (stocks moved little). By grade: Para 23,011, Centrals (with Caucho and Pernambuco) 4,026, African 10,625, East Indian 1,304 long tons."
+   }
+  },
+  "selfSupplied": {
+   "tea": {
+    "territories": [
+     "chn-home",
+     "jpn-home"
+    ],
+    "sourceId": "bot-foreign-abstract-30",
+    "locator": "No. 20, pp. 159 and 163 (PDF 537, 541): both tables count domestic produce exported only",
+    "note": "China's and Japan's own tea is not recorded in any source found; each supplies its own modelled demand for the good (provisional)."
+   },
+   "tobacco": {
+    "territories": [
+     "chn-home",
+     "per-home",
+     "hon-home",
+     "sal-home",
+     "nic-home",
+     "cos-home",
+     "hti-home",
+     "dom-home",
+     "bwi"
+    ],
+    "sourceId": "usda-yearbook-1906",
+    "locator": "p. 605 (PDF 650), headnote: 'No statistics for China, Persia, Central America (except Guatemala), West Indies (except Cuba and Porto Rico), and several less important tobacco-growing countries'",
+    "note": "Each supplies its own modelled demand for tobacco (provisional)."
+   }
   }
+ },
+ "cottonWorld1900": {
+  "sourceId": "usda-yearbook-1905",
+  "locator": "pp. 709-710 (PDF 783-784): cotton crop of countries named, 1900 (bales of 500 lb gross, 478 lb of lint net)",
+  "status": "sourced",
+  "totalBales": 15893591,
+  "lintLbPerBale": 478,
+  "rows": [
+   [
+    "usa-home",
+    10123027
+   ],
+   [
+    "bin",
+    2262467,
+    "exports and mill consumption"
+   ],
+   [
+    "chn-home",
+    1192000,
+    "estimate of Ellison, based upon net imports and an assumed annual per capita consumption of 2 1/4 lb"
+   ],
+   [
+    "egy",
+    1124632,
+    "Davies, Benachi & Co., as quoted by Ellison"
+   ],
+   [
+    "rus-home",
+    633065,
+    "Asiatic Russia: Transcaucasia 56,000 (average production), Central Asia 577,065"
+   ],
+   [
+    "bra-home",
+    209000,
+    "estimated from exports and an assumed home consumption of about 50,000,000 lb"
+   ],
+   [
+    "mex-home",
+    100527
+   ],
+   [
+    "ott-home",
+    63000,
+    "Asiatic Turkey, average production as unofficially estimated"
+   ]
+  ],
+  "note": "Report only (D-148 additions, item 11): the cotton placement shares stay the USDA 1901 commercial crop (C-8). The listed rows are the largest; the total is the printed world total."
  }
 }

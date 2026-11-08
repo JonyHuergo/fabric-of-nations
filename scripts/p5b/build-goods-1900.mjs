@@ -855,6 +855,19 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
       note: "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand",
     };
   }
+  // A12 crops (D-148 additions, item 9): modelled output against the world estimate.
+  for (const [key, entry] of Object.entries(placement.report.goods)) {
+    if (entry.a12 === undefined) continue;
+    const good = goods.find((candidate) => candidate.key === key);
+    const modelledPerYear = (placement.worldOutput.get(good.id) ?? 0) * 365;
+    sourcedOutput[key] = {
+      sourcedPerYearSimUnits: entry.a12.worldKgPerYear,
+      conversion: key === "coffee-tea-cocoa" ? "kg; world estimate of crops1900 (A12; coffee, tea and cocoa combined by kg)" : "kg; world estimate of crops1900 (A12)",
+      modelledPerYear,
+      modelledOverSourced: modelledPerYear / entry.a12.worldKgPerYear,
+      note: "world estimate of the crops (or the recorded sum where none exists); D-146 A5 sizes the world level by modelled demand",
+    };
+  }
   calibration.placement = {
     method: "scripts/p5b/placement.mjs (D-148)",
     notPlaced1900: NOT_PLACED_1900,
@@ -1008,6 +1021,28 @@ function beforeAfterReport(calibration) {
   lines.push("|---|---:|---:|---:|---|");
   for (const [key, entry] of Object.entries(placement.modelledOverSourced)) {
     lines.push(`| ${key} | ${num(entry.sourcedPerYearSimUnits)} | ${num(entry.modelledPerYear)} | ${entry.modelledOverSourced === null ? "—" : entry.modelledOverSourced.toFixed(2)} | ${entry.conversion} |`);
+  }
+  lines.push("");
+  lines.push("## A12 crops: coverage and placement (D-148 additions, item 9)");
+  lines.push("");
+  lines.push("Recorded 1900 output (production, or exports and receipts as a provisional proxy) against each crop's world estimate, kg per year (`sources_1900.json` `crops1900`). \"Before\" is the first transcription set (batch 1); \"after\" adds batch 2. The world estimates are those of batch 2 in both columns (tea has no world total: its figure is the recorded sum).");
+  lines.push("");
+  lines.push("| Crop | Good | Recorded before | Recorded after | World estimate | Coverage before | Coverage after |");
+  lines.push("|---|---|---:|---:|---:|---:|---:|");
+  const a12Goods = Object.entries(placement.goods).filter(([, entry]) => entry.a12 !== undefined);
+  for (const [key, entry] of a12Goods) {
+    for (const [crop, row] of Object.entries(entry.a12.crops)) {
+      lines.push(`| ${crop} | ${key} | ${num(row.recordedBatch1Kg)} | ${num(row.recordedKg)} | ${num(row.worldKg)}${row.worldEstimateKg === null ? " (recorded sum)" : ""} | ${pct(row.recordedBatch1Kg / row.worldKg)} | ${pct(row.recordedKg / row.worldKg)} |`);
+    }
+  }
+  lines.push("");
+  lines.push(`Rule: a good uses its sourced shares when the recorded producers that can host its producer in the 1900 world hold at least ${pct(a12Goods[0]?.[1].a12.minCoverage)} of the world estimate. Producers the sources name without a figure (China and Japan's own tea; China, Persia, most of Central America and the West Indies for tobacco) first make their own demand; the rest of world demand goes to the recorded producers in proportion to their kg; the share no recorded producer holds keeps the local-and-pooled rule.`);
+  lines.push("");
+  lines.push("| Good | Coverage before | Coverage after (hostable) | Placement before | Placement after | Own demand of self-supplied producers per day | By sourced shares per day | Local and pooled per day |");
+  lines.push("|---|---:|---:|---|---|---:|---:|---:|");
+  for (const [key, entry] of a12Goods) {
+    const a = entry.a12;
+    lines.push(`| ${key} | ${pct(a.coverageBatch1)} | ${pct(a.coverage)} | local demand, then pooled worldwide by province weight (D-148) | ${a.usesSourcedShares ? "sourced shares" : "local and pooled (coverage below the rule)"} | ${num(a.selfSuppliedPerDay ?? 0)} | ${num(a.sharesPerDay ?? 0)} | ${num(a.residualPerDay ?? entry.worldDemandPerDay)} |`);
   }
   lines.push("");
   lines.push("## World balance at opening prices (per day)");
