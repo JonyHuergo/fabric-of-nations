@@ -534,7 +534,8 @@ function build() {
     // with the capacity of the new coverage, and the 57-good buildings.
     markets: "historical/p5b/markets_1900.json",
     tradeRoutes: "historical/p5b/trade_routes_1900.json",
-    populations: "historical/p2b/pops_1900.json",
+    // P6 (D-153): the P2b blocks with their expected 1900 income (scripts/p5b/build-goods-1900.mjs).
+    populations: "historical/p6/pops_1900.json",
     buildings: "historical/p5b/buildings_1900.json",
     employment: "historical/p2b/employment_1900.json",
     calibration: "historical/p2b/calibration_targets_1900.json",
@@ -557,6 +558,8 @@ function build() {
     professions: "historical_1900_professions.json",
     buildings: "historical/p5b/buildings_definitions_1900.json",
     needs: "historical/p5b/needs_1900.json",
+    // P6 (D-153): the linear expenditure system of households.
+    demandSystem: "historical/p6/demand_1900.json",
   };
   meta.countryMeta = meta.countryMeta.map((entry) => {
     const out = {};

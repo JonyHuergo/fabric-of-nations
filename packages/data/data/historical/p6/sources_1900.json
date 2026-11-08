@@ -1,0 +1,263 @@
+{
+  "description": "P6 (D-153) source rows for the demand system, saving and housing of the 1900 world. Authored transcriptions read from page images (or a text layer where noted); every value has its locator and status. Read by scripts/p5b/build-goods-1900.mjs (P6 stage, scripts/p6/demand.mjs); docs/P6_DEMAND_PROVENANCE.md is generated from it.",
+  "decision": "D-153",
+  "sources": [
+    {
+      "id": "commissioner-labor-1903",
+      "title": "Eighteenth Annual Report of the Commissioner of Labor, 1903: Cost of Living and Retail Prices of Food",
+      "author": "U.S. Department of Commerce and Labor, Bureau of Labor",
+      "url": "https://archive.org/details/costlivingandre00labogoog",
+      "accessDate": "2026-11-06",
+      "licence": "Public domain (U.S. government work, 1904)",
+      "notes": "Table V-C (All States) p. 558 = PDF 699; Table V-L pp. 582-583 = PDF 725-726; text pp. 92 and 96 = PDF 93 and 97."
+    },
+    {
+      "id": "bls-bulletin-59",
+      "title": "Bulletin of the Bureau of Labor No. 59 (July 1905): Wages and Hours of Labor; Retail Prices of Food, 1890 to 1904",
+      "author": "U.S. Bureau of Labor",
+      "url": "https://fraser.stlouisfed.org/files/docs/publications/bls/bls_v11_0059_1905.pdf",
+      "accessDate": "2026-11-08",
+      "licence": "Public domain (U.S. government work); digitized by FRASER, Federal Reserve Bank of St. Louis",
+      "notes": "Average quantity per family of food articles consumed in 1901, 2,567 families, p. 165 = PDF 171."
+    },
+    {
+      "id": "engel-1895",
+      "title": "Die Lebenskosten belgischer Arbeiter-Familien früher und jetzt (Bulletin de l'Institut international de statistique IX)",
+      "author": "Ernst Engel (1821-1896)",
+      "url": "https://archive.org/details/dielebenskostenb00engluoft",
+      "accessDate": "2026-11-08",
+      "licence": "Public domain (author died 1896; published 1895)",
+      "notes": "1853 Belgian worker budgets (Ducpétiaux), 199 families in five expenditure classes: Table 2 p. 39 = PDF 51 (Mark per Quet), Table 4 p. 40 = PDF 54 (per cent)."
+    },
+    {
+      "id": "statab-1992",
+      "title": "Statistical Abstract of the United States 1992, Table 692: Average Annual Income and Expenditures of All Consumer Units: 1990",
+      "author": "U.S. Bureau of the Census (from the Bureau of Labor Statistics Consumer Expenditure Survey)",
+      "url": "https://www.census.gov/library/publications/1992/compendia/statab/112ed.html",
+      "accessDate": "2026-11-07",
+      "licence": "Public domain (U.S. government work)",
+      "notes": "pp. 442-443 (part 4 PDF 93-94), rows 39-44: complete income reporters and income quintiles."
+    },
+    {
+      "id": "atwater-1902",
+      "title": "Principles of Nutrition and Nutritive Value of Food (Farmers' Bulletin 142; 1916 reprint)",
+      "author": "W. O. Atwater, U.S. Department of Agriculture",
+      "url": "https://archive.org/details/principlesofnutr00atwa",
+      "accessDate": "2026-11-08",
+      "licence": "Public domain (U.S. government work)",
+      "notes": "Factors used in calculating meals consumed in dietary studies, pp. 33-34."
+    },
+    {
+      "id": "webb-1911",
+      "title": "The New Dictionary of Statistics (1911), articles Houses and Housing (pp. 301-304) and Commerce (consumption per head)",
+      "author": "Augustus D. Webb",
+      "url": "https://archive.org/details/newdictionaryofs00webb",
+      "accessDate": "2026-11-08",
+      "licence": "Public domain in the United States (published 1911; archive.org: not in copyright); the figures are census statistics",
+      "notes": "Census counts of houses and dwellings of 1899-1901 and per-head consumption of about 1901, transcribed from the text layer (OCR) and checked against the printed totals where the page gives them."
+    },
+    {
+      "id": "histstats-1975",
+      "title": "Historical Statistics of the United States, Colonial Times to 1970, chapter N (Construction and Housing)",
+      "author": "U.S. Bureau of the Census",
+      "url": "https://www2.census.gov/library/publications/1975/compendia/hist_stats_colonial-1970/hist_stats_colonial-1970p2-chN.pdf",
+      "accessDate": "2026-11-08",
+      "licence": "Public domain (U.S. government work)",
+      "notes": "Series N 156-169, new housing units started and construction cost, 1889-1970, p. 640 (PDF 31)."
+    },
+    {
+      "id": "mpd-2023",
+      "title": "Maddison Project Database 2023 (GDP per capita, 2011 international dollars), via Our World in Data",
+      "author": "Jutta Bolt and Jan Luiten van Zanden; Our World in Data",
+      "url": "https://ourworldindata.org/grapher/gdp-per-capita-maddison-project-database",
+      "accessDate": "2026-11-08",
+      "licence": "CC BY 4.0 (Maddison Project Database 2023, Bolt and van Zanden; Our World in Data)",
+      "notes": "United States 1900 and 1990."
+    },
+    {
+      "id": "russell-1888",
+      "title": "Life in One Room, or, Some Serious Considerations for the Citizens of Glasgow (lecture of 27 February 1888)",
+      "author": "James Burn Russell, Medical Officer of Health, Glasgow",
+      "url": "https://archive.org/details/b21450912",
+      "accessDate": "2026-11-08",
+      "licence": "Public Domain Mark 1.0 (Wellcome Collection / University of Glasgow Library)",
+      "notes": "Qualitative evidence for the crowding mortality coefficients: one- and two-room districts, death rate of 38 per 1,000, one infant in five dying."
+    }
+  ],
+  "budget1901ByIncome": {
+    "sourceId": "commissioner-labor-1903",
+    "locator": "Table V-C, All States, p. 558 (PDF 699)",
+    "unit": "USD per family per year",
+    "status": "sourced",
+    "columns": ["incomeClass", "families", "rent", "fuel", "lighting", "clothing", "sundries", "food"],
+    "rows": [
+      ["under-200", 32, 33.16, 13.1, 2.48, 17.0, 30.52, 99.59],
+      ["200-300", 115, 56.29, 19.01, 3.54, 27.05, 58.62, 147.84],
+      ["300-400", 545, 72.59, 23.2, 4.41, 38.94, 62.52, 186.85],
+      ["400-500", 1676, 86.54, 25.83, 5.2, 53.1, 76.91, 218.46],
+      ["500-600", 2264, 99.55, 27.46, 6.05, 64.69, 92.99, 249.28],
+      ["600-700", 2336, 113.03, 28.45, 6.82, 78.76, 118.59, 265.93],
+      ["700-800", 2094, 125.82, 28.72, 7.78, 93.52, 149.78, 287.03],
+      ["800-900", 806, 131.51, 29.83, 8.47, 104.58, 177.39, 318.8],
+      ["900-1000", 684, 143.53, 31.44, 9.08, 117.1, 189.45, 325.66],
+      ["1000-1100", 340, 157.74, 33.95, 10.39, 135.5, 213.16, 349.0],
+      ["1100-1200", 96, 161.42, 35.35, 10.55, 144.89, 254.22, 366.66],
+      ["1200-and-over", 168, 183.08, 40.54, 12.44, 165.44, 267.32, 383.64]
+    ],
+    "totals": { "families": 11156, "rent": 111.97, "fuel": 28.2, "lighting": 6.92, "clothing": 79.98, "sundries": 124.26, "food": 266.47 },
+    "note": "Each row's five non-food items sum to the printed total of preceding; the family counts sum to 11,156. The 'total of all' column is cut by the binding of the scan and is computed as preceding + food."
+  },
+  "childrenByIncome1901": {
+    "sourceId": "commissioner-labor-1903",
+    "locator": "Table V-L, pp. 582-583 (PDF 725-726): normal families by number of children and classified income",
+    "status": "sourced",
+    "note": "Rows: 0 to 5 children; columns: the twelve income classes of budget1901ByIncome. Each column sums to that class's family count. A normal family is husband, wife and up to five children; average size 3.96 persons (text p. 92, PDF 93).",
+    "counts": [
+      [13, 39, 131, 373, 410, 421, 384, 115, 122, 54, 22, 40],
+      [9, 30, 133, 416, 559, 545, 459, 152, 155, 64, 20, 37],
+      [3, 23, 129, 392, 553, 605, 526, 197, 143, 75, 16, 38],
+      [4, 15, 75, 259, 380, 423, 416, 175, 120, 58, 18, 30],
+      [3, 3, 49, 159, 257, 224, 226, 118, 115, 66, 13, 15],
+      [0, 5, 28, 77, 105, 118, 83, 49, 29, 23, 7, 8]
+    ],
+    "childFactor": { "value": 0.5, "status": "provisional", "note": "Atwater factor of a child of unknown age in a 1901 normal family (children 0-15; the bulletin's factors run from 0.3 to 0.9)." }
+  },
+  "surplus1901": {
+    "sourceId": "commissioner-labor-1903",
+    "locator": "text p. 96 (PDF 97): the 11,156 normal families spent 94.90 per cent of income, leaving a surplus of 5.10 per cent",
+    "expenditureShareOfIncome": 0.949,
+    "status": "sourced"
+  },
+  "retailQuantities1901": {
+    "sourceId": "bls-bulletin-59",
+    "locator": "p. 165 (PDF 171): average quantity per family of certain principal articles of food consumed in 1901, United States, 2,567 families",
+    "status": "sourced",
+    "familyFoodSpendingUSD": 326.9,
+    "note": "Retail price paid = the article's share of food spending (foodArticles1901 of the P5b sources, parts of 10,000) x 326.90 USD / quantity.",
+    "articles": {
+      "fresh-beef": [349.7, "lb"],
+      "salt-beef": [48.6, "lb"],
+      "fresh-hog-products": [114.2, "lb"],
+      "salt-hog-products": [110.5, "lb"],
+      "other-meat": [77.7, "lb"],
+      "poultry": [67.7, "lb"],
+      "fish": [79.9, "lb"],
+      "eggs": [85.2, "doz"],
+      "milk": [354.5, "qt"],
+      "butter": [117.1, "lb"],
+      "cheese": [16.0, "lb"],
+      "lard": [84.4, "lb"],
+      "tea": [10.6, "lb"],
+      "coffee": [46.8, "lb"],
+      "sugar": [268.5, "lb"],
+      "molasses": [3.6, "gal"],
+      "flour-and-meal": [680.8, "lb"],
+      "bread": [252.7, "loaf"],
+      "rice": [25.1, "lb"],
+      "potatoes": [14.7, "bu"]
+    }
+  },
+  "engel1853": {
+    "sourceId": "engel-1895",
+    "locator": "Table 2, p. 39 (PDF 51): Mark per Quet per year; Table 4, p. 40 (PDF 54): per cent of expenditure I-XII",
+    "status": "sourced",
+    "classes": ["under-600-fr", "600-900-fr", "900-1200-fr", "1200-2000-fr", "over-2000-fr"],
+    "expenditurePerQuetMark": [28.27, 43.63, 57.11, 81.55, 125.03],
+    "incomePerQuetMark": [25.87, 40.18, 54.8, 77.85, 120.9],
+    "percent": {
+      "food-animal": [11.39, 12.5, 17.11, 17.75, 17.25],
+      "food-plant": [58.01, 52.32, 45.15, 38.6, 39.95],
+      "drinks": [0.0, 0.36, 0.93, 1.55, 2.26],
+      "inn": [1.03, 1.72, 2.09, 2.82, 4.18],
+      "garden-and-field": [1.07, 2.08, 1.7, 2.54, 0.54],
+      "clothing": [10.9, 13.85, 15.19, 16.77, 17.1],
+      "housing": [8.54, 7.94, 7.45, 6.95, 7.43],
+      "heat-and-light": [6.59, 5.88, 5.72, 5.31, 4.03],
+      "health": [0.59, 0.6, 0.97, 1.53, 1.32],
+      "mental": [0.33, 0.56, 1.07, 2.34, 1.26],
+      "church": [0.06, 0.09, 0.18, 0.18, 0.14],
+      "legal": [0.13, 0.26, 0.61, 0.95, 0.79],
+      "insurance": [0.04, 0.16, 0.22, 0.54, 0.89],
+      "recreation": [1.25, 1.58, 1.13, 1.73, 1.6],
+      "general": [0.07, 0.1, 0.28, 0.43, 1.26]
+    },
+    "quetsPerAdultEquivalent": { "value": 3.5, "status": "provisional", "note": "Engel's Quet: a newborn is 1, an adult man 3.5; taken as one Atwater adult equivalent (man at moderate work)." },
+    "usdPerMark": { "value": 0.2382, "status": "sourced", "note": "gold parity, Director of the Mint, Values of Foreign Coins (4.198 Mark per dollar)" },
+    "cpi1853Over1900": { "value": 1.0, "status": "provisional", "note": "US consumer prices of 1853 and 1900 were about equal (Minneapolis Fed series); a precise 1853 Belgian deflator is not used." }
+  },
+  "cex1990": {
+    "sourceId": "statab-1992",
+    "locator": "Table 692, pp. 442-443, rows 40-44 (income quintiles)",
+    "unit": "USD per consumer unit per year",
+    "status": "sourced",
+    "columns": ["quintile", "income", "totalExpenditure", "food", "foodAtHome", "cereals", "meatsPoultryFishEggs", "dairy", "fruitsVegetables", "foodAway", "alcohol", "housing", "shelter", "fuelUtilities", "householdOperationsFurnishings", "housekeepingSupplies", "apparel", "vehiclePurchases", "gasoline", "otherTransport", "health", "insurancePensions", "other", "personalTaxes"],
+    "rows": [
+      ["q1", 5637, 12908, 2401, 1609, 232, 469, 193, 272, 792, 127, 4440, 2413, 1214, 578, 236, 667, 798, 521, 722, 1012, 327, 1893, 83],
+      ["q2", 14115, 17924, 3113, 2063, 305, 549, 256, 343, 1050, 196, 5866, 3257, 1558, 769, 281, 961, 1355, 747, 1136, 1420, 867, 2264, 686],
+      ["q3", 24500, 24673, 3859, 2326, 337, 636, 290, 377, 1533, 281, 7616, 4294, 1844, 1114, 365, 1335, 1842, 1068, 1700, 1409, 2054, 3510, 1822],
+      ["q4", 38376, 34247, 5256, 3038, 439, 798, 367, 483, 2218, 385, 9910, 5563, 2076, 1745, 526, 1958, 2722, 1321, 2420, 1560, 3795, 4920, 3326],
+      ["q5", 76660, 55411, 7127, 3509, 538, 882, 401, 585, 3618, 554, 16619, 9637, 2658, 3581, 744, 3391, 4129, 1613, 3882, 2080, 7539, 8477, 6825]
+    ],
+    "adultEquivalentsPerConsumerUnit": { "value": 2.0, "status": "provisional", "note": "average consumer unit of 2.6 persons in 1990 on Atwater's scale; size by quintile not transcribed" },
+    "note": "Quintile categories sum to total expenditures (checked for q1 and q5). Shelter is excluded from consumption (housing is owner-occupied in P6) and personal insurance and pensions (mostly Social Security) are treated as saving."
+  },
+  "housing1900": {
+    "status": "sourced",
+    "note": "Persons per dwelling (inhabited house) at the census nearest 1900, by modern country of the P4 crosswalk; countries without a census figure take the median of the sourced values.",
+    "byCountry": {
+      "usa": { "value": 5.3, "sourceId": "webb-1911", "locator": "p. 303: dwellings 1900 14,430,000, 5.3 persons per dwelling (US census definition)" },
+      "gbr": { "value": 5.15, "sourceId": "webb-1911", "locator": "p. 301: UK 1901 inhabited houses 8,045,924 (England and Wales 6,260,852 at 5.20 persons; Scotland 926,914; Ireland 858,158); UK population 41.46 M", "status": "estimated" },
+      "irl": { "value": 5.2, "sourceId": "webb-1911", "locator": "p. 301: Ireland 1901 inhabited houses 858,158 for 4,458,775 persons", "status": "estimated" },
+      "ind": { "value": 5.3, "sourceId": "webb-1911", "locator": "p. 304: India 1901 occupied houses 55,841,300, 5.3 persons per house (British territory 5.3, native states 5.0)" },
+      "pak": { "value": 5.3, "sourceId": "webb-1911", "locator": "p. 304: India 1901 (British India total)" },
+      "bgd": { "value": 5.3, "sourceId": "webb-1911", "locator": "p. 304: India 1901 (British India total)" },
+      "mmr": { "value": 5.3, "sourceId": "webb-1911", "locator": "p. 304: India 1901 (British India total)" },
+      "bel": { "value": 5.03, "sourceId": "webb-1911", "locator": "p. 302: Belgium 1900, 5.03 inhabitants per dwelling-house" },
+      "nld": { "value": 5.73, "sourceId": "webb-1911", "locator": "p. 302: Netherlands 1899, 5.73 persons per inhabited house" },
+      "fra": { "value": 5.56, "sourceId": "webb-1911", "locator": "p. 302: France 1901 occupied dwelling-houses 7,006,133 for 38,961,945 persons", "status": "estimated" },
+      "can": { "value": 5.02, "sourceId": "webb-1911", "locator": "p. 303: Canada 1901 houses 1,068,951 (incl. vacant and building) for 5,371,315 persons", "status": "estimated" },
+      "aus": { "value": 5.06, "sourceId": "webb-1911", "locator": "p. 303: Australia 1901 inhabited dwellings 745,176 for 3,773,801 persons", "status": "estimated" },
+      "nzl": { "value": 5.17, "sourceId": "webb-1911", "locator": "p. 303: New Zealand 1886, 5.17 persons per inhabited dwelling (1906: 4.82)", "status": "estimated" },
+      "deu": { "value": 4.6, "sourceId": "webb-1911", "locator": "p. 302: German households 1900 12,260,000 for 56.37 M persons (no house count; households taken as dwellings)", "status": "estimated" }
+    },
+    "defaultValue": { "value": 5.2, "status": "estimated", "note": "median of the sourced country values" }
+  },
+  "dwellingCost1900": {
+    "sourceId": "histstats-1975",
+    "locator": "series N 167, average construction cost per new non-farm housing unit started, 1900 (p. 640, PDF 31)",
+    "usdPerDwelling": 2300,
+    "status": "sourced",
+    "note": "Non-farm units, excluding land. Starts 1889-1904 (series N 156, thousands): 342, 328, 298, 381, 267, 265, 309, 257, 292, 262, 282, 189, 275, 240, 253, 315."
+  },
+  "dwellingRecipe": {
+    "status": "provisional",
+    "note": "Materials of one standard dwelling (a frame-and-brick workman's house of four to five rooms): about 40 m3 of lumber (17,000 board feet), 25 t of brick, lime, cement and plaster, 0.4 t of nails, hardware and pipe, 0.1 t of paint and glass. The rest of the price is building labour and the builder's margin (D-135 A3 sizing).",
+    "inputs": { "timber": 40, "construction-materials": 25, "steel": 0.4, "chemicals": 0.1 }
+  },
+  "dwellingIncomeElasticity": {
+    "sourceIds": ["webb-1911", "mpd-2023"],
+    "status": "calibrated",
+    "personsPerDwelling1900": 5.3,
+    "personsPerOccupiedUnit1990": 2.63,
+    "gdpPerHead1900": 8037.5713,
+    "gdpPerHead1990": 36982,
+    "note": "elasticity = ln(5.3 / 2.63) / ln(36982 / 8037.57) = 0.46; the 1990 persons per occupied unit is to be confirmed from the 1992 Statistical Abstract."
+  },
+  "tastes1901": {
+    "sourceId": "webb-1911",
+    "locator": "Commerce article: annual consumption per head of population of wheat, rye, sugar, tea and coffee in several countries, data mainly of 1901",
+    "unit": "lb per head per year",
+    "status": "sourced (text layer; two OCR readings marked)",
+    "byCountry": {
+      "GBR": { "sugar": 78.7, "tea": 6.2, "coffee": 0.8 },
+      "RUS": { "sugar": 9.6, "tea": 0.9, "coffee": 0.14 },
+      "USA": { "sugar": 68.7, "tea": 1.1, "coffee": 10.6 },
+      "AUH": { "sugar": 16.9, "tea": 0.05, "coffee": 2.2 },
+      "FRA": { "sugar": 26.8, "tea": 0.05, "coffee": 4.8, "ocr": "sugar read as z6.8" },
+      "ITA": { "sugar": 6.8, "tea": 0.002, "coffee": 1.1, "ocr": "sugar read as 6.S" },
+      "GER": { "sugar": 27.1, "tea": 0.13, "coffee": 6.6 },
+      "BEL": { "sugar": 19.0, "tea": 0.02, "coffee": 10.55 }
+    },
+    "note": "Used as national tastes (plan Q16): the weight of coffee-tea-cocoa and of sugar in a country's food category relative to the United States, by the value of tea and coffee (at 1901 US retail prices) and of sugar per head. Countries not listed take no taste multiplier."
+  }
+}

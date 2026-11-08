@@ -294,7 +294,7 @@ deposits for sourced producers that lack one; cotton as its own farm). P5b is ap
 monetary metal, metal-standard and paper currencies, currency switching), which was
 proposed during P3 and is now assigned here.
 
-### P6 — Goods catalogue, Engel demand, housing
+### P6 — Engel demand, saving, housing (the goods catalogue was built in P5b)
 
 - ~22 goods covering food (grain, meat, fish, processed food), fibres, timber, coal,
   iron, oil, steel, machinery, chemicals/fertiliser, construction materials, textiles,
@@ -316,6 +316,14 @@ cocoa 2.36× the 1900 world estimate; clothing scaled once by 0.52 in D-148 item
 P2b farm-gate demand distortion behind the territories above 100 % of GDP (D-135); and
 construction demand for housing, which, with P8 infrastructure and P10 investment, is where
 most 1900 steel, timber and construction materials went (steel is 0.25 of 1900 output today).
+
+**Status (2026-11-08, D-153).** Plan `docs/P6_PLAN.md` approved (Q1–Q16) and implemented on
+`prosperity/p6-demand`: a linear expenditure system with an income-dependent marginal-share
+schedule anchored on sourced budgets (Belgium 1853, United States 1901 and 1990), retail margins
+(the farm-gate fix), adult equivalents, smoothed income and prices, saving by stratum, and an
+owner-occupied dwelling stock bought from residential builders, depreciated, with crowding in
+mortality and unrest; schema 34, protocol 23. The steel, rubber, gold and silver gaps move to P8,
+P10 and P11. P7 adds housing to migration ("toward jobs and housing").
 
 ### P7 — Labour market, wages, social mobility, urbanisation
 

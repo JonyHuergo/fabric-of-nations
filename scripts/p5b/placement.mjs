@@ -154,6 +154,7 @@ export function placeCatalogue(ctx) {
     markets, buildings, deposits, sources, technology, rows, workingAgeShare, fertiliser, round, territoryCoverage,
     extraDemand = new Map(),
     hydro,
+    householdQuantities = null,
   } = ctx;
   const goodById = new Map(goods.map((good) => [good.id, good]));
   const goodByKey = new Map(goods.map((good) => [good.key, good]));
@@ -319,7 +320,22 @@ export function placeCatalogue(ctx) {
   };
   // Households, plus D-149 mint purchases (one year of each mint's cash, in its home
   // market): the modelled demand of the gold and silver mines (plan §13.7).
-  const newHouseholds = householdDemand(needs);
+  // P6 (D-153): the demand system's 1900 quantities replace the tiers when given.
+  const newHouseholds =
+    householdQuantities === null
+      ? householdDemand(needs)
+      : (() => {
+          const demand = new Map();
+          for (const pop of pops) {
+            const market = marketOfProvince.get(pop.provinceId);
+            if (market === undefined || !(pop.population > 0)) continue;
+            const key = demandKey(market, territoryOf(pop.provinceId));
+            const row = demand.get(key) ?? new Map();
+            demand.set(key, row);
+            for (const [id, quantity] of householdQuantities(pop)) row.set(id, (row.get(id) ?? 0) + quantity);
+          }
+          return demand;
+        })();
   for (const [key, goodsDemand] of extraDemand) {
     const row = newHouseholds.get(key) ?? new Map();
     newHouseholds.set(key, row);

@@ -1,8 +1,8 @@
 # P6 plan — Engel demand, saving and housing
 
 **Status:** approved by the designer on 2026-11-08 (Q1–Q16 decided as recorded in §0); implementation in progress. Step 1 of the
-assignment (the aluminium unit in the P5b report) is done (`630ddb4`); every other step
-waits for the decisions in **§0**.
+assignment (the aluminium unit in the P5b report) is done (`630ddb4`); implementation follows
+§12 in order.
 **Branch:** `prosperity/p6-demand` (from `main` at `051d7f0`; local commits only).
 **Inputs read:** AGENTS.md; `docs/PROSPERITY_PROGRAM.md` (P6, "Carried into P6 from P5b",
 stage map); GDD §6.4, §6.5, §6.6, §6.8, §17J; `P5B_COMPLETION_REPORT.md` §11; D-115 to

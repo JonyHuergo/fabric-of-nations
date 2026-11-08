@@ -6669,6 +6669,11 @@ textile recipe, and electricity and the jewellery metal share were sourced from 
 and 1900 censuses, and cotton and wool were calibrated to the 1900 world fibre supply
 (D-148, D-152); the monetary demand for gold and silver (free coinage, a
 growing circulation) is deferred to P11 (D-152).
+P6 (D-153, plan `docs/P6_PLAN.md`) replaces the need tiers as household demand in the 1900
+world with a linear expenditure system (sourced marginal-share schedule, retail margins, adult
+equivalents, national tastes), adds saving by profession stratum and an owner-occupied dwelling
+stock built by residential builders, whose crowding above the 1900 level raises mortality and
+unrest; schema 34, protocol 23. Legacy worlds keep the tiers of §6.4.
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair
@@ -6736,7 +6741,7 @@ history. §2 (no gameplay pools) binds every stage.
 | P3 | Local-currency display and display-currency choice | All money labels formatted through one converter; display choice changes no world hash |
 | P4 | Cause-driven demography, urban/rural split | Country-specific 1900 levels; transition caused by literacy/urbanisation in isolating fixtures; WPP comparison report |
 | P5 | Land, diminishing returns, own consumption, harvest variance, deposits and discovery | Falling marginal product; famine only through food shortfall; deposit conservation |
-| P6 | Goods catalogue (~22), Engel/LES demand with substitution, saving, housing | Food share falls with income; housing conservation |
+| P6 | Engel/LES demand with substitution, saving, housing (the goods catalogue was built in P5b) | Food share falls with income; housing conservation |
 | P7 | Labour market, wages, nine professions, mobility, urbanisation | Agricultural share falls in a growing no-input economy; people conserved |
 | P8 | Railways, roads, ports; provincial transport wedge on the national price | Railway raises farm-gate prices in its province; wedge is real freight cost |
 | P9 | Companies and company finance | Consolidation equals building sum; dividends conserve cash |

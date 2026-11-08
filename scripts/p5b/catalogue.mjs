@@ -76,6 +76,9 @@ export const GOODS = [
   // D-148 additions, item 12 (designer, 2026-11-08): raw silk, reeled from the cocoon by
   // sericulture farms and bought by textile mills.
   [58, "silk", "Raw silk", "kg", "raw", "fibres-forest"],
+  // P6 (D-153, plan §4.3): one standard dwelling, built by residential builders and bought
+  // by households with their saving; storable (a builder's unsold houses), never shipped.
+  [59, "dwelling", "Dwelling", "dwelling", "industrial", "capital-equipment", true, false],
 ];
 
 /**
@@ -184,6 +187,11 @@ export const BUILDINGS = [
   // mulberry, silkworms and reeling, a peasant craft in 1900 (Lyons, Lombardy, the Levant,
   // China, Japan); crop band to 46° (Friuli and Tyrol), provisional.
   { key: "silk-farm", name: "Sericulture and Silk Reeling", sector: "agriculture", output: "silk", inputs: {}, jobs: { peasants: 1 }, landUse: "cropland", maxAbsLatitudeDeg: 46 },
+  // P6 (D-153, plan §4.3; appended so earlier definition ids stay): residential building.
+  // Materials per dwelling from the P6 source row dwellingRecipe (provisional): lumber,
+  // brick, lime and cement, nails and hardware, paint and glass; the rest of the price is
+  // building labour (D-135 A3 sizing).
+  { key: "residential-builder", name: "Residential Builder", sector: "manufacturing", output: "dwelling", inputs: { timber: 40, "construction-materials": 25, steel: 0.4, chemicals: 0.1 }, jobs: { laborers: 0.9, clerks: 0.1 } },
 ];
 
 /**

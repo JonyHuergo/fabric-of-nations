@@ -66,6 +66,8 @@ import {
   TEXTILE_CALIBRATION,
 } from "./catalogue.mjs";
 import { NOT_PLACED_1900, placeCatalogue } from "./placement.mjs";
+import { buildP6Demand, P6_COEFFICIENTS } from "../p6/demand.mjs";
+import { p6BeforeAfterReport, p6Provenance } from "../p6/report.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const DATA = join(ROOT, "packages/data/data");
@@ -101,7 +103,13 @@ const INPUTS = {
   p3Currencies: join(DATA, "historical/p3/currencies_1900.json"),
   // C-12: gross theoretical hydro potential by province (scripts/p5b/extract-hydro-riveratlas.mjs).
   hydro: join(OUT, "hydro_province_1900.json"),
+  // P6 (D-153): demand, saving and housing sources; P4 age structures and growth.
+  p6Sources: join(DATA, "historical/p6/sources_1900.json"),
+  p4Demography: join(DATA, "historical/p4/demography_1900.json"),
+  p6Demand: join(ROOT, "scripts/p6/demand.mjs"),
+  p6Report: join(ROOT, "scripts/p6/report.mjs"),
 };
+const P6_OUT = join(DATA, "historical/p6");
 
 /**
  * D-149 (designer: "treasury, capped"): the most of its opening treasury a country pays
@@ -293,6 +301,9 @@ function build() {
     "mobile-phones": () => rusd1990("mobile-phones", price1990("price1990-cellular-phone").value, ["price1990-cellular-phone"], "1989 retail value per cellular telephone", "provisional"),
     pharmaceuticals: () => defined("pharmaceuticals", rusdPerUsd1900 / 100, "1 dose-eq = 1 US cent of 1900 drugs at wholesale"),
     jewellery: () => defined("jewellery", rusdPerUsd1900, "1 unit = 1 US dollar of 1900 jewellery and plate at wholesale (D-152)"),
+    // P6 (D-153): the average construction cost of a new non-farm dwelling, 1900.
+    dwelling: () => usd1900("dwelling", read(INPUTS.p6Sources).dwellingCost1900.usdPerDwelling, ["p6:dwellingCost1900"],
+      "average construction cost per new non-farm housing unit started, 1900 (Historical Statistics, series N 167), excluding land"),
   };
   for (const key of ["commerce", "transport-services", "communication", "finance-services", "personal-services"]) {
     priceOf[key] = () => defined(key, 1, "1 service unit = the service whose 1900 US price, x 15.704, is 1 RUSD (D-146 C-6)");
@@ -532,15 +543,10 @@ function build() {
   }
   const needs = oldNeeds.map((tier) => ({ ...tier, items: tier.items.map((item) => ({ ...item })) }));
   const needsTrace = {};
-  // D-148 item 13: cloth demand at the 1900 world fibre supply (TEXTILE_CALIBRATION).
-  for (const tier of needs) {
-    for (const item of tier.items) {
-      if (item.goodKey !== "clothing" && item.goodKey !== "textiles") continue;
-      const before = item.quantityPerCapitaPerDay;
-      item.quantityPerCapitaPerDay = sig(before * TEXTILE_CALIBRATION.clothDemandFactor);
-      needsTrace[`${tier.tier}:${item.goodKey}`] = { quantityPerCapitaPerDay: item.quantityPerCapitaPerDay, p2bQuantityPerCapitaPerDay: before, factor: TEXTILE_CALIBRATION.clothDemandFactor, status: "estimated" };
-    }
-  }
+  // D-148 item 13 applied a cloth factor (TEXTILE_CALIBRATION.clothDemandFactor) to these
+  // tiers. P6 (D-153, plan Q12a) removes it: household demand comes from the demand system,
+  // and the tiers now only price the wealth indicator's subsistence basket.
+  needsTrace["clothDemandFactor"] = { removed: "P6 (D-153, plan Q12a)", formerFactor: TEXTILE_CALIBRATION.clothDemandFactor };
   for (const tierName of ["comfort", "luxury"]) {
     const tier = needs.find((entry) => entry.tier === tierName);
     const share = tierName === "comfort" ? comfortShare : 1 - comfortShare;
@@ -723,7 +729,55 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
     mintDemand.set(key, goodsDemand);
   }
 
+  // P6 (D-153): the demand system's 1900 quantities, incomes and housing.
+  const p6Sources = read(INPUTS.p6Sources);
+  const p4 = read(INPUTS.p4Demography);
+  const pops = read(INPUTS.p2bPops);
+  const mpdByTag = new Map(read(INPUTS.p2bSources).rows.filter((row) => row.id.startsWith("mpd-")).map((row) => [row.id.slice(4), row.value]));
+  const knowsTechnology = (country, key) => key === null || key === undefined || (country?.technology?.researchedTechnologyKeys ?? []).includes(key);
+  const p6 = buildP6Demand({
+    goods,
+    p6: p6Sources,
+    src,
+    oldNeeds,
+    rusdPerUsd1900: calibration.rusdPerUsd1900,
+    p4,
+    pops,
+    provinces,
+    markets,
+    professions,
+    countries: grantedCountries,
+    mpdByTag,
+    knows: knowsTechnology,
+    workingAgeShare: p2bCalibration.workingAgeShare,
+  });
+  for (const province of provinces) province.housingReferencePersonsPerDwelling = p6.housingRefOf(province.id);
+  calibration.p6 = { ...p6.trace, coefficients: P6_COEFFICIENTS };
+  // Planned 1900 household spending by country (report; plan §6 consistency checks).
+  const countryOfProvinceP6 = new Map();
+  for (const country of grantedCountries) for (const id of country.provinceIds) countryOfProvinceP6.set(id, country.tag);
+  const byCountry = {};
+  for (const pop of pops) {
+    const { plan } = p6.quantitiesOf(pop);
+    const tag = countryOfProvinceP6.get(pop.provinceId);
+    if (plan === null || tag === undefined) continue;
+    const row = (byCountry[tag] ??= { persons: 0, incomeRUSDPerDay: 0, consumptionRUSDPerDay: 0, categorySpendRUSDPerDay: {}, blocksAboveIncome: 0 });
+    row.persons += pop.population;
+    row.incomeRUSDPerDay += plan.income;
+    row.consumptionRUSDPerDay += plan.consumption;
+    if (plan.consumption > plan.income * (1 + 1e-9) && plan.income > plan.committedCost) row.blocksAboveIncome += 1;
+    for (const [key, value] of Object.entries(plan.categorySpend)) row.categorySpendRUSDPerDay[key] = (row.categorySpendRUSDPerDay[key] ?? 0) + value;
+  }
+  calibration.p6.countries = Object.fromEntries(Object.entries(byCountry).sort((a, b) => a[0].localeCompare(b[0])).map(([tag, row]) => [tag, {
+    persons: row.persons,
+    incomeRUSDPerCapitaYear: sig((row.incomeRUSDPerDay / row.persons) * 365),
+    consumptionRUSDPerCapitaYear: sig((row.consumptionRUSDPerDay / row.persons) * 365),
+    foodShare: sig((row.categorySpendRUSDPerDay.food ?? 0) / row.consumptionRUSDPerDay),
+    categoryShares: Object.fromEntries(Object.entries(row.categorySpendRUSDPerDay).map(([key, value]) => [key, sig(value / row.consumptionRUSDPerDay)])),
+    blocksAboveIncome: row.blocksAboveIncome,
+  }]));
   const placement = placeCatalogue({
+    householdQuantities: (pop) => p6.quantitiesOf(pop).quantities,
     goods,
     definitions,
     oldDefinitions: p5Definitions,
@@ -731,7 +785,7 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
     oldNeeds,
     professions,
     provinces,
-    pops: read(INPUTS.p2bPops),
+    pops,
     countries: grantedCountries,
     oldCountries,
     markets,
@@ -920,6 +974,9 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
   return {
     outputs: {
       "provinces_1900.json": json(provinces),
+      // P6 (D-153): the demand system and the blocks' 1900 incomes.
+      "../p6/demand_1900.json": json(p6.demandSystem),
+      "../p6/pops_1900.json": json(pops.map((pop) => ({ ...pop, incomeRUSDPerCapitaDay: sig(p6.incomeOf(pop)) }))),
       "countries_1900.json": json(countryRows),
       "buildings_1900.json": json(placement.buildingRows),
       "markets_1900.json": json(marketRows),
@@ -964,7 +1021,11 @@ const outputs = build();
 const DOC = join(ROOT, "docs/P5B_BEFORE_AFTER.md");
 const docText = beforeAfterReport(JSON.parse(outputs["calibration_1900.json"]));
 const PROVENANCE = join(ROOT, "docs/P5B_GOODS_PROVENANCE.md");
+const P6_DOC = join(ROOT, "docs/P6_BEFORE_AFTER.md");
+const P6_PROVENANCE = join(ROOT, "docs/P6_DEMAND_PROVENANCE.md");
 const provenanceText = goodsProvenance(JSON.parse(outputs["goods_1900.json"]), JSON.parse(outputs["calibration_1900.json"]), read(INPUTS.sources), read(INPUTS.hydro).meta);
+const p6DocText = p6BeforeAfterReport(JSON.parse(outputs["calibration_1900.json"]), JSON.parse(outputs["../p6/demand_1900.json"]));
+const p6ProvenanceText = p6Provenance(read(INPUTS.p6Sources), JSON.parse(outputs["calibration_1900.json"]));
 const inputSums = Object.fromEntries(Object.entries(INPUTS).map(([key, path]) => [key, sha256(readText(path))]));
 outputs["build_report.json"] = json({
   generator: "scripts/p5b/build-goods-1900.mjs",
@@ -976,6 +1037,8 @@ if (CHECK) {
   const stale = Object.entries(outputs).filter(([name, text]) => !existsSync(join(OUT, name)) || readText(join(OUT, name)) !== text);
   if (!existsSync(DOC) || readText(DOC) !== docText) stale.push(["docs/P5B_BEFORE_AFTER.md"]);
   if (!existsSync(PROVENANCE) || readText(PROVENANCE) !== provenanceText) stale.push(["docs/P5B_GOODS_PROVENANCE.md"]);
+  if (!existsSync(P6_DOC) || readText(P6_DOC) !== p6DocText) stale.push(["docs/P6_BEFORE_AFTER.md"]);
+  if (!existsSync(P6_PROVENANCE) || readText(P6_PROVENANCE) !== p6ProvenanceText) stale.push(["docs/P6_DEMAND_PROVENANCE.md"]);
   if (stale.length > 0) {
     console.error(`P5b outputs are stale: ${stale.map(([name]) => name).join(", ")}; run node scripts/p5b/build-goods-1900.mjs`);
     process.exit(1);
@@ -983,9 +1046,12 @@ if (CHECK) {
   console.log("P5b outputs are current");
 } else {
   mkdirSync(OUT, { recursive: true });
+  mkdirSync(P6_OUT, { recursive: true });
   for (const [name, text] of Object.entries(outputs)) writeFileSync(join(OUT, name), text);
   writeFileSync(DOC, docText);
   writeFileSync(PROVENANCE, provenanceText);
+  writeFileSync(P6_DOC, p6DocText);
+  writeFileSync(P6_PROVENANCE, p6ProvenanceText);
   console.log(`wrote ${Object.keys(outputs).length} files to ${OUT}, docs/P5B_BEFORE_AFTER.md and docs/P5B_GOODS_PROVENANCE.md`);
 }
 
