@@ -883,7 +883,7 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
             factor: 1 / src.units.find((row) => row.id === "jewellery-metal-share-of-value").value,
             note: "gross metal dollars / the metal share of value = jewellery units (includes old material; report only)",
           }
-        : OUTPUT_UNIT_TO_SIM[entry.unit];
+        : outputUnitToSim(entry.unit, good);
     const total = entry.entries.reduce((acc, [territory, value]) => acc + (AGGREGATE_OUTPUT_KEYS.has(territory) ? 0 : value), 0);
     const modelledPerYear = (placement.worldOutput.get(good.id) ?? 0) * 365;
     sourcedOutput[key] = {
@@ -930,19 +930,35 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
 }
 
 const AGGREGATE_OUTPUT_KEYS = new Set(["other", "other-europe"]);
-/** Unit of a sourced output table -> simulation unit of the good (report only). */
+/**
+ * Unit of a sourced output table -> a mass unit (report only). `to` is the mass unit the factor
+ * yields; outputUnitToSim converts it to the good's own unit label (kg or t), so a table in kg
+ * for a good in t (aluminium) is divided by 1,000 instead of read as tonnes.
+ */
 const OUTPUT_UNIT_TO_SIM = {
-  "metric tons": { factor: 1, note: "metric tons = t" },
-  "metric tons of pig iron": { factor: 1, note: "pig iron t ~ t Fe of ore (about 0.93 Fe in pig iron; report only)" },
-  "metric tons of copper": { factor: 1, note: "t Cu" },
-  "kg fine": { factor: 1, note: "kg" },
-  kg: { factor: 1, note: "kg" },
-  "metric tons of sodium nitrate": { factor: 0.1647, note: "t NaNO3 x 0.1647 N" },
-  "long tons": { factor: 1016.047, note: "long tons x 1,016.047 kg" },
-  "thousand bales of 500 lb": { factor: 226796.185, note: "thousand bales x 500 lb x 0.45359237 kg" },
-  lb: { factor: 0.45359237, note: "lb x 0.45359237 kg" },
-  "bales of 500 lb gross (478 lb lint)": { factor: 478 * 0.45359237, note: "bales x 478 lb of lint x 0.45359237 kg" },
+  "metric tons": { factor: 1, to: "t", note: "metric tons = t" },
+  "metric tons of pig iron": { factor: 1, to: "t Fe", note: "pig iron t ~ t Fe of ore (about 0.93 Fe in pig iron; report only)" },
+  "metric tons of copper": { factor: 1, to: "t Cu", note: "t Cu" },
+  "kg fine": { factor: 1, to: "kg", note: "kg" },
+  kg: { factor: 1, to: "kg", note: "kg" },
+  "metric tons of sodium nitrate": { factor: 0.1647, to: "t N", note: "t NaNO3 x 0.1647 N" },
+  "long tons": { factor: 1016.047, to: "kg", note: "long tons x 1,016.047 kg" },
+  "thousand bales of 500 lb": { factor: 226796.185, to: "kg", note: "thousand bales x 500 lb x 0.45359237 kg" },
+  lb: { factor: 0.45359237, to: "kg", note: "lb x 0.45359237 kg" },
+  "bales of 500 lb gross (478 lb lint)": { factor: 478 * 0.45359237, to: "kg", note: "bales x 478 lb of lint x 0.45359237 kg" },
 };
+/** Kilograms per mass unit of a good's unit label. */
+const MASS_UNIT_KG = { kg: 1, t: 1000 };
+/** Conversion of a sourced output table's unit to the good's simulation unit; undefined if none is defined. */
+function outputUnitToSim(unit, good) {
+  const entry = OUTPUT_UNIT_TO_SIM[unit];
+  if (entry === undefined) return undefined;
+  if (entry.to === good.unitLabel) return entry;
+  const from = MASS_UNIT_KG[entry.to];
+  const to = MASS_UNIT_KG[good.unitLabel];
+  if (from === undefined || to === undefined) throw new Error(`no conversion from ${unit} (${entry.to}) to the unit of ${good.key} (${good.unitLabel})`);
+  return { factor: (entry.factor * from) / to, note: `${entry.note}; ${entry.to} -> ${good.unitLabel} (x ${from / to})` };
+}
 
 const outputs = build();
 const DOC = join(ROOT, "docs/P5B_BEFORE_AFTER.md");

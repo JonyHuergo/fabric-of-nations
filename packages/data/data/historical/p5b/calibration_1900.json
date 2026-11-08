@@ -3424,10 +3424,10 @@
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "aluminium": {
-    "sourcedPerYearSimUnits": 7743219,
-    "conversion": "kg",
+    "sourcedPerYearSimUnits": 7743.219,
+    "conversion": "kg; kg -> t (x 0.001)",
     "modelledPerYear": 9987.598657893192,
-    "modelledOverSourced": 0.0012898509854742828,
+    "modelledOverSourced": 1.289850985474283,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "nitrates": {

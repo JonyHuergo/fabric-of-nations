@@ -73,7 +73,7 @@ Territories above 100 % after P5b are listed first; then the largest economies.
 | gold | 384,400 | 185,300 | 0.48 | kg |
 | silver | 5,680,000 | 1,026,000 | 0.18 | kg |
 | bauxite | 88,220 | 35,990 | 0.41 | metric tons = t |
-| aluminium | 7,743,000 | 9,988 | 0.00 | kg |
+| aluminium | 7,743 | 9,988 | 1.29 | kg; kg -> t (x 0.001) |
 | nitrates | 235,500 | 59,510 | 0.25 | t NaNO3 x 0.1647 N |
 | sugar | 9,288,000,000 | 7,986,000,000 | 0.86 | long tons x 1,016.047 kg |
 | cotton | 3,446,000,000 | 3,346,000,000 | 0.97 | bales x 478 lb of lint x 0.45359237 kg |
