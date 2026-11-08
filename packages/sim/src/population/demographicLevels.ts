@@ -26,6 +26,8 @@
 
 import {
   CHILD_MORTALITY_LAG_MONTHS,
+  CROWDING_MORTALITY_WEIGHT_ADULT,
+  CROWDING_MORTALITY_WEIGHT_CHILD,
   FERTILITY_CHILD_MORTALITY_ELASTICITY,
   FERTILITY_INCOME_ELASTICITY,
   FERTILITY_INCOME_RATIO_MAX,
@@ -51,6 +53,7 @@ import {
   WEALTH_INTERCEPT,
   WEALTH_SLOPE,
 } from "./constants.js";
+import { blockCrowding, crowdingMortalityFactor } from "./housing.js";
 import type { PopBlock, PopBlockDemographyInitialDef } from "./types.js";
 
 /**
@@ -218,7 +221,8 @@ export function effectiveChildMortality(block: PopBlock, factors: DemographyCoun
     block.childMortalityResidual *
     urbanMortalityFactor(block.urbanShare, factors.sanitationCoverage, URBAN_MORTALITY_PENALTY_CHILD) *
     Math.pow(factors.healthFactor, MORTALITY_CHILD_HEALTH_ELASTICITY) *
-    foodMortalityFactor(block.foodSufficiency, FOOD_MORTALITY_WEIGHT_CHILD)
+    foodMortalityFactor(block.foodSufficiency, FOOD_MORTALITY_WEIGHT_CHILD) *
+    crowdingMortalityFactor(blockCrowding(block), CROWDING_MORTALITY_WEIGHT_CHILD)
   );
 }
 
@@ -228,7 +232,8 @@ export function effectiveAdultMortality(block: PopBlock, factors: DemographyCoun
     block.adultMortalityResidual *
     urbanMortalityFactor(block.urbanShare, factors.sanitationCoverage, URBAN_MORTALITY_PENALTY_ADULT) *
     factors.healthFactor *
-    foodMortalityFactor(block.foodSufficiency, FOOD_MORTALITY_WEIGHT_ADULT)
+    foodMortalityFactor(block.foodSufficiency, FOOD_MORTALITY_WEIGHT_ADULT) *
+    crowdingMortalityFactor(blockCrowding(block), CROWDING_MORTALITY_WEIGHT_ADULT)
   );
 }
 

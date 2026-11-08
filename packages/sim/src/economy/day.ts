@@ -52,6 +52,26 @@ import type { DayPhaseObserver, DayResultDetail } from "../population/types.js";
 import { buildBuildingCapacityIndex, computeBuildingCapacity } from "./production.js";
 import { runCountryAIPhase, type CountryAIPhaseResult } from "./ai.js";
 import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
+import {
+  applyDwellingPurchases,
+  buildLesHouseholdDemand,
+  initialiseSmoothedPrices,
+  type LesHouseholdDemand,
+} from "./householdDemand.js";
+import {
+  demandSystemOf,
+  updateHouseholdIncomeAndHousing,
+  updateSmoothedPrices,
+  type HousingDayResult,
+} from "./demandDay.js";
+import type { HouseholdCountryDemand } from "./householdDemand.js";
+
+/** P6 (D-153): the demand system's day (planned spending and housing). */
+export interface EconomyDemandDayResult {
+  readonly categoryKeys: readonly string[];
+  readonly byCountry: readonly HouseholdCountryDemand[];
+  readonly housing: HousingDayResult;
+}
 import { buildProvinceOwnerMap, copyCountry, copyCurrency, copyCurrencyValuation } from "./country.js";
 import { closeFinancePeriod, type FinanceCloseResult } from "./period.js";
 import { runFiscalPhase, type FiscalPhaseResult } from "./fiscal.js";
@@ -208,6 +228,8 @@ export interface EconomyDayResult {
     readonly ownConsumption: readonly OwnConsumptionEntry[];
     /** P5 (D-143 §4): deposits found by this month's prospecting (first civil day). */
     readonly discovery: DiscoveryPhaseResult;
+    /** P6 (D-153): planned household spending by country and the day's housing; null on the tier path. */
+    readonly demand: EconomyDemandDayResult | null;
   };
 }
 
@@ -261,6 +283,7 @@ export function cloneWorld(
       ...market,
       priceRUSD: [...market.priceRUSD],
       stockLots: market.stockLots.map((lot) => ({ ...lot })),
+      priceSmoothedRUSD: [...market.priceSmoothedRUSD],
     })),
     finance: cloneFinanceState(
       source.finance,
@@ -1073,6 +1096,8 @@ interface MarketAttempt {
   readonly fulfilledByRecord: Float64Array;
   /** P5 (D-143 §2): the food owner households kept from their own farms today. */
   readonly ownConsumption: OwnConsumptionPlan;
+  /** P6 (D-153): the demand-system rows and plans, or null on the tier path. */
+  readonly les: LesHouseholdDemand | null;
 }
 
 /**
@@ -1131,14 +1156,32 @@ function runMarketAttempt(
     ownConsumption.entries.length === 0
       ? baseLookups
       : { ...baseLookups, production: { ...baseLookups.production, ownConsumption } };
-  const household = buildHouseholdDemand(
-    world,
-    definitions,
-    populationDefinitions,
-    index,
-    detail,
-    ownConsumption,
-  );
+  // P6 (D-153): a world with a demand system buys by it instead of the need tiers.
+  const demandSystem = demandSystemOf(populationDefinitions, definitions);
+  let les: LesHouseholdDemand | null = null;
+  if (demandSystem !== null) {
+    initialiseSmoothedPrices(world);
+    const gated = demandSystem.requiredTechnologyId.some((id) => id >= 0);
+    les = buildLesHouseholdDemand(
+      world,
+      definitions,
+      demandSystem,
+      index,
+      detail,
+      ownConsumption,
+      gated ? needGate(world) : null,
+    );
+  }
+  const household: HouseholdDemandBuild =
+    les ??
+    buildHouseholdDemand(
+      world,
+      definitions,
+      populationDefinitions,
+      index,
+      detail,
+      ownConsumption,
+    );
   const cap = { cappedBuildings: 0 };
   observe?.("market-production-demand");
   const production = buildProductionDemands(
@@ -1249,6 +1292,7 @@ function runMarketAttempt(
     settlement,
     fulfilledByRecord,
     ownConsumption,
+    les,
   };
 }
 
@@ -1413,16 +1457,33 @@ export function runEconomicDay(
   // building’s opening operating cash, so settlement cannot overdraw a buyer and the
   // market is cleared once. A building whose full input cost fits in its opening cash
   // is not capped; `fallbackUsed` reports whether the cap bound for any building.
+  const attemptIndex = buildFinanceIndex(world.finance);
+  // P6 (D-153): household cash before the market, to measure the day's income.
+  const demandSystem = demandSystemOf(populationDefinitions, economyDefinitions);
+  const householdAccountIds = attemptIndex.ownerAccountIds("popBlock", "household-cash");
+  const cashBeforeMarket =
+    demandSystem === null
+      ? null
+      : world.popBlocks.map((block) => {
+          const accountId = householdAccountIds[block.id] ?? -1;
+          return accountId >= 0 ? (attemptIndex.account(accountId)?.balanceRUSD ?? 0) : 0;
+        });
   const attempt = runMarketAttempt(
     world,
     economyDefinitions,
     populationDefinitions,
     dayIndex,
-    buildFinanceIndex(world.finance),
+    attemptIndex,
     "cash",
     observe,
     options.detail ?? "full",
   );
+  // P6 (D-153): bought dwellings join the buyers' stock; households read smoothed prices.
+  const dwellingsBought =
+    demandSystem !== null && attempt.les !== null
+      ? applyDwellingPurchases(world, demandSystem, attempt.les, attempt.fulfilledByRecord)
+      : 0;
+  if (demandSystem !== null) updateSmoothedPrices(world);
   const fallbackUsed = attempt.cappedBuildings > 0;
   const household = attempt.household;
   const productionRecords = attempt.production;
@@ -1554,6 +1615,11 @@ export function runEconomicDay(
     financeClose === null
       ? null
       : runProfitDistributionPhase(world, dayIndex, financeClose, { financeInPlace: true });
+  // P6 (D-153): the day's income enters the smoothed income; dwellings depreciate.
+  const housing =
+    demandSystem !== null && cashBeforeMarket !== null
+      ? updateHouseholdIncomeAndHousing(world, dayIndex, cashBeforeMarket, attempt.settlement, attempt.ownConsumption, attempt.markets, dwellingsBought)
+      : null;
 
   observe?.("day-result");
   let workingAge = 0;
@@ -1608,6 +1674,10 @@ export function runEconomicDay(
       profitDistribution,
       ownConsumption: attempt.ownConsumption.entries,
       discovery,
+      demand:
+        attempt.les === null || housing === null
+          ? null
+          : { categoryKeys: attempt.les.categoryKeys, byCountry: [...attempt.les.byCountry.values()], housing },
     },
   };
 }

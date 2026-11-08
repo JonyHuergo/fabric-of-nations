@@ -752,3 +752,9 @@ export const RESOURCE_DISCOVERY_PURPOSE = "resource.discovery";
  * Cadence: first day of each month. PROVISIONAL.
  */
 export const RESOURCE_DISCOVERY_MONTHLY_HAZARD = 1 / 120;
+
+/**
+ * P6 (D-153): weight of province crowding above its 1900 level in the unrest target
+ * (housing worse than people are used to). Dimensionless; PROVISIONAL.
+ */
+export const UNREST_CROWDING_WEIGHT = 0.1;

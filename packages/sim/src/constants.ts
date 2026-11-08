@@ -27,9 +27,11 @@
  * authored transport routes, in-transit consignments, freight/customs postings, and
  * the trade-policy action. M12a adds permanent provincial ownership, effective
  * control, claims and special-status state plus the deterministic ownership and
- * control mutations.
+ * control mutations. P6 (0.30.0, D-153) adds the linear expenditure system of
+ * households, smoothed income and prices, saving by stratum, and the dwelling stock
+ * with its depreciation, crowding mortality and unrest.
  */
-export const SIM_VERSION = "0.29.0";
+export const SIM_VERSION = "0.30.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -84,8 +86,13 @@ export const SIM_VERSION = "0.29.0";
  * as incompatible. `ProvinceEconomy.hydroPotentialMWhPerYear` (C-12) joined schema 33
  * before any release as an optional encoded field (absent = null), so schema-33 worlds
  * without hydro data encode as before.
+ * P6 (schema 34, D-153) adds the demand and housing state: per block the smoothed
+ * income, the dwellings and their 1900 references; per province the 1900 persons per
+ * dwelling; per market the smoothed prices. They are encoded on every record of a
+ * world that has them and on none otherwise. Schema-33 worlds are reported as
+ * incompatible (D-120).
  */
-export const WORLD_SCHEMA_VERSION = 33;
+export const WORLD_SCHEMA_VERSION = 34;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 2;

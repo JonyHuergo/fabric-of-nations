@@ -75,12 +75,14 @@ import {
   TAX_COLLECTION_QUALITY_WEIGHT,
   UNREST_DAILY_SMOOTHING,
   UNREST_GRIEVANCE_WEIGHT,
+  UNREST_CROWDING_WEIGHT,
   UNREST_INSTITUTION_RELIEF,
   UNREST_MILITANCY_WEIGHT,
   UNREST_OVERLOAD_WEIGHT,
   UNREST_UNEMPLOYMENT_WEIGHT,
   UNREST_UNMET_WEIGHT,
 } from "./constants.js";
+import { provinceCrowding } from "../population/housing.js";
 import type {
   Country,
   CountryPoliticsInput,
@@ -1845,12 +1847,19 @@ export function runUnrestPhase(
       const unmet = unmetPopulation / provincePopulation;
       const unemployment = workingAge > 0 ? clamp(1 - employed / workingAge, 0, 1) : 0;
       const overload = Math.min(country.institutions.overload, 1);
+      // P6 (D-153): housing worse than the province's 1900 level adds unrest.
+      const crowding = provinceCrowding(
+        lookups.blocksByProvince.get(provinceId) ?? [],
+        province.housingReferencePersonsPerDwelling,
+      );
+      const crowdingExcess = crowding === null ? 0 : Math.max(0, crowding - 1);
       const target = clamp(
         UNREST_MILITANCY_WEIGHT * militancy +
           UNREST_UNMET_WEIGHT * unmet +
           UNREST_UNEMPLOYMENT_WEIGHT * unemployment +
           UNREST_OVERLOAD_WEIGHT * overload +
-          UNREST_GRIEVANCE_WEIGHT * grievance -
+          UNREST_GRIEVANCE_WEIGHT * grievance +
+          UNREST_CROWDING_WEIGHT * crowdingExcess -
           UNREST_INSTITUTION_RELIEF * country.institutions.quality,
         0,
         1,

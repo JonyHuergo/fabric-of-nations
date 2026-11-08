@@ -295,3 +295,111 @@ export const MORTALITY_LEVEL_MAX = 50;
 
 /** Last age band (0-based, five-year) counted as child mortality: 0–4. */
 export const CHILD_MORTALITY_BAND = 0;
+
+// ---------------------------------------------------------------------------
+// P6 (D-153): Engel demand, saving and housing. Every value below is read only by
+// worlds whose population definitions carry a demand system; legacy tier worlds are
+// unaffected (plan Q9a).
+// ---------------------------------------------------------------------------
+
+/**
+ * Atwater's dietary scale (USDA Farmers' Bulletin 142, "Principles of nutrition and
+ * nutritive value of food", pp. 33–34; public domain): the food a person needs as a
+ * fraction of a man at moderately active work. Used as the adult-equivalent scale of
+ * household demand (plan Q14). Index = single year of age 0..80 (80 = 80+). Men 17+
+ * and women 17+ take the "moderately active" factors (1.0 and 0.8); the bulletin
+ * gives no old-age factor, so the elderly keep the adult values. SOURCED.
+ */
+export const ADULT_EQUIVALENT_MALE_BY_AGE: readonly number[] = Array.from({ length: 81 }, (_, age) =>
+  age < 2 ? 0.3 : age < 6 ? 0.4 : age < 10 ? 0.5 : age < 12 ? 0.6 : age < 13 ? 0.7 : age < 15 ? 0.8 : age < 17 ? 0.9 : 1,
+);
+export const ADULT_EQUIVALENT_FEMALE_BY_AGE: readonly number[] = Array.from({ length: 81 }, (_, age) =>
+  age < 2 ? 0.3 : age < 6 ? 0.4 : age < 10 ? 0.5 : age < 13 ? 0.6 : age < 15 ? 0.7 : 0.8,
+);
+
+/**
+ * Household income is smoothed over a year before the demand system reads it
+ * (permanent income; plan Q15): smoothed += (today − smoothed) / 365. A good or bad
+ * harvest therefore moves cash (saving or dissaving) before it moves the spending
+ * pattern. Days; PROVISIONAL. Daily.
+ */
+export const INCOME_SMOOTHING_DAYS = 365;
+
+/**
+ * Market prices are smoothed over 30 days before households read them (plan Q15):
+ * smoothed += (today − smoothed) / 30. Households react to sustained price changes,
+ * not to one day's clearing price. Days; PROVISIONAL. Daily.
+ */
+export const DEMAND_PRICE_SMOOTHING_DAYS = 30;
+
+/**
+ * Marginal propensity to consume out of supernumerary income (income above the
+ * committed cost), by profession stratum; 1 − μ is saved (extended LES, Lluch 1973;
+ * plan Q8). Dimensionless 0..1.
+ * - lower 0.94: the 1901 survey's 11,156 normal wage-earner families spent 94.90 %
+ *   of income (surplus 5.10 %; Commissioner of Labor 1903, p. 96) at a mean income of
+ *   about 651 USD a family against a committed cost of about 96 USD a family at 1901
+ *   retail prices: 1 − 0.051 × 651 ÷ (651 − 96) = 0.94. CALIBRATED (one survey).
+ * - middle 0.85 and upper 0.60: no 1900 source by class was found (the Historical
+ *   Statistics saving series begin in 1929); top income groups saved a far larger
+ *   share of income than wage earners. PROVISIONAL.
+ */
+export const MARGINAL_PROPENSITY_TO_CONSUME = { lower: 0.94, middle: 0.85, upper: 0.6 } as const;
+
+/**
+ * Consumption out of financial wealth: each day a household may spend
+ * `WEALTH_CONSUMPTION_RATE_PER_YEAR` ÷ days in year of its cash above the reserve, on
+ * top of its income (life-cycle propensities to consume out of wealth of about
+ * 0.03–0.06 a year). It keeps blocks without a wage consuming from their savings and
+ * bounds idle cash: cash levels off where this drawdown equals saving less dwelling
+ * purchases. Per year; PROVISIONAL.
+ */
+export const WEALTH_CONSUMPTION_RATE_PER_YEAR = 0.04;
+
+/**
+ * Cash a household keeps before drawing down wealth or buying dwellings: this many
+ * days of its committed spending. Days; PROVISIONAL.
+ */
+export const CASH_RESERVE_DAYS = 30;
+
+/**
+ * Housing (plan §4): annual depreciation of the dwelling stock. US non-farm starts
+ * 1890–1899 (Historical Statistics, series N 156: 2,941,000) about equal the census
+ * increase of dwellings 1890–1900 (11.48 M → 14.43 M, Webb 1911), so removals were
+ * small; farm building is not in the series, so the rate lies between 0 and the BEA
+ * rate for one-to-four-unit residential structures (about 1.1 %). Per year;
+ * PROVISIONAL. Daily (rate ÷ days in year).
+ */
+export const DWELLING_DEPRECIATION_RATE_PER_YEAR = 0.005;
+
+/**
+ * Income elasticity of dwellings per person: desired dwellings per person rise with
+ * smoothed real income as income^ε. US persons per dwelling fell from 5.3 (1900 census,
+ * Webb 1911) to about 2.63 per occupied unit (1990) while real GDP per head rose 4.60
+ * times (Maddison Project 2023: 8,038 → 36,982): ε = ln(5.3 / 2.63) ÷ ln 4.60 = 0.46.
+ * Dimensionless; CALIBRATED (one country, 1990 figure to be confirmed).
+ */
+export const DWELLING_INCOME_ELASTICITY = 0.46;
+
+/**
+ * A household closes the gap between its desired and actual dwellings over this many
+ * days (building takes time and is paid from saving). Days; PROVISIONAL. Daily.
+ */
+export const HOUSING_ADJUSTMENT_DAYS = 365;
+
+/**
+ * Crowding (persons per dwelling ÷ the block's 1900 persons per dwelling) above which
+ * the mortality and unrest terms stop growing: a model domain for a block with almost
+ * no dwellings, not a conservation repair. Dimensionless; PROVISIONAL.
+ */
+export const CROWDING_MAX = 3;
+
+/**
+ * Mortality: increase of the child and adult death rates per unit of crowding above
+ * the 1900 level (plan Q7a; only worse-than-1900 housing counts). Order of magnitude
+ * from Glasgow, where the one- and two-room districts had a death rate of 38 per 1,000
+ * and one infant in five died, against a city rate in the mid-20s (Russell, "Life in
+ * One Room", 1888; public domain). PROVISIONAL. Daily.
+ */
+export const CROWDING_MORTALITY_WEIGHT_CHILD = 0.5;
+export const CROWDING_MORTALITY_WEIGHT_ADULT = 0.3;

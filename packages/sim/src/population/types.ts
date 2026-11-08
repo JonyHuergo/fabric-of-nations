@@ -70,6 +70,13 @@ export interface ProvinceEconomy {
    * station cannot work there.
    */
   hydroPotentialMWhPerYear: number | null;
+  /**
+   * P6 (D-153): persons per dwelling in the province at its 1900 census (or the
+   * recorded proxy), the province's housing reference. Static. Null in worlds without
+   * housing (legacy, fixtures). Province crowding = persons ÷ dwellings ÷ this value,
+   * 1.0 in 1900.
+   */
+  housingReferencePersonsPerDwelling: number | null;
 }
 
 /** Authoritative population block state. */
@@ -139,6 +146,20 @@ export interface PopBlock {
    * requirement, not a repair) and smoothed over `FOOD_SUFFICIENCY_SMOOTHING_DAYS`.
    */
   foodSufficiency: Rate;
+
+  // P6 (D-153) demand, saving and housing. All zero in worlds without a demand system.
+  /**
+   * Household income per person per day, RUSD, smoothed over INCOME_SMOOTHING_DAYS:
+   * wages, welfare, distributed profits and public pay received, less income tax, plus
+   * the value of food kept from the block's own farms (permanent income, plan Q15).
+   */
+  incomeSmoothedRUSDPerCapitaDay: number;
+  /** Standard dwellings the block owns and lives in (plan Q4a, Q5a); real, ≥ 0. */
+  dwellings: number;
+  /** The block's persons per dwelling at world creation (crowding 1.0); fixed. */
+  housingReferencePersonsPerDwelling: number;
+  /** The block's smoothed income per person per day at world creation; fixed. */
+  housingReferenceIncomeRUSDPerCapitaDay: number;
 }
 
 export interface NeedItemDef {
@@ -195,10 +216,76 @@ export interface ProfessionIdentityDef {
   stratum: "lower" | "middle" | "upper";
 }
 
+/**
+ * P6 (D-153): one good of a demand category. Quantities are in the good's unit.
+ */
+export interface DemandGoodDef {
+  goodKey: string;
+  /** Committed (subsistence) quantity per adult equivalent per day; 0 for most goods. */
+  committedPerAdultEquivalentPerDay: number;
+  /**
+   * Retail margin of an urban household: units of the commerce and transport services
+   * bought with each unit of the good. A rural household pays this × its urban share.
+   */
+  retailCommercePerUnit: number;
+  retailTransportPerUnit: number;
+  /** A technology that gates the good (P5b C-21 rule); absent: always available. */
+  requiredTechnologyKey?: string;
+}
+
+/** P6: a need category of the linear expenditure system. */
+export interface DemandCategoryDef {
+  key: string;
+  /** Elasticity of substitution between the category's goods (CES), > 0. */
+  substitutionElasticity: number;
+  /** Committed quantities of this category go at market tier 1 (food) instead of 3. */
+  committedAtSubsistenceTier: boolean;
+  goods: readonly DemandGoodDef[];
+}
+
+/**
+ * P6: one point of the marginal-share schedule (plan Q1b, Q2, Q13). `consumptionRatio`
+ * is consumption per adult equivalent ÷ committed cost per adult equivalent
+ * (dimensionless, > 1). Between knots shares and weights are linear in the ratio;
+ * outside they are constant.
+ */
+export interface DemandKnotDef {
+  consumptionRatio: number;
+  /** Marginal budget share of each category (keys = category keys); they sum to 1. */
+  marginalShares: Readonly<Record<string, number>>;
+  /** Weight of each good inside its category (category key → good key → weight). */
+  goodWeights: Readonly<Record<string, Readonly<Record<string, number>>>>;
+}
+
+/** P6 (Q16): a sourced national taste, a multiplier of a good's weight in a country. */
+export interface DemandTasteDef {
+  countryKey: string;
+  goodKey: string;
+  weightMultiplier: number;
+}
+
+/** P6 (D-153): the linear expenditure system that replaces the need tiers. */
+export interface DemandSystemDef {
+  /** Service goods bought as retail margins. */
+  commerceGoodKey: string;
+  transportGoodKey: string;
+  categories: readonly DemandCategoryDef[];
+  knots: readonly DemandKnotDef[];
+  tastes: readonly DemandTasteDef[];
+  /** The dwelling good households buy (plan §4.3); null: no housing. */
+  dwellingGoodKey: string | null;
+}
+
 export interface PopulationDefinitions {
   dataVersion: string;
   scenarioId: string;
   needs: readonly NeedTierDef[];
+  /**
+   * P6 (D-153): the demand system. When present, households buy by it instead of the
+   * need tiers (whose subsistence tier still prices the wealth indicator's basket);
+   * absent in legacy worlds (plan Q9a).
+   */
+  demandSystem?: DemandSystemDef;
   /** P4 age pattern of fertility and mortality (D-124). */
   standardSchedule: StandardDemographicSchedule;
   /** P4 dietary energy of the food goods; goods absent here provide none. */
@@ -221,6 +308,12 @@ export interface PopBlockInitialDef {
   wealthLevel: number;
   initialSavingsRUSD: MoneyRUSD;
   militancy: Rate;
+  /**
+   * P6 (D-153): expected 1900 income per person per day, RUSD (the generator's wage and
+   * profit estimate). Initialises the smoothed income and the housing reference. Absent:
+   * 0 (worlds without a demand system).
+   */
+  incomeRUSDPerCapitaDay?: number;
   /**
    * P4 sourced 1900 demography of the block (D-142). Absent fields default to the
    * standard schedule (levels 1) and a rural block.
@@ -257,6 +350,8 @@ export interface ProvinceEconomyInitialDef {
   wageRUSDPerYearByProfession?: readonly number[];
   /** P5b absolute centroid latitude in degrees; defaults to null (no crop-band limit). */
   absLatitudeDeg?: number | null;
+  /** P6 persons per dwelling at the 1900 census; defaults to null (no housing). */
+  housingReferencePersonsPerDwelling?: number | null;
   /** P5b gross theoretical hydro potential, MWh/year; defaults to null (no hydro). */
   hydroPotentialMWhPerYear?: number | null;
 }

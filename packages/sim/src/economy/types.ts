@@ -335,6 +335,12 @@ export interface Market {
   /** Sole authoritative inventory representation. */
   stockLots: StockLot[];
   /**
+   * P6 (D-153): market prices smoothed over DEMAND_PRICE_SMOOTHING_DAYS, RUSD per unit,
+   * indexed by good id; what households read (plan Q15). Empty in worlds without a
+   * demand system.
+   */
+  priceSmoothedRUSD: number[];
+  /**
    * Administrator of the customs territory (D-119): the country whose tariff
    * schedule applies, or null in a countryless fixture. A shipment between two
    * markets is dutiable only when their administrations differ; intra-market pooled

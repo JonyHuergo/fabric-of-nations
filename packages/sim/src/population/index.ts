@@ -12,3 +12,5 @@ export * from "./needs.js";
 export * from "./wealth.js";
 export * from "./demographicLevels.js";
 export * from "./indicators.js";
+export * from "./demandSystem.js";
+export * from "./housing.js";

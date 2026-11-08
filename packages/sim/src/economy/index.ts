@@ -267,3 +267,5 @@ export {
 export * from "./provinceTransfer.js";
 export * from "./demographyFactors.js";
 export * from "./demographyReport.js";
+export * from "./householdDemand.js";
+export * from "./demandDay.js";

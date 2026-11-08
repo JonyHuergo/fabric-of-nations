@@ -1443,6 +1443,8 @@ export function createEconomyWorld(
       priceRUSD: [...market.priceRUSD],
       stockLots: canonicalizeStockLots(market.stockLots),
       customsCountryId: customsCountryByMarket.get(market.id) ?? null,
+      // P6 (D-153): filled from the day's prices on the first day a demand system runs.
+      priceSmoothedRUSD: [],
     };
     world.markets.push(built);
   }

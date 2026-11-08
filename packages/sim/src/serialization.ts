@@ -237,6 +237,11 @@ export type SerializedProvinceEconomy = {
    * column table keeps one set of fields.
    */
   readonly hydroPotentialMWhPerYear?: number | null;
+  /**
+   * P6 (D-153): present on every province (null where it has none) in a world with a
+   * demand system, absent on all of them otherwise (absent means null).
+   */
+  readonly housingReferencePersonsPerDwelling?: number | null;
 };
 
 /** Encoded financial account. */
@@ -940,6 +945,8 @@ export type SerializedMarket = {
   readonly priceRUSD: readonly number[];
   readonly stockLots: readonly SerializedStockLot[];
   readonly customsCountryId: number | null;
+  /** P6 (D-153): present on every market of a world with a demand system; absent means empty. */
+  readonly priceSmoothedRUSD?: readonly number[];
 };
 
 /** Encoded population block with explicit typed-array tags. */
@@ -967,6 +974,11 @@ export type SerializedPopBlock = {
   readonly adultMortalityResidual: number;
   readonly childMortalityLagged: number;
   readonly foodSufficiency: number;
+  /** P6 (D-153): present on every block of a world with a demand system; absent means 0. */
+  readonly incomeSmoothedRUSDPerCapitaDay?: number;
+  readonly dwellings?: number;
+  readonly housingReferencePersonsPerDwelling?: number;
+  readonly housingReferenceIncomeRUSDPerCapitaDay?: number;
 };
 
 /** Encoded M12a province ownership record. */
@@ -1357,6 +1369,9 @@ export function encodeWorld(world: World): SerializedWorld {
   assertValidWorld(world);
   // P5b (C-12): the hydro field is written for every province or for none.
   const encodeHydro = world.provinceEconomies.some((entry) => entry.hydroPotentialMWhPerYear !== null);
+  // P6 (D-153): the demand and housing fields are written for every record or for none,
+  // so worlds without a demand system keep their earlier encoding.
+  const encodeDemand = worldHasDemandState(world);
   return {
     schemaVersion: world.schemaVersion,
     simVersion: world.simVersion,
@@ -1380,6 +1395,7 @@ export function encodeWorld(world: World): SerializedWorld {
       wageRUSDPerYearByProfession: [...province.wageRUSDPerYearByProfession],
       absLatitudeDeg: province.absLatitudeDeg,
       ...(encodeHydro ? { hydroPotentialMWhPerYear: province.hydroPotentialMWhPerYear } : {}),
+      ...(encodeDemand ? { housingReferencePersonsPerDwelling: province.housingReferencePersonsPerDwelling } : {}),
     })),
     countries: [...world.countries]
       .sort((left, right) => left.id - right.id)
@@ -1545,6 +1561,14 @@ export function encodeWorld(world: World): SerializedWorld {
       adultMortalityResidual: block.adultMortalityResidual,
       childMortalityLagged: block.childMortalityLagged,
       foodSufficiency: block.foodSufficiency,
+      ...(encodeDemand
+        ? {
+            incomeSmoothedRUSDPerCapitaDay: block.incomeSmoothedRUSDPerCapitaDay,
+            dwellings: block.dwellings,
+            housingReferencePersonsPerDwelling: block.housingReferencePersonsPerDwelling,
+            housingReferenceIncomeRUSDPerCapitaDay: block.housingReferenceIncomeRUSDPerCapitaDay,
+          }
+        : {}),
     })),
     buildings: [...world.buildings]
       .sort((left, right) => left.id - right.id)
@@ -1583,6 +1607,7 @@ export function encodeWorld(world: World): SerializedWorld {
           quantity: lot.quantity,
         })),
         customsCountryId: market.customsCountryId,
+        ...(encodeDemand ? { priceSmoothedRUSD: [...market.priceSmoothedRUSD] } : {}),
       })),
     finance: {
       accounts: [...world.finance.accounts]
@@ -1988,6 +2013,10 @@ function decodeProvinceEconomy(value: unknown, path: string): ProvinceEconomy {
       record.hydroPotentialMWhPerYear === undefined || record.hydroPotentialMWhPerYear === null
         ? null
         : requireFiniteNumber(record.hydroPotentialMWhPerYear, `${path}.hydroPotentialMWhPerYear`),
+    housingReferencePersonsPerDwelling:
+      record.housingReferencePersonsPerDwelling === undefined || record.housingReferencePersonsPerDwelling === null
+        ? null
+        : requireFiniteNumber(record.housingReferencePersonsPerDwelling, `${path}.housingReferencePersonsPerDwelling`),
   };
 }
 
@@ -3783,6 +3812,12 @@ function decodeMarket(value: unknown, path: string): Market {
       record.customsCountryId === null || record.customsCountryId === undefined
         ? null
         : requireUint32(record.customsCountryId, `${path}.customsCountryId`),
+    priceSmoothedRUSD:
+      record.priceSmoothedRUSD === undefined
+        ? []
+        : requireArray(record.priceSmoothedRUSD, `${path}.priceSmoothedRUSD`).map((price, index) =>
+            requireFiniteNumber(price, `${path}.priceSmoothedRUSD[${String(index)}]`),
+          ),
   };
 }
 
@@ -3904,7 +3939,37 @@ function decodePopBlock(value: unknown, path: string): PopBlock {
     adultMortalityResidual: requireFiniteNumber(record.adultMortalityResidual, `${path}.adultMortalityResidual`),
     childMortalityLagged: requireFiniteNumber(record.childMortalityLagged, `${path}.childMortalityLagged`),
     foodSufficiency: requireFiniteNumber(record.foodSufficiency, `${path}.foodSufficiency`),
+    incomeSmoothedRUSDPerCapitaDay:
+      record.incomeSmoothedRUSDPerCapitaDay === undefined ? 0 : requireNonNegativeFinite(record.incomeSmoothedRUSDPerCapitaDay, `${path}.incomeSmoothedRUSDPerCapitaDay`),
+    dwellings:
+      record.dwellings === undefined ? 0 : requireNonNegativeFinite(record.dwellings, `${path}.dwellings`),
+    housingReferencePersonsPerDwelling:
+      record.housingReferencePersonsPerDwelling === undefined ? 0 : requireNonNegativeFinite(record.housingReferencePersonsPerDwelling, `${path}.housingReferencePersonsPerDwelling`),
+    housingReferenceIncomeRUSDPerCapitaDay:
+      record.housingReferenceIncomeRUSDPerCapitaDay === undefined ? 0 : requireNonNegativeFinite(record.housingReferenceIncomeRUSDPerCapitaDay, `${path}.housingReferenceIncomeRUSDPerCapitaDay`),
   };
+}
+
+/** P6 (D-153): a finite, non-negative number. */
+function requireNonNegativeFinite(value: unknown, path: string): number {
+  const number = requireFiniteNumber(value, path);
+  if (number < 0) throw new RangeError(`${path} must be non-negative`);
+  return number;
+}
+
+/** P6 (D-153): whether the world carries demand-system or housing state to encode. */
+function worldHasDemandState(world: World): boolean {
+  return (
+    world.provinceEconomies.some((entry) => entry.housingReferencePersonsPerDwelling !== null) ||
+    world.markets.some((market) => market.priceSmoothedRUSD.length > 0) ||
+    world.popBlocks.some(
+      (block) =>
+        block.incomeSmoothedRUSDPerCapitaDay !== 0 ||
+        block.dwellings !== 0 ||
+        block.housingReferencePersonsPerDwelling !== 0 ||
+        block.housingReferenceIncomeRUSDPerCapitaDay !== 0,
+    )
+  );
 }
 
 function decodeConstructionProject(

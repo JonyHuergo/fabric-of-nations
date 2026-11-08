@@ -43,6 +43,7 @@ import {
   WORKING_AGE_START,
 } from "./constants.js";
 import { assertValidPopulationDefinitions, expandAgeGroupsToSingle } from "./definitions.js";
+import { assertValidBlockHousing, initialiseProvinceHousing } from "./housing.js";
 import type {
   FinanceState,
   FinancialAccount,
@@ -124,6 +125,13 @@ export function assertValidProvinceEconomy(province: ProvinceEconomy): void {
     const potential = requireFiniteNumber(record.hydroPotentialMWhPerYear, "province.hydroPotentialMWhPerYear");
     if (potential < 0) throw new RangeError("province.hydroPotentialMWhPerYear must be non-negative");
   }
+  if (record.housingReferencePersonsPerDwelling !== null) {
+    const reference = requireFiniteNumber(
+      record.housingReferencePersonsPerDwelling,
+      "province.housingReferencePersonsPerDwelling",
+    );
+    if (!(reference > 0)) throw new RangeError("province.housingReferencePersonsPerDwelling must be positive");
+  }
   for (const field of ["unrest", "infrastructure", "urbanShare"] as const) {
     const rate = requireFiniteNumber(record[field], `province.${field}`);
     if (rate < 0 || rate > 1) {
@@ -202,6 +210,7 @@ export function assertValidPopBlock(block: PopBlock): void {
   assertRemainder(record.fractionalMaleBirthRemainder, "popBlock.fractionalMaleBirthRemainder");
   assertRemainder(record.fractionalDeathRemainder, "popBlock.fractionalDeathRemainder");
   assertValidBlockDemography(block, `popBlock ${String(block.id)}`);
+  assertValidBlockHousing(block, `popBlock ${String(block.id)}`);
 }
 
 function assertUnique<T>(values: readonly T[], key: (value: T) => string | number, path: string): void {
@@ -563,6 +572,8 @@ export function createPopulationWorld(
     assertWealth(initial.wealthLevel, `popBlock ${String(initial.id)} wealthLevel`);
     assertNonNegative(initial.initialSavingsRUSD, `popBlock ${String(initial.id)} initialSavingsRUSD`);
     assertRate(initial.militancy, `popBlock ${String(initial.id)} militancy`);
+    const initialIncome = initial.incomeRUSDPerCapitaDay ?? 0;
+    assertNonNegative(initialIncome, `popBlock ${String(initial.id)} incomeRUSDPerCapitaDay`);
 
     const block: PopBlock = {
       id: initial.id,
@@ -590,6 +601,11 @@ export function createPopulationWorld(
       adultMortalityResidual: 1,
       childMortalityLagged: 1,
       foodSufficiency: 1,
+      // P6 (D-153): housing is set per province below (initialiseProvinceHousing).
+      incomeSmoothedRUSDPerCapitaDay: initialIncome,
+      dwellings: 0,
+      housingReferencePersonsPerDwelling: 0,
+      housingReferenceIncomeRUSDPerCapitaDay: 0,
     };
     const sourced = sourcedLevelsOf(initial.demography);
     assertRate(sourced.urbanShare, `popBlock ${String(initial.id)} demography.urbanShare`);
@@ -674,7 +690,16 @@ export function createPopulationWorld(
       wageRUSDPerYearByProfession: [...(province.wageRUSDPerYearByProfession ?? [])],
       absLatitudeDeg: province.absLatitudeDeg ?? null,
       hydroPotentialMWhPerYear: province.hydroPotentialMWhPerYear ?? null,
+      housingReferencePersonsPerDwelling: province.housingReferencePersonsPerDwelling ?? null,
     }));
+  // P6 (D-153): each province with a 1900 housing reference shares its dwellings
+  // among its blocks so that crowding is 1.0 everywhere at the start.
+  const blockById = new Map(blocks.map((block) => [block.id, block]));
+  for (const province of worldProvinces) {
+    if (province.housingReferencePersonsPerDwelling === null) continue;
+    const provinceBlocks = province.popBlockIds.map((id) => blockById.get(id)).filter((block) => block !== undefined);
+    initialiseProvinceHousing(provinceBlocks, province.housingReferencePersonsPerDwelling);
+  }
 
   const world: World = {
     schemaVersion: WORLD_SCHEMA_VERSION,
