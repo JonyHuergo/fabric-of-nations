@@ -14,7 +14,7 @@
  * 21 (D-143): province ownership as columns (`provinceOwnership`), the harvest column
  * and the focused province's land section.
  */
-export const PROTOCOL_VERSION = 22 as const;
+export const PROTOCOL_VERSION = 23 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -1099,6 +1099,9 @@ export interface ProvinceEconomyTable {
   readonly controlledSinceDay: readonly (number | null)[];
   readonly territoryTag: readonly (string | null)[];
   readonly harvestFactor: readonly (number | null)[];
+  /** P6 (D-153): dwellings and crowding (null without housing). */
+  readonly dwellings: readonly (number | null)[];
+  readonly crowding: readonly (number | null)[];
 }
 
 /** Encode province rows as a column table (rows ascending by id). */
@@ -1127,6 +1130,8 @@ export function encodeProvinceEconomyTable(
     controlledSinceDay: rows.map((row) => row.controlledSinceDay),
     territoryTag: rows.map((row) => row.territoryTag),
     harvestFactor: rows.map((row) => row.harvestFactor),
+    dwellings: rows.map((row) => row.dwellings),
+    crowding: rows.map((row) => row.crowding),
   };
 }
 
@@ -1171,6 +1176,8 @@ export function provinceEconomyRows(
       controlledSinceDay: table.controlledSinceDay[index] ?? null,
       territoryTag: table.territoryTag[index] ?? null,
       harvestFactor: table.harvestFactor[index] ?? null,
+      dwellings: table.dwellings[index] ?? null,
+      crowding: table.crowding[index] ?? null,
     });
   });
   provinceRowsCache.set(table, rows);
@@ -1270,6 +1277,8 @@ export interface CountrySnapshot {
   readonly hardshipPopulationShare: number;
   readonly blocksWithUnmetSubsistence: number;
   readonly blocksWithUnmetBasic: number;
+  /** P6 (D-153): planned household spending, saving and housing; null on the tier path. */
+  readonly households: CountryHouseholdsSnapshot | null;
   readonly buildingCount: number;
   /** Estimated capacity for every good in the catalog; zero means no capacity. */
   readonly productionCapacityByGood: readonly SnapshotProductionCapacity[];
@@ -1511,6 +1520,19 @@ export interface CountryDemographySnapshot {
   readonly history: readonly DemographyYearSnapshot[];
 }
 
+/** P6 (D-153): a country's households (planned at today's smoothed prices). */
+export interface CountryHouseholdsSnapshot {
+  /** Share of planned consumption by category, in the demand system's order. */
+  readonly categoryShares: readonly { readonly key: string; readonly share: number }[];
+  readonly foodShare: number;
+  /** Saving ÷ income by profession stratum; null where the stratum has no income. */
+  readonly savingRate: { readonly lower: number | null; readonly middle: number | null; readonly upper: number | null };
+  readonly dwellings: number;
+  readonly personsPerDwelling: number | null;
+  /** Population-weighted province crowding (1 = the 1900 level). */
+  readonly crowding: number | null;
+}
+
 export interface ProvinceEconomySnapshot {
   readonly id: number;
   /** Owner country (simulation country), or null. */
@@ -1544,6 +1566,10 @@ export interface ProvinceEconomySnapshot {
    * 0.01; null for a province with no cropland or grazing land.
    */
   readonly harvestFactor: number | null;
+  /** P6 (D-153): the province's dwellings (sum of its blocks); null without housing. */
+  readonly dwellings: number | null;
+  /** P6: persons per dwelling ÷ the province's 1900 persons per dwelling; null without housing. */
+  readonly crowding: number | null;
 }
 
 /**
@@ -3047,6 +3073,7 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isFiniteNumber(value.hardshipPopulationShare)) return false;
   if (!isIntegerIn(value.blocksWithUnmetSubsistence, 0, 1_000_000)) return false;
   if (!isIntegerIn(value.blocksWithUnmetBasic, 0, 1_000_000)) return false;
+  if (value.households !== null && !isCountryHouseholds(value.households)) return false;
   if (!isIntegerIn(value.buildingCount, 0, 1_000_000)) return false;
   if (!Array.isArray(value.productionCapacityByGood)) return false;
   if (!value.productionCapacityByGood.every(isProductionCapacity)) return false;
@@ -3110,6 +3137,25 @@ function isProvinceLandSnapshot(value: unknown): value is ProvinceLandSnapshot {
   );
 }
 
+function isNullableFiniteArray(value: unknown, length: number): boolean {
+  return Array.isArray(value) && value.length === length && value.every((entry) => entry === null || isFiniteNumber(entry));
+}
+
+/** P6 (D-153): the households section. */
+function isCountryHouseholds(value: unknown): value is CountryHouseholdsSnapshot {
+  if (!isRecord(value) || !Array.isArray(value.categoryShares)) return false;
+  if (!value.categoryShares.every((entry) => isRecord(entry) && typeof entry.key === "string" && isFiniteNumber(entry.share))) return false;
+  if (!isFiniteNumber(value.foodShare) || !isFiniteNumber(value.dwellings)) return false;
+  if (!isRecord(value.savingRate)) return false;
+  for (const stratum of ["lower", "middle", "upper"] as const) {
+    const rate = value.savingRate[stratum];
+    if (rate !== null && !isFiniteNumber(rate)) return false;
+  }
+  if (value.personsPerDwelling !== null && !isFiniteNumber(value.personsPerDwelling)) return false;
+  if (value.crowding !== null && !isFiniteNumber(value.crowding)) return false;
+  return true;
+}
+
 function isProvinceEconomyTable(value: unknown): value is ProvinceEconomyTable {
   if (!isRecord(value) || !isNumberArray(value.ids)) return false;
   const length = value.ids.length;
@@ -3133,6 +3179,7 @@ function isProvinceEconomyTable(value: unknown): value is ProvinceEconomyTable {
     const entries = value[column];
     if (!Array.isArray(entries) || entries.length !== length || !entries.every(isNullableId)) return false;
   }
+  if (!isNullableFiniteArray(value.dwellings, length) || !isNullableFiniteArray(value.crowding, length)) return false;
   const harvest = value.harvestFactor;
   if (
     !Array.isArray(harvest) ||

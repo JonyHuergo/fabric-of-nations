@@ -32,6 +32,8 @@ const LENS_RULES: Readonly<Record<MapModeId, (data: LensData | null) => boolean>
   unrest: (data) => populated(data),
   // P5: the harvest lens needs a campaign whose provinces have farm land.
   harvest: (data) => data !== null && provinceEconomyRows(data).some((province) => province.harvestFactor !== null),
+  // P6 (D-153): the crowding lens needs a campaign with a dwelling stock.
+  crowding: (data) => data !== null && provinceEconomyRows(data).some((province) => province.crowding !== null),
 };
 
 function populated(data: LensData | null): boolean {
@@ -47,6 +49,7 @@ export const LENS_ORDER: readonly MapModeId[] = [
   "literacy",
   "unrest",
   "harvest",
+  "crowding",
 ];
 
 /** The lenses that have real data right now, in display order. */

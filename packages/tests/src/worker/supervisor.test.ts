@@ -139,6 +139,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
         hardshipPopulationShare: 0,
         blocksWithUnmetSubsistence: 0,
         blocksWithUnmetBasic: 0,
+        households: null,
         buildingCount: 1,
         productionCapacityByGood: [],
         latestFiscal: null,
@@ -308,7 +309,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
     ],
     provinceTable: encodeProvinceEconomyTable(
       [
-        { id: 0, countryId: 0, marketId: 0, population: 100, populationByProfession: {}, buildingCount: 1, buildingLevels: 1, employedWorkers: 0, unrest: 0, infrastructure: 0.5, urbanShare: 0, arableLandHa: 0, pastureHa: 0, literacy: 0, controllerCountryId: null, controlledSinceDay: null, territoryTag: null, harvestFactor: null },
+        { id: 0, countryId: 0, marketId: 0, population: 100, populationByProfession: {}, buildingCount: 1, buildingLevels: 1, employedWorkers: 0, unrest: 0, infrastructure: 0.5, urbanShare: 0, arableLandHa: 0, pastureHa: 0, literacy: 0, controllerCountryId: null, controlledSinceDay: null, territoryTag: null, harvestFactor: null, dwellings: null, crowding: null },
       ],
       [],
     ),

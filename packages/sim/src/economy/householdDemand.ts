@@ -19,6 +19,7 @@ import { daysInYear, dayIndexToCivilDate } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import {
   CASH_RESERVE_DAYS,
+  DWELLING_DEPRECIATION_RATE_PER_YEAR,
   HOUSING_ADJUSTMENT_DAYS,
   MARGINAL_PROPENSITY_TO_CONSUME,
   WEALTH_CONSUMPTION_RATE_PER_YEAR,
@@ -254,7 +255,10 @@ export function buildLesHouseholdDemand(
       // Dwellings (tier 6, funded last from cash above the reserve).
       let dwellingDesired = 0;
       if (tierIndex === 2 && dwellingGoodId !== null && blockHasHousing(block)) {
-        dwellingDesired = Math.max(0, desiredDwellings(block) - block.dwellings) / HOUSING_ADJUSTMENT_DAYS;
+        // Replacement of today's depreciation plus a share of the gap (plan §4.3).
+        dwellingDesired =
+          (block.dwellings * DWELLING_DEPRECIATION_RATE_PER_YEAR) / year +
+          Math.max(0, desiredDwellings(block) - block.dwellings) / HOUSING_ADJUSTMENT_DAYS;
         if (owner !== undefined && dwellingDesired > 0) {
           const entry = byCountry.get(owner.id);
           if (entry !== undefined) entry.dwellingsDesired += dwellingDesired;

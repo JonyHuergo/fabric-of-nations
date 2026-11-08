@@ -1,6 +1,7 @@
 ﻿import { prePhase4Digest } from "../fixtures/p4Encoding.js";
 import { prePhase5Digest } from "../fixtures/p5Encoding.js";
 import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
+import { prePhase6Digest } from "../fixtures/p6Encoding.js";
 import {
   WORLD_SCHEMA_VERSION,
   createEconomyWorld,
@@ -77,7 +78,10 @@ describe("M3a schema-25 serialization", () => {
     expect(prePhase5bDigest(cloneWorld())).toBe("7d816ee4e04c0e72");
     // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
     // above restores m3-economy-v12 and still gives the P5 digest.
-    expect(hashWorld(cloneWorld())).toBe("e33dd890a6d41eda");
+    // P6 schema 34 (D-153): encoding only — restoring schema 33, simulation 0.29.0 and
+    // data m3-economy-v13 reproduces the P5b digest.
+    expect(prePhase6Digest(cloneWorld())).toBe("e33dd890a6d41eda");
+    expect(hashWorld(cloneWorld())).toBe("239ec16ebc4fd258");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

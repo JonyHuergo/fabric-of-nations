@@ -23,6 +23,7 @@
 } from "@century/sim";
 import { prePhase5Digest } from "../fixtures/p5Encoding.js";
 import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
+import { prePhase6Digest } from "../fixtures/p6Encoding.js";
 import {
   loadWppWorldSchedules,
   loadM2PopulationCalibration,
@@ -132,7 +133,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     expect(prePhase5bDigest(world)).toBe("25dd311842cb4d96");
     // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
     // above restores m3-economy-v12 and still gives the P5 digest.
-    expect(hashWorld(world)).toBe("2a0c4e6417cc51e6");
+    // P6 schema 34 (D-153): encoding only; restoring the three version strings gives the P5b digest.
+    expect(prePhase6Digest(world)).toBe("2a0c4e6417cc51e6");
+    expect(hashWorld(world)).toBe("3237a586f4216a60");
     const restored = deserializeWorld(serializeWorld(world));
     expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(tick(restored).advanced).toBe(false);
@@ -353,7 +356,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     expect(prePhase5bDigest(world)).toBe("03cbedcb11ce7e19");
     // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
     // above restores m3-economy-v12 and still gives the P5 digest.
-    expect(hashWorld(world)).toBe("96854a837daea17d");
+    // P6 schema 34 (D-153): encoding only; restoring the three version strings gives the P5b digest.
+    expect(prePhase6Digest(world)).toBe("96854a837daea17d");
+    expect(hashWorld(world)).toBe("4f0c32c95770d5bb");
   });
 });
 

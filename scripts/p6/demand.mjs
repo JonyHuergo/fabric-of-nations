@@ -428,6 +428,8 @@ export function buildP6Demand(ctx) {
     const W = sum(w);
     list.forEach((pop, i) => dwellingsOfPop.set(pop, (total * w[i]) / W));
   }
+  // The block's own 1900 urban share (P4), as the simulation reads it.
+  const urbanOfBlock = new Map(p4.blocks.map((entry) => [`${entry.provinceId}|${entry.professionKey}`, entry.urbanShare]));
   const growthOf = (provinceId) => (p4ById.get(provinceId)?.model?.stableGrowthPer1000 ?? 0) / 1000;
 
   const system = resolve(demandSystem, goods);
@@ -448,7 +450,7 @@ export function buildP6Demand(ctx) {
       income: incomeOf(pop),
       cash: (pop.savingsPerCapitaRUSD ?? 0) * pop.population,
       mpc: P6_COEFFICIENTS.marginalPropensityToConsume[profession.stratum],
-      urban: province.urbanShare ?? 0,
+      urban: urbanOfBlock.get(`${pop.provinceId}|${pop.professionKey}`) ?? province.urbanShare ?? 0,
       prices,
       available: (goodKey) => GATES[goodKey] === undefined || knows(country, GATES[goodKey]),
       taste: tastes.filter((taste) => taste.countryKey === country?.tag),

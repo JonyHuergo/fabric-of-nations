@@ -1,6 +1,7 @@
 ﻿import { prePhase4Digest } from "../fixtures/p4Encoding.js";
 import { prePhase5Digest } from "../fixtures/p5Encoding.js";
 import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
+import { prePhase6Digest } from "../fixtures/p6Encoding.js";
 import {
   CAMPAIGN_TERMINAL_DAY_INDEX,
   CAMPAIGN_TICKS,
@@ -58,7 +59,10 @@ describe("determinism", () => {
     expect(prePhase5bDigest(world)).toBe("8f7987a7a6119c7d");
     // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
     // above restores m3-economy-v12 and still gives the P5 digest.
-    expect(hashWorld(world)).toBe("88433b30fbb759be");
+    // P6 schema 34 (D-153): encoding only — restoring schema 33, simulation 0.29.0 and
+    // data m3-economy-v13 reproduces the P5b digest; this world has no demand system.
+    expect(prePhase6Digest(world)).toBe("88433b30fbb759be");
+    expect(hashWorld(world)).toBe("a9195048d679521e");
   });
 
   test("a one-year economic simulation is deterministic and save/resume safe", () => {

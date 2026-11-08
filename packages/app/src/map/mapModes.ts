@@ -34,7 +34,8 @@ export type MapModeId =
   | "urban"
   | "literacy"
   | "unrest"
-  | "harvest";
+  | "harvest"
+  | "crowding";
 
 export interface ProvinceAppearance {
   readonly fill: Rgb;
@@ -65,6 +66,8 @@ export interface ProvinceState {
   readonly unrest: number | null;
   /** P5 (D-143): this year's harvest weather factor (1 = normal); null without farm land. */
   readonly harvest: number | null;
+  /** P6 (D-153): persons per dwelling ÷ the 1900 level (1 = as in 1900); null without housing. */
+  readonly crowding: number | null;
 }
 
 /** The fields of a province the map reads; geometry is not among them. */
@@ -271,6 +274,8 @@ export const MAP_MODES: Readonly<Record<MapModeId, MapMode>> = {
   unrest: sequentialMode("unrest", "Unrest", (state) => state.unrest, [0.05, 0.15, 0.3, 0.5], percent),
   // P5 (D-143): this year's harvest against a normal year; darker is a better harvest.
   harvest: sequentialMode("harvest", "Harvest", (state) => state.harvest, [0.85, 0.95, 1.05, 1.15], percent),
+  // P6 (D-153): housing against 1900; darker is more crowded than people were used to.
+  crowding: sequentialMode("crowding", "Crowding", (state) => state.crowding, [0.9, 1.0, 1.1, 1.25], percent),
 };
 
 /** Approximate land area of a province from its bundle area (square degrees) at its label latitude. */
@@ -325,6 +330,7 @@ export function buildProvinceStates(
       literacy: populated ? Math.round(economy.literacy * 100) / 100 : null,
       unrest: populated ? Math.round(economy.unrest * 100) / 100 : null,
       harvest: economy?.harvestFactor ?? null,
+      crowding: populated && economy.crowding !== null ? Math.round(economy.crowding * 100) / 100 : null,
     };
   });
 }
@@ -415,7 +421,7 @@ export function dataLensFill(
   province: Pick<ProvinceMapProvince, "area" | "label">,
   economy: ProvinceEconomySnapshot | undefined,
 ): Rgb | null {
-  if (lens !== "density" && lens !== "urban" && lens !== "literacy" && lens !== "unrest" && lens !== "harvest") return null;
+  if (lens !== "density" && lens !== "urban" && lens !== "literacy" && lens !== "unrest" && lens !== "harvest" && lens !== "crowding") return null;
   const populated = economy !== undefined && economy.population > 0;
   const state: ProvinceState = {
     ownerTag: "",
@@ -427,6 +433,7 @@ export function dataLensFill(
     literacy: populated ? economy.literacy : null,
     unrest: populated ? economy.unrest : null,
     harvest: economy?.harvestFactor ?? null,
+    crowding: populated ? economy.crowding : null,
   };
   const context: MapDataContext = {
     provinces: [],

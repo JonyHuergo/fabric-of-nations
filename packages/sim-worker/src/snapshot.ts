@@ -7,6 +7,8 @@
  */
 
 import { provinceHarvestFactor, provinceLandSnapshot } from "./landSnapshot.js";
+import { countryHouseholdsSnapshot } from "./householdsSnapshot.js";
+import { provinceCrowding, type PopBlock } from "@century/sim";
 import {
   countryDemographySnapshot,
   demographySnapshotContext,
@@ -178,6 +180,8 @@ interface SnapshotBuild {
   readonly priceIndexes: ReturnType<typeof derivePriceIndexes>;
   /** P4 (D-142) shared demography factors; null without population definitions. */
   readonly demography: DemographySnapshotContext | null;
+  /** P6 (D-153): the population definitions (demand system), when given. */
+  readonly populationDefinitions?: PopulationDefinitions;
 }
 
 export interface SnapshotRuntimeState {
@@ -1407,6 +1411,7 @@ function countrySnapshot(
       population > 0 ? roundDisplay(hardshipPopulation / population) : 0,
     blocksWithUnmetSubsistence: unmetSubsistenceBlocks,
     blocksWithUnmetBasic: unmetBasicBlocks,
+    households: countryHouseholdsSnapshot(world, country, new Set(provinceIds), definitions, build?.populationDefinitions),
     buildingCount,
     productionCapacityByGood: productionCapacitySnapshots(definitions, capacity),
     latestFiscal,
@@ -1947,6 +1952,12 @@ function provinceEconomySnapshots(
     if (provinceId === undefined) continue;
     employed.set(provinceId, (employed.get(provinceId) ?? 0) + assignment.workers);
   }
+  const blocksByProvince = new Map<number, PopBlock[]>();
+  for (const block of world.popBlocks) {
+    const list = blocksByProvince.get(block.provinceId);
+    if (list === undefined) blocksByProvince.set(block.provinceId, [block]);
+    else list.push(block);
+  }
   return [...world.provinceEconomies]
     .sort((left, right) => left.id - right.id)
     .map((province) => {
@@ -1977,8 +1988,22 @@ function provinceEconomySnapshots(
         controlledSinceDay: controlled ? ownership.controlledSinceDay : null,
         territoryTag: territoryByProvince.get(province.id) ?? null,
         harvestFactor: provinceHarvestFactor(world, province),
+        // P6 (D-153): housing (null where the province has no 1900 housing reference).
+        ...provinceHousing(blocksByProvince.get(province.id) ?? [], province),
       };
     });
+}
+
+/** P6 (D-153): a province's dwellings and crowding for the snapshot. */
+function provinceHousing(
+  blocks: readonly PopBlock[],
+  province: World["provinceEconomies"][number],
+): { readonly dwellings: number | null; readonly crowding: number | null } {
+  if (province.housingReferencePersonsPerDwelling === null) return { dwellings: null, crowding: null };
+  let dwellings = 0;
+  for (const block of blocks) dwellings += block.dwellings;
+  const crowding = provinceCrowding(blocks, province.housingReferencePersonsPerDwelling);
+  return { dwellings: roundDisplay(dwellings, 1), crowding: crowding === null ? null : roundDisplay(crowding, 3) };
 }
 
 /** P5 (D-143): attach the focused province's land section. */
@@ -2416,6 +2441,7 @@ export function buildSimulationSnapshot(
     cache,
     priceIndexes: derivePriceIndexes(world),
     demography: demographySnapshotContext(world, definitions, populationDefinitions),
+    ...(populationDefinitions === undefined ? {} : { populationDefinitions }),
   };
   const territoryMeta = runtime.territoryMeta ?? [];
   if (

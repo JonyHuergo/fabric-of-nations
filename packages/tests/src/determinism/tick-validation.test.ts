@@ -47,6 +47,7 @@ import {
 import { loadM5EightPolities } from "@century/data";
 import { GRAIN_ID, productionWorld, reservation } from "../fixtures/m3c.js";
 import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
+import { prePhase6Digest } from "../fixtures/p6Encoding.js";
 
 const SEED = 20_261_023;
 
@@ -85,7 +86,10 @@ const PRE_P5B_HASH_AFTER_22_TICKS = "d1580017f60be441";
 // only; the proof restores m3-economy-v12 and still gives the P5 hash (asserted).
 // D-149 adds the (paper, empty) monetary-standard fields to every authority record;
 // the proof strips them and still gives the P5 hash.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "1b0c4a1e37334b84";
+const PRE_P6_HASH_AFTER_22_TICKS = "1b0c4a1e37334b84";
+// P6 schema 34 (D-153) re-pins it: encoding only (schema, simulation and data version
+// strings); restoring them gives the P5b hash (asserted). The world has no demand system.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "9b91fb62e7376098";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {
@@ -116,6 +120,7 @@ describe("Batch 5 validation boundary and determinism", () => {
     runTicks(world, 22, contextFor(scenario));
     expect(world.dayIndex).toBe(22);
     expect(prePhase5bDigest(world)).toBe(PRE_P5B_HASH_AFTER_22_TICKS);
+    expect(prePhase6Digest(world)).toBe(PRE_P6_HASH_AFTER_22_TICKS);
     expect(hashWorld(world)).toBe(PRE_BATCH5_HASH_AFTER_22_TICKS);
   });
 

@@ -13,6 +13,17 @@ import { colors, fonts, spacing, themedSheet } from "../theme";
 import { provinceEconomyRows } from "@century/sim-worker";
 import { useMoney } from "../format/useMoney";
 
+/** P6 (D-153): names of the demand system's categories (presentation). */
+const CATEGORY_NAMES: Readonly<Record<string, string>> = {
+  food: "Food",
+  clothing: "Clothing",
+  "fuel-light": "Fuel and light",
+  "household-goods": "Household goods",
+  tobacco: "Tobacco",
+  transport: "Transport",
+  services: "Services",
+};
+
 export function PopulationScreen({
   snapshot,
   countryId,
@@ -126,6 +137,28 @@ export function PopulationScreen({
             employment estimate. The model does not calculate an unemployment rate, labor-force
             participation rate, or per-capita income; no such figure is shown.
           </Notice>
+        </Section>
+      )}
+      {country === undefined || country === null || country.households === null ? null : (
+        <Section title="Households" subtitle="Planned spending at this month's prices; dwellings owned by households.">
+          <StatRow
+            label="Food share"
+            value={formatRate(country.households.foodShare)}
+            detail={country.households.categoryShares
+              .filter((entry) => entry.key !== "food" && entry.share > 0)
+              .map((entry) => `${CATEGORY_NAMES[entry.key] ?? entry.key} ${formatRate(entry.share)}`)
+              .join(" · ")}
+          />
+          <StatRow
+            label="Saving rate"
+            value={country.households.savingRate.lower === null ? "—" : formatRate(country.households.savingRate.lower)}
+            detail={`Workers and peasants. Clerks and academics ${country.households.savingRate.middle === null ? "—" : formatRate(country.households.savingRate.middle)} · capitalists ${country.households.savingRate.upper === null ? "—" : formatRate(country.households.savingRate.upper)}. Saving is kept as cash and pays for new dwellings.`}
+          />
+          <StatRow
+            label="Housing"
+            value={country.households.personsPerDwelling === null ? "—" : `${country.households.personsPerDwelling.toFixed(2)} per dwelling`}
+            detail={`${formatCount(Math.round(country.households.dwellings))} dwellings · crowding ${country.households.crowding === null ? "—" : formatRate(country.households.crowding)} of 1900. Crowding above 1900 raises deaths and unrest.`}
+          />
         </Section>
       )}
       <Section

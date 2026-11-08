@@ -434,43 +434,43 @@
    },
    {
     "goodId": 8,
-    "quantity": 9621810
+    "quantity": 6596060
    },
    {
     "goodId": 9,
-    "quantity": 6134130
+    "quantity": 7894580
    },
    {
     "goodId": 10,
-    "quantity": 7180210
+    "quantity": 6396420
    },
    {
     "goodId": 11,
-    "quantity": 7207840
+    "quantity": 3991500
    },
    {
     "goodId": 12,
-    "quantity": 288042
+    "quantity": 304673
    },
    {
     "goodId": 13,
-    "quantity": 59283
+    "quantity": 155073
    },
    {
     "goodId": 14,
-    "quantity": 2706
+    "quantity": 30151
    },
    {
     "goodId": 15,
-    "quantity": 145
+    "quantity": 259
    },
    {
     "goodId": 16,
-    "quantity": 80049
+    "quantity": 81417
    },
    {
     "goodId": 17,
-    "quantity": 4770
+    "quantity": 5360
    },
    {
     "goodId": 18,
@@ -478,19 +478,19 @@
    },
    {
     "goodId": 19,
-    "quantity": 941
+    "quantity": 1811
    },
    {
     "goodId": 20,
-    "quantity": 64
+    "quantity": 104
    },
    {
     "goodId": 21,
-    "quantity": 86
+    "quantity": 92
    },
    {
     "goodId": 22,
-    "quantity": 408
+    "quantity": 639
    },
    {
     "goodId": 23,
@@ -498,7 +498,7 @@
    },
    {
     "goodId": 24,
-    "quantity": 51
+    "quantity": 82
    },
    {
     "goodId": 25,
@@ -510,35 +510,35 @@
    },
    {
     "goodId": 27,
-    "quantity": 2759
+    "quantity": 3101
    },
    {
     "goodId": 28,
-    "quantity": 619
+    "quantity": 695
    },
    {
     "goodId": 29,
-    "quantity": 1190
+    "quantity": 1337
    },
    {
     "goodId": 31,
-    "quantity": 994
+    "quantity": 1914
    },
    {
     "goodId": 32,
-    "quantity": 66
+    "quantity": 107
    },
    {
     "goodId": 33,
-    "quantity": 24
+    "quantity": 26
    },
    {
     "goodId": 34,
-    "quantity": 53
+    "quantity": 121
    },
    {
     "goodId": 35,
-    "quantity": 15
+    "quantity": 13
    },
    {
     "goodId": 36,
@@ -546,15 +546,15 @@
    },
    {
     "goodId": 37,
-    "quantity": 22735
+    "quantity": 33474
    },
    {
     "goodId": 38,
-    "quantity": 944
+    "quantity": 1580
    },
    {
     "goodId": 39,
-    "quantity": 3
+    "quantity": 5
    },
    {
     "goodId": 40,
@@ -570,7 +570,7 @@
    },
    {
     "goodId": 43,
-    "quantity": 54
+    "quantity": 134
    },
    {
     "goodId": 44,
@@ -578,7 +578,7 @@
    },
    {
     "goodId": 45,
-    "quantity": 73795
+    "quantity": 145206
    },
    {
     "goodId": 46,
@@ -602,15 +602,19 @@
    },
    {
     "goodId": 51,
-    "quantity": 2887730
+    "quantity": 6628420
    },
    {
     "goodId": 57,
-    "quantity": 95170
+    "quantity": 112942
    },
    {
     "goodId": 58,
-    "quantity": 4641
+    "quantity": 8426
+   },
+   {
+    "goodId": 59,
+    "quantity": 422
    }
   ],
   "resourceRequirements": [],
@@ -4576,5 +4580,73 @@
   ],
   "landUse": "cropland",
   "maxAbsLatitudeDeg": 46
+ },
+ {
+  "id": 72,
+  "key": "residential-builder",
+  "name": "Residential Builder",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 14,
+    "quantityPerThroughputUnit": 51.1344
+   },
+   {
+    "goodId": 31,
+    "quantityPerThroughputUnit": 0.511344
+   },
+   {
+    "goodId": 34,
+    "quantityPerThroughputUnit": 0.127836
+   },
+   {
+    "goodId": 37,
+    "quantityPerThroughputUnit": 31.959
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 59,
+    "quantityPerThroughputUnit": 1.27836
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 900
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 100
+   }
+  ],
+  "constructionCostRUSD": 7771278,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 319.37,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 13016.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 354.829
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.182275
+   }
+  ]
  }
 ]

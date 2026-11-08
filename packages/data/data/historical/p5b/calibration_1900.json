@@ -539,6 +539,15 @@
    "formula": "raw silk import value (year to June 1900) per kg",
    "status": "sourced",
    "basis": "1900-wholesale"
+  },
+  "dwelling": {
+   "usdPerUnit1900": 2300,
+   "rowIds": [
+    "p6:dwellingCost1900"
+   ],
+   "formula": "average construction cost per new non-farm housing unit started, 1900 (Historical Statistics, series N 167), excluding land",
+   "status": "sourced",
+   "basis": "1900-wholesale"
   }
  },
  "recipes": {
@@ -1381,32 +1390,26 @@
     "depreciation-rate"
    ],
    "status": "provisional"
+  },
+  "residential-builder": {
+   "outputPerTU": 1.27836,
+   "vaPerLevelDayUS": 37347.7,
+   "netValuePerUnitRUSD": 29215.3,
+   "formula": "output per TU = (US wage bill per level-day / labour share + upkeep) / (price + joint outputs - inputs, per unit, at reference prices)",
+   "rowIds": [
+    "labour-share-agriculture",
+    "labour-share-manufacturing",
+    "jobs-per-level",
+    "capital-per-job-years",
+    "depreciation-rate"
+   ],
+   "status": "provisional"
   }
  },
  "needs": {
-  "basic:clothing": {
-   "quantityPerCapitaPerDay": 0.0052,
-   "p2bQuantityPerCapitaPerDay": 0.01,
-   "factor": 0.52,
-   "status": "estimated"
-  },
-  "comfort:clothing": {
-   "quantityPerCapitaPerDay": 0.0145756,
-   "p2bQuantityPerCapitaPerDay": 0.02803,
-   "factor": 0.52,
-   "status": "estimated"
-  },
-  "luxury:textiles": {
-   "quantityPerCapitaPerDay": 0.0072878,
-   "p2bQuantityPerCapitaPerDay": 0.014015,
-   "factor": 0.52,
-   "status": "estimated"
-  },
-  "luxury:clothing": {
-   "quantityPerCapitaPerDay": 0.0072878,
-   "p2bQuantityPerCapitaPerDay": 0.014015,
-   "factor": 0.52,
-   "status": "estimated"
+  "clothDemandFactor": {
+   "removed": "P6 (D-153, plan Q12a)",
+   "formerFactor": 0.52
   },
   "comfort:food-products": {
    "quantityPerCapitaPerDay": 0.0297113,
@@ -1760,6 +1763,1335 @@
    "personal-services": 0.5,
    "transport-services": 0.3,
    "commerce": 0.2
+  }
+ },
+ "p6": {
+  "decision": "D-153",
+  "rows": {},
+  "committed": {
+   "worldAdultEquivalentsPerPerson": 0.743217202663505,
+   "perAdultEquivalentPerDay": {
+    "grain": 0.7090793890552635,
+    "food-products": 0.04036505061035655,
+    "fish": 0.04036505061035655,
+    "livestock": 0.04036505061035655,
+    "clothing": 0.01345501687011885,
+    "timber": 0.0004
+   },
+   "rowIds": [
+    "p2b subsistence and basic tiers",
+    "atwater-1902",
+    "p4 age structures"
+   ],
+   "firewood": "provisional"
+  },
+  "margins": {
+   "retailUSDPerKg1901": {
+    "grain": 0.05880692644955973,
+    "food-products": 0.07194882289524547,
+    "livestock": 0.2891046403748557,
+    "fish": 0.22098789498770885,
+    "dairy": 0.061602233577654965,
+    "produce": 0.03227585015391543,
+    "sugar": 0.12937546633508373,
+    "coffee-tea-cocoa": 0.6152241397044578
+   },
+   "byGood": {
+    "grain": {
+     "commerce": 0.31025218377833164,
+     "transport": 0.20683478918555442,
+     "rate": 1.2723064560879247,
+     "status": "sourced"
+    },
+    "food-products": {
+     "commerce": 0.2707759888481609,
+     "transport": 0.18051732589877395,
+     "rate": 0.6650446509708128,
+     "status": "sourced"
+    },
+    "livestock": {
+     "commerce": 1.6585855634680404,
+     "transport": 1.1057237089786938,
+     "rate": 1.5566645112579383,
+     "status": "sourced"
+    },
+    "fish": {
+     "commerce": 1.016762341732188,
+     "transport": 0.677841561154792,
+     "rate": 0.9542817016015295,
+     "status": "sourced"
+    },
+    "dairy": {
+     "commerce": 0.3522464856620961,
+     "transport": 0.23483099044139746,
+     "rate": 1.5436245835221905,
+     "status": "sourced"
+    },
+    "produce": {
+     "commerce": 0.05544417049025272,
+     "transport": 0.03696278032683516,
+     "rate": 0.22296123038580462,
+     "status": "sourced"
+    },
+    "sugar": {
+     "commerce": 0.11142139399569297,
+     "transport": 0.07428092933046199,
+     "rate": 0.10059659661982057,
+     "status": "sourced"
+    },
+    "coffee-tea-cocoa": {
+     "commerce": 3.1940519339512834,
+     "transport": 2.1293679559675223,
+     "rate": 1.2271429832503022,
+     "status": "sourced"
+    },
+    "coal": {
+     "commerce": 27.019199999999994,
+     "transport": 40.5288,
+     "rate": 3.75,
+     "status": "provisional"
+    },
+    "timber": {
+     "commerce": 181.62749999999997,
+     "transport": 272.44124999999997,
+     "rate": 3.75,
+     "status": "provisional"
+    },
+    "kerosene": {
+     "commerce": 295.2393333333333,
+     "transport": 0,
+     "rate": 0.6666666666666666,
+     "status": "provisional"
+    },
+    "household-goods": {
+     "commerce": 7.852,
+     "transport": 2.6173333333333337,
+     "rate": 0.6666666666666667,
+     "status": "provisional"
+    },
+    "tobacco": {
+     "commerce": 9.03618,
+     "transport": 0,
+     "rate": 3,
+     "status": "provisional"
+    },
+    "paper": {
+     "commerce": 972.861,
+     "transport": 0,
+     "rate": 1,
+     "status": "provisional"
+    },
+    "clothing": {
+     "commerce": 5.7420800000000005,
+     "transport": 0,
+     "rate": 0.4,
+     "status": "provisional"
+    }
+   },
+   "rowIds": [
+    "bls-bulletin-59 p. 165",
+    "commissioner-labor-1903 p. 651 food-article weights",
+    "C-20 category mixes"
+   ]
+  },
+  "committedCostPerAdultEquivalentRUSD": 1.5242601743677122,
+  "sundrySplit1901": {
+   "household-goods": 0.13334451370622677,
+   "tobacco": 0.05538465186989331,
+   "food": 0.06304664130973636,
+   "transport": 0.06861152741207341,
+   "services": 0.4750057406037615
+  },
+  "knotFits": {
+   "engel-1853": {
+    "consumptionRatios": [
+     0.6084503238110393,
+     0.9452012875987981,
+     1.2438176186311436,
+     1.7856998571252891,
+     2.723658263913967
+    ],
+    "meanRatio": 1.4613654702160475,
+    "rawSlopes": {
+     "food": 0.6607421639314748,
+     "clothing": 0.20432807331356648,
+     "fuel-light": 0.035567395582593114,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.09955307533940552
+    },
+    "slopeSum": 1.00019070816704
+   },
+   "us-1901": {
+    "consumptionRatios": [
+     1.9059643755315623,
+     2.9062426234142613,
+     3.335587907886782,
+     3.975661634465402,
+     4.5006921835883364,
+     5.088863553932747,
+     5.768279051179176,
+     6.200632421163134,
+     6.715120920867379,
+     7.153191922971864,
+     8.167190648584072,
+     9.082743789885086
+    ],
+    "meanRatio": 5.142087730707961,
+    "rawSlopes": {
+     "food": 0.3761635466580812,
+     "clothing": 0.22419912053631386,
+     "fuel-light": 0.0340438946812201,
+     "household-goods": 0.05203020915473261,
+     "tobacco": 0.02161075053377345,
+     "transport": 0.02677179602259967,
+     "services": 0.18534431861037476
+    },
+    "slopeSum": 0.9201636361970957
+   },
+   "cex-1990": {
+    "consumptionRatios": [
+     9.138949649510995,
+     12.402154111835157,
+     16.47059988460891,
+     22.367914035468498,
+     34.362953957980366
+    ],
+    "meanRatio": 18.948514327880783,
+    "rawSlopes": {
+     "food": 0.18444346022373104,
+     "clothing": 0.0975509553703115,
+     "fuel-light": 0.048732625402325716,
+     "household-goods": 0.12736035145110253,
+     "tobacco": 0,
+     "transport": 0.26836056499639444,
+     "services": 0.2735520425561349
+    },
+    "slopeSum": 1
+   }
+  },
+  "tastes": {
+   "GBR": {
+    "ctc": 1.165988051933434,
+    "sugar": 1.212473459875432,
+    "relativeGdpPerHead": 0.9448127694991646
+   },
+   "RUS": {
+    "ctc": 1.239150464684938,
+    "sugar": 1.0705057394514566,
+    "relativeGdpPerHead": 0.13053455588008284
+   },
+   "AUT": {
+    "ctc": 0.31078792123559856,
+    "sugar": 0.430391628375471,
+    "relativeGdpPerHead": 0.5715656917407377
+   },
+   "FRA": {
+    "ctc": 0.662180664543179,
+    "sugar": 0.6840034409921478,
+    "relativeGdpPerHead": 0.5703215348148762
+   },
+   "ITA": {
+    "ctc": 0.20921186644975118,
+    "sugar": 0.24374003214459,
+    "relativeGdpPerHead": 0.4060928206011684
+   },
+   "DEU": {
+    "ctc": 0.894559035958329,
+    "sugar": 0.6663661912855877,
+    "relativeGdpPerHead": 0.5919698653248651
+   },
+   "BEL": {
+    "ctc": 1.1014668953410487,
+    "sugar": 0.37378663076486646,
+    "relativeGdpPerHead": 0.7399001238097882
+   }
+  },
+  "coefficients": {
+   "marginalPropensityToConsume": {
+    "lower": 0.94,
+    "middle": 0.85,
+    "upper": 0.6
+   },
+   "wealthConsumptionRatePerYear": 0.04,
+   "cashReserveDays": 30,
+   "dwellingDepreciationRatePerYear": 0.005,
+   "dwellingIncomeElasticity": 0.46
+  },
+  "countries": {
+   "AFG": {
+    "persons": 4500000,
+    "incomeRUSDPerCapitaYear": 32.0001,
+    "consumptionRUSDPerCapitaYear": 49.1404,
+    "foodShare": 0.65634,
+    "categoryShares": {
+     "food": 0.65634,
+     "clothing": 0.268556,
+     "fuel-light": 0.0751038,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "AND": {
+    "persons": 5000,
+    "incomeRUSDPerCapitaYear": 181.919,
+    "consumptionRUSDPerCapitaYear": 178.359,
+    "foodShare": 0.662322,
+    "categoryShares": {
+     "food": 0.662322,
+     "clothing": 0.219651,
+     "fuel-light": 0.08673,
+     "household-goods": 0.0000457085,
+     "tobacco": 0.000018985,
+     "transport": 0.000023519,
+     "services": 0.0312089
+    },
+    "blocksAboveIncome": 0
+   },
+   "ARG": {
+    "persons": 4700000,
+    "incomeRUSDPerCapitaYear": 814.31,
+    "consumptionRUSDPerCapitaYear": 719.053,
+    "foodShare": 0.588028,
+    "categoryShares": {
+     "food": 0.588028,
+     "clothing": 0.217383,
+     "fuel-light": 0.0577577,
+     "household-goods": 0.0167422,
+     "tobacco": 0.00649214,
+     "transport": 0.0103849,
+     "services": 0.103213
+    },
+    "blocksAboveIncome": 0
+   },
+   "AUS": {
+    "persons": 3800000,
+    "incomeRUSDPerCapitaYear": 2399.02,
+    "consumptionRUSDPerCapitaYear": 2100.45,
+    "foodShare": 0.550303,
+    "categoryShares": {
+     "food": 0.550303,
+     "clothing": 0.21852,
+     "fuel-light": 0.05148,
+     "household-goods": 0.0256513,
+     "tobacco": 0.00877034,
+     "transport": 0.0204221,
+     "services": 0.124853
+    },
+    "blocksAboveIncome": 0
+   },
+   "AUT": {
+    "persons": 51000000,
+    "incomeRUSDPerCapitaYear": 478.474,
+    "consumptionRUSDPerCapitaYear": 424.774,
+    "foodShare": 0.60269,
+    "categoryShares": {
+     "food": 0.60269,
+     "clothing": 0.223365,
+     "fuel-light": 0.0558506,
+     "household-goods": 0.0131352,
+     "tobacco": 0.00525641,
+     "transport": 0.00752285,
+     "services": 0.09218
+    },
+    "blocksAboveIncome": 0
+   },
+   "BEL": {
+    "persons": 15700000,
+    "incomeRUSDPerCapitaYear": 608.6,
+    "consumptionRUSDPerCapitaYear": 559.696,
+    "foodShare": 0.529227,
+    "categoryShares": {
+     "food": 0.529227,
+     "clothing": 0.21869,
+     "fuel-light": 0.0544699,
+     "household-goods": 0.0309169,
+     "tobacco": 0.00958282,
+     "transport": 0.028402,
+     "services": 0.128711
+    },
+    "blocksAboveIncome": 0
+   },
+   "BGR": {
+    "persons": 3700000,
+    "incomeRUSDPerCapitaYear": 55.5216,
+    "consumptionRUSDPerCapitaYear": 60.2697,
+    "foodShare": 0.658239,
+    "categoryShares": {
+     "food": 0.658239,
+     "clothing": 0.257263,
+     "fuel-light": 0.0844981,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "BOL": {
+    "persons": 1800000,
+    "incomeRUSDPerCapitaYear": 65.7169,
+    "consumptionRUSDPerCapitaYear": 72.1047,
+    "foodShare": 0.660213,
+    "categoryShares": {
+     "food": 0.660213,
+     "clothing": 0.243587,
+     "fuel-light": 0.0912527,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.00494704
+    },
+    "blocksAboveIncome": 0
+   },
+   "BRA": {
+    "persons": 17600000,
+    "incomeRUSDPerCapitaYear": 27.5194,
+    "consumptionRUSDPerCapitaYear": 59.6833,
+    "foodShare": 0.661642,
+    "categoryShares": {
+     "food": 0.661642,
+     "clothing": 0.237014,
+     "fuel-light": 0.101343,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "CAN": {
+    "persons": 5180000,
+    "incomeRUSDPerCapitaYear": 831.452,
+    "consumptionRUSDPerCapitaYear": 734.315,
+    "foodShare": 0.588637,
+    "categoryShares": {
+     "food": 0.588637,
+     "clothing": 0.218299,
+     "fuel-light": 0.057162,
+     "household-goods": 0.0165693,
+     "tobacco": 0.0064245,
+     "transport": 0.01028,
+     "services": 0.102628
+    },
+    "blocksAboveIncome": 0
+   },
+   "CHE": {
+    "persons": 3300000,
+    "incomeRUSDPerCapitaYear": 1642.33,
+    "consumptionRUSDPerCapitaYear": 1413.33,
+    "foodShare": 0.524603,
+    "categoryShares": {
+     "food": 0.524603,
+     "clothing": 0.218717,
+     "fuel-light": 0.0481695,
+     "household-goods": 0.0318792,
+     "tobacco": 0.00995525,
+     "transport": 0.0290018,
+     "services": 0.137674
+    },
+    "blocksAboveIncome": 0
+   },
+   "CHL": {
+    "persons": 3000000,
+    "incomeRUSDPerCapitaYear": 488.713,
+    "consumptionRUSDPerCapitaYear": 434.468,
+    "foodShare": 0.606871,
+    "categoryShares": {
+     "food": 0.606871,
+     "clothing": 0.221409,
+     "fuel-light": 0.058491,
+     "household-goods": 0.0122434,
+     "tobacco": 0.00498131,
+     "transport": 0.00669855,
+     "services": 0.089306
+    },
+    "blocksAboveIncome": 0
+   },
+   "CHN": {
+    "persons": 401200000,
+    "incomeRUSDPerCapitaYear": 53.3033,
+    "consumptionRUSDPerCapitaYear": 62.6217,
+    "foodShare": 0.655557,
+    "categoryShares": {
+     "food": 0.655557,
+     "clothing": 0.25259,
+     "fuel-light": 0.0719234,
+     "household-goods": 0.000527884,
+     "tobacco": 0.000219257,
+     "transport": 0.000271619,
+     "services": 0.0189109
+    },
+    "blocksAboveIncome": 0
+   },
+   "COL": {
+    "persons": 4000000,
+    "incomeRUSDPerCapitaYear": 39.9257,
+    "consumptionRUSDPerCapitaYear": 63.2522,
+    "foodShare": 0.662778,
+    "categoryShares": {
+     "food": 0.662778,
+     "clothing": 0.230258,
+     "fuel-light": 0.106964,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "COS": {
+    "persons": 300000,
+    "incomeRUSDPerCapitaYear": 39.9428,
+    "consumptionRUSDPerCapitaYear": 57.773,
+    "foodShare": 0.661248,
+    "categoryShares": {
+     "food": 0.661248,
+     "clothing": 0.239363,
+     "fuel-light": 0.0993897,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "CRT": {
+    "persons": 300000,
+    "incomeRUSDPerCapitaYear": 108.961,
+    "consumptionRUSDPerCapitaYear": 107.087,
+    "foodShare": 0.658174,
+    "categoryShares": {
+     "food": 0.658174,
+     "clothing": 0.247003,
+     "fuel-light": 0.0675325,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.0272908
+    },
+    "blocksAboveIncome": 0
+   },
+   "CUB": {
+    "persons": 1600000,
+    "incomeRUSDPerCapitaYear": 85.8844,
+    "consumptionRUSDPerCapitaYear": 96.2791,
+    "foodShare": 0.664206,
+    "categoryShares": {
+     "food": 0.664206,
+     "clothing": 0.221764,
+     "fuel-light": 0.11403,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "DAR": {
+    "persons": 600000,
+    "incomeRUSDPerCapitaYear": 39.1473,
+    "consumptionRUSDPerCapitaYear": 48.7809,
+    "foodShare": 0.656731,
+    "categoryShares": {
+     "food": 0.656731,
+     "clothing": 0.266232,
+     "fuel-light": 0.0770372,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "DEU": {
+    "persons": 67165500,
+    "incomeRUSDPerCapitaYear": 797.592,
+    "consumptionRUSDPerCapitaYear": 702.992,
+    "foodShare": 0.550879,
+    "categoryShares": {
+     "food": 0.550879,
+     "clothing": 0.222325,
+     "fuel-light": 0.0500721,
+     "household-goods": 0.0254241,
+     "tobacco": 0.00860122,
+     "transport": 0.0205919,
+     "services": 0.122107
+    },
+    "blocksAboveIncome": 0
+   },
+   "DNK": {
+    "persons": 2537000,
+    "incomeRUSDPerCapitaYear": 841.743,
+    "consumptionRUSDPerCapitaYear": 747.456,
+    "foodShare": 0.585169,
+    "categoryShares": {
+     "food": 0.585169,
+     "clothing": 0.217636,
+     "fuel-light": 0.0577686,
+     "household-goods": 0.0174198,
+     "tobacco": 0.00666935,
+     "transport": 0.0111332,
+     "services": 0.104203
+    },
+    "blocksAboveIncome": 0
+   },
+   "DOM": {
+    "persons": 600000,
+    "incomeRUSDPerCapitaYear": 30.3598,
+    "consumptionRUSDPerCapitaYear": 55.6312,
+    "foodShare": 0.659817,
+    "categoryShares": {
+     "food": 0.659817,
+     "clothing": 0.247872,
+     "fuel-light": 0.0923109,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "ECU": {
+    "persons": 1400000,
+    "incomeRUSDPerCapitaYear": 40.5085,
+    "consumptionRUSDPerCapitaYear": 56.2131,
+    "foodShare": 0.66032,
+    "categoryShares": {
+     "food": 0.66032,
+     "clothing": 0.244864,
+     "fuel-light": 0.0947732,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.0000427941
+    },
+    "blocksAboveIncome": 0
+   },
+   "ESP": {
+    "persons": 18800000,
+    "incomeRUSDPerCapitaYear": 324.709,
+    "consumptionRUSDPerCapitaYear": 293.681,
+    "foodShare": 0.635921,
+    "categoryShares": {
+     "food": 0.635921,
+     "clothing": 0.214138,
+     "fuel-light": 0.0726268,
+     "household-goods": 0.005987,
+     "tobacco": 0.0024867,
+     "transport": 0.00308057,
+     "services": 0.06576
+    },
+    "blocksAboveIncome": 0
+   },
+   "ETH": {
+    "persons": 11000000,
+    "incomeRUSDPerCapitaYear": 63.3509,
+    "consumptionRUSDPerCapitaYear": 64.5562,
+    "foodShare": 0.651846,
+    "categoryShares": {
+     "food": 0.651846,
+     "clothing": 0.25136,
+     "fuel-light": 0.0683538,
+     "household-goods": 0.00134914,
+     "tobacco": 0.000560366,
+     "transport": 0.000694192,
+     "services": 0.0258368
+    },
+    "blocksAboveIncome": 0
+   },
+   "FRA": {
+    "persons": 77650000,
+    "incomeRUSDPerCapitaYear": 464.417,
+    "consumptionRUSDPerCapitaYear": 431.795,
+    "foodShare": 0.562408,
+    "categoryShares": {
+     "food": 0.562408,
+     "clothing": 0.221828,
+     "fuel-light": 0.0563981,
+     "household-goods": 0.0227932,
+     "tobacco": 0.00788446,
+     "transport": 0.0177965,
+     "services": 0.110891
+    },
+    "blocksAboveIncome": 0
+   },
+   "GBR": {
+    "persons": 380380000,
+    "incomeRUSDPerCapitaYear": 230.686,
+    "consumptionRUSDPerCapitaYear": 229.494,
+    "foodShare": 0.461702,
+    "categoryShares": {
+     "food": 0.461702,
+     "clothing": 0.205683,
+     "fuel-light": 0.0565505,
+     "household-goods": 0.0494458,
+     "tobacco": 0.00803477,
+     "transport": 0.0733799,
+     "services": 0.145204
+    },
+    "blocksAboveIncome": 0
+   },
+   "GRC": {
+    "persons": 2400000,
+    "incomeRUSDPerCapitaYear": 108.956,
+    "consumptionRUSDPerCapitaYear": 107.172,
+    "foodShare": 0.658522,
+    "categoryShares": {
+     "food": 0.658522,
+     "clothing": 0.245435,
+     "fuel-light": 0.0700757,
+     "household-goods": 4.00322e-7,
+     "tobacco": 1.66274e-7,
+     "transport": 2.05983e-7,
+     "services": 0.0259662
+    },
+    "blocksAboveIncome": 0
+   },
+   "GUA": {
+    "persons": 1400000,
+    "incomeRUSDPerCapitaYear": 39.9468,
+    "consumptionRUSDPerCapitaYear": 56.6058,
+    "foodShare": 0.659986,
+    "categoryShares": {
+     "food": 0.659986,
+     "clothing": 0.24687,
+     "fuel-light": 0.0931439,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "HON": {
+    "persons": 500000,
+    "incomeRUSDPerCapitaYear": 39.9585,
+    "consumptionRUSDPerCapitaYear": 53.0065,
+    "foodShare": 0.658587,
+    "categoryShares": {
+     "food": 0.658587,
+     "clothing": 0.255192,
+     "fuel-light": 0.0862211,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "HTI": {
+    "persons": 1500000,
+    "incomeRUSDPerCapitaYear": 30.3638,
+    "consumptionRUSDPerCapitaYear": 51.4499,
+    "foodShare": 0.657673,
+    "categoryShares": {
+     "food": 0.657673,
+     "clothing": 0.260628,
+     "fuel-light": 0.0816992,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "ITA": {
+    "persons": 33175000,
+    "incomeRUSDPerCapitaYear": 450.488,
+    "consumptionRUSDPerCapitaYear": 403.17,
+    "foodShare": 0.61473,
+    "categoryShares": {
+     "food": 0.61473,
+     "clothing": 0.219038,
+     "fuel-light": 0.0622746,
+     "household-goods": 0.0105436,
+     "tobacco": 0.00435954,
+     "transport": 0.00550077,
+     "services": 0.0835535
+    },
+    "blocksAboveIncome": 0
+   },
+   "JPN": {
+    "persons": 47103000,
+    "incomeRUSDPerCapitaYear": 193.422,
+    "consumptionRUSDPerCapitaYear": 177.578,
+    "foodShare": 0.635095,
+    "categoryShares": {
+     "food": 0.635095,
+     "clothing": 0.225845,
+     "fuel-light": 0.0661434,
+     "household-goods": 0.0057784,
+     "tobacco": 0.00240006,
+     "transport": 0.00297323,
+     "services": 0.0617652
+    },
+    "blocksAboveIncome": 0
+   },
+   "KOR": {
+    "persons": 17000000,
+    "incomeRUSDPerCapitaYear": 39.7814,
+    "consumptionRUSDPerCapitaYear": 54.9598,
+    "foodShare": 0.659301,
+    "categoryShares": {
+     "food": 0.659301,
+     "clothing": 0.250943,
+     "fuel-light": 0.0897556,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "LBR": {
+    "persons": 600000,
+    "incomeRUSDPerCapitaYear": 61.1758,
+    "consumptionRUSDPerCapitaYear": 62.2164,
+    "foodShare": 0.657515,
+    "categoryShares": {
+     "food": 0.657515,
+     "clothing": 0.261122,
+     "fuel-light": 0.080217,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.00114602
+    },
+    "blocksAboveIncome": 0
+   },
+   "LIE": {
+    "persons": 7500,
+    "incomeRUSDPerCapitaYear": 817.846,
+    "consumptionRUSDPerCapitaYear": 713.052,
+    "foodShare": 0.52209,
+    "categoryShares": {
+     "food": 0.52209,
+     "clothing": 0.221843,
+     "fuel-light": 0.0442858,
+     "household-goods": 0.0325044,
+     "tobacco": 0.00956966,
+     "transport": 0.0317976,
+     "services": 0.137909
+    },
+    "blocksAboveIncome": 0
+   },
+   "LUX": {
+    "persons": 240000,
+    "incomeRUSDPerCapitaYear": 1263.77,
+    "consumptionRUSDPerCapitaYear": 1105.7,
+    "foodShare": 0.544171,
+    "categoryShares": {
+     "food": 0.544171,
+     "clothing": 0.216174,
+     "fuel-light": 0.0532188,
+     "household-goods": 0.0271621,
+     "tobacco": 0.00931801,
+     "transport": 0.0215057,
+     "services": 0.128451
+    },
+    "blocksAboveIncome": 0
+   },
+   "MAR": {
+    "persons": 5000000,
+    "incomeRUSDPerCapitaYear": 65.7435,
+    "consumptionRUSDPerCapitaYear": 71.9839,
+    "foodShare": 0.660141,
+    "categoryShares": {
+     "food": 0.660141,
+     "clothing": 0.243881,
+     "fuel-light": 0.0906888,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.00528923
+    },
+    "blocksAboveIncome": 0
+   },
+   "MCO": {
+    "persons": 15000,
+    "incomeRUSDPerCapitaYear": 814.915,
+    "consumptionRUSDPerCapitaYear": 708.222,
+    "foodShare": 0.491706,
+    "categoryShares": {
+     "food": 0.491706,
+     "clothing": 0.218392,
+     "fuel-light": 0.0422935,
+     "household-goods": 0.0402209,
+     "tobacco": 0.0103431,
+     "transport": 0.0450913,
+     "services": 0.151953
+    },
+    "blocksAboveIncome": 0
+   },
+   "MEX": {
+    "persons": 13600000,
+    "incomeRUSDPerCapitaYear": 95.3017,
+    "consumptionRUSDPerCapitaYear": 99.1525,
+    "foodShare": 0.66125,
+    "categoryShares": {
+     "food": 0.66125,
+     "clothing": 0.233589,
+     "fuel-light": 0.0904007,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.0147598
+    },
+    "blocksAboveIncome": 0
+   },
+   "MNT": {
+    "persons": 300000,
+    "incomeRUSDPerCapitaYear": 55.5134,
+    "consumptionRUSDPerCapitaYear": 63.4069,
+    "foodShare": 0.658797,
+    "categoryShares": {
+     "food": 0.658797,
+     "clothing": 0.253533,
+     "fuel-light": 0.0866195,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.0010504
+    },
+    "blocksAboveIncome": 0
+   },
+   "NIC": {
+    "persons": 400000,
+    "incomeRUSDPerCapitaYear": 39.935,
+    "consumptionRUSDPerCapitaYear": 60.6529,
+    "foodShare": 0.661478,
+    "categoryShares": {
+     "food": 0.661478,
+     "clothing": 0.237995,
+     "fuel-light": 0.100528,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "NLD": {
+    "persons": 47230000,
+    "incomeRUSDPerCapitaYear": 161.472,
+    "consumptionRUSDPerCapitaYear": 163.234,
+    "foodShare": 0.528113,
+    "categoryShares": {
+     "food": 0.528113,
+     "clothing": 0.225013,
+     "fuel-light": 0.0604814,
+     "household-goods": 0.0318424,
+     "tobacco": 0.00750186,
+     "transport": 0.038331,
+     "services": 0.108718
+    },
+    "blocksAboveIncome": 0
+   },
+   "NOR": {
+    "persons": 2200000,
+    "incomeRUSDPerCapitaYear": 455.768,
+    "consumptionRUSDPerCapitaYear": 407.834,
+    "foodShare": 0.62252,
+    "categoryShares": {
+     "food": 0.62252,
+     "clothing": 0.214998,
+     "fuel-light": 0.0667808,
+     "household-goods": 0.00893221,
+     "tobacco": 0.00370975,
+     "transport": 0.00459695,
+     "services": 0.0784625
+    },
+    "blocksAboveIncome": 0
+   },
+   "NPL": {
+    "persons": 5000000,
+    "incomeRUSDPerCapitaYear": 32.0044,
+    "consumptionRUSDPerCapitaYear": 47.8354,
+    "foodShare": 0.655674,
+    "categoryShares": {
+     "food": 0.655674,
+     "clothing": 0.272519,
+     "fuel-light": 0.0718072,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "NZL": {
+    "persons": 800000,
+    "incomeRUSDPerCapitaYear": 1604.24,
+    "consumptionRUSDPerCapitaYear": 1405.96,
+    "foodShare": 0.554675,
+    "categoryShares": {
+     "food": 0.554675,
+     "clothing": 0.216625,
+     "fuel-light": 0.053886,
+     "household-goods": 0.0246406,
+     "tobacco": 0.00868126,
+     "transport": 0.0186341,
+     "services": 0.122858
+    },
+    "blocksAboveIncome": 0
+   },
+   "OMN": {
+    "persons": 500000,
+    "incomeRUSDPerCapitaYear": 65.7676,
+    "consumptionRUSDPerCapitaYear": 65.4702,
+    "foodShare": 0.657186,
+    "categoryShares": {
+     "food": 0.657186,
+     "clothing": 0.26076,
+     "fuel-light": 0.07497,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.00708384
+    },
+    "blocksAboveIncome": 0
+   },
+   "ORF": {
+    "persons": 300000,
+    "incomeRUSDPerCapitaYear": 68.1729,
+    "consumptionRUSDPerCapitaYear": 72.3029,
+    "foodShare": 0.659407,
+    "categoryShares": {
+     "food": 0.659407,
+     "clothing": 0.24791,
+     "fuel-light": 0.0865309,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.00615155
+    },
+    "blocksAboveIncome": 0
+   },
+   "OTT": {
+    "persons": 33700000,
+    "incomeRUSDPerCapitaYear": 94.6718,
+    "consumptionRUSDPerCapitaYear": 91.641,
+    "foodShare": 0.652616,
+    "categoryShares": {
+     "food": 0.652616,
+     "clothing": 0.237168,
+     "fuel-light": 0.0791086,
+     "household-goods": 0.00170113,
+     "tobacco": 0.000706564,
+     "transport": 0.000875304,
+     "services": 0.0278239
+    },
+    "blocksAboveIncome": 0
+   },
+   "PER": {
+    "persons": 9900000,
+    "incomeRUSDPerCapitaYear": 106.365,
+    "consumptionRUSDPerCapitaYear": 98.9839,
+    "foodShare": 0.651501,
+    "categoryShares": {
+     "food": 0.651501,
+     "clothing": 0.234006,
+     "fuel-light": 0.0767445,
+     "household-goods": 0.00199714,
+     "tobacco": 0.000829514,
+     "transport": 0.00102762,
+     "services": 0.0338941
+    },
+    "blocksAboveIncome": 0
+   },
+   "PRT": {
+    "persons": 13355513,
+    "incomeRUSDPerCapitaYear": 111.378,
+    "consumptionRUSDPerCapitaYear": 115.191,
+    "foodShare": 0.629072,
+    "categoryShares": {
+     "food": 0.629072,
+     "clothing": 0.240008,
+     "fuel-light": 0.0628056,
+     "household-goods": 0.00674918,
+     "tobacco": 0.00279106,
+     "transport": 0.00351956,
+     "services": 0.0550551
+    },
+    "blocksAboveIncome": 0
+   },
+   "PRU": {
+    "persons": 3700000,
+    "incomeRUSDPerCapitaYear": 39.6237,
+    "consumptionRUSDPerCapitaYear": 59.9319,
+    "foodShare": 0.662163,
+    "categoryShares": {
+     "food": 0.662163,
+     "clothing": 0.233918,
+     "fuel-light": 0.103919,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "PRY": {
+    "persons": 600000,
+    "incomeRUSDPerCapitaYear": 65.7058,
+    "consumptionRUSDPerCapitaYear": 73.2218,
+    "foodShare": 0.661395,
+    "categoryShares": {
+     "food": 0.661395,
+     "clothing": 0.237799,
+     "fuel-light": 0.0990371,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.0017697
+    },
+    "blocksAboveIncome": 0
+   },
+   "ROM": {
+    "persons": 6000000,
+    "incomeRUSDPerCapitaYear": 61.5939,
+    "consumptionRUSDPerCapitaYear": 63.2464,
+    "foodShare": 0.657744,
+    "categoryShares": {
+     "food": 0.657744,
+     "clothing": 0.259872,
+     "fuel-light": 0.0815237,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.000860988
+    },
+    "blocksAboveIncome": 0
+   },
+   "RUS": {
+    "persons": 138800000,
+    "incomeRUSDPerCapitaYear": 69.9379,
+    "consumptionRUSDPerCapitaYear": 73.3213,
+    "foodShare": 0.654859,
+    "categoryShares": {
+     "food": 0.654859,
+     "clothing": 0.237891,
+     "fuel-light": 0.0774643,
+     "household-goods": 0.00114453,
+     "tobacco": 0.000475382,
+     "transport": 0.000588912,
+     "services": 0.027577
+    },
+    "blocksAboveIncome": 0
+   },
+   "SAL": {
+    "persons": 900000,
+    "incomeRUSDPerCapitaYear": 39.9391,
+    "consumptionRUSDPerCapitaYear": 59.3602,
+    "foodShare": 0.660973,
+    "categoryShares": {
+     "food": 0.660973,
+     "clothing": 0.240998,
+     "fuel-light": 0.0980288,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "SHM": {
+    "persons": 1000000,
+    "incomeRUSDPerCapitaYear": 65.7512,
+    "consumptionRUSDPerCapitaYear": 70.0318,
+    "foodShare": 0.659498,
+    "categoryShares": {
+     "food": 0.659498,
+     "clothing": 0.247434,
+     "fuel-light": 0.0870834,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.00598391
+    },
+    "blocksAboveIncome": 0
+   },
+   "SMR": {
+    "persons": 11000,
+    "incomeRUSDPerCapitaYear": 255.094,
+    "consumptionRUSDPerCapitaYear": 245.949,
+    "foodShare": 0.644725,
+    "categoryShares": {
+     "food": 0.644725,
+     "clothing": 0.236235,
+     "fuel-light": 0.0496554,
+     "household-goods": 0.00305457,
+     "tobacco": 0.00126871,
+     "transport": 0.00157171,
+     "services": 0.06349
+    },
+    "blocksAboveIncome": 0
+   },
+   "SOK": {
+    "persons": 10000000,
+    "incomeRUSDPerCapitaYear": 39.1425,
+    "consumptionRUSDPerCapitaYear": 50.2459,
+    "foodShare": 0.657245,
+    "categoryShares": {
+     "food": 0.657245,
+     "clothing": 0.263175,
+     "fuel-light": 0.0795799,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "SRB": {
+    "persons": 2500000,
+    "incomeRUSDPerCapitaYear": 55.5311,
+    "consumptionRUSDPerCapitaYear": 59.173,
+    "foodShare": 0.657499,
+    "categoryShares": {
+     "food": 0.657499,
+     "clothing": 0.260472,
+     "fuel-light": 0.0789706,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0.00305889
+    },
+    "blocksAboveIncome": 0
+   },
+   "SWE": {
+    "persons": 5100000,
+    "incomeRUSDPerCapitaYear": 472.64,
+    "consumptionRUSDPerCapitaYear": 424.794,
+    "foodShare": 0.630873,
+    "categoryShares": {
+     "food": 0.630873,
+     "clothing": 0.209917,
+     "fuel-light": 0.0729547,
+     "household-goods": 0.00725095,
+     "tobacco": 0.00301168,
+     "transport": 0.00373093,
+     "services": 0.0722625
+    },
+    "blocksAboveIncome": 0
+   },
+   "THA": {
+    "persons": 7300000,
+    "incomeRUSDPerCapitaYear": 34.4419,
+    "consumptionRUSDPerCapitaYear": 52.1509,
+    "foodShare": 0.658403,
+    "categoryShares": {
+     "food": 0.658403,
+     "clothing": 0.256287,
+     "fuel-light": 0.08531,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "TON": {
+    "persons": 20000,
+    "incomeRUSDPerCapitaYear": 55.7785,
+    "consumptionRUSDPerCapitaYear": 59.2923,
+    "foodShare": 0.652166,
+    "categoryShares": {
+     "food": 0.652166,
+     "clothing": 0.253709,
+     "fuel-light": 0.0670895,
+     "household-goods": 0.00119685,
+     "tobacco": 0.000497112,
+     "transport": 0.000615831,
+     "services": 0.0247262
+    },
+    "blocksAboveIncome": 0
+   },
+   "URY": {
+    "persons": 900000,
+    "incomeRUSDPerCapitaYear": 488.858,
+    "consumptionRUSDPerCapitaYear": 438.42,
+    "foodShare": 0.627138,
+    "categoryShares": {
+     "food": 0.627138,
+     "clothing": 0.211659,
+     "fuel-light": 0.0704367,
+     "household-goods": 0.00801974,
+     "tobacco": 0.003331,
+     "transport": 0.00412651,
+     "services": 0.075289
+    },
+    "blocksAboveIncome": 0
+   },
+   "USA": {
+    "persons": 84659676,
+    "incomeRUSDPerCapitaYear": 1782.29,
+    "consumptionRUSDPerCapitaYear": 1638.7,
+    "foodShare": 0.517122,
+    "categoryShares": {
+     "food": 0.517122,
+     "clothing": 0.215775,
+     "fuel-light": 0.0498778,
+     "household-goods": 0.033886,
+     "tobacco": 0.0101258,
+     "transport": 0.0325763,
+     "services": 0.140637
+    },
+    "blocksAboveIncome": 0
+   },
+   "VEN": {
+    "persons": 2400000,
+    "incomeRUSDPerCapitaYear": 97.4135,
+    "consumptionRUSDPerCapitaYear": 101.529,
+    "foodShare": 0.662214,
+    "categoryShares": {
+     "food": 0.662214,
+     "clothing": 0.229361,
+     "fuel-light": 0.0975356,
+     "household-goods": 2.05234e-7,
+     "tobacco": 8.52439e-8,
+     "transport": 1.05602e-7,
+     "services": 0.0108888
+    },
+    "blocksAboveIncome": 0
+   },
+   "WAD": {
+    "persons": 1000000,
+    "incomeRUSDPerCapitaYear": 39.1456,
+    "consumptionRUSDPerCapitaYear": 49.2991,
+    "foodShare": 0.65631,
+    "categoryShares": {
+     "food": 0.65631,
+     "clothing": 0.268734,
+     "fuel-light": 0.0749557,
+     "household-goods": 0,
+     "tobacco": 0,
+     "transport": 0,
+     "services": 0
+    },
+    "blocksAboveIncome": 0
+   },
+   "ZAR": {
+    "persons": 1200000,
+    "incomeRUSDPerCapitaYear": 110.285,
+    "consumptionRUSDPerCapitaYear": 102.352,
+    "foodShare": 0.649922,
+    "categoryShares": {
+     "food": 0.649922,
+     "clothing": 0.235291,
+     "fuel-light": 0.073968,
+     "household-goods": 0.00228098,
+     "tobacco": 0.000947407,
+     "transport": 0.00117367,
+     "services": 0.0364164
+    },
+    "blocksAboveIncome": 0
+   }
   }
  },
  "monetary": {
@@ -2236,8 +3568,8 @@
   },
   "goods": {
    "cotton": {
-    "worldDemandPerDay": 9166398.735292558,
-    "placedPerDay": 9166398.735292558,
+    "worldDemandPerDay": 16642719.965343488,
+    "placedPerDay": 16642719.965343487,
     "unplaced": [
      {
       "territory": "bgr-home",
@@ -2246,31 +3578,31 @@
      }
     ],
     "basis": "sourced shares (pp. 709-710 (PDF 783-784): cotton crop of countries named, 1900 (bales of 500 lb gross, or 478 lb of lint net))",
-    "consolidatedTerritories": 13
+    "consolidatedTerritories": 10
    },
    "dairy": {
-    "worldDemandPerDay": 422805898.6347401,
-    "placedPerDay": 422805898.63473994,
+    "worldDemandPerDay": 169657589.33935273,
+    "placedPerDay": 169657589.3393528,
     "unplaced": [],
     "basis": "local demand (no sourced shares)",
-    "consolidatedTerritories": 15
+    "consolidatedTerritories": 43
    },
    "produce": {
-    "worldDemandPerDay": 269548694.6855,
-    "placedPerDay": 269548694.6855,
+    "worldDemandPerDay": 259636446.09919596,
+    "placedPerDay": 259636446.0991959,
     "unplaced": [],
     "basis": "local demand (no sourced shares)",
-    "consolidatedTerritories": 7
+    "consolidatedTerritories": 14
    },
    "sugar": {
-    "worldDemandPerDay": 21879612.467729494,
-    "placedPerDay": 21879612.467729494,
+    "worldDemandPerDay": 19491230.40229005,
+    "placedPerDay": 19491230.40229005,
     "unplaced": [],
     "basis": "sourced shares (p. 819 (PDF 908): sugar crop of the countries named, 1900-1901 (tons of 2,240 lb; Willett & Gray, Licht))"
    },
    "coffee-tea-cocoa": {
-    "worldDemandPerDay": 8543434.18345985,
-    "placedPerDay": 8543434.18345985,
+    "worldDemandPerDay": 4175290.1348657818,
+    "placedPerDay": 4175290.134865784,
     "unplaced": [],
     "a12": {
      "worldKgPerYear": 1322556977.9492574,
@@ -2304,21 +3636,21 @@
        "worldEstimateKg": null
       }
      },
-     "selfSuppliedPerDay": 1670947.3616999998,
+     "selfSuppliedPerDay": 371064.8337954833,
      "selfSuppliedTerritories": [
       "chn-home",
       "jpn-home"
      ],
-     "sharesPerDay": 6105600.452360064,
-     "residualPerDay": 766886.3693997856
+     "sharesPerDay": 3379719.790156923,
+     "residualPerDay": 424505.5109133759
     },
-    "pooledWorldwidePerDay": 165262.93736605058,
+    "pooledWorldwidePerDay": 41300.87240695521,
     "basis": "sourced 1900 shares (A12, crops1900): recorded producers hold 88.8 % of the world estimate (rule: at least 75 %); chn-home, jpn-home make their own demand (no statistics); the remaining 11.2 % by local demand (no sourced shares); demand without a local producer placed worldwide by province weight (provisional)",
-    "consolidatedTerritories": 39
+    "consolidatedTerritories": 55
    },
    "tobacco": {
-    "worldDemandPerDay": 2685300.0821241005,
-    "placedPerDay": 2685300.082124101,
+    "worldDemandPerDay": 2499650.807340569,
+    "placedPerDay": 2499650.8073405693,
     "unplaced": [],
     "a12": {
      "worldKgPerYear": 1008493896.4000654,
@@ -2338,7 +3670,7 @@
        "worldEstimateKg": 998444349.6974101
       }
      },
-     "selfSuppliedPerDay": 334996.36128,
+     "selfSuppliedPerDay": 15384.854257407325,
      "selfSuppliedTerritories": [
       "bwi",
       "chn-home",
@@ -2350,15 +3682,15 @@
       "per-home",
       "sal-home"
      ],
-     "sharesPerDay": 2350303.7208441007,
+     "sharesPerDay": 2484265.9530831617,
      "residualPerDay": 0
     },
     "basis": "sourced 1900 shares (A12, crops1900): recorded producers hold 100.0 % of the world estimate (rule: at least 75 %); bwi, chn-home, cos-home, dom-home, hon-home, hti-home, nic-home, per-home, sal-home make their own demand (no statistics)",
-    "consolidatedTerritories": 7
+    "consolidatedTerritories": 8
    },
    "rubber": {
-    "worldDemandPerDay": 45605.938579906586,
-    "placedPerDay": 45605.93857990659,
+    "worldDemandPerDay": 119572.25980520692,
+    "placedPerDay": 119572.25980520692,
     "unplaced": [],
     "a12": {
      "worldKgPerYear": 39591283.8483008,
@@ -2380,31 +3712,31 @@
      },
      "selfSuppliedPerDay": 0,
      "selfSuppliedTerritories": [],
-     "sharesPerDay": 42364.47064001626,
-     "residualPerDay": 3241.4679398903213
+     "sharesPerDay": 111073.59365058508,
+     "residualPerDay": 8498.666154621837
     },
-    "pooledWorldwidePerDay": 1283.1276468901067,
+    "pooledWorldwidePerDay": 1365.51016069584,
     "basis": "sourced 1900 shares (A12, crops1900): recorded producers hold 92.9 % of the world estimate (rule: at least 75 %); the remaining 7.1 % by local demand (no sourced shares); demand without a local producer placed worldwide by province weight (provisional)",
-    "consolidatedTerritories": 36
+    "consolidatedTerritories": 32
    },
    "timber": {
-    "worldDemandPerDay": 109709.88706329385,
-    "placedPerDay": 109709.88706329379,
+    "worldDemandPerDay": 1073262.5149379054,
+    "placedPerDay": 1073262.5149379054,
     "unplaced": [],
-    "pooledWorldwidePerDay": 155.05592238069178,
+    "pooledWorldwidePerDay": 2025.009295192272,
     "basis": "local demand (no sourced shares); demand without a local producer placed worldwide by province weight (provisional)",
-    "consolidatedTerritories": 75
+    "consolidatedTerritories": 4
    },
    "paper": {
-    "worldDemandPerDay": 5531.108510337093,
-    "placedPerDay": 5531.108510337093,
+    "worldDemandPerDay": 8121.713014360929,
+    "placedPerDay": 8121.71301436093,
     "unplaced": [],
     "basis": "local demand (no sourced shares)",
-    "consolidatedTerritories": 39
+    "consolidatedTerritories": 112
    },
    "coal": {
-    "worldDemandPerDay": 1802891.852538167,
-    "placedPerDay": 1802891.852538167,
+    "worldDemandPerDay": 1833711.218963256,
+    "placedPerDay": 1833711.218963256,
     "unplaced": [
      {
       "territory": "cap",
@@ -2425,8 +3757,8 @@
     "basis": "sourced shares (p. 128 (PDF 168): coal production of the chief countries of the world, 1900)"
    },
    "crude-oil": {
-    "worldDemandPerDay": 42265.8255226945,
-    "placedPerDay": 42265.82552269449,
+    "worldDemandPerDay": 47500.28848275651,
+    "placedPerDay": 47500.28848275651,
     "unplaced": [
      {
       "territory": "ita-home",
@@ -2443,8 +3775,8 @@
     "unplaced": []
    },
    "iron-ore": {
-    "worldDemandPerDay": 17463.105743231135,
-    "placedPerDay": 17463.105743231135,
+    "worldDemandPerDay": 33632.33124898122,
+    "placedPerDay": 33632.33124898122,
     "unplaced": [
      {
       "territory": "can-home",
@@ -2453,11 +3785,11 @@
      }
     ],
     "basis": "sourced shares (p. 395 (PDF 439): production of pig iron and steel in the principal countries, 1900 (pig iron column; ore placed where the iron was smelted))",
-    "consolidatedTerritories": 3
+    "consolidatedTerritories": 1
    },
    "copper-ore": {
-    "worldDemandPerDay": 451.1922290813578,
-    "placedPerDay": 451.19222908135794,
+    "worldDemandPerDay": 750.0721227886825,
+    "placedPerDay": 750.0721227886825,
     "unplaced": [
      {
       "territory": "gbr-home",
@@ -2466,18 +3798,18 @@
      }
     ],
     "basis": "sourced shares (p. 199 (PDF 239): the world's copper production, 1896-1900 (metric tons, 1900; Henry R. Merton & Co.))",
-    "consolidatedTerritories": 8
+    "consolidatedTerritories": 5
    },
    "bauxite": {
-    "worldDemandPerDay": 98.60635496467347,
-    "placedPerDay": 98.60635496467347,
+    "worldDemandPerDay": 106.1903016632937,
+    "placedPerDay": 106.1903016632937,
     "unplaced": [],
     "basis": "sourced shares (p. 14 (PDF 54): production of bauxite in the principal countries, 1900)",
     "consolidatedTerritories": 3
    },
    "nitrates": {
-    "worldDemandPerDay": 163.03341860405507,
-    "placedPerDay": 163.03341860405507,
+    "worldDemandPerDay": 255.58634193151806,
+    "placedPerDay": 255.58634193151806,
     "unplaced": [],
     "basis": "sourced shares (p. 161 (PDF 201): world's production of ammonium sulphate and sodium nitrate, 1900 (exports from Chile))"
    },
@@ -2487,8 +3819,8 @@
     "unplaced": []
    },
    "tin": {
-    "worldDemandPerDay": 79.09084813598992,
-    "placedPerDay": 79.09084813598992,
+    "worldDemandPerDay": 132.2526896488145,
+    "placedPerDay": 132.2526896488145,
     "unplaced": [
      {
       "territory": "aut-home",
@@ -2497,11 +3829,11 @@
      }
     ],
     "basis": "sourced shares (p. 638 (PDF 680): production of tin in the world, 1900)",
-    "consolidatedTerritories": 3
+    "consolidatedTerritories": 2
    },
    "gold": {
-    "worldDemandPerDay": 507.80111504913407,
-    "placedPerDay": 507.8011150491341,
+    "worldDemandPerDay": 548.9012821053163,
+    "placedPerDay": 548.9012821053163,
     "unplaced": [
      {
       "territory": "nfd",
@@ -2578,8 +3910,8 @@
     "consolidatedTerritories": 8
    },
    "silver": {
-    "worldDemandPerDay": 2809.6203315560206,
-    "placedPerDay": 2809.620331556021,
+    "worldDemandPerDay": 3320.0424589128415,
+    "placedPerDay": 3320.0424589128415,
     "unplaced": [
      {
       "territory": "cos-home",
@@ -2613,11 +3945,11 @@
      }
     ],
     "basis": "sourced shares (p. 315 (PDF 359): silver production of the world, 1900 (kilograms))",
-    "consolidatedTerritories": 13
+    "consolidatedTerritories": 12
    },
    "kerosene": {
-    "worldDemandPerDay": 24514.138747176003,
-    "placedPerDay": 24514.138747176003,
+    "worldDemandPerDay": 27550.1223032292,
+    "placedPerDay": 27550.122303229196,
     "unplaced": [],
     "basis": "sourced shares of crude-oil (p. 504 (PDF 546): production of crude petroleum in the countries of the world, 1900)",
     "consolidatedTerritories": 1
@@ -2628,50 +3960,55 @@
     "unplaced": []
    },
    "fuel-oil": {
-    "worldDemandPerDay": 0,
+    "worldDemandPerDay": 27746.389499493762,
     "placedPerDay": 0,
-    "unplaced": []
+    "unplaced": [
+     {
+      "quantity": 27746.389499493762,
+      "reason": "no producer placed in 1900"
+     }
+    ]
    },
    "electricity": {
-    "worldDemandPerDay": 7172.182178603593,
-    "placedPerDay": 7172.182178603592,
+    "worldDemandPerDay": 95836.72278136636,
+    "placedPerDay": 95836.72278136633,
     "unplaced": [],
     "basis": "local demand (no sourced shares)",
-    "hydroPerDay": 1704.4548782561073
+    "hydroPerDay": 22775.407204252282
    },
    "steel": {
-    "worldDemandPerDay": 18456.995795276987,
-    "placedPerDay": 18456.995795276987,
+    "worldDemandPerDay": 35546.47182900866,
+    "placedPerDay": 35546.47182900866,
     "unplaced": [],
     "basis": "sourced shares (p. 395 (PDF 439): production of pig iron and steel in the principal countries, 1900 (steel column))"
    },
    "copper": {
-    "worldDemandPerDay": 482.2077321627364,
-    "placedPerDay": 482.2077321627363,
+    "worldDemandPerDay": 801.1046095073877,
+    "placedPerDay": 801.1046095073877,
     "unplaced": [],
     "basis": "sourced shares of copper-ore (p. 199 (PDF 239): the world's copper production, 1896-1900 (metric tons, 1900; Henry R. Merton & Co.))",
-    "consolidatedTerritories": 9
+    "consolidatedTerritories": 5
    },
    "aluminium": {
-    "worldDemandPerDay": 27.363283994227924,
-    "placedPerDay": 27.363283994227924,
+    "worldDemandPerDay": 29.4678307791261,
+    "placedPerDay": 29.467830779126103,
     "unplaced": [],
     "basis": "sourced shares (p. 20 (PDF 60): aluminum, world's production and commerce, 1900 (kilograms))",
     "consolidatedTerritories": 1
    },
    "chemicals": {
-    "worldDemandPerDay": 1949.0928258718295,
-    "placedPerDay": 1949.0928258718295,
+    "worldDemandPerDay": 3949.5037126245015,
+    "placedPerDay": 3949.503712624503,
     "unplaced": [],
     "basis": "local demand (no sourced shares)",
-    "consolidatedTerritories": 34
+    "consolidatedTerritories": 113
    },
    "fertiliser": {
-    "worldDemandPerDay": 176.58680266998493,
-    "placedPerDay": 176.58680266998493,
+    "worldDemandPerDay": 254.68717252437207,
+    "placedPerDay": 254.68717252437202,
     "unplaced": [],
     "basis": "local demand (no sourced shares)",
-    "consolidatedTerritories": 52
+    "consolidatedTerritories": 50
    },
    "plastics": {
     "worldDemandPerDay": 0,
@@ -2679,25 +4016,25 @@
     "unplaced": []
    },
    "construction-materials": {
-    "worldDemandPerDay": 406821.24291537004,
-    "placedPerDay": 406821.24291537004,
+    "worldDemandPerDay": 712537.1529361844,
+    "placedPerDay": 712537.1529361851,
     "unplaced": [],
     "basis": "local demand (no sourced shares)",
-    "consolidatedTerritories": 42
+    "consolidatedTerritories": 28
    },
    "machinery": {
-    "worldDemandPerDay": 17531.386726851375,
-    "placedPerDay": 17531.38672685138,
+    "worldDemandPerDay": 29330.98476728057,
+    "placedPerDay": 29330.984767280574,
     "unplaced": [],
     "basis": "sourced shares of steel (p. 395 (PDF 439): production of pig iron and steel in the principal countries, 1900 (steel column))"
    },
    "electrical-equipment": {
-    "worldDemandPerDay": 22.987947955430144,
-    "placedPerDay": 22.987947955430144,
+    "worldDemandPerDay": 22.765432585130053,
+    "placedPerDay": 22.765432585130053,
     "unplaced": [],
-    "pooledWorldwidePerDay": 12.78066597091023,
+    "pooledWorldwidePerDay": 4.188193642823069,
     "basis": "local demand (no sourced shares); demand without a local producer placed worldwide by province weight (provisional)",
-    "consolidatedTerritories": 59
+    "consolidatedTerritories": 60
    },
    "electronic-components": {
     "worldDemandPerDay": 0,
@@ -2715,11 +4052,11 @@
     "unplaced": []
    },
    "ships": {
-    "worldDemandPerDay": 1218.27066801666,
-    "placedPerDay": 1218.2706680166607,
+    "worldDemandPerDay": 2261.5333981978,
+    "placedPerDay": 2261.533398197801,
     "unplaced": [],
     "basis": "local demand (no sourced shares)",
-    "consolidatedTerritories": 55
+    "consolidatedTerritories": 121
    },
    "armaments": {
     "worldDemandPerDay": 0,
@@ -2727,11 +4064,11 @@
     "unplaced": []
    },
    "household-goods": {
-    "worldDemandPerDay": 2976068.6426908504,
-    "placedPerDay": 2976068.64269085,
+    "worldDemandPerDay": 3264165.800691668,
+    "placedPerDay": 3264165.8006916675,
     "unplaced": [],
     "basis": "local demand (no sourced shares)",
-    "consolidatedTerritories": 20
+    "consolidatedTerritories": 17
    },
    "appliances": {
     "worldDemandPerDay": 0,
@@ -2759,393 +4096,445 @@
     "unplaced": []
    },
    "pharmaceuticals": {
-    "worldDemandPerDay": 116152523.02092005,
-    "placedPerDay": 116152523.02092002,
+    "worldDemandPerDay": 160561407.65136853,
+    "placedPerDay": 160561407.65136853,
     "unplaced": [],
     "basis": "local demand (no sourced shares)",
-    "consolidatedTerritories": 25
+    "consolidatedTerritories": 36
    },
    "commerce": {
-    "worldDemandPerDay": 129887583.71079001,
-    "placedPerDay": 129887583.71079001,
+    "worldDemandPerDay": 293006886.63920724,
+    "placedPerDay": 293006886.6392072,
     "unplaced": [],
     "basis": "local demand (no sourced shares)"
    },
    "transport-services": {
-    "worldDemandPerDay": 90797679.89935498,
-    "placedPerDay": 90797679.89935496,
+    "worldDemandPerDay": 238734331.6359072,
+    "placedPerDay": 238734331.6359071,
     "unplaced": [],
     "basis": "local demand (no sourced shares)"
    },
    "communication": {
-    "worldDemandPerDay": 14841069.912460504,
-    "placedPerDay": 14841069.912460502,
+    "worldDemandPerDay": 24376807.366160747,
+    "placedPerDay": 24376807.366160754,
     "unplaced": [],
     "basis": "local demand (no sourced shares)"
    },
    "finance-services": {
-    "worldDemandPerDay": 62101793.12897102,
-    "placedPerDay": 62101793.128971025,
+    "worldDemandPerDay": 54965315.31973988,
+    "placedPerDay": 54965315.31973988,
     "unplaced": [],
     "basis": "local demand (no sourced shares)"
    },
    "personal-services": {
-    "worldDemandPerDay": 153044583.30883503,
-    "placedPerDay": 153044583.30883503,
+    "worldDemandPerDay": 145177914.0336229,
+    "placedPerDay": 145177914.0336229,
     "unplaced": [],
     "basis": "local demand (no sourced shares)"
    },
    "jewellery": {
-    "worldDemandPerDay": 673186.8539046501,
-    "placedPerDay": 673186.8539046501,
+    "worldDemandPerDay": 798903.9869334305,
+    "placedPerDay": 798903.9869334304,
     "unplaced": [],
     "basis": "sourced shares (p. 50 (PDF 56): industrial consumption of gold and silver in 1900 by country (where the metal was worked))",
     "consolidatedTerritories": 8
    },
    "silk": {
-    "worldDemandPerDay": 49135.86100287002,
-    "placedPerDay": 49135.86100287001,
+    "worldDemandPerDay": 89212.17574556104,
+    "placedPerDay": 89212.17574556105,
     "unplaced": [],
     "basis": "sourced shares (pp. 731-732 (PDF 805-806): raw silk production of countries named, 1900 (estimate of the Silk Manufacturers' Association of Lyons; pounds))"
+   },
+   "dwelling": {
+    "worldDemandPerDay": 13233.30645210195,
+    "placedPerDay": 13233.306452101951,
+    "unplaced": [],
+    "basis": "local demand (no sourced shares)"
    }
   },
   "iterations": 12,
   "converged": true,
   "residualCap": {
-   "and-home": {
-    "shareBefore": 3.055314824164874,
-    "gdp": 3416521.5933886287,
-    "p2bValueAdded": 4380926.920247196,
-    "newValueAddedUncapped": 520636.7140764811,
-    "residual": 0,
-    "factor": 0,
-    "outputLostPerDay": {
-     "finance-services": 424.967,
-     "personal-services": 1047.295,
-     "communication": 101.5585,
-     "commerce": 888.8300000000002,
-     "transport-services": 621.335
-    }
-   },
    "lie-home": {
     "shareBefore": 2.2355302459058817,
     "gdp": 12775924.757990934,
-    "p2bValueAdded": 13518677.91245924,
-    "newValueAddedUncapped": 1151222.9175196183,
+    "p2bValueAdded": 13584586.109183677,
+    "newValueAddedUncapped": 1403148.956267256,
     "residual": 0,
     "factor": 0,
     "outputLostPerDay": {
-     "finance-services": 805.7374319999999,
-     "personal-services": 1985.67132,
-     "communication": 192.554916,
-     "commerce": 1685.22168,
-     "transport-services": 1178.05116
+     "finance-services": 738.9646665256497,
+     "personal-services": 1971.947205822116,
+     "communication": 319.668117459628,
+     "dwelling": 0.06074644362486826,
+     "commerce": 935.0570891283271,
+     "transport-services": 1357.9756819899044
     }
    },
    "mco-home": {
     "shareBefore": 4.453489550195094,
     "gdp": 25458140.329224728,
-    "p2bValueAdded": 59744318.46711448,
-    "newValueAddedUncapped": 1970131.855519011,
+    "p2bValueAdded": 60651028.02168006,
+    "newValueAddedUncapped": 1960703.83019062,
     "residual": 0,
     "factor": 0,
     "outputLostPerDay": {
-     "finance-services": 1611.4748639999998,
-     "personal-services": 3971.34264,
-     "communication": 385.10983200000004,
-     "commerce": 3370.44336,
-     "transport-services": 2356.10232
+     "finance-services": 1886.7275208570277,
+     "personal-services": 4969.846532110612,
+     "communication": 842.1526684412967,
+     "dwelling": 0.039515279241306635,
+     "transport-services": 2799.3916851650133
     }
    }
   },
   "worldBalance": {
    "grain": {
-    "demandPerDay": 1209461873.1921499,
-    "outputPerDay": 1205482191.3518078,
-    "outputOverDemand": 0.9967095433692024
+    "demandPerDay": 1428446706.2410746,
+    "outputPerDay": 1422512673.42349,
+    "outputOverDemand": 0.9958458143438899
    },
    "livestock": {
-    "demandPerDay": 290697095.9878651,
-    "outputPerDay": 290666586.57008,
-    "outputOverDemand": 0.9998950473939844
+    "demandPerDay": 110168796.58666132,
+    "outputPerDay": 110151168.14761382,
+    "outputOverDemand": 0.9998399870054527
    },
    "fish": {
-    "demandPerDay": 87922763.5508,
-    "outputPerDay": 87981301.14451197,
-    "outputOverDemand": 1.0006657842787
+    "demandPerDay": 54427404.58995471,
+    "outputPerDay": 54499172.39063789,
+    "outputOverDemand": 1.0013185967845402
    },
    "cotton": {
-    "demandPerDay": 9166398.73529256,
-    "outputPerDay": 9166398.735292558,
-    "outputOverDemand": 0.9999999999999998
+    "demandPerDay": 16642719.965343488,
+    "outputPerDay": 16642719.965343487,
+    "outputOverDemand": 0.9999999999999999
    },
    "wool": {
-    "demandPerDay": 2601275.313256974,
-    "outputPerDay": 2499732.6445026873,
-    "outputOverDemand": 0.9609642746245309
+    "demandPerDay": 4722934.037836757,
+    "outputPerDay": 947300.046069479,
+    "outputOverDemand": 0.20057448155752147
    },
    "textiles": {
-    "demandPerDay": 10233827.125822421,
-    "outputPerDay": 10232760.037369877,
-    "outputOverDemand": 0.9998957292868617
+    "demandPerDay": 18544458.977968488,
+    "outputPerDay": 18578829.559182316,
+    "outputOverDemand": 1.0018534151497578
    },
    "clothing": {
-    "demandPerDay": 17695207.328382988,
-    "outputPerDay": 17768745.172058105,
-    "outputOverDemand": 1.004155805711141
+    "demandPerDay": 33168622.535344146,
+    "outputPerDay": 33305547.59433188,
+    "outputOverDemand": 1.0041281502975237
    },
    "food-products": {
-    "demandPerDay": 173586708.87845498,
-    "outputPerDay": 175068854.27321482,
-    "outputOverDemand": 1.0085383575985511
+    "demandPerDay": 350010794.2711777,
+    "outputPerDay": 355155806.29207695,
+    "outputOverDemand": 1.0146995809989592
    },
    "dairy": {
-    "demandPerDay": 422805898.6347403,
-    "outputPerDay": 422805898.63473994,
-    "outputOverDemand": 0.9999999999999991
+    "demandPerDay": 169657589.3393528,
+    "outputPerDay": 169657589.33935273,
+    "outputOverDemand": 0.9999999999999997
    },
    "produce": {
-    "demandPerDay": 269548694.6855,
-    "outputPerDay": 269548694.68549997,
-    "outputOverDemand": 0.9999999999999998
-   },
-   "sugar": {
-    "demandPerDay": 21879612.46772949,
-    "outputPerDay": 21879612.46772949,
-    "outputOverDemand": 1
-   },
-   "coffee-tea-cocoa": {
-    "demandPerDay": 8543434.183459848,
-    "outputPerDay": 8543434.183459846,
-    "outputOverDemand": 0.9999999999999998
-   },
-   "tobacco": {
-    "demandPerDay": 2685300.0821241005,
-    "outputPerDay": 2685300.0821241005,
-    "outputOverDemand": 1
-   },
-   "rubber": {
-    "demandPerDay": 45603.86083566658,
-    "outputPerDay": 45605.938579906586,
-    "outputOverDemand": 1.0000455607091578
-   },
-   "timber": {
-    "demandPerDay": 109709.88706329383,
-    "outputPerDay": 109709.88706329378,
+    "demandPerDay": 259636446.09919602,
+    "outputPerDay": 259636446.09919587,
     "outputOverDemand": 0.9999999999999994
    },
+   "sugar": {
+    "demandPerDay": 19491230.402290057,
+    "outputPerDay": 19491230.402290054,
+    "outputOverDemand": 0.9999999999999998
+   },
+   "coffee-tea-cocoa": {
+    "demandPerDay": 4175290.1348657813,
+    "outputPerDay": 4175290.134865782,
+    "outputOverDemand": 1.0000000000000002
+   },
+   "tobacco": {
+    "demandPerDay": 2499650.807340569,
+    "outputPerDay": 2499650.8073405693,
+    "outputOverDemand": 1.0000000000000002
+   },
+   "rubber": {
+    "demandPerDay": 119570.18112152342,
+    "outputPerDay": 119572.25980520692,
+    "outputOverDemand": 1.0000173846327236
+   },
+   "timber": {
+    "demandPerDay": 1073258.695443701,
+    "outputPerDay": 1073262.5149379054,
+    "outputOverDemand": 1.0000035587824452
+   },
    "paper": {
-    "demandPerDay": 5531.088094748524,
-    "outputPerDay": 5531.1085103370915,
-    "outputOverDemand": 1.0000036910619063
+    "demandPerDay": 8121.703267144906,
+    "outputPerDay": 8121.713014360927,
+    "outputOverDemand": 1.000001200144317
    },
    "coal": {
-    "demandPerDay": 1802875.2307820262,
-    "outputPerDay": 1802891.852538167,
-    "outputOverDemand": 1.0000092195820638
+    "demandPerDay": 1833694.5898242544,
+    "outputPerDay": 1833711.218963256,
+    "outputOverDemand": 1.0000090686524867
    },
    "crude-oil": {
-    "demandPerDay": 42265.8255226945,
-    "outputPerDay": 42265.825522694504,
+    "demandPerDay": 47500.2884827565,
+    "outputPerDay": 47500.28848275651,
     "outputOverDemand": 1.0000000000000002
    },
    "iron-ore": {
-    "demandPerDay": 17463.10579443944,
-    "outputPerDay": 17463.105743231135,
-    "outputOverDemand": 0.999999997067629
+    "demandPerDay": 33632.33134223747,
+    "outputPerDay": 33632.33124898122,
+    "outputOverDemand": 0.9999999972271846
    },
    "copper-ore": {
-    "demandPerDay": 451.19223046249215,
-    "outputPerDay": 451.1922290813578,
-    "outputOverDemand": 0.9999999969389226
+    "demandPerDay": 750.0721253055476,
+    "outputPerDay": 750.0721227886826,
+    "outputOverDemand": 0.9999999966445027
    },
    "bauxite": {
-    "demandPerDay": 98.60635496467347,
-    "outputPerDay": 98.60635496467347,
-    "outputOverDemand": 1
+    "demandPerDay": 106.1903016632937,
+    "outputPerDay": 106.19030166329371,
+    "outputOverDemand": 1.0000000000000002
    },
    "nitrates": {
-    "demandPerDay": 163.03341860405507,
-    "outputPerDay": 163.03341860405507,
+    "demandPerDay": 255.58634193151806,
+    "outputPerDay": 255.58634193151806,
     "outputOverDemand": 1
    },
    "tin": {
-    "demandPerDay": 79.09084816277664,
-    "outputPerDay": 79.09084813598992,
-    "outputOverDemand": 0.999999999661317
+    "demandPerDay": 132.2526896978064,
+    "outputPerDay": 132.25268964881448,
+    "outputOverDemand": 0.9999999996295582
    },
    "gold": {
-    "demandPerDay": 507.801115049134,
-    "outputPerDay": 507.801115049134,
-    "outputOverDemand": 1
+    "demandPerDay": 548.9012821053163,
+    "outputPerDay": 548.9012821053162,
+    "outputOverDemand": 0.9999999999999998
    },
    "silver": {
-    "demandPerDay": 2809.6203315560206,
-    "outputPerDay": 2809.6203315560215,
-    "outputOverDemand": 1.0000000000000002
+    "demandPerDay": 3320.0424589128415,
+    "outputPerDay": 3320.0424589128415,
+    "outputOverDemand": 1
    },
    "kerosene": {
-    "demandPerDay": 24514.138747176003,
-    "outputPerDay": 24514.138747176006,
-    "outputOverDemand": 1.0000000000000002
+    "demandPerDay": 27550.122303229204,
+    "outputPerDay": 27550.1223032292,
+    "outputOverDemand": 0.9999999999999999
    },
    "petrol": {
     "demandPerDay": 0,
-    "outputPerDay": 5494.554814451109,
+    "outputPerDay": 6175.034689210248,
     "outputOverDemand": null
    },
    "fuel-oil": {
-    "demandPerDay": 0,
-    "outputPerDay": 10566.443863177747,
-    "outputOverDemand": null
+    "demandPerDay": 27746.389499493765,
+    "outputPerDay": 11875.058052948634,
+    "outputOverDemand": 0.42798570434417404
    },
    "electricity": {
-    "demandPerDay": 7172.182178603592,
-    "outputPerDay": 7172.182178603593,
-    "outputOverDemand": 1.0000000000000002
+    "demandPerDay": 95836.72278136635,
+    "outputPerDay": 95836.72278136635,
+    "outputOverDemand": 1
    },
    "steel": {
-    "demandPerDay": 18456.995801170062,
-    "outputPerDay": 18456.99579527699,
-    "outputOverDemand": 0.9999999996807134
+    "demandPerDay": 35546.43364484483,
+    "outputPerDay": 35546.47182900866,
+    "outputOverDemand": 1.000001074205199
    },
    "copper": {
-    "demandPerDay": 482.2077323234567,
-    "outputPerDay": 482.20773216273636,
-    "outputOverDemand": 0.999999999666699
+    "demandPerDay": 801.1046098013392,
+    "outputPerDay": 801.1046095073882,
+    "outputOverDemand": 0.999999999633068
    },
    "aluminium": {
-    "demandPerDay": 27.36328399422793,
-    "outputPerDay": 27.363283994227924,
-    "outputOverDemand": 0.9999999999999998
+    "demandPerDay": 29.4678307791261,
+    "outputPerDay": 29.4678307791261,
+    "outputOverDemand": 1
    },
    "chemicals": {
-    "demandPerDay": 1949.09282587183,
-    "outputPerDay": 1949.0928258718295,
-    "outputOverDemand": 0.9999999999999998
+    "demandPerDay": 3949.494163888992,
+    "outputPerDay": 3949.503712624503,
+    "outputOverDemand": 1.0000024177110067
    },
    "fertiliser": {
-    "demandPerDay": 176.586802669985,
-    "outputPerDay": 176.58680266998493,
-    "outputOverDemand": 0.9999999999999997
+    "demandPerDay": 254.68717252437202,
+    "outputPerDay": 254.68717252437202,
+    "outputOverDemand": 1
    },
    "construction-materials": {
-    "demandPerDay": 406819.570738514,
-    "outputPerDay": 406821.24291537004,
-    "outputOverDemand": 1.0000041103648307
+    "demandPerDay": 712533.7573006175,
+    "outputPerDay": 712537.1529361848,
+    "outputOverDemand": 1.0000047655785183
    },
    "machinery": {
-    "demandPerDay": 17531.312377503764,
-    "outputPerDay": 17531.38672685138,
-    "outputOverDemand": 1.0000042409459151
+    "demandPerDay": 29330.918349107757,
+    "outputPerDay": 29330.984767280574,
+    "outputOverDemand": 1.0000022644423208
    },
    "electrical-equipment": {
-    "demandPerDay": 22.987336992238017,
-    "outputPerDay": 22.987947955430144,
-    "outputOverDemand": 1.000026578250118
+    "demandPerDay": 22.764559728890262,
+    "outputPerDay": 22.765432585130053,
+    "outputOverDemand": 1.0000383427683288
    },
    "ships": {
-    "demandPerDay": 1218.2363976428085,
-    "outputPerDay": 1218.2706680166607,
-    "outputOverDemand": 1.0000281311360575
+    "demandPerDay": 2261.504532686692,
+    "outputPerDay": 2261.5333981978006,
+    "outputOverDemand": 1.0000127638528649
    },
    "household-goods": {
-    "demandPerDay": 2976068.6426908514,
-    "outputPerDay": 2976068.642690849,
-    "outputOverDemand": 0.9999999999999992
+    "demandPerDay": 3264165.800691668,
+    "outputPerDay": 3264165.8006916675,
+    "outputOverDemand": 0.9999999999999999
    },
    "pharmaceuticals": {
-    "demandPerDay": 116152523.02092005,
-    "outputPerDay": 116152523.02092002,
-    "outputOverDemand": 0.9999999999999998
-   },
-   "commerce": {
-    "demandPerDay": 129887583.71079004,
-    "outputPerDay": 129881639.21575001,
-    "outputOverDemand": 0.9999542335389557
-   },
-   "transport-services": {
-    "demandPerDay": 90797679.89935495,
-    "outputPerDay": 90793524.41087496,
-    "outputOverDemand": 0.9999542335389562
-   },
-   "communication": {
-    "demandPerDay": 14841069.912460502,
-    "outputPerDay": 14840390.689212505,
-    "outputOverDemand": 0.9999542335389562
-   },
-   "finance-services": {
-    "demandPerDay": 62101793.128971025,
-    "outputPerDay": 62098950.949675016,
-    "outputOverDemand": 0.9999542335389559
-   },
-   "personal-services": {
-    "demandPerDay": 153044583.30883506,
-    "outputPerDay": 153037578.999875,
-    "outputOverDemand": 0.9999542335389556
-   },
-   "jewellery": {
-    "demandPerDay": 673186.85390465,
-    "outputPerDay": 673186.8539046502,
+    "demandPerDay": 160561407.65136853,
+    "outputPerDay": 160561407.6513686,
     "outputOverDemand": 1.0000000000000004
    },
+   "commerce": {
+    "demandPerDay": 293006886.6392069,
+    "outputPerDay": 293005951.58211803,
+    "outputOverDemand": 0.9999968087538843
+   },
+   "transport-services": {
+    "demandPerDay": 238734331.63590708,
+    "outputPerDay": 238730174.26854,
+    "outputOverDemand": 0.9999825858001293
+   },
+   "communication": {
+    "demandPerDay": 24376807.366160758,
+    "outputPerDay": 24375645.54537485,
+    "outputOverDemand": 0.9999523390914793
+   },
+   "finance-services": {
+    "demandPerDay": 54965315.31973989,
+    "outputPerDay": 54962689.6275525,
+    "outputOverDemand": 0.9999522300168366
+   },
+   "personal-services": {
+    "demandPerDay": 145177914.03362292,
+    "outputPerDay": 145170972.2398849,
+    "outputOverDemand": 0.9999521842300586
+   },
+   "jewellery": {
+    "demandPerDay": 798903.9869334305,
+    "outputPerDay": 798903.9869334307,
+    "outputOverDemand": 1.0000000000000002
+   },
    "silk": {
-    "demandPerDay": 49135.86100287002,
-    "outputPerDay": 49135.86100287002,
-    "outputOverDemand": 1
+    "demandPerDay": 89212.17574556104,
+    "outputPerDay": 89212.17574556105,
+    "outputOverDemand": 1.0000000000000002
+   },
+   "dwelling": {
+    "demandPerDay": 13233.306452101946,
+    "outputPerDay": 13233.206190379084,
+    "outputOverDemand": 0.9999924235320005
    }
   },
   "workforceCapFactorByTerritory": {
-   "gbr-home": 1.1714231418362957,
-   "deu-home": 2.142546759302133,
-   "fra-home": 1.8667526242772265,
-   "rus-home": 2.059511738426362,
-   "ita-home": 2.1111751195984065,
-   "esp-home": 2.477829417132536,
-   "prt-home": 2.9693154474556502,
-   "nld-home": 1.8926186233420188,
-   "bel-home": 1.6356097698246614,
-   "che-home": 1.6614217480106814,
-   "swe-home": 2.0324546128926557,
-   "nor-home": 2.0729710589289514,
-   "dnk-home": 1.4913763245901082,
-   "grc-home": 1.2770318703350703,
-   "ott-home": 1.7879783096999369,
-   "mco-home": 10.29616619223548,
-   "and-home": 10.319917440660475,
+   "cyp": 1.008123977799823,
+   "deu-home": 1.5263134149546844,
+   "fra-home": 1.4781435869037631,
+   "rus-home": 1.762433024316841,
+   "ita-home": 1.126221151650084,
+   "prt-home": 1.522510186939016,
+   "nld-home": 1.4573163399733546,
+   "bel-home": 1.192852222033018,
+   "che-home": 1.3260173575672105,
+   "isl": 1.8986628907947032,
+   "grc-home": 1.3599641775997382,
+   "srb-home": 1.70812217758293,
+   "mnt-home": 1.8792395515568083,
+   "rom-home": 1.4740239739102905,
+   "bgr-home": 1.9353528157922564,
+   "ott-home": 1.525008810324134,
+   "mco-home": 5.6730346491937205,
+   "and-home": 26.315789473684212,
    "lie-home": 6.245386930676204,
-   "aut-home": 2.074466433642181,
-   "crt-home": 1.2723253336087248,
-   "per-home": 1.5349597226806766,
-   "chn-home": 1.4440404053764457,
-   "jpn-home": 2.7646955789928493,
-   "bpo": 6.0641199080933665,
-   "its": 1.3937150982663313,
-   "eth-home": 1.221805989828627,
-   "gsw": 1.0170899361776067,
-   "zar-home": 1.4569215281341366,
-   "usa-home": 1.4288839127577113,
-   "can-home": 1.5819024744848076,
-   "gua-home": 1.1187417357339915,
-   "sal-home": 1.159913074887847,
-   "cos-home": 1.9453880846319156,
-   "chl-home": 2.0046779857286308,
-   "arg-home": 1.6275097863207222,
-   "ury-home": 1.9180236684120684,
-   "bra-home": 1.8661264043062045,
-   "bwi": 1.6939313236992064,
-   "sur": 1.7388224308093576,
-   "cub-home": 2.0302624942788268,
-   "hti-home": 1.341305159237716,
-   "dom-home": 1.2020197866686924,
-   "fca": 5.566244747459798,
-   "dgc": 1.4419610670511898,
-   "dwi": 10.64651841675968,
-   "pri": 3.115817651513407,
-   "aus-home": 1.2431404644731374,
-   "nzl-home": 1.0448181562139425,
-   "fji": 2.4894039379795054,
-   "ton-home": 3.9020764621173414,
+   "aut-home": 1.1232685325903824,
+   "crt-home": 1.475812125684279,
+   "shm-home": 1.4260231201076983,
+   "omn-home": 1.6732136513640552,
+   "per-home": 1.184975745027719,
+   "afg-home": 2.5018804142345212,
+   "npl-home": 2.3350744292104633,
+   "bhu": 2.7285363719046556,
+   "tha-home": 2.1060882452032548,
+   "chn-home": 1.4481761446686363,
+   "tib": 1.7996452189282353,
+   "kor-home": 1.1787121407804726,
+   "jpn-home": 1.2352763662062374,
+   "twn": 1.7863171708236578,
+   "bin": 1.3644519892566795,
+   "goa": 1.2719442949174322,
+   "mal": 2.849571411021719,
+   "sar": 1.8224266589101994,
+   "mac": 2.337342668914377,
+   "fic": 2.621982457255723,
+   "dei": 2.0107370662831414,
+   "phl": 5.937175769766075,
+   "ptm": 2.213898649779254,
+   "cap": 1.3085846739776426,
+   "bpo": 7.996736026111791,
+   "pai": 1.0555493576595982,
+   "sgg": 2.454366799110936,
+   "mad": 3.4933277440089427,
+   "bso": 2.5353762202302432,
+   "its": 4.196110231558353,
+   "eri": 3.8442891282988594,
+   "eth-home": 1.716069221907435,
+   "egy": 1.6215927910103631,
+   "sud": 2.200865673831707,
+   "dar-home": 1.5100717927598064,
+   "wad-home": 1.837826011415628,
+   "sok-home": 1.9891423406630193,
+   "gea": 4.679657728440123,
+   "kam": 2.8764645355088927,
+   "tog": 4.136395518690356,
+   "gsw": 3.3989082294778044,
+   "cfs": 3.123498077610841,
+   "ang": 2.2529088006301192,
+   "moz": 2.431618244515774,
+   "cra": 2.5285328674952683,
+   "hct": 1.5444671395310225,
+   "nat": 1.7432711488624864,
+   "zar-home": 1.8686225328343122,
+   "orf-home": 1.8705060662742607,
+   "bea": 1.8745282308584799,
+   "bwa": 2.2117856153499416,
+   "fwa": 3.0388009226958443,
+   "fea": 3.1163152660837303,
+   "alg": 2.0361925280825344,
+   "tun": 2.190611664295875,
+   "mar-home": 1.713245088512944,
+   "lbr-home": 1.6990384986677993,
+   "usa-home": 1.1523586114180646,
+   "mex-home": 1.507498741621813,
+   "gua-home": 1.6347380925236017,
+   "hon-home": 2.1474920177155217,
+   "sal-home": 1.7619179735655097,
+   "nic-home": 1.6932238854015773,
+   "cos-home": 2.80644538374064,
+   "bwi": 3.766294113331214,
+   "col-home": 2.26205614790179,
+   "ven-home": 1.4362306614330236,
+   "ecu-home": 2.394225173015869,
+   "pru-home": 2.93381318838427,
+   "bol-home": 2.258795466392284,
+   "chl-home": 1.119935489945895,
+   "pry-home": 1.9870690302631044,
+   "bra-home": 2.7412608234941147,
+   "sur": 5.6028722770523745,
+   "cub-home": 2.583677944383356,
+   "hti-home": 2.19316121536826,
+   "dom-home": 2.75009921379769,
+   "fca": 8.764422365364444,
+   "dgc": 3.8108971057781442,
+   "dwi": 13.136429981969606,
+   "pri": 10.114215037477868,
+   "aus-home": 1.0313199838206535,
+   "gng": 4.8045852118677885,
+   "fji": 4.09893234615591,
+   "fpo": 2.960807914368286,
+   "ton-home": 4.738235703999629,
    "asm": 1.2561236025624922
   },
   "fertiliserMarkets": [
@@ -3160,387 +4549,392 @@
   "buildingsByDefinition": {
    "coal-mine": {
     "buildings": 37,
-    "levels": 1187
+    "levels": 1132
    },
    "commercial-farm": {
     "buildings": 191,
-    "levels": 2746
+    "levels": 2456
    },
    "fishery": {
     "buildings": 300,
-    "levels": 17233
+    "levels": 15735
    },
    "food-processing": {
     "buildings": 289,
-    "levels": 1538
+    "levels": 1618
    },
    "ranch": {
     "buildings": 300,
-    "levels": 46767
+    "levels": 25963
    },
    "subsistence-farm": {
     "buildings": 1073,
-    "levels": 74203
+    "levels": 106405
    },
    "textile-mill": {
     "buildings": 278,
-    "levels": 5002
+    "levels": 5609
    },
    "workshop": {
     "buildings": 261,
-    "levels": 4212
+    "levels": 5756
+   },
+   "alkali-and-acid-works": {
+    "buildings": 54,
+    "levels": 116
    },
    "bank-and-office": {
-    "buildings": 153,
-    "levels": 2329
+    "buildings": 129,
+    "levels": 953
    },
    "cement-and-brick-works": {
-    "buildings": 281,
-    "levels": 4402
+    "buildings": 348,
+    "levels": 5327
+   },
+   "coal-power-station": {
+    "buildings": 49,
+    "levels": 235
    },
    "dairy-farm": {
-    "buildings": 183,
-    "levels": 9352
+    "buildings": 122,
+    "levels": 3030
    },
    "furniture-works": {
-    "buildings": 133,
-    "levels": 1930
+    "buildings": 78,
+    "levels": 710
    },
    "hydro-station": {
-    "buildings": 72,
-    "levels": 73
+    "buildings": 71,
+    "levels": 135
    },
    "jewellery-workshop": {
-    "buildings": 49,
-    "levels": 264
+    "buildings": 50,
+    "levels": 280
    },
    "logging-camp": {
-    "buildings": 109,
-    "levels": 1060
+    "buildings": 341,
+    "levels": 13731
    },
    "machine-works": {
-    "buildings": 38,
-    "levels": 725
+    "buildings": 40,
+    "levels": 1087
    },
    "paper-mill": {
-    "buildings": 55,
-    "levels": 212
+    "buildings": 51,
+    "levels": 153
    },
    "personal-services": {
-    "buildings": 178,
-    "levels": 8572
+    "buildings": 150,
+    "levels": 3505
    },
    "pharmaceutical-works": {
-    "buildings": 117,
-    "levels": 1145
+    "buildings": 86,
+    "levels": 600
    },
    "post-and-telegraph": {
-    "buildings": 117,
-    "levels": 622
+    "buildings": 110,
+    "levels": 435
+   },
+   "residential-builder": {
+    "buildings": 420,
+    "levels": 50696
    },
    "steel-works": {
-    "buildings": 37,
-    "levels": 333
+    "buildings": 38,
+    "levels": 576
    },
    "trading-house": {
-    "buildings": 169,
-    "levels": 5655
+    "buildings": 359,
+    "levels": 9569
    },
    "transport-company": {
-    "buildings": 169,
-    "levels": 5214
+    "buildings": 356,
+    "levels": 8895
    },
    "warehouse": {
     "buildings": 273,
     "levels": 369
    },
    "iron-mine": {
-    "buildings": 11,
-    "levels": 52
+    "buildings": 14,
+    "levels": 90
    },
    "market-garden": {
-    "buildings": 180,
-    "levels": 9517
-   },
-   "alkali-and-acid-works": {
-    "buildings": 37,
-    "levels": 64
-   },
-   "coal-power-station": {
-    "buildings": 38,
-    "levels": 52
+    "buildings": 157,
+    "levels": 8775
    },
    "commercial-farm-peasant": {
     "buildings": 219,
-    "levels": 13054
+    "levels": 17740
+   },
+   "cotton-farm": {
+    "buildings": 75,
+    "levels": 8832
    },
    "beet-sugar-works": {
     "buildings": 21,
-    "levels": 1045
+    "levels": 1271
    },
    "copper-smelter": {
-    "buildings": 36,
-    "levels": 75
+    "buildings": 46,
+    "levels": 127
    },
    "tobacco-farm": {
-    "buildings": 99,
-    "levels": 1593
+    "buildings": 95,
+    "levels": 1611
    },
    "silver-mine": {
-    "buildings": 25,
-    "levels": 77
+    "buildings": 27,
+    "levels": 65
    },
    "copper-mine": {
-    "buildings": 26,
-    "levels": 74
+    "buildings": 33,
+    "levels": 109
+   },
+   "fertiliser-works": {
+    "buildings": 8,
+    "levels": 35
    },
    "oil-refinery": {
-    "buildings": 21,
-    "levels": 976
+    "buildings": 22,
+    "levels": 688
+   },
+   "shipyard": {
+    "buildings": 26,
+    "levels": 88
    },
    "bauxite-mine": {
     "buildings": 1,
     "levels": 1
    },
    "silk-farm": {
-    "buildings": 47,
-    "levels": 995
+    "buildings": 48,
+    "levels": 2807
    },
    "aluminium-works": {
-    "buildings": 4,
+    "buildings": 5,
     "levels": 5
    },
    "electrical-works": {
-    "buildings": 8,
-    "levels": 23
-   },
-   "shipyard": {
-    "buildings": 12,
-    "levels": 32
+    "buildings": 4,
+    "levels": 12
    },
    "gold-mine": {
     "buildings": 51,
-    "levels": 430
+    "levels": 345
    },
    "oil-field": {
     "buildings": 12,
-    "levels": 691
+    "levels": 483
    },
    "plantation": {
-    "buildings": 197,
-    "levels": 9281
+    "buildings": 150,
+    "levels": 5432
    },
    "sugar-estate": {
-    "buildings": 100,
-    "levels": 2783
+    "buildings": 99,
+    "levels": 1475
    },
    "workshop-peasant": {
     "buildings": 92,
-    "levels": 4394
-   },
-   "cotton-farm": {
-    "buildings": 70,
-    "levels": 4302
-   },
-   "fertiliser-works": {
-    "buildings": 7,
-    "levels": 36
+    "levels": 8373
    },
    "rubber-estate": {
-    "buildings": 56,
-    "levels": 532
+    "buildings": 71,
+    "levels": 1488
    },
    "tin-mine": {
-    "buildings": 7,
-    "levels": 197
+    "buildings": 8,
+    "levels": 125
    },
    "nitrate-works": {
     "buildings": 2,
-    "levels": 48
+    "levels": 67
    }
   },
   "modelledOverSourced": {
    "coal": {
     "sourcedPerYearSimUnits": 762658161,
     "conversion": "metric tons = t",
-    "modelledPerYear": 658055526.176431,
-    "modelledOverSourced": 0.8628446659688087,
+    "modelledPerYear": 669304594.9215884,
+    "modelledOverSourced": 0.8775944835416092,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "crude-oil": {
     "sourcedPerYearSimUnits": 19484560,
     "conversion": "metric tons = t",
-    "modelledPerYear": 15427026.315783493,
-    "modelledOverSourced": 0.791756463362965,
+    "modelledPerYear": 17337605.296206124,
+    "modelledOverSourced": 0.8898125128925736,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "iron-ore": {
     "sourcedPerYearSimUnits": 40343980,
     "conversion": "pig iron t ~ t Fe of ore (about 0.93 Fe in pig iron; report only)",
-    "modelledPerYear": 6374033.596279364,
-    "modelledOverSourced": 0.15799218610259483,
+    "modelledPerYear": 12275800.905878147,
+    "modelledOverSourced": 0.3042783807120207,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "steel": {
     "sourcedPerYearSimUnits": 26782347,
     "conversion": "metric tons = t",
-    "modelledPerYear": 6736803.465276102,
-    "modelledOverSourced": 0.25153895083489514,
+    "modelledPerYear": 12974462.21758816,
+    "modelledOverSourced": 0.48444082281467565,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "copper-ore": {
     "sourcedPerYearSimUnits": 492625,
     "conversion": "t Cu",
-    "modelledPerYear": 164685.1636146956,
-    "modelledOverSourced": 0.3343012709762915,
+    "modelledPerYear": 273776.3248178691,
+    "modelledOverSourced": 0.5557499615688792,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "tin": {
     "sourcedPerYearSimUnits": 82984,
     "conversion": "metric tons = t",
-    "modelledPerYear": 28868.15956963632,
-    "modelledOverSourced": 0.34787621191598767,
+    "modelledPerYear": 48272.23172181728,
+    "modelledOverSourced": 0.5817052892342774,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "gold": {
     "sourcedPerYearSimUnits": 384425.1,
     "conversion": "kg",
-    "modelledPerYear": 185347.40699293392,
-    "modelledOverSourced": 0.48214179301230314,
+    "modelledPerYear": 200348.9679684404,
+    "modelledOverSourced": 0.5211651579681983,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "silver": {
     "sourcedPerYearSimUnits": 5679864.999999999,
     "conversion": "kg",
-    "modelledPerYear": 1025511.4210179478,
-    "modelledOverSourced": 0.18055207668103873,
+    "modelledPerYear": 1211815.4975031873,
+    "modelledOverSourced": 0.21335286974306386,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "bauxite": {
     "sourcedPerYearSimUnits": 88221,
     "conversion": "metric tons = t",
-    "modelledPerYear": 35991.31956210582,
-    "modelledOverSourced": 0.4079677124732866,
+    "modelledPerYear": 38759.460107102204,
+    "modelledOverSourced": 0.43934505511275324,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "aluminium": {
     "sourcedPerYearSimUnits": 7743.219,
     "conversion": "kg; kg -> t (x 0.001)",
-    "modelledPerYear": 9987.598657893192,
-    "modelledOverSourced": 1.289850985474283,
+    "modelledPerYear": 10755.758234381026,
+    "modelledOverSourced": 1.3890551506267648,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "nitrates": {
     "sourcedPerYearSimUnits": 235521.00000000003,
     "conversion": "t NaNO3 x 0.1647 N",
-    "modelledPerYear": 59507.1977904801,
-    "modelledOverSourced": 0.252661961313344,
+    "modelledPerYear": 93289.01480500409,
+    "modelledOverSourced": 0.396096376989755,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "sugar": {
     "sourcedPerYearSimUnits": 9288324720.563,
     "conversion": "long tons x 1,016.047 kg",
-    "modelledPerYear": 7986058550.721264,
-    "modelledOverSourced": 0.8597953657930684,
+    "modelledPerYear": 7114299096.83587,
+    "modelledOverSourced": 0.765939963434509,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "cotton": {
     "sourcedPerYearSimUnits": 3446003149.3413205,
     "conversion": "bales x 478 lb of lint x 0.45359237 kg",
-    "modelledPerYear": 3345735538.3817835,
-    "modelledOverSourced": 0.970903215518331,
+    "modelledPerYear": 6074592787.350372,
+    "modelledOverSourced": 1.7627937422261173,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "jewellery": {
     "sourcedPerYearSimUnits": 291002424.24242425,
     "conversion": "gross metal dollars / the metal share of value = jewellery units (includes old material; report only)",
-    "modelledPerYear": 245713201.67519733,
-    "modelledOverSourced": 0.8443682292849286,
+    "modelledPerYear": 291599955.23070216,
+    "modelledOverSourced": 1.002053353987801,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "silk": {
     "sourcedPerYearSimUnits": 18472095.67588,
     "conversion": "lb x 0.45359237 kg",
-    "modelledPerYear": 17934589.266047556,
-    "modelledOverSourced": 0.970901709299054,
+    "modelledPerYear": 32562444.14712978,
+    "modelledOverSourced": 1.762791007500481,
     "note": "sourced total excludes aggregate rows ('other'); D-146 A5 sizes the world level by modelled demand"
    },
    "coffee-tea-cocoa": {
     "sourcedPerYearSimUnits": 1322556977.9492574,
     "conversion": "kg; world estimate of crops1900 (A12; coffee, tea and cocoa combined by kg)",
-    "modelledPerYear": 3118353476.962844,
-    "modelledOverSourced": 2.357821650752718,
+    "modelledPerYear": 1523980899.2260106,
+    "modelledOverSourced": 1.152298860945166,
     "note": "world estimate of the crops (or the recorded sum where none exists); D-146 A5 sizes the world level by modelled demand"
    },
    "tobacco": {
     "sourcedPerYearSimUnits": 1008493896.4000654,
     "conversion": "kg; world estimate of crops1900 (A12)",
-    "modelledPerYear": 980134529.9752967,
-    "modelledOverSourced": 0.971879486305271,
+    "modelledPerYear": 912372544.6793078,
+    "modelledOverSourced": 0.904688216692363,
     "note": "world estimate of the crops (or the recorded sum where none exists); D-146 A5 sizes the world level by modelled demand"
    },
    "rubber": {
     "sourcedPerYearSimUnits": 39591283.8483008,
     "conversion": "kg; world estimate of crops1900 (A12)",
-    "modelledPerYear": 16646167.581665903,
-    "modelledOverSourced": 0.42045031036244945,
+    "modelledPerYear": 43643874.82890052,
+    "modelledOverSourced": 1.1023606861582909,
     "note": "world estimate of the crops (or the recorded sum where none exists); D-146 A5 sizes the world level by modelled demand"
    }
   },
   "warehouseCapacityPerLevel": {
-   "grain": 25086114.128125004,
-   "livestock": 7127794.367199999,
-   "fish": 1429246.3079999993,
-   "cotton": 811576.1698070044,
-   "wool": 61299.03155791999,
-   "textiles": 193684.62341261387,
-   "clothing": 276913.18747061485,
-   "food-products": 3257851.6700035515,
-   "dairy": 9621806.441440284,
-   "produce": 6134128.275281248,
-   "sugar": 7180212.345435205,
-   "coffee-tea-cocoa": 7207843.74815633,
-   "tobacco": 288042.0309885531,
-   "rubber": 59282.938010698235,
-   "timber": 2705.97411190654,
-   "paper": 144.3088015930065,
-   "coal": 80048.45998373757,
-   "crude-oil": 4769.140847460334,
+   "grain": 31874626.71934141,
+   "livestock": 2628482.9679508414,
+   "fish": 1304520.7757701303,
+   "cotton": 1473264.4310956635,
+   "wool": 113940.48094274403,
+   "textiles": 448213.07229098986,
+   "clothing": 754834.9960160048,
+   "food-products": 10012153.408590777,
+   "dairy": 6596055.9020210905,
+   "produce": 7894583.590803183,
+   "sugar": 6396419.194748567,
+   "coffee-tea-cocoa": 3991498.1863511764,
+   "tobacco": 304673.18218648597,
+   "rubber": 155073.423428,
+   "timber": 30150.78852479028,
+   "paper": 258.5149597418755,
+   "coal": 81416.84090826707,
+   "crude-oil": 5359.780940458058,
    "natural-gas": 0,
-   "iron-ore": 940.0052968303584,
-   "copper-ore": 63.97835780659764,
-   "bauxite": 85.08505935402603,
-   "nitrates": 407.5835465101377,
+   "iron-ore": 1810.3635160089066,
+   "copper-ore": 103.52462844355443,
+   "bauxite": 91.63,
+   "nitrates": 638.9658548287952,
    "uranium": 0,
-   "tin": 50.622094674037754,
+   "tin": 81.68979524374551,
    "gold": 10163.789160000002,
    "silver": 1544429.7314996724,
-   "kerosene": 2758.9325046465688,
-   "petrol": 618.3821521324209,
-   "fuel-oil": 1189.1955794695268,
-   "steel": 993.7194610941738,
-   "copper": 65.86000402556454,
-   "aluminium": 23.611121652393017,
-   "chemicals": 52.819212743662206,
-   "fertiliser": 14.54965176792783,
+   "kerosene": 3100.6158818499607,
+   "petrol": 694.966447611579,
+   "fuel-oil": 1336.4729634084808,
+   "steel": 1913.8120429523358,
+   "copper": 106.5693568854695,
+   "aluminium": 25.42708461107391,
+   "chemicals": 120.95279092325067,
+   "fertiliser": 12.129975457383473,
    "plastics": 0,
-   "construction-materials": 22734.384292801078,
-   "machinery": 943.8849292525861,
-   "electrical-equipment": 2.4309197667411557,
+   "construction-materials": 33473.21562264496,
+   "machinery": 1579.1719681575655,
+   "electrical-equipment": 4.742798455235428,
    "electronic-components": 0,
    "motor-vehicles": 0,
    "aircraft": 0,
-   "ships": 53.650914198820345,
+   "ships": 133.064431261521,
    "armaments": 0,
-   "household-goods": 73794.09738660936,
+   "household-goods": 145206.20651770642,
    "appliances": 0,
    "radios": 0,
    "televisions": 0,
    "computers": 0,
    "mobile-phones": 0,
-   "pharmaceuticals": 2887731.4413613062,
-   "jewellery": 95169.20920137803,
-   "silk": 4640.607032223487
+   "pharmaceuticals": 6628416.718484374,
+   "jewellery": 112941.98664647665,
+   "silk": 8425.590631262707,
+   "dwelling": 421.33361433087435
   }
  },
  "coverage": {
@@ -3548,309 +4942,315 @@
    "usa-home": {
     "gdpRUSDPerYear": 332877688000.00006,
     "coveredBeforeRUSDPerYear": 134601904608.32295,
-    "coveredAfterRUSDPerYear": 123983052119.17766,
+    "coveredAfterRUSDPerYear": 158125083937.1165,
     "shareBefore": 0.40435844594163045,
-    "shareAfter": 0.3724582829930543,
+    "shareAfter": 0.4750245800106508,
     "jobsAfter": {
-     "laborers": 2592466.666767,
-     "clerks": 760333.3332330001,
-     "peasants": 7062800,
-     "academics": 37200,
-     "capitalists": 22200
+     "laborers": 4904883.333579999,
+     "clerks": 1451566.6664199997,
+     "peasants": 7075000,
+     "academics": 46150,
+     "capitalists": 23400
     }
    },
    "gbr-home": {
     "gdpRUSDPerYear": 156379831304.7256,
     "coveredBeforeRUSDPerYear": 42821734497.84891,
-    "coveredAfterRUSDPerYear": 33067364619.425526,
+    "coveredAfterRUSDPerYear": 68435219144.44435,
     "shareBefore": 0.27383156856337454,
-    "shareAfter": 0.21145543094358277,
+    "shareAfter": 0.4376217736869776,
     "jobsAfter": {
-     "laborers": 873683.3334010005,
-     "peasants": 3201000,
-     "clerks": 249766.66659900005,
-     "capitalists": 6150,
-     "academics": 10400
+     "laborers": 3046133.3335319995,
+     "peasants": 3191000,
+     "clerks": 1082316.6664680005,
+     "academics": 44600,
+     "capitalists": 19950
     }
    },
    "deu-home": {
     "gdpRUSDPerYear": 101868671678.83311,
     "coveredBeforeRUSDPerYear": 52404317824.39535,
-    "coveredAfterRUSDPerYear": 47221650394.12733,
+    "coveredAfterRUSDPerYear": 53431077774.11405,
     "shareBefore": 0.5144301673984056,
-    "shareAfter": 0.46355419792854063,
+    "shareAfter": 0.5245094187795941,
     "jobsAfter": {
-     "laborers": 2565133.333449,
-     "clerks": 755566.6665509996,
-     "academics": 36550,
-     "capitalists": 21750,
-     "peasants": 4372000
+     "laborers": 4623066.666902,
+     "clerks": 1119533.3330979997,
+     "academics": 33500,
+     "capitalists": 17400,
+     "peasants": 4376500
     }
    },
    "fra-home": {
     "gdpRUSDPerYear": 66021443920.45612,
     "coveredBeforeRUSDPerYear": 28829904790.11867,
-    "coveredAfterRUSDPerYear": 24737160284.55306,
+    "coveredAfterRUSDPerYear": 31234808929.93186,
     "shareBefore": 0.4366748601386768,
-    "shareAfter": 0.3746837211612163,
+    "shareAfter": 0.4731009665217887,
     "jobsAfter": {
-     "laborers": 1205400.0000719996,
-     "clerks": 418799.99992799986,
-     "academics": 20250,
+     "laborers": 2372016.6668369994,
+     "clerks": 859483.3331629997,
+     "academics": 23150,
      "capitalists": 12150,
-     "peasants": 3030400
+     "peasants": 3035200
     }
    },
    "rus-home": {
     "gdpRUSDPerYear": 18828543922.944847,
     "coveredBeforeRUSDPerYear": 15719145214.098166,
-    "coveredAfterRUSDPerYear": 14067154429.577385,
+    "coveredAfterRUSDPerYear": 16993625255.28346,
     "shareBefore": 0.8348571869618922,
-    "shareAfter": 0.7471185497480166,
+    "shareAfter": 0.9025459071518899,
     "jobsAfter": {
-     "peasants": 14647500,
-     "laborers": 7621233.333789002,
-     "clerks": 1700916.6662109988,
-     "academics": 68700,
-     "capitalists": 40650
+     "peasants": 14584000,
+     "laborers": 10470250.000335995,
+     "clerks": 1418949.9996639986,
+     "academics": 11600,
+     "capitalists": 7200
     }
    },
    "jpn-home": {
     "gdpRUSDPerYear": 18745657357.440353,
     "coveredBeforeRUSDPerYear": 17652647119.7827,
-    "coveredAfterRUSDPerYear": 15381228008.341026,
+    "coveredAfterRUSDPerYear": 9878004489.65106,
     "shareBefore": 0.9416926162248546,
-    "shareAfter": 0.8205221996248668,
+    "shareAfter": 0.5269489514983786,
     "jobsAfter": {
-     "laborers": 2614133.3335,
-     "clerks": 958516.6665,
-     "academics": 48400,
-     "capitalists": 28950,
-     "peasants": 4855000
+     "laborers": 3078150.000163,
+     "clerks": 671599.999837,
+     "academics": 11100,
+     "capitalists": 6150,
+     "peasants": 4852000
     }
    },
    "ita-home": {
     "gdpRUSDPerYear": 31088428249.768734,
     "coveredBeforeRUSDPerYear": 22679773790.8484,
-    "coveredAfterRUSDPerYear": 18712341448.804226,
+    "coveredAfterRUSDPerYear": 15071826594.00943,
     "shareBefore": 0.7295246195348302,
-    "shareAfter": 0.6019069635321119,
+    "shareAfter": 0.4848050365531602,
     "jobsAfter": {
-     "laborers": 1479616.66676,
-     "peasants": 3578000,
-     "clerks": 579233.33324,
-     "academics": 29450,
-     "capitalists": 17700
+     "laborers": 2110266.6667819996,
+     "peasants": 3581000,
+     "clerks": 592983.333218,
+     "academics": 11450,
+     "capitalists": 6300
     }
    },
    "esp-home": {
     "gdpRUSDPerYear": 12709460327.405699,
     "coveredBeforeRUSDPerYear": 11403529854.339758,
-    "coveredAfterRUSDPerYear": 9374920671.738832,
+    "coveredAfterRUSDPerYear": 6080325051.483791,
     "shareBefore": 0.8972473701145333,
-    "shareAfter": 0.7376332613843153,
+    "shareAfter": 0.4784093812679558,
     "jobsAfter": {
-     "peasants": 2052400,
-     "laborers": 1079250.0000650003,
-     "clerks": 398049.999935,
-     "academics": 20300,
-     "capitalists": 12000
+     "peasants": 1917600,
+     "laborers": 1275533.333394,
+     "clerks": 351716.66660600004,
+     "academics": 5300,
+     "capitalists": 2850
     }
    },
    "prt-home": {
     "gdpRUSDPerYear": 2408460835.1373553,
     "coveredBeforeRUSDPerYear": 2583231193.164187,
-    "coveredAfterRUSDPerYear": 2080524756.2420578,
+    "coveredAfterRUSDPerYear": 1339156859.7979755,
     "shareBefore": 1.0725651650535826,
-    "shareAfter": 0.8638399785825891,
+    "shareAfter": 0.5560218543979782,
     "jobsAfter": {
-     "peasants": 594000,
-     "laborers": 339566.666692,
-     "clerks": 122933.333308,
-     "capitalists": 3450,
-     "academics": 6050
+     "peasants": 592000,
+     "laborers": 341250.000032,
+     "clerks": 81349.99996799999,
+     "capitalists": 900,
+     "academics": 1500
     }
    },
    "nld-home": {
     "gdpRUSDPerYear": 11076667809.006136,
     "coveredBeforeRUSDPerYear": 5184427983.110365,
-    "coveredAfterRUSDPerYear": 3914704237.067776,
+    "coveredAfterRUSDPerYear": 5801294804.288213,
     "shareBefore": 0.46804942357258816,
-    "shareAfter": 0.3534189437264551,
+    "shareAfter": 0.5237400727655062,
     "jobsAfter": {
-     "peasants": 399500,
-     "laborers": 138666.66668000002,
-     "clerks": 47633.33332,
-     "capitalists": 1200,
-     "academics": 2000
+     "peasants": 398500,
+     "laborers": 372700.000032,
+     "clerks": 131199.999968,
+     "capitalists": 2100,
+     "academics": 4500
     }
    },
    "bel-home": {
     "gdpRUSDPerYear": 17637048765.601818,
     "coveredBeforeRUSDPerYear": 6966140893.8919115,
-    "coveredAfterRUSDPerYear": 5997324197.189703,
+    "coveredAfterRUSDPerYear": 8613362689.462128,
     "shareBefore": 0.39497202658294117,
-    "shareAfter": 0.34004125502484883,
+    "shareAfter": 0.48836757237191997,
     "jobsAfter": {
-     "clerks": 64549.99999,
-     "capitalists": 1950,
-     "academics": 3150,
-     "peasants": 518500,
-     "laborers": 215850.00000999996
+     "clerks": 171216.66664,
+     "capitalists": 2250,
+     "academics": 4250,
+     "peasants": 518000,
+     "laborers": 487283.33336000005
     }
    },
    "che-home": {
     "gdpRUSDPerYear": 10386244005.558239,
     "coveredBeforeRUSDPerYear": 4188828686.014844,
-    "coveredAfterRUSDPerYear": 3497827070.487812,
+    "coveredAfterRUSDPerYear": 4600828152.797848,
     "shareBefore": 0.40330543782460493,
-    "shareAfter": 0.33677497549796986,
+    "shareAfter": 0.44297323944398925,
     "jobsAfter": {
-     "peasants": 260000,
-     "laborers": 98066.66667199999,
-     "clerks": 37233.333328,
+     "peasants": 257000,
+     "laborers": 205033.333346,
+     "clerks": 65666.666654,
      "capitalists": 1050,
-     "academics": 1650
+     "academics": 2250
     }
    },
    "swe-home": {
     "gdpRUSDPerYear": 5024309066.138305,
     "coveredBeforeRUSDPerYear": 3644065786.3771677,
-    "coveredAfterRUSDPerYear": 3017484914.579663,
+    "coveredAfterRUSDPerYear": 2460031074.63041,
     "shareBefore": 0.7252869475997433,
-    "shareAfter": 0.6005770892790456,
+    "shareAfter": 0.4896257459975876,
     "jobsAfter": {
-     "peasants": 564000,
-     "laborers": 252833.33334799996,
-     "clerks": 92966.66665199999,
-     "capitalists": 2700,
-     "academics": 4500
+     "peasants": 495000,
+     "laborers": 380100.00001599995,
+     "clerks": 111499.999984,
+     "capitalists": 900,
+     "academics": 1500
     }
    },
    "nor-home": {
     "gdpRUSDPerYear": 2089774422.8282478,
     "coveredBeforeRUSDPerYear": 1552571303.0173285,
-    "coveredAfterRUSDPerYear": 1249446447.7567275,
+    "coveredAfterRUSDPerYear": 1007630252.3280691,
     "shareBefore": 0.7429372692369915,
-    "shareAfter": 0.5978857976765541,
+    "shareAfter": 0.48217177955712937,
     "jobsAfter": {
-     "clerks": 40033.333327,
-     "capitalists": 1200,
-     "academics": 2000,
-     "laborers": 105766.666673,
-     "peasants": 241000
+     "laborers": 164916.666674,
+     "peasants": 226000,
+     "clerks": 44083.333326,
+     "capitalists": 300,
+     "academics": 700
     }
    },
    "dnk-home": {
     "gdpRUSDPerYear": 4416050536.013793,
     "coveredBeforeRUSDPerYear": 2312613124.6617856,
-    "coveredAfterRUSDPerYear": 1843295734.7238748,
+    "coveredAfterRUSDPerYear": 1895752745.9789953,
     "shareBefore": 0.5236835733200863,
-    "shareAfter": 0.4174082066523972,
+    "shareAfter": 0.42928692290062015,
     "jobsAfter": {
-     "peasants": 265000,
-     "clerks": 30866.666662000003,
-     "capitalists": 900,
-     "academics": 1700,
-     "laborers": 78533.333338
+     "peasants": 234000,
+     "laborers": 144800.000008,
+     "clerks": 46399.999992,
+     "capitalists": 600,
+     "academics": 1200
     }
    },
    "grc-home": {
     "gdpRUSDPerYear": 982372239.022709,
     "coveredBeforeRUSDPerYear": 1008206198.5478656,
-    "coveredAfterRUSDPerYear": 846276667.6094347,
+    "coveredAfterRUSDPerYear": 382723732.92216486,
     "shareBefore": 1.0262975260282772,
-    "shareAfter": 0.8614623194679586,
+    "shareAfter": 0.38959135622858093,
     "jobsAfter": {
-     "clerks": 58933.333321,
-     "capitalists": 1650,
-     "academics": 2850,
-     "laborers": 106900,
-     "peasants": 642666.666679
+     "clerks": 22899.999991999997,
+     "capitalists": 150,
+     "academics": 150,
+     "laborers": 113800,
+     "peasants": 265000.000008
     }
    },
    "srb-home": {
     "gdpRUSDPerYear": 522071230.2604051,
     "coveredBeforeRUSDPerYear": 144937962.0577855,
-    "coveredAfterRUSDPerYear": 107168967.43742676,
+    "coveredAfterRUSDPerYear": 237673414.9876719,
     "shareBefore": 0.2776210479659865,
-    "shareAfter": 0.20527652401755925,
+    "shareAfter": 0.4552509336113431,
     "jobsAfter": {
-     "laborers": 12000,
-     "peasants": 251333.333338,
-     "clerks": 4666.666662
+     "clerks": 27466.666658000002,
+     "capitalists": 150,
+     "academics": 150,
+     "laborers": 143900,
+     "peasants": 258333.333342
     }
    },
    "mnt-home": {
     "gdpRUSDPerYear": 62648547.631248616,
     "coveredBeforeRUSDPerYear": 19057718.095585257,
-    "coveredAfterRUSDPerYear": 13275894.181277853,
+    "coveredAfterRUSDPerYear": 29097794.044746313,
     "shareBefore": 0.30420047736397027,
-    "shareAfter": 0.2119106457091423,
+    "shareAfter": 0.46446079190880646,
     "jobsAfter": {
-     "peasants": 30333.333334,
-     "laborers": 2000,
-     "clerks": 666.666666
+     "clerks": 4799.999999,
+     "capitalists": 150,
+     "academics": 150,
+     "laborers": 20900,
+     "peasants": 32000.000001
     }
    },
    "rom-home": {
     "gdpRUSDPerYear": 1389707734.2490835,
     "coveredBeforeRUSDPerYear": 364748055.2707949,
-    "coveredAfterRUSDPerYear": 272434279.8073286,
+    "coveredAfterRUSDPerYear": 585066313.1282486,
     "shareBefore": 0.26246385932930233,
-    "shareAfter": 0.19603710412861455,
+    "shareAfter": 0.42099953731953865,
     "jobsAfter": {
-     "laborers": 22000,
-     "peasants": 589333.3333439999,
-     "clerks": 10666.666656
+     "clerks": 55766.666646,
+     "capitalists": 150,
+     "academics": 150,
+     "laborers": 301600,
+     "peasants": 611333.333354
     }
    },
    "bgr-home": {
     "gdpRUSDPerYear": 772665420.7853996,
     "coveredBeforeRUSDPerYear": 214704016.37116104,
-    "coveredAfterRUSDPerYear": 164256551.1945951,
+    "coveredAfterRUSDPerYear": 394485137.5333639,
     "shareBefore": 0.27787449858040564,
-    "shareAfter": 0.21258431757905183,
+    "shareAfter": 0.5105510443736143,
     "jobsAfter": {
-     "laborers": 14000,
-     "peasants": 387000.000007,
-     "clerks": 6999.999992999999
+     "laborers": 234200,
+     "clerks": 40799.999987,
+     "peasants": 402000.000013
     }
    },
    "ott-home": {
     "gdpRUSDPerYear": 5933654933.071101,
     "coveredBeforeRUSDPerYear": 5578838430.647863,
-    "coveredAfterRUSDPerYear": 4453205678.813506,
+    "coveredAfterRUSDPerYear": 3935218822.0222855,
     "shareBefore": 0.9402027070287361,
-    "shareAfter": 0.7504996042142016,
+    "shareAfter": 0.663203180233725,
     "jobsAfter": {
-     "peasants": 4033000.0000680005,
-     "laborers": 809700,
-     "clerks": 352699.99993200006,
-     "academics": 17250,
-     "capitalists": 10350
+     "peasants": 4050000.000136001,
+     "laborers": 1297500,
+     "clerks": 313299.99986399995,
+     "academics": 2550,
+     "capitalists": 1650
     }
    },
    "lux-home": {
     "gdpRUSDPerYear": 631774881.1558859,
     "coveredBeforeRUSDPerYear": 250601213.0561671,
-    "coveredAfterRUSDPerYear": 180861644.48635584,
+    "coveredAfterRUSDPerYear": 241489742.76039135,
     "shareBefore": 0.39666219808813996,
-    "shareAfter": 0.2862754596312124,
+    "shareAfter": 0.3822401775749066,
     "jobsAfter": {
-     "peasants": 26000,
-     "clerks": 3133.333333,
+     "peasants": 18000,
+     "laborers": 15633.333333999999,
+     "clerks": 6066.666666,
      "capitalists": 150,
-     "academics": 150,
-     "laborers": 7566.6666669999995
+     "academics": 150
     }
    },
    "mco-home": {
     "gdpRUSDPerYear": 25458140.329224728,
     "coveredBeforeRUSDPerYear": 113377561.92360261,
-    "coveredAfterRUSDPerYear": 59744318.46711448,
+    "coveredAfterRUSDPerYear": 60651028.02168006,
     "shareBefore": 4.453489550195094,
-    "shareAfter": 2.3467667981439657,
+    "shareAfter": 2.3823825007381068,
     "jobsAfter": {
      "laborers": 3666.666667,
      "peasants": 3000,
@@ -3860,35 +5260,37 @@
    "smr-home": {
     "gdpRUSDPerYear": 10530337.513393566,
     "coveredBeforeRUSDPerYear": 3015387,
-    "coveredAfterRUSDPerYear": 2697342.839548014,
+    "coveredAfterRUSDPerYear": 2172604.0977961253,
     "shareBefore": 0.2863523601370536,
-    "shareAfter": 0.25614970423476513,
+    "shareAfter": 0.20631856244235136,
     "jobsAfter": {
-     "clerks": 2500,
+     "clerks": 2000,
      "capitalists": 150,
      "academics": 150,
      "peasants": 2000,
-     "laborers": 2200
+     "laborers": 2700
     }
    },
    "and-home": {
     "gdpRUSDPerYear": 3416521.5933886287,
     "coveredBeforeRUSDPerYear": 10438549.071359674,
-    "coveredAfterRUSDPerYear": 4380926.920247196,
+    "coveredAfterRUSDPerYear": 2745824.751141105,
     "shareBefore": 3.055314824164874,
-    "shareAfter": 1.2822769593275234,
+    "shareAfter": 0.8036901497870228,
     "jobsAfter": {
+     "clerks": 2933.333333,
+     "capitalists": 150,
+     "academics": 150,
      "peasants": 4666.6666669999995,
-     "laborers": 2000,
-     "clerks": 333.333333
+     "laborers": 5100
     }
    },
    "lie-home": {
     "gdpRUSDPerYear": 12775924.757990934,
     "coveredBeforeRUSDPerYear": 28560966.215906512,
-    "coveredAfterRUSDPerYear": 13518677.91245924,
+    "coveredAfterRUSDPerYear": 13584586.109183677,
     "shareBefore": 2.2355302459058817,
-    "shareAfter": 1.0581369386982133,
+    "shareAfter": 1.0632957196062813,
     "jobsAfter": {
      "laborers": 3666.666667,
      "peasants": 3000,
@@ -3898,521 +5300,524 @@
    "chn-home": {
     "gdpRUSDPerYear": 49670204978.43222,
     "coveredBeforeRUSDPerYear": 39660092438.461945,
-    "coveredAfterRUSDPerYear": 32888561805.345318,
+    "coveredAfterRUSDPerYear": 36207438534.827415,
     "shareBefore": 0.798468467276975,
-    "shareAfter": 0.6621386366258439,
+    "shareAfter": 0.7289568978132746,
     "jobsAfter": {
-     "peasants": 67345000.001058,
-     "laborers": 9468600,
-     "clerks": 4014599.998942,
-     "academics": 180500,
-     "capitalists": 108300
+     "peasants": 67344000.002076,
+     "laborers": 21545700,
+     "clerks": 4320999.997924,
+     "academics": 24850,
+     "capitalists": 15450
     }
    },
    "kor-home": {
     "gdpRUSDPerYear": 2546141189.5457106,
     "coveredBeforeRUSDPerYear": 870043907.1793314,
-    "coveredAfterRUSDPerYear": 645603708.9574866,
+    "coveredAfterRUSDPerYear": 1164917821.978536,
     "shareBefore": 0.3417107860128397,
-    "shareAfter": 0.2535616294996889,
+    "shareAfter": 0.45752286902297973,
     "jobsAfter": {
-     "peasants": 1977333.3333689999,
-     "laborers": 85000,
-     "clerks": 35666.666631
+     "peasants": 2011333.333401,
+     "laborers": 729500,
+     "clerks": 170166.666599
     }
    },
    "per-home": {
     "gdpRUSDPerYear": 2447632659.8918295,
     "coveredBeforeRUSDPerYear": 1951744191.9543874,
-    "coveredAfterRUSDPerYear": 1620553862.7520823,
+    "coveredAfterRUSDPerYear": 1306159872.9205809,
     "shareBefore": 0.7974007799195827,
-    "shareAfter": 0.6620903084467344,
+    "shareAfter": 0.5336421164515369,
     "jobsAfter": {
-     "clerks": 143766.666641,
-     "capitalists": 4350,
-     "academics": 7150,
-     "laborers": 313400,
-     "peasants": 1662333.333359
+     "clerks": 128799.99995799999,
+     "capitalists": 750,
+     "academics": 1350,
+     "laborers": 537100,
+     "peasants": 1341000.0000420003
     }
    },
    "afg-home": {
     "gdpRUSDPerYear": 542410775.997293,
     "coveredBeforeRUSDPerYear": 227271632.45202777,
-    "coveredAfterRUSDPerYear": 168916853.72583738,
+    "coveredAfterRUSDPerYear": 396494352.6153202,
     "shareBefore": 0.41900279734332196,
-    "shareAfter": 0.3114186907796249,
+    "shareAfter": 0.7309853899681724,
     "jobsAfter": {
-     "laborers": 25000,
-     "peasants": 612000.0000110001,
-     "clerks": 10999.999989
+     "laborers": 347400,
+     "peasants": 625000.0000209999,
+     "clerks": 57599.999979
     }
    },
    "npl-home": {
     "gdpRUSDPerYear": 602678639.9969921,
     "coveredBeforeRUSDPerYear": 252292319.19247735,
-    "coveredAfterRUSDPerYear": 187314257.80691057,
+    "coveredAfterRUSDPerYear": 420049326.6874261,
     "shareBefore": 0.4186183190327378,
-    "shareAfter": 0.31080288129648237,
+    "shareAfter": 0.6969706553554353,
     "jobsAfter": {
-     "laborers": 30000,
-     "peasants": 677000.000012,
-     "clerks": 11999.999988
+     "laborers": 360600,
+     "peasants": 690000.000023,
+     "clerks": 57399.999977
     }
    },
    "tha-home": {
     "gdpRUSDPerYear": 947013297.8044711,
     "coveredBeforeRUSDPerYear": 367883699.999481,
-    "coveredAfterRUSDPerYear": 275576952.6455392,
+    "coveredAfterRUSDPerYear": 612706888.6066471,
     "shareBefore": 0.3884673012009147,
-    "shareAfter": 0.29099586382200654,
+    "shareAfter": 0.646988685404027,
     "jobsAfter": {
-     "laborers": 40800,
-     "peasants": 941533.33335,
-     "clerks": 16666.66665
+     "laborers": 483700,
+     "peasants": 948333.333365,
+     "clerks": 92966.666635
     }
    },
    "omn-home": {
     "gdpRUSDPerYear": 123617811.10564795,
     "coveredBeforeRUSDPerYear": 57749444.395031296,
-    "coveredAfterRUSDPerYear": 44233867.10194574,
+    "coveredAfterRUSDPerYear": 52272989.14351305,
     "shareBefore": 0.4671611952882475,
-    "shareAfter": 0.35782761971203314,
+    "shareAfter": 0.4228596888747593,
     "jobsAfter": {
-     "clerks": 4433.333332,
+     "clerks": 6866.666665,
      "capitalists": 150,
      "academics": 150,
-     "laborers": 6600,
-     "peasants": 80666.666668
+     "laborers": 30500,
+     "peasants": 51333.333335
     }
    },
    "eth-home": {
     "gdpRUSDPerYear": 1620486858.243959,
     "coveredBeforeRUSDPerYear": 1095701480.7197976,
-    "coveredAfterRUSDPerYear": 878287194.4722383,
+    "coveredAfterRUSDPerYear": 1138312116.0954957,
     "shareBefore": 0.6761557337818555,
-    "shareAfter": 0.5419897051334279,
+    "shareAfter": 0.7024506927066524,
     "jobsAfter": {
-     "peasants": 1850000.0000300002,
-     "clerks": 103399.99996999998,
-     "capitalists": 2850,
-     "academics": 4450,
-     "laborers": 226300
+     "peasants": 1616000.000052,
+     "clerks": 111999.99994800001,
+     "laborers": 590350,
+     "academics": 1050,
+     "capitalists": 600
     }
    },
    "lbr-home": {
     "gdpRUSDPerYear": 138017708.88184854,
     "coveredBeforeRUSDPerYear": 38787807.31166393,
-    "coveredAfterRUSDPerYear": 26873514.268846128,
+    "coveredAfterRUSDPerYear": 62484100.418238945,
     "shareBefore": 0.2810350035941303,
-    "shareAfter": 0.19471062435800518,
+    "shareAfter": 0.45272524029310685,
     "jobsAfter": {
-     "peasants": 58000.000001,
-     "laborers": 2000,
-     "clerks": 999.9999989999999
+     "clerks": 7433.333331,
+     "capitalists": 150,
+     "academics": 150,
+     "laborers": 36600,
+     "peasants": 60666.666669
     }
    },
    "mar-home": {
     "gdpRUSDPerYear": 1236178111.0564795,
     "coveredBeforeRUSDPerYear": 565069291.1798115,
-    "coveredAfterRUSDPerYear": 446965763.7627524,
+    "coveredAfterRUSDPerYear": 565748160.5808971,
     "shareBefore": 0.4571099311060315,
-    "shareAfter": 0.3615706828692836,
+    "shareAfter": 0.4576590990576509,
     "jobsAfter": {
-     "peasants": 770000.000013,
-     "laborers": 69600,
-     "clerks": 34299.999987,
-     "capitalists": 750,
-     "academics": 1350
+     "peasants": 499333.33335,
+     "laborers": 285800,
+     "clerks": 58566.66665,
+     "capitalists": 150,
+     "academics": 150
     }
    },
    "zar-home": {
     "gdpRUSDPerYear": 307595404.4360479,
     "coveredBeforeRUSDPerYear": 242845041.04183835,
-    "coveredAfterRUSDPerYear": 213125195.74897835,
+    "coveredAfterRUSDPerYear": 194582486.96010417,
     "shareBefore": 0.789495023461341,
-    "shareAfter": 0.6928750972067568,
+    "shareAfter": 0.6325923084477023,
     "jobsAfter": {
-     "clerks": 17833.33333,
-     "capitalists": 600,
-     "academics": 1000,
-     "laborers": 60900,
-     "peasants": 202666.66667
+     "clerks": 13999.999995,
+     "capitalists": 150,
+     "academics": 150,
+     "laborers": 69700,
+     "peasants": 151000.00000499998
     }
    },
    "orf-home": {
     "gdpRUSDPerYear": 76898851.10901198,
     "coveredBeforeRUSDPerYear": 36056572.63290104,
-    "coveredAfterRUSDPerYear": 25470264.523660265,
+    "coveredAfterRUSDPerYear": 35407252.85793693,
     "shareBefore": 0.46888311220394135,
-    "shareAfter": 0.33121775106306284,
+    "shareAfter": 0.46043929587118976,
     "jobsAfter": {
-     "clerks": 3166.666666,
+     "clerks": 4899.999999,
      "capitalists": 150,
      "academics": 150,
-     "peasants": 41333.333334,
-     "laborers": 4200
+     "laborers": 19800,
+     "peasants": 29000.000001
     }
    },
    "mex-home": {
     "gdpRUSDPerYear": 4871614199.381895,
     "coveredBeforeRUSDPerYear": 1787630722.1443653,
-    "coveredAfterRUSDPerYear": 1645683237.67597,
+    "coveredAfterRUSDPerYear": 2079869857.3291118,
     "shareBefore": 0.36694833559914863,
-    "shareAfter": 0.3378106661001137,
+    "shareAfter": 0.4269364880316268,
     "jobsAfter": {
-     "laborers": 252100,
-     "peasants": 1971133.333363,
-     "clerks": 80866.666637,
-     "capitalists": 1950,
-     "academics": 2950
+     "laborers": 681900,
+     "peasants": 1476866.666709,
+     "clerks": 145433.333291,
+     "capitalists": 300,
+     "academics": 500
     }
    },
    "gua-home": {
     "gdpRUSDPerYear": 210567372.11758253,
     "coveredBeforeRUSDPerYear": 72700973.1172093,
-    "coveredAfterRUSDPerYear": 128024431.85060215,
+    "coveredAfterRUSDPerYear": 153556363.9640991,
     "shareBefore": 0.3452622900978813,
-    "shareAfter": 0.6079974811060104,
+    "shareAfter": 0.7292505121750391,
     "jobsAfter": {
-     "laborers": 11200,
-     "peasants": 371800.000003,
-     "clerks": 2999.999997
+     "laborers": 75100,
+     "clerks": 16766.666661,
+     "peasants": 308133.333339
     }
    },
    "hon-home": {
     "gdpRUSDPerYear": 75202632.89913662,
     "coveredBeforeRUSDPerYear": 27280714.18274793,
-    "coveredAfterRUSDPerYear": 19073265.671524193,
+    "coveredAfterRUSDPerYear": 44841656.99056465,
     "shareBefore": 0.3627627535240343,
-    "shareAfter": 0.2536249721084322,
+    "shareAfter": 0.5962777533428549,
     "jobsAfter": {
-     "peasants": 58000.000001,
-     "laborers": 2000,
-     "clerks": 999.9999989999999
+     "laborers": 35700,
+     "clerks": 6299.999997999999,
+     "peasants": 60000.000002
     }
    },
    "sal-home": {
     "gdpRUSDPerYear": 135364739.2184459,
     "coveredBeforeRUSDPerYear": 47560304.649635926,
-    "coveredAfterRUSDPerYear": 85098177.13370867,
+    "coveredAfterRUSDPerYear": 104095696.79168737,
     "shareBefore": 0.35134928729767,
-    "shareAfter": 0.6286583760663168,
+    "shareAfter": 0.7690015685968421,
     "jobsAfter": {
-     "laborers": 8200,
-     "peasants": 241133.333335,
-     "clerks": 1666.666665
+     "laborers": 54600,
+     "peasants": 202866.66667,
+     "clerks": 11533.33333
     }
    },
    "nic-home": {
     "gdpRUSDPerYear": 60162106.319309294,
     "coveredBeforeRUSDPerYear": 22160365.94964662,
-    "coveredAfterRUSDPerYear": 32820582.623019196,
+    "coveredAfterRUSDPerYear": 43041341.023466356,
     "shareBefore": 0.36834425031648454,
-    "shareAfter": 0.5455357970484701,
+    "shareAfter": 0.7154227745123353,
     "jobsAfter": {
-     "peasants": 104533.333334,
-     "laborers": 3800,
-     "clerks": 666.666666
+     "laborers": 23100,
+     "peasants": 80733.333335,
+     "clerks": 5166.666665
     }
    },
    "cos-home": {
     "gdpRUSDPerYear": 45121579.73948197,
     "coveredBeforeRUSDPerYear": 16979112.199303932,
-    "coveredAfterRUSDPerYear": 46993370.921319045,
+    "coveredAfterRUSDPerYear": 51677184.59573163,
     "shareBefore": 0.3762969359081856,
-    "shareAfter": 1.041483281229164,
+    "shareAfter": 1.1452875740188995,
     "jobsAfter": {
-     "peasants": 80133.333334,
-     "laborers": 4200,
-     "clerks": 666.666666
+     "laborers": 29500,
+     "peasants": 80800.000001,
+     "clerks": 4699.999999
     }
    },
    "col-home": {
     "gdpRUSDPerYear": 601621063.193093,
     "coveredBeforeRUSDPerYear": 204885358.11784127,
-    "coveredAfterRUSDPerYear": 219923716.43900138,
+    "coveredAfterRUSDPerYear": 426820559.9939708,
     "shareBefore": 0.3405554935700155,
-    "shareAfter": 0.36555188954282986,
+    "shareAfter": 0.7094508256220757,
     "jobsAfter": {
-     "laborers": 38000,
-     "peasants": 677666.666675,
-     "clerks": 8333.333325
+     "laborers": 282500,
+     "peasants": 595000.000016,
+     "clerks": 67499.999984
     }
    },
    "ven-home": {
     "gdpRUSDPerYear": 878876185.130091,
     "coveredBeforeRUSDPerYear": 317288489.6956764,
-    "coveredAfterRUSDPerYear": 419627949.7985383,
+    "coveredAfterRUSDPerYear": 432587746.6230379,
     "shareBefore": 0.361016142050443,
-    "shareAfter": 0.47745968874606054,
+    "shareAfter": 0.4922055619916546,
     "jobsAfter": {
-     "peasants": 579600.000005,
-     "laborers": 30900,
-     "clerks": 13699.999995,
-     "capitalists": 300,
-     "academics": 500
+     "peasants": 368266.666674,
+     "laborers": 116900,
+     "clerks": 29533.333326,
+     "capitalists": 150,
+     "academics": 150
     }
    },
    "ecu-home": {
     "gdpRUSDPerYear": 213509824.41368076,
     "coveredBeforeRUSDPerYear": 73386528.2895744,
-    "coveredAfterRUSDPerYear": 93356508.30523987,
+    "coveredAfterRUSDPerYear": 164028179.57829684,
     "shareBefore": 0.3437149952752812,
-    "shareAfter": 0.4372468974746532,
+    "shareAfter": 0.7682465199375933,
     "jobsAfter": {
-     "peasants": 298000.000003,
-     "laborers": 8000,
-     "clerks": 2999.999997
+     "laborers": 108200,
+     "clerks": 23166.666661,
+     "peasants": 248333.333339,
+     "capitalists": 150,
+     "academics": 150
     }
    },
    "pru-home": {
     "gdpRUSDPerYear": 552198207.4566293,
     "coveredBeforeRUSDPerYear": 188085351.64274496,
-    "coveredAfterRUSDPerYear": 207419472.56197497,
+    "coveredAfterRUSDPerYear": 465596552.0021387,
     "shareBefore": 0.34061202862111345,
-    "shareAfter": 0.3756250378235176,
+    "shareAfter": 0.8431692564643241,
     "jobsAfter": {
-     "laborers": 66000,
-     "clerks": 7866.6666589999995,
-     "peasants": 577133.333341
+     "laborers": 319900,
+     "clerks": 65233.333319,
+     "peasants": 571866.666681
     }
    },
    "bol-home": {
     "gdpRUSDPerYear": 444853095.9028543,
     "coveredBeforeRUSDPerYear": 206080816.64564097,
-    "coveredAfterRUSDPerYear": 192344511.98458564,
+    "coveredAfterRUSDPerYear": 272651559.1984922,
     "shareBefore": 0.4632558895142415,
-    "shareAfter": 0.43237759556154526,
+    "shareAfter": 0.6129024653523667,
     "jobsAfter": {
-     "peasants": 313333.333338,
-     "laborers": 51000,
-     "clerks": 13066.666662,
-     "capitalists": 300,
-     "academics": 300
+     "laborers": 118950,
+     "peasants": 272000.000006,
+     "clerks": 21749.999993999998,
+     "capitalists": 150,
+     "academics": 150
     }
    },
    "chl-home": {
     "gdpRUSDPerYear": 3055212405.9477954,
     "coveredBeforeRUSDPerYear": 2167478295.265876,
-    "coveredAfterRUSDPerYear": 1920555294.9297643,
+    "coveredAfterRUSDPerYear": 1571968360.7282698,
     "shareBefore": 0.7094362051706435,
-    "shareAfter": 0.6286159650277948,
+    "shareAfter": 0.5145201550203218,
     "jobsAfter": {
-     "laborers": 190350.000008,
-     "peasants": 329000,
-     "clerks": 53049.999992,
-     "capitalists": 1800,
-     "academics": 2800
+     "laborers": 239266.666676,
+     "peasants": 331000,
+     "clerks": 45133.33332400001,
+     "capitalists": 600,
+     "academics": 1000
     }
    },
    "arg-home": {
     "gdpRUSDPerYear": 7973950163.32417,
     "coveredBeforeRUSDPerYear": 4457050545.445042,
-    "coveredAfterRUSDPerYear": 3645207073.636351,
+    "coveredAfterRUSDPerYear": 3586875921.283053,
     "shareBefore": 0.5589513922403287,
-    "shareAfter": 0.45713943515753575,
+    "shareAfter": 0.44982422109693254,
     "jobsAfter": {
-     "laborers": 164900.00001000002,
-     "clerks": 63999.999990000004,
-     "capitalists": 1950,
-     "academics": 3150,
-     "peasants": 520000
+     "laborers": 312100.000016,
+     "clerks": 93199.999984,
+     "capitalists": 1050,
+     "academics": 2050,
+     "peasants": 475600
     }
    },
    "ury-home": {
     "gdpRUSDPerYear": 917020173.6708437,
     "coveredBeforeRUSDPerYear": 658100946.5449287,
-    "coveredAfterRUSDPerYear": 519015791.610579,
+    "coveredAfterRUSDPerYear": 370621769.2817681,
     "shareBefore": 0.7176515473051612,
-    "shareAfter": 0.5659807782995133,
+    "shareAfter": 0.4041587959817332,
     "jobsAfter": {
-     "clerks": 16033.333331,
-     "capitalists": 600,
-     "academics": 1000,
-     "laborers": 43366.666669,
-     "peasants": 101000
+     "laborers": 50100.000003,
+     "clerks": 17599.999997,
+     "peasants": 77000,
+     "capitalists": 150,
+     "academics": 150
     }
    },
    "pry-home": {
     "gdpRUSDPerYear": 148284365.30095145,
     "coveredBeforeRUSDPerYear": 69627660.73143269,
-    "coveredAfterRUSDPerYear": 51178496.434635326,
+    "coveredAfterRUSDPerYear": 71727446.19050775,
     "shareBefore": 0.4695549702095662,
-    "shareAfter": 0.34513750880455735,
+    "shareAfter": 0.48371550193395557,
     "jobsAfter": {
-     "peasants": 90333.333335,
-     "clerks": 5366.666665,
+     "clerks": 10399.999998,
      "capitalists": 150,
      "academics": 150,
-     "laborers": 8000
+     "laborers": 42300,
+     "peasants": 54000.000002
     }
    },
    "bra-home": {
     "gdpRUSDPerYear": 1826957330.2962134,
     "coveredBeforeRUSDPerYear": 887798343.870385,
-    "coveredAfterRUSDPerYear": 2045118279.3756404,
+    "coveredAfterRUSDPerYear": 2578700441.411685,
     "shareBefore": 0.4859436666353023,
-    "shareAfter": 1.1194121753484279,
+    "shareAfter": 1.4114727249779764,
     "jobsAfter": {
-     "laborers": 263000,
-     "peasants": 4713066.666714,
-     "clerks": 48933.333286
+     "laborers": 1407200,
+     "peasants": 4677000.00009,
+     "clerks": 340699.99991,
+     "academics": 100
     }
    },
    "hti-home": {
     "gdpRUSDPerYear": 171643187.67195314,
     "coveredBeforeRUSDPerYear": 76592279.0244087,
-    "coveredAfterRUSDPerYear": 137009892.61242855,
+    "coveredAfterRUSDPerYear": 167314553.56567946,
     "shareBefore": 0.44622964688113886,
-    "shareAfter": 0.7982250532091245,
+    "shareAfter": 0.9747812064959629,
     "jobsAfter": {
-     "laborers": 18200,
-     "peasants": 401133.333337,
-     "clerks": 3666.666663
+     "laborers": 99400,
+     "peasants": 386000.000007,
+     "clerks": 18599.999992999998
     }
    },
    "dom-home": {
     "gdpRUSDPerYear": 68657275.06878126,
     "coveredBeforeRUSDPerYear": 31780562.999913726,
-    "coveredAfterRUSDPerYear": 51998849.49444045,
+    "coveredAfterRUSDPerYear": 74544922.70835459,
     "shareBefore": 0.4628870424594593,
-    "shareAfter": 0.757368384375111,
+    "shareAfter": 1.085754170023134,
     "jobsAfter": {
-     "laborers": 13000,
-     "peasants": 158666.666668,
-     "clerks": 1333.333332
+     "laborers": 49100,
+     "peasants": 145933.33333599998,
+     "clerks": 9966.666664
     }
    },
    "can-home": {
     "gdpRUSDPerYear": 8973387951.757423,
     "coveredBeforeRUSDPerYear": 4948297897.794761,
-    "coveredAfterRUSDPerYear": 4206856931.05305,
+    "coveredAfterRUSDPerYear": 4062730263.354567,
     "shareBefore": 0.5514414315304004,
-    "shareAfter": 0.4688147836324344,
+    "shareAfter": 0.4527532170899719,
     "jobsAfter": {
-     "clerks": 70316.666656,
-     "capitalists": 2100,
-     "academics": 3700,
-     "laborers": 225883.333344,
-     "peasants": 570000
+     "clerks": 96933.333316,
+     "capitalists": 1350,
+     "academics": 2750,
+     "laborers": 360966.666684,
+     "peasants": 525000
     }
    },
    "aus-home": {
     "gdpRUSDPerYear": 18989442576.768784,
     "coveredBeforeRUSDPerYear": 7576327007.296172,
-    "coveredAfterRUSDPerYear": 7414845067.307557,
+    "coveredAfterRUSDPerYear": 9056343435.551334,
     "shareBefore": 0.3989757454262962,
-    "shareAfter": 0.3904719707980631,
+    "shareAfter": 0.4769146539683393,
     "jobsAfter": {
-     "clerks": 39099.999994,
+     "clerks": 70549.999987,
      "capitalists": 1200,
-     "academics": 2200,
-     "laborers": 181300.000006,
-     "peasants": 416200
+     "academics": 2400,
+     "laborers": 304050.00001300004,
+     "peasants": 394800
     }
    },
    "nzl-home": {
     "gdpRUSDPerYear": 2673376926.8884463,
     "coveredBeforeRUSDPerYear": 1027935062.5961913,
-    "coveredAfterRUSDPerYear": 804144452.313515,
+    "coveredAfterRUSDPerYear": 1081098177.2726133,
     "shareBefore": 0.38450809246439066,
-    "shareAfter": 0.30079725916145383,
+    "shareAfter": 0.4043942200589378,
     "jobsAfter": {
-     "peasants": 90000,
-     "laborers": 21366.666667999998,
-     "clerks": 8033.333332,
+     "peasants": 67000,
+     "laborers": 46233.333335999996,
+     "clerks": 16966.666664,
      "capitalists": 300,
-     "academics": 300
+     "academics": 500
     }
    },
    "cub-home": {
     "gdpRUSDPerYear": 516899514.6068928,
     "coveredBeforeRUSDPerYear": 202624420.14520484,
-    "coveredAfterRUSDPerYear": 518415099.73098224,
+    "coveredAfterRUSDPerYear": 507980860.6596312,
     "shareBefore": 0.3919996332349097,
-    "shareAfter": 1.0029320691570818,
+    "shareAfter": 0.9827458651145293,
     "jobsAfter": {
-     "peasants": 366733.333337,
-     "clerks": 10666.666663,
-     "capitalists": 300,
-     "academics": 300,
-     "laborers": 67000
+     "laborers": 89400,
+     "peasants": 285600.000005,
+     "clerks": 19999.999995
     }
    },
    "aut-home": {
     "gdpRUSDPerYear": 50848446263.3103,
     "coveredBeforeRUSDPerYear": 36591651613.566635,
-    "coveredAfterRUSDPerYear": 31314725963.521866,
+    "coveredAfterRUSDPerYear": 25001515995.44494,
     "shareBefore": 0.7196218233312931,
-    "shareAfter": 0.6158443033119186,
+    "shareAfter": 0.49168692128720526,
     "jobsAfter": {
-     "laborers": 2619733.333481999,
-     "clerks": 908716.6665180004,
-     "academics": 45750,
-     "capitalists": 27300,
-     "peasants": 5611500
+     "laborers": 3641066.6668620007,
+     "clerks": 842033.3331380001,
+     "academics": 19600,
+     "capitalists": 10800,
+     "peasants": 5596500
     }
    },
    "ton-home": {
     "gdpRUSDPerYear": 2594556.9802862224,
     "coveredBeforeRUSDPerYear": 3713398.307845845,
-    "coveredAfterRUSDPerYear": 1866450.304432099,
+    "coveredAfterRUSDPerYear": 2146911.6308328756,
     "shareBefore": 1.4312263465634876,
-    "shareAfter": 0.7193714836920632,
+    "shareAfter": 0.8274675203302091,
     "jobsAfter": {
-     "clerks": 2833.333333,
+     "clerks": 2933.333333,
      "capitalists": 150,
      "academics": 150,
      "peasants": 4666.6666669999995,
-     "laborers": 4200
+     "laborers": 5100
     }
    },
    "sok-home": {
     "gdpRUSDPerYear": 1473169871.1308718,
     "coveredBeforeRUSDPerYear": 507725763.3126916,
-    "coveredAfterRUSDPerYear": 377276624.48028123,
+    "coveredAfterRUSDPerYear": 847454358.8572044,
     "shareBefore": 0.3446484843753547,
-    "shareAfter": 0.25609852052612686,
+    "shareAfter": 0.5752590895757732,
     "jobsAfter": {
-     "laborers": 48000,
-     "peasants": 1176666.6666879999,
-     "clerks": 21333.333312
+     "laborers": 638800,
+     "peasants": 1181000.0000399998,
+     "clerks": 110199.99996
     }
    },
    "wad-home": {
     "gdpRUSDPerYear": 147316987.11308718,
     "coveredBeforeRUSDPerYear": 52012537.52968399,
-    "coveredAfterRUSDPerYear": 37787170.06983681,
+    "coveredAfterRUSDPerYear": 80812135.75013608,
     "shareBefore": 0.3530654444470604,
-    "shareAfter": 0.2565024632280164,
+    "shareAfter": 0.5485595200782991,
     "jobsAfter": {
-     "laborers": 5000,
-     "peasants": 116666.666669,
-     "clerks": 2333.333331
+     "laborers": 60400,
+     "peasants": 119666.666671,
+     "clerks": 9933.333329000001
     }
    },
    "dar-home": {
     "gdpRUSDPerYear": 88390192.2678523,
     "coveredBeforeRUSDPerYear": 31691878.571050204,
-    "coveredAfterRUSDPerYear": 23087329.59093627,
+    "coveredAfterRUSDPerYear": 44422725.168030284,
     "shareBefore": 0.3585451932835834,
-    "shareAfter": 0.261197865946188,
+    "shareAfter": 0.5025752747930939,
     "jobsAfter": {
-     "peasants": 72666.666668,
-     "laborers": 3000,
-     "clerks": 1333.333332
+     "laborers": 33200,
+     "clerks": 6133.333331,
+     "peasants": 69666.666669
     }
    },
    "shm-home": {
     "gdpRUSDPerYear": 247235622.2112959,
     "coveredBeforeRUSDPerYear": 115764451.25557983,
-    "coveredAfterRUSDPerYear": 86637498.00328974,
+    "coveredAfterRUSDPerYear": 101486378.521466,
     "shareBefore": 0.46823532232197357,
-    "shareAfter": 0.35042481835099965,
+    "shareAfter": 0.4104844504758797,
     "jobsAfter": {
-     "peasants": 152333.333336,
-     "laborers": 12700,
-     "clerks": 7666.666664,
+     "laborers": 53400,
+     "peasants": 96666.66667,
+     "clerks": 12633.33333,
      "capitalists": 150,
      "academics": 150
     }
@@ -4420,210 +5825,219 @@
    "crt-home": {
     "gdpRUSDPerYear": 122796529.87783863,
     "coveredBeforeRUSDPerYear": 130842872.23224793,
-    "coveredAfterRUSDPerYear": 103209515.48078012,
+    "coveredAfterRUSDPerYear": 45958358.78781482,
     "shareBefore": 1.0655258121904099,
-    "shareAfter": 0.8404921180057433,
+    "shareAfter": 0.3742643121392393,
     "jobsAfter": {
-     "clerks": 7066.666665,
+     "clerks": 4499.999999,
      "capitalists": 150,
      "academics": 150,
-     "laborers": 12300,
-     "peasants": 80333.333335
+     "laborers": 16200,
+     "peasants": 32000.000001
     }
    },
    "bin": {
     "gdpRUSDPerYear": 35437504031.823135,
     "coveredBeforeRUSDPerYear": 7550247444.5,
-    "coveredAfterRUSDPerYear": 6955022904.431324,
+    "coveredAfterRUSDPerYear": 18776320961.568764,
     "shareBefore": 0.21305810470511194,
-    "shareAfter": 0.19626164693161413,
+    "shareAfter": 0.5298432120023885,
     "jobsAfter": {
-     "laborers": 678250,
-     "peasants": 27214000,
-     "clerks": 7650,
-     "academics": 1100
+     "laborers": 14034900,
+     "peasants": 39931600,
+     "clerks": 2111500,
+     "academics": 1000
     }
    },
    "cey": {
     "gdpRUSDPerYear": 1712673611.7188663,
     "coveredBeforeRUSDPerYear": 101634636,
-    "coveredAfterRUSDPerYear": 724688487.9976567,
+    "coveredAfterRUSDPerYear": 442909933.85205495,
     "shareBefore": 0.05934267644726415,
-    "shareAfter": 0.4231328625834013,
+    "shareAfter": 0.25860732063685127,
     "jobsAfter": {
-     "clerks": 60700,
-     "capitalists": 2250,
-     "academics": 3650,
-     "laborers": 112400,
-     "peasants": 572000
+     "clerks": 19500,
+     "capitalists": 150,
+     "academics": 150,
+     "laborers": 122200,
+     "peasants": 341000
     }
    },
    "mal": {
     "gdpRUSDPerYear": 306204403.3793237,
     "coveredBeforeRUSDPerYear": 83190618,
-    "coveredAfterRUSDPerYear": 122092702.08551162,
+    "coveredAfterRUSDPerYear": 331164215.30706817,
     "shareBefore": 0.2716832843744056,
-    "shareAfter": 0.39872941322226546,
+    "shareAfter": 1.0815135630065529,
     "jobsAfter": {
-     "laborers": 178000,
-     "peasants": 273000
+     "laborers": 329300,
+     "clerks": 43700,
+     "peasants": 408000
     }
    },
    "hkg": {
     "gdpRUSDPerYear": 148352640.93335843,
     "coveredBeforeRUSDPerYear": 9114168.5,
-    "coveredAfterRUSDPerYear": 38065527.42728072,
+    "coveredAfterRUSDPerYear": 34739749.86164974,
     "shareBefore": 0.06143583587496889,
-    "shareAfter": 0.25658813478339193,
+    "shareAfter": 0.23417008044538418,
     "jobsAfter": {
-     "clerks": 4600,
+     "clerks": 5700,
      "capitalists": 150,
      "academics": 150,
-     "laborers": 9100,
-     "peasants": 16000
+     "laborers": 16000,
+     "peasants": 5000
     }
    },
    "kuw": {
     "gdpRUSDPerYear": 12361781.110564794,
     "coveredBeforeRUSDPerYear": 1397080.5,
-    "coveredAfterRUSDPerYear": 1546762.944573945,
+    "coveredAfterRUSDPerYear": 4002748.297992434,
     "shareBefore": 0.11301611697411532,
-    "shareAfter": 0.12512460225104854,
+    "shareAfter": 0.323800289148588,
     "jobsAfter": {
-     "clerks": 2900,
-     "capitalists": 150,
-     "academics": 150,
-     "laborers": 3800,
-     "peasants": 2000
+     "peasants": 3000,
+     "laborers": 3000,
+     "clerks": 1000
     }
    },
    "tru": {
     "gdpRUSDPerYear": 19778849.77690367,
     "coveredBeforeRUSDPerYear": 2328467.5,
-    "coveredAfterRUSDPerYear": 2566799.7811145936,
+    "coveredAfterRUSDPerYear": 6551961.782578403,
     "shareBefore": 0.1177251218480368,
-    "shareAfter": 0.12977497731500642,
+    "shareAfter": 0.33126101145827586,
     "jobsAfter": {
-     "clerks": 2900,
+     "clerks": 3300,
      "capitalists": 150,
      "academics": 150,
-     "laborers": 3800,
-     "peasants": 4000
+     "laborers": 7400,
+     "peasants": 6000
     }
    },
    "cyp": {
     "gdpRUSDPerYear": 98237223.9022709,
     "coveredBeforeRUSDPerYear": 7035535,
-    "coveredAfterRUSDPerYear": 30324162.04475389,
+    "coveredAfterRUSDPerYear": 18832598.802139632,
     "shareBefore": 0.07161781166576067,
-    "shareAfter": 0.3086830107793071,
+    "shareAfter": 0.19170532364467893,
     "jobsAfter": {
-     "clerks": 4300,
+     "clerks": 3300,
      "capitalists": 150,
      "academics": 150,
-     "laborers": 6400,
-     "peasants": 21000
+     "laborers": 9400,
+     "peasants": 14000
     }
    },
    "mlt": {
     "gdpRUSDPerYear": 191460682.0617012,
     "coveredBeforeRUSDPerYear": 4523060.5,
-    "coveredAfterRUSDPerYear": 20635871.77912758,
+    "coveredAfterRUSDPerYear": 35085198.34758987,
     "shareBefore": 0.02362396525121734,
-    "shareAfter": 0.10778125073469312,
+    "shareAfter": 0.1832501481232743,
     "jobsAfter": {
-     "clerks": 2900,
+     "clerks": 4000,
      "capitalists": 150,
      "academics": 150,
-     "laborers": 4800,
-     "peasants": 4000
+     "laborers": 8700,
+     "peasants": 3000
     }
    },
    "bwi": {
     "gdpRUSDPerYear": 228857583.5626042,
     "coveredBeforeRUSDPerYear": 52267005.5,
-    "coveredAfterRUSDPerYear": 248200823.5377969,
+    "coveredAfterRUSDPerYear": 324078875.20463175,
     "shareBefore": 0.2283822309331616,
-    "shareAfter": 1.0845208608518815,
+    "shareAfter": 1.416072258387626,
     "jobsAfter": {
-     "laborers": 77800,
-     "peasants": 505200
+     "laborers": 169800,
+     "peasants": 371400,
+     "clerks": 22800
     }
    },
    "bsa": {
     "gdpRUSDPerYear": 1945917.7352146667,
     "coveredBeforeRUSDPerYear": 586507,
-    "coveredAfterRUSDPerYear": 406951.908918926,
+    "coveredAfterRUSDPerYear": 1052731.5092644526,
     "shareBefore": 0.3014038000611052,
-    "shareAfter": 0.20913109611698594,
+    "shareAfter": 0.5409948684949516,
     "jobsAfter": {
-     "peasants": 2000
+     "peasants": 2000,
+     "laborers": 2100,
+     "clerks": 900
     }
    },
    "bwa": {
     "gdpRUSDPerYear": 2946339742.2617435,
     "coveredBeforeRUSDPerYear": 513708335,
-    "coveredAfterRUSDPerYear": 415695183.9966699,
+    "coveredAfterRUSDPerYear": 1685671607.383133,
     "shareBefore": 0.17435475197631292,
-    "shareAfter": 0.14108867963664076,
+    "shareAfter": 0.5721239757941612,
     "jobsAfter": {
-     "laborers": 26000,
-     "peasants": 1423000
+     "laborers": 1447600,
+     "peasants": 2139000,
+     "clerks": 175300,
+     "academics": 100
     }
    },
    "bea": {
     "gdpRUSDPerYear": 589267948.4523487,
     "coveredBeforeRUSDPerYear": 103379814,
-    "coveredAfterRUSDPerYear": 81114643.61666676,
+    "coveredAfterRUSDPerYear": 295438800.269305,
     "shareBefore": 0.17543770074635212,
-    "shareAfter": 0.1376532421790562,
+    "shareAfter": 0.501365806582972,
     "jobsAfter": {
-     "peasants": 278000,
-     "laborers": 4000
+     "peasants": 409000,
+     "laborers": 251300,
+     "clerks": 25700
     }
    },
    "sud": {
     "gdpRUSDPerYear": 294633974.22617435,
     "coveredBeforeRUSDPerYear": 52328054,
-    "coveredAfterRUSDPerYear": 50240945.1560774,
+    "coveredAfterRUSDPerYear": 177157843.15133086,
     "shareBefore": 0.17760359828643055,
-    "shareAfter": 0.17051986380060224,
+    "shareAfter": 0.6012811102881723,
     "jobsAfter": {
-     "peasants": 171000,
-     "laborers": 2000
+     "peasants": 256000,
+     "laborers": 143000,
+     "clerks": 16000
     }
    },
    "bso": {
     "gdpRUSDPerYear": 29463397.422617435,
     "coveredBeforeRUSDPerYear": 6062396.5,
-    "coveredAfterRUSDPerYear": 3987780.069342088,
+    "coveredAfterRUSDPerYear": 18142705.473703623,
     "shareBefore": 0.20576026630745,
-    "shareAfter": 0.13534691916692837,
+    "shareAfter": 0.6157709925121012,
     "jobsAfter": {
-     "peasants": 14000
+     "laborers": 17700,
+     "peasants": 21000,
+     "clerks": 2300
     }
    },
    "cra": {
     "gdpRUSDPerYear": 441950961.33926153,
     "coveredBeforeRUSDPerYear": 76896713.5,
-    "coveredAfterRUSDPerYear": 64433104.70373143,
+    "coveredAfterRUSDPerYear": 269709172.13852227,
     "shareBefore": 0.1739937690529665,
-    "shareAfter": 0.1457924302471868,
+    "shareAfter": 0.6102694546046735,
     "jobsAfter": {
-     "peasants": 209000,
-     "laborers": 12000
+     "peasants": 311000,
+     "laborers": 240700,
+     "clerks": 27300
     }
    },
    "hct": {
     "gdpRUSDPerYear": 256329503.6967066,
     "coveredBeforeRUSDPerYear": 27306049.5,
-    "coveredAfterRUSDPerYear": 39186568.81299357,
+    "coveredAfterRUSDPerYear": 82004287.95951946,
     "shareBefore": 0.10652714223762934,
-    "shareAfter": 0.15287576438863543,
+    "shareAfter": 0.3199174764390303,
     "jobsAfter": {
-     "peasants": 60000,
-     "laborers": 11400,
-     "clerks": 6300,
+     "laborers": 55000,
+     "clerks": 7700,
+     "peasants": 67000,
      "capitalists": 150,
      "academics": 150
     }
@@ -4631,536 +6045,597 @@
    "fji": {
     "gdpRUSDPerYear": 15567341.881717334,
     "coveredBeforeRUSDPerYear": 3519042,
-    "coveredAfterRUSDPerYear": 19430618.788892563,
+    "coveredAfterRUSDPerYear": 23154586.56425248,
     "shareBefore": 0.22605285004582887,
-    "shareAfter": 1.2481654823623007,
+    "shareAfter": 1.4873821581220485,
     "jobsAfter": {
-     "laborers": 5400,
-     "peasants": 22600
+     "laborers": 11100,
+     "clerks": 1500,
+     "peasants": 18400
     }
    },
    "bpo": {
     "gdpRUSDPerYear": 38918354.70429333,
     "coveredBeforeRUSDPerYear": 8797605,
-    "coveredAfterRUSDPerYear": 104870969.38726743,
+    "coveredAfterRUSDPerYear": 112593793.02339208,
     "shareBefore": 0.2260528500458289,
-    "shareAfter": 2.694640361446175,
+    "shareAfter": 2.8930769010893242,
     "jobsAfter": {
-     "laborers": 15000,
-     "peasants": 46000
+     "laborers": 35900,
+     "clerks": 2900,
+     "peasants": 38200
     }
    },
    "cap": {
     "gdpRUSDPerYear": 615190808.8720958,
     "coveredBeforeRUSDPerYear": 61797621.5,
-    "coveredAfterRUSDPerYear": 135966537.90049928,
+    "coveredAfterRUSDPerYear": 242257807.37488377,
     "shareBefore": 0.1004527710895114,
-    "shareAfter": 0.22101522964847814,
+    "shareAfter": 0.39379295639842943,
     "jobsAfter": {
-     "peasants": 153000,
-     "laborers": 52400,
-     "clerks": 18000,
-     "capitalists": 600,
-     "academics": 1000
+     "laborers": 176800,
+     "clerks": 23900,
+     "peasants": 139000,
+     "capitalists": 150,
+     "academics": 150
     }
    },
    "nat": {
     "gdpRUSDPerYear": 281962454.0663772,
     "coveredBeforeRUSDPerYear": 29222263.499999993,
-    "coveredAfterRUSDPerYear": 43329807.38851482,
+    "coveredAfterRUSDPerYear": 106915900.2708439,
     "shareBefore": 0.10363884651507797,
-    "shareAfter": 0.15367225942186785,
+    "shareAfter": 0.3791848834088905,
     "jobsAfter": {
-     "clerks": 5400,
+     "clerks": 11200,
      "capitalists": 150,
      "academics": 150,
-     "laborers": 8300,
-     "peasants": 66000
+     "laborers": 66500,
+     "peasants": 74000
     }
    },
    "nfd": {
     "gdpRUSDPerYear": 381109140.80823034,
     "coveredBeforeRUSDPerYear": 7934920.5,
-    "coveredAfterRUSDPerYear": 32495350.355163086,
+    "coveredAfterRUSDPerYear": 54170959.983460486,
     "shareBefore": 0.02082059874809657,
-    "shareAfter": 0.08526520850759223,
+    "shareAfter": 0.1421402799958521,
     "jobsAfter": {
-     "clerks": 2900,
+     "clerks": 3600,
      "capitalists": 150,
      "academics": 150,
-     "laborers": 3800,
+     "laborers": 5100,
      "peasants": 6000
     }
    },
    "alg": {
     "gdpRUSDPerYear": 1162007424.3930907,
     "coveredBeforeRUSDPerYear": 182551852,
-    "coveredAfterRUSDPerYear": 119578544.9880718,
+    "coveredAfterRUSDPerYear": 527155223.5761844,
     "shareBefore": 0.15710041792146526,
-    "shareAfter": 0.10290686830209105,
+    "shareAfter": 0.45365908384923986,
     "jobsAfter": {
-     "peasants": 268000,
-     "laborers": 4000
+     "laborers": 318800,
+     "clerks": 48200,
+     "peasants": 350000
     }
    },
    "tun": {
     "gdpRUSDPerYear": 469747682.2014622,
     "coveredBeforeRUSDPerYear": 74976653.5,
-    "coveredAfterRUSDPerYear": 44617395.16423094,
+    "coveredAfterRUSDPerYear": 224972501.24784717,
     "shareBefore": 0.15961048098975936,
-    "shareAfter": 0.09498161854707297,
+    "shareAfter": 0.4789220038160028,
     "jobsAfter": {
-     "laborers": 1000,
-     "peasants": 98000
+     "laborers": 137700,
+     "peasants": 132000,
+     "clerks": 24300
     }
    },
    "fwa": {
     "gdpRUSDPerYear": 1473169871.1308718,
     "coveredBeforeRUSDPerYear": 387036155.5,
-    "coveredAfterRUSDPerYear": 243044198.29745924,
+    "coveredAfterRUSDPerYear": 1063672635.8867921,
     "shareBefore": 0.2627233716115125,
-    "shareAfter": 0.16498042965736703,
+    "shareAfter": 0.7220298600529136,
     "jobsAfter": {
-     "laborers": 18000,
-     "peasants": 793000
+     "laborers": 941550,
+     "clerks": 108400,
+     "academics": 50,
+     "peasants": 1076000
     }
    },
    "fea": {
     "gdpRUSDPerYear": 441950961.33926153,
     "coveredBeforeRUSDPerYear": 115823680.5,
-    "coveredAfterRUSDPerYear": 71475231.97460617,
+    "coveredAfterRUSDPerYear": 325259319.71912503,
     "shareBefore": 0.26207360234948895,
-    "shareAfter": 0.16172661274004685,
+    "shareAfter": 0.7359624668164061,
     "jobsAfter": {
-     "peasants": 236000,
-     "laborers": 4000
+     "laborers": 287200,
+     "peasants": 313000,
+     "clerks": 35800
     }
    },
    "fic": {
     "gdpRUSDPerYear": 1945917735.2146668,
     "coveredBeforeRUSDPerYear": 580348676.4999999,
-    "coveredAfterRUSDPerYear": 356284978.9739639,
+    "coveredAfterRUSDPerYear": 1379246875.5301979,
     "shareBefore": 0.2982390601604635,
-    "shareAfter": 0.1830935463130767,
+    "shareAfter": 0.7087899198256931,
     "jobsAfter": {
-     "laborers": 31000,
-     "peasants": 1287000
+     "laborers": 1218000,
+     "clerks": 167900,
+     "academics": 100,
+     "peasants": 1727000
     }
    },
    "mad": {
     "gdpRUSDPerYear": 515609454.8958051,
     "coveredBeforeRUSDPerYear": 133372723.00000001,
-    "coveredAfterRUSDPerYear": 109313478.60578802,
+    "coveredAfterRUSDPerYear": 427206894.24316645,
     "shareBefore": 0.2586700490722229,
-    "shareAfter": 0.21200828954519113,
+    "shareAfter": 0.8285474406777449,
     "jobsAfter": {
-     "laborers": 22200,
-     "peasants": 327800
+     "laborers": 371400,
+     "clerks": 44400,
+     "peasants": 378200
     }
    },
    "fso": {
     "gdpRUSDPerYear": 7365849.355654359,
     "coveredBeforeRUSDPerYear": 2233514.5,
-    "coveredAfterRUSDPerYear": 1127567.5472892686,
+    "coveredAfterRUSDPerYear": 5404958.721902259,
     "shareBefore": 0.303225655610979,
-    "shareAfter": 0.15308045180474628,
+    "shareAfter": 0.7337862154013737,
     "jobsAfter": {
-     "peasants": 4000
+     "peasants": 5000,
+     "laborers": 5700,
+     "clerks": 1300
     }
    },
    "fca": {
     "gdpRUSDPerYear": 45771516.71252084,
     "coveredBeforeRUSDPerYear": 17602877.5,
-    "coveredAfterRUSDPerYear": 64760534.99066419,
+    "coveredAfterRUSDPerYear": 108509368.40330625,
     "shareBefore": 0.3845814769599872,
-    "shareAfter": 1.4148653931965705,
+    "shareAfter": 2.3706745198072805,
     "jobsAfter": {
-     "peasants": 48500,
-     "laborers": 15500
+     "peasants": 51000,
+     "laborers": 63200,
+     "clerks": 19800
     }
    },
    "fpo": {
     "gdpRUSDPerYear": 25945569.802862223,
     "coveredBeforeRUSDPerYear": 8797605,
-    "coveredAfterRUSDPerYear": 4460439.624046617,
+    "coveredAfterRUSDPerYear": 20183225.90182613,
     "shareBefore": 0.3390792750687433,
-    "shareAfter": 0.17191526946363525,
+    "shareAfter": 0.7779064424169858,
     "jobsAfter": {
-     "peasants": 17000
+     "laborers": 22000,
+     "clerks": 3000,
+     "peasants": 22000
     }
    },
    "gea": {
     "gdpRUSDPerYear": 1031218909.7916102,
     "coveredBeforeRUSDPerYear": 362786569.5,
-    "coveredAfterRUSDPerYear": 224488622.25885543,
+    "coveredAfterRUSDPerYear": 1097092967.5888243,
     "shareBefore": 0.351803643295595,
-    "shareAfter": 0.2176924997469454,
+    "shareAfter": 1.06387980008098,
     "jobsAfter": {
-     "peasants": 712000,
-     "laborers": 21000
+     "peasants": 915000,
+     "laborers": 981650,
+     "clerks": 106300,
+     "academics": 50
     }
    },
    "gsw": {
     "gdpRUSDPerYear": 29463397.422617435,
     "coveredBeforeRUSDPerYear": 11805719.499999998,
-    "coveredAfterRUSDPerYear": 17215892.668800563,
+    "coveredAfterRUSDPerYear": 32502055.89690578,
     "shareBefore": 0.40069104491450785,
-    "shareAfter": 0.5843145792679314,
+    "shareAfter": 1.1031333362783116,
     "jobsAfter": {
-     "peasants": 54000,
-     "laborers": 2000
+     "laborers": 21400,
+     "clerks": 2600,
+     "peasants": 49000
     }
    },
    "kam": {
     "gdpRUSDPerYear": 294633974.22617435,
     "coveredBeforeRUSDPerYear": 103698887.5,
-    "coveredAfterRUSDPerYear": 102299180.46553284,
+    "coveredAfterRUSDPerYear": 251105256.99491277,
     "shareBefore": 0.35195835026274347,
-    "shareAfter": 0.3472076861950868,
+    "shareAfter": 0.8522617177954944,
     "jobsAfter": {
-     "laborers": 9000,
-     "peasants": 326000
+     "laborers": 170500,
+     "peasants": 343000,
+     "clerks": 22500
     }
    },
    "tog": {
     "gdpRUSDPerYear": 147316987.11308718,
     "coveredBeforeRUSDPerYear": 54880642,
-    "coveredAfterRUSDPerYear": 44396132.98863228,
+    "coveredAfterRUSDPerYear": 152278789.50762865,
     "shareBefore": 0.37253437689348845,
-    "shareAfter": 0.30136465494336917,
+    "shareAfter": 1.033681128644944,
     "jobsAfter": {
-     "laborers": 5000,
-     "peasants": 141000
+     "laborers": 124700,
+     "peasants": 157000,
+     "clerks": 16300
     }
    },
    "gng": {
     "gdpRUSDPerYear": 64863924.50715556,
     "coveredBeforeRUSDPerYear": 28152336,
-    "coveredAfterRUSDPerYear": 18364522.310072925,
+    "coveredAfterRUSDPerYear": 74883116.25150965,
     "shareBefore": 0.4340214720879914,
-    "shareAfter": 0.2831238234443711,
+    "shareAfter": 1.1544647786960347,
     "jobsAfter": {
-     "peasants": 64000,
-     "laborers": 2000
+     "laborers": 71300,
+     "peasants": 76000,
+     "clerks": 7700
     }
    },
    "gsa": {
     "gdpRUSDPerYear": 5189113.960572445,
     "coveredBeforeRUSDPerYear": 2639281.4999999995,
-    "coveredAfterRUSDPerYear": 1193353.6579633222,
+    "coveredAfterRUSDPerYear": 5477697.58462005,
     "shareBefore": 0.5086189126031149,
-    "shareAfter": 0.22997252845679952,
+    "shareAfter": 1.055613275453247,
     "jobsAfter": {
-     "peasants": 5000
+     "peasants": 6000,
+     "laborers": 6600,
+     "clerks": 1400
     }
    },
    "gpn": {
     "gdpRUSDPerYear": 7589079.167337201,
     "coveredBeforeRUSDPerYear": 3519042,
-    "coveredAfterRUSDPerYear": 1869733.6516901245,
+    "coveredAfterRUSDPerYear": 4764291.043151201,
     "shareBefore": 0.4636981539401618,
-    "shareAfter": 0.24637160984395987,
+    "shareAfter": 0.6277824935146723,
     "jobsAfter": {
-     "peasants": 6000
+     "laborers": 3600,
+     "clerks": 400,
+     "peasants": 8000
     }
    },
    "cfs": {
     "gdpRUSDPerYear": 1325852884.0177846,
     "coveredBeforeRUSDPerYear": 365977304.5,
-    "coveredAfterRUSDPerYear": 276391388.98385096,
+    "coveredAfterRUSDPerYear": 1111058357.428822,
     "shareBefore": 0.2760316087188832,
-    "shareAfter": 0.2084630899216293,
+    "shareAfter": 0.837995203556776,
     "jobsAfter": {
-     "peasants": 910000,
-     "laborers": 21000
+     "peasants": 1403000,
+     "laborers": 864150,
+     "clerks": 102400,
+     "academics": 450
     }
    },
    "ang": {
     "gdpRUSDPerYear": 589267948.4523487,
     "coveredBeforeRUSDPerYear": 104337034.5,
-    "coveredAfterRUSDPerYear": 78142888.70967299,
+    "coveredAfterRUSDPerYear": 307561688.8315803,
     "shareBefore": 0.17706212390141093,
-    "shareAfter": 0.13261011211437376,
+    "shareAfter": 0.5219386013431737,
     "jobsAfter": {
-     "laborers": 5000,
-     "peasants": 266000
+     "laborers": 293100,
+     "clerks": 31900,
+     "peasants": 323000
     }
    },
    "moz": {
     "gdpRUSDPerYear": 441950961.33926153,
     "coveredBeforeRUSDPerYear": 76896713.5,
-    "coveredAfterRUSDPerYear": 50460730.86128619,
+    "coveredAfterRUSDPerYear": 218605168.67637563,
     "shareBefore": 0.1739937690529665,
-    "shareAfter": 0.11417721710203557,
+    "shareAfter": 0.49463670814048627,
     "jobsAfter": {
-     "peasants": 173000,
-     "laborers": 2000
+     "laborers": 234400,
+     "clerks": 23600,
+     "peasants": 164000
     }
    },
    "pai": {
     "gdpRUSDPerYear": 133803379.72985308,
     "coveredBeforeRUSDPerYear": 9088722.000000002,
-    "coveredAfterRUSDPerYear": 73539996.37019601,
+    "coveredAfterRUSDPerYear": 46474909.25085915,
     "shareBefore": 0.06792595238139716,
-    "shareAfter": 0.5496123978233742,
+    "shareAfter": 0.3473373344133105,
     "jobsAfter": {
-     "clerks": 4800,
+     "clerks": 3400,
      "capitalists": 150,
      "academics": 150,
-     "peasants": 73000,
-     "laborers": 5900
+     "peasants": 38000,
+     "laborers": 12300
     }
    },
    "ptm": {
     "gdpRUSDPerYear": 16512342.463693526,
     "coveredBeforeRUSDPerYear": 3106921.5,
-    "coveredAfterRUSDPerYear": 1721812.2560080062,
+    "coveredAfterRUSDPerYear": 6628798.785506809,
     "shareBefore": 0.18815752561039334,
-    "shareAfter": 0.10427425786461472,
+    "shareAfter": 0.40144508873176926,
     "jobsAfter": {
-     "peasants": 5000
+     "peasants": 5000,
+     "laborers": 7600,
+     "clerks": 1400
     }
    },
    "mac": {
     "gdpRUSDPerYear": 9934040.995686444,
     "coveredBeforeRUSDPerYear": 2566021.5,
-    "coveredAfterRUSDPerYear": 1422053.069163585,
+    "coveredAfterRUSDPerYear": 9162755.73652054,
     "shareBefore": 0.25830591006361026,
-    "shareAfter": 0.14314950681007543,
+    "shareAfter": 0.9223593641801145,
     "jobsAfter": {
-     "laborers": 2000,
+     "laborers": 10300,
+     "clerks": 3700,
      "peasants": 2000
     }
    },
    "eri": {
     "gdpRUSDPerYear": 44195096.13392615,
     "coveredBeforeRUSDPerYear": 15315528,
-    "coveredAfterRUSDPerYear": 18115763.388973337,
+    "coveredAfterRUSDPerYear": 35752843.722414374,
     "shareBefore": 0.3465436064125474,
-    "shareAfter": 0.4099043779444765,
+    "shareAfter": 0.8089776208218015,
     "jobsAfter": {
-     "laborers": 1000,
-     "peasants": 59000
+     "laborers": 37800,
+     "peasants": 27000,
+     "clerks": 4200
     }
    },
    "its": {
     "gdpRUSDPerYear": 58926794.84523487,
     "coveredBeforeRUSDPerYear": 20101630.5,
-    "coveredAfterRUSDPerYear": 45237244.6100685,
+    "coveredAfterRUSDPerYear": 55398406.83608076,
     "shareBefore": 0.34112886256235136,
-    "shareAfter": 0.7676854770207584,
+    "shareAfter": 0.9401225195020184,
     "jobsAfter": {
-     "laborers": 4000,
-     "peasants": 107000
+     "laborers": 54200,
+     "peasants": 48000,
+     "clerks": 5800
     }
    },
    "dei": {
     "gdpRUSDPerYear": 6935183834.751281,
     "coveredBeforeRUSDPerYear": 1095017222,
-    "coveredAfterRUSDPerYear": 1460375572.2743335,
+    "coveredAfterRUSDPerYear": 3651472065.3203654,
     "shareBefore": 0.15789303471856286,
-    "shareAfter": 0.2105748898762548,
+    "shareAfter": 0.5265140985914931,
     "jobsAfter": {
-     "laborers": 301500,
-     "peasants": 4127200,
-     "clerks": 300
+     "laborers": 2712800,
+     "clerks": 338900,
+     "academics": 500,
+     "peasants": 4128800
     }
    },
    "sur": {
     "gdpRUSDPerYear": 9154303.342504168,
     "coveredBeforeRUSDPerYear": 2437321.5,
-    "coveredAfterRUSDPerYear": 5972336.8665367905,
+    "coveredAfterRUSDPerYear": 12357985.215556175,
     "shareBefore": 0.26624871481845264,
-    "shareAfter": 0.6524075774075291,
+    "shareAfter": 1.3499645743851478,
     "jobsAfter": {
-     "peasants": 12600,
-     "laborers": 3400
+     "laborers": 13200,
+     "peasants": 11200,
+     "clerks": 1600
     }
    },
    "dgc": {
     "gdpRUSDPerYear": 5721439.589065105,
     "coveredBeforeRUSDPerYear": 1624881,
-    "coveredAfterRUSDPerYear": 5179014.91941512,
+    "coveredAfterRUSDPerYear": 8088142.884789543,
     "shareBefore": 0.2839986291396828,
-    "shareAfter": 0.9051943726388942,
+    "shareAfter": 1.4136552101760744,
     "jobsAfter": {
-     "peasants": 11200,
-     "laborers": 1800
+     "laborers": 5600,
+     "clerks": 1200,
+     "peasants": 8200
     }
    },
    "sah": {
     "gdpRUSDPerYear": 7365849.355654359,
     "coveredBeforeRUSDPerYear": 2233514.5,
-    "coveredAfterRUSDPerYear": 974307.681401669,
+    "coveredAfterRUSDPerYear": 3669102.9120410625,
     "shareBefore": 0.303225655610979,
-    "shareAfter": 0.1322736366653693,
+    "shareAfter": 0.49812353401233944,
     "jobsAfter": {
-     "peasants": 3000
+     "peasants": 3000,
+     "laborers": 3600,
+     "clerks": 400
     }
    },
    "sgg": {
     "gdpRUSDPerYear": 22097548.066963077,
     "coveredBeforeRUSDPerYear": 6381470,
-    "coveredAfterRUSDPerYear": 3374588.0417329483,
+    "coveredAfterRUSDPerYear": 11109843.457004778,
     "shareBefore": 0.28878633867712283,
-    "shareAfter": 0.15271323458633512,
+    "shareAfter": 0.5027636289482516,
     "jobsAfter": {
-     "peasants": 11000
+     "peasants": 11000,
+     "laborers": 12300,
+     "clerks": 1700
     }
    },
    "phl": {
     "gdpRUSDPerYear": 985931652.5087645,
     "coveredBeforeRUSDPerYear": 578295901.9999999,
-    "coveredAfterRUSDPerYear": 401773429.17186695,
+    "coveredAfterRUSDPerYear": 1724376872.2684896,
     "shareBefore": 0.5865476582768084,
-    "shareAfter": 0.4075063703954827,
+    "shareAfter": 1.748982161066343,
     "jobsAfter": {
-     "laborers": 80800,
-     "peasants": 1236200
+     "laborers": 1268050,
+     "clerks": 247700,
+     "academics": 50,
+     "peasants": 1644200
     }
    },
    "pri": {
     "gdpRUSDPerYear": 108707352.19223699,
     "coveredBeforeRUSDPerYear": 76640220.5,
-    "coveredAfterRUSDPerYear": 227196158.4775112,
+    "coveredAfterRUSDPerYear": 391528061.2051745,
     "shareBefore": 0.7050141407590372,
-    "shareAfter": 2.089979692226702,
+    "shareAfter": 3.6016704786701106,
     "jobsAfter": {
-     "laborers": 37400,
-     "peasants": 227600
+     "laborers": 212900,
+     "peasants": 158000,
+     "clerks": 44100
     }
    },
    "gum": {
     "gdpRUSDPerYear": 1255246.6670624744,
     "coveredBeforeRUSDPerYear": 879760.5,
-    "coveredAfterRUSDPerYear": 370396.76613585674,
+    "coveredAfterRUSDPerYear": 1167003.5696367375,
     "shareBefore": 0.7008666289143103,
-    "shareAfter": 0.2950788684447643,
+    "shareAfter": 0.9297005921296383,
     "jobsAfter": {
-     "peasants": 2000
+     "peasants": 2000,
+     "laborers": 900,
+     "clerks": 100
     }
    },
    "asm": {
     "gdpRUSDPerYear": 778367.0940858667,
     "coveredBeforeRUSDPerYear": 586507,
-    "coveredAfterRUSDPerYear": 259117.66104807408,
+    "coveredAfterRUSDPerYear": 1383337.0087822238,
     "shareBefore": 0.753509500152763,
-    "shareAfter": 0.33289904341651055,
+    "shareAfter": 1.7772295608241873,
     "jobsAfter": {
-     "peasants": 2000
+     "peasants": 2000,
+     "laborers": 2100,
+     "clerks": 900
     }
    },
    "isl": {
     "gdpRUSDPerYear": 42117294.25728008,
     "coveredBeforeRUSDPerYear": 5252721,
-    "coveredAfterRUSDPerYear": 2358993.6937322305,
+    "coveredAfterRUSDPerYear": 17431245.43608042,
     "shareBefore": 0.12471648743418634,
-    "shareAfter": 0.05601009597914691,
+    "shareAfter": 0.41387381937687945,
     "jobsAfter": {
-     "peasants": 3000
+     "peasants": 3000,
+     "laborers": 4900,
+     "clerks": 1100
     }
    },
    "grl": {
     "gdpRUSDPerYear": 6317594.138592012,
     "coveredBeforeRUSDPerYear": 1750907,
-    "coveredAfterRUSDPerYear": 825137.9825779744,
+    "coveredAfterRUSDPerYear": 2217015.6320213154,
     "shareBefore": 0.27714774985374746,
-    "shareAfter": 0.13060952705674617,
+    "shareAfter": 0.35092720161909874,
     "jobsAfter": {
-     "peasants": 2000
+     "clerks": 2600,
+     "capitalists": 150,
+     "academics": 150,
+     "peasants": 2000,
+     "laborers": 3100
     }
    },
    "fro": {
     "gdpRUSDPerYear": 7896992.673240015,
     "coveredBeforeRUSDPerYear": 1750907,
-    "coveredAfterRUSDPerYear": 825137.9825779744,
+    "coveredAfterRUSDPerYear": 2291795.4476303025,
     "shareBefore": 0.22171819988299796,
-    "shareAfter": 0.10448762164539693,
+    "shareAfter": 0.2902111654980191,
     "jobsAfter": {
-     "peasants": 2000
+     "peasants": 2000,
+     "laborers": 2100,
+     "clerks": 900
     }
    },
    "dwi": {
     "gdpRUSDPerYear": 3432863.7534390627,
     "coveredBeforeRUSDPerYear": 1895694.5,
-    "coveredAfterRUSDPerYear": 20824066.848889925,
+    "coveredAfterRUSDPerYear": 20706150.347134203,
     "shareBefore": 0.5522195566604944,
-    "shareAfter": 6.066091853493531,
+    "shareAfter": 6.0317425433475655,
     "jobsAfter": {
-     "laborers": 1800,
-     "peasants": 7200
+     "laborers": 5500,
+     "peasants": 6400,
+     "clerks": 1100
     }
    },
    "egy": {
     "gdpRUSDPerYear": 2398185535.44957,
     "coveredBeforeRUSDPerYear": 248214635.5,
-    "coveredAfterRUSDPerYear": 676420162.1017857,
+    "coveredAfterRUSDPerYear": 1239698183.3413377,
     "shareBefore": 0.10350101434227399,
-    "shareAfter": 0.28205497535660107,
+    "shareAfter": 0.5169317240123128,
     "jobsAfter": {
-     "peasants": 1175400,
-     "laborers": 112200,
-     "clerks": 45100,
-     "capitalists": 1650,
-     "academics": 2650
+     "peasants": 1411800,
+     "laborers": 539700,
+     "clerks": 89200,
+     "capitalists": 150,
+     "academics": 150
     }
    },
    "bhu": {
     "gdpRUSDPerYear": 36160718.39981953,
     "coveredBeforeRUSDPerYear": 8952752,
-    "coveredAfterRUSDPerYear": 5883262.430224892,
+    "coveredAfterRUSDPerYear": 24625653.145068385,
     "shareBefore": 0.24758224936274167,
-    "shareAfter": 0.16269760918948595,
+    "shareAfter": 0.6810056391244508,
     "jobsAfter": {
-     "peasants": 24000
+     "laborers": 26800,
+     "peasants": 36000,
+     "clerks": 3200
     }
    },
    "fin": {
     "gdpRUSDPerYear": 1829361795.9001207,
     "coveredBeforeRUSDPerYear": 58149135.5,
-    "coveredAfterRUSDPerYear": 295847846.85096496,
+    "coveredAfterRUSDPerYear": 303464492.9148257,
     "shareBefore": 0.031786569299917106,
-    "shareAfter": 0.16172188984923877,
+    "shareAfter": 0.1658854435437189,
     "jobsAfter": {
-     "clerks": 23200,
-     "capitalists": 900,
-     "academics": 1500,
-     "laborers": 44400,
-     "peasants": 112000
+     "clerks": 19500,
+     "capitalists": 300,
+     "academics": 500,
+     "laborers": 79700,
+     "peasants": 76000
     }
    },
    "twn": {
     "gdpRUSDPerYear": 449319033.449243,
     "coveredBeforeRUSDPerYear": 88412539,
-    "coveredAfterRUSDPerYear": 48241133.36405694,
+    "coveredAfterRUSDPerYear": 185498496.33341995,
     "shareBefore": 0.19677007297307705,
-    "shareAfter": 0.10736498962380693,
+    "shareAfter": 0.4128436200652841,
     "jobsAfter": {
-     "laborers": 2000,
-     "peasants": 161000
+     "laborers": 180200,
+     "peasants": 145000,
+     "clerks": 29800
     }
    },
    "tib": {
     "gdpRUSDPerYear": 144642873.59927812,
     "coveredBeforeRUSDPerYear": 25739162,
-    "coveredAfterRUSDPerYear": 18771977.200422913,
+    "coveredAfterRUSDPerYear": 60908869.81559444,
     "shareBefore": 0.1779497417294706,
-    "shareAfter": 0.1297815560027466,
+    "shareAfter": 0.42109831130939607,
     "jobsAfter": {
-     "laborers": 1000,
-     "peasants": 75000
+     "laborers": 72900,
+     "peasants": 74000,
+     "clerks": 9100
     }
    },
    "khi": {
     "gdpRUSDPerYear": 197788497.7690367,
     "coveredBeforeRUSDPerYear": 17230659.5,
-    "coveredAfterRUSDPerYear": 23992175.54919491,
+    "coveredAfterRUSDPerYear": 37342366.60284953,
     "shareBefore": 0.08711659016754722,
-    "shareAfter": 0.12130217793155626,
+    "shareAfter": 0.1887994854304181,
     "jobsAfter": {
-     "peasants": 40000,
-     "laborers": 7300,
-     "clerks": 4400,
+     "laborers": 27500,
+     "clerks": 6200,
+     "peasants": 27000,
      "capitalists": 150,
      "academics": 150
     }
@@ -5168,315 +6643,318 @@
    "buk": {
     "gdpRUSDPerYear": 494471244.4225918,
     "coveredBeforeRUSDPerYear": 41912415,
-    "coveredAfterRUSDPerYear": 62863720.06775851,
+    "coveredAfterRUSDPerYear": 104605590.58708096,
     "shareBefore": 0.08476208773058648,
-    "shareAfter": 0.1271332171017675,
+    "shareAfter": 0.21155040210524656,
     "jobsAfter": {
-     "clerks": 8200,
-     "capitalists": 300,
-     "academics": 300,
-     "laborers": 15200,
-     "peasants": 95000
+     "clerks": 11400,
+     "capitalists": 150,
+     "academics": 150,
+     "laborers": 76300,
+     "peasants": 73000
     }
    },
    "sar": {
     "gdpRUSDPerYear": 64863924.50715556,
     "coveredBeforeRUSDPerYear": 14076168,
-    "coveredAfterRUSDPerYear": 9709428.205449086,
+    "coveredAfterRUSDPerYear": 35686213.57378133,
     "shareBefore": 0.2170107360439957,
-    "shareAfter": 0.14968918823864838,
+    "shareAfter": 0.5501704351830353,
     "jobsAfter": {
-     "peasants": 38000
+     "laborers": 30400,
+     "peasants": 56000,
+     "clerks": 4600
     }
    },
    "goa": {
     "gdpRUSDPerYear": 57316305.62817795,
     "coveredBeforeRUSDPerYear": 13988675,
-    "coveredAfterRUSDPerYear": 7629896.032762745,
+    "coveredAfterRUSDPerYear": 21067451.115046687,
     "shareBefore": 0.24406100230442734,
-    "shareAfter": 0.1331191176601536,
+    "shareAfter": 0.3675647075321873,
     "jobsAfter": {
-     "laborers": 5000,
-     "peasants": 21000
+     "laborers": 27300,
+     "peasants": 20000,
+     "clerks": 3700
     }
    }
   },
   "countries": {
    "USA": {
     "coveredBeforeRUSDPerYear": 135258306998.32294,
-    "coveredAfterRUSDPerYear": 124612651221.2542
+    "coveredAfterRUSDPerYear": 160243539211.16858
    },
    "GBR": {
     "coveredBeforeRUSDPerYear": 51548040755.84891,
-    "coveredAfterRUSDPerYear": 42217259814.175224
+    "coveredAfterRUSDPerYear": 91537487449.28938
    },
    "DEU": {
     "coveredBeforeRUSDPerYear": 52971800302.39535,
-    "coveredAfterRUSDPerYear": 47631477832.128876
+    "coveredAfterRUSDPerYear": 55049181948.98163
    },
    "FRA": {
     "coveredBeforeRUSDPerYear": 30332648528.11867,
-    "coveredAfterRUSDPerYear": 25751822654.71919
+    "coveredAfterRUSDPerYear": 35316419933.162254
    },
    "RUS": {
     "coveredBeforeRUSDPerYear": 15836437424.098166,
-    "coveredAfterRUSDPerYear": 14449858172.045301
+    "coveredAfterRUSDPerYear": 17439037705.388206
    },
    "JPN": {
     "coveredBeforeRUSDPerYear": 17741059658.7827,
-    "coveredAfterRUSDPerYear": 15429469141.705086
+    "coveredAfterRUSDPerYear": 10063502985.984482
    },
    "ITA": {
     "coveredBeforeRUSDPerYear": 22715190949.3484,
-    "coveredAfterRUSDPerYear": 18775694456.80327
+    "coveredAfterRUSDPerYear": 15162977844.56793
    },
    "ESP": {
     "coveredBeforeRUSDPerYear": 11412144838.839758,
-    "coveredAfterRUSDPerYear": 9379269567.461967
+    "coveredAfterRUSDPerYear": 6095103997.8528385
    },
    "PRT": {
     "coveredBeforeRUSDPerYear": 2793215281.164187,
-    "coveredAfterRUSDPerYear": 2293442133.5411487
+    "coveredAfterRUSDPerYear": 1948657632.1938632
    },
    "NLD": {
     "coveredBeforeRUSDPerYear": 6283507407.610365,
-    "coveredAfterRUSDPerYear": 5386231161.128062
+    "coveredAfterRUSDPerYear": 9473212997.708916
    },
    "BEL": {
     "coveredBeforeRUSDPerYear": 7332118198.3919115,
-    "coveredAfterRUSDPerYear": 6273715586.173552
+    "coveredAfterRUSDPerYear": 9724421046.890944
    },
    "CHE": {
     "coveredBeforeRUSDPerYear": 4188828686.014844,
-    "coveredAfterRUSDPerYear": 3497827070.487812
+    "coveredAfterRUSDPerYear": 4600828152.797848
    },
    "SWE": {
     "coveredBeforeRUSDPerYear": 3644065786.3771677,
-    "coveredAfterRUSDPerYear": 3017484914.579663
+    "coveredAfterRUSDPerYear": 2460031074.63041
    },
    "NOR": {
     "coveredBeforeRUSDPerYear": 1552571303.0173285,
-    "coveredAfterRUSDPerYear": 1249446447.7567275
+    "coveredAfterRUSDPerYear": 1007630252.3280691
    },
    "DNK": {
     "coveredBeforeRUSDPerYear": 2323263354.1617856,
-    "coveredAfterRUSDPerYear": 1868129071.2316532
+    "coveredAfterRUSDPerYear": 1938398952.8418622
    },
    "GRC": {
     "coveredBeforeRUSDPerYear": 1008206198.5478656,
-    "coveredAfterRUSDPerYear": 846276667.6094347
+    "coveredAfterRUSDPerYear": 382723732.92216486
    },
    "SRB": {
     "coveredBeforeRUSDPerYear": 144937962.0577855,
-    "coveredAfterRUSDPerYear": 107168967.43742676
+    "coveredAfterRUSDPerYear": 237673414.9876719
    },
    "MNT": {
     "coveredBeforeRUSDPerYear": 19057718.095585257,
-    "coveredAfterRUSDPerYear": 13275894.181277853
+    "coveredAfterRUSDPerYear": 29097794.044746313
    },
    "ROM": {
     "coveredBeforeRUSDPerYear": 364748055.2707949,
-    "coveredAfterRUSDPerYear": 272434279.8073286
+    "coveredAfterRUSDPerYear": 585066313.1282486
    },
    "BGR": {
     "coveredBeforeRUSDPerYear": 214704016.37116104,
-    "coveredAfterRUSDPerYear": 164256551.1945951
+    "coveredAfterRUSDPerYear": 394485137.5333639
    },
    "OTT": {
     "coveredBeforeRUSDPerYear": 5827053066.147863,
-    "coveredAfterRUSDPerYear": 5129625840.915292
+    "coveredAfterRUSDPerYear": 5174917005.3636265
    },
    "LUX": {
     "coveredBeforeRUSDPerYear": 250601213.0561671,
-    "coveredAfterRUSDPerYear": 180861644.48635584
+    "coveredAfterRUSDPerYear": 241489742.76039135
    },
    "MCO": {
     "coveredBeforeRUSDPerYear": 113377561.92360261,
-    "coveredAfterRUSDPerYear": 59744318.46711448
+    "coveredAfterRUSDPerYear": 60651028.02168006
    },
    "SMR": {
     "coveredBeforeRUSDPerYear": 3015387,
-    "coveredAfterRUSDPerYear": 2697342.839548014
+    "coveredAfterRUSDPerYear": 2172604.0977961253
    },
    "AND": {
     "coveredBeforeRUSDPerYear": 10438549.071359674,
-    "coveredAfterRUSDPerYear": 4380926.920247196
+    "coveredAfterRUSDPerYear": 2745824.751141105
    },
    "LIE": {
     "coveredBeforeRUSDPerYear": 28560966.215906512,
-    "coveredAfterRUSDPerYear": 13518677.91245924
+    "coveredAfterRUSDPerYear": 13584586.109183677
    },
    "CHN": {
     "coveredBeforeRUSDPerYear": 39685831600.461945,
-    "coveredAfterRUSDPerYear": 32907333782.545742
+    "coveredAfterRUSDPerYear": 36268347404.643
    },
    "KOR": {
     "coveredBeforeRUSDPerYear": 870043907.1793314,
-    "coveredAfterRUSDPerYear": 645603708.9574866
+    "coveredAfterRUSDPerYear": 1164917821.978536
    },
    "PER": {
     "coveredBeforeRUSDPerYear": 1951744191.9543874,
-    "coveredAfterRUSDPerYear": 1620553862.7520823
+    "coveredAfterRUSDPerYear": 1306159872.9205809
    },
    "AFG": {
     "coveredBeforeRUSDPerYear": 227271632.45202777,
-    "coveredAfterRUSDPerYear": 168916853.72583738
+    "coveredAfterRUSDPerYear": 396494352.6153202
    },
    "NPL": {
     "coveredBeforeRUSDPerYear": 252292319.19247735,
-    "coveredAfterRUSDPerYear": 187314257.80691057
+    "coveredAfterRUSDPerYear": 420049326.6874261
    },
    "THA": {
     "coveredBeforeRUSDPerYear": 367883699.999481,
-    "coveredAfterRUSDPerYear": 275576952.6455392
+    "coveredAfterRUSDPerYear": 612706888.6066471
    },
    "OMN": {
     "coveredBeforeRUSDPerYear": 57749444.395031296,
-    "coveredAfterRUSDPerYear": 44233867.10194574
+    "coveredAfterRUSDPerYear": 52272989.14351305
    },
    "ETH": {
     "coveredBeforeRUSDPerYear": 1095701480.7197976,
-    "coveredAfterRUSDPerYear": 878287194.4722383
+    "coveredAfterRUSDPerYear": 1138312116.0954957
    },
    "LBR": {
     "coveredBeforeRUSDPerYear": 38787807.31166393,
-    "coveredAfterRUSDPerYear": 26873514.268846128
+    "coveredAfterRUSDPerYear": 62484100.418238945
    },
    "MAR": {
     "coveredBeforeRUSDPerYear": 565069291.1798115,
-    "coveredAfterRUSDPerYear": 446965763.7627524
+    "coveredAfterRUSDPerYear": 565748160.5808971
    },
    "ZAR": {
     "coveredBeforeRUSDPerYear": 242845041.04183835,
-    "coveredAfterRUSDPerYear": 213125195.74897835
+    "coveredAfterRUSDPerYear": 194582486.96010417
    },
    "ORF": {
     "coveredBeforeRUSDPerYear": 36056572.63290104,
-    "coveredAfterRUSDPerYear": 25470264.523660265
+    "coveredAfterRUSDPerYear": 35407252.85793693
    },
    "MEX": {
     "coveredBeforeRUSDPerYear": 1787630722.1443653,
-    "coveredAfterRUSDPerYear": 1645683237.67597
+    "coveredAfterRUSDPerYear": 2079869857.3291118
    },
    "GUA": {
     "coveredBeforeRUSDPerYear": 72700973.1172093,
-    "coveredAfterRUSDPerYear": 128024431.85060215
+    "coveredAfterRUSDPerYear": 153556363.9640991
    },
    "HON": {
     "coveredBeforeRUSDPerYear": 27280714.18274793,
-    "coveredAfterRUSDPerYear": 19073265.671524193
+    "coveredAfterRUSDPerYear": 44841656.99056465
    },
    "SAL": {
     "coveredBeforeRUSDPerYear": 47560304.649635926,
-    "coveredAfterRUSDPerYear": 85098177.13370867
+    "coveredAfterRUSDPerYear": 104095696.79168737
    },
    "NIC": {
     "coveredBeforeRUSDPerYear": 22160365.94964662,
-    "coveredAfterRUSDPerYear": 32820582.623019196
+    "coveredAfterRUSDPerYear": 43041341.023466356
    },
    "COS": {
     "coveredBeforeRUSDPerYear": 16979112.199303932,
-    "coveredAfterRUSDPerYear": 46993370.921319045
+    "coveredAfterRUSDPerYear": 51677184.59573163
    },
    "COL": {
     "coveredBeforeRUSDPerYear": 204885358.11784127,
-    "coveredAfterRUSDPerYear": 219923716.43900138
+    "coveredAfterRUSDPerYear": 426820559.9939708
    },
    "VEN": {
     "coveredBeforeRUSDPerYear": 317288489.6956764,
-    "coveredAfterRUSDPerYear": 419627949.7985383
+    "coveredAfterRUSDPerYear": 432587746.6230379
    },
    "ECU": {
     "coveredBeforeRUSDPerYear": 73386528.2895744,
-    "coveredAfterRUSDPerYear": 93356508.30523987
+    "coveredAfterRUSDPerYear": 164028179.57829684
    },
    "PRU": {
     "coveredBeforeRUSDPerYear": 188085351.64274496,
-    "coveredAfterRUSDPerYear": 207419472.56197497
+    "coveredAfterRUSDPerYear": 465596552.0021387
    },
    "BOL": {
     "coveredBeforeRUSDPerYear": 206080816.64564097,
-    "coveredAfterRUSDPerYear": 192344511.98458564
+    "coveredAfterRUSDPerYear": 272651559.1984922
    },
    "CHL": {
     "coveredBeforeRUSDPerYear": 2167478295.265876,
-    "coveredAfterRUSDPerYear": 1920555294.9297643
+    "coveredAfterRUSDPerYear": 1571968360.7282698
    },
    "ARG": {
     "coveredBeforeRUSDPerYear": 4457050545.445042,
-    "coveredAfterRUSDPerYear": 3645207073.636351
+    "coveredAfterRUSDPerYear": 3586875921.283053
    },
    "URY": {
     "coveredBeforeRUSDPerYear": 658100946.5449287,
-    "coveredAfterRUSDPerYear": 519015791.610579
+    "coveredAfterRUSDPerYear": 370621769.2817681
    },
    "PRY": {
     "coveredBeforeRUSDPerYear": 69627660.73143269,
-    "coveredAfterRUSDPerYear": 51178496.434635326
+    "coveredAfterRUSDPerYear": 71727446.19050775
    },
    "BRA": {
     "coveredBeforeRUSDPerYear": 887798343.870385,
-    "coveredAfterRUSDPerYear": 2045118279.3756404
+    "coveredAfterRUSDPerYear": 2578700441.411685
    },
    "HTI": {
     "coveredBeforeRUSDPerYear": 76592279.0244087,
-    "coveredAfterRUSDPerYear": 137009892.61242855
+    "coveredAfterRUSDPerYear": 167314553.56567946
    },
    "DOM": {
     "coveredBeforeRUSDPerYear": 31780562.999913726,
-    "coveredAfterRUSDPerYear": 51998849.49444045
+    "coveredAfterRUSDPerYear": 74544922.70835459
    },
    "CAN": {
     "coveredBeforeRUSDPerYear": 4948297897.794761,
-    "coveredAfterRUSDPerYear": 4206856931.05305
+    "coveredAfterRUSDPerYear": 4062730263.354567
    },
    "AUS": {
     "coveredBeforeRUSDPerYear": 7576327007.296172,
-    "coveredAfterRUSDPerYear": 7414845067.307557
+    "coveredAfterRUSDPerYear": 9056343435.551334
    },
    "NZL": {
     "coveredBeforeRUSDPerYear": 1027935062.5961913,
-    "coveredAfterRUSDPerYear": 804144452.313515
+    "coveredAfterRUSDPerYear": 1081098177.2726133
    },
    "CUB": {
     "coveredBeforeRUSDPerYear": 202624420.14520484,
-    "coveredAfterRUSDPerYear": 518415099.73098224
+    "coveredAfterRUSDPerYear": 507980860.6596312
    },
    "AUT": {
     "coveredBeforeRUSDPerYear": 36591651613.566635,
-    "coveredAfterRUSDPerYear": 31314725963.521866
+    "coveredAfterRUSDPerYear": 25001515995.44494
    },
    "TON": {
     "coveredBeforeRUSDPerYear": 3713398.307845845,
-    "coveredAfterRUSDPerYear": 1866450.304432099
+    "coveredAfterRUSDPerYear": 2146911.6308328756
    },
    "SOK": {
     "coveredBeforeRUSDPerYear": 507725763.3126916,
-    "coveredAfterRUSDPerYear": 377276624.48028123
+    "coveredAfterRUSDPerYear": 847454358.8572044
    },
    "WAD": {
     "coveredBeforeRUSDPerYear": 52012537.52968399,
-    "coveredAfterRUSDPerYear": 37787170.06983681
+    "coveredAfterRUSDPerYear": 80812135.75013608
    },
    "DAR": {
     "coveredBeforeRUSDPerYear": 31691878.571050204,
-    "coveredAfterRUSDPerYear": 23087329.59093627
+    "coveredAfterRUSDPerYear": 44422725.168030284
    },
    "SHM": {
     "coveredBeforeRUSDPerYear": 115764451.25557983,
-    "coveredAfterRUSDPerYear": 86637498.00328974
+    "coveredAfterRUSDPerYear": 101486378.521466
    },
    "CRT": {
     "coveredBeforeRUSDPerYear": 130842872.23224793,
-    "coveredAfterRUSDPerYear": 103209515.48078012
+    "coveredAfterRUSDPerYear": 45958358.78781482
    }
   },
   "world": {
    "gdpRUSDPerYear": 1036642490819.1588,
    "coveredBeforeRUSDPerYear": 481810231427.8955,
-   "coveredAfterRUSDPerYear": 422417576580.19025,
+   "coveredAfterRUSDPerYear": 524894990857.2733,
    "shareBefore": 0.46477955099753554,
-   "shareAfter": 0.40748626486108463
+   "shareAfter": 0.5063413814366217
   }
  }
 }

@@ -780,5 +780,19 @@
   "unitLabel": "kg",
   "group": "fibres-forest",
   "priceBasis": "1900-wholesale"
+ },
+ {
+  "id": 59,
+  "key": "dwelling",
+  "name": "Dwelling",
+  "category": "industrial",
+  "basePrice1900RUSD": 36119.2,
+  "transportCostPerUnit": 180.596,
+  "priceElasticity": 1,
+  "spoilageRateAnnual": 0,
+  "unitLabel": "dwelling",
+  "group": "capital-equipment",
+  "priceBasis": "1900-wholesale",
+  "tradeable": false
  }
 ]

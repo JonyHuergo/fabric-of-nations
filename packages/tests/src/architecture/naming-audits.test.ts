@@ -182,8 +182,12 @@ describe("M14 monetary equivalence and determinism", () => {
   // x 0.52, cotton at the 1905 Yearbook's world crop, ranch wool 34.4 kg per throughput
   // unit, mill fibre 246.7 cotton + 70 wool; A12 batch 4 (Haiti 1899-1900, Ecuador and
   // Santo Domingo cocoa, Ecuador, Costa Rica and Peru rubber); 6,241 buildings.
+  // Re-pinned on 2026-11-08, by design (P6, D-153): the demand system replaces the tiers
+  // (placement by its 1900 quantities, the cloth factor removed), good 59 dwelling and the
+  // residential builder, block incomes, dwellings and housing references, schema 34 and
+  // data m3-economy-v14.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("e5a8eecc9d898cee");
+    expect(hashWorld(world)).toBe("ee45f584207dc7ae");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {
@@ -195,7 +199,7 @@ describe("M14 monetary equivalence and determinism", () => {
     // P4 (D-142): schema 31 adds the block demography and the annual record.
     // P5 (D-143): schema 32 adds the deposits and the monthly closing balances.
     // P5b (D-146): schema 33 adds the deposit link, province latitude and three sectors.
-    expect(envelope.schemaVersion).toBe(33);
+    expect(envelope.schemaVersion).toBe(34);
     expect(hasLegacyMonetaryKey(envelope.payload)).toBe(false);
     expect(save).toContain("balanceRUSD");
     expect(save).not.toMatch(/SUSD|Susd|susd/);
@@ -223,7 +227,8 @@ describe("M14 current documentation and protocol", () => {
     // 21: province ownership columns, harvest column and province land (D-143).
     // 22: sparse market prices, compact price rows, goods groups, SET_MARKET_FOCUS,
     //     metal-standard and currency actions, country resources (P5b, D-151).
-    expect(PROTOCOL_VERSION).toBe(22);
+    // 23: households section, province dwellings and crowding columns (P6, D-153).
+    expect(PROTOCOL_VERSION).toBe(23);
   });
 
   test("the monetary terminology audit passes", () => {

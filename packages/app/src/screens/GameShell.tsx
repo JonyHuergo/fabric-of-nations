@@ -1252,6 +1252,14 @@ function ProvinceEconomySection({ economy }: { readonly economy: ProvinceEconomy
         value={`${percentText(economy.urbanShare)} urban`}
         detail={`Adult literacy ${percentText(economy.literacy)} · 1900 urban share from HYDE 3.3`}
       />
+      {economy.dwellings === null || economy.crowding === null ? null : (
+        <StatRow
+          label="Housing"
+          value={`${economy.dwellings > 0 ? (economy.population / economy.dwellings).toFixed(1) : "—"} per dwelling`}
+          detail={`${formatPeople(Math.round(economy.dwellings))} dwellings · crowding ${percentText(economy.crowding)} of 1900`}
+          tone={economy.crowding > 1.05 ? "negative" : "default"}
+        />
+      )}
       {focus === null || focus.demography === null ? null : (
         <>
           <DemographyRows demography={focus.demography} compact />

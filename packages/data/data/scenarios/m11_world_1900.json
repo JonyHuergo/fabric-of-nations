@@ -1,7 +1,7 @@
 {
   "meta": {
     "scenarioId": "m11-world-1900",
-    "dataVersion": "m3-economy-v13",
+    "dataVersion": "m3-economy-v14",
     "status": "provisional",
     "description": "Authored 1900 world for M11/M11b country selection: 67 polities (66 selectable), 66 dependent territories, and 20 documented markets. Population totals are rounded historical estimates; occupation composition, market grouping, building levels, fiscal and technology starts are provisional authored inputs; map geometry is Natural Earth 1:50m aggregated with an explicit 1900 crosswalk. Polities without reliable 1900 polygon data use marker-only map approximations. Not a full historical reconstruction.",
     "startDayIndex": 0,
@@ -172,7 +172,7 @@
       "provinces": "historical/p5b/provinces_1900.json",
       "markets": "historical/p5b/markets_1900.json",
       "tradeRoutes": "historical/p5b/trade_routes_1900.json",
-      "populations": "historical/p2b/pops_1900.json",
+      "populations": "historical/p6/pops_1900.json",
       "buildings": "historical/p5b/buildings_1900.json",
       "employment": "historical/p2b/employment_1900.json",
       "calibration": "historical/p2b/calibration_targets_1900.json",
@@ -188,7 +188,8 @@
       "buildings": "historical/p5b/buildings_definitions_1900.json",
       "needs": "historical/p5b/needs_1900.json",
       "demography": "demography.json",
-      "technology": "technology.json"
+      "technology": "technology.json",
+      "demandSystem": "historical/p6/demand_1900.json"
     },
     "countryMeta": [
       {

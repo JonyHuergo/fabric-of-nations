@@ -60,6 +60,7 @@ import {
   type MonetaryArrangement,
   type MonetaryCurrencyInput,
   type MoneyCoefficients,
+  type DemandSystemDef,
   type NeedTierDef,
   type PoliticsDefinitions,
   type PopulationDefinitions,
@@ -143,6 +144,8 @@ export interface HistoricalScenarioDefinitions {
   readonly needs: string;
   readonly demography: string;
   readonly technology: string;
+  /** P6 (D-153): the demand system (linear expenditure system); absent: need tiers. */
+  readonly demandSystem?: string;
 }
 
 export interface HistoricalProfitDistributionInput {
@@ -252,6 +255,8 @@ export interface HistoricalProvinceInput {
   readonly absLatitudeDeg?: number;
   /** P5b (C-12): gross theoretical hydro potential, MWh/year (HydroSHEDS RiverATLAS). */
   readonly hydroPotentialMWhPerYear?: number;
+  /** P6 (D-153): persons per dwelling at the 1900 census (or the recorded proxy). */
+  readonly housingReferencePersonsPerDwelling?: number;
   readonly sourceIds: readonly string[];
   readonly calibrationStatus: "source-backed" | "provisional";
 }
@@ -301,6 +306,8 @@ export interface HistoricalPopulationInput {
   readonly wealthLevel: number;
   readonly savingsPerCapitaRUSD: number;
   readonly militancy: number;
+  /** P6 (D-153): expected 1900 income per person per day, RUSD (generator estimate). */
+  readonly incomeRUSDPerCapitaDay?: number;
   readonly sourceIds: readonly string[];
   readonly calibrationStatus: "source-backed" | "provisional";
 }
@@ -753,6 +760,9 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
       needs: stringField(definitions, "needs", "meta.definitions", errors),
       demography: stringField(definitions, "demography", "meta.definitions", errors),
       technology: stringField(definitions, "technology", "meta.definitions", errors),
+      ...(definitions.demandSystem === undefined
+        ? {}
+        : { demandSystem: stringField(definitions, "demandSystem", "meta.definitions", errors) }),
     },
     ...(profitDistribution === undefined ? {} : { profitDistribution }),
     ...(countryAI === undefined ? {} : { countryAI }),
@@ -1133,6 +1143,13 @@ function parseProvinces(value: unknown, errors: string[]): HistoricalProvinceInp
     if (hydroPotentialMWhPerYear !== undefined && !(hydroPotentialMWhPerYear >= 0)) {
       errors.push(`${path}.hydroPotentialMWhPerYear must be non-negative`);
     }
+    const housingReferencePersonsPerDwelling =
+      record.housingReferencePersonsPerDwelling === undefined
+        ? undefined
+        : numberField(record, "housingReferencePersonsPerDwelling", path, errors);
+    if (housingReferencePersonsPerDwelling !== undefined && !(housingReferencePersonsPerDwelling > 0)) {
+      errors.push(`${path}.housingReferencePersonsPerDwelling must be positive`);
+    }
     const infrastructure =
       record.infrastructure === undefined
         ? undefined
@@ -1158,6 +1175,7 @@ function parseProvinces(value: unknown, errors: string[]): HistoricalProvinceInp
       ...(wages === undefined ? {} : { wageRUSDPerYearByProfession: wages }),
       ...(absLatitudeDeg === undefined ? {} : { absLatitudeDeg }),
       ...(hydroPotentialMWhPerYear === undefined ? {} : { hydroPotentialMWhPerYear }),
+      ...(housingReferencePersonsPerDwelling === undefined ? {} : { housingReferencePersonsPerDwelling }),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       calibrationStatus: status === "source-backed" ? "source-backed" : "provisional",
     };
@@ -1252,6 +1270,9 @@ function parsePopulations(value: unknown, errors: string[]): HistoricalPopulatio
       wealthLevel: numberField(record, "wealthLevel", path, errors),
       savingsPerCapitaRUSD: numberField(record, "savingsPerCapitaRUSD", path, errors),
       militancy: numberField(record, "militancy", path, errors),
+      ...(record.incomeRUSDPerCapitaDay === undefined
+        ? {}
+        : { incomeRUSDPerCapitaDay: numberField(record, "incomeRUSDPerCapitaDay", path, errors) }),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       calibrationStatus: status === "source-backed" ? "source-backed" : "provisional",
     };
@@ -2352,6 +2373,10 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     fertilityMultipliers: demography.fertilityMultipliers.filter((entry) =>
       professions.some((profession) => profession.id === entry.professionId),
     ),
+    // P6 (D-153): the demand system replaces the tiers for household demand.
+    ...(data.meta.definitions.demandSystem === undefined
+      ? {}
+      : { demandSystem: readJson<DemandSystemDef>(data.meta.definitions.demandSystem) }),
   };
   assertValidPopulationDefinitions(populationDefinitions);
 
@@ -2417,6 +2442,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       wealthLevel: population.wealthLevel,
       initialSavingsRUSD: population.population * population.savingsPerCapitaRUSD,
       militancy: population.militancy,
+      ...(population.incomeRUSDPerCapitaDay === undefined ? {} : { incomeRUSDPerCapitaDay: population.incomeRUSDPerCapitaDay }),
       ...(provinceDemography === undefined
         ? data.meta.worldDemography === undefined
           ? {}
@@ -2448,6 +2474,9 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       ...(province.hydroPotentialMWhPerYear === undefined
         ? {}
         : { hydroPotentialMWhPerYear: province.hydroPotentialMWhPerYear }),
+      ...(province.housingReferencePersonsPerDwelling === undefined
+        ? {}
+        : { housingReferencePersonsPerDwelling: province.housingReferencePersonsPerDwelling }),
       ...(province.wageRUSDPerYearByProfession === undefined
         ? {}
         : {

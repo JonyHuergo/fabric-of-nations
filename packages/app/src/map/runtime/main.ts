@@ -173,9 +173,9 @@ class MapController {
         return;
       case "set-states": {
         const next = [...this.states];
-        for (const [index, ownerTag, controllerTag, unitTag, marketId, densityPerKm2, urbanShare, literacy, unrest, harvest] of command.changes) {
+        for (const [index, ownerTag, controllerTag, unitTag, marketId, densityPerKm2, urbanShare, literacy, unrest, harvest, crowding] of command.changes) {
           if (index < next.length) {
-            next[index] = { ownerTag, controllerTag, unitTag, marketId, densityPerKm2, urbanShare, literacy, unrest, harvest };
+            next[index] = { ownerTag, controllerTag, unitTag, marketId, densityPerKm2, urbanShare, literacy, unrest, harvest, crowding };
           }
         }
         this.states = next;

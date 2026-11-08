@@ -120,7 +120,7 @@ try {
   await sleep(800);
   await press(app, "Markets");
   let body = await waitForText(app, "goods traded", 30_000);
-  check("home market counts the goods traded of 59", /\d+ of 59 goods traded/.test(body), body.match(/\d+ of 59 goods traded/)?.[0] ?? null);
+  check("home market counts the goods traded of 60", /\d+ of 60 goods traded/.test(body), body.match(/\d+ of 60 goods traded/)?.[0] ?? null);
   const searchHeight = await heightOf(app, 'input[aria-label="Search goods"]');
   check("goods search field is at least 44 pt", searchHeight !== null && searchHeight >= 44, String(searchHeight));
   const chipHeight = await buttonHeight(app, "Capital and transport equipment");
@@ -202,6 +202,43 @@ try {
 
   const small = await app.evaluate(`(() => Array.from(document.querySelectorAll('[role="button"]')).filter((node) => { const r = node.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.height < 44; }).map((node) => (node.getAttribute('aria-label') ?? node.textContent ?? '').trim().slice(0, 40)).slice(0, 10))()`);
   check("every visible button on the Money screen is at least 44 pt", small.length === 0, JSON.stringify(small));
+
+  // P6 (D-153): the Households section and the Crowding lens.
+  await app.step("Population screen households");
+  await press(app, "Society");
+  await sleep(600);
+  await press(app, "Population");
+  body = await waitForText(app, "Households", 30_000);
+  check("Households section shows the food share and saving", body.includes("Food share") && body.includes("Saving rate"), null);
+  check("Households section shows housing per dwelling and crowding", /per dwelling/.test(body) && body.includes("crowding"), body.match(/[0-9.]+ per dwelling/)?.[0] ?? null);
+  await reveal(app, "Food share");
+  await sleep(400);
+  await shot(app, "p6-844x390-households");
+  await press(app, "Close sheet", false);
+  await sleep(800);
+
+  await app.step("crowding lens");
+  const lensSwitch = await app.evaluate(`(() => {
+    const node = Array.from(document.querySelectorAll('[aria-label]')).find((candidate) => (candidate.getAttribute('aria-label') ?? '').startsWith('Map lens'));
+    if (!node) return null;
+    const box = node.getBoundingClientRect();
+    node.click();
+    return { height: box.height };
+  })()`);
+  check("lens switch is at least 44 pt", lensSwitch !== null && lensSwitch.height >= 44, JSON.stringify(lensSwitch));
+  await sleep(800);
+  const crowdingChip = await app.evaluate(`(() => {
+    const node = Array.from(document.querySelectorAll('[role="button"]')).find((candidate) => (candidate.textContent ?? '').trim() === 'Crowding');
+    if (!node) return null;
+    const box = node.getBoundingClientRect();
+    node.click();
+    return { height: box.height };
+  })()`);
+  check("Crowding lens offered, at least 44 pt", crowdingChip !== null && crowdingChip.height >= 44, JSON.stringify(crowdingChip));
+  await sleep(1500);
+  body = await app.text();
+  check("crowding legend shows the bands", body.includes("Below 90%") && body.includes("125% and above"), null);
+  await shot(app, "p6-844x390-crowding-lens");
 
   const report = await app.dumpReport();
   const consoleErrors = report.events.console.filter((entry) => entry.type === "error");

@@ -42,7 +42,8 @@ export function diffProvinceStates(
       before.urbanShare !== state.urbanShare ||
       before.literacy !== state.literacy ||
       before.unrest !== state.unrest ||
-      before.harvest !== state.harvest
+      before.harvest !== state.harvest ||
+      before.crowding !== state.crowding
     ) {
       changes.push([
         index,
@@ -55,6 +56,7 @@ export function diffProvinceStates(
         state.literacy,
         state.unrest,
         state.harvest,
+        state.crowding,
       ]);
     }
   });

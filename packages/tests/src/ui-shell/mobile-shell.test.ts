@@ -418,8 +418,8 @@ describe("the bridge", () => {
     {
       type: "set-states",
       changes: [
-        [4, "FRA", "DEU", "FRA", 2, 61.5, 0.3, 0.8, 0.02, 1.07],
-        [5, "DEU", "DEU", "DEU", null, null, null, null, null, null],
+        [4, "FRA", "DEU", "FRA", 2, 61.5, 0.3, 0.8, 0.02, 1.07, 1.12],
+        [5, "DEU", "DEU", "DEU", null, null, null, null, null, null, null],
       ],
     },
     { type: "set-selection", selectedTag: "GBR", playerTag: null, selectedProvinceIndex: 12 },
@@ -516,6 +516,7 @@ describe("the bridge", () => {
       first.literacy,
       first.unrest,
       first.harvest,
+      first.crowding,
     ];
     expect(diffProvinceStates(base, next)).toEqual([change]);
     expect(planMapCommands(inputs(), inputs({ states: next }), base)).toEqual([

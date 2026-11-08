@@ -221,9 +221,13 @@ describe("P2b traceability of every money value", () => {
 describe("P2b 1900 world", () => {
   it("reads the calibrated tables and the 1900-world definitions", () => {
     const meta = readJson<{ meta: { files: Record<string, string>; definitions: Record<string, string> } }>("scenarios/m11_world_1900.json").meta;
-    for (const key of ["populations", "employment", "calibration", "moneyCoefficients"]) {
+    for (const key of ["employment", "calibration", "moneyCoefficients"]) {
       expect(meta.files[key]).toMatch(/^historical\/p2b\//);
     }
+    // P6 (D-153): the populations are the P2b blocks with their expected 1900 income,
+    // written by scripts/p5b/build-goods-1900.mjs; the demand system replaces the tiers.
+    expect(meta.files.populations).toBe("historical/p6/pops_1900.json");
+    expect(meta.definitions.demandSystem).toBe("historical/p6/demand_1900.json");
     // P5b (D-148): the markets (opening stock of every good), routes (capacity from the
     // new coverage), buildings (57-good placement), provinces (P5 land plus latitude),
     // countries (P5 surveys plus the A9 grants and the new fiscal values) and the goods,
@@ -299,12 +303,13 @@ describe("P2b 1900 world", () => {
     expect(Math.abs(closing / opening - 1)).toBeLessThan(0.02);
   });
 
-  it("serializes the wage tables, techniques and money coefficients (schema 29, kept in 33)", () => {
+  it("serializes the wage tables, techniques and money coefficients (schema 29, kept in 34)", () => {
     // P3 (D-141) raised the schema to 30 (closing valuations) and P4 (D-142) to 31 (block
     // demography, annual record); the P2b fields are unchanged.
     // P5 (D-143) raised it to 32 (deposits, closing balances); the P2b fields are unchanged.
     // P5b (D-146) raised it to 33 (deposit link, province latitude, three sectors).
-    expect(WORLD_SCHEMA_VERSION).toBe(33);
+    // P6 (D-153) raised it to 34 (demand and housing state); the P2b fields are unchanged.
+    expect(WORLD_SCHEMA_VERSION).toBe(34);
     const restored = deserializeWorld(serializeWorld(world));
     expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(restored.moneyCoefficients).toEqual(world.moneyCoefficients);

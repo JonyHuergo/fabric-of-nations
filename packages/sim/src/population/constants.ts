@@ -382,10 +382,13 @@ export const DWELLING_DEPRECIATION_RATE_PER_YEAR = 0.005;
 export const DWELLING_INCOME_ELASTICITY = 0.46;
 
 /**
- * A household closes the gap between its desired and actual dwellings over this many
- * days (building takes time and is paid from saving). Days; PROVISIONAL. Daily.
+ * Each day a household orders the dwellings that depreciated plus 1/30 of the gap
+ * between its desired and actual dwellings. Population growth opens the gap a little
+ * every day, so after about a month orders settle at replacement plus growth, the flow
+ * the 1900 builders are sized to; in steady growth the gap stays near
+ * growth × 30 days (crowding within about 0.1 % of 1900). Days; PROVISIONAL. Daily.
  */
-export const HOUSING_ADJUSTMENT_DAYS = 365;
+export const HOUSING_ADJUSTMENT_DAYS = 30;
 
 /**
  * Crowding (persons per dwelling ÷ the block's 1900 persons per dwelling) above which

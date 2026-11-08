@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-11-08T16:50:49.354Z",
+  "startedAt": "2026-11-08T22:19:01.006Z",
   "viewport": "844,390",
   "checks": [
     {
@@ -8,9 +8,9 @@
       "detail": "{\"width\":844,\"height\":390}"
     },
     {
-      "name": "home market counts the goods traded of 59",
+      "name": "home market counts the goods traded of 60",
       "passed": true,
-      "detail": "39 of 59 goods traded"
+      "detail": "41 of 60 goods traded"
     },
     {
       "name": "goods search field is at least 44 pt",
@@ -65,7 +65,7 @@
     {
       "name": "a hydro station shows the province's river flow",
       "passed": true,
-      "detail": "River flow for hydro stations: 15.9k MWh a day, 15.7k MWh left (a new station needs 175.2 MWh)."
+      "detail": "River flow for hydro stations: 15.9k MWh a day, 15.2k MWh left (a new station needs 175.2 MWh)."
     },
     {
       "name": "Money screen shows the gold standard and the mint's metal",
@@ -81,6 +81,31 @@
       "name": "every visible button on the Money screen is at least 44 pt",
       "passed": true,
       "detail": "[]"
+    },
+    {
+      "name": "Households section shows the food share and saving",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Households section shows housing per dwelling and crowding",
+      "passed": true,
+      "detail": "4.80 per dwelling"
+    },
+    {
+      "name": "lens switch is at least 44 pt",
+      "passed": true,
+      "detail": "{\"height\":44}"
+    },
+    {
+      "name": "Crowding lens offered, at least 44 pt",
+      "passed": true,
+      "detail": "{\"height\":44}"
+    },
+    {
+      "name": "crowding legend shows the bands",
+      "passed": true,
+      "detail": null
     },
     {
       "name": "no console errors",
@@ -106,7 +131,9 @@
     "docs/images/p5b/p5b-844x390-production.png",
     "docs/images/p5b/p5b-844x390-construction.png",
     "docs/images/p5b/p5b-844x390-construction-hydro.png",
-    "docs/images/p5b/p5b-844x390-money.png"
+    "docs/images/p5b/p5b-844x390-money.png",
+    "docs/images/p5b/p6-844x390-households.png",
+    "docs/images/p5b/p6-844x390-crowding-lens.png"
   ],
-  "finishedAt": "2026-11-08T16:51:30.012Z"
+  "finishedAt": "2026-11-08T22:19:42.821Z"
 }

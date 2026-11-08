@@ -1,0 +1,485 @@
+{
+ "commerceGoodKey": "commerce",
+ "transportGoodKey": "transport-services",
+ "categories": [
+  {
+   "key": "food",
+   "substitutionElasticity": 1.5,
+   "committedAtSubsistenceTier": true,
+   "goods": [
+    {
+     "goodKey": "grain",
+     "committedPerAdultEquivalentPerDay": 0.70907939,
+     "retailCommercePerUnit": 0.31025218,
+     "retailTransportPerUnit": 0.20683479
+    },
+    {
+     "goodKey": "livestock",
+     "committedPerAdultEquivalentPerDay": 0.040365051,
+     "retailCommercePerUnit": 1.6585856,
+     "retailTransportPerUnit": 1.1057237
+    },
+    {
+     "goodKey": "fish",
+     "committedPerAdultEquivalentPerDay": 0.040365051,
+     "retailCommercePerUnit": 1.0167623,
+     "retailTransportPerUnit": 0.67784156
+    },
+    {
+     "goodKey": "food-products",
+     "committedPerAdultEquivalentPerDay": 0.040365051,
+     "retailCommercePerUnit": 0.27077599,
+     "retailTransportPerUnit": 0.18051733
+    },
+    {
+     "goodKey": "dairy",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0.35224649,
+     "retailTransportPerUnit": 0.23483099
+    },
+    {
+     "goodKey": "produce",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0.05544417,
+     "retailTransportPerUnit": 0.03696278
+    },
+    {
+     "goodKey": "sugar",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0.11142139,
+     "retailTransportPerUnit": 0.074280929
+    },
+    {
+     "goodKey": "coffee-tea-cocoa",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 3.1940519,
+     "retailTransportPerUnit": 2.129368
+    }
+   ]
+  },
+  {
+   "key": "clothing",
+   "substitutionElasticity": 1.2,
+   "committedAtSubsistenceTier": false,
+   "goods": [
+    {
+     "goodKey": "clothing",
+     "committedPerAdultEquivalentPerDay": 0.013455017,
+     "retailCommercePerUnit": 5.74208,
+     "retailTransportPerUnit": 0
+    },
+    {
+     "goodKey": "textiles",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0
+    }
+   ]
+  },
+  {
+   "key": "fuel-light",
+   "substitutionElasticity": 2,
+   "committedAtSubsistenceTier": false,
+   "goods": [
+    {
+     "goodKey": "timber",
+     "committedPerAdultEquivalentPerDay": 0.0004,
+     "retailCommercePerUnit": 181.6275,
+     "retailTransportPerUnit": 272.44125
+    },
+    {
+     "goodKey": "coal",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 27.0192,
+     "retailTransportPerUnit": 40.5288
+    },
+    {
+     "goodKey": "kerosene",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 295.23933,
+     "retailTransportPerUnit": 0
+    },
+    {
+     "goodKey": "electricity",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0,
+     "requiredTechnologyKey": "electrical-generation"
+    },
+    {
+     "goodKey": "natural-gas",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0,
+     "requiredTechnologyKey": "pipelines"
+    },
+    {
+     "goodKey": "fuel-oil",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0
+    }
+   ]
+  },
+  {
+   "key": "household-goods",
+   "substitutionElasticity": 2,
+   "committedAtSubsistenceTier": false,
+   "goods": [
+    {
+     "goodKey": "household-goods",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 7.852,
+     "retailTransportPerUnit": 2.6173333
+    },
+    {
+     "goodKey": "appliances",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0,
+     "requiredTechnologyKey": "refrigeration"
+    },
+    {
+     "goodKey": "radios",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0,
+     "requiredTechnologyKey": "radio"
+    },
+    {
+     "goodKey": "televisions",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0,
+     "requiredTechnologyKey": "television"
+    },
+    {
+     "goodKey": "computers",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0,
+     "requiredTechnologyKey": "personal-computers"
+    },
+    {
+     "goodKey": "mobile-phones",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0,
+     "requiredTechnologyKey": "mobile-telephony"
+    }
+   ]
+  },
+  {
+   "key": "tobacco",
+   "substitutionElasticity": 1,
+   "committedAtSubsistenceTier": false,
+   "goods": [
+    {
+     "goodKey": "tobacco",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 9.03618,
+     "retailTransportPerUnit": 0
+    }
+   ]
+  },
+  {
+   "key": "transport",
+   "substitutionElasticity": 1.5,
+   "committedAtSubsistenceTier": false,
+   "goods": [
+    {
+     "goodKey": "transport-services",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0
+    },
+    {
+     "goodKey": "motor-vehicles",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0,
+     "requiredTechnologyKey": "internal-combustion"
+    },
+    {
+     "goodKey": "petrol",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0,
+     "requiredTechnologyKey": "internal-combustion"
+    }
+   ]
+  },
+  {
+   "key": "services",
+   "substitutionElasticity": 1.5,
+   "committedAtSubsistenceTier": false,
+   "goods": [
+    {
+     "goodKey": "personal-services",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0
+    },
+    {
+     "goodKey": "communication",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0
+    },
+    {
+     "goodKey": "finance-services",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0
+    },
+    {
+     "goodKey": "pharmaceuticals",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0
+    },
+    {
+     "goodKey": "paper",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 972.861,
+     "retailTransportPerUnit": 0
+    },
+    {
+     "goodKey": "jewellery",
+     "committedPerAdultEquivalentPerDay": 0,
+     "retailCommercePerUnit": 0,
+     "retailTransportPerUnit": 0
+    }
+   ]
+  }
+ ],
+ "knots": [
+  {
+   "consumptionRatio": 1.4613655,
+   "marginalShares": {
+    "food": 0.660616179,
+    "clothing": 0.2042891137,
+    "fuel-light": 0.03556061388,
+    "services": 0.09953409337
+   },
+   "goodWeights": {
+    "food": {
+     "livestock": 0.1588533891,
+     "dairy": 0.04538668259,
+     "fish": 0.0226933413,
+     "food-products": 0.3887234996,
+     "grain": 0.1397611227,
+     "produce": 0.1747014034,
+     "sugar": 0.03494028068,
+     "coffee-tea-cocoa": 0.03494028068
+    },
+    "clothing": {
+     "clothing": 0.9,
+     "textiles": 0.1
+    },
+    "fuel-light": {
+     "coal": 0.45,
+     "kerosene": 0.3,
+     "timber": 0.2,
+     "electricity": 0.05
+    },
+    "household-goods": {
+     "household-goods": 1
+    },
+    "tobacco": {
+     "tobacco": 1
+    },
+    "transport": {
+     "transport-services": 1
+    },
+    "services": {
+     "personal-services": 0.55,
+     "finance-services": 0.2,
+     "communication": 0.08,
+     "pharmaceuticals": 0.07,
+     "paper": 0.05,
+     "jewellery": 0.05
+    }
+   }
+  },
+  {
+   "consumptionRatio": 5.1420877,
+   "marginalShares": {
+    "food": 0.4088007088,
+    "clothing": 0.2436513591,
+    "fuel-light": 0.03699765275,
+    "household-goods": 0.05654451785,
+    "tobacco": 0.02348576893,
+    "transport": 0.02909460336,
+    "services": 0.2014253893
+   },
+   "goodWeights": {
+    "food": {
+     "livestock": 0.3421,
+     "fish": 0.0245,
+     "dairy": 0.2126,
+     "coffee-tea-cocoa": 0.049,
+     "sugar": 0.0534,
+     "food-products": 0.1707,
+     "produce": 0.1477
+    },
+    "clothing": {
+     "clothing": 0.9,
+     "textiles": 0.1
+    },
+    "fuel-light": {
+     "coal": 0.45,
+     "kerosene": 0.3,
+     "timber": 0.2,
+     "electricity": 0.05
+    },
+    "household-goods": {
+     "household-goods": 1
+    },
+    "tobacco": {
+     "tobacco": 1
+    },
+    "transport": {
+     "transport-services": 1
+    },
+    "services": {
+     "personal-services": 0.55,
+     "finance-services": 0.2,
+     "communication": 0.08,
+     "pharmaceuticals": 0.07,
+     "paper": 0.05,
+     "jewellery": 0.05
+    }
+   }
+  },
+  {
+   "consumptionRatio": 18.948514,
+   "marginalShares": {
+    "food": 0.1844434602,
+    "clothing": 0.09755095537,
+    "fuel-light": 0.0487326254,
+    "household-goods": 0.1273603515,
+    "transport": 0.268360565,
+    "services": 0.2735520426
+   },
+   "goodWeights": {
+    "food": {
+     "food-products": 0.6386883557,
+     "livestock": 0.1144770162,
+     "fish": 0.01717155243,
+     "dairy": 0.07612858921,
+     "produce": 0.08841581184,
+     "sugar": 0.04069917164,
+     "coffee-tea-cocoa": 0.02441950298
+    },
+    "clothing": {
+     "clothing": 0.9,
+     "textiles": 0.1
+    },
+    "fuel-light": {
+     "electricity": 0.55,
+     "natural-gas": 0.3,
+     "fuel-oil": 0.1,
+     "timber": 0.05
+    },
+    "household-goods": {
+     "household-goods": 0.55,
+     "appliances": 0.2,
+     "televisions": 0.1,
+     "radios": 0.05,
+     "computers": 0.05,
+     "mobile-phones": 0.05
+    },
+    "tobacco": {
+     "tobacco": 1
+    },
+    "transport": {
+     "motor-vehicles": 0.417539267,
+     "petrol": 0.2028795812,
+     "transport-services": 0.3795811518
+    },
+    "services": {
+     "personal-services": 0.5,
+     "finance-services": 0.2,
+     "communication": 0.1,
+     "pharmaceuticals": 0.12,
+     "paper": 0.04,
+     "jewellery": 0.04
+    }
+   }
+  }
+ ],
+ "tastes": [
+  {
+   "countryKey": "AUT",
+   "goodKey": "coffee-tea-cocoa",
+   "weightMultiplier": 0.3108
+  },
+  {
+   "countryKey": "AUT",
+   "goodKey": "sugar",
+   "weightMultiplier": 0.4304
+  },
+  {
+   "countryKey": "BEL",
+   "goodKey": "coffee-tea-cocoa",
+   "weightMultiplier": 1.1015
+  },
+  {
+   "countryKey": "BEL",
+   "goodKey": "sugar",
+   "weightMultiplier": 0.3738
+  },
+  {
+   "countryKey": "DEU",
+   "goodKey": "coffee-tea-cocoa",
+   "weightMultiplier": 0.8946
+  },
+  {
+   "countryKey": "DEU",
+   "goodKey": "sugar",
+   "weightMultiplier": 0.6664
+  },
+  {
+   "countryKey": "FRA",
+   "goodKey": "coffee-tea-cocoa",
+   "weightMultiplier": 0.6622
+  },
+  {
+   "countryKey": "FRA",
+   "goodKey": "sugar",
+   "weightMultiplier": 0.684
+  },
+  {
+   "countryKey": "GBR",
+   "goodKey": "coffee-tea-cocoa",
+   "weightMultiplier": 1.166
+  },
+  {
+   "countryKey": "GBR",
+   "goodKey": "sugar",
+   "weightMultiplier": 1.2125
+  },
+  {
+   "countryKey": "ITA",
+   "goodKey": "coffee-tea-cocoa",
+   "weightMultiplier": 0.2092
+  },
+  {
+   "countryKey": "ITA",
+   "goodKey": "sugar",
+   "weightMultiplier": 0.2437
+  },
+  {
+   "countryKey": "RUS",
+   "goodKey": "coffee-tea-cocoa",
+   "weightMultiplier": 1.2392
+  },
+  {
+   "countryKey": "RUS",
+   "goodKey": "sugar",
+   "weightMultiplier": 1.0705
+  }
+ ],
+ "dwellingGoodKey": "dwelling"
+}
