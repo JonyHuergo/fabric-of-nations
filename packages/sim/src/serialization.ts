@@ -230,6 +230,13 @@ export type SerializedProvinceEconomy = {
   readonly urbanShare: number;
   readonly wageRUSDPerYearByProfession: readonly number[];
   readonly absLatitudeDeg: number | null;
+  /**
+   * P5b (C-12): present on every province (null where it has none) when any province of
+   * the world has a hydro potential, and absent on all of them otherwise (absent means
+   * null), so worlds without hydro data keep their schema-33 encoding and the save's
+   * column table keeps one set of fields.
+   */
+  readonly hydroPotentialMWhPerYear?: number | null;
 };
 
 /** Encoded financial account. */
@@ -1348,6 +1355,8 @@ function encodePeriodSummary(summary: FinancePeriodSummary): SerializedFinancePe
 /** Encode all authoritative world fields. Validates the world first. */
 export function encodeWorld(world: World): SerializedWorld {
   assertValidWorld(world);
+  // P5b (C-12): the hydro field is written for every province or for none.
+  const encodeHydro = world.provinceEconomies.some((entry) => entry.hydroPotentialMWhPerYear !== null);
   return {
     schemaVersion: world.schemaVersion,
     simVersion: world.simVersion,
@@ -1370,6 +1379,7 @@ export function encodeWorld(world: World): SerializedWorld {
       urbanShare: province.urbanShare,
       wageRUSDPerYearByProfession: [...province.wageRUSDPerYearByProfession],
       absLatitudeDeg: province.absLatitudeDeg,
+      ...(encodeHydro ? { hydroPotentialMWhPerYear: province.hydroPotentialMWhPerYear } : {}),
     })),
     countries: [...world.countries]
       .sort((left, right) => left.id - right.id)
@@ -1974,6 +1984,10 @@ function decodeProvinceEconomy(value: unknown, path: string): ProvinceEconomy {
     wageRUSDPerYearByProfession: wages,
     absLatitudeDeg:
       record.absLatitudeDeg === null ? null : requireFiniteNumber(record.absLatitudeDeg, `${path}.absLatitudeDeg`),
+    hydroPotentialMWhPerYear:
+      record.hydroPotentialMWhPerYear === undefined || record.hydroPotentialMWhPerYear === null
+        ? null
+        : requireFiniteNumber(record.hydroPotentialMWhPerYear, `${path}.hydroPotentialMWhPerYear`),
   };
 }
 

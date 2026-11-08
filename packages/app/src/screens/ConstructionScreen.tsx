@@ -264,6 +264,17 @@ export function ConstructionScreen({
             })()}
           </Text>
         ) : null}
+        {selectedType !== null && selectedType.usesHydroPotential ? (
+          <Text style={styles.depositNote}>
+            {(() => {
+              const land = snapshot.focusProvince?.provinceId === provinceId ? snapshot.focusProvince?.land : null;
+              if (land === null || land === undefined) return "The province's river flow appears here once it is selected.";
+              if (land.hydro === null) return "No hydro potential in this province: a hydro station needs a river with fall and flow.";
+              const levelOne = selectedType.outputs[0]?.dailyCapacityAtLevelOne ?? 0;
+              return `River flow for hydro stations: ${formatQuantity(land.hydro.capacityMWhPerDay)} MWh a day, ${formatQuantity(Math.max(0, land.hydro.roomMWhPerDay))} MWh left (a new station needs ${formatQuantity(levelOne)} MWh).`;
+            })()}
+          </Text>
+        ) : null}
         {selectedType === null ? null : (
           <>
             <StatRow

@@ -472,6 +472,8 @@ export interface SnapshotProjectType {
   readonly workingCapitalRUSD: number;
   readonly outputs: readonly SnapshotProjectOutput[];
   readonly materials: readonly SnapshotConstructionMaterialRequirement[];
+  /** P5b (C-12): the type generates from its province's river flow (hydro station). */
+  readonly usesHydroPotential: boolean;
 }
 
 /** Current material state of a construction project. */
@@ -1486,6 +1488,12 @@ export interface ProvinceLandSnapshot {
   /** Of it, kept by the owner households before the market, by good. */
   readonly keptToday: readonly GoodQuantitySnapshot[];
   readonly deposits: readonly DepositSnapshot[];
+  /**
+   * P5b (C-12): the most the province's hydro stations can generate a day (technical share
+   * of the rivers' gross potential, MWh) and what is left after the stations and projects
+   * already there (may be negative); null where the province has no hydro potential.
+   */
+  readonly hydro: { readonly capacityMWhPerDay: number; readonly roomMWhPerDay: number } | null;
 }
 
 export interface CountryDemographySnapshot {
@@ -2751,6 +2759,7 @@ function isProjectType(value: unknown): value is SnapshotProjectType {
     isFiniteNumber(value.plannedJobs) &&
     isFiniteNumber(value.dailyUpkeepRUSDAtLevelOne) &&
     isFiniteNumber(value.workingCapitalRUSD) &&
+    typeof value.usesHydroPotential === "boolean" &&
     value.outputs.every((output) => isProjectOutput(output)) &&
     value.materials.every((material) => isConstructionMaterialRequirement(material))
   );
@@ -3080,6 +3089,12 @@ function isProvinceLandSnapshot(value: unknown): value is ProvinceLandSnapshot {
   }
   if (!isIntegerIn(value.harvestYear, 1900, 2100)) return false;
   if (!isGoodQuantityList(value.farmOutputToday) || !isGoodQuantityList(value.keptToday)) return false;
+  if (
+    value.hydro !== null &&
+    !(isRecord(value.hydro) && isFiniteNumber(value.hydro.capacityMWhPerDay) && value.hydro.capacityMWhPerDay >= 0 && isFiniteNumber(value.hydro.roomMWhPerDay))
+  ) {
+    return false;
+  }
   return (
     Array.isArray(value.deposits) &&
     value.deposits.every(

@@ -1,0 +1,9777 @@
+{
+ "meta": {
+  "dataset": "HydroSHEDS RiverATLAS v1.0 (shapefile release)",
+  "citation": "Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Tan, F., Thieme, M. (2019). Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution. Scientific Data 6: 283. doi:10.1038/s41597-019-0300-6",
+  "attributeSources": "dis_m3_pyr: WaterGAP 2.2 (Döll, Kaspar & Lehner 2003, Journal of Hydrology 270: 105-134); ele_mt_cmn and sgr_dk_rav: EarthEnv-DEM90 (Robinson, Regetz & Guralnick 2014, ISPRS J. Photogramm. Remote Sens. 87: 57-67); HYRIV_ID, NEXT_DOWN, LENGTH_KM: HydroRIVERS (Lehner & Grill 2013, Hydrological Processes 27(15): 2171-2186)",
+  "url": "https://www.hydrosheds.org/hydroatlas",
+  "file": "RiverATLAS_Data_v10_shp.zip (figshare file 20087486, 2,418,581,202 bytes)",
+  "accessDate": "2026-11-08",
+  "licence": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+  "generator": "scripts/p5b/extract-hydro-riveratlas.mjs",
+  "method": "gross theoretical potential, MWh/year: per reach, 1000 kg/m³ x 9.81 m/s² x dis_m3_pyr x (ele_mt_cmn - ele_mt_cmn of its NEXT_DOWN reach, both made non-increasing downstream) x 8,765.82 h / 10^6; a headwater reach adds 1000 x 9.81 x dis_m3_pyr/2 x sgr_dk_rav/10 x LENGTH_KM x 8,765.82 / 10^6; a reach goes to the province containing its middle vertex (the smaller on an overlap), else the nearest label within 0.5°",
+  "unit": "MWh/year (gross theoretical; the simulation applies HYDRO_TECHNICAL_SHARE)",
+  "counts": {
+   "reaches": 8340795,
+   "withDownstream": 8190834,
+   "headwaters": 4294969,
+   "noElevation": 0,
+   "noGradientHeadwater": 0,
+   "negativeDischarge": 0,
+   "placedInside": 8265305,
+   "placedNearest": 6642,
+   "unplaced": 68848
+  },
+  "grossWorldPWhPerYear": 49.805,
+  "grossUnplacedPWhPerYear": 0.567,
+  "grossHeadwatersPWhPerYear": 3.261,
+  "grossByRegionTWhPerYear": {
+   "af": 6448,
+   "ar": 1952,
+   "as": 14291,
+   "au": 4166,
+   "eu": 3416,
+   "na": 5474,
+   "sa_north+sa_south": 11336,
+   "si": 2722
+  },
+  "limitations": [
+   "Gross theoretical potential at long-term mean flow: no seasonal flow, no technical, economic or environmental limits (the simulation applies one provisional technical share).",
+   "Discharge is the naturalised 1971-2000 mean at each reach's downstream end; the 1900 climate and any upstream use are not modelled.",
+   "Greenland is left out (no gradient data, and DEM outliers over the ice sheet)."
+  ]
+ },
+ "provinces": [
+  {
+   "provinceId": 1001,
+   "key": "gbr-northumberland-and-durham",
+   "grossMWhPerYear": 2147678,
+   "reaches": 601
+  },
+  {
+   "provinceId": 1002,
+   "key": "gbr-lancashire-and-cheshire",
+   "grossMWhPerYear": 3381892,
+   "reaches": 1220
+  },
+  {
+   "provinceId": 1003,
+   "key": "gbr-yorkshire",
+   "grossMWhPerYear": 2382843,
+   "reaches": 913
+  },
+  {
+   "provinceId": 1004,
+   "key": "gbr-derbyshire-and-nottinghamshire",
+   "grossMWhPerYear": 1209105,
+   "reaches": 769
+  },
+  {
+   "provinceId": 1005,
+   "key": "gbr-staffordshire-and-warwickshire",
+   "grossMWhPerYear": 1834044,
+   "reaches": 882
+  },
+  {
+   "provinceId": 1006,
+   "key": "gbr-east-anglia-and-essex",
+   "grossMWhPerYear": 398764,
+   "reaches": 662
+  },
+  {
+   "provinceId": 1007,
+   "key": "gbr-middlesex-and-london",
+   "grossMWhPerYear": 98685,
+   "reaches": 69
+  },
+  {
+   "provinceId": 1008,
+   "key": "gbr-surrey-kent-and-sussex",
+   "grossMWhPerYear": 923844,
+   "reaches": 905
+  },
+  {
+   "provinceId": 1009,
+   "key": "gbr-devon-and-cornwall",
+   "grossMWhPerYear": 2247606,
+   "reaches": 948
+  },
+  {
+   "provinceId": 1010,
+   "key": "gbr-wessex",
+   "grossMWhPerYear": 1210364,
+   "reaches": 835
+  },
+  {
+   "provinceId": 1011,
+   "key": "gbr-north-wales",
+   "grossMWhPerYear": 2080672,
+   "reaches": 576
+  },
+  {
+   "provinceId": 1012,
+   "key": "gbr-mid-wales",
+   "grossMWhPerYear": 2157316,
+   "reaches": 561
+  },
+  {
+   "provinceId": 1013,
+   "key": "gbr-south-wales",
+   "grossMWhPerYear": 2698703,
+   "reaches": 894
+  },
+  {
+   "provinceId": 1014,
+   "key": "gbr-highlands-and-islands",
+   "grossMWhPerYear": 15264152,
+   "reaches": 3245
+  },
+  {
+   "provinceId": 1015,
+   "key": "gbr-north-east-scotland",
+   "grossMWhPerYear": 1825367,
+   "reaches": 476
+  },
+  {
+   "provinceId": 1016,
+   "key": "gbr-east-scotland",
+   "grossMWhPerYear": 7151296,
+   "reaches": 1463
+  },
+  {
+   "provinceId": 1017,
+   "key": "gbr-south-west-scotland",
+   "grossMWhPerYear": 4509698,
+   "reaches": 1326
+  },
+  {
+   "provinceId": 1018,
+   "key": "gbr-ni-antrim",
+   "grossMWhPerYear": 468669,
+   "reaches": 227
+  },
+  {
+   "provinceId": 1019,
+   "key": "gbr-ni-down",
+   "grossMWhPerYear": 223777,
+   "reaches": 180
+  },
+  {
+   "provinceId": 1020,
+   "key": "gbr-ni-armagh",
+   "grossMWhPerYear": 68433,
+   "reaches": 66
+  },
+  {
+   "provinceId": 1021,
+   "key": "gbr-ni-fermanagh",
+   "grossMWhPerYear": 127377,
+   "reaches": 130
+  },
+  {
+   "provinceId": 1022,
+   "key": "gbr-ni-londonderry",
+   "grossMWhPerYear": 376450,
+   "reaches": 175
+  },
+  {
+   "provinceId": 1023,
+   "key": "gbr-ni-tyrone",
+   "grossMWhPerYear": 660749,
+   "reaches": 297
+  },
+  {
+   "provinceId": 1024,
+   "key": "gbr-ie-clare",
+   "grossMWhPerYear": 367764,
+   "reaches": 216
+  },
+  {
+   "provinceId": 1025,
+   "key": "gbr-ie-cavan",
+   "grossMWhPerYear": 108857,
+   "reaches": 126
+  },
+  {
+   "provinceId": 1026,
+   "key": "gbr-ie-cork",
+   "grossMWhPerYear": 1542512,
+   "reaches": 724
+  },
+  {
+   "provinceId": 1027,
+   "key": "gbr-ie-carlow",
+   "grossMWhPerYear": 263492,
+   "reaches": 75
+  },
+  {
+   "provinceId": 1028,
+   "key": "gbr-ie-dublin",
+   "grossMWhPerYear": 117291,
+   "reaches": 49
+  },
+  {
+   "provinceId": 1029,
+   "key": "gbr-ie-donegal",
+   "grossMWhPerYear": 1364194,
+   "reaches": 409
+  },
+  {
+   "provinceId": 1030,
+   "key": "gbr-ie-galway",
+   "grossMWhPerYear": 480070,
+   "reaches": 479
+  },
+  {
+   "provinceId": 1031,
+   "key": "gbr-ie-kildare",
+   "grossMWhPerYear": 176604,
+   "reaches": 150
+  },
+  {
+   "provinceId": 1032,
+   "key": "gbr-ie-kilkenny",
+   "grossMWhPerYear": 404264,
+   "reaches": 183
+  },
+  {
+   "provinceId": 1033,
+   "key": "gbr-ie-kerry",
+   "grossMWhPerYear": 1161532,
+   "reaches": 518
+  },
+  {
+   "provinceId": 1034,
+   "key": "gbr-ie-longford",
+   "grossMWhPerYear": 47284,
+   "reaches": 63
+  },
+  {
+   "provinceId": 1035,
+   "key": "gbr-ie-louth",
+   "grossMWhPerYear": 51795,
+   "reaches": 38
+  },
+  {
+   "provinceId": 1036,
+   "key": "gbr-ie-limerick",
+   "grossMWhPerYear": 708356,
+   "reaches": 270
+  },
+  {
+   "provinceId": 1037,
+   "key": "gbr-ie-leitrim",
+   "grossMWhPerYear": 168560,
+   "reaches": 132
+  },
+  {
+   "provinceId": 1038,
+   "key": "gbr-ie-laois",
+   "grossMWhPerYear": 93213,
+   "reaches": 116
+  },
+  {
+   "provinceId": 1039,
+   "key": "gbr-ie-meath",
+   "grossMWhPerYear": 307337,
+   "reaches": 169
+  },
+  {
+   "provinceId": 1040,
+   "key": "gbr-ie-monaghan",
+   "grossMWhPerYear": 83528,
+   "reaches": 90
+  },
+  {
+   "provinceId": 1041,
+   "key": "gbr-ie-mayo",
+   "grossMWhPerYear": 689350,
+   "reaches": 504
+  },
+  {
+   "provinceId": 1042,
+   "key": "gbr-ie-offaly",
+   "grossMWhPerYear": 93383,
+   "reaches": 133
+  },
+  {
+   "provinceId": 1043,
+   "key": "gbr-ie-roscommon",
+   "grossMWhPerYear": 114873,
+   "reaches": 142
+  },
+  {
+   "provinceId": 1044,
+   "key": "gbr-ie-sligo",
+   "grossMWhPerYear": 241167,
+   "reaches": 141
+  },
+  {
+   "provinceId": 1045,
+   "key": "gbr-ie-tipperary",
+   "grossMWhPerYear": 599690,
+   "reaches": 305
+  },
+  {
+   "provinceId": 1046,
+   "key": "gbr-ie-waterford",
+   "grossMWhPerYear": 256854,
+   "reaches": 130
+  },
+  {
+   "provinceId": 1047,
+   "key": "gbr-ie-westmeath",
+   "grossMWhPerYear": 51538,
+   "reaches": 114
+  },
+  {
+   "provinceId": 1048,
+   "key": "gbr-ie-wicklow",
+   "grossMWhPerYear": 411079,
+   "reaches": 161
+  },
+  {
+   "provinceId": 1049,
+   "key": "gbr-ie-wexford",
+   "grossMWhPerYear": 238681,
+   "reaches": 172
+  },
+  {
+   "provinceId": 1050,
+   "key": "cyp-cyprus",
+   "grossMWhPerYear": 691648,
+   "reaches": 295
+  },
+  {
+   "provinceId": 1051,
+   "key": "mlt-malta",
+   "grossMWhPerYear": 1482,
+   "reaches": 6
+  },
+  {
+   "provinceId": 2001,
+   "key": "deu-bavaria",
+   "grossMWhPerYear": 26022390,
+   "reaches": 3991
+  },
+  {
+   "provinceId": 2002,
+   "key": "deu-saxony",
+   "grossMWhPerYear": 3511269,
+   "reaches": 812
+  },
+  {
+   "provinceId": 2003,
+   "key": "deu-prussian-saxony",
+   "grossMWhPerYear": 3806996,
+   "reaches": 836
+  },
+  {
+   "provinceId": 2004,
+   "key": "deu-thuringia",
+   "grossMWhPerYear": 1656154,
+   "reaches": 749
+  },
+  {
+   "provinceId": 2005,
+   "key": "deu-hesse",
+   "grossMWhPerYear": 4331579,
+   "reaches": 1031
+  },
+  {
+   "provinceId": 2006,
+   "key": "deu-hamburg",
+   "grossMWhPerYear": 18290,
+   "reaches": 32
+  },
+  {
+   "provinceId": 2007,
+   "key": "deu-bremen",
+   "grossMWhPerYear": 134158,
+   "reaches": 6
+  },
+  {
+   "provinceId": 2008,
+   "key": "deu-berlin",
+   "grossMWhPerYear": 6475,
+   "reaches": 21
+  },
+  {
+   "provinceId": 2009,
+   "key": "deu-brandenburg",
+   "grossMWhPerYear": 1112151,
+   "reaches": 1045
+  },
+  {
+   "provinceId": 2010,
+   "key": "deu-brandenburg-lebus",
+   "grossMWhPerYear": 2191159,
+   "reaches": 756
+  },
+  {
+   "provinceId": 2011,
+   "key": "deu-schleswig-holstein",
+   "grossMWhPerYear": 233717,
+   "reaches": 677
+  },
+  {
+   "provinceId": 2012,
+   "key": "deu-saar",
+   "grossMWhPerYear": 346152,
+   "reaches": 98
+  },
+  {
+   "provinceId": 2013,
+   "key": "deu-baden",
+   "grossMWhPerYear": 10890667,
+   "reaches": 848
+  },
+  {
+   "provinceId": 2014,
+   "key": "deu-wurttemberg",
+   "grossMWhPerYear": 4859724,
+   "reaches": 1219
+  },
+  {
+   "provinceId": 2015,
+   "key": "deu-hohenzollern",
+   "grossMWhPerYear": 273355,
+   "reaches": 74
+  },
+  {
+   "provinceId": 2016,
+   "key": "deu-mecklenburg",
+   "grossMWhPerYear": 521625,
+   "reaches": 556
+  },
+  {
+   "provinceId": 2017,
+   "key": "deu-pomerania",
+   "grossMWhPerYear": 1202058,
+   "reaches": 1112
+  },
+  {
+   "provinceId": 2018,
+   "key": "deu-west-prussia",
+   "grossMWhPerYear": 3080781,
+   "reaches": 699
+  },
+  {
+   "provinceId": 2019,
+   "key": "deu-danzig",
+   "grossMWhPerYear": 248510,
+   "reaches": 34
+  },
+  {
+   "provinceId": 2020,
+   "key": "deu-posen",
+   "grossMWhPerYear": 1977900,
+   "reaches": 1217
+  },
+  {
+   "provinceId": 2021,
+   "key": "deu-lower-silesia",
+   "grossMWhPerYear": 2229791,
+   "reaches": 909
+  },
+  {
+   "provinceId": 2022,
+   "key": "deu-middle-silesia",
+   "grossMWhPerYear": 782081,
+   "reaches": 362
+  },
+  {
+   "provinceId": 2023,
+   "key": "deu-upper-silesia",
+   "grossMWhPerYear": 212076,
+   "reaches": 265
+  },
+  {
+   "provinceId": 2024,
+   "key": "deu-east-prussia-north",
+   "grossMWhPerYear": 944722,
+   "reaches": 498
+  },
+  {
+   "provinceId": 2025,
+   "key": "deu-east-prussia-south",
+   "grossMWhPerYear": 865984,
+   "reaches": 946
+  },
+  {
+   "provinceId": 2026,
+   "key": "deu-memel",
+   "grossMWhPerYear": 494783,
+   "reaches": 162
+  },
+  {
+   "provinceId": 2027,
+   "key": "deu-north-schleswig",
+   "grossMWhPerYear": 97857,
+   "reaches": 185
+  },
+  {
+   "provinceId": 2028,
+   "key": "deu-eupen-malmedy",
+   "grossMWhPerYear": 251762,
+   "reaches": 83
+  },
+  {
+   "provinceId": 2029,
+   "key": "deu-alsace",
+   "grossMWhPerYear": 8956991,
+   "reaches": 506
+  },
+  {
+   "provinceId": 2030,
+   "key": "deu-lorraine",
+   "grossMWhPerYear": 615563,
+   "reaches": 290
+  },
+  {
+   "provinceId": 2031,
+   "key": "deu-hanover",
+   "grossMWhPerYear": 3814820,
+   "reaches": 2113
+  },
+  {
+   "provinceId": 2032,
+   "key": "deu-westphalia",
+   "grossMWhPerYear": 3405070,
+   "reaches": 1096
+  },
+  {
+   "provinceId": 2033,
+   "key": "deu-rhine-province",
+   "grossMWhPerYear": 17544840,
+   "reaches": 1132
+  },
+  {
+   "provinceId": 2034,
+   "key": "deu-palatinate",
+   "grossMWhPerYear": 890208,
+   "reaches": 243
+  },
+  {
+   "provinceId": 3001,
+   "key": "fra-nord",
+   "grossMWhPerYear": 185932,
+   "reaches": 245
+  },
+  {
+   "provinceId": 3002,
+   "key": "fra-ardennes",
+   "grossMWhPerYear": 813051,
+   "reaches": 254
+  },
+  {
+   "provinceId": 3003,
+   "key": "fra-aisne",
+   "grossMWhPerYear": 387731,
+   "reaches": 332
+  },
+  {
+   "provinceId": 3004,
+   "key": "fra-meuse",
+   "grossMWhPerYear": 603540,
+   "reaches": 301
+  },
+  {
+   "provinceId": 3005,
+   "key": "fra-meurthe-et-moselle",
+   "grossMWhPerYear": 908043,
+   "reaches": 293
+  },
+  {
+   "provinceId": 3006,
+   "key": "fra-alpes-maritimes",
+   "grossMWhPerYear": 5444848,
+   "reaches": 333
+  },
+  {
+   "provinceId": 3007,
+   "key": "fra-alpes-de-haute-provence",
+   "grossMWhPerYear": 5729323,
+   "reaches": 382
+  },
+  {
+   "provinceId": 3008,
+   "key": "fra-hautes-alpes",
+   "grossMWhPerYear": 4511408,
+   "reaches": 332
+  },
+  {
+   "provinceId": 3009,
+   "key": "fra-savoie",
+   "grossMWhPerYear": 7964934,
+   "reaches": 422
+  },
+  {
+   "provinceId": 3010,
+   "key": "fra-haute-savoie",
+   "grossMWhPerYear": 4090714,
+   "reaches": 362
+  },
+  {
+   "provinceId": 3011,
+   "key": "fra-pyrenees-atlantiques",
+   "grossMWhPerYear": 5216678,
+   "reaches": 661
+  },
+  {
+   "provinceId": 3012,
+   "key": "fra-haute-garonne",
+   "grossMWhPerYear": 2737613,
+   "reaches": 276
+  },
+  {
+   "provinceId": 3013,
+   "key": "fra-hautes-pyrenees",
+   "grossMWhPerYear": 2876943,
+   "reaches": 288
+  },
+  {
+   "provinceId": 3014,
+   "key": "fra-ariege",
+   "grossMWhPerYear": 1854579,
+   "reaches": 248
+  },
+  {
+   "provinceId": 3015,
+   "key": "fra-pyrenees-orientales",
+   "grossMWhPerYear": 2271840,
+   "reaches": 219
+  },
+  {
+   "provinceId": 3016,
+   "key": "fra-territoire-de-belfort",
+   "grossMWhPerYear": 113385,
+   "reaches": 58
+  },
+  {
+   "provinceId": 3017,
+   "key": "fra-doubs",
+   "grossMWhPerYear": 3501068,
+   "reaches": 422
+  },
+  {
+   "provinceId": 3018,
+   "key": "fra-ain",
+   "grossMWhPerYear": 6861064,
+   "reaches": 413
+  },
+  {
+   "provinceId": 3019,
+   "key": "fra-jura",
+   "grossMWhPerYear": 2965748,
+   "reaches": 436
+  },
+  {
+   "provinceId": 3020,
+   "key": "fra-var",
+   "grossMWhPerYear": 1871091,
+   "reaches": 376
+  },
+  {
+   "provinceId": 3021,
+   "key": "fra-bouches-du-rhone",
+   "grossMWhPerYear": 3781953,
+   "reaches": 184
+  },
+  {
+   "provinceId": 3022,
+   "key": "fra-gard",
+   "grossMWhPerYear": 6031538,
+   "reaches": 390
+  },
+  {
+   "provinceId": 3023,
+   "key": "fra-herault",
+   "grossMWhPerYear": 1809773,
+   "reaches": 414
+  },
+  {
+   "provinceId": 3024,
+   "key": "fra-aude",
+   "grossMWhPerYear": 2151369,
+   "reaches": 395
+  },
+  {
+   "provinceId": 3025,
+   "key": "fra-landes",
+   "grossMWhPerYear": 1293782,
+   "reaches": 619
+  },
+  {
+   "provinceId": 3026,
+   "key": "fra-gironde",
+   "grossMWhPerYear": 1764168,
+   "reaches": 481
+  },
+  {
+   "provinceId": 3027,
+   "key": "fra-charente-maritime",
+   "grossMWhPerYear": 280700,
+   "reaches": 359
+  },
+  {
+   "provinceId": 3028,
+   "key": "fra-vendee",
+   "grossMWhPerYear": 392970,
+   "reaches": 343
+  },
+  {
+   "provinceId": 3029,
+   "key": "fra-loire-atlantique",
+   "grossMWhPerYear": 556765,
+   "reaches": 326
+  },
+  {
+   "provinceId": 3030,
+   "key": "fra-morbihan",
+   "grossMWhPerYear": 805214,
+   "reaches": 476
+  },
+  {
+   "provinceId": 3031,
+   "key": "fra-finistere",
+   "grossMWhPerYear": 1162278,
+   "reaches": 584
+  },
+  {
+   "provinceId": 3032,
+   "key": "fra-cotes-d-armor",
+   "grossMWhPerYear": 961010,
+   "reaches": 527
+  },
+  {
+   "provinceId": 3033,
+   "key": "fra-ille-et-vilaine",
+   "grossMWhPerYear": 447551,
+   "reaches": 438
+  },
+  {
+   "provinceId": 3034,
+   "key": "fra-manche",
+   "grossMWhPerYear": 640519,
+   "reaches": 411
+  },
+  {
+   "provinceId": 3035,
+   "key": "fra-calvados",
+   "grossMWhPerYear": 868151,
+   "reaches": 424
+  },
+  {
+   "provinceId": 3036,
+   "key": "fra-eure",
+   "grossMWhPerYear": 1359134,
+   "reaches": 380
+  },
+  {
+   "provinceId": 3037,
+   "key": "fra-seine-maritime",
+   "grossMWhPerYear": 810619,
+   "reaches": 431
+  },
+  {
+   "provinceId": 3038,
+   "key": "fra-somme",
+   "grossMWhPerYear": 563820,
+   "reaches": 421
+  },
+  {
+   "provinceId": 3039,
+   "key": "fra-pas-de-calais",
+   "grossMWhPerYear": 399755,
+   "reaches": 420
+  },
+  {
+   "provinceId": 3040,
+   "key": "fra-haute-corse",
+   "grossMWhPerYear": 1987418,
+   "reaches": 260
+  },
+  {
+   "provinceId": 3041,
+   "key": "fra-corse-du-sud",
+   "grossMWhPerYear": 1415703,
+   "reaches": 176
+  },
+  {
+   "provinceId": 3042,
+   "key": "fra-gers",
+   "grossMWhPerYear": 568809,
+   "reaches": 255
+  },
+  {
+   "provinceId": 3043,
+   "key": "fra-haute-vienne",
+   "grossMWhPerYear": 1137603,
+   "reaches": 294
+  },
+  {
+   "provinceId": 3044,
+   "key": "fra-correze",
+   "grossMWhPerYear": 4401364,
+   "reaches": 439
+  },
+  {
+   "provinceId": 3045,
+   "key": "fra-tarn-et-garonne",
+   "grossMWhPerYear": 1594666,
+   "reaches": 179
+  },
+  {
+   "provinceId": 3046,
+   "key": "fra-tarn",
+   "grossMWhPerYear": 2502329,
+   "reaches": 302
+  },
+  {
+   "provinceId": 3047,
+   "key": "fra-isere",
+   "grossMWhPerYear": 7764529,
+   "reaches": 487
+  },
+  {
+   "provinceId": 3048,
+   "key": "fra-drome",
+   "grossMWhPerYear": 7198898,
+   "reaches": 349
+  },
+  {
+   "provinceId": 3049,
+   "key": "fra-aveyron",
+   "grossMWhPerYear": 6143691,
+   "reaches": 544
+  },
+  {
+   "provinceId": 3050,
+   "key": "fra-lot",
+   "grossMWhPerYear": 2277716,
+   "reaches": 278
+  },
+  {
+   "provinceId": 3051,
+   "key": "fra-indre-et-loire",
+   "grossMWhPerYear": 1735197,
+   "reaches": 288
+  },
+  {
+   "provinceId": 3052,
+   "key": "fra-indre",
+   "grossMWhPerYear": 625760,
+   "reaches": 327
+  },
+  {
+   "provinceId": 3053,
+   "key": "fra-loir-et-cher",
+   "grossMWhPerYear": 1047487,
+   "reaches": 302
+  },
+  {
+   "provinceId": 3054,
+   "key": "fra-creuse",
+   "grossMWhPerYear": 777378,
+   "reaches": 294
+  },
+  {
+   "provinceId": 3055,
+   "key": "fra-mayenne",
+   "grossMWhPerYear": 554080,
+   "reaches": 264
+  },
+  {
+   "provinceId": 3056,
+   "key": "fra-sarthe",
+   "grossMWhPerYear": 422181,
+   "reaches": 323
+  },
+  {
+   "provinceId": 3057,
+   "key": "fra-vaucluse",
+   "grossMWhPerYear": 1500236,
+   "reaches": 158
+  },
+  {
+   "provinceId": 3058,
+   "key": "fra-haute-marne",
+   "grossMWhPerYear": 551920,
+   "reaches": 344
+  },
+  {
+   "provinceId": 3059,
+   "key": "fra-marne",
+   "grossMWhPerYear": 456833,
+   "reaches": 362
+  },
+  {
+   "provinceId": 3060,
+   "key": "fra-dordogne",
+   "grossMWhPerYear": 2841064,
+   "reaches": 615
+  },
+  {
+   "provinceId": 3061,
+   "key": "fra-rhone",
+   "grossMWhPerYear": 2777538,
+   "reaches": 153
+  },
+  {
+   "provinceId": 3062,
+   "key": "fra-vosges",
+   "grossMWhPerYear": 1054588,
+   "reaches": 398
+  },
+  {
+   "provinceId": 3063,
+   "key": "fra-ardeche",
+   "grossMWhPerYear": 8610581,
+   "reaches": 349
+  },
+  {
+   "provinceId": 3064,
+   "key": "fra-loire",
+   "grossMWhPerYear": 1278609,
+   "reaches": 221
+  },
+  {
+   "provinceId": 3065,
+   "key": "fra-puy-de-dome",
+   "grossMWhPerYear": 2607883,
+   "reaches": 397
+  },
+  {
+   "provinceId": 3066,
+   "key": "fra-allier",
+   "grossMWhPerYear": 1764903,
+   "reaches": 362
+  },
+  {
+   "provinceId": 3067,
+   "key": "fra-loiret",
+   "grossMWhPerYear": 1786185,
+   "reaches": 317
+  },
+  {
+   "provinceId": 3068,
+   "key": "fra-maine-et-loire",
+   "grossMWhPerYear": 2138278,
+   "reaches": 304
+  },
+  {
+   "provinceId": 3069,
+   "key": "fra-aube",
+   "grossMWhPerYear": 549326,
+   "reaches": 302
+  },
+  {
+   "provinceId": 3070,
+   "key": "fra-paris",
+   "grossMWhPerYear": 27446,
+   "reaches": 3
+  },
+  {
+   "provinceId": 3071,
+   "key": "fra-hauts-de-seine",
+   "grossMWhPerYear": 187653,
+   "reaches": 5
+  },
+  {
+   "provinceId": 3072,
+   "key": "fra-seine-saint-denis",
+   "grossMWhPerYear": 82256,
+   "reaches": 8
+  },
+  {
+   "provinceId": 3073,
+   "key": "fra-val-d-oise",
+   "grossMWhPerYear": 232829,
+   "reaches": 51
+  },
+  {
+   "provinceId": 3074,
+   "key": "fra-yvelines",
+   "grossMWhPerYear": 183688,
+   "reaches": 74
+  },
+  {
+   "provinceId": 3075,
+   "key": "fra-charente",
+   "grossMWhPerYear": 938291,
+   "reaches": 395
+  },
+  {
+   "provinceId": 3076,
+   "key": "fra-cher",
+   "grossMWhPerYear": 923973,
+   "reaches": 329
+  },
+  {
+   "provinceId": 3077,
+   "key": "fra-eure-et-loir",
+   "grossMWhPerYear": 306583,
+   "reaches": 284
+  },
+  {
+   "provinceId": 3078,
+   "key": "fra-haute-loire",
+   "grossMWhPerYear": 2541112,
+   "reaches": 280
+  },
+  {
+   "provinceId": 3079,
+   "key": "fra-cantal",
+   "grossMWhPerYear": 4148534,
+   "reaches": 410
+  },
+  {
+   "provinceId": 3080,
+   "key": "fra-lot-et-garonne",
+   "grossMWhPerYear": 2129728,
+   "reaches": 252
+  },
+  {
+   "provinceId": 3081,
+   "key": "fra-lozere",
+   "grossMWhPerYear": 2422069,
+   "reaches": 383
+  },
+  {
+   "provinceId": 3082,
+   "key": "fra-nievre",
+   "grossMWhPerYear": 1307264,
+   "reaches": 317
+  },
+  {
+   "provinceId": 3083,
+   "key": "fra-cote-d-or",
+   "grossMWhPerYear": 754121,
+   "reaches": 412
+  },
+  {
+   "provinceId": 3084,
+   "key": "fra-oise",
+   "grossMWhPerYear": 262590,
+   "reaches": 264
+  },
+  {
+   "provinceId": 3085,
+   "key": "fra-orne",
+   "grossMWhPerYear": 576168,
+   "reaches": 372
+  },
+  {
+   "provinceId": 3086,
+   "key": "fra-haute-saone",
+   "grossMWhPerYear": 739581,
+   "reaches": 390
+  },
+  {
+   "provinceId": 3087,
+   "key": "fra-saone-et-loire",
+   "grossMWhPerYear": 1026400,
+   "reaches": 474
+  },
+  {
+   "provinceId": 3088,
+   "key": "fra-deux-sevres",
+   "grossMWhPerYear": 385662,
+   "reaches": 368
+  },
+  {
+   "provinceId": 3089,
+   "key": "fra-vienne",
+   "grossMWhPerYear": 957414,
+   "reaches": 337
+  },
+  {
+   "provinceId": 3090,
+   "key": "fra-yonne",
+   "grossMWhPerYear": 833934,
+   "reaches": 312
+  },
+  {
+   "provinceId": 3091,
+   "key": "fra-essonne",
+   "grossMWhPerYear": 150086,
+   "reaches": 88
+  },
+  {
+   "provinceId": 3092,
+   "key": "fra-seien-et-marne",
+   "grossMWhPerYear": 534266,
+   "reaches": 246
+  },
+  {
+   "provinceId": 3093,
+   "key": "fra-val-de-marne",
+   "grossMWhPerYear": 52309,
+   "reaches": 8
+  },
+  {
+   "provinceId": 4001,
+   "key": "rus-fin-uusimaa",
+   "grossMWhPerYear": 292889,
+   "reaches": 293
+  },
+  {
+   "provinceId": 4002,
+   "key": "rus-fin-finland-proper",
+   "grossMWhPerYear": 1076674,
+   "reaches": 576
+  },
+  {
+   "provinceId": 4003,
+   "key": "rus-fin-hame",
+   "grossMWhPerYear": 2336954,
+   "reaches": 1326
+  },
+  {
+   "provinceId": 4004,
+   "key": "rus-fin-kymi",
+   "grossMWhPerYear": 4080313,
+   "reaches": 411
+  },
+  {
+   "provinceId": 4005,
+   "key": "rus-fin-mikkeli",
+   "grossMWhPerYear": 191129,
+   "reaches": 477
+  },
+  {
+   "provinceId": 4006,
+   "key": "rus-fin-kuopio",
+   "grossMWhPerYear": 2001968,
+   "reaches": 1195
+  },
+  {
+   "provinceId": 4007,
+   "key": "rus-fin-vaasa",
+   "grossMWhPerYear": 1074042,
+   "reaches": 805
+  },
+  {
+   "provinceId": 4008,
+   "key": "rus-fin-oulu",
+   "grossMWhPerYear": 7834117,
+   "reaches": 2132
+  },
+  {
+   "provinceId": 4009,
+   "key": "rus-fin-lapland",
+   "grossMWhPerYear": 13123745,
+   "reaches": 3711
+  },
+  {
+   "provinceId": 4010,
+   "key": "rus-fin-aland",
+   "grossMWhPerYear": 681,
+   "reaches": 14
+  },
+  {
+   "provinceId": 4011,
+   "key": "rus-est-harju",
+   "grossMWhPerYear": 301266,
+   "reaches": 296
+  },
+  {
+   "provinceId": 4012,
+   "key": "rus-est-jarva",
+   "grossMWhPerYear": 55418,
+   "reaches": 96
+  },
+  {
+   "provinceId": 4013,
+   "key": "rus-est-viru",
+   "grossMWhPerYear": 189705,
+   "reaches": 245
+  },
+  {
+   "provinceId": 4014,
+   "key": "rus-est-tartu",
+   "grossMWhPerYear": 67363,
+   "reaches": 106
+  },
+  {
+   "provinceId": 4015,
+   "key": "rus-est-voru",
+   "grossMWhPerYear": 139175,
+   "reaches": 197
+  },
+  {
+   "provinceId": 4016,
+   "key": "rus-est-viljandi",
+   "grossMWhPerYear": 145066,
+   "reaches": 250
+  },
+  {
+   "provinceId": 4017,
+   "key": "rus-est-parnu",
+   "grossMWhPerYear": 230486,
+   "reaches": 213
+  },
+  {
+   "provinceId": 4018,
+   "key": "rus-est-laane",
+   "grossMWhPerYear": 32323,
+   "reaches": 80
+  },
+  {
+   "provinceId": 4019,
+   "key": "rus-est-saare",
+   "grossMWhPerYear": 22037,
+   "reaches": 99
+  },
+  {
+   "provinceId": 4020,
+   "key": "rus-lva-riga",
+   "grossMWhPerYear": 2470823,
+   "reaches": 298
+  },
+  {
+   "provinceId": 4021,
+   "key": "rus-lva-vidzeme",
+   "grossMWhPerYear": 3180174,
+   "reaches": 648
+  },
+  {
+   "provinceId": 4022,
+   "key": "rus-lva-kurzeme",
+   "grossMWhPerYear": 691552,
+   "reaches": 474
+  },
+  {
+   "provinceId": 4023,
+   "key": "rus-lva-zemgale",
+   "grossMWhPerYear": 217534,
+   "reaches": 317
+  },
+  {
+   "provinceId": 4024,
+   "key": "rus-lva-latgale",
+   "grossMWhPerYear": 2167155,
+   "reaches": 782
+  },
+  {
+   "provinceId": 4025,
+   "key": "rus-ltu-vilnius",
+   "grossMWhPerYear": 967714,
+   "reaches": 401
+  },
+  {
+   "provinceId": 4026,
+   "key": "rus-ltu-kaunas",
+   "grossMWhPerYear": 1603411,
+   "reaches": 350
+  },
+  {
+   "provinceId": 4027,
+   "key": "rus-ltu-siauliai",
+   "grossMWhPerYear": 207238,
+   "reaches": 369
+  },
+  {
+   "provinceId": 4028,
+   "key": "rus-ltu-panevezys",
+   "grossMWhPerYear": 156844,
+   "reaches": 324
+  },
+  {
+   "provinceId": 4029,
+   "key": "rus-ltu-alytus",
+   "grossMWhPerYear": 919970,
+   "reaches": 214
+  },
+  {
+   "provinceId": 4030,
+   "key": "rus-ltu-marijampole",
+   "grossMWhPerYear": 367235,
+   "reaches": 165
+  },
+  {
+   "provinceId": 4031,
+   "key": "rus-ltu-taurage",
+   "grossMWhPerYear": 292927,
+   "reaches": 169
+  },
+  {
+   "provinceId": 4032,
+   "key": "rus-ltu-telsiai",
+   "grossMWhPerYear": 399870,
+   "reaches": 332
+  },
+  {
+   "provinceId": 4033,
+   "key": "rus-ltu-utena",
+   "grossMWhPerYear": 178073,
+   "reaches": 275
+  },
+  {
+   "provinceId": 4034,
+   "key": "rus-pol-warsaw",
+   "grossMWhPerYear": 4679510,
+   "reaches": 1506
+  },
+  {
+   "provinceId": 4035,
+   "key": "rus-pol-odz",
+   "grossMWhPerYear": 682279,
+   "reaches": 1035
+  },
+  {
+   "provinceId": 4036,
+   "key": "rus-pol-lublin",
+   "grossMWhPerYear": 1356743,
+   "reaches": 1027
+  },
+  {
+   "provinceId": 4037,
+   "key": "rus-pol-siedlce",
+   "grossMWhPerYear": 471221,
+   "reaches": 848
+  },
+  {
+   "provinceId": 4038,
+   "key": "rus-pol-kielce",
+   "grossMWhPerYear": 1157568,
+   "reaches": 556
+  },
+  {
+   "provinceId": 4039,
+   "key": "rus-pol-kalisz",
+   "grossMWhPerYear": 1837522,
+   "reaches": 469
+  },
+  {
+   "provinceId": 4040,
+   "key": "rus-blr-brest",
+   "grossMWhPerYear": 631802,
+   "reaches": 1195
+  },
+  {
+   "provinceId": 4041,
+   "key": "rus-blr-grodno",
+   "grossMWhPerYear": 1067968,
+   "reaches": 1074
+  },
+  {
+   "provinceId": 4042,
+   "key": "rus-blr-minsk",
+   "grossMWhPerYear": 586382,
+   "reaches": 1669
+  },
+  {
+   "provinceId": 4043,
+   "key": "rus-blr-mogilev",
+   "grossMWhPerYear": 822470,
+   "reaches": 1241
+  },
+  {
+   "provinceId": 4044,
+   "key": "rus-blr-gomel",
+   "grossMWhPerYear": 2047567,
+   "reaches": 1517
+  },
+  {
+   "provinceId": 4045,
+   "key": "rus-blr-vitebsk",
+   "grossMWhPerYear": 1332643,
+   "reaches": 1438
+  },
+  {
+   "provinceId": 4046,
+   "key": "rus-ukr-kiev",
+   "grossMWhPerYear": 2737266,
+   "reaches": 2401
+  },
+  {
+   "provinceId": 4047,
+   "key": "rus-ukr-volhynia",
+   "grossMWhPerYear": 1054311,
+   "reaches": 1666
+  },
+  {
+   "provinceId": 4048,
+   "key": "rus-ukr-podolia",
+   "grossMWhPerYear": 2903425,
+   "reaches": 2141
+  },
+  {
+   "provinceId": 4049,
+   "key": "rus-ukr-kherson",
+   "grossMWhPerYear": 3129565,
+   "reaches": 1812
+  },
+  {
+   "provinceId": 4050,
+   "key": "rus-ukr-yekaterinoslav",
+   "grossMWhPerYear": 8532378,
+   "reaches": 3445
+  },
+  {
+   "provinceId": 4051,
+   "key": "rus-ukr-taurida",
+   "grossMWhPerYear": 1055083,
+   "reaches": 876
+  },
+  {
+   "provinceId": 4052,
+   "key": "rus-ukr-kharkov",
+   "grossMWhPerYear": 947225,
+   "reaches": 2312
+  },
+  {
+   "provinceId": 4053,
+   "key": "rus-ukr-poltava",
+   "grossMWhPerYear": 4175182,
+   "reaches": 1871
+  },
+  {
+   "provinceId": 4054,
+   "key": "rus-ukr-chernigov",
+   "grossMWhPerYear": 1018421,
+   "reaches": 1204
+  },
+  {
+   "provinceId": 4055,
+   "key": "rus-ukr-donetsk",
+   "grossMWhPerYear": 1631033,
+   "reaches": 2315
+  },
+  {
+   "provinceId": 4056,
+   "key": "rus-ukr-odessa",
+   "grossMWhPerYear": 2728772,
+   "reaches": 1170
+  },
+  {
+   "provinceId": 4057,
+   "key": "rus-mda-kishinev",
+   "grossMWhPerYear": 1969310,
+   "reaches": 993
+  },
+  {
+   "provinceId": 4058,
+   "key": "rus-mda-bender",
+   "grossMWhPerYear": 344576,
+   "reaches": 138
+  },
+  {
+   "provinceId": 4059,
+   "key": "rus-mda-izmail",
+   "grossMWhPerYear": 114701,
+   "reaches": 99
+  },
+  {
+   "provinceId": 4060,
+   "key": "rus-moscow",
+   "grossMWhPerYear": 1801021,
+   "reaches": 1970
+  },
+  {
+   "provinceId": 4061,
+   "key": "rus-saint-petersburg",
+   "grossMWhPerYear": 7672939,
+   "reaches": 2629
+  },
+  {
+   "provinceId": 4062,
+   "key": "rus-novgorod",
+   "grossMWhPerYear": 3466553,
+   "reaches": 2010
+  },
+  {
+   "provinceId": 4063,
+   "key": "rus-pskov",
+   "grossMWhPerYear": 1913929,
+   "reaches": 2068
+  },
+  {
+   "provinceId": 4064,
+   "key": "rus-smolensk",
+   "grossMWhPerYear": 1175485,
+   "reaches": 2121
+  },
+  {
+   "provinceId": 4065,
+   "key": "rus-tver",
+   "grossMWhPerYear": 3184248,
+   "reaches": 3331
+  },
+  {
+   "provinceId": 4066,
+   "key": "rus-yaroslavl",
+   "grossMWhPerYear": 2446622,
+   "reaches": 1293
+  },
+  {
+   "provinceId": 4067,
+   "key": "rus-kostroma",
+   "grossMWhPerYear": 1845911,
+   "reaches": 2481
+  },
+  {
+   "provinceId": 4068,
+   "key": "rus-vladimir",
+   "grossMWhPerYear": 954647,
+   "reaches": 1193
+  },
+  {
+   "provinceId": 4069,
+   "key": "rus-ivanovo",
+   "grossMWhPerYear": 392553,
+   "reaches": 963
+  },
+  {
+   "provinceId": 4070,
+   "key": "rus-nizhny-novgorod",
+   "grossMWhPerYear": 5107476,
+   "reaches": 3156
+  },
+  {
+   "provinceId": 4071,
+   "key": "rus-ryazan",
+   "grossMWhPerYear": 2343965,
+   "reaches": 1654
+  },
+  {
+   "provinceId": 4072,
+   "key": "rus-tula",
+   "grossMWhPerYear": 595470,
+   "reaches": 1184
+  },
+  {
+   "provinceId": 4073,
+   "key": "rus-kaluga",
+   "grossMWhPerYear": 1117480,
+   "reaches": 1338
+  },
+  {
+   "provinceId": 4074,
+   "key": "rus-bryansk",
+   "grossMWhPerYear": 757154,
+   "reaches": 1529
+  },
+  {
+   "provinceId": 4075,
+   "key": "rus-orel",
+   "grossMWhPerYear": 528667,
+   "reaches": 1143
+  },
+  {
+   "provinceId": 4076,
+   "key": "rus-kursk",
+   "grossMWhPerYear": 487992,
+   "reaches": 1288
+  },
+  {
+   "provinceId": 4077,
+   "key": "rus-belgorod",
+   "grossMWhPerYear": 369057,
+   "reaches": 1259
+  },
+  {
+   "provinceId": 4078,
+   "key": "rus-voronezh",
+   "grossMWhPerYear": 1392214,
+   "reaches": 2344
+  },
+  {
+   "provinceId": 4079,
+   "key": "rus-tsaritsyn",
+   "grossMWhPerYear": 20018301,
+   "reaches": 4447
+  },
+  {
+   "provinceId": 4080,
+   "key": "rus-kurgan",
+   "grossMWhPerYear": 831438,
+   "reaches": 2847
+  },
+  {
+   "provinceId": 4081,
+   "key": "rus-lipetsk",
+   "grossMWhPerYear": 586349,
+   "reaches": 1067
+  },
+  {
+   "provinceId": 4082,
+   "key": "rus-tambov",
+   "grossMWhPerYear": 612001,
+   "reaches": 1480
+  },
+  {
+   "provinceId": 4083,
+   "key": "rus-penza",
+   "grossMWhPerYear": 1058475,
+   "reaches": 2006
+  },
+  {
+   "provinceId": 4084,
+   "key": "rus-saratov",
+   "grossMWhPerYear": 11775261,
+   "reaches": 4425
+  },
+  {
+   "provinceId": 4085,
+   "key": "rus-samara",
+   "grossMWhPerYear": 15837563,
+   "reaches": 2279
+  },
+  {
+   "provinceId": 4086,
+   "key": "rus-simbirsk",
+   "grossMWhPerYear": 1048128,
+   "reaches": 1690
+  },
+  {
+   "provinceId": 4087,
+   "key": "rus-kazan",
+   "grossMWhPerYear": 5643591,
+   "reaches": 2898
+  },
+  {
+   "provinceId": 4088,
+   "key": "rus-chuvash",
+   "grossMWhPerYear": 4282824,
+   "reaches": 838
+  },
+  {
+   "provinceId": 4089,
+   "key": "rus-mari-el",
+   "grossMWhPerYear": 1150785,
+   "reaches": 989
+  },
+  {
+   "provinceId": 4090,
+   "key": "rus-mordovia",
+   "grossMWhPerYear": 667320,
+   "reaches": 1148
+  },
+  {
+   "provinceId": 4091,
+   "key": "rus-udmurt",
+   "grossMWhPerYear": 1995848,
+   "reaches": 1895
+  },
+  {
+   "provinceId": 4092,
+   "key": "rus-vyatka",
+   "grossMWhPerYear": 7202870,
+   "reaches": 4981
+  },
+  {
+   "provinceId": 4093,
+   "key": "rus-perm",
+   "grossMWhPerYear": 19314163,
+   "reaches": 7148
+  },
+  {
+   "provinceId": 4094,
+   "key": "rus-vologda",
+   "grossMWhPerYear": 8248419,
+   "reaches": 5387
+  },
+  {
+   "provinceId": 4095,
+   "key": "rus-arkhangelsk",
+   "grossMWhPerYear": 56028090,
+   "reaches": 20539
+  },
+  {
+   "provinceId": 4096,
+   "key": "rus-olonets",
+   "grossMWhPerYear": 11720184,
+   "reaches": 4857
+  },
+  {
+   "provinceId": 4097,
+   "key": "rus-ust-sysolsk",
+   "grossMWhPerYear": 52832903,
+   "reaches": 17683
+  },
+  {
+   "provinceId": 4098,
+   "key": "rus-orenburg",
+   "grossMWhPerYear": 4633133,
+   "reaches": 5965
+  },
+  {
+   "provinceId": 4099,
+   "key": "rus-ufa",
+   "grossMWhPerYear": 17118164,
+   "reaches": 6626
+  },
+  {
+   "provinceId": 4100,
+   "key": "rus-yekaterinburg",
+   "grossMWhPerYear": 9219945,
+   "reaches": 8140
+  },
+  {
+   "provinceId": 4101,
+   "key": "rus-chelyabinsk",
+   "grossMWhPerYear": 3442919,
+   "reaches": 4038
+  },
+  {
+   "provinceId": 4102,
+   "key": "rus-don",
+   "grossMWhPerYear": 4042696,
+   "reaches": 4163
+  },
+  {
+   "provinceId": 4103,
+   "key": "rus-kuban",
+   "grossMWhPerYear": 27522355,
+   "reaches": 3679
+  },
+  {
+   "provinceId": 4104,
+   "key": "rus-stavropol",
+   "grossMWhPerYear": 19947199,
+   "reaches": 3412
+  },
+  {
+   "provinceId": 4105,
+   "key": "rus-terek",
+   "grossMWhPerYear": 42581350,
+   "reaches": 2094
+  },
+  {
+   "provinceId": 4106,
+   "key": "rus-dagestan",
+   "grossMWhPerYear": 28256415,
+   "reaches": 1816
+  },
+  {
+   "provinceId": 4107,
+   "key": "rus-astrakhan",
+   "grossMWhPerYear": 7753652,
+   "reaches": 971
+  },
+  {
+   "provinceId": 4108,
+   "key": "rus-kalmykia",
+   "grossMWhPerYear": 1514903,
+   "reaches": 1781
+  },
+  {
+   "provinceId": 4109,
+   "key": "rus-alexandrovsk",
+   "grossMWhPerYear": 18922304,
+   "reaches": 5029
+  },
+  {
+   "provinceId": 6001,
+   "key": "ita-piedmont",
+   "grossMWhPerYear": 30186517,
+   "reaches": 2132
+  },
+  {
+   "provinceId": 6002,
+   "key": "ita-aosta",
+   "grossMWhPerYear": 9489391,
+   "reaches": 338
+  },
+  {
+   "provinceId": 6003,
+   "key": "ita-liguria",
+   "grossMWhPerYear": 2216653,
+   "reaches": 435
+  },
+  {
+   "provinceId": 6004,
+   "key": "ita-lombardy",
+   "grossMWhPerYear": 27557658,
+   "reaches": 1701
+  },
+  {
+   "provinceId": 6005,
+   "key": "ita-venetia",
+   "grossMWhPerYear": 11182419,
+   "reaches": 894
+  },
+  {
+   "provinceId": 6006,
+   "key": "ita-emilia-romagna",
+   "grossMWhPerYear": 10635345,
+   "reaches": 1016
+  },
+  {
+   "provinceId": 6007,
+   "key": "ita-tuscany",
+   "grossMWhPerYear": 5233546,
+   "reaches": 1288
+  },
+  {
+   "provinceId": 6008,
+   "key": "ita-umbria",
+   "grossMWhPerYear": 3914904,
+   "reaches": 496
+  },
+  {
+   "provinceId": 6009,
+   "key": "ita-marche",
+   "grossMWhPerYear": 2704546,
+   "reaches": 483
+  },
+  {
+   "provinceId": 6010,
+   "key": "ita-lazio",
+   "grossMWhPerYear": 5226922,
+   "reaches": 964
+  },
+  {
+   "provinceId": 6011,
+   "key": "ita-abruzzo",
+   "grossMWhPerYear": 5124276,
+   "reaches": 541
+  },
+  {
+   "provinceId": 6012,
+   "key": "ita-molise",
+   "grossMWhPerYear": 1678927,
+   "reaches": 250
+  },
+  {
+   "provinceId": 6013,
+   "key": "ita-campania",
+   "grossMWhPerYear": 3949299,
+   "reaches": 785
+  },
+  {
+   "provinceId": 6014,
+   "key": "ita-apulia",
+   "grossMWhPerYear": 1321679,
+   "reaches": 666
+  },
+  {
+   "provinceId": 6015,
+   "key": "ita-basilicata",
+   "grossMWhPerYear": 3346231,
+   "reaches": 482
+  },
+  {
+   "provinceId": 6016,
+   "key": "ita-calabria",
+   "grossMWhPerYear": 4816355,
+   "reaches": 654
+  },
+  {
+   "provinceId": 6017,
+   "key": "ita-sicily",
+   "grossMWhPerYear": 2614869,
+   "reaches": 976
+  },
+  {
+   "provinceId": 6018,
+   "key": "ita-sardinia",
+   "grossMWhPerYear": 3686204,
+   "reaches": 1028
+  },
+  {
+   "provinceId": 6019,
+   "key": "ita-friuli",
+   "grossMWhPerYear": 6261241,
+   "reaches": 636
+  },
+  {
+   "provinceId": 7001,
+   "key": "esp-navarra",
+   "grossMWhPerYear": 6377013,
+   "reaches": 801
+  },
+  {
+   "provinceId": 7002,
+   "key": "esp-gipuzkoa",
+   "grossMWhPerYear": 1067450,
+   "reaches": 202
+  },
+  {
+   "provinceId": 7003,
+   "key": "esp-huesca",
+   "grossMWhPerYear": 8285935,
+   "reaches": 925
+  },
+  {
+   "provinceId": 7004,
+   "key": "esp-lerida",
+   "grossMWhPerYear": 5649442,
+   "reaches": 591
+  },
+  {
+   "provinceId": 7005,
+   "key": "esp-gerona",
+   "grossMWhPerYear": 2028235,
+   "reaches": 267
+  },
+  {
+   "provinceId": 7006,
+   "key": "esp-badajoz",
+   "grossMWhPerYear": 2903271,
+   "reaches": 931
+  },
+  {
+   "provinceId": 7007,
+   "key": "esp-cadiz",
+   "grossMWhPerYear": 435391,
+   "reaches": 277
+  },
+  {
+   "provinceId": 7008,
+   "key": "esp-orense",
+   "grossMWhPerYear": 8304934,
+   "reaches": 573
+  },
+  {
+   "provinceId": 7009,
+   "key": "esp-caceres",
+   "grossMWhPerYear": 4056453,
+   "reaches": 808
+  },
+  {
+   "provinceId": 7010,
+   "key": "esp-salamanca",
+   "grossMWhPerYear": 10317602,
+   "reaches": 540
+  },
+  {
+   "provinceId": 7011,
+   "key": "esp-zamora",
+   "grossMWhPerYear": 7967027,
+   "reaches": 480
+  },
+  {
+   "provinceId": 7012,
+   "key": "esp-pontevedra",
+   "grossMWhPerYear": 2669964,
+   "reaches": 444
+  },
+  {
+   "provinceId": 7013,
+   "key": "esp-huelva",
+   "grossMWhPerYear": 1035906,
+   "reaches": 451
+  },
+  {
+   "provinceId": 7014,
+   "key": "esp-barcelona",
+   "grossMWhPerYear": 2114044,
+   "reaches": 378
+  },
+  {
+   "provinceId": 7015,
+   "key": "esp-tarragona",
+   "grossMWhPerYear": 3716688,
+   "reaches": 259
+  },
+  {
+   "provinceId": 7016,
+   "key": "esp-castellon",
+   "grossMWhPerYear": 591110,
+   "reaches": 274
+  },
+  {
+   "provinceId": 7017,
+   "key": "esp-valencia",
+   "grossMWhPerYear": 1954003,
+   "reaches": 484
+  },
+  {
+   "provinceId": 7018,
+   "key": "esp-alicante",
+   "grossMWhPerYear": 382004,
+   "reaches": 219
+  },
+  {
+   "provinceId": 7019,
+   "key": "esp-murcia",
+   "grossMWhPerYear": 662182,
+   "reaches": 489
+  },
+  {
+   "provinceId": 7020,
+   "key": "esp-almeria",
+   "grossMWhPerYear": 641459,
+   "reaches": 406
+  },
+  {
+   "provinceId": 7021,
+   "key": "esp-granada",
+   "grossMWhPerYear": 1579071,
+   "reaches": 613
+  },
+  {
+   "provinceId": 7022,
+   "key": "esp-malaga",
+   "grossMWhPerYear": 1033569,
+   "reaches": 299
+  },
+  {
+   "provinceId": 7023,
+   "key": "esp-sevilla",
+   "grossMWhPerYear": 1344659,
+   "reaches": 576
+  },
+  {
+   "provinceId": 7024,
+   "key": "esp-la-coruna",
+   "grossMWhPerYear": 4484869,
+   "reaches": 751
+  },
+  {
+   "provinceId": 7025,
+   "key": "esp-lugo",
+   "grossMWhPerYear": 5862034,
+   "reaches": 838
+  },
+  {
+   "provinceId": 7026,
+   "key": "esp-asturias",
+   "grossMWhPerYear": 8977734,
+   "reaches": 937
+  },
+  {
+   "provinceId": 7027,
+   "key": "esp-cantabria",
+   "grossMWhPerYear": 2866325,
+   "reaches": 461
+  },
+  {
+   "provinceId": 7028,
+   "key": "esp-bizkaia",
+   "grossMWhPerYear": 570494,
+   "reaches": 195
+  },
+  {
+   "provinceId": 7029,
+   "key": "esp-santa-cruz-de-tenerife",
+   "grossMWhPerYear": 164808,
+   "reaches": 76
+  },
+  {
+   "provinceId": 7030,
+   "key": "esp-las-palmas",
+   "grossMWhPerYear": 18125,
+   "reaches": 84
+  },
+  {
+   "provinceId": 7031,
+   "key": "esp-baleares",
+   "grossMWhPerYear": 103353,
+   "reaches": 143
+  },
+  {
+   "provinceId": 7032,
+   "key": "esp-zaragoza",
+   "grossMWhPerYear": 8514860,
+   "reaches": 815
+  },
+  {
+   "provinceId": 7033,
+   "key": "esp-la-rioja",
+   "grossMWhPerYear": 4558804,
+   "reaches": 305
+  },
+  {
+   "provinceId": 7034,
+   "key": "esp-alava",
+   "grossMWhPerYear": 664533,
+   "reaches": 257
+  },
+  {
+   "provinceId": 7035,
+   "key": "esp-albacete",
+   "grossMWhPerYear": 1221476,
+   "reaches": 692
+  },
+  {
+   "provinceId": 7036,
+   "key": "esp-teruel",
+   "grossMWhPerYear": 540645,
+   "reaches": 690
+  },
+  {
+   "provinceId": 7037,
+   "key": "esp-cuenca",
+   "grossMWhPerYear": 940851,
+   "reaches": 726
+  },
+  {
+   "provinceId": 7038,
+   "key": "esp-toledo",
+   "grossMWhPerYear": 1775111,
+   "reaches": 625
+  },
+  {
+   "provinceId": 7039,
+   "key": "esp-leon",
+   "grossMWhPerYear": 6974855,
+   "reaches": 1030
+  },
+  {
+   "provinceId": 7040,
+   "key": "esp-soria",
+   "grossMWhPerYear": 572002,
+   "reaches": 460
+  },
+  {
+   "provinceId": 7041,
+   "key": "esp-burgos",
+   "grossMWhPerYear": 3125636,
+   "reaches": 742
+  },
+  {
+   "provinceId": 7042,
+   "key": "esp-avila",
+   "grossMWhPerYear": 994005,
+   "reaches": 367
+  },
+  {
+   "provinceId": 7043,
+   "key": "esp-palencia",
+   "grossMWhPerYear": 1378431,
+   "reaches": 373
+  },
+  {
+   "provinceId": 7044,
+   "key": "esp-ciudad-real",
+   "grossMWhPerYear": 792535,
+   "reaches": 902
+  },
+  {
+   "provinceId": 7045,
+   "key": "esp-cordoba",
+   "grossMWhPerYear": 1717913,
+   "reaches": 610
+  },
+  {
+   "provinceId": 7046,
+   "key": "esp-guadalajara",
+   "grossMWhPerYear": 1112624,
+   "reaches": 596
+  },
+  {
+   "provinceId": 7047,
+   "key": "esp-jaen",
+   "grossMWhPerYear": 1872904,
+   "reaches": 635
+  },
+  {
+   "provinceId": 7048,
+   "key": "esp-madrid",
+   "grossMWhPerYear": 1008618,
+   "reaches": 377
+  },
+  {
+   "provinceId": 7049,
+   "key": "esp-segovia",
+   "grossMWhPerYear": 367870,
+   "reaches": 315
+  },
+  {
+   "provinceId": 7050,
+   "key": "esp-valladolid",
+   "grossMWhPerYear": 930335,
+   "reaches": 357
+  },
+  {
+   "provinceId": 8001,
+   "key": "prt-evora",
+   "grossMWhPerYear": 628074,
+   "reaches": 301
+  },
+  {
+   "provinceId": 8002,
+   "key": "prt-portalegre",
+   "grossMWhPerYear": 3712253,
+   "reaches": 256
+  },
+  {
+   "provinceId": 8003,
+   "key": "prt-viana-do-castelo",
+   "grossMWhPerYear": 3098431,
+   "reaches": 239
+  },
+  {
+   "provinceId": 8004,
+   "key": "prt-castelo-branco",
+   "grossMWhPerYear": 1190427,
+   "reaches": 279
+  },
+  {
+   "provinceId": 8005,
+   "key": "prt-guarda",
+   "grossMWhPerYear": 2392616,
+   "reaches": 243
+  },
+  {
+   "provinceId": 8006,
+   "key": "prt-braganca",
+   "grossMWhPerYear": 2757708,
+   "reaches": 332
+  },
+  {
+   "provinceId": 8007,
+   "key": "prt-vila-real",
+   "grossMWhPerYear": 3185213,
+   "reaches": 356
+  },
+  {
+   "provinceId": 8008,
+   "key": "prt-braga",
+   "grossMWhPerYear": 2003463,
+   "reaches": 275
+  },
+  {
+   "provinceId": 8009,
+   "key": "prt-faro",
+   "grossMWhPerYear": 384397,
+   "reaches": 175
+  },
+  {
+   "provinceId": 8010,
+   "key": "prt-beja",
+   "grossMWhPerYear": 1965082,
+   "reaches": 453
+  },
+  {
+   "provinceId": 8011,
+   "key": "prt-setubal",
+   "grossMWhPerYear": 176242,
+   "reaches": 212
+  },
+  {
+   "provinceId": 8012,
+   "key": "prt-lisboa",
+   "grossMWhPerYear": 93869,
+   "reaches": 102
+  },
+  {
+   "provinceId": 8013,
+   "key": "prt-santarem",
+   "grossMWhPerYear": 1850480,
+   "reaches": 275
+  },
+  {
+   "provinceId": 8014,
+   "key": "prt-leiria",
+   "grossMWhPerYear": 321698,
+   "reaches": 197
+  },
+  {
+   "provinceId": 8015,
+   "key": "prt-coimbra",
+   "grossMWhPerYear": 1157946,
+   "reaches": 257
+  },
+  {
+   "provinceId": 8016,
+   "key": "prt-aveiro",
+   "grossMWhPerYear": 969670,
+   "reaches": 227
+  },
+  {
+   "provinceId": 8017,
+   "key": "prt-porto",
+   "grossMWhPerYear": 1933635,
+   "reaches": 199
+  },
+  {
+   "provinceId": 8018,
+   "key": "prt-madeira",
+   "grossMWhPerYear": 16509,
+   "reaches": 18
+  },
+  {
+   "provinceId": 8020,
+   "key": "prt-viseu",
+   "grossMWhPerYear": 7264380,
+   "reaches": 383
+  },
+  {
+   "provinceId": 9001,
+   "key": "nld-groningen",
+   "grossMWhPerYear": 7626,
+   "reaches": 70
+  },
+  {
+   "provinceId": 9002,
+   "key": "nld-drenthe",
+   "grossMWhPerYear": 24254,
+   "reaches": 116
+  },
+  {
+   "provinceId": 9003,
+   "key": "nld-overijssel",
+   "grossMWhPerYear": 99328,
+   "reaches": 122
+  },
+  {
+   "provinceId": 9004,
+   "key": "nld-gelderland",
+   "grossMWhPerYear": 1294801,
+   "reaches": 178
+  },
+  {
+   "provinceId": 9005,
+   "key": "nld-limburg",
+   "grossMWhPerYear": 703237,
+   "reaches": 105
+  },
+  {
+   "provinceId": 9006,
+   "key": "nld-zeeland",
+   "grossMWhPerYear": 1532,
+   "reaches": 42
+  },
+  {
+   "provinceId": 9007,
+   "key": "nld-noord-brabant",
+   "grossMWhPerYear": 511807,
+   "reaches": 236
+  },
+  {
+   "provinceId": 9008,
+   "key": "nld-zuid-holland",
+   "grossMWhPerYear": 419428,
+   "reaches": 62
+  },
+  {
+   "provinceId": 9009,
+   "key": "nld-noord-holland",
+   "grossMWhPerYear": 10404,
+   "reaches": 65
+  },
+  {
+   "provinceId": 9010,
+   "key": "nld-friesland",
+   "grossMWhPerYear": 8765,
+   "reaches": 88
+  },
+  {
+   "provinceId": 9011,
+   "key": "nld-flevoland",
+   "grossMWhPerYear": 27286,
+   "reaches": 27
+  },
+  {
+   "provinceId": 9012,
+   "key": "nld-utrecht",
+   "grossMWhPerYear": 415214,
+   "reaches": 47
+  },
+  {
+   "provinceId": 10001,
+   "key": "bel-west-flanders",
+   "grossMWhPerYear": 54166,
+   "reaches": 135
+  },
+  {
+   "provinceId": 10002,
+   "key": "bel-hainaut",
+   "grossMWhPerYear": 238082,
+   "reaches": 218
+  },
+  {
+   "provinceId": 10003,
+   "key": "bel-namur",
+   "grossMWhPerYear": 810003,
+   "reaches": 186
+  },
+  {
+   "provinceId": 10004,
+   "key": "bel-luxembourg",
+   "grossMWhPerYear": 675837,
+   "reaches": 271
+  },
+  {
+   "provinceId": 10005,
+   "key": "bel-liege",
+   "grossMWhPerYear": 1012166,
+   "reaches": 160
+  },
+  {
+   "provinceId": 10006,
+   "key": "bel-east-flanders",
+   "grossMWhPerYear": 147031,
+   "reaches": 123
+  },
+  {
+   "provinceId": 10007,
+   "key": "bel-antwerp",
+   "grossMWhPerYear": 124828,
+   "reaches": 160
+  },
+  {
+   "provinceId": 10008,
+   "key": "bel-limburg",
+   "grossMWhPerYear": 256273,
+   "reaches": 106
+  },
+  {
+   "provinceId": 10009,
+   "key": "bel-brussels",
+   "grossMWhPerYear": 16896,
+   "reaches": 14
+  },
+  {
+   "provinceId": 10010,
+   "key": "bel-flemish-brabant",
+   "grossMWhPerYear": 114677,
+   "reaches": 113
+  },
+  {
+   "provinceId": 10011,
+   "key": "bel-walloon-brabant",
+   "grossMWhPerYear": 66985,
+   "reaches": 71
+  },
+  {
+   "provinceId": 11001,
+   "key": "che-valais",
+   "grossMWhPerYear": 17652306,
+   "reaches": 550
+  },
+  {
+   "provinceId": 11002,
+   "key": "che-ticino",
+   "grossMWhPerYear": 7953715,
+   "reaches": 355
+  },
+  {
+   "provinceId": 11003,
+   "key": "che-graubunden",
+   "grossMWhPerYear": 18137360,
+   "reaches": 787
+  },
+  {
+   "provinceId": 11004,
+   "key": "che-schaffhausen",
+   "grossMWhPerYear": 576043,
+   "reaches": 25
+  },
+  {
+   "provinceId": 11005,
+   "key": "che-thurgau",
+   "grossMWhPerYear": 623520,
+   "reaches": 63
+  },
+  {
+   "provinceId": 11006,
+   "key": "che-zurich",
+   "grossMWhPerYear": 1665891,
+   "reaches": 131
+  },
+  {
+   "provinceId": 11007,
+   "key": "che-aargau",
+   "grossMWhPerYear": 7806091,
+   "reaches": 109
+  },
+  {
+   "provinceId": 11008,
+   "key": "che-basel-stadt",
+   "grossMWhPerYear": 828412,
+   "reaches": 10
+  },
+  {
+   "provinceId": 11009,
+   "key": "che-basel-landschaft",
+   "grossMWhPerYear": 1631361,
+   "reaches": 51
+  },
+  {
+   "provinceId": 11010,
+   "key": "che-sankt-gallen",
+   "grossMWhPerYear": 2230724,
+   "reaches": 224
+  },
+  {
+   "provinceId": 11011,
+   "key": "che-solothurn",
+   "grossMWhPerYear": 1097989,
+   "reaches": 52
+  },
+  {
+   "provinceId": 11012,
+   "key": "che-jura",
+   "grossMWhPerYear": 929695,
+   "reaches": 55
+  },
+  {
+   "provinceId": 11013,
+   "key": "che-geneve",
+   "grossMWhPerYear": 1098326,
+   "reaches": 39
+  },
+  {
+   "provinceId": 11014,
+   "key": "che-vaud",
+   "grossMWhPerYear": 2126292,
+   "reaches": 210
+  },
+  {
+   "provinceId": 11015,
+   "key": "che-neuchatel",
+   "grossMWhPerYear": 346955,
+   "reaches": 49
+  },
+  {
+   "provinceId": 11016,
+   "key": "che-bern",
+   "grossMWhPerYear": 8500004,
+   "reaches": 534
+  },
+  {
+   "provinceId": 11017,
+   "key": "che-lucerne",
+   "grossMWhPerYear": 1105767,
+   "reaches": 139
+  },
+  {
+   "provinceId": 11018,
+   "key": "che-zug",
+   "grossMWhPerYear": 435665,
+   "reaches": 24
+  },
+  {
+   "provinceId": 11019,
+   "key": "che-uri",
+   "grossMWhPerYear": 3521570,
+   "reaches": 113
+  },
+  {
+   "provinceId": 11020,
+   "key": "che-schwyz",
+   "grossMWhPerYear": 917541,
+   "reaches": 70
+  },
+  {
+   "provinceId": 11021,
+   "key": "che-glarus",
+   "grossMWhPerYear": 1525566,
+   "reaches": 86
+  },
+  {
+   "provinceId": 11022,
+   "key": "che-nidwalden",
+   "grossMWhPerYear": 424379,
+   "reaches": 29
+  },
+  {
+   "provinceId": 11023,
+   "key": "che-fribourg",
+   "grossMWhPerYear": 1134804,
+   "reaches": 122
+  },
+  {
+   "provinceId": 11024,
+   "key": "che-obwalden",
+   "grossMWhPerYear": 669481,
+   "reaches": 53
+  },
+  {
+   "provinceId": 11025,
+   "key": "che-appenzell-ausserrhoden",
+   "grossMWhPerYear": 248950,
+   "reaches": 36
+  },
+  {
+   "provinceId": 11026,
+   "key": "che-appenzell-innerrhoden",
+   "grossMWhPerYear": 102490,
+   "reaches": 18
+  },
+  {
+   "provinceId": 12001,
+   "key": "swe-norrbotten",
+   "grossMWhPerYear": 48413851,
+   "reaches": 4843
+  },
+  {
+   "provinceId": 12002,
+   "key": "swe-vasterbotten",
+   "grossMWhPerYear": 28368314,
+   "reaches": 2795
+  },
+  {
+   "provinceId": 12003,
+   "key": "swe-jamtland",
+   "grossMWhPerYear": 24762648,
+   "reaches": 2521
+  },
+  {
+   "provinceId": 12004,
+   "key": "swe-dalarna",
+   "grossMWhPerYear": 8372817,
+   "reaches": 1120
+  },
+  {
+   "provinceId": 12005,
+   "key": "swe-varmland",
+   "grossMWhPerYear": 4098668,
+   "reaches": 738
+  },
+  {
+   "provinceId": 12006,
+   "key": "swe-vastra-gotaland",
+   "grossMWhPerYear": 4280485,
+   "reaches": 1203
+  },
+  {
+   "provinceId": 12007,
+   "key": "swe-vasternorrland",
+   "grossMWhPerYear": 14789789,
+   "reaches": 903
+  },
+  {
+   "provinceId": 12008,
+   "key": "swe-gavleborg",
+   "grossMWhPerYear": 4418799,
+   "reaches": 703
+  },
+  {
+   "provinceId": 12009,
+   "key": "swe-uppsala",
+   "grossMWhPerYear": 1028008,
+   "reaches": 231
+  },
+  {
+   "provinceId": 12010,
+   "key": "swe-stockholm",
+   "grossMWhPerYear": 99086,
+   "reaches": 163
+  },
+  {
+   "provinceId": 12011,
+   "key": "swe-sodermanland",
+   "grossMWhPerYear": 152899,
+   "reaches": 174
+  },
+  {
+   "provinceId": 12012,
+   "key": "swe-ostergotland",
+   "grossMWhPerYear": 683188,
+   "reaches": 353
+  },
+  {
+   "provinceId": 12013,
+   "key": "swe-kalmar",
+   "grossMWhPerYear": 626446,
+   "reaches": 377
+  },
+  {
+   "provinceId": 12014,
+   "key": "swe-blekinge",
+   "grossMWhPerYear": 612608,
+   "reaches": 104
+  },
+  {
+   "provinceId": 12015,
+   "key": "swe-skane",
+   "grossMWhPerYear": 744676,
+   "reaches": 499
+  },
+  {
+   "provinceId": 12016,
+   "key": "swe-halland",
+   "grossMWhPerYear": 1948389,
+   "reaches": 364
+  },
+  {
+   "provinceId": 12017,
+   "key": "swe-gotland",
+   "grossMWhPerYear": 21920,
+   "reaches": 89
+  },
+  {
+   "provinceId": 12018,
+   "key": "swe-vastmanland",
+   "grossMWhPerYear": 585573,
+   "reaches": 226
+  },
+  {
+   "provinceId": 12019,
+   "key": "swe-jonkoping",
+   "grossMWhPerYear": 541271,
+   "reaches": 462
+  },
+  {
+   "provinceId": 12020,
+   "key": "swe-orebro",
+   "grossMWhPerYear": 841181,
+   "reaches": 350
+  },
+  {
+   "provinceId": 12021,
+   "key": "swe-kronoberg",
+   "grossMWhPerYear": 617182,
+   "reaches": 372
+  },
+  {
+   "provinceId": 13001,
+   "key": "nor-troms",
+   "grossMWhPerYear": 10424277,
+   "reaches": 1631
+  },
+  {
+   "provinceId": 13002,
+   "key": "nor-nordland",
+   "grossMWhPerYear": 36855679,
+   "reaches": 4185
+  },
+  {
+   "provinceId": 13003,
+   "key": "nor-nord-tr-ndelag",
+   "grossMWhPerYear": 14914807,
+   "reaches": 2230
+  },
+  {
+   "provinceId": 13004,
+   "key": "nor-s-r-tr-ndelag",
+   "grossMWhPerYear": 15371241,
+   "reaches": 1590
+  },
+  {
+   "provinceId": 13005,
+   "key": "nor-hedmark",
+   "grossMWhPerYear": 13470399,
+   "reaches": 1313
+  },
+  {
+   "provinceId": 13006,
+   "key": "nor-akershus",
+   "grossMWhPerYear": 2689295,
+   "reaches": 243
+  },
+  {
+   "provinceId": 13007,
+   "key": "nor-stfold",
+   "grossMWhPerYear": 6044659,
+   "reaches": 215
+  },
+  {
+   "provinceId": 13008,
+   "key": "nor-finnmark",
+   "grossMWhPerYear": 13853410,
+   "reaches": 2283
+  },
+  {
+   "provinceId": 13009,
+   "key": "nor-oslo",
+   "grossMWhPerYear": 261840,
+   "reaches": 64
+  },
+  {
+   "provinceId": 13010,
+   "key": "nor-buskerud",
+   "grossMWhPerYear": 15722055,
+   "reaches": 826
+  },
+  {
+   "provinceId": 13011,
+   "key": "nor-vestfold",
+   "grossMWhPerYear": 742838,
+   "reaches": 160
+  },
+  {
+   "provinceId": 13012,
+   "key": "nor-telemark",
+   "grossMWhPerYear": 16271687,
+   "reaches": 1005
+  },
+  {
+   "provinceId": 13013,
+   "key": "nor-aust-agder",
+   "grossMWhPerYear": 9625507,
+   "reaches": 896
+  },
+  {
+   "provinceId": 13014,
+   "key": "nor-vest-agder",
+   "grossMWhPerYear": 14765165,
+   "reaches": 1078
+  },
+  {
+   "provinceId": 13015,
+   "key": "nor-rogaland",
+   "grossMWhPerYear": 14006934,
+   "reaches": 1078
+  },
+  {
+   "provinceId": 13016,
+   "key": "nor-hordaland",
+   "grossMWhPerYear": 30676458,
+   "reaches": 1816
+  },
+  {
+   "provinceId": 13017,
+   "key": "nor-sogn-og-fjordane",
+   "grossMWhPerYear": 33214505,
+   "reaches": 2451
+  },
+  {
+   "provinceId": 13018,
+   "key": "nor-m-re-og-romsdal",
+   "grossMWhPerYear": 16467296,
+   "reaches": 1724
+  },
+  {
+   "provinceId": 13019,
+   "key": "nor-oppland",
+   "grossMWhPerYear": 21459008,
+   "reaches": 1436
+  },
+  {
+   "provinceId": 14001,
+   "key": "dnk-north-jutland",
+   "grossMWhPerYear": 100032,
+   "reaches": 366
+  },
+  {
+   "provinceId": 14002,
+   "key": "dnk-central-jutland",
+   "grossMWhPerYear": 495258,
+   "reaches": 749
+  },
+  {
+   "provinceId": 14003,
+   "key": "dnk-south-jutland",
+   "grossMWhPerYear": 249399,
+   "reaches": 428
+  },
+  {
+   "provinceId": 14004,
+   "key": "dnk-copenhagen",
+   "grossMWhPerYear": 28474,
+   "reaches": 85
+  },
+  {
+   "provinceId": 14005,
+   "key": "dnk-zealand",
+   "grossMWhPerYear": 61871,
+   "reaches": 214
+  },
+  {
+   "provinceId": 14006,
+   "key": "isl-iceland",
+   "grossMWhPerYear": 137848589,
+   "reaches": 13976
+  },
+  {
+   "provinceId": 14007,
+   "key": "fro-faroe-islands",
+   "grossMWhPerYear": 280811,
+   "reaches": 105
+  },
+  {
+   "provinceId": 15001,
+   "key": "grc-attica",
+   "grossMWhPerYear": 137554,
+   "reaches": 107
+  },
+  {
+   "provinceId": 15002,
+   "key": "grc-peloponnese",
+   "grossMWhPerYear": 3664515,
+   "reaches": 610
+  },
+  {
+   "provinceId": 15003,
+   "key": "grc-thessaly",
+   "grossMWhPerYear": 3094382,
+   "reaches": 646
+  },
+  {
+   "provinceId": 15004,
+   "key": "grc-central-greece",
+   "grossMWhPerYear": 2851429,
+   "reaches": 593
+  },
+  {
+   "provinceId": 15005,
+   "key": "grc-ionian-islands",
+   "grossMWhPerYear": 80919,
+   "reaches": 50
+  },
+  {
+   "provinceId": 15006,
+   "key": "grc-northern-aegean-islands",
+   "grossMWhPerYear": 8060,
+   "reaches": 11
+  },
+  {
+   "provinceId": 15007,
+   "key": "grc-southern-aegean-islands",
+   "grossMWhPerYear": 11631,
+   "reaches": 27
+  },
+  {
+   "provinceId": 15008,
+   "key": "grc-epirus",
+   "grossMWhPerYear": 5995,
+   "reaches": 7
+  },
+  {
+   "provinceId": 15009,
+   "key": "grc-macedonia",
+   "grossMWhPerYear": 424,
+   "reaches": 5
+  },
+  {
+   "provinceId": 15010,
+   "key": "grc-western-macedonia",
+   "grossMWhPerYear": 3083,
+   "reaches": 1
+  },
+  {
+   "provinceId": 15011,
+   "key": "grc-thrace",
+   "grossMWhPerYear": 75428,
+   "reaches": 7
+  },
+  {
+   "provinceId": 16001,
+   "key": "srb-belgrade",
+   "grossMWhPerYear": 631253,
+   "reaches": 130
+  },
+  {
+   "provinceId": 16002,
+   "key": "srb-sumadija",
+   "grossMWhPerYear": 1539225,
+   "reaches": 296
+  },
+  {
+   "provinceId": 16003,
+   "key": "srb-podrinje",
+   "grossMWhPerYear": 9649349,
+   "reaches": 771
+  },
+  {
+   "provinceId": 16004,
+   "key": "srb-nis",
+   "grossMWhPerYear": 16601635,
+   "reaches": 1020
+  },
+  {
+   "provinceId": 16005,
+   "key": "srb-timok",
+   "grossMWhPerYear": 481154,
+   "reaches": 185
+  },
+  {
+   "provinceId": 17001,
+   "key": "mnt-montenegro",
+   "grossMWhPerYear": 7515698,
+   "reaches": 698
+  },
+  {
+   "provinceId": 17002,
+   "key": "mnt-brda",
+   "grossMWhPerYear": 3001094,
+   "reaches": 207
+  },
+  {
+   "provinceId": 17003,
+   "key": "mnt-old-herzegovina",
+   "grossMWhPerYear": 256245,
+   "reaches": 30
+  },
+  {
+   "provinceId": 18001,
+   "key": "rom-muntenia",
+   "grossMWhPerYear": 11012002,
+   "reaches": 1959
+  },
+  {
+   "provinceId": 18002,
+   "key": "rom-oltenia",
+   "grossMWhPerYear": 7080773,
+   "reaches": 1138
+  },
+  {
+   "provinceId": 18003,
+   "key": "rom-moldavia",
+   "grossMWhPerYear": 6158253,
+   "reaches": 1153
+  },
+  {
+   "provinceId": 18004,
+   "key": "rom-dobruja",
+   "grossMWhPerYear": 2733754,
+   "reaches": 434
+  },
+  {
+   "provinceId": 19001,
+   "key": "bgr-sofia",
+   "grossMWhPerYear": 6352758,
+   "reaches": 939
+  },
+  {
+   "provinceId": 19002,
+   "key": "bgr-plovdiv",
+   "grossMWhPerYear": 3324513,
+   "reaches": 829
+  },
+  {
+   "provinceId": 19003,
+   "key": "bgr-stara-zagora",
+   "grossMWhPerYear": 1747469,
+   "reaches": 791
+  },
+  {
+   "provinceId": 19004,
+   "key": "bgr-ruse",
+   "grossMWhPerYear": 2099836,
+   "reaches": 653
+  },
+  {
+   "provinceId": 19005,
+   "key": "bgr-varna",
+   "grossMWhPerYear": 929661,
+   "reaches": 616
+  },
+  {
+   "provinceId": 19006,
+   "key": "bgr-pleven",
+   "grossMWhPerYear": 9675012,
+   "reaches": 850
+  },
+  {
+   "provinceId": 20001,
+   "key": "ott-constantinople",
+   "grossMWhPerYear": 2069523,
+   "reaches": 767
+  },
+  {
+   "provinceId": 20002,
+   "key": "ott-adrianople",
+   "grossMWhPerYear": 4841383,
+   "reaches": 1754
+  },
+  {
+   "provinceId": 20003,
+   "key": "ott-salonika",
+   "grossMWhPerYear": 4232189,
+   "reaches": 922
+  },
+  {
+   "provinceId": 20004,
+   "key": "ott-monastir",
+   "grossMWhPerYear": 12898804,
+   "reaches": 1428
+  },
+  {
+   "provinceId": 20005,
+   "key": "ott-kosovo",
+   "grossMWhPerYear": 5110474,
+   "reaches": 567
+  },
+  {
+   "provinceId": 20006,
+   "key": "ott-scutari",
+   "grossMWhPerYear": 17017421,
+   "reaches": 1096
+  },
+  {
+   "provinceId": 20007,
+   "key": "ott-janina",
+   "grossMWhPerYear": 10244476,
+   "reaches": 1198
+  },
+  {
+   "provinceId": 21001,
+   "key": "lux-diekirch",
+   "grossMWhPerYear": 264283,
+   "reaches": 78
+  },
+  {
+   "provinceId": 21002,
+   "key": "lux-grevenmacher",
+   "grossMWhPerYear": 36246,
+   "reaches": 22
+  },
+  {
+   "provinceId": 21003,
+   "key": "lux-luxembourg",
+   "grossMWhPerYear": 66765,
+   "reaches": 61
+  },
+  {
+   "provinceId": 22001,
+   "key": "mco-monaco",
+   "grossMWhPerYear": 59,
+   "reaches": 1
+  },
+  {
+   "provinceId": 23001,
+   "key": "smr-san-marino",
+   "grossMWhPerYear": 10121,
+   "reaches": 2
+  },
+  {
+   "provinceId": 24001,
+   "key": "and-andorra",
+   "grossMWhPerYear": 308026,
+   "reaches": 24
+  },
+  {
+   "provinceId": 25001,
+   "key": "lie-liechtenstein",
+   "grossMWhPerYear": 797506,
+   "reaches": 35
+  },
+  {
+   "provinceId": 60001,
+   "key": "aut-vienna",
+   "grossMWhPerYear": 1186087,
+   "reaches": 16
+  },
+  {
+   "provinceId": 60002,
+   "key": "aut-lower-austria",
+   "grossMWhPerYear": 19276588,
+   "reaches": 1061
+  },
+  {
+   "provinceId": 60003,
+   "key": "aut-upper-austria",
+   "grossMWhPerYear": 16070404,
+   "reaches": 908
+  },
+  {
+   "provinceId": 60004,
+   "key": "aut-salzburg",
+   "grossMWhPerYear": 7199297,
+   "reaches": 591
+  },
+  {
+   "provinceId": 60005,
+   "key": "aut-styria",
+   "grossMWhPerYear": 12665282,
+   "reaches": 1131
+  },
+  {
+   "provinceId": 60006,
+   "key": "aut-carinthia",
+   "grossMWhPerYear": 10196088,
+   "reaches": 744
+  },
+  {
+   "provinceId": 60007,
+   "key": "aut-tyrol",
+   "grossMWhPerYear": 20448539,
+   "reaches": 1089
+  },
+  {
+   "provinceId": 60008,
+   "key": "aut-vorarlberg",
+   "grossMWhPerYear": 4094277,
+   "reaches": 275
+  },
+  {
+   "provinceId": 60009,
+   "key": "aut-prague",
+   "grossMWhPerYear": 210428,
+   "reaches": 21
+  },
+  {
+   "provinceId": 60010,
+   "key": "aut-bohemia",
+   "grossMWhPerYear": 7659384,
+   "reaches": 2303
+  },
+  {
+   "provinceId": 60011,
+   "key": "aut-moravia",
+   "grossMWhPerYear": 2066138,
+   "reaches": 1047
+  },
+  {
+   "provinceId": 60012,
+   "key": "aut-austrian-silesia",
+   "grossMWhPerYear": 662626,
+   "reaches": 214
+  },
+  {
+   "provinceId": 60013,
+   "key": "aut-hultschin",
+   "grossMWhPerYear": 15874,
+   "reaches": 13
+  },
+  {
+   "provinceId": 60014,
+   "key": "aut-western-galicia",
+   "grossMWhPerYear": 4925760,
+   "reaches": 1455
+  },
+  {
+   "provinceId": 60015,
+   "key": "aut-eastern-galicia",
+   "grossMWhPerYear": 7010138,
+   "reaches": 1650
+  },
+  {
+   "provinceId": 60016,
+   "key": "aut-tarnopol",
+   "grossMWhPerYear": 1470744,
+   "reaches": 509
+  },
+  {
+   "provinceId": 60017,
+   "key": "aut-northern-bukovina",
+   "grossMWhPerYear": 1667411,
+   "reaches": 288
+  },
+  {
+   "provinceId": 60018,
+   "key": "aut-southern-bukovina",
+   "grossMWhPerYear": 2596784,
+   "reaches": 453
+  },
+  {
+   "provinceId": 60019,
+   "key": "aut-carpathian-ruthenia",
+   "grossMWhPerYear": 5634811,
+   "reaches": 742
+  },
+  {
+   "provinceId": 60020,
+   "key": "aut-carniola",
+   "grossMWhPerYear": 2916764,
+   "reaches": 648
+  },
+  {
+   "provinceId": 60021,
+   "key": "aut-lower-styria",
+   "grossMWhPerYear": 5677631,
+   "reaches": 413
+  },
+  {
+   "provinceId": 60022,
+   "key": "aut-gorizia-gradisca",
+   "grossMWhPerYear": 3940332,
+   "reaches": 351
+  },
+  {
+   "provinceId": 60023,
+   "key": "aut-istria",
+   "grossMWhPerYear": 891891,
+   "reaches": 305
+  },
+  {
+   "provinceId": 60024,
+   "key": "aut-trieste",
+   "grossMWhPerYear": 69515,
+   "reaches": 9
+  },
+  {
+   "provinceId": 60025,
+   "key": "aut-south-tyrol",
+   "grossMWhPerYear": 11549909,
+   "reaches": 530
+  },
+  {
+   "provinceId": 60026,
+   "key": "aut-trentino",
+   "grossMWhPerYear": 9331800,
+   "reaches": 432
+  },
+  {
+   "provinceId": 60027,
+   "key": "aut-northern-dalmatia",
+   "grossMWhPerYear": 2127217,
+   "reaches": 432
+  },
+  {
+   "provinceId": 60028,
+   "key": "aut-southern-dalmatia",
+   "grossMWhPerYear": 1939607,
+   "reaches": 296
+  },
+  {
+   "provinceId": 60029,
+   "key": "aut-fiume",
+   "grossMWhPerYear": 2745,
+   "reaches": 1
+  },
+  {
+   "provinceId": 60030,
+   "key": "aut-bosnia",
+   "grossMWhPerYear": 6753917,
+   "reaches": 795
+  },
+  {
+   "provinceId": 60031,
+   "key": "aut-herzegovina",
+   "grossMWhPerYear": 23076478,
+   "reaches": 2636
+  },
+  {
+   "provinceId": 60032,
+   "key": "aut-croatia-proper",
+   "grossMWhPerYear": 4354465,
+   "reaches": 956
+  },
+  {
+   "provinceId": 60033,
+   "key": "aut-slavonia",
+   "grossMWhPerYear": 3406540,
+   "reaches": 730
+  },
+  {
+   "provinceId": 60034,
+   "key": "aut-hun-central-hungary",
+   "grossMWhPerYear": 1859149,
+   "reaches": 277
+  },
+  {
+   "provinceId": 60035,
+   "key": "aut-hun-transdanubia",
+   "grossMWhPerYear": 4367777,
+   "reaches": 1480
+  },
+  {
+   "provinceId": 60036,
+   "key": "aut-hun-northern-hungary",
+   "grossMWhPerYear": 857154,
+   "reaches": 498
+  },
+  {
+   "provinceId": 60037,
+   "key": "aut-hun-great-hungarian-plain",
+   "grossMWhPerYear": 3132749,
+   "reaches": 1018
+  },
+  {
+   "provinceId": 60038,
+   "key": "aut-burgenland",
+   "grossMWhPerYear": 209707,
+   "reaches": 156
+  },
+  {
+   "provinceId": 60039,
+   "key": "aut-svk-pressburg",
+   "grossMWhPerYear": 3560556,
+   "reaches": 72
+  },
+  {
+   "provinceId": 60040,
+   "key": "aut-svk-nagyszombat",
+   "grossMWhPerYear": 696660,
+   "reaches": 152
+  },
+  {
+   "provinceId": 60041,
+   "key": "aut-svk-nyitra",
+   "grossMWhPerYear": 340268,
+   "reaches": 219
+  },
+  {
+   "provinceId": 60042,
+   "key": "aut-svk-trencsen",
+   "grossMWhPerYear": 1666887,
+   "reaches": 219
+  },
+  {
+   "provinceId": 60043,
+   "key": "aut-svk-turoc",
+   "grossMWhPerYear": 2955030,
+   "reaches": 418
+  },
+  {
+   "provinceId": 60044,
+   "key": "aut-svk-besztercebanya",
+   "grossMWhPerYear": 1346800,
+   "reaches": 457
+  },
+  {
+   "provinceId": 60045,
+   "key": "aut-svk-kassa",
+   "grossMWhPerYear": 874325,
+   "reaches": 277
+  },
+  {
+   "provinceId": 60046,
+   "key": "aut-svk-eperjes",
+   "grossMWhPerYear": 1232120,
+   "reaches": 435
+  },
+  {
+   "provinceId": 60047,
+   "key": "aut-transylvania",
+   "grossMWhPerYear": 9610068,
+   "reaches": 2153
+  },
+  {
+   "provinceId": 60048,
+   "key": "aut-szekely-land",
+   "grossMWhPerYear": 1217364,
+   "reaches": 567
+  },
+  {
+   "provinceId": 60049,
+   "key": "aut-partium",
+   "grossMWhPerYear": 6033974,
+   "reaches": 1378
+  },
+  {
+   "provinceId": 60050,
+   "key": "aut-banat",
+   "grossMWhPerYear": 1777054,
+   "reaches": 915
+  },
+  {
+   "provinceId": 60051,
+   "key": "aut-backa",
+   "grossMWhPerYear": 2923923,
+   "reaches": 233
+  },
+  {
+   "provinceId": 60052,
+   "key": "aut-syrmia",
+   "grossMWhPerYear": 1136296,
+   "reaches": 114
+  },
+  {
+   "provinceId": 60053,
+   "key": "aut-cieszyn-silesia",
+   "grossMWhPerYear": 436413,
+   "reaches": 162
+  },
+  {
+   "provinceId": 66001,
+   "key": "crt-crete",
+   "grossMWhPerYear": 1654345,
+   "reaches": 304
+  },
+  {
+   "provinceId": 100001,
+   "key": "as-ott-hudavendigar",
+   "grossMWhPerYear": 15377091,
+   "reaches": 2703
+  },
+  {
+   "provinceId": 100002,
+   "key": "as-ott-aydin",
+   "grossMWhPerYear": 11736995,
+   "reaches": 2500
+  },
+  {
+   "provinceId": 100003,
+   "key": "as-ott-konya",
+   "grossMWhPerYear": 22742004,
+   "reaches": 4022
+  },
+  {
+   "provinceId": 100004,
+   "key": "as-ott-ankara",
+   "grossMWhPerYear": 23819872,
+   "reaches": 4760
+  },
+  {
+   "provinceId": 100005,
+   "key": "as-ott-kastamonu",
+   "grossMWhPerYear": 18990837,
+   "reaches": 2038
+  },
+  {
+   "provinceId": 100006,
+   "key": "as-ott-sivas",
+   "grossMWhPerYear": 20068079,
+   "reaches": 2674
+  },
+  {
+   "provinceId": 100007,
+   "key": "as-ott-trabzon",
+   "grossMWhPerYear": 39285416,
+   "reaches": 2108
+  },
+  {
+   "provinceId": 100008,
+   "key": "as-ott-erzurum",
+   "grossMWhPerYear": 29197649,
+   "reaches": 2652
+  },
+  {
+   "provinceId": 100009,
+   "key": "as-ott-van",
+   "grossMWhPerYear": 18417237,
+   "reaches": 2245
+  },
+  {
+   "provinceId": 100010,
+   "key": "as-ott-bitlis",
+   "grossMWhPerYear": 17427149,
+   "reaches": 894
+  },
+  {
+   "provinceId": 100011,
+   "key": "as-ott-diyarbekir",
+   "grossMWhPerYear": 18879833,
+   "reaches": 1546
+  },
+  {
+   "provinceId": 100012,
+   "key": "as-ott-mamuret-ul-aziz",
+   "grossMWhPerYear": 21927876,
+   "reaches": 1560
+  },
+  {
+   "provinceId": 100013,
+   "key": "as-ott-adana",
+   "grossMWhPerYear": 19929902,
+   "reaches": 1356
+  },
+  {
+   "provinceId": 100014,
+   "key": "as-ott-hatay",
+   "grossMWhPerYear": 2594661,
+   "reaches": 237
+  },
+  {
+   "provinceId": 100015,
+   "key": "as-ott-aleppo",
+   "grossMWhPerYear": 14749213,
+   "reaches": 3589
+  },
+  {
+   "provinceId": 100016,
+   "key": "as-ott-urfa",
+   "grossMWhPerYear": 26225897,
+   "reaches": 1913
+  },
+  {
+   "provinceId": 100017,
+   "key": "as-ott-lebanon",
+   "grossMWhPerYear": 6213442,
+   "reaches": 428
+  },
+  {
+   "provinceId": 100018,
+   "key": "as-ott-syrian-coast",
+   "grossMWhPerYear": 2914007,
+   "reaches": 1236
+  },
+  {
+   "provinceId": 100019,
+   "key": "as-ott-damascus",
+   "grossMWhPerYear": 2985506,
+   "reaches": 1537
+  },
+  {
+   "provinceId": 100020,
+   "key": "as-ott-jerusalem",
+   "grossMWhPerYear": 1677860,
+   "reaches": 878
+  },
+  {
+   "provinceId": 100021,
+   "key": "as-ott-palestine",
+   "grossMWhPerYear": 1036834,
+   "reaches": 225
+  },
+  {
+   "provinceId": 100022,
+   "key": "as-ott-transjordan",
+   "grossMWhPerYear": 2466071,
+   "reaches": 2957
+  },
+  {
+   "provinceId": 100023,
+   "key": "as-ott-baghdad",
+   "grossMWhPerYear": 34705509,
+   "reaches": 8748
+  },
+  {
+   "provinceId": 100024,
+   "key": "as-ott-basra",
+   "grossMWhPerYear": 2731208,
+   "reaches": 2569
+  },
+  {
+   "provinceId": 100025,
+   "key": "as-ott-mosul",
+   "grossMWhPerYear": 35446187,
+   "reaches": 3599
+  },
+  {
+   "provinceId": 100026,
+   "key": "as-ott-hejaz",
+   "grossMWhPerYear": 4249045,
+   "reaches": 14972
+  },
+  {
+   "provinceId": 100027,
+   "key": "as-ott-yemen",
+   "grossMWhPerYear": 5050383,
+   "reaches": 5027
+  },
+  {
+   "provinceId": 100028,
+   "key": "as-ott-asir",
+   "grossMWhPerYear": 6303427,
+   "reaches": 6810
+  },
+  {
+   "provinceId": 100029,
+   "key": "as-ott-al-hasa",
+   "grossMWhPerYear": 2753766,
+   "reaches": 12782
+  },
+  {
+   "provinceId": 100030,
+   "key": "as-ott-dodecanese",
+   "grossMWhPerYear": 86833,
+   "reaches": 49
+  },
+  {
+   "provinceId": 100031,
+   "key": "as-shm-ha-il",
+   "grossMWhPerYear": 4088051,
+   "reaches": 6314
+  },
+  {
+   "provinceId": 100032,
+   "key": "as-shm-riyadh",
+   "grossMWhPerYear": 9861124,
+   "reaches": 11280
+  },
+  {
+   "provinceId": 100033,
+   "key": "as-shm-northern-arabia",
+   "grossMWhPerYear": 588946,
+   "reaches": 7687
+  },
+  {
+   "provinceId": 100034,
+   "key": "as-omn-muscat",
+   "grossMWhPerYear": 2598588,
+   "reaches": 4413
+  },
+  {
+   "provinceId": 100035,
+   "key": "as-omn-dhofar",
+   "grossMWhPerYear": 320346,
+   "reaches": 5726
+  },
+  {
+   "provinceId": 100036,
+   "key": "as-omn-gwadar",
+   "grossMWhPerYear": 61548,
+   "reaches": 151
+  },
+  {
+   "provinceId": 100037,
+   "key": "as-kuw-kuwait",
+   "grossMWhPerYear": 9264,
+   "reaches": 358
+  },
+  {
+   "provinceId": 100038,
+   "key": "as-tru-trucial-coast",
+   "grossMWhPerYear": 86479,
+   "reaches": 1433
+  },
+  {
+   "provinceId": 100040,
+   "key": "as-per-azerbaijan",
+   "grossMWhPerYear": 29202000,
+   "reaches": 4574
+  },
+  {
+   "provinceId": 100041,
+   "key": "as-per-gilan",
+   "grossMWhPerYear": 14257574,
+   "reaches": 634
+  },
+  {
+   "provinceId": 100042,
+   "key": "as-per-mazandaran",
+   "grossMWhPerYear": 21200884,
+   "reaches": 1931
+  },
+  {
+   "provinceId": 100043,
+   "key": "as-per-khorasan",
+   "grossMWhPerYear": 22160943,
+   "reaches": 11368
+  },
+  {
+   "provinceId": 100044,
+   "key": "as-per-kerman",
+   "grossMWhPerYear": 21375677,
+   "reaches": 7519
+  },
+  {
+   "provinceId": 100045,
+   "key": "as-per-sistan",
+   "grossMWhPerYear": 10266926,
+   "reaches": 7494
+  },
+  {
+   "provinceId": 100046,
+   "key": "as-per-fars",
+   "grossMWhPerYear": 43475648,
+   "reaches": 9971
+  },
+  {
+   "provinceId": 100047,
+   "key": "as-per-isfahan",
+   "grossMWhPerYear": 47844787,
+   "reaches": 11995
+  },
+  {
+   "provinceId": 100048,
+   "key": "as-per-kermanshah",
+   "grossMWhPerYear": 58875620,
+   "reaches": 4749
+  },
+  {
+   "provinceId": 100049,
+   "key": "as-per-tehran",
+   "grossMWhPerYear": 32566555,
+   "reaches": 7202
+  },
+  {
+   "provinceId": 100050,
+   "key": "as-per-khuzestan",
+   "grossMWhPerYear": 60010943,
+   "reaches": 2588
+  },
+  {
+   "provinceId": 100051,
+   "key": "as-afg-kabul",
+   "grossMWhPerYear": 93147830,
+   "reaches": 5240
+  },
+  {
+   "provinceId": 100052,
+   "key": "as-afg-herat",
+   "grossMWhPerYear": 35190220,
+   "reaches": 7285
+  },
+  {
+   "provinceId": 100053,
+   "key": "as-afg-kandahar",
+   "grossMWhPerYear": 53983802,
+   "reaches": 8379
+  },
+  {
+   "provinceId": 100054,
+   "key": "as-afg-afghan-turkestan",
+   "grossMWhPerYear": 63009661,
+   "reaches": 5158
+  },
+  {
+   "provinceId": 100055,
+   "key": "as-afg-hazarajat",
+   "grossMWhPerYear": 4560171,
+   "reaches": 771
+  },
+  {
+   "provinceId": 100056,
+   "key": "as-afg-badakhshan",
+   "grossMWhPerYear": 57768416,
+   "reaches": 1906
+  },
+  {
+   "provinceId": 100057,
+   "key": "as-npl-western-nepal",
+   "grossMWhPerYear": 503412014,
+   "reaches": 10186
+  },
+  {
+   "provinceId": 100058,
+   "key": "as-npl-eastern-nepal",
+   "grossMWhPerYear": 340419683,
+   "reaches": 6385
+  },
+  {
+   "provinceId": 100059,
+   "key": "as-bhu-western-bhutan",
+   "grossMWhPerYear": 73476826,
+   "reaches": 1801
+  },
+  {
+   "provinceId": 100060,
+   "key": "as-bhu-eastern-bhutan",
+   "grossMWhPerYear": 69768853,
+   "reaches": 1417
+  },
+  {
+   "provinceId": 100061,
+   "key": "as-tha-bangkok",
+   "grossMWhPerYear": 23247506,
+   "reaches": 4147
+  },
+  {
+   "provinceId": 100062,
+   "key": "as-tha-nakhon-sawan",
+   "grossMWhPerYear": 14515081,
+   "reaches": 3242
+  },
+  {
+   "provinceId": 100063,
+   "key": "as-tha-phitsanulok",
+   "grossMWhPerYear": 20301446,
+   "reaches": 4731
+  },
+  {
+   "provinceId": 100064,
+   "key": "as-tha-nakhon-ratchasima",
+   "grossMWhPerYear": 31567939,
+   "reaches": 9107
+  },
+  {
+   "provinceId": 100065,
+   "key": "as-tha-nakhon-si-thammarat",
+   "grossMWhPerYear": 18249688,
+   "reaches": 7452
+  },
+  {
+   "provinceId": 100066,
+   "key": "as-tha-chanthaburi",
+   "grossMWhPerYear": 5138034,
+   "reaches": 2914
+  },
+  {
+   "provinceId": 100067,
+   "key": "as-tha-inner-cambodia",
+   "grossMWhPerYear": 37418978,
+   "reaches": 4157
+  },
+  {
+   "provinceId": 100068,
+   "key": "as-tha-kedah-and-perlis",
+   "grossMWhPerYear": 2477156,
+   "reaches": 1036
+  },
+  {
+   "provinceId": 100069,
+   "key": "as-tha-kelantan",
+   "grossMWhPerYear": 11140936,
+   "reaches": 1741
+  },
+  {
+   "provinceId": 100070,
+   "key": "as-tha-terengganu",
+   "grossMWhPerYear": 7107010,
+   "reaches": 1745
+  },
+  {
+   "provinceId": 100071,
+   "key": "as-tha-xaignabouri",
+   "grossMWhPerYear": 40173648,
+   "reaches": 968
+  },
+  {
+   "provinceId": 100072,
+   "key": "as-chn-zhili",
+   "grossMWhPerYear": 8365489,
+   "reaches": 5704
+  },
+  {
+   "provinceId": 100073,
+   "key": "as-chn-shandong",
+   "grossMWhPerYear": 10201606,
+   "reaches": 5513
+  },
+  {
+   "provinceId": 100074,
+   "key": "as-chn-shanxi",
+   "grossMWhPerYear": 44087120,
+   "reaches": 7259
+  },
+  {
+   "provinceId": 100075,
+   "key": "as-chn-henan",
+   "grossMWhPerYear": 41316772,
+   "reaches": 6495
+  },
+  {
+   "provinceId": 100076,
+   "key": "as-chn-shaanxi",
+   "grossMWhPerYear": 83419991,
+   "reaches": 9934
+  },
+  {
+   "provinceId": 100077,
+   "key": "as-chn-gansu",
+   "grossMWhPerYear": 132180315,
+   "reaches": 20227
+  },
+  {
+   "provinceId": 100078,
+   "key": "as-chn-qinghai",
+   "grossMWhPerYear": 175052227,
+   "reaches": 30526
+  },
+  {
+   "provinceId": 100079,
+   "key": "as-chn-jiangsu",
+   "grossMWhPerYear": 12853120,
+   "reaches": 2366
+  },
+  {
+   "provinceId": 100080,
+   "key": "as-chn-anhui",
+   "grossMWhPerYear": 26542142,
+   "reaches": 7658
+  },
+  {
+   "provinceId": 100081,
+   "key": "as-chn-jiangxi",
+   "grossMWhPerYear": 86142350,
+   "reaches": 17055
+  },
+  {
+   "provinceId": 100082,
+   "key": "as-chn-zhejiang",
+   "grossMWhPerYear": 39570203,
+   "reaches": 8061
+  },
+  {
+   "provinceId": 100083,
+   "key": "as-chn-fujian",
+   "grossMWhPerYear": 78869210,
+   "reaches": 10175
+  },
+  {
+   "provinceId": 100084,
+   "key": "as-chn-hubei",
+   "grossMWhPerYear": 253240641,
+   "reaches": 9865
+  },
+  {
+   "provinceId": 100085,
+   "key": "as-chn-hunan",
+   "grossMWhPerYear": 115629583,
+   "reaches": 16830
+  },
+  {
+   "provinceId": 100086,
+   "key": "as-chn-guangdong",
+   "grossMWhPerYear": 85289588,
+   "reaches": 18965
+  },
+  {
+   "provinceId": 100087,
+   "key": "as-chn-guangxi",
+   "grossMWhPerYear": 196194006,
+   "reaches": 18984
+  },
+  {
+   "provinceId": 100088,
+   "key": "as-chn-sichuan",
+   "grossMWhPerYear": 1204640693,
+   "reaches": 35403
+  },
+  {
+   "provinceId": 100089,
+   "key": "as-chn-yunnan",
+   "grossMWhPerYear": 1049018829,
+   "reaches": 25673
+  },
+  {
+   "provinceId": 100090,
+   "key": "as-chn-guizhou",
+   "grossMWhPerYear": 147541243,
+   "reaches": 11101
+  },
+  {
+   "provinceId": 100091,
+   "key": "as-chn-xinjiang",
+   "grossMWhPerYear": 83979311,
+   "reaches": 62531
+  },
+  {
+   "provinceId": 100092,
+   "key": "as-chn-fengtian",
+   "grossMWhPerYear": 10154861,
+   "reaches": 3646
+  },
+  {
+   "provinceId": 100093,
+   "key": "as-chn-jilin",
+   "grossMWhPerYear": 28475483,
+   "reaches": 7974
+  },
+  {
+   "provinceId": 100094,
+   "key": "as-chn-heilongjiang",
+   "grossMWhPerYear": 53691873,
+   "reaches": 19390
+  },
+  {
+   "provinceId": 100095,
+   "key": "as-chn-rehe",
+   "grossMWhPerYear": 10870036,
+   "reaches": 12222
+  },
+  {
+   "provinceId": 100096,
+   "key": "as-chn-xing-an",
+   "grossMWhPerYear": 20339228,
+   "reaches": 16686
+  },
+  {
+   "provinceId": 100097,
+   "key": "as-chn-inner-mongolia",
+   "grossMWhPerYear": 10897075,
+   "reaches": 14543
+  },
+  {
+   "provinceId": 100098,
+   "key": "as-chn-khalkha-mongolia",
+   "grossMWhPerYear": 46577628,
+   "reaches": 18634
+  },
+  {
+   "provinceId": 100099,
+   "key": "as-chn-western-mongolia",
+   "grossMWhPerYear": 9105750,
+   "reaches": 8024
+  },
+  {
+   "provinceId": 100100,
+   "key": "as-chn-eastern-and-gobi-mongolia",
+   "grossMWhPerYear": 8981184,
+   "reaches": 25054
+  },
+  {
+   "provinceId": 100101,
+   "key": "as-tib-u-tsang",
+   "grossMWhPerYear": 1617369861,
+   "reaches": 56862
+  },
+  {
+   "provinceId": 100102,
+   "key": "as-tib-kham",
+   "grossMWhPerYear": 2255180,
+   "reaches": 26
+  },
+  {
+   "provinceId": 100103,
+   "key": "as-kor-hamgyong",
+   "grossMWhPerYear": 18909332,
+   "reaches": 2521
+  },
+  {
+   "provinceId": 100104,
+   "key": "as-kor-pyongan",
+   "grossMWhPerYear": 16912527,
+   "reaches": 2823
+  },
+  {
+   "provinceId": 100105,
+   "key": "as-kor-hwanghae",
+   "grossMWhPerYear": 2004816,
+   "reaches": 1031
+  },
+  {
+   "provinceId": 100106,
+   "key": "as-kor-gangwon",
+   "grossMWhPerYear": 7768858,
+   "reaches": 1416
+  },
+  {
+   "provinceId": 100107,
+   "key": "as-kor-north-kangwon",
+   "grossMWhPerYear": 4375278,
+   "reaches": 934
+  },
+  {
+   "provinceId": 100108,
+   "key": "as-kor-gyeonggi",
+   "grossMWhPerYear": 3810887,
+   "reaches": 830
+  },
+  {
+   "provinceId": 100109,
+   "key": "as-kor-chungcheong",
+   "grossMWhPerYear": 3471748,
+   "reaches": 1070
+  },
+  {
+   "provinceId": 100110,
+   "key": "as-kor-jeolla",
+   "grossMWhPerYear": 3185388,
+   "reaches": 1325
+  },
+  {
+   "provinceId": 100111,
+   "key": "as-kor-gyeongsang",
+   "grossMWhPerYear": 5282206,
+   "reaches": 1819
+  },
+  {
+   "provinceId": 100112,
+   "key": "as-jpn-kanto",
+   "grossMWhPerYear": 14760318,
+   "reaches": 2192
+  },
+  {
+   "provinceId": 100113,
+   "key": "as-jpn-chubu",
+   "grossMWhPerYear": 103922837,
+   "reaches": 9023
+  },
+  {
+   "provinceId": 100114,
+   "key": "as-jpn-kansai",
+   "grossMWhPerYear": 16146282,
+   "reaches": 2791
+  },
+  {
+   "provinceId": 100115,
+   "key": "as-jpn-chugoku",
+   "grossMWhPerYear": 15103752,
+   "reaches": 2856
+  },
+  {
+   "provinceId": 100116,
+   "key": "as-jpn-shikoku",
+   "grossMWhPerYear": 15035091,
+   "reaches": 2068
+  },
+  {
+   "provinceId": 100117,
+   "key": "as-jpn-kyushu",
+   "grossMWhPerYear": 28901342,
+   "reaches": 4622
+  },
+  {
+   "provinceId": 100118,
+   "key": "as-jpn-tohoku",
+   "grossMWhPerYear": 40819585,
+   "reaches": 6382
+  },
+  {
+   "provinceId": 100119,
+   "key": "as-jpn-hokkaido",
+   "grossMWhPerYear": 32896028,
+   "reaches": 6885
+  },
+  {
+   "provinceId": 100120,
+   "key": "as-jpn-ryukyu",
+   "grossMWhPerYear": 236460,
+   "reaches": 192
+  },
+  {
+   "provinceId": 100121,
+   "key": "as-twn-taihoku",
+   "grossMWhPerYear": 12541831,
+   "reaches": 1165
+  },
+  {
+   "provinceId": 100122,
+   "key": "as-twn-taichung",
+   "grossMWhPerYear": 27343275,
+   "reaches": 1406
+  },
+  {
+   "provinceId": 100123,
+   "key": "as-twn-tainan",
+   "grossMWhPerYear": 35540676,
+   "reaches": 2015
+  },
+  {
+   "provinceId": 100124,
+   "key": "as-rus-tiflis",
+   "grossMWhPerYear": 26056119,
+   "reaches": 1884
+  },
+  {
+   "provinceId": 100125,
+   "key": "as-rus-kutais",
+   "grossMWhPerYear": 62553894,
+   "reaches": 3098
+  },
+  {
+   "provinceId": 100126,
+   "key": "as-rus-batum",
+   "grossMWhPerYear": 6406218,
+   "reaches": 324
+  },
+  {
+   "provinceId": 100127,
+   "key": "as-rus-artvin",
+   "grossMWhPerYear": 18598124,
+   "reaches": 678
+  },
+  {
+   "provinceId": 100128,
+   "key": "as-rus-kars",
+   "grossMWhPerYear": 4694174,
+   "reaches": 743
+  },
+  {
+   "provinceId": 100129,
+   "key": "as-rus-erivan",
+   "grossMWhPerYear": 8907340,
+   "reaches": 1282
+  },
+  {
+   "provinceId": 100130,
+   "key": "as-rus-igdir",
+   "grossMWhPerYear": 116180,
+   "reaches": 9
+  },
+  {
+   "provinceId": 100131,
+   "key": "as-rus-baku",
+   "grossMWhPerYear": 8725454,
+   "reaches": 1521
+  },
+  {
+   "provinceId": 100132,
+   "key": "as-rus-elisavetpol",
+   "grossMWhPerYear": 13075257,
+   "reaches": 1453
+  },
+  {
+   "provinceId": 100133,
+   "key": "as-rus-zakatala",
+   "grossMWhPerYear": 1998663,
+   "reaches": 126
+  },
+  {
+   "provinceId": 100134,
+   "key": "as-rus-nakhchivan",
+   "grossMWhPerYear": 1224914,
+   "reaches": 214
+  },
+  {
+   "provinceId": 100135,
+   "key": "as-rus-uralsk",
+   "grossMWhPerYear": 2840967,
+   "reaches": 9472
+  },
+  {
+   "provinceId": 100136,
+   "key": "as-rus-turgai",
+   "grossMWhPerYear": 3429630,
+   "reaches": 18451
+  },
+  {
+   "provinceId": 100137,
+   "key": "as-rus-akmolinsk",
+   "grossMWhPerYear": 5193546,
+   "reaches": 23669
+  },
+  {
+   "provinceId": 100138,
+   "key": "as-rus-semipalatinsk",
+   "grossMWhPerYear": 62916058,
+   "reaches": 17924
+  },
+  {
+   "provinceId": 100139,
+   "key": "as-rus-semirechye",
+   "grossMWhPerYear": 42625612,
+   "reaches": 13452
+  },
+  {
+   "provinceId": 100140,
+   "key": "as-rus-kazakh-syr-darya",
+   "grossMWhPerYear": 19486007,
+   "reaches": 9469
+  },
+  {
+   "provinceId": 100141,
+   "key": "as-rus-uzbek-syr-darya",
+   "grossMWhPerYear": 28922814,
+   "reaches": 1645
+  },
+  {
+   "provinceId": 100142,
+   "key": "as-rus-fergana",
+   "grossMWhPerYear": 10600415,
+   "reaches": 966
+  },
+  {
+   "provinceId": 100143,
+   "key": "as-rus-osh",
+   "grossMWhPerYear": 75567908,
+   "reaches": 3754
+  },
+  {
+   "provinceId": 100144,
+   "key": "as-rus-samarkand",
+   "grossMWhPerYear": 5248927,
+   "reaches": 556
+  },
+  {
+   "provinceId": 100145,
+   "key": "as-rus-khojand",
+   "grossMWhPerYear": 22699001,
+   "reaches": 1236
+  },
+  {
+   "provinceId": 100146,
+   "key": "as-rus-transcaspia",
+   "grossMWhPerYear": 33576906,
+   "reaches": 11325
+  },
+  {
+   "provinceId": 100147,
+   "key": "as-rus-kyrgyz-steppe",
+   "grossMWhPerYear": 45539495,
+   "reaches": 5191
+  },
+  {
+   "provinceId": 100148,
+   "key": "as-rus-pamir",
+   "grossMWhPerYear": 82187642,
+   "reaches": 3057
+  },
+  {
+   "provinceId": 100149,
+   "key": "as-rus-wakhan",
+   "grossMWhPerYear": 1739666,
+   "reaches": 48
+  },
+  {
+   "provinceId": 100150,
+   "key": "as-rus-tobolsk",
+   "grossMWhPerYear": 77573602,
+   "reaches": 47447
+  },
+  {
+   "provinceId": 100151,
+   "key": "as-rus-omsk",
+   "grossMWhPerYear": 4223352,
+   "reaches": 4903
+  },
+  {
+   "provinceId": 100152,
+   "key": "as-rus-tomsk",
+   "grossMWhPerYear": 64216316,
+   "reaches": 24161
+  },
+  {
+   "provinceId": 100153,
+   "key": "as-rus-altai",
+   "grossMWhPerYear": 111979775,
+   "reaches": 12365
+  },
+  {
+   "provinceId": 100154,
+   "key": "as-rus-yeniseysk",
+   "grossMWhPerYear": 617711708,
+   "reaches": 97811
+  },
+  {
+   "provinceId": 100155,
+   "key": "as-rus-irkutsk",
+   "grossMWhPerYear": 374267430,
+   "reaches": 52313
+  },
+  {
+   "provinceId": 100156,
+   "key": "as-rus-transbaikal",
+   "grossMWhPerYear": 213905304,
+   "reaches": 42761
+  },
+  {
+   "provinceId": 100157,
+   "key": "as-rus-yakutsk",
+   "grossMWhPerYear": 645937976,
+   "reaches": 114034
+  },
+  {
+   "provinceId": 100158,
+   "key": "as-rus-amur",
+   "grossMWhPerYear": 86976919,
+   "reaches": 17393
+  },
+  {
+   "provinceId": 100159,
+   "key": "as-rus-primorye",
+   "grossMWhPerYear": 43418584,
+   "reaches": 9882
+  },
+  {
+   "provinceId": 100160,
+   "key": "as-rus-khabarovsk",
+   "grossMWhPerYear": 280851066,
+   "reaches": 42708
+  },
+  {
+   "provinceId": 100161,
+   "key": "as-rus-sakhalin",
+   "grossMWhPerYear": 12308225,
+   "reaches": 4753
+  },
+  {
+   "provinceId": 100162,
+   "key": "as-rus-kamchatka",
+   "grossMWhPerYear": 282708549,
+   "reaches": 54127
+  },
+  {
+   "provinceId": 100163,
+   "key": "as-rus-uriankhai",
+   "grossMWhPerYear": 75405562,
+   "reaches": 8341
+  },
+  {
+   "provinceId": 100164,
+   "key": "as-khi-khiva",
+   "grossMWhPerYear": 3730206,
+   "reaches": 238
+  },
+  {
+   "provinceId": 100165,
+   "key": "as-khi-tashauz",
+   "grossMWhPerYear": 608389,
+   "reaches": 1126
+  },
+  {
+   "provinceId": 100166,
+   "key": "as-khi-karakalpak",
+   "grossMWhPerYear": 8743032,
+   "reaches": 3800
+  },
+  {
+   "provinceId": 100167,
+   "key": "as-buk-bukhara",
+   "grossMWhPerYear": 11974777,
+   "reaches": 5292
+  },
+  {
+   "provinceId": 100168,
+   "key": "as-buk-eastern-bukhara",
+   "grossMWhPerYear": 161368534,
+   "reaches": 3604
+  },
+  {
+   "provinceId": 100169,
+   "key": "as-bin-bengal",
+   "grossMWhPerYear": 35787301,
+   "reaches": 6183
+  },
+  {
+   "provinceId": 100170,
+   "key": "as-bin-eastern-bengal",
+   "grossMWhPerYear": 76977211,
+   "reaches": 11346
+  },
+  {
+   "provinceId": 100171,
+   "key": "as-bin-assam",
+   "grossMWhPerYear": 1630041617,
+   "reaches": 52574
+  },
+  {
+   "provinceId": 100172,
+   "key": "as-bin-bihar",
+   "grossMWhPerYear": 87501329,
+   "reaches": 10661
+  },
+  {
+   "provinceId": 100173,
+   "key": "as-bin-orissa",
+   "grossMWhPerYear": 90895985,
+   "reaches": 11846
+  },
+  {
+   "provinceId": 100174,
+   "key": "as-bin-united-provinces",
+   "grossMWhPerYear": 253473244,
+   "reaches": 13452
+  },
+  {
+   "provinceId": 100175,
+   "key": "as-bin-punjab",
+   "grossMWhPerYear": 335699309,
+   "reaches": 8043
+  },
+  {
+   "provinceId": 100176,
+   "key": "as-bin-west-punjab",
+   "grossMWhPerYear": 85743196,
+   "reaches": 7358
+  },
+  {
+   "provinceId": 100177,
+   "key": "as-bin-sind",
+   "grossMWhPerYear": 40233034,
+   "reaches": 4151
+  },
+  {
+   "provinceId": 100178,
+   "key": "as-bin-north-west-frontier",
+   "grossMWhPerYear": 231950034,
+   "reaches": 6577
+  },
+  {
+   "provinceId": 100179,
+   "key": "as-bin-baluchistan",
+   "grossMWhPerYear": 24757067,
+   "reaches": 14939
+  },
+  {
+   "provinceId": 100180,
+   "key": "as-bin-kashmir",
+   "grossMWhPerYear": 282366861,
+   "reaches": 6752
+  },
+  {
+   "provinceId": 100181,
+   "key": "as-bin-azad-kashmir",
+   "grossMWhPerYear": 225171002,
+   "reaches": 3803
+  },
+  {
+   "provinceId": 100182,
+   "key": "as-bin-aksai-chin",
+   "grossMWhPerYear": 493994,
+   "reaches": 115
+  },
+  {
+   "provinceId": 100183,
+   "key": "as-bin-rajputana",
+   "grossMWhPerYear": 15731766,
+   "reaches": 13767
+  },
+  {
+   "provinceId": 100184,
+   "key": "as-bin-central-provinces",
+   "grossMWhPerYear": 131718235,
+   "reaches": 26267
+  },
+  {
+   "provinceId": 100185,
+   "key": "as-bin-bombay",
+   "grossMWhPerYear": 95074458,
+   "reaches": 28726
+  },
+  {
+   "provinceId": 100186,
+   "key": "as-bin-madras",
+   "grossMWhPerYear": 79628074,
+   "reaches": 13148
+  },
+  {
+   "provinceId": 100187,
+   "key": "as-bin-hyderabad",
+   "grossMWhPerYear": 51648082,
+   "reaches": 5575
+  },
+  {
+   "provinceId": 100188,
+   "key": "as-bin-mysore",
+   "grossMWhPerYear": 77768775,
+   "reaches": 13317
+  },
+  {
+   "provinceId": 100189,
+   "key": "as-bin-travancore-and-cochin",
+   "grossMWhPerYear": 22793589,
+   "reaches": 4692
+  },
+  {
+   "provinceId": 100190,
+   "key": "as-bin-andaman-and-nicobar",
+   "grossMWhPerYear": 490670,
+   "reaches": 620
+  },
+  {
+   "provinceId": 100191,
+   "key": "as-bin-sikkim",
+   "grossMWhPerYear": 38275710,
+   "reaches": 750
+  },
+  {
+   "provinceId": 100192,
+   "key": "as-bin-burma",
+   "grossMWhPerYear": 364500078,
+   "reaches": 30958
+  },
+  {
+   "provinceId": 100193,
+   "key": "as-bin-shan-states",
+   "grossMWhPerYear": 266941257,
+   "reaches": 11322
+  },
+  {
+   "provinceId": 100194,
+   "key": "as-bin-frontier-divisions",
+   "grossMWhPerYear": 639451507,
+   "reaches": 35582
+  },
+  {
+   "provinceId": 100195,
+   "key": "as-bin-aden",
+   "grossMWhPerYear": 6709550,
+   "reaches": 11246
+  },
+  {
+   "provinceId": 100196,
+   "key": "as-bin-goa",
+   "grossMWhPerYear": 1285920,
+   "reaches": 619
+  },
+  {
+   "provinceId": 100197,
+   "key": "as-cey-western-ceylon",
+   "grossMWhPerYear": 3981060,
+   "reaches": 876
+  },
+  {
+   "provinceId": 100198,
+   "key": "as-cey-central-ceylon",
+   "grossMWhPerYear": 11257313,
+   "reaches": 1156
+  },
+  {
+   "provinceId": 100199,
+   "key": "as-cey-northern-ceylon",
+   "grossMWhPerYear": 4193077,
+   "reaches": 2221
+  },
+  {
+   "provinceId": 100200,
+   "key": "as-cey-southern-ceylon",
+   "grossMWhPerYear": 1232404,
+   "reaches": 470
+  },
+  {
+   "provinceId": 100201,
+   "key": "as-mal-straits-settlements",
+   "grossMWhPerYear": 190804,
+   "reaches": 282
+  },
+  {
+   "provinceId": 100202,
+   "key": "as-mal-federated-malay-states",
+   "grossMWhPerYear": 37977118,
+   "reaches": 7606
+  },
+  {
+   "provinceId": 100203,
+   "key": "as-mal-johor",
+   "grossMWhPerYear": 2169574,
+   "reaches": 1828
+  },
+  {
+   "provinceId": 100204,
+   "key": "as-mal-british-north-borneo",
+   "grossMWhPerYear": 56691709,
+   "reaches": 8084
+  },
+  {
+   "provinceId": 100205,
+   "key": "as-mal-brunei",
+   "grossMWhPerYear": 2429889,
+   "reaches": 787
+  },
+  {
+   "provinceId": 100206,
+   "key": "as-sar-sarawak",
+   "grossMWhPerYear": 133668577,
+   "reaches": 18614
+  },
+  {
+   "provinceId": 100207,
+   "key": "as-hkg-hong-kong",
+   "grossMWhPerYear": 42256,
+   "reaches": 76
+  },
+  {
+   "provinceId": 100208,
+   "key": "as-mac-macao",
+   "grossMWhPerYear": 790133,
+   "reaches": 41
+  },
+  {
+   "provinceId": 100209,
+   "key": "as-fic-tonkin",
+   "grossMWhPerYear": 119596546,
+   "reaches": 9089
+  },
+  {
+   "provinceId": 100210,
+   "key": "as-fic-annam",
+   "grossMWhPerYear": 140771780,
+   "reaches": 16653
+  },
+  {
+   "provinceId": 100211,
+   "key": "as-fic-cochinchina",
+   "grossMWhPerYear": 16418105,
+   "reaches": 3788
+  },
+  {
+   "provinceId": 100212,
+   "key": "as-fic-cambodia",
+   "grossMWhPerYear": 84773351,
+   "reaches": 10040
+  },
+  {
+   "provinceId": 100213,
+   "key": "as-fic-laos",
+   "grossMWhPerYear": 217152500,
+   "reaches": 18331
+  },
+  {
+   "provinceId": 100214,
+   "key": "as-fic-french-india",
+   "grossMWhPerYear": 48218,
+   "reaches": 38
+  },
+  {
+   "provinceId": 100215,
+   "key": "as-dei-west-java",
+   "grossMWhPerYear": 78727466,
+   "reaches": 7265
+  },
+  {
+   "provinceId": 100216,
+   "key": "as-dei-central-java",
+   "grossMWhPerYear": 36730692,
+   "reaches": 4856
+  },
+  {
+   "provinceId": 100217,
+   "key": "as-dei-east-java",
+   "grossMWhPerYear": 35886999,
+   "reaches": 4650
+  },
+  {
+   "provinceId": 100218,
+   "key": "as-dei-aceh",
+   "grossMWhPerYear": 88867654,
+   "reaches": 5938
+  },
+  {
+   "provinceId": 100219,
+   "key": "as-dei-north-sumatra",
+   "grossMWhPerYear": 88028113,
+   "reaches": 7714
+  },
+  {
+   "provinceId": 100220,
+   "key": "as-dei-west-sumatra",
+   "grossMWhPerYear": 60931615,
+   "reaches": 5770
+  },
+  {
+   "provinceId": 100221,
+   "key": "as-dei-riau-and-jambi",
+   "grossMWhPerYear": 49719632,
+   "reaches": 14618
+  },
+  {
+   "provinceId": 100222,
+   "key": "as-dei-south-sumatra",
+   "grossMWhPerYear": 93149524,
+   "reaches": 15404
+  },
+  {
+   "provinceId": 100223,
+   "key": "as-dei-west-borneo",
+   "grossMWhPerYear": 100861456,
+   "reaches": 21316
+  },
+  {
+   "provinceId": 100224,
+   "key": "as-dei-central-borneo",
+   "grossMWhPerYear": 73899371,
+   "reaches": 18361
+  },
+  {
+   "provinceId": 100225,
+   "key": "as-dei-south-and-east-borneo",
+   "grossMWhPerYear": 237832986,
+   "reaches": 25097
+  },
+  {
+   "provinceId": 100226,
+   "key": "as-dei-north-sulawesi",
+   "grossMWhPerYear": 15742135,
+   "reaches": 2206
+  },
+  {
+   "provinceId": 100227,
+   "key": "as-dei-central-sulawesi",
+   "grossMWhPerYear": 94393203,
+   "reaches": 6304
+  },
+  {
+   "provinceId": 100228,
+   "key": "as-dei-south-sulawesi",
+   "grossMWhPerYear": 102921104,
+   "reaches": 7744
+  },
+  {
+   "provinceId": 100229,
+   "key": "as-dei-moluccas",
+   "grossMWhPerYear": 27209732,
+   "reaches": 5146
+  },
+  {
+   "provinceId": 100230,
+   "key": "as-dei-bali-and-lombok",
+   "grossMWhPerYear": 8909862,
+   "reaches": 1291
+  },
+  {
+   "provinceId": 100231,
+   "key": "as-dei-timor-and-flores",
+   "grossMWhPerYear": 23359363,
+   "reaches": 3044
+  },
+  {
+   "provinceId": 100232,
+   "key": "as-dei-new-guinea",
+   "grossMWhPerYear": 835210569,
+   "reaches": 52160
+  },
+  {
+   "provinceId": 100233,
+   "key": "as-phl-manila-and-central-luzon",
+   "grossMWhPerYear": 15255645,
+   "reaches": 3428
+  },
+  {
+   "provinceId": 100234,
+   "key": "as-phl-northern-luzon",
+   "grossMWhPerYear": 93723707,
+   "reaches": 9995
+  },
+  {
+   "provinceId": 100235,
+   "key": "as-phl-visayas",
+   "grossMWhPerYear": 40232560,
+   "reaches": 9721
+  },
+  {
+   "provinceId": 100236,
+   "key": "as-phl-palawan",
+   "grossMWhPerYear": 1658168,
+   "reaches": 845
+  },
+  {
+   "provinceId": 100237,
+   "key": "as-phl-mindanao-and-sulu",
+   "grossMWhPerYear": 82352153,
+   "reaches": 9578
+  },
+  {
+   "provinceId": 100238,
+   "key": "as-ptm-timor",
+   "grossMWhPerYear": 3617518,
+   "reaches": 566
+  },
+  {
+   "provinceId": 200001,
+   "key": "af-sah-saguia-el-hamra",
+   "grossMWhPerYear": 87215,
+   "reaches": 1331
+  },
+  {
+   "provinceId": 200002,
+   "key": "af-sah-rio-de-oro",
+   "grossMWhPerYear": 185836,
+   "reaches": 2393
+  },
+  {
+   "provinceId": 200003,
+   "key": "af-cap-walvis-bay",
+   "grossMWhPerYear": 8126,
+   "reaches": 32
+  },
+  {
+   "provinceId": 200004,
+   "key": "af-bpo-zanzibar",
+   "grossMWhPerYear": 35913,
+   "reaches": 79
+  },
+  {
+   "provinceId": 200005,
+   "key": "af-bpo-pemba",
+   "grossMWhPerYear": 2271,
+   "reaches": 21
+  },
+  {
+   "provinceId": 200008,
+   "key": "af-pai-bissau-and-cacheu",
+   "grossMWhPerYear": 143511,
+   "reaches": 501
+  },
+  {
+   "provinceId": 200009,
+   "key": "af-pai-bafata-and-gabu",
+   "grossMWhPerYear": 783485,
+   "reaches": 895
+  },
+  {
+   "provinceId": 200010,
+   "key": "af-pai-bolama-and-quinara",
+   "grossMWhPerYear": 942522,
+   "reaches": 452
+  },
+  {
+   "provinceId": 200013,
+   "key": "af-pai-sao-tome",
+   "grossMWhPerYear": 307673,
+   "reaches": 49
+  },
+  {
+   "provinceId": 200014,
+   "key": "af-pai-principe",
+   "grossMWhPerYear": 5533,
+   "reaches": 8
+  },
+  {
+   "provinceId": 200015,
+   "key": "af-sgg-rio-muni",
+   "grossMWhPerYear": 32360122,
+   "reaches": 3082
+  },
+  {
+   "provinceId": 200016,
+   "key": "af-sgg-fernando-po",
+   "grossMWhPerYear": 3505870,
+   "reaches": 320
+  },
+  {
+   "provinceId": 200020,
+   "key": "af-fra-mayotte",
+   "grossMWhPerYear": 33419,
+   "reaches": 24
+  },
+  {
+   "provinceId": 200021,
+   "key": "af-mad-antananarivo",
+   "grossMWhPerYear": 72860577,
+   "reaches": 5560
+  },
+  {
+   "provinceId": 200022,
+   "key": "af-mad-fianarantsoa",
+   "grossMWhPerYear": 71101233,
+   "reaches": 7221
+  },
+  {
+   "provinceId": 200023,
+   "key": "af-mad-toamasina",
+   "grossMWhPerYear": 177394489,
+   "reaches": 9617
+  },
+  {
+   "provinceId": 200024,
+   "key": "af-mad-mahajanga",
+   "grossMWhPerYear": 168758232,
+   "reaches": 14231
+  },
+  {
+   "provinceId": 200025,
+   "key": "af-mad-toliara",
+   "grossMWhPerYear": 65865122,
+   "reaches": 8010
+  },
+  {
+   "provinceId": 200026,
+   "key": "af-mad-antsiranana",
+   "grossMWhPerYear": 38890791,
+   "reaches": 4357
+  },
+  {
+   "provinceId": 200027,
+   "key": "af-mad-grande-comore",
+   "grossMWhPerYear": 689277,
+   "reaches": 117
+  },
+  {
+   "provinceId": 200028,
+   "key": "af-mad-anjouan",
+   "grossMWhPerYear": 169938,
+   "reaches": 35
+  },
+  {
+   "provinceId": 200029,
+   "key": "af-mad-moheli",
+   "grossMWhPerYear": 20065,
+   "reaches": 15
+  },
+  {
+   "provinceId": 200030,
+   "key": "af-bso-british-somaliland",
+   "grossMWhPerYear": 8274806,
+   "reaches": 7150
+  },
+  {
+   "provinceId": 200031,
+   "key": "af-its-banaadir-and-the-lower-shabelle",
+   "grossMWhPerYear": 618323,
+   "reaches": 1401
+  },
+  {
+   "provinceId": 200032,
+   "key": "af-its-hiiraan-bakool-and-bay",
+   "grossMWhPerYear": 1173374,
+   "reaches": 3959
+  },
+  {
+   "provinceId": 200033,
+   "key": "af-its-mudug-galguduud-and-bari",
+   "grossMWhPerYear": 1927436,
+   "reaches": 6257
+  },
+  {
+   "provinceId": 200034,
+   "key": "af-eri-hamasien",
+   "grossMWhPerYear": 1170492,
+   "reaches": 513
+  },
+  {
+   "provinceId": 200035,
+   "key": "af-eri-barka-and-gash",
+   "grossMWhPerYear": 5332413,
+   "reaches": 1523
+  },
+  {
+   "provinceId": 200036,
+   "key": "af-eri-akele-guzai",
+   "grossMWhPerYear": 4375469,
+   "reaches": 2325
+  },
+  {
+   "provinceId": 200037,
+   "key": "af-eri-massawa-and-the-dankalia-coast",
+   "grossMWhPerYear": 800019,
+   "reaches": 694
+  },
+  {
+   "provinceId": 200038,
+   "key": "af-eth-tigray",
+   "grossMWhPerYear": 13394339,
+   "reaches": 2116
+  },
+  {
+   "provinceId": 200039,
+   "key": "af-eth-amhara-and-begemder",
+   "grossMWhPerYear": 83683780,
+   "reaches": 6338
+  },
+  {
+   "provinceId": 200040,
+   "key": "af-eth-afar",
+   "grossMWhPerYear": 16919186,
+   "reaches": 3870
+  },
+  {
+   "provinceId": 200041,
+   "key": "af-eth-shewa-and-addis-ababa",
+   "grossMWhPerYear": 159569,
+   "reaches": 35
+  },
+  {
+   "provinceId": 200042,
+   "key": "af-eth-oromia",
+   "grossMWhPerYear": 155685418,
+   "reaches": 15109
+  },
+  {
+   "provinceId": 200043,
+   "key": "af-eth-sidamo-and-the-southern-provinces",
+   "grossMWhPerYear": 78957626,
+   "reaches": 5188
+  },
+  {
+   "provinceId": 200044,
+   "key": "af-eth-hararghe",
+   "grossMWhPerYear": 96182,
+   "reaches": 56
+  },
+  {
+   "provinceId": 200045,
+   "key": "af-eth-ogaden",
+   "grossMWhPerYear": 27976746,
+   "reaches": 13253
+  },
+  {
+   "provinceId": 200046,
+   "key": "af-eth-benishangul",
+   "grossMWhPerYear": 74884603,
+   "reaches": 2604
+  },
+  {
+   "provinceId": 200047,
+   "key": "af-eth-gambela",
+   "grossMWhPerYear": 4383160,
+   "reaches": 927
+  },
+  {
+   "provinceId": 200048,
+   "key": "af-egy-alexandria-and-beheira",
+   "grossMWhPerYear": 683410,
+   "reaches": 400
+  },
+  {
+   "provinceId": 200049,
+   "key": "af-egy-gharbia-and-menufia",
+   "grossMWhPerYear": 332803,
+   "reaches": 92
+  },
+  {
+   "provinceId": 200050,
+   "key": "af-egy-dakahlia-and-damietta",
+   "grossMWhPerYear": 35,
+   "reaches": 76
+  },
+  {
+   "provinceId": 200051,
+   "key": "af-egy-sharqia-and-the-canal",
+   "grossMWhPerYear": 533,
+   "reaches": 161
+  },
+  {
+   "provinceId": 200052,
+   "key": "af-egy-cairo",
+   "grossMWhPerYear": 2648602,
+   "reaches": 340
+  },
+  {
+   "provinceId": 200053,
+   "key": "af-egy-fayyum-and-beni-suef",
+   "grossMWhPerYear": 1314300,
+   "reaches": 284
+  },
+  {
+   "provinceId": 200054,
+   "key": "af-egy-minya-and-asyut",
+   "grossMWhPerYear": 5928699,
+   "reaches": 174
+  },
+  {
+   "provinceId": 200055,
+   "key": "af-egy-sohag-and-qena",
+   "grossMWhPerYear": 6875950,
+   "reaches": 19
+  },
+  {
+   "provinceId": 200056,
+   "key": "af-egy-aswan-and-the-red-sea",
+   "grossMWhPerYear": 22063851,
+   "reaches": 1681
+  },
+  {
+   "provinceId": 200057,
+   "key": "af-egy-sinai",
+   "grossMWhPerYear": 209895,
+   "reaches": 1757
+  },
+  {
+   "provinceId": 200058,
+   "key": "af-egy-the-western-desert",
+   "grossMWhPerYear": 443505,
+   "reaches": 3039
+  },
+  {
+   "provinceId": 200059,
+   "key": "af-sud-khartoum",
+   "grossMWhPerYear": 3396266,
+   "reaches": 829
+  },
+  {
+   "provinceId": 200060,
+   "key": "af-sud-blue-nile-and-sennar",
+   "grossMWhPerYear": 17740168,
+   "reaches": 4738
+  },
+  {
+   "provinceId": 200061,
+   "key": "af-sud-kassala-and-the-red-sea",
+   "grossMWhPerYear": 9373241,
+   "reaches": 10110
+  },
+  {
+   "provinceId": 200062,
+   "key": "af-sud-northern-province",
+   "grossMWhPerYear": 53250425,
+   "reaches": 10935
+  },
+  {
+   "provinceId": 200063,
+   "key": "af-sud-kordofan",
+   "grossMWhPerYear": 2992941,
+   "reaches": 14334
+  },
+  {
+   "provinceId": 200064,
+   "key": "af-sud-bahr-el-ghazal",
+   "grossMWhPerYear": 7675562,
+   "reaches": 7632
+  },
+  {
+   "provinceId": 200065,
+   "key": "af-sud-equatoria",
+   "grossMWhPerYear": 45651499,
+   "reaches": 8287
+  },
+  {
+   "provinceId": 200066,
+   "key": "af-sud-upper-nile",
+   "grossMWhPerYear": 9050089,
+   "reaches": 5605
+  },
+  {
+   "provinceId": 200067,
+   "key": "af-dar-north-darfur",
+   "grossMWhPerYear": 9989251,
+   "reaches": 10112
+  },
+  {
+   "provinceId": 200068,
+   "key": "af-dar-south-and-west-darfur",
+   "grossMWhPerYear": 2441516,
+   "reaches": 8599
+  },
+  {
+   "provinceId": 200069,
+   "key": "af-wad-wadai-and-ouaddai",
+   "grossMWhPerYear": 2037559,
+   "reaches": 8669
+  },
+  {
+   "provinceId": 200070,
+   "key": "af-wad-borkou-ennedi-and-tibesti",
+   "grossMWhPerYear": 2713815,
+   "reaches": 13846
+  },
+  {
+   "provinceId": 200071,
+   "key": "af-sok-sokoto-and-gwandu",
+   "grossMWhPerYear": 8397172,
+   "reaches": 4127
+  },
+  {
+   "provinceId": 200072,
+   "key": "af-sok-kano",
+   "grossMWhPerYear": 2415427,
+   "reaches": 2726
+  },
+  {
+   "provinceId": 200073,
+   "key": "af-sok-zaria",
+   "grossMWhPerYear": 7641845,
+   "reaches": 2190
+  },
+  {
+   "provinceId": 200074,
+   "key": "af-sok-bauchi-and-adamawa",
+   "grossMWhPerYear": 15992486,
+   "reaches": 4522
+  },
+  {
+   "provinceId": 200075,
+   "key": "af-gea-tanga-and-the-usambara",
+   "grossMWhPerYear": 7577411,
+   "reaches": 1310
+  },
+  {
+   "provinceId": 200076,
+   "key": "af-gea-kilimanjaro-and-moshi",
+   "grossMWhPerYear": 2902620,
+   "reaches": 529
+  },
+  {
+   "provinceId": 200077,
+   "key": "af-gea-arusha-and-the-maasai-steppe",
+   "grossMWhPerYear": 6667196,
+   "reaches": 3377
+  },
+  {
+   "provinceId": 200078,
+   "key": "af-gea-dar-es-salaam-and-the-coast",
+   "grossMWhPerYear": 10774181,
+   "reaches": 1342
+  },
+  {
+   "provinceId": 200079,
+   "key": "af-gea-morogoro-and-the-rufiji",
+   "grossMWhPerYear": 27503140,
+   "reaches": 3359
+  },
+  {
+   "provinceId": 200080,
+   "key": "af-gea-dodoma-and-singida",
+   "grossMWhPerYear": 5333844,
+   "reaches": 3974
+  },
+  {
+   "provinceId": 200081,
+   "key": "af-gea-tabora-and-kigoma",
+   "grossMWhPerYear": 12739646,
+   "reaches": 4771
+  },
+  {
+   "provinceId": 200082,
+   "key": "af-gea-bukoba-mwanza-and-the-lake",
+   "grossMWhPerYear": 6218180,
+   "reaches": 5071
+  },
+  {
+   "provinceId": 200083,
+   "key": "af-gea-iringa-mbeya-and-rukwa",
+   "grossMWhPerYear": 59607629,
+   "reaches": 8191
+  },
+  {
+   "provinceId": 200084,
+   "key": "af-gea-lindi-mtwara-and-ruvuma",
+   "grossMWhPerYear": 63615822,
+   "reaches": 6920
+  },
+  {
+   "provinceId": 200085,
+   "key": "af-gea-rwanda",
+   "grossMWhPerYear": 4443984,
+   "reaches": 961
+  },
+  {
+   "provinceId": 200086,
+   "key": "af-gea-burundi",
+   "grossMWhPerYear": 5340783,
+   "reaches": 1036
+  },
+  {
+   "provinceId": 200087,
+   "key": "af-kam-southern-cameroons",
+   "grossMWhPerYear": 59909476,
+   "reaches": 5279
+  },
+  {
+   "provinceId": 200088,
+   "key": "af-kam-northern-kamerun",
+   "grossMWhPerYear": 40727033,
+   "reaches": 8038
+  },
+  {
+   "provinceId": 200089,
+   "key": "af-kam-central-kamerun",
+   "grossMWhPerYear": 160281592,
+   "reaches": 7649
+  },
+  {
+   "provinceId": 200090,
+   "key": "af-kam-southern-kamerun",
+   "grossMWhPerYear": 67705696,
+   "reaches": 9173
+  },
+  {
+   "provinceId": 200091,
+   "key": "af-tog-british-togoland",
+   "grossMWhPerYear": 2360464,
+   "reaches": 714
+  },
+  {
+   "provinceId": 200092,
+   "key": "af-tog-french-togoland-maritime-and-plateaux",
+   "grossMWhPerYear": 3459345,
+   "reaches": 1140
+  },
+  {
+   "provinceId": 200093,
+   "key": "af-tog-french-togoland-centre",
+   "grossMWhPerYear": 1185697,
+   "reaches": 630
+  },
+  {
+   "provinceId": 200094,
+   "key": "af-tog-french-togoland-kara-and-savanes",
+   "grossMWhPerYear": 3255621,
+   "reaches": 1018
+  },
+  {
+   "provinceId": 200095,
+   "key": "af-gsw-windhoek-and-the-khomas-highlands",
+   "grossMWhPerYear": 189451,
+   "reaches": 1578
+  },
+  {
+   "provinceId": 200096,
+   "key": "af-gsw-erongo-and-the-central-coast",
+   "grossMWhPerYear": 2818917,
+   "reaches": 2645
+  },
+  {
+   "provinceId": 200097,
+   "key": "af-gsw-namaland",
+   "grossMWhPerYear": 7889761,
+   "reaches": 10504
+  },
+  {
+   "provinceId": 200098,
+   "key": "af-gsw-hereroland",
+   "grossMWhPerYear": 1361144,
+   "reaches": 7459
+  },
+  {
+   "provinceId": 200099,
+   "key": "af-gsw-ovamboland",
+   "grossMWhPerYear": 215304,
+   "reaches": 2650
+  },
+  {
+   "provinceId": 200100,
+   "key": "af-gsw-kaokoland",
+   "grossMWhPerYear": 9080690,
+   "reaches": 5130
+  },
+  {
+   "provinceId": 200101,
+   "key": "af-gsw-kavango-and-caprivi",
+   "grossMWhPerYear": 2628079,
+   "reaches": 1952
+  },
+  {
+   "provinceId": 200102,
+   "key": "af-cfs-leopoldville-and-bas-congo",
+   "grossMWhPerYear": 746454589,
+   "reaches": 3444
+  },
+  {
+   "provinceId": 200103,
+   "key": "af-cfs-kwango-and-bandundu",
+   "grossMWhPerYear": 131306097,
+   "reaches": 13007
+  },
+  {
+   "provinceId": 200104,
+   "key": "af-cfs-equateur",
+   "grossMWhPerYear": 139061959,
+   "reaches": 22408
+  },
+  {
+   "provinceId": 200105,
+   "key": "af-cfs-orientale",
+   "grossMWhPerYear": 187045862,
+   "reaches": 27076
+  },
+  {
+   "provinceId": 200106,
+   "key": "af-cfs-kasai",
+   "grossMWhPerYear": 115618343,
+   "reaches": 17245
+  },
+  {
+   "provinceId": 200107,
+   "key": "af-cfs-katanga",
+   "grossMWhPerYear": 190155122,
+   "reaches": 20549
+  },
+  {
+   "provinceId": 200108,
+   "key": "af-cfs-maniema",
+   "grossMWhPerYear": 62920387,
+   "reaches": 8202
+  },
+  {
+   "provinceId": 200109,
+   "key": "af-cfs-north-kivu",
+   "grossMWhPerYear": 47832134,
+   "reaches": 3991
+  },
+  {
+   "provinceId": 200110,
+   "key": "af-cfs-south-kivu",
+   "grossMWhPerYear": 40058387,
+   "reaches": 3915
+  },
+  {
+   "provinceId": 200111,
+   "key": "af-ang-luanda",
+   "grossMWhPerYear": 28257774,
+   "reaches": 1444
+  },
+  {
+   "provinceId": 200112,
+   "key": "af-ang-cuanza",
+   "grossMWhPerYear": 193467558,
+   "reaches": 3946
+  },
+  {
+   "provinceId": 200113,
+   "key": "af-ang-malanje",
+   "grossMWhPerYear": 51659034,
+   "reaches": 4296
+  },
+  {
+   "provinceId": 200114,
+   "key": "af-ang-uige-and-zaire",
+   "grossMWhPerYear": 46163224,
+   "reaches": 5174
+  },
+  {
+   "provinceId": 200115,
+   "key": "af-ang-cabinda",
+   "grossMWhPerYear": 385413,
+   "reaches": 232
+  },
+  {
+   "provinceId": 200116,
+   "key": "af-ang-benguela",
+   "grossMWhPerYear": 38109936,
+   "reaches": 1884
+  },
+  {
+   "provinceId": 200117,
+   "key": "af-ang-huambo-and-bie",
+   "grossMWhPerYear": 34604625,
+   "reaches": 6420
+  },
+  {
+   "provinceId": 200118,
+   "key": "af-ang-huila",
+   "grossMWhPerYear": 11609780,
+   "reaches": 3388
+  },
+  {
+   "provinceId": 200119,
+   "key": "af-ang-namibe",
+   "grossMWhPerYear": 8995961,
+   "reaches": 2529
+  },
+  {
+   "provinceId": 200120,
+   "key": "af-ang-cunene",
+   "grossMWhPerYear": 7619073,
+   "reaches": 2711
+  },
+  {
+   "provinceId": 200121,
+   "key": "af-ang-cuando-cubango",
+   "grossMWhPerYear": 7543813,
+   "reaches": 7424
+  },
+  {
+   "provinceId": 200122,
+   "key": "af-ang-moxico",
+   "grossMWhPerYear": 11013420,
+   "reaches": 7645
+  },
+  {
+   "provinceId": 200123,
+   "key": "af-ang-lunda",
+   "grossMWhPerYear": 50354282,
+   "reaches": 7518
+  },
+  {
+   "provinceId": 200124,
+   "key": "af-moz-cabo-delgado",
+   "grossMWhPerYear": 32574735,
+   "reaches": 3603
+  },
+  {
+   "provinceId": 200125,
+   "key": "af-moz-niassa",
+   "grossMWhPerYear": 50300095,
+   "reaches": 6976
+  },
+  {
+   "provinceId": 200126,
+   "key": "af-moz-nampula",
+   "grossMWhPerYear": 19427225,
+   "reaches": 3384
+  },
+  {
+   "provinceId": 200127,
+   "key": "af-moz-zambezia",
+   "grossMWhPerYear": 36897111,
+   "reaches": 5249
+  },
+  {
+   "provinceId": 200128,
+   "key": "af-moz-tete",
+   "grossMWhPerYear": 91159431,
+   "reaches": 4445
+  },
+  {
+   "provinceId": 200129,
+   "key": "af-moz-manica-and-sofala",
+   "grossMWhPerYear": 58630629,
+   "reaches": 6446
+  },
+  {
+   "provinceId": 200130,
+   "key": "af-moz-inhambane",
+   "grossMWhPerYear": 1947198,
+   "reaches": 2504
+  },
+  {
+   "provinceId": 200131,
+   "key": "af-moz-gaza",
+   "grossMWhPerYear": 6822664,
+   "reaches": 2699
+  },
+  {
+   "provinceId": 200132,
+   "key": "af-moz-lourenco-marques",
+   "grossMWhPerYear": 2002347,
+   "reaches": 928
+  },
+  {
+   "provinceId": 200133,
+   "key": "af-cra-nyasaland-northern-province",
+   "grossMWhPerYear": 7222975,
+   "reaches": 1151
+  },
+  {
+   "provinceId": 200134,
+   "key": "af-cra-nyasaland-central-province",
+   "grossMWhPerYear": 6665659,
+   "reaches": 1386
+  },
+  {
+   "provinceId": 200135,
+   "key": "af-cra-nyasaland-southern-province",
+   "grossMWhPerYear": 50363477,
+   "reaches": 1419
+  },
+  {
+   "provinceId": 200136,
+   "key": "af-cra-northern-rhodesia-barotseland",
+   "grossMWhPerYear": 24478119,
+   "reaches": 9814
+  },
+  {
+   "provinceId": 200137,
+   "key": "af-cra-northern-rhodesia-north-eastern",
+   "grossMWhPerYear": 39447270,
+   "reaches": 8413
+  },
+  {
+   "provinceId": 200138,
+   "key": "af-cra-northern-rhodesia-central",
+   "grossMWhPerYear": 44927319,
+   "reaches": 6365
+  },
+  {
+   "provinceId": 200139,
+   "key": "af-cra-northern-rhodesia-southern",
+   "grossMWhPerYear": 39266158,
+   "reaches": 5815
+  },
+  {
+   "provinceId": 200140,
+   "key": "af-cra-southern-rhodesia-mashonaland",
+   "grossMWhPerYear": 33582533,
+   "reaches": 5296
+  },
+  {
+   "provinceId": 200141,
+   "key": "af-cra-southern-rhodesia-matabeleland",
+   "grossMWhPerYear": 34394817,
+   "reaches": 5752
+  },
+  {
+   "provinceId": 200142,
+   "key": "af-cra-southern-rhodesia-victoria-and-the-midlands",
+   "grossMWhPerYear": 32149363,
+   "reaches": 6475
+  },
+  {
+   "provinceId": 200143,
+   "key": "af-hct-bechuanaland-ngamiland-and-chobe",
+   "grossMWhPerYear": 4430525,
+   "reaches": 14163
+  },
+  {
+   "provinceId": 200144,
+   "key": "af-hct-bechuanaland-central-district",
+   "grossMWhPerYear": 198384,
+   "reaches": 1911
+  },
+  {
+   "provinceId": 200145,
+   "key": "af-hct-bechuanaland-kgalagadi-and-the-south",
+   "grossMWhPerYear": 247184,
+   "reaches": 4667
+  },
+  {
+   "provinceId": 200146,
+   "key": "af-hct-basutoland-the-lowlands",
+   "grossMWhPerYear": 2359228,
+   "reaches": 732
+  },
+  {
+   "provinceId": 200147,
+   "key": "af-hct-basutoland-the-highlands",
+   "grossMWhPerYear": 6141760,
+   "reaches": 615
+  },
+  {
+   "provinceId": 200148,
+   "key": "af-hct-swaziland",
+   "grossMWhPerYear": 8983915,
+   "reaches": 775
+  },
+  {
+   "provinceId": 200149,
+   "key": "af-cap-cape-peninsula-and-the-western-districts",
+   "grossMWhPerYear": 7246367,
+   "reaches": 5879
+  },
+  {
+   "provinceId": 200150,
+   "key": "af-cap-eastern-cape-and-the-transkei",
+   "grossMWhPerYear": 33601087,
+   "reaches": 7906
+  },
+  {
+   "provinceId": 200151,
+   "key": "af-cap-northern-cape-and-griqualand-west",
+   "grossMWhPerYear": 35394766,
+   "reaches": 16154
+  },
+  {
+   "provinceId": 200152,
+   "key": "af-nat-natal-and-zululand",
+   "grossMWhPerYear": 30423569,
+   "reaches": 4240
+  },
+  {
+   "provinceId": 200153,
+   "key": "af-zar-pretoria-and-the-witwatersrand",
+   "grossMWhPerYear": 391877,
+   "reaches": 826
+  },
+  {
+   "provinceId": 200154,
+   "key": "af-zar-lydenburg-and-the-eastern-transvaal",
+   "grossMWhPerYear": 9461862,
+   "reaches": 3495
+  },
+  {
+   "provinceId": 200155,
+   "key": "af-zar-zoutpansberg-and-the-northern-transvaal",
+   "grossMWhPerYear": 9947470,
+   "reaches": 5818
+  },
+  {
+   "provinceId": 200156,
+   "key": "af-zar-potchefstroom-and-the-western-transvaal",
+   "grossMWhPerYear": 1637277,
+   "reaches": 4553
+  },
+  {
+   "provinceId": 200157,
+   "key": "af-orf-orange-free-state",
+   "grossMWhPerYear": 4540901,
+   "reaches": 5754
+  },
+  {
+   "provinceId": 200158,
+   "key": "af-bea-mombasa-and-the-coast",
+   "grossMWhPerYear": 11229292,
+   "reaches": 3322
+  },
+  {
+   "provinceId": 200159,
+   "key": "af-bea-ukamba-and-nairobi",
+   "grossMWhPerYear": 35997768,
+   "reaches": 6707
+  },
+  {
+   "provinceId": 200160,
+   "key": "af-bea-nyanza-and-the-western-province",
+   "grossMWhPerYear": 11444647,
+   "reaches": 981
+  },
+  {
+   "provinceId": 200161,
+   "key": "af-bea-rift-valley",
+   "grossMWhPerYear": 32637195,
+   "reaches": 7884
+  },
+  {
+   "provinceId": 200162,
+   "key": "af-bea-northern-frontier-district",
+   "grossMWhPerYear": 6227371,
+   "reaches": 5039
+  },
+  {
+   "provinceId": 200163,
+   "key": "af-bea-buganda",
+   "grossMWhPerYear": 10708122,
+   "reaches": 1728
+  },
+  {
+   "provinceId": 200164,
+   "key": "af-bea-eastern-province-of-uganda",
+   "grossMWhPerYear": 9315918,
+   "reaches": 1185
+  },
+  {
+   "provinceId": 200165,
+   "key": "af-bea-northern-province-of-uganda",
+   "grossMWhPerYear": 80075882,
+   "reaches": 3560
+  },
+  {
+   "provinceId": 200166,
+   "key": "af-bea-western-province-of-uganda",
+   "grossMWhPerYear": 47499815,
+   "reaches": 2127
+  },
+  {
+   "provinceId": 200167,
+   "key": "af-bea-jubaland",
+   "grossMWhPerYear": 7651942,
+   "reaches": 4414
+  },
+  {
+   "provinceId": 200168,
+   "key": "af-bwa-gold-coast-colony",
+   "grossMWhPerYear": 13510427,
+   "reaches": 2611
+  },
+  {
+   "provinceId": 200169,
+   "key": "af-bwa-ashanti",
+   "grossMWhPerYear": 5594429,
+   "reaches": 2787
+  },
+  {
+   "provinceId": 200170,
+   "key": "af-bwa-northern-territories-of-the-gold-coast",
+   "grossMWhPerYear": 5364550,
+   "reaches": 4003
+  },
+  {
+   "provinceId": 200171,
+   "key": "af-bwa-gambia",
+   "grossMWhPerYear": 134548,
+   "reaches": 286
+  },
+  {
+   "provinceId": 200172,
+   "key": "af-bwa-sierra-leone-colony",
+   "grossMWhPerYear": 186806,
+   "reaches": 150
+  },
+  {
+   "provinceId": 200173,
+   "key": "af-bwa-sierra-leone-protectorate",
+   "grossMWhPerYear": 61210751,
+   "reaches": 10003
+  },
+  {
+   "provinceId": 200174,
+   "key": "af-bwa-lagos-colony",
+   "grossMWhPerYear": 432214,
+   "reaches": 171
+  },
+  {
+   "provinceId": 200175,
+   "key": "af-bwa-southern-nigeria-the-west",
+   "grossMWhPerYear": 18967617,
+   "reaches": 5196
+  },
+  {
+   "provinceId": 200176,
+   "key": "af-bwa-southern-nigeria-the-east",
+   "grossMWhPerYear": 47203959,
+   "reaches": 11763
+  },
+  {
+   "provinceId": 200177,
+   "key": "af-bwa-southern-nigeria-the-middle-belt",
+   "grossMWhPerYear": 82105165,
+   "reaches": 12275
+  },
+  {
+   "provinceId": 200178,
+   "key": "af-bwa-northern-nigeria-borno-and-the-chad-frontier",
+   "grossMWhPerYear": 2548117,
+   "reaches": 3938
+  },
+  {
+   "provinceId": 200179,
+   "key": "af-bwa-northern-nigeria-the-niger-province",
+   "grossMWhPerYear": 29895479,
+   "reaches": 3165
+  },
+  {
+   "provinceId": 200180,
+   "key": "af-fwa-senegal-the-communes-and-the-coast",
+   "grossMWhPerYear": 59231,
+   "reaches": 1150
+  },
+  {
+   "provinceId": 200181,
+   "key": "af-fwa-senegal-the-interior",
+   "grossMWhPerYear": 3334771,
+   "reaches": 5571
+  },
+  {
+   "provinceId": 200182,
+   "key": "af-fwa-mauritania-trarza-and-the-coast",
+   "grossMWhPerYear": 653225,
+   "reaches": 5167
+  },
+  {
+   "provinceId": 200183,
+   "key": "af-fwa-mauritania-adrar-and-the-hodh",
+   "grossMWhPerYear": 1580553,
+   "reaches": 24287
+  },
+  {
+   "provinceId": 200184,
+   "key": "af-fwa-mauritania-dakhlet-nouadhibou",
+   "grossMWhPerYear": 56103,
+   "reaches": 453
+  },
+  {
+   "provinceId": 200185,
+   "key": "af-fwa-french-sudan-kayes-bamako-and-koulikoro",
+   "grossMWhPerYear": 16584581,
+   "reaches": 8847
+  },
+  {
+   "provinceId": 200186,
+   "key": "af-fwa-french-sudan-segou-and-mopti",
+   "grossMWhPerYear": 3543268,
+   "reaches": 3981
+  },
+  {
+   "provinceId": 200187,
+   "key": "af-fwa-french-sudan-sikasso",
+   "grossMWhPerYear": 2176385,
+   "reaches": 3017
+  },
+  {
+   "provinceId": 200188,
+   "key": "af-fwa-french-sudan-tombouctou-gao-and-kidal",
+   "grossMWhPerYear": 3868173,
+   "reaches": 23139
+  },
+  {
+   "provinceId": 200189,
+   "key": "af-fwa-guinea-conakry-and-the-coast",
+   "grossMWhPerYear": 14491072,
+   "reaches": 3531
+  },
+  {
+   "provinceId": 200190,
+   "key": "af-fwa-guinea-fouta-djallon",
+   "grossMWhPerYear": 7025439,
+   "reaches": 1249
+  },
+  {
+   "provinceId": 200191,
+   "key": "af-fwa-guinea-the-middle-niger",
+   "grossMWhPerYear": 8467934,
+   "reaches": 1354
+  },
+  {
+   "provinceId": 200192,
+   "key": "af-fwa-guinea-the-upper-niger",
+   "grossMWhPerYear": 9800616,
+   "reaches": 3548
+  },
+  {
+   "provinceId": 200193,
+   "key": "af-fwa-guinea-faranah",
+   "grossMWhPerYear": 7592821,
+   "reaches": 2670
+  },
+  {
+   "provinceId": 200194,
+   "key": "af-fwa-guinea-the-forest-region",
+   "grossMWhPerYear": 13788815,
+   "reaches": 3454
+  },
+  {
+   "provinceId": 200195,
+   "key": "af-fwa-guinea-boke",
+   "grossMWhPerYear": 12301517,
+   "reaches": 3101
+  },
+  {
+   "provinceId": 200196,
+   "key": "af-fwa-ivory-coast-the-south",
+   "grossMWhPerYear": 38374358,
+   "reaches": 8590
+  },
+  {
+   "provinceId": 200197,
+   "key": "af-fwa-ivory-coast-the-north",
+   "grossMWhPerYear": 12917125,
+   "reaches": 7774
+  },
+  {
+   "provinceId": 200198,
+   "key": "af-fwa-upper-volta-ouagadougou",
+   "grossMWhPerYear": 15160,
+   "reaches": 131
+  },
+  {
+   "provinceId": 200199,
+   "key": "af-fwa-upper-volta-bobo-dioulasso",
+   "grossMWhPerYear": 272242,
+   "reaches": 1073
+  },
+  {
+   "provinceId": 200200,
+   "key": "af-fwa-upper-volta-banfora",
+   "grossMWhPerYear": 364537,
+   "reaches": 840
+  },
+  {
+   "provinceId": 200201,
+   "key": "af-fwa-upper-volta-dedougou",
+   "grossMWhPerYear": 187397,
+   "reaches": 1323
+  },
+  {
+   "provinceId": 200202,
+   "key": "af-fwa-upper-volta-koudougou",
+   "grossMWhPerYear": 120624,
+   "reaches": 975
+  },
+  {
+   "provinceId": 200203,
+   "key": "af-fwa-upper-volta-manga",
+   "grossMWhPerYear": 146233,
+   "reaches": 515
+  },
+  {
+   "provinceId": 200204,
+   "key": "af-fwa-upper-volta-tenkodogo",
+   "grossMWhPerYear": 505976,
+   "reaches": 651
+  },
+  {
+   "provinceId": 200205,
+   "key": "af-fwa-upper-volta-kaya",
+   "grossMWhPerYear": 44785,
+   "reaches": 818
+  },
+  {
+   "provinceId": 200206,
+   "key": "af-fwa-upper-volta-ouahigouya",
+   "grossMWhPerYear": 15684,
+   "reaches": 686
+  },
+  {
+   "provinceId": 200207,
+   "key": "af-fwa-upper-volta-dori",
+   "grossMWhPerYear": 112631,
+   "reaches": 1413
+  },
+  {
+   "provinceId": 200208,
+   "key": "af-fwa-upper-volta-fada-n-gourma",
+   "grossMWhPerYear": 309354,
+   "reaches": 1946
+  },
+  {
+   "provinceId": 200209,
+   "key": "af-fwa-upper-volta-gaoua",
+   "grossMWhPerYear": 448874,
+   "reaches": 749
+  },
+  {
+   "provinceId": 200210,
+   "key": "af-fwa-upper-volta-ziniare",
+   "grossMWhPerYear": 65760,
+   "reaches": 363
+  },
+  {
+   "provinceId": 200211,
+   "key": "af-fwa-dahomey-the-coast",
+   "grossMWhPerYear": 1100879,
+   "reaches": 442
+  },
+  {
+   "provinceId": 200212,
+   "key": "af-fwa-dahomey-the-north",
+   "grossMWhPerYear": 7835013,
+   "reaches": 4783
+  },
+  {
+   "provinceId": 200213,
+   "key": "af-fwa-niger-the-niger-valley",
+   "grossMWhPerYear": 5422797,
+   "reaches": 4640
+  },
+  {
+   "provinceId": 200214,
+   "key": "af-fwa-niger-the-sahel",
+   "grossMWhPerYear": 1056645,
+   "reaches": 10333
+  },
+  {
+   "provinceId": 200215,
+   "key": "af-fwa-niger-the-sahara",
+   "grossMWhPerYear": 2413650,
+   "reaches": 18683
+  },
+  {
+   "provinceId": 200216,
+   "key": "af-fea-gabon-the-estuary-and-the-coast",
+   "grossMWhPerYear": 16727072,
+   "reaches": 4118
+  },
+  {
+   "provinceId": 200217,
+   "key": "af-fea-gabon-the-interior",
+   "grossMWhPerYear": 164549810,
+   "reaches": 16092
+  },
+  {
+   "provinceId": 200218,
+   "key": "af-fea-middle-congo-brazzaville-and-the-pool",
+   "grossMWhPerYear": 98058251,
+   "reaches": 2607
+  },
+  {
+   "provinceId": 200219,
+   "key": "af-fea-middle-congo-the-north",
+   "grossMWhPerYear": 44708415,
+   "reaches": 8098
+  },
+  {
+   "provinceId": 200220,
+   "key": "af-fea-middle-congo-the-south",
+   "grossMWhPerYear": 64265029,
+   "reaches": 7744
+  },
+  {
+   "provinceId": 200221,
+   "key": "af-fea-ubangi-shari-the-west",
+   "grossMWhPerYear": 44441670,
+   "reaches": 7690
+  },
+  {
+   "provinceId": 200222,
+   "key": "af-fea-ubangi-shari-the-centre",
+   "grossMWhPerYear": 18405920,
+   "reaches": 6983
+  },
+  {
+   "provinceId": 200223,
+   "key": "af-fea-ubangi-shari-the-east",
+   "grossMWhPerYear": 31577690,
+   "reaches": 13615
+  },
+  {
+   "provinceId": 200224,
+   "key": "af-fea-chad-the-chari-and-the-lake",
+   "grossMWhPerYear": 4648665,
+   "reaches": 8127
+  },
+  {
+   "provinceId": 200225,
+   "key": "af-fea-chad-the-south",
+   "grossMWhPerYear": 13449092,
+   "reaches": 5255
+  },
+  {
+   "provinceId": 200226,
+   "key": "af-fea-chad-the-east",
+   "grossMWhPerYear": 695833,
+   "reaches": 5858
+  },
+  {
+   "provinceId": 200227,
+   "key": "af-alg-algiers-and-the-mitidja",
+   "grossMWhPerYear": 2630985,
+   "reaches": 868
+  },
+  {
+   "provinceId": 200228,
+   "key": "af-alg-the-kabylie",
+   "grossMWhPerYear": 3085284,
+   "reaches": 590
+  },
+  {
+   "provinceId": 200229,
+   "key": "af-alg-constantine-and-the-east",
+   "grossMWhPerYear": 5801239,
+   "reaches": 4013
+  },
+  {
+   "provinceId": 200230,
+   "key": "af-alg-oran-and-the-west",
+   "grossMWhPerYear": 2011354,
+   "reaches": 3235
+  },
+  {
+   "provinceId": 200231,
+   "key": "af-alg-laghouat-and-the-southern-territories",
+   "grossMWhPerYear": 6040044,
+   "reaches": 11048
+  },
+  {
+   "provinceId": 200232,
+   "key": "af-alg-bechar-and-the-west-sahara",
+   "grossMWhPerYear": 5598368,
+   "reaches": 18705
+  },
+  {
+   "provinceId": 200233,
+   "key": "af-alg-ouargla-and-the-east-sahara",
+   "grossMWhPerYear": 5561478,
+   "reaches": 30522
+  },
+  {
+   "provinceId": 200234,
+   "key": "af-tun-tunis-and-the-sahel",
+   "grossMWhPerYear": 1170528,
+   "reaches": 880
+  },
+  {
+   "provinceId": 200235,
+   "key": "af-tun-bizerte-and-the-north-west",
+   "grossMWhPerYear": 1748943,
+   "reaches": 2566
+  },
+  {
+   "provinceId": 200236,
+   "key": "af-tun-kairouan-and-the-centre",
+   "grossMWhPerYear": 560988,
+   "reaches": 1118
+  },
+  {
+   "provinceId": 200237,
+   "key": "af-tun-gabes-and-the-south",
+   "grossMWhPerYear": 354939,
+   "reaches": 1451
+  },
+  {
+   "provinceId": 200238,
+   "key": "af-mar-tangier-and-tetouan",
+   "grossMWhPerYear": 1722137,
+   "reaches": 499
+  },
+  {
+   "provinceId": 200239,
+   "key": "af-mar-the-rif-and-the-eastern-zone",
+   "grossMWhPerYear": 3178367,
+   "reaches": 1059
+  },
+  {
+   "provinceId": 200240,
+   "key": "af-mar-gharb-and-the-atlantic-plain",
+   "grossMWhPerYear": 2171538,
+   "reaches": 746
+  },
+  {
+   "provinceId": 200241,
+   "key": "af-mar-fez-and-meknes",
+   "grossMWhPerYear": 8929034,
+   "reaches": 3500
+  },
+  {
+   "provinceId": 200242,
+   "key": "af-mar-casablanca-the-chaouia-and-tadla",
+   "grossMWhPerYear": 6009598,
+   "reaches": 1479
+  },
+  {
+   "provinceId": 200243,
+   "key": "af-mar-marrakech-and-the-south",
+   "grossMWhPerYear": 6179236,
+   "reaches": 2057
+  },
+  {
+   "provinceId": 200244,
+   "key": "af-mar-souss-the-anti-atlas-and-tarfaya",
+   "grossMWhPerYear": 18684085,
+   "reaches": 7378
+  },
+  {
+   "provinceId": 200245,
+   "key": "af-mar-eastern-morocco",
+   "grossMWhPerYear": 5176233,
+   "reaches": 2588
+  },
+  {
+   "provinceId": 200246,
+   "key": "af-fso-french-somaliland",
+   "grossMWhPerYear": 516272,
+   "reaches": 677
+  },
+  {
+   "provinceId": 200247,
+   "key": "af-lbr-montserrado",
+   "grossMWhPerYear": 8177364,
+   "reaches": 630
+  },
+  {
+   "provinceId": 200248,
+   "key": "af-lbr-grand-bassa",
+   "grossMWhPerYear": 16344706,
+   "reaches": 1927
+  },
+  {
+   "provinceId": 200249,
+   "key": "af-lbr-sinoe-grand-kru-and-grand-gedeh",
+   "grossMWhPerYear": 11107513,
+   "reaches": 2971
+  },
+  {
+   "provinceId": 200250,
+   "key": "af-lbr-maryland",
+   "grossMWhPerYear": 3708238,
+   "reaches": 916
+  },
+  {
+   "provinceId": 200251,
+   "key": "af-lbr-nimba-and-bong",
+   "grossMWhPerYear": 12138198,
+   "reaches": 2495
+  },
+  {
+   "provinceId": 200252,
+   "key": "af-lbr-western-liberia",
+   "grossMWhPerYear": 29044935,
+   "reaches": 3668
+  },
+  {
+   "provinceId": 200253,
+   "key": "af-ott-tripoli-and-the-jefara",
+   "grossMWhPerYear": 236941,
+   "reaches": 304
+  },
+  {
+   "provinceId": 200254,
+   "key": "af-ott-misrata-and-the-gulf-coast",
+   "grossMWhPerYear": 2422701,
+   "reaches": 5805
+  },
+  {
+   "provinceId": 200255,
+   "key": "af-ott-sirte-ghadames-and-the-jufra",
+   "grossMWhPerYear": 1460986,
+   "reaches": 8130
+  },
+  {
+   "provinceId": 200256,
+   "key": "af-ott-benghazi-and-the-jabal-al-akhdar",
+   "grossMWhPerYear": 1038710,
+   "reaches": 1257
+  },
+  {
+   "provinceId": 200257,
+   "key": "af-ott-derna-butnan-and-ajdabiya",
+   "grossMWhPerYear": 630931,
+   "reaches": 6723
+  },
+  {
+   "provinceId": 200258,
+   "key": "af-ott-kufra",
+   "grossMWhPerYear": 37575,
+   "reaches": 2070
+  },
+  {
+   "provinceId": 200259,
+   "key": "af-ott-sabha-wadi-al-hayaa-and-ash-shati",
+   "grossMWhPerYear": 101375,
+   "reaches": 2748
+  },
+  {
+   "provinceId": 200260,
+   "key": "af-ott-murzuq-and-ghat",
+   "grossMWhPerYear": 95645,
+   "reaches": 3114
+  },
+  {
+   "provinceId": 300001,
+   "key": "am-usa-alaska",
+   "grossMWhPerYear": 943613728,
+   "reaches": 85805
+  },
+  {
+   "provinceId": 300002,
+   "key": "am-usa-alabama",
+   "grossMWhPerYear": 32819280,
+   "reaches": 8042
+  },
+  {
+   "provinceId": 300003,
+   "key": "am-usa-arkansas",
+   "grossMWhPerYear": 36747717,
+   "reaches": 6291
+  },
+  {
+   "provinceId": 300004,
+   "key": "am-usa-arizona-territory",
+   "grossMWhPerYear": 61160220,
+   "reaches": 14183
+  },
+  {
+   "provinceId": 300005,
+   "key": "am-usa-california",
+   "grossMWhPerYear": 181279812,
+   "reaches": 20600
+  },
+  {
+   "provinceId": 300006,
+   "key": "am-usa-colorado",
+   "grossMWhPerYear": 37760714,
+   "reaches": 11941
+  },
+  {
+   "provinceId": 300007,
+   "key": "am-usa-connecticut",
+   "grossMWhPerYear": 4455788,
+   "reaches": 1076
+  },
+  {
+   "provinceId": 300008,
+   "key": "am-usa-district-of-columbia",
+   "grossMWhPerYear": 74336,
+   "reaches": 13
+  },
+  {
+   "provinceId": 300009,
+   "key": "am-usa-delaware",
+   "grossMWhPerYear": 142991,
+   "reaches": 203
+  },
+  {
+   "provinceId": 300010,
+   "key": "am-usa-florida",
+   "grossMWhPerYear": 5666848,
+   "reaches": 4881
+  },
+  {
+   "provinceId": 300011,
+   "key": "am-usa-georgia",
+   "grossMWhPerYear": 21230175,
+   "reaches": 7623
+  },
+  {
+   "provinceId": 300013,
+   "key": "am-usa-iowa",
+   "grossMWhPerYear": 13730589,
+   "reaches": 5868
+  },
+  {
+   "provinceId": 300014,
+   "key": "am-usa-idaho",
+   "grossMWhPerYear": 131505372,
+   "reaches": 11250
+  },
+  {
+   "provinceId": 300015,
+   "key": "am-usa-illinois",
+   "grossMWhPerYear": 30498787,
+   "reaches": 5924
+  },
+  {
+   "provinceId": 300016,
+   "key": "am-usa-indiana",
+   "grossMWhPerYear": 11217407,
+   "reaches": 4260
+  },
+  {
+   "provinceId": 300017,
+   "key": "am-usa-kansas",
+   "grossMWhPerYear": 12862654,
+   "reaches": 9451
+  },
+  {
+   "provinceId": 300018,
+   "key": "am-usa-kentucky",
+   "grossMWhPerYear": 41214311,
+   "reaches": 5188
+  },
+  {
+   "provinceId": 300019,
+   "key": "am-usa-louisiana",
+   "grossMWhPerYear": 45262752,
+   "reaches": 4695
+  },
+  {
+   "provinceId": 300020,
+   "key": "am-usa-massachusetts",
+   "grossMWhPerYear": 6525230,
+   "reaches": 1535
+  },
+  {
+   "provinceId": 300021,
+   "key": "am-usa-maryland",
+   "grossMWhPerYear": 6491242,
+   "reaches": 1243
+  },
+  {
+   "provinceId": 300022,
+   "key": "am-usa-maine",
+   "grossMWhPerYear": 28697174,
+   "reaches": 6010
+  },
+  {
+   "provinceId": 300023,
+   "key": "am-usa-michigan",
+   "grossMWhPerYear": 12180481,
+   "reaches": 6439
+  },
+  {
+   "provinceId": 300024,
+   "key": "am-usa-minnesota",
+   "grossMWhPerYear": 16774017,
+   "reaches": 8448
+  },
+  {
+   "provinceId": 300025,
+   "key": "am-usa-missouri",
+   "grossMWhPerYear": 52728054,
+   "reaches": 7973
+  },
+  {
+   "provinceId": 300026,
+   "key": "am-usa-mississippi",
+   "grossMWhPerYear": 52952036,
+   "reaches": 7856
+  },
+  {
+   "provinceId": 300027,
+   "key": "am-usa-montana",
+   "grossMWhPerYear": 103328124,
+   "reaches": 18349
+  },
+  {
+   "provinceId": 300028,
+   "key": "am-usa-north-carolina",
+   "grossMWhPerYear": 25923003,
+   "reaches": 6606
+  },
+  {
+   "provinceId": 300029,
+   "key": "am-usa-north-dakota",
+   "grossMWhPerYear": 8845703,
+   "reaches": 7476
+  },
+  {
+   "provinceId": 300030,
+   "key": "am-usa-nebraska",
+   "grossMWhPerYear": 25340981,
+   "reaches": 8861
+  },
+  {
+   "provinceId": 300031,
+   "key": "am-usa-new-hampshire",
+   "grossMWhPerYear": 11520645,
+   "reaches": 2086
+  },
+  {
+   "provinceId": 300032,
+   "key": "am-usa-new-jersey",
+   "grossMWhPerYear": 2577494,
+   "reaches": 1130
+  },
+  {
+   "provinceId": 300033,
+   "key": "am-usa-new-mexico-territory",
+   "grossMWhPerYear": 11704185,
+   "reaches": 13748
+  },
+  {
+   "provinceId": 300034,
+   "key": "am-usa-nevada",
+   "grossMWhPerYear": 14755381,
+   "reaches": 13647
+  },
+  {
+   "provinceId": 300035,
+   "key": "am-usa-new-york",
+   "grossMWhPerYear": 141377142,
+   "reaches": 8451
+  },
+  {
+   "provinceId": 300036,
+   "key": "am-usa-ohio",
+   "grossMWhPerYear": 10438009,
+   "reaches": 4865
+  },
+  {
+   "provinceId": 300037,
+   "key": "am-usa-oklahoma-territory-and-indian-territory",
+   "grossMWhPerYear": 16193687,
+   "reaches": 8052
+  },
+  {
+   "provinceId": 300038,
+   "key": "am-usa-oregon",
+   "grossMWhPerYear": 195168106,
+   "reaches": 17056
+  },
+  {
+   "provinceId": 300039,
+   "key": "am-usa-pennsylvania",
+   "grossMWhPerYear": 45625219,
+   "reaches": 7982
+  },
+  {
+   "provinceId": 300040,
+   "key": "am-usa-rhode-island",
+   "grossMWhPerYear": 419097,
+   "reaches": 192
+  },
+  {
+   "provinceId": 300041,
+   "key": "am-usa-south-carolina",
+   "grossMWhPerYear": 12881243,
+   "reaches": 3753
+  },
+  {
+   "provinceId": 300042,
+   "key": "am-usa-south-dakota",
+   "grossMWhPerYear": 17355416,
+   "reaches": 8652
+  },
+  {
+   "provinceId": 300043,
+   "key": "am-usa-tennessee",
+   "grossMWhPerYear": 66263503,
+   "reaches": 7205
+  },
+  {
+   "provinceId": 300044,
+   "key": "am-usa-texas",
+   "grossMWhPerYear": 27129743,
+   "reaches": 28882
+  },
+  {
+   "provinceId": 300045,
+   "key": "am-usa-utah",
+   "grossMWhPerYear": 24985734,
+   "reaches": 9600
+  },
+  {
+   "provinceId": 300046,
+   "key": "am-usa-virginia",
+   "grossMWhPerYear": 21054261,
+   "reaches": 5246
+  },
+  {
+   "provinceId": 300047,
+   "key": "am-usa-vermont",
+   "grossMWhPerYear": 8264271,
+   "reaches": 1867
+  },
+  {
+   "provinceId": 300048,
+   "key": "am-usa-washington",
+   "grossMWhPerYear": 258759534,
+   "reaches": 13404
+  },
+  {
+   "provinceId": 300049,
+   "key": "am-usa-wisconsin",
+   "grossMWhPerYear": 15871094,
+   "reaches": 6143
+  },
+  {
+   "provinceId": 300050,
+   "key": "am-usa-west-virginia",
+   "grossMWhPerYear": 29622306,
+   "reaches": 3699
+  },
+  {
+   "provinceId": 300051,
+   "key": "am-usa-wyoming",
+   "grossMWhPerYear": 31015862,
+   "reaches": 11714
+  },
+  {
+   "provinceId": 300052,
+   "key": "am-can-ontario",
+   "grossMWhPerYear": 150480504,
+   "reaches": 38260
+  },
+  {
+   "provinceId": 300053,
+   "key": "am-can-quebec",
+   "grossMWhPerYear": 729029320,
+   "reaches": 88045
+  },
+  {
+   "provinceId": 300054,
+   "key": "am-can-nova-scotia",
+   "grossMWhPerYear": 10388835,
+   "reaches": 4278
+  },
+  {
+   "provinceId": 300055,
+   "key": "am-can-new-brunswick",
+   "grossMWhPerYear": 23745141,
+   "reaches": 5251
+  },
+  {
+   "provinceId": 300056,
+   "key": "am-can-manitoba",
+   "grossMWhPerYear": 95944681,
+   "reaches": 21074
+  },
+  {
+   "provinceId": 300057,
+   "key": "am-can-british-columbia",
+   "grossMWhPerYear": 1101277631,
+   "reaches": 67062
+  },
+  {
+   "provinceId": 300058,
+   "key": "am-can-prince-edward-island",
+   "grossMWhPerYear": 128403,
+   "reaches": 290
+  },
+  {
+   "provinceId": 300059,
+   "key": "am-can-yukon",
+   "grossMWhPerYear": 248670345,
+   "reaches": 18753
+  },
+  {
+   "provinceId": 300060,
+   "key": "am-can-northwest-territories",
+   "grossMWhPerYear": 523572238,
+   "reaches": 105440
+  },
+  {
+   "provinceId": 300061,
+   "key": "am-can-alberta-district",
+   "grossMWhPerYear": 150499930,
+   "reaches": 28545
+  },
+  {
+   "provinceId": 300062,
+   "key": "am-can-saskatchewan-district",
+   "grossMWhPerYear": 32230176,
+   "reaches": 24086
+  },
+  {
+   "provinceId": 300063,
+   "key": "am-nfd-newfoundland-and-labrador",
+   "grossMWhPerYear": 210325602,
+   "reaches": 27107
+  },
+  {
+   "provinceId": 300064,
+   "key": "am-mex-aguascalientes",
+   "grossMWhPerYear": 115230,
+   "reaches": 268
+  },
+  {
+   "provinceId": 300065,
+   "key": "am-mex-baja-california",
+   "grossMWhPerYear": 3147331,
+   "reaches": 5099
+  },
+  {
+   "provinceId": 300066,
+   "key": "am-mex-campeche",
+   "grossMWhPerYear": 2368185,
+   "reaches": 2217
+  },
+  {
+   "provinceId": 300067,
+   "key": "am-mex-chihuahua",
+   "grossMWhPerYear": 22482699,
+   "reaches": 11402
+  },
+  {
+   "provinceId": 300068,
+   "key": "am-mex-chiapas",
+   "grossMWhPerYear": 100622020,
+   "reaches": 6446
+  },
+  {
+   "provinceId": 300069,
+   "key": "am-mex-coahuila",
+   "grossMWhPerYear": 6045154,
+   "reaches": 6545
+  },
+  {
+   "provinceId": 300070,
+   "key": "am-mex-colima",
+   "grossMWhPerYear": 4211936,
+   "reaches": 230
+  },
+  {
+   "provinceId": 300071,
+   "key": "am-mex-distrito-federal",
+   "grossMWhPerYear": 122872,
+   "reaches": 43
+  },
+  {
+   "provinceId": 300072,
+   "key": "am-mex-durango",
+   "grossMWhPerYear": 37305425,
+   "reaches": 5699
+  },
+  {
+   "provinceId": 300073,
+   "key": "am-mex-guerrero",
+   "grossMWhPerYear": 82546351,
+   "reaches": 3781
+  },
+  {
+   "provinceId": 300074,
+   "key": "am-mex-guanajuato",
+   "grossMWhPerYear": 1661924,
+   "reaches": 1372
+  },
+  {
+   "provinceId": 300075,
+   "key": "am-mex-hidalgo",
+   "grossMWhPerYear": 22778989,
+   "reaches": 1233
+  },
+  {
+   "provinceId": 300076,
+   "key": "am-mex-jalisco",
+   "grossMWhPerYear": 38974415,
+   "reaches": 3796
+  },
+  {
+   "provinceId": 300077,
+   "key": "am-mex-mexico",
+   "grossMWhPerYear": 7643541,
+   "reaches": 1008
+  },
+  {
+   "provinceId": 300078,
+   "key": "am-mex-michoacan",
+   "grossMWhPerYear": 32431956,
+   "reaches": 2395
+  },
+  {
+   "provinceId": 300079,
+   "key": "am-mex-morelos",
+   "grossMWhPerYear": 2412518,
+   "reaches": 233
+  },
+  {
+   "provinceId": 300080,
+   "key": "am-mex-nayarit",
+   "grossMWhPerYear": 20006729,
+   "reaches": 1330
+  },
+  {
+   "provinceId": 300081,
+   "key": "am-mex-nuevo-leon",
+   "grossMWhPerYear": 3073282,
+   "reaches": 2746
+  },
+  {
+   "provinceId": 300082,
+   "key": "am-mex-oaxaca",
+   "grossMWhPerYear": 112062174,
+   "reaches": 7316
+  },
+  {
+   "provinceId": 300083,
+   "key": "am-mex-puebla",
+   "grossMWhPerYear": 38830321,
+   "reaches": 2094
+  },
+  {
+   "provinceId": 300084,
+   "key": "am-mex-queretaro",
+   "grossMWhPerYear": 3344469,
+   "reaches": 510
+  },
+  {
+   "provinceId": 300085,
+   "key": "am-mex-quintana-roo",
+   "grossMWhPerYear": 603089,
+   "reaches": 1230
+  },
+  {
+   "provinceId": 300086,
+   "key": "am-mex-sinaloa",
+   "grossMWhPerYear": 16865964,
+   "reaches": 2354
+  },
+  {
+   "provinceId": 300087,
+   "key": "am-mex-san-luis-potosi",
+   "grossMWhPerYear": 7495547,
+   "reaches": 2852
+  },
+  {
+   "provinceId": 300088,
+   "key": "am-mex-sonora",
+   "grossMWhPerYear": 10855961,
+   "reaches": 8366
+  },
+  {
+   "provinceId": 300089,
+   "key": "am-mex-tabasco",
+   "grossMWhPerYear": 6734407,
+   "reaches": 1647
+  },
+  {
+   "provinceId": 300090,
+   "key": "am-mex-tamaulipas",
+   "grossMWhPerYear": 6012877,
+   "reaches": 3151
+  },
+  {
+   "provinceId": 300091,
+   "key": "am-mex-tlaxcala",
+   "grossMWhPerYear": 443380,
+   "reaches": 175
+  },
+  {
+   "provinceId": 300092,
+   "key": "am-mex-veracruz",
+   "grossMWhPerYear": 45353890,
+   "reaches": 6284
+  },
+  {
+   "provinceId": 300093,
+   "key": "am-mex-yucatan",
+   "grossMWhPerYear": 4771,
+   "reaches": 1015
+  },
+  {
+   "provinceId": 300094,
+   "key": "am-mex-zacatecas",
+   "grossMWhPerYear": 1923538,
+   "reaches": 3471
+  },
+  {
+   "provinceId": 300095,
+   "key": "am-gua-alta-verapaz",
+   "grossMWhPerYear": 20722718,
+   "reaches": 1218
+  },
+  {
+   "provinceId": 300096,
+   "key": "am-gua-baja-verapaz",
+   "grossMWhPerYear": 5167931,
+   "reaches": 331
+  },
+  {
+   "provinceId": 300097,
+   "key": "am-gua-chimaltenango",
+   "grossMWhPerYear": 5325778,
+   "reaches": 219
+  },
+  {
+   "provinceId": 300098,
+   "key": "am-gua-chiquimula",
+   "grossMWhPerYear": 1910534,
+   "reaches": 179
+  },
+  {
+   "provinceId": 300099,
+   "key": "am-gua-escuintla",
+   "grossMWhPerYear": 7094047,
+   "reaches": 584
+  },
+  {
+   "provinceId": 300100,
+   "key": "am-gua-guatemala",
+   "grossMWhPerYear": 4674160,
+   "reaches": 230
+  },
+  {
+   "provinceId": 300101,
+   "key": "am-gua-huehuetenango",
+   "grossMWhPerYear": 26805628,
+   "reaches": 939
+  },
+  {
+   "provinceId": 300102,
+   "key": "am-gua-izabal",
+   "grossMWhPerYear": 5394456,
+   "reaches": 766
+  },
+  {
+   "provinceId": 300103,
+   "key": "am-gua-jalapa",
+   "grossMWhPerYear": 1473444,
+   "reaches": 149
+  },
+  {
+   "provinceId": 300104,
+   "key": "am-gua-jutiapa",
+   "grossMWhPerYear": 2543521,
+   "reaches": 249
+  },
+  {
+   "provinceId": 300105,
+   "key": "am-gua-peten",
+   "grossMWhPerYear": 6446532,
+   "reaches": 2170
+  },
+  {
+   "provinceId": 300106,
+   "key": "am-gua-el-progreso",
+   "grossMWhPerYear": 4254229,
+   "reaches": 192
+  },
+  {
+   "provinceId": 300107,
+   "key": "am-gua-quiche",
+   "grossMWhPerYear": 26382484,
+   "reaches": 1027
+  },
+  {
+   "provinceId": 300108,
+   "key": "am-gua-quezaltenango",
+   "grossMWhPerYear": 8727132,
+   "reaches": 214
+  },
+  {
+   "provinceId": 300109,
+   "key": "am-gua-retalhuleu",
+   "grossMWhPerYear": 4980921,
+   "reaches": 209
+  },
+  {
+   "provinceId": 300110,
+   "key": "am-gua-sacatepequez",
+   "grossMWhPerYear": 1731669,
+   "reaches": 94
+  },
+  {
+   "provinceId": 300111,
+   "key": "am-gua-san-marcos",
+   "grossMWhPerYear": 7752391,
+   "reaches": 364
+  },
+  {
+   "provinceId": 300112,
+   "key": "am-gua-solola",
+   "grossMWhPerYear": 3793564,
+   "reaches": 156
+  },
+  {
+   "provinceId": 300113,
+   "key": "am-gua-santa-rosa",
+   "grossMWhPerYear": 4267775,
+   "reaches": 271
+  },
+  {
+   "provinceId": 300114,
+   "key": "am-gua-suchitepequez",
+   "grossMWhPerYear": 5372795,
+   "reaches": 279
+  },
+  {
+   "provinceId": 300115,
+   "key": "am-gua-totonicapan",
+   "grossMWhPerYear": 1503296,
+   "reaches": 129
+  },
+  {
+   "provinceId": 300116,
+   "key": "am-gua-zacapa",
+   "grossMWhPerYear": 4532501,
+   "reaches": 241
+  },
+  {
+   "provinceId": 300117,
+   "key": "am-hon-atlantida",
+   "grossMWhPerYear": 2095921,
+   "reaches": 412
+  },
+  {
+   "provinceId": 300118,
+   "key": "am-hon-choluteca",
+   "grossMWhPerYear": 2486705,
+   "reaches": 329
+  },
+  {
+   "provinceId": 300119,
+   "key": "am-hon-colon",
+   "grossMWhPerYear": 5871642,
+   "reaches": 817
+  },
+  {
+   "provinceId": 300120,
+   "key": "am-hon-comayagua",
+   "grossMWhPerYear": 5167719,
+   "reaches": 392
+  },
+  {
+   "provinceId": 300121,
+   "key": "am-hon-copan",
+   "grossMWhPerYear": 2119994,
+   "reaches": 271
+  },
+  {
+   "provinceId": 300122,
+   "key": "am-hon-cortes",
+   "grossMWhPerYear": 4993301,
+   "reaches": 286
+  },
+  {
+   "provinceId": 300123,
+   "key": "am-hon-el-paraiso",
+   "grossMWhPerYear": 3522287,
+   "reaches": 401
+  },
+  {
+   "provinceId": 300124,
+   "key": "am-hon-francisco-morazan",
+   "grossMWhPerYear": 3379346,
+   "reaches": 492
+  },
+  {
+   "provinceId": 300125,
+   "key": "am-hon-gracias-a-dios",
+   "grossMWhPerYear": 5784904,
+   "reaches": 1824
+  },
+  {
+   "provinceId": 300126,
+   "key": "am-hon-islas-de-la-bahia",
+   "grossMWhPerYear": 66,
+   "reaches": 1
+  },
+  {
+   "provinceId": 300127,
+   "key": "am-hon-intibuca",
+   "grossMWhPerYear": 4476538,
+   "reaches": 249
+  },
+  {
+   "provinceId": 300128,
+   "key": "am-hon-lempira",
+   "grossMWhPerYear": 6429972,
+   "reaches": 354
+  },
+  {
+   "provinceId": 300129,
+   "key": "am-hon-la-paz",
+   "grossMWhPerYear": 1785152,
+   "reaches": 169
+  },
+  {
+   "provinceId": 300130,
+   "key": "am-hon-ocotepeque",
+   "grossMWhPerYear": 1053676,
+   "reaches": 149
+  },
+  {
+   "provinceId": 300131,
+   "key": "am-hon-olancho",
+   "grossMWhPerYear": 13970886,
+   "reaches": 1536
+  },
+  {
+   "provinceId": 300132,
+   "key": "am-hon-santa-barbara",
+   "grossMWhPerYear": 7329423,
+   "reaches": 427
+  },
+  {
+   "provinceId": 300133,
+   "key": "am-hon-valle",
+   "grossMWhPerYear": 432470,
+   "reaches": 103
+  },
+  {
+   "provinceId": 300134,
+   "key": "am-hon-yoro",
+   "grossMWhPerYear": 6631410,
+   "reaches": 683
+  },
+  {
+   "provinceId": 300135,
+   "key": "am-sal-ahuachapan",
+   "grossMWhPerYear": 1688779,
+   "reaches": 100
+  },
+  {
+   "provinceId": 300136,
+   "key": "am-sal-cabanas",
+   "grossMWhPerYear": 2794104,
+   "reaches": 94
+  },
+  {
+   "provinceId": 300137,
+   "key": "am-sal-chalatenango",
+   "grossMWhPerYear": 1138044,
+   "reaches": 131
+  },
+  {
+   "provinceId": 300138,
+   "key": "am-sal-cuscatlan",
+   "grossMWhPerYear": 367721,
+   "reaches": 71
+  },
+  {
+   "provinceId": 300139,
+   "key": "am-sal-la-libertad",
+   "grossMWhPerYear": 1410010,
+   "reaches": 164
+  },
+  {
+   "provinceId": 300140,
+   "key": "am-sal-morazan",
+   "grossMWhPerYear": 656724,
+   "reaches": 95
+  },
+  {
+   "provinceId": 300141,
+   "key": "am-sal-la-paz",
+   "grossMWhPerYear": 712329,
+   "reaches": 102
+  },
+  {
+   "provinceId": 300142,
+   "key": "am-sal-santa-ana",
+   "grossMWhPerYear": 2096573,
+   "reaches": 175
+  },
+  {
+   "provinceId": 300143,
+   "key": "am-sal-san-miguel",
+   "grossMWhPerYear": 896968,
+   "reaches": 146
+  },
+  {
+   "provinceId": 300144,
+   "key": "am-sal-sonsonate",
+   "grossMWhPerYear": 1169187,
+   "reaches": 97
+  },
+  {
+   "provinceId": 300145,
+   "key": "am-sal-san-salvador",
+   "grossMWhPerYear": 609252,
+   "reaches": 66
+  },
+  {
+   "provinceId": 300146,
+   "key": "am-sal-san-vicente",
+   "grossMWhPerYear": 686471,
+   "reaches": 110
+  },
+  {
+   "provinceId": 300147,
+   "key": "am-sal-la-union",
+   "grossMWhPerYear": 268172,
+   "reaches": 115
+  },
+  {
+   "provinceId": 300148,
+   "key": "am-sal-usulutan",
+   "grossMWhPerYear": 2024509,
+   "reaches": 160
+  },
+  {
+   "provinceId": 300149,
+   "key": "am-nic-atlantico-norte",
+   "grossMWhPerYear": 11622712,
+   "reaches": 3803
+  },
+  {
+   "provinceId": 300150,
+   "key": "am-nic-atlantico-sur",
+   "grossMWhPerYear": 10241859,
+   "reaches": 3393
+  },
+  {
+   "provinceId": 300151,
+   "key": "am-nic-boaco",
+   "grossMWhPerYear": 1303857,
+   "reaches": 298
+  },
+  {
+   "provinceId": 300152,
+   "key": "am-nic-carazo",
+   "grossMWhPerYear": 149800,
+   "reaches": 56
+  },
+  {
+   "provinceId": 300153,
+   "key": "am-nic-chinandega",
+   "grossMWhPerYear": 1068276,
+   "reaches": 355
+  },
+  {
+   "provinceId": 300154,
+   "key": "am-nic-chontales",
+   "grossMWhPerYear": 962108,
+   "reaches": 487
+  },
+  {
+   "provinceId": 300155,
+   "key": "am-nic-esteli",
+   "grossMWhPerYear": 788448,
+   "reaches": 146
+  },
+  {
+   "provinceId": 300156,
+   "key": "am-nic-granada",
+   "grossMWhPerYear": 50784,
+   "reaches": 32
+  },
+  {
+   "provinceId": 300157,
+   "key": "am-nic-jinotega",
+   "grossMWhPerYear": 5169568,
+   "reaches": 846
+  },
+  {
+   "provinceId": 300158,
+   "key": "am-nic-leon",
+   "grossMWhPerYear": 877040,
+   "reaches": 320
+  },
+  {
+   "provinceId": 300159,
+   "key": "am-nic-madriz",
+   "grossMWhPerYear": 956140,
+   "reaches": 110
+  },
+  {
+   "provinceId": 300160,
+   "key": "am-nic-managua",
+   "grossMWhPerYear": 342980,
+   "reaches": 114
+  },
+  {
+   "provinceId": 300161,
+   "key": "am-nic-masaya",
+   "grossMWhPerYear": 49480,
+   "reaches": 17
+  },
+  {
+   "provinceId": 300162,
+   "key": "am-nic-matagalpa",
+   "grossMWhPerYear": 5416053,
+   "reaches": 864
+  },
+  {
+   "provinceId": 300163,
+   "key": "am-nic-nueva-segovia",
+   "grossMWhPerYear": 1353220,
+   "reaches": 202
+  },
+  {
+   "provinceId": 300164,
+   "key": "am-nic-rivas",
+   "grossMWhPerYear": 83735,
+   "reaches": 84
+  },
+  {
+   "provinceId": 300165,
+   "key": "am-nic-rio-san-juan",
+   "grossMWhPerYear": 1592569,
+   "reaches": 816
+  },
+  {
+   "provinceId": 300166,
+   "key": "am-cos-alajuela",
+   "grossMWhPerYear": 16737749,
+   "reaches": 1267
+  },
+  {
+   "provinceId": 300167,
+   "key": "am-cos-cartago",
+   "grossMWhPerYear": 20527875,
+   "reaches": 724
+  },
+  {
+   "provinceId": 300168,
+   "key": "am-cos-guanacaste",
+   "grossMWhPerYear": 4067433,
+   "reaches": 1005
+  },
+  {
+   "provinceId": 300169,
+   "key": "am-cos-heredia",
+   "grossMWhPerYear": 6358130,
+   "reaches": 538
+  },
+  {
+   "provinceId": 300170,
+   "key": "am-cos-limon",
+   "grossMWhPerYear": 27186129,
+   "reaches": 1697
+  },
+  {
+   "provinceId": 300171,
+   "key": "am-cos-puntarenas",
+   "grossMWhPerYear": 23271984,
+   "reaches": 1618
+  },
+  {
+   "provinceId": 300172,
+   "key": "am-cos-san-jose",
+   "grossMWhPerYear": 21560931,
+   "reaches": 1006
+  },
+  {
+   "provinceId": 300173,
+   "key": "am-bwi-blz-belize",
+   "grossMWhPerYear": 350035,
+   "reaches": 152
+  },
+  {
+   "provinceId": 300174,
+   "key": "am-bwi-blz-cayo",
+   "grossMWhPerYear": 4100294,
+   "reaches": 478
+  },
+  {
+   "provinceId": 300175,
+   "key": "am-bwi-blz-corozal",
+   "grossMWhPerYear": 10324,
+   "reaches": 46
+  },
+  {
+   "provinceId": 300176,
+   "key": "am-bwi-blz-orange-walk",
+   "grossMWhPerYear": 579563,
+   "reaches": 213
+  },
+  {
+   "provinceId": 300177,
+   "key": "am-bwi-blz-stann-creek",
+   "grossMWhPerYear": 729294,
+   "reaches": 238
+  },
+  {
+   "provinceId": 300178,
+   "key": "am-bwi-blz-toledo",
+   "grossMWhPerYear": 2837242,
+   "reaches": 515
+  },
+  {
+   "provinceId": 300179,
+   "key": "am-pan-panama",
+   "grossMWhPerYear": 3559335,
+   "reaches": 1062
+  },
+  {
+   "provinceId": 300180,
+   "key": "am-pan-colon",
+   "grossMWhPerYear": 1567248,
+   "reaches": 503
+  },
+  {
+   "provinceId": 300181,
+   "key": "am-pan-chiriqui-and-bocas-del-toro",
+   "grossMWhPerYear": 27115952,
+   "reaches": 1522
+  },
+  {
+   "provinceId": 300182,
+   "key": "am-pan-veraguas-and-azero",
+   "grossMWhPerYear": 6190656,
+   "reaches": 1605
+  },
+  {
+   "provinceId": 300183,
+   "key": "am-pan-cocle",
+   "grossMWhPerYear": 1302485,
+   "reaches": 361
+  },
+  {
+   "provinceId": 300184,
+   "key": "am-pan-darien-and-the-comarcas",
+   "grossMWhPerYear": 21007335,
+   "reaches": 3418
+  },
+  {
+   "provinceId": 300185,
+   "key": "am-col-amazonas",
+   "grossMWhPerYear": 147585055,
+   "reaches": 17098
+  },
+  {
+   "provinceId": 300186,
+   "key": "am-col-antioquia",
+   "grossMWhPerYear": 250374909,
+   "reaches": 9179
+  },
+  {
+   "provinceId": 300187,
+   "key": "am-col-arauca",
+   "grossMWhPerYear": 26605597,
+   "reaches": 2254
+  },
+  {
+   "provinceId": 300188,
+   "key": "am-col-atlantico",
+   "grossMWhPerYear": 1284469,
+   "reaches": 98
+  },
+  {
+   "provinceId": 300189,
+   "key": "am-col-bolivar",
+   "grossMWhPerYear": 22734697,
+   "reaches": 1340
+  },
+  {
+   "provinceId": 300190,
+   "key": "am-col-boyaca",
+   "grossMWhPerYear": 80904349,
+   "reaches": 2664
+  },
+  {
+   "provinceId": 300191,
+   "key": "am-col-caldas",
+   "grossMWhPerYear": 38184893,
+   "reaches": 906
+  },
+  {
+   "provinceId": 300192,
+   "key": "am-col-caqueta",
+   "grossMWhPerYear": 59543673,
+   "reaches": 11560
+  },
+  {
+   "provinceId": 300193,
+   "key": "am-col-casanare",
+   "grossMWhPerYear": 34140719,
+   "reaches": 4815
+  },
+  {
+   "provinceId": 300194,
+   "key": "am-col-cauca",
+   "grossMWhPerYear": 96760059,
+   "reaches": 5020
+  },
+  {
+   "provinceId": 300195,
+   "key": "am-col-cesar",
+   "grossMWhPerYear": 14967213,
+   "reaches": 1243
+  },
+  {
+   "provinceId": 300196,
+   "key": "am-col-choco",
+   "grossMWhPerYear": 96698173,
+   "reaches": 11729
+  },
+  {
+   "provinceId": 300197,
+   "key": "am-col-cordoba",
+   "grossMWhPerYear": 12375648,
+   "reaches": 2225
+  },
+  {
+   "provinceId": 300198,
+   "key": "am-col-bogota",
+   "grossMWhPerYear": 83475215,
+   "reaches": 2718
+  },
+  {
+   "provinceId": 300199,
+   "key": "am-col-guainia",
+   "grossMWhPerYear": 32446224,
+   "reaches": 10223
+  },
+  {
+   "provinceId": 300200,
+   "key": "am-col-guaviare",
+   "grossMWhPerYear": 12200361,
+   "reaches": 7109
+  },
+  {
+   "provinceId": 300201,
+   "key": "am-col-huila",
+   "grossMWhPerYear": 52474872,
+   "reaches": 2082
+  },
+  {
+   "provinceId": 300202,
+   "key": "am-col-la-guajira",
+   "grossMWhPerYear": 5319952,
+   "reaches": 842
+  },
+  {
+   "provinceId": 300203,
+   "key": "am-col-magdalena",
+   "grossMWhPerYear": 28970006,
+   "reaches": 1298
+  },
+  {
+   "provinceId": 300204,
+   "key": "am-col-meta",
+   "grossMWhPerYear": 88176767,
+   "reaches": 11786
+  },
+  {
+   "provinceId": 300205,
+   "key": "am-col-narino",
+   "grossMWhPerYear": 103127410,
+   "reaches": 5126
+  },
+  {
+   "provinceId": 300206,
+   "key": "am-col-norte-de-santander",
+   "grossMWhPerYear": 56521086,
+   "reaches": 2288
+  },
+  {
+   "provinceId": 300207,
+   "key": "am-col-putumayo",
+   "grossMWhPerYear": 35938289,
+   "reaches": 3372
+  },
+  {
+   "provinceId": 300208,
+   "key": "am-col-quindio",
+   "grossMWhPerYear": 3889299,
+   "reaches": 221
+  },
+  {
+   "provinceId": 300209,
+   "key": "am-col-risaralda",
+   "grossMWhPerYear": 15013905,
+   "reaches": 591
+  },
+  {
+   "provinceId": 300210,
+   "key": "am-col-santander",
+   "grossMWhPerYear": 96115945,
+   "reaches": 3006
+  },
+  {
+   "provinceId": 300211,
+   "key": "am-col-sucre",
+   "grossMWhPerYear": 538232,
+   "reaches": 393
+  },
+  {
+   "provinceId": 300212,
+   "key": "am-col-tolima",
+   "grossMWhPerYear": 87425815,
+   "reaches": 2612
+  },
+  {
+   "provinceId": 300213,
+   "key": "am-col-valle-del-cauca",
+   "grossMWhPerYear": 62684490,
+   "reaches": 3592
+  },
+  {
+   "provinceId": 300214,
+   "key": "am-col-vaupes",
+   "grossMWhPerYear": 26890719,
+   "reaches": 8189
+  },
+  {
+   "provinceId": 300215,
+   "key": "am-col-vichada",
+   "grossMWhPerYear": 77083612,
+   "reaches": 13624
+  },
+  {
+   "provinceId": 300216,
+   "key": "am-ven-distrito-capital",
+   "grossMWhPerYear": 53576,
+   "reaches": 17
+  },
+  {
+   "provinceId": 300217,
+   "key": "am-ven-anzoategui",
+   "grossMWhPerYear": 1871133,
+   "reaches": 1908
+  },
+  {
+   "provinceId": 300218,
+   "key": "am-ven-apure",
+   "grossMWhPerYear": 38507651,
+   "reaches": 5737
+  },
+  {
+   "provinceId": 300219,
+   "key": "am-ven-aragua",
+   "grossMWhPerYear": 801718,
+   "reaches": 239
+  },
+  {
+   "provinceId": 300220,
+   "key": "am-ven-barinas",
+   "grossMWhPerYear": 14894097,
+   "reaches": 2178
+  },
+  {
+   "provinceId": 300221,
+   "key": "am-ven-bolivar",
+   "grossMWhPerYear": 423810075,
+   "reaches": 27156
+  },
+  {
+   "provinceId": 300222,
+   "key": "am-ven-carabobo",
+   "grossMWhPerYear": 485173,
+   "reaches": 173
+  },
+  {
+   "provinceId": 300223,
+   "key": "am-ven-cojedes",
+   "grossMWhPerYear": 2326648,
+   "reaches": 582
+  },
+  {
+   "provinceId": 300224,
+   "key": "am-ven-falcon",
+   "grossMWhPerYear": 1342179,
+   "reaches": 1109
+  },
+  {
+   "provinceId": 300225,
+   "key": "am-ven-guarico",
+   "grossMWhPerYear": 4023562,
+   "reaches": 2749
+  },
+  {
+   "provinceId": 300226,
+   "key": "am-ven-lara",
+   "grossMWhPerYear": 3558717,
+   "reaches": 885
+  },
+  {
+   "provinceId": 300227,
+   "key": "am-ven-merida",
+   "grossMWhPerYear": 26359296,
+   "reaches": 874
+  },
+  {
+   "provinceId": 300228,
+   "key": "am-ven-miranda",
+   "grossMWhPerYear": 1693213,
+   "reaches": 402
+  },
+  {
+   "provinceId": 300229,
+   "key": "am-ven-monagas",
+   "grossMWhPerYear": 1710992,
+   "reaches": 955
+  },
+  {
+   "provinceId": 300230,
+   "key": "am-ven-nueva-esparta",
+   "grossMWhPerYear": 731,
+   "reaches": 21
+  },
+  {
+   "provinceId": 300231,
+   "key": "am-ven-portuguesa",
+   "grossMWhPerYear": 4039332,
+   "reaches": 879
+  },
+  {
+   "provinceId": 300232,
+   "key": "am-ven-sucre",
+   "grossMWhPerYear": 1046762,
+   "reaches": 339
+  },
+  {
+   "provinceId": 300233,
+   "key": "am-ven-tachira",
+   "grossMWhPerYear": 19209774,
+   "reaches": 1143
+  },
+  {
+   "provinceId": 300234,
+   "key": "am-ven-trujillo",
+   "grossMWhPerYear": 6582750,
+   "reaches": 404
+  },
+  {
+   "provinceId": 300235,
+   "key": "am-ven-yaracuy",
+   "grossMWhPerYear": 723375,
+   "reaches": 274
+  },
+  {
+   "provinceId": 300236,
+   "key": "am-ven-zulia",
+   "grossMWhPerYear": 7551416,
+   "reaches": 1954
+  },
+  {
+   "provinceId": 300237,
+   "key": "am-ven-dependencias-federales",
+   "grossMWhPerYear": 3,
+   "reaches": 1
+  },
+  {
+   "provinceId": 300238,
+   "key": "am-ven-vargas",
+   "grossMWhPerYear": 160810,
+   "reaches": 35
+  },
+  {
+   "provinceId": 300239,
+   "key": "am-ven-delta-amacuro",
+   "grossMWhPerYear": 14200016,
+   "reaches": 1192
+  },
+  {
+   "provinceId": 300240,
+   "key": "am-ven-amazonas",
+   "grossMWhPerYear": 202716048,
+   "reaches": 24142
+  },
+  {
+   "provinceId": 300241,
+   "key": "am-ecu-azuay",
+   "grossMWhPerYear": 20458972,
+   "reaches": 583
+  },
+  {
+   "provinceId": 300242,
+   "key": "am-ecu-bolivar",
+   "grossMWhPerYear": 15055920,
+   "reaches": 443
+  },
+  {
+   "provinceId": 300243,
+   "key": "am-ecu-carchi",
+   "grossMWhPerYear": 15034277,
+   "reaches": 480
+  },
+  {
+   "provinceId": 300244,
+   "key": "am-ecu-orellana",
+   "grossMWhPerYear": 25685517,
+   "reaches": 3698
+  },
+  {
+   "provinceId": 300245,
+   "key": "am-ecu-esmeraldas",
+   "grossMWhPerYear": 27338239,
+   "reaches": 1707
+  },
+  {
+   "provinceId": 300246,
+   "key": "am-ecu-canar",
+   "grossMWhPerYear": 12940993,
+   "reaches": 336
+  },
+  {
+   "provinceId": 300247,
+   "key": "am-ecu-guayas",
+   "grossMWhPerYear": 3438751,
+   "reaches": 706
+  },
+  {
+   "provinceId": 300248,
+   "key": "am-ecu-chimborazo",
+   "grossMWhPerYear": 12964900,
+   "reaches": 564
+  },
+  {
+   "provinceId": 300249,
+   "key": "am-ecu-imbabura",
+   "grossMWhPerYear": 20406203,
+   "reaches": 594
+  },
+  {
+   "provinceId": 300250,
+   "key": "am-ecu-loja",
+   "grossMWhPerYear": 12120319,
+   "reaches": 716
+  },
+  {
+   "provinceId": 300251,
+   "key": "am-ecu-manabi",
+   "grossMWhPerYear": 3491515,
+   "reaches": 1356
+  },
+  {
+   "provinceId": 300252,
+   "key": "am-ecu-napo",
+   "grossMWhPerYear": 34021207,
+   "reaches": 528
+  },
+  {
+   "provinceId": 300253,
+   "key": "am-ecu-el-oro",
+   "grossMWhPerYear": 3689618,
+   "reaches": 252
+  },
+  {
+   "provinceId": 300254,
+   "key": "am-ecu-pichincha",
+   "grossMWhPerYear": 39798313,
+   "reaches": 1072
+  },
+  {
+   "provinceId": 300255,
+   "key": "am-ecu-los-rios",
+   "grossMWhPerYear": 4001665,
+   "reaches": 665
+  },
+  {
+   "provinceId": 300256,
+   "key": "am-ecu-morona-santiago",
+   "grossMWhPerYear": 98444274,
+   "reaches": 3602
+  },
+  {
+   "provinceId": 300257,
+   "key": "am-ecu-santo-domingo-de-los-tsachilas",
+   "grossMWhPerYear": 13002037,
+   "reaches": 534
+  },
+  {
+   "provinceId": 300258,
+   "key": "am-ecu-santa-elena",
+   "grossMWhPerYear": 262850,
+   "reaches": 159
+  },
+  {
+   "provinceId": 300259,
+   "key": "am-ecu-tungurahua",
+   "grossMWhPerYear": 75669133,
+   "reaches": 2284
+  },
+  {
+   "provinceId": 300260,
+   "key": "am-ecu-sucumbios",
+   "grossMWhPerYear": 28509293,
+   "reaches": 2784
+  },
+  {
+   "provinceId": 300261,
+   "key": "am-ecu-galapagos",
+   "grossMWhPerYear": 123926,
+   "reaches": 208
+  },
+  {
+   "provinceId": 300262,
+   "key": "am-ecu-cotopaxi",
+   "grossMWhPerYear": 17818356,
+   "reaches": 739
+  },
+  {
+   "provinceId": 300263,
+   "key": "am-ecu-pastaza",
+   "grossMWhPerYear": 46413082,
+   "reaches": 5425
+  },
+  {
+   "provinceId": 300264,
+   "key": "am-ecu-zamora-chinchipe",
+   "grossMWhPerYear": 20179285,
+   "reaches": 1100
+  },
+  {
+   "provinceId": 300265,
+   "key": "am-pru-amazonas",
+   "grossMWhPerYear": 138220324,
+   "reaches": 4713
+  },
+  {
+   "provinceId": 300266,
+   "key": "am-pru-ancash",
+   "grossMWhPerYear": 106101702,
+   "reaches": 2179
+  },
+  {
+   "provinceId": 300267,
+   "key": "am-pru-apurimac",
+   "grossMWhPerYear": 68839244,
+   "reaches": 1415
+  },
+  {
+   "provinceId": 300268,
+   "key": "am-pru-arequipa",
+   "grossMWhPerYear": 77507779,
+   "reaches": 2861
+  },
+  {
+   "provinceId": 300269,
+   "key": "am-pru-ayacucho",
+   "grossMWhPerYear": 142754521,
+   "reaches": 2687
+  },
+  {
+   "provinceId": 300270,
+   "key": "am-pru-cajamarca",
+   "grossMWhPerYear": 64275338,
+   "reaches": 2301
+  },
+  {
+   "provinceId": 300271,
+   "key": "am-pru-callao",
+   "grossMWhPerYear": 380,
+   "reaches": 2
+  },
+  {
+   "provinceId": 300272,
+   "key": "am-pru-cusco",
+   "grossMWhPerYear": 428413163,
+   "reaches": 8819
+  },
+  {
+   "provinceId": 300273,
+   "key": "am-pru-huanuco",
+   "grossMWhPerYear": 183317938,
+   "reaches": 5736
+  },
+  {
+   "provinceId": 300274,
+   "key": "am-pru-huancavelica",
+   "grossMWhPerYear": 101486470,
+   "reaches": 1452
+  },
+  {
+   "provinceId": 300275,
+   "key": "am-pru-ica",
+   "grossMWhPerYear": 5931115,
+   "reaches": 704
+  },
+  {
+   "provinceId": 300276,
+   "key": "am-pru-junin",
+   "grossMWhPerYear": 273874256,
+   "reaches": 5343
+  },
+  {
+   "provinceId": 300277,
+   "key": "am-pru-la-libertad",
+   "grossMWhPerYear": 63283235,
+   "reaches": 1369
+  },
+  {
+   "provinceId": 300278,
+   "key": "am-pru-lambayeque",
+   "grossMWhPerYear": 2096947,
+   "reaches": 533
+  },
+  {
+   "provinceId": 300279,
+   "key": "am-pru-lima",
+   "grossMWhPerYear": 76738481,
+   "reaches": 1729
+  },
+  {
+   "provinceId": 300280,
+   "key": "am-pru-loreto",
+   "grossMWhPerYear": 334956570,
+   "reaches": 48736
+  },
+  {
+   "provinceId": 300281,
+   "key": "am-pru-madre-de-dios",
+   "grossMWhPerYear": 81621701,
+   "reaches": 10592
+  },
+  {
+   "provinceId": 300282,
+   "key": "am-pru-moquegua",
+   "grossMWhPerYear": 8784394,
+   "reaches": 638
+  },
+  {
+   "provinceId": 300283,
+   "key": "am-pru-pasco",
+   "grossMWhPerYear": 86572554,
+   "reaches": 3282
+  },
+  {
+   "provinceId": 300284,
+   "key": "am-pru-piura",
+   "grossMWhPerYear": 11233512,
+   "reaches": 1430
+  },
+  {
+   "provinceId": 300285,
+   "key": "am-pru-puno",
+   "grossMWhPerYear": 152413023,
+   "reaches": 5521
+  },
+  {
+   "provinceId": 300286,
+   "key": "am-pru-san-martin",
+   "grossMWhPerYear": 182076692,
+   "reaches": 6244
+  },
+  {
+   "provinceId": 300287,
+   "key": "am-pru-tumbes",
+   "grossMWhPerYear": 979793,
+   "reaches": 165
+  },
+  {
+   "provinceId": 300288,
+   "key": "am-pru-ucayali",
+   "grossMWhPerYear": 108055863,
+   "reaches": 12366
+  },
+  {
+   "provinceId": 300289,
+   "key": "am-bol-el-beni",
+   "grossMWhPerYear": 42768642,
+   "reaches": 9863
+  },
+  {
+   "provinceId": 300290,
+   "key": "am-bol-cochabamba",
+   "grossMWhPerYear": 66515848,
+   "reaches": 4576
+  },
+  {
+   "provinceId": 300291,
+   "key": "am-bol-chuquisaca",
+   "grossMWhPerYear": 22010743,
+   "reaches": 2362
+  },
+  {
+   "provinceId": 300292,
+   "key": "am-bol-la-paz",
+   "grossMWhPerYear": 75615970,
+   "reaches": 6673
+  },
+  {
+   "provinceId": 300293,
+   "key": "am-bol-pando",
+   "grossMWhPerYear": 40422229,
+   "reaches": 4206
+  },
+  {
+   "provinceId": 300294,
+   "key": "am-bol-oruro",
+   "grossMWhPerYear": 4639599,
+   "reaches": 2014
+  },
+  {
+   "provinceId": 300295,
+   "key": "am-bol-potosi",
+   "grossMWhPerYear": 9240632,
+   "reaches": 4033
+  },
+  {
+   "provinceId": 300296,
+   "key": "am-bol-santa-cruz",
+   "grossMWhPerYear": 22129506,
+   "reaches": 14476
+  },
+  {
+   "provinceId": 300297,
+   "key": "am-bol-tarija",
+   "grossMWhPerYear": 20211247,
+   "reaches": 1573
+  },
+  {
+   "provinceId": 300298,
+   "key": "am-bol-acre",
+   "grossMWhPerYear": 26568709,
+   "reaches": 11086
+  },
+  {
+   "provinceId": 300299,
+   "key": "am-chl-aisen-del-general-carlos-ibanez-del-campo",
+   "grossMWhPerYear": 137515413,
+   "reaches": 9565
+  },
+  {
+   "provinceId": 300300,
+   "key": "am-chl-antofagasta",
+   "grossMWhPerYear": 525986,
+   "reaches": 2180
+  },
+  {
+   "provinceId": 300301,
+   "key": "am-chl-arica-y-parinacota",
+   "grossMWhPerYear": 401902,
+   "reaches": 703
+  },
+  {
+   "provinceId": 300302,
+   "key": "am-chl-la-araucania",
+   "grossMWhPerYear": 39543876,
+   "reaches": 3552
+  },
+  {
+   "provinceId": 300303,
+   "key": "am-chl-atacama",
+   "grossMWhPerYear": 2516092,
+   "reaches": 3153
+  },
+  {
+   "provinceId": 300304,
+   "key": "am-chl-bio-bio",
+   "grossMWhPerYear": 43435498,
+   "reaches": 2484
+  },
+  {
+   "provinceId": 300305,
+   "key": "am-chl-coquimbo",
+   "grossMWhPerYear": 8424728,
+   "reaches": 1689
+  },
+  {
+   "provinceId": 300306,
+   "key": "am-chl-libertador-general-bernardo-o-higgins",
+   "grossMWhPerYear": 17305898,
+   "reaches": 864
+  },
+  {
+   "provinceId": 300307,
+   "key": "am-chl-los-lagos",
+   "grossMWhPerYear": 63907722,
+   "reaches": 5145
+  },
+  {
+   "provinceId": 300308,
+   "key": "am-chl-los-rios",
+   "grossMWhPerYear": 24556214,
+   "reaches": 1785
+  },
+  {
+   "provinceId": 300309,
+   "key": "am-chl-magallanes",
+   "grossMWhPerYear": 43939860,
+   "reaches": 8562
+  },
+  {
+   "provinceId": 300310,
+   "key": "am-chl-maule",
+   "grossMWhPerYear": 48504576,
+   "reaches": 2153
+  },
+  {
+   "provinceId": 300311,
+   "key": "am-chl-nuble",
+   "grossMWhPerYear": 14644452,
+   "reaches": 1164
+  },
+  {
+   "provinceId": 300312,
+   "key": "am-chl-region-metropolitana-de-santiago",
+   "grossMWhPerYear": 20821425,
+   "reaches": 817
+  },
+  {
+   "provinceId": 300313,
+   "key": "am-chl-tarapaca",
+   "grossMWhPerYear": 89627,
+   "reaches": 609
+  },
+  {
+   "provinceId": 300314,
+   "key": "am-chl-valparaiso",
+   "grossMWhPerYear": 7599693,
+   "reaches": 732
+  },
+  {
+   "provinceId": 300315,
+   "key": "am-chl-tacna",
+   "grossMWhPerYear": 943236,
+   "reaches": 662
+  },
+  {
+   "provinceId": 300316,
+   "key": "am-arg-salta",
+   "grossMWhPerYear": 38007948,
+   "reaches": 5708
+  },
+  {
+   "provinceId": 300317,
+   "key": "am-arg-buenos-aires",
+   "grossMWhPerYear": 13137367,
+   "reaches": 10914
+  },
+  {
+   "provinceId": 300318,
+   "key": "am-arg-ciudad-de-buenos-aires",
+   "grossMWhPerYear": 18067,
+   "reaches": 15
+  },
+  {
+   "provinceId": 300319,
+   "key": "am-arg-san-luis",
+   "grossMWhPerYear": 1805789,
+   "reaches": 2821
+  },
+  {
+   "provinceId": 300320,
+   "key": "am-arg-entre-rios",
+   "grossMWhPerYear": 23084021,
+   "reaches": 3309
+  },
+  {
+   "provinceId": 300321,
+   "key": "am-arg-la-rioja",
+   "grossMWhPerYear": 3522711,
+   "reaches": 3960
+  },
+  {
+   "provinceId": 300322,
+   "key": "am-arg-santiago-del-estero",
+   "grossMWhPerYear": 3761347,
+   "reaches": 4912
+  },
+  {
+   "provinceId": 300323,
+   "key": "am-arg-chaco",
+   "grossMWhPerYear": 7587763,
+   "reaches": 3115
+  },
+  {
+   "provinceId": 300324,
+   "key": "am-arg-san-juan",
+   "grossMWhPerYear": 12107940,
+   "reaches": 3928
+  },
+  {
+   "provinceId": 300325,
+   "key": "am-arg-catamarca",
+   "grossMWhPerYear": 13405537,
+   "reaches": 3893
+  },
+  {
+   "provinceId": 300326,
+   "key": "am-arg-la-pampa",
+   "grossMWhPerYear": 5033397,
+   "reaches": 4334
+  },
+  {
+   "provinceId": 300327,
+   "key": "am-arg-mendoza",
+   "grossMWhPerYear": 56625406,
+   "reaches": 5794
+  },
+  {
+   "provinceId": 300328,
+   "key": "am-arg-misiones",
+   "grossMWhPerYear": 48137582,
+   "reaches": 2962
+  },
+  {
+   "provinceId": 300329,
+   "key": "am-arg-formosa",
+   "grossMWhPerYear": 6937666,
+   "reaches": 2047
+  },
+  {
+   "provinceId": 300330,
+   "key": "am-arg-neuquen",
+   "grossMWhPerYear": 75924743,
+   "reaches": 5258
+  },
+  {
+   "provinceId": 300331,
+   "key": "am-arg-rio-negro",
+   "grossMWhPerYear": 51546284,
+   "reaches": 8332
+  },
+  {
+   "provinceId": 300332,
+   "key": "am-arg-santa-fe",
+   "grossMWhPerYear": 22176469,
+   "reaches": 4465
+  },
+  {
+   "provinceId": 300333,
+   "key": "am-arg-tucuman",
+   "grossMWhPerYear": 7412482,
+   "reaches": 993
+  },
+  {
+   "provinceId": 300334,
+   "key": "am-arg-chubut",
+   "grossMWhPerYear": 65694718,
+   "reaches": 10987
+  },
+  {
+   "provinceId": 300335,
+   "key": "am-arg-tierra-del-fuego",
+   "grossMWhPerYear": 1539265,
+   "reaches": 823
+  },
+  {
+   "provinceId": 300336,
+   "key": "am-arg-corrientes",
+   "grossMWhPerYear": 37085253,
+   "reaches": 3872
+  },
+  {
+   "provinceId": 300337,
+   "key": "am-arg-cordoba",
+   "grossMWhPerYear": 5084881,
+   "reaches": 6176
+  },
+  {
+   "provinceId": 300338,
+   "key": "am-arg-jujuy",
+   "grossMWhPerYear": 11727940,
+   "reaches": 2399
+  },
+  {
+   "provinceId": 300339,
+   "key": "am-arg-santa-cruz",
+   "grossMWhPerYear": 28589173,
+   "reaches": 9447
+  },
+  {
+   "provinceId": 300340,
+   "key": "am-ury-artigas",
+   "grossMWhPerYear": 2651438,
+   "reaches": 866
+  },
+  {
+   "provinceId": 300341,
+   "key": "am-ury-canelones",
+   "grossMWhPerYear": 426536,
+   "reaches": 319
+  },
+  {
+   "provinceId": 300342,
+   "key": "am-ury-cerro-largo",
+   "grossMWhPerYear": 1293666,
+   "reaches": 896
+  },
+  {
+   "provinceId": 300343,
+   "key": "am-ury-colonia",
+   "grossMWhPerYear": 381409,
+   "reaches": 388
+  },
+  {
+   "provinceId": 300344,
+   "key": "am-ury-durazno",
+   "grossMWhPerYear": 1581068,
+   "reaches": 762
+  },
+  {
+   "provinceId": 300345,
+   "key": "am-ury-florida",
+   "grossMWhPerYear": 1381502,
+   "reaches": 837
+  },
+  {
+   "provinceId": 300346,
+   "key": "am-ury-flores",
+   "grossMWhPerYear": 531077,
+   "reaches": 310
+  },
+  {
+   "provinceId": 300347,
+   "key": "am-ury-lavalleja",
+   "grossMWhPerYear": 1284698,
+   "reaches": 778
+  },
+  {
+   "provinceId": 300348,
+   "key": "am-ury-maldonado",
+   "grossMWhPerYear": 484810,
+   "reaches": 366
+  },
+  {
+   "provinceId": 300349,
+   "key": "am-ury-montevideo",
+   "grossMWhPerYear": 14057,
+   "reaches": 30
+  },
+  {
+   "provinceId": 300350,
+   "key": "am-ury-paysandu",
+   "grossMWhPerYear": 1383260,
+   "reaches": 902
+  },
+  {
+   "provinceId": 300351,
+   "key": "am-ury-rio-negro",
+   "grossMWhPerYear": 3376057,
+   "reaches": 513
+  },
+  {
+   "provinceId": 300352,
+   "key": "am-ury-rocha",
+   "grossMWhPerYear": 533365,
+   "reaches": 560
+  },
+  {
+   "provinceId": 300353,
+   "key": "am-ury-rivera",
+   "grossMWhPerYear": 720517,
+   "reaches": 681
+  },
+  {
+   "provinceId": 300354,
+   "key": "am-ury-salto",
+   "grossMWhPerYear": 2181634,
+   "reaches": 1054
+  },
+  {
+   "provinceId": 300355,
+   "key": "am-ury-san-jose",
+   "grossMWhPerYear": 469109,
+   "reaches": 372
+  },
+  {
+   "provinceId": 300356,
+   "key": "am-ury-soriano",
+   "grossMWhPerYear": 1005358,
+   "reaches": 511
+  },
+  {
+   "provinceId": 300357,
+   "key": "am-ury-tacuarembo",
+   "grossMWhPerYear": 2185152,
+   "reaches": 899
+  },
+  {
+   "provinceId": 300358,
+   "key": "am-ury-treinta-y-tres",
+   "grossMWhPerYear": 1248411,
+   "reaches": 640
+  },
+  {
+   "provinceId": 300359,
+   "key": "am-pry-concepcion",
+   "grossMWhPerYear": 1148076,
+   "reaches": 760
+  },
+  {
+   "provinceId": 300360,
+   "key": "am-pry-alto-parana",
+   "grossMWhPerYear": 89124505,
+   "reaches": 1079
+  },
+  {
+   "provinceId": 300361,
+   "key": "am-pry-central",
+   "grossMWhPerYear": 54984,
+   "reaches": 96
+  },
+  {
+   "provinceId": 300362,
+   "key": "am-pry-neembucu",
+   "grossMWhPerYear": 2858703,
+   "reaches": 321
+  },
+  {
+   "provinceId": 300363,
+   "key": "am-pry-amambay",
+   "grossMWhPerYear": 1330747,
+   "reaches": 556
+  },
+  {
+   "provinceId": 300364,
+   "key": "am-pry-canindeyu",
+   "grossMWhPerYear": 946341,
+   "reaches": 777
+  },
+  {
+   "provinceId": 300365,
+   "key": "am-pry-presidente-hayes",
+   "grossMWhPerYear": 3710901,
+   "reaches": 2096
+  },
+  {
+   "provinceId": 300366,
+   "key": "am-pry-alto-paraguay",
+   "grossMWhPerYear": 2300195,
+   "reaches": 2321
+  },
+  {
+   "provinceId": 300367,
+   "key": "am-pry-boqueron",
+   "grossMWhPerYear": 1377074,
+   "reaches": 2599
+  },
+  {
+   "provinceId": 300368,
+   "key": "am-pry-san-pedro",
+   "grossMWhPerYear": 5331732,
+   "reaches": 828
+  },
+  {
+   "provinceId": 300369,
+   "key": "am-pry-cordillera",
+   "grossMWhPerYear": 169325,
+   "reaches": 189
+  },
+  {
+   "provinceId": 300370,
+   "key": "am-pry-guaira",
+   "grossMWhPerYear": 222192,
+   "reaches": 201
+  },
+  {
+   "provinceId": 300371,
+   "key": "am-pry-caaguazu",
+   "grossMWhPerYear": 569733,
+   "reaches": 759
+  },
+  {
+   "provinceId": 300372,
+   "key": "am-pry-caazapa",
+   "grossMWhPerYear": 545005,
+   "reaches": 487
+  },
+  {
+   "provinceId": 300373,
+   "key": "am-pry-itapua",
+   "grossMWhPerYear": 34045354,
+   "reaches": 1013
+  },
+  {
+   "provinceId": 300374,
+   "key": "am-pry-misiones",
+   "grossMWhPerYear": 8332950,
+   "reaches": 288
+  },
+  {
+   "provinceId": 300375,
+   "key": "am-pry-paraguari",
+   "grossMWhPerYear": 414754,
+   "reaches": 350
+  },
+  {
+   "provinceId": 300376,
+   "key": "am-pry-asuncion",
+   "grossMWhPerYear": 666,
+   "reaches": 5
+  },
+  {
+   "provinceId": 300377,
+   "key": "am-bra-amazonas",
+   "grossMWhPerYear": 1370332817,
+   "reaches": 198102
+  },
+  {
+   "provinceId": 300378,
+   "key": "am-bra-para",
+   "grossMWhPerYear": 713217398,
+   "reaches": 111813
+  },
+  {
+   "provinceId": 300379,
+   "key": "am-bra-maranhao",
+   "grossMWhPerYear": 44355634,
+   "reaches": 18603
+  },
+  {
+   "provinceId": 300380,
+   "key": "am-bra-piaui",
+   "grossMWhPerYear": 20747338,
+   "reaches": 11033
+  },
+  {
+   "provinceId": 300381,
+   "key": "am-bra-ceara",
+   "grossMWhPerYear": 8321550,
+   "reaches": 6632
+  },
+  {
+   "provinceId": 300382,
+   "key": "am-bra-rio-grande-do-norte",
+   "grossMWhPerYear": 2507490,
+   "reaches": 2202
+  },
+  {
+   "provinceId": 300383,
+   "key": "am-bra-paraiba",
+   "grossMWhPerYear": 3210627,
+   "reaches": 2643
+  },
+  {
+   "provinceId": 300384,
+   "key": "am-bra-pernambuco",
+   "grossMWhPerYear": 25678976,
+   "reaches": 4806
+  },
+  {
+   "provinceId": 300385,
+   "key": "am-bra-alagoas",
+   "grossMWhPerYear": 49954551,
+   "reaches": 1468
+  },
+  {
+   "provinceId": 300386,
+   "key": "am-bra-sergipe",
+   "grossMWhPerYear": 3406543,
+   "reaches": 1047
+  },
+  {
+   "provinceId": 300387,
+   "key": "am-bra-bahia",
+   "grossMWhPerYear": 94011850,
+   "reaches": 24585
+  },
+  {
+   "provinceId": 300388,
+   "key": "am-bra-espirito-santo",
+   "grossMWhPerYear": 16880399,
+   "reaches": 2033
+  },
+  {
+   "provinceId": 300389,
+   "key": "am-bra-rio-de-janeiro",
+   "grossMWhPerYear": 29433439,
+   "reaches": 2384
+  },
+  {
+   "provinceId": 300390,
+   "key": "am-bra-sao-paulo",
+   "grossMWhPerYear": 116275918,
+   "reaches": 13523
+  },
+  {
+   "provinceId": 300391,
+   "key": "am-bra-minas-gerais",
+   "grossMWhPerYear": 211839652,
+   "reaches": 29994
+  },
+  {
+   "provinceId": 300392,
+   "key": "am-bra-goias",
+   "grossMWhPerYear": 220314099,
+   "reaches": 38958
+  },
+  {
+   "provinceId": 300393,
+   "key": "am-bra-mato-grosso",
+   "grossMWhPerYear": 313510190,
+   "reaches": 71813
+  },
+  {
+   "provinceId": 300394,
+   "key": "am-bra-parana",
+   "grossMWhPerYear": 157120624,
+   "reaches": 15024
+  },
+  {
+   "provinceId": 300395,
+   "key": "am-bra-santa-catarina",
+   "grossMWhPerYear": 75103417,
+   "reaches": 8803
+  },
+  {
+   "provinceId": 300396,
+   "key": "am-bra-rio-grande-do-sul",
+   "grossMWhPerYear": 159274931,
+   "reaches": 23608
+  },
+  {
+   "provinceId": 300397,
+   "key": "am-bwi-guy-essequibo",
+   "grossMWhPerYear": 35734180,
+   "reaches": 6530
+  },
+  {
+   "provinceId": 300398,
+   "key": "am-bwi-guy-demerara",
+   "grossMWhPerYear": 81711347,
+   "reaches": 11921
+  },
+  {
+   "provinceId": 300399,
+   "key": "am-bwi-guy-berbice",
+   "grossMWhPerYear": 225771,
+   "reaches": 168
+  },
+  {
+   "provinceId": 300400,
+   "key": "am-sur-paramaribo-and-the-coast",
+   "grossMWhPerYear": 924672,
+   "reaches": 455
+  },
+  {
+   "provinceId": 300401,
+   "key": "am-sur-nickerie",
+   "grossMWhPerYear": 453101,
+   "reaches": 203
+  },
+  {
+   "provinceId": 300402,
+   "key": "am-sur-suriname-interior",
+   "grossMWhPerYear": 30617749,
+   "reaches": 9534
+  },
+  {
+   "provinceId": 300403,
+   "key": "am-sur-marowijne",
+   "grossMWhPerYear": 1114943,
+   "reaches": 326
+  },
+  {
+   "provinceId": 300404,
+   "key": "am-fra-french-guiana",
+   "grossMWhPerYear": 23917125,
+   "reaches": 9349
+  },
+  {
+   "provinceId": 300405,
+   "key": "am-cub-pinar-del-rio",
+   "grossMWhPerYear": 357553,
+   "reaches": 369
+  },
+  {
+   "provinceId": 300406,
+   "key": "am-cub-la-habana",
+   "grossMWhPerYear": 377537,
+   "reaches": 332
+  },
+  {
+   "provinceId": 300407,
+   "key": "am-cub-matanzas",
+   "grossMWhPerYear": 258165,
+   "reaches": 409
+  },
+  {
+   "provinceId": 300408,
+   "key": "am-cub-santa-clara",
+   "grossMWhPerYear": 1671923,
+   "reaches": 946
+  },
+  {
+   "provinceId": 300409,
+   "key": "am-cub-camaguey",
+   "grossMWhPerYear": 1079630,
+   "reaches": 1136
+  },
+  {
+   "provinceId": 300410,
+   "key": "am-cub-oriente",
+   "grossMWhPerYear": 3063584,
+   "reaches": 1199
+  },
+  {
+   "provinceId": 300411,
+   "key": "am-cub-isle-of-pines",
+   "grossMWhPerYear": 11907,
+   "reaches": 65
+  },
+  {
+   "provinceId": 300412,
+   "key": "am-hti-l-artibonite",
+   "grossMWhPerYear": 1549492,
+   "reaches": 240
+  },
+  {
+   "provinceId": 300413,
+   "key": "am-hti-centre",
+   "grossMWhPerYear": 2126173,
+   "reaches": 219
+  },
+  {
+   "provinceId": 300414,
+   "key": "am-hti-grand-anse",
+   "grossMWhPerYear": 460827,
+   "reaches": 93
+  },
+  {
+   "provinceId": 300415,
+   "key": "am-hti-nord",
+   "grossMWhPerYear": 327864,
+   "reaches": 118
+  },
+  {
+   "provinceId": 300416,
+   "key": "am-hti-nord-est",
+   "grossMWhPerYear": 170748,
+   "reaches": 64
+  },
+  {
+   "provinceId": 300417,
+   "key": "am-hti-nippes",
+   "grossMWhPerYear": 263346,
+   "reaches": 75
+  },
+  {
+   "provinceId": 300418,
+   "key": "am-hti-nord-ouest",
+   "grossMWhPerYear": 420099,
+   "reaches": 94
+  },
+  {
+   "provinceId": 300419,
+   "key": "am-hti-ouest",
+   "grossMWhPerYear": 986431,
+   "reaches": 168
+  },
+  {
+   "provinceId": 300420,
+   "key": "am-hti-sud",
+   "grossMWhPerYear": 515920,
+   "reaches": 126
+  },
+  {
+   "provinceId": 300421,
+   "key": "am-hti-sud-est",
+   "grossMWhPerYear": 540657,
+   "reaches": 97
+  },
+  {
+   "provinceId": 300422,
+   "key": "am-dom-santo-domingo",
+   "grossMWhPerYear": 1843753,
+   "reaches": 366
+  },
+  {
+   "provinceId": 300423,
+   "key": "am-dom-santiago",
+   "grossMWhPerYear": 2418813,
+   "reaches": 493
+  },
+  {
+   "provinceId": 300424,
+   "key": "am-dom-la-vega",
+   "grossMWhPerYear": 2281513,
+   "reaches": 471
+  },
+  {
+   "provinceId": 300425,
+   "key": "am-dom-azua",
+   "grossMWhPerYear": 4591564,
+   "reaches": 581
+  },
+  {
+   "provinceId": 300426,
+   "key": "am-dom-el-seibo",
+   "grossMWhPerYear": 505027,
+   "reaches": 359
+  },
+  {
+   "provinceId": 300427,
+   "key": "am-bwi-jam-cornwall",
+   "grossMWhPerYear": 645508,
+   "reaches": 199
+  },
+  {
+   "provinceId": 300428,
+   "key": "am-bwi-jam-middlesex",
+   "grossMWhPerYear": 1111073,
+   "reaches": 272
+  },
+  {
+   "provinceId": 300429,
+   "key": "am-bwi-jam-surrey",
+   "grossMWhPerYear": 833259,
+   "reaches": 142
+  },
+  {
+   "provinceId": 300430,
+   "key": "am-bwi-tto-trinidad",
+   "grossMWhPerYear": 285546,
+   "reaches": 252
+  },
+  {
+   "provinceId": 300431,
+   "key": "am-bwi-tto-tobago",
+   "grossMWhPerYear": 10208,
+   "reaches": 10
+  },
+  {
+   "provinceId": 300432,
+   "key": "am-bwi-brb-barbados",
+   "grossMWhPerYear": 34646,
+   "reaches": 28
+  },
+  {
+   "provinceId": 300433,
+   "key": "am-bwi-bhs-new-providence",
+   "grossMWhPerYear": 229,
+   "reaches": 4
+  },
+  {
+   "provinceId": 300434,
+   "key": "am-bwi-bhs-grand-bahama",
+   "grossMWhPerYear": 1002,
+   "reaches": 23
+  },
+  {
+   "provinceId": 300435,
+   "key": "am-bwi-bhs-out-islands",
+   "grossMWhPerYear": 13866,
+   "reaches": 196
+  },
+  {
+   "provinceId": 300437,
+   "key": "am-bwi-tca-turks-and-caicos",
+   "grossMWhPerYear": 73,
+   "reaches": 13
+  },
+  {
+   "provinceId": 300438,
+   "key": "am-bwi-cym-cayman-islands",
+   "grossMWhPerYear": 225,
+   "reaches": 6
+  },
+  {
+   "provinceId": 300440,
+   "key": "am-bwi-aia-anguilla",
+   "grossMWhPerYear": 124,
+   "reaches": 1
+  },
+  {
+   "provinceId": 300441,
+   "key": "am-bwi-atg-antigua",
+   "grossMWhPerYear": 847,
+   "reaches": 5
+  },
+  {
+   "provinceId": 300442,
+   "key": "am-bwi-atg-barbuda",
+   "grossMWhPerYear": 200,
+   "reaches": 3
+  },
+  {
+   "provinceId": 300444,
+   "key": "am-bwi-kna-nevis",
+   "grossMWhPerYear": 54,
+   "reaches": 1
+  },
+  {
+   "provinceId": 300445,
+   "key": "am-bwi-msr-montserrat",
+   "grossMWhPerYear": 661,
+   "reaches": 1
+  },
+  {
+   "provinceId": 300446,
+   "key": "am-bwi-dma-dominica",
+   "grossMWhPerYear": 210354,
+   "reaches": 54
+  },
+  {
+   "provinceId": 300447,
+   "key": "am-bwi-lca-saint-lucia",
+   "grossMWhPerYear": 82517,
+   "reaches": 30
+  },
+  {
+   "provinceId": 300448,
+   "key": "am-bwi-vct-saint-vincent",
+   "grossMWhPerYear": 57428,
+   "reaches": 18
+  },
+  {
+   "provinceId": 300450,
+   "key": "am-bwi-grd-grenada",
+   "grossMWhPerYear": 10559,
+   "reaches": 11
+  },
+  {
+   "provinceId": 300453,
+   "key": "am-fca-saint-pierre",
+   "grossMWhPerYear": 2605,
+   "reaches": 4
+  },
+  {
+   "provinceId": 300454,
+   "key": "am-fca-miquelon",
+   "grossMWhPerYear": 7884,
+   "reaches": 11
+  },
+  {
+   "provinceId": 300455,
+   "key": "am-fca-guadeloupe-basse-terre",
+   "grossMWhPerYear": 128276,
+   "reaches": 39
+  },
+  {
+   "provinceId": 300456,
+   "key": "am-fca-guadeloupe-grande-terre",
+   "grossMWhPerYear": 7479,
+   "reaches": 21
+  },
+  {
+   "provinceId": 300457,
+   "key": "am-fca-marie-galante",
+   "grossMWhPerYear": 6284,
+   "reaches": 3
+  },
+  {
+   "provinceId": 300458,
+   "key": "am-fca-martinique",
+   "grossMWhPerYear": 161835,
+   "reaches": 78
+  },
+  {
+   "provinceId": 300459,
+   "key": "am-dgc-aruba",
+   "grossMWhPerYear": 17,
+   "reaches": 2
+  },
+  {
+   "provinceId": 300460,
+   "key": "am-dgc-curacao",
+   "grossMWhPerYear": 60,
+   "reaches": 7
+  },
+  {
+   "provinceId": 300462,
+   "key": "am-dwi-saint-croix",
+   "grossMWhPerYear": 3537,
+   "reaches": 10
+  },
+  {
+   "provinceId": 300463,
+   "key": "am-dwi-saint-thomas",
+   "grossMWhPerYear": 274,
+   "reaches": 1
+  },
+  {
+   "provinceId": 300465,
+   "key": "am-bsa-falkland-islands",
+   "grossMWhPerYear": 240850,
+   "reaches": 391
+  },
+  {
+   "provinceId": 300469,
+   "key": "am-pri-puerto-rico",
+   "grossMWhPerYear": 1891620,
+   "reaches": 475
+  },
+  {
+   "provinceId": 400001,
+   "key": "oc-aus-new-south-wales",
+   "grossMWhPerYear": 36998866,
+   "reaches": 28732
+  },
+  {
+   "provinceId": 400002,
+   "key": "oc-aus-victoria",
+   "grossMWhPerYear": 22620456,
+   "reaches": 8590
+  },
+  {
+   "provinceId": 400003,
+   "key": "oc-aus-queensland",
+   "grossMWhPerYear": 77295304,
+   "reaches": 71148
+  },
+  {
+   "provinceId": 400004,
+   "key": "oc-aus-south-australia",
+   "grossMWhPerYear": 8160957,
+   "reaches": 31033
+  },
+  {
+   "provinceId": 400005,
+   "key": "oc-aus-western-australia",
+   "grossMWhPerYear": 46640040,
+   "reaches": 92028
+  },
+  {
+   "provinceId": 400006,
+   "key": "oc-aus-tasmania",
+   "grossMWhPerYear": 37620491,
+   "reaches": 5006
+  },
+  {
+   "provinceId": 400007,
+   "key": "oc-aus-northern-territory",
+   "grossMWhPerYear": 37710276,
+   "reaches": 56213
+  },
+  {
+   "provinceId": 400008,
+   "key": "oc-aus-federal-capital-territory",
+   "grossMWhPerYear": 564423,
+   "reaches": 121
+  },
+  {
+   "provinceId": 400009,
+   "key": "oc-aus-jervis-bay-territory",
+   "grossMWhPerYear": 85,
+   "reaches": 2
+  },
+  {
+   "provinceId": 400010,
+   "key": "oc-aus-macquarie-island",
+   "grossMWhPerYear": 13439,
+   "reaches": 12
+  },
+  {
+   "provinceId": 400012,
+   "key": "oc-nzl-northland",
+   "grossMWhPerYear": 1633768,
+   "reaches": 1015
+  },
+  {
+   "provinceId": 400013,
+   "key": "oc-nzl-auckland",
+   "grossMWhPerYear": 233107,
+   "reaches": 286
+  },
+  {
+   "provinceId": 400014,
+   "key": "oc-nzl-waikato",
+   "grossMWhPerYear": 12467827,
+   "reaches": 2043
+  },
+  {
+   "provinceId": 400015,
+   "key": "oc-nzl-bay-of-plenty",
+   "grossMWhPerYear": 9251252,
+   "reaches": 1276
+  },
+  {
+   "provinceId": 400016,
+   "key": "oc-nzl-gisborne",
+   "grossMWhPerYear": 4378518,
+   "reaches": 924
+  },
+  {
+   "provinceId": 400017,
+   "key": "oc-nzl-hawke-s-bay",
+   "grossMWhPerYear": 10551655,
+   "reaches": 1265
+  },
+  {
+   "provinceId": 400018,
+   "key": "oc-nzl-taranaki",
+   "grossMWhPerYear": 4154293,
+   "reaches": 854
+  },
+  {
+   "provinceId": 400019,
+   "key": "oc-nzl-manawatu-wanganui",
+   "grossMWhPerYear": 18030515,
+   "reaches": 2193
+  },
+  {
+   "provinceId": 400020,
+   "key": "oc-nzl-wellington",
+   "grossMWhPerYear": 2793583,
+   "reaches": 735
+  },
+  {
+   "provinceId": 400021,
+   "key": "oc-nzl-tasman",
+   "grossMWhPerYear": 12218992,
+   "reaches": 1235
+  },
+  {
+   "provinceId": 400022,
+   "key": "oc-nzl-nelson",
+   "grossMWhPerYear": 96942,
+   "reaches": 40
+  },
+  {
+   "provinceId": 400023,
+   "key": "oc-nzl-marlborough",
+   "grossMWhPerYear": 8755512,
+   "reaches": 929
+  },
+  {
+   "provinceId": 400024,
+   "key": "oc-nzl-west-coast",
+   "grossMWhPerYear": 55946661,
+   "reaches": 4413
+  },
+  {
+   "provinceId": 400025,
+   "key": "oc-nzl-canterbury",
+   "grossMWhPerYear": 71671087,
+   "reaches": 4331
+  },
+  {
+   "provinceId": 400026,
+   "key": "oc-nzl-otago",
+   "grossMWhPerYear": 37316026,
+   "reaches": 2594
+  },
+  {
+   "provinceId": 400027,
+   "key": "oc-nzl-southland",
+   "grossMWhPerYear": 38851455,
+   "reaches": 3456
+  },
+  {
+   "provinceId": 400028,
+   "key": "oc-nzl-stewart-island",
+   "grossMWhPerYear": 206640,
+   "reaches": 132
+  },
+  {
+   "provinceId": 400033,
+   "key": "oc-nzl-campbell-island",
+   "grossMWhPerYear": 901,
+   "reaches": 4
+  },
+  {
+   "provinceId": 400034,
+   "key": "oc-nzl-auckland-islands",
+   "grossMWhPerYear": 20523,
+   "reaches": 25
+  },
+  {
+   "provinceId": 400037,
+   "key": "oc-gng-sandaun-west-sepik",
+   "grossMWhPerYear": 94158633,
+   "reaches": 5560
+  },
+  {
+   "provinceId": 400038,
+   "key": "oc-gng-east-sepik",
+   "grossMWhPerYear": 40516643,
+   "reaches": 4536
+  },
+  {
+   "provinceId": 400039,
+   "key": "oc-gng-madang",
+   "grossMWhPerYear": 59003696,
+   "reaches": 4055
+  },
+  {
+   "provinceId": 400040,
+   "key": "oc-gng-morobe",
+   "grossMWhPerYear": 95288160,
+   "reaches": 4251
+  },
+  {
+   "provinceId": 400041,
+   "key": "oc-gng-eastern-highlands",
+   "grossMWhPerYear": 29018358,
+   "reaches": 1380
+  },
+  {
+   "provinceId": 400042,
+   "key": "oc-gng-southern-highlands",
+   "grossMWhPerYear": 181806803,
+   "reaches": 4679
+  },
+  {
+   "provinceId": 400043,
+   "key": "oc-gng-western-highlands",
+   "grossMWhPerYear": 34078654,
+   "reaches": 1520
+  },
+  {
+   "provinceId": 400044,
+   "key": "oc-gng-chimbu",
+   "grossMWhPerYear": 44383500,
+   "reaches": 957
+  },
+  {
+   "provinceId": 400045,
+   "key": "oc-gng-enga",
+   "grossMWhPerYear": 69922277,
+   "reaches": 2341
+  },
+  {
+   "provinceId": 400046,
+   "key": "oc-gng-manus",
+   "grossMWhPerYear": 544678,
+   "reaches": 265
+  },
+  {
+   "provinceId": 400047,
+   "key": "oc-gng-new-ireland",
+   "grossMWhPerYear": 10233460,
+   "reaches": 1252
+  },
+  {
+   "provinceId": 400048,
+   "key": "oc-gng-east-new-britain",
+   "grossMWhPerYear": 54554793,
+   "reaches": 3484
+  },
+  {
+   "provinceId": 400049,
+   "key": "oc-gng-west-new-britain",
+   "grossMWhPerYear": 32914699,
+   "reaches": 4187
+  },
+  {
+   "provinceId": 400050,
+   "key": "oc-gng-bougainville",
+   "grossMWhPerYear": 10757642,
+   "reaches": 1298
+  },
+  {
+   "provinceId": 400051,
+   "key": "oc-bpo-papua-western",
+   "grossMWhPerYear": 129108329,
+   "reaches": 13407
+  },
+  {
+   "provinceId": 400052,
+   "key": "oc-bpo-papua-gulf",
+   "grossMWhPerYear": 73701190,
+   "reaches": 4902
+  },
+  {
+   "provinceId": 400053,
+   "key": "oc-bpo-papua-central",
+   "grossMWhPerYear": 59856357,
+   "reaches": 3378
+  },
+  {
+   "provinceId": 400054,
+   "key": "oc-bpo-papua-national-capital-district",
+   "grossMWhPerYear": 6909,
+   "reaches": 7
+  },
+  {
+   "provinceId": 400055,
+   "key": "oc-bpo-papua-northern-oro",
+   "grossMWhPerYear": 55052454,
+   "reaches": 3038
+  },
+  {
+   "provinceId": 400056,
+   "key": "oc-bpo-papua-milne-bay",
+   "grossMWhPerYear": 8666266,
+   "reaches": 1339
+  },
+  {
+   "provinceId": 400057,
+   "key": "oc-fji-central-division",
+   "grossMWhPerYear": 2754195,
+   "reaches": 585
+  },
+  {
+   "provinceId": 400058,
+   "key": "oc-fji-western-division",
+   "grossMWhPerYear": 2685321,
+   "reaches": 643
+  },
+  {
+   "provinceId": 400059,
+   "key": "oc-fji-northern-division",
+   "grossMWhPerYear": 1348355,
+   "reaches": 600
+  },
+  {
+   "provinceId": 400060,
+   "key": "oc-fji-eastern-division-lau",
+   "grossMWhPerYear": 74227,
+   "reaches": 61
+  },
+  {
+   "provinceId": 400062,
+   "key": "oc-bpo-solomon-honiara",
+   "grossMWhPerYear": 6391,
+   "reaches": 11
+  },
+  {
+   "provinceId": 400063,
+   "key": "oc-bpo-solomon-guadalcanal",
+   "grossMWhPerYear": 3030964,
+   "reaches": 454
+  },
+  {
+   "provinceId": 400064,
+   "key": "oc-bpo-solomon-central",
+   "grossMWhPerYear": 15311,
+   "reaches": 25
+  },
+  {
+   "provinceId": 400065,
+   "key": "oc-bpo-solomon-choiseul-and-western",
+   "grossMWhPerYear": 4545666,
+   "reaches": 1136
+  },
+  {
+   "provinceId": 400066,
+   "key": "oc-bpo-solomon-isabel",
+   "grossMWhPerYear": 1388238,
+   "reaches": 477
+  },
+  {
+   "provinceId": 400067,
+   "key": "oc-bpo-solomon-malaita",
+   "grossMWhPerYear": 1927120,
+   "reaches": 453
+  },
+  {
+   "provinceId": 400068,
+   "key": "oc-bpo-solomon-makira",
+   "grossMWhPerYear": 1901317,
+   "reaches": 366
+  },
+  {
+   "provinceId": 400069,
+   "key": "oc-bpo-solomon-rennell-and-bellona",
+   "grossMWhPerYear": 42925,
+   "reaches": 59
+  },
+  {
+   "provinceId": 400070,
+   "key": "oc-bpo-solomon-temotu",
+   "grossMWhPerYear": 162332,
+   "reaches": 72
+  },
+  {
+   "provinceId": 400071,
+   "key": "oc-bpo-new-hebrides-sanma",
+   "grossMWhPerYear": 2558513,
+   "reaches": 364
+  },
+  {
+   "provinceId": 400072,
+   "key": "oc-bpo-new-hebrides-malampa",
+   "grossMWhPerYear": 426218,
+   "reaches": 139
+  },
+  {
+   "provinceId": 400073,
+   "key": "oc-bpo-new-hebrides-penama",
+   "grossMWhPerYear": 250402,
+   "reaches": 65
+  },
+  {
+   "provinceId": 400074,
+   "key": "oc-bpo-new-hebrides-shefa",
+   "grossMWhPerYear": 167386,
+   "reaches": 72
+  },
+  {
+   "provinceId": 400075,
+   "key": "oc-bpo-new-hebrides-tafea",
+   "grossMWhPerYear": 311701,
+   "reaches": 111
+  },
+  {
+   "provinceId": 400076,
+   "key": "oc-bpo-new-hebrides-torba",
+   "grossMWhPerYear": 322149,
+   "reaches": 51
+  },
+  {
+   "provinceId": 400077,
+   "key": "oc-fpo-new-caledonia-north-province",
+   "grossMWhPerYear": 1606934,
+   "reaches": 655
+  },
+  {
+   "provinceId": 400078,
+   "key": "oc-fpo-new-caledonia-south-province",
+   "grossMWhPerYear": 1453000,
+   "reaches": 434
+  },
+  {
+   "provinceId": 400079,
+   "key": "oc-fpo-new-caledonia-loyalty-islands-province",
+   "grossMWhPerYear": 109340,
+   "reaches": 93
+  },
+  {
+   "provinceId": 400080,
+   "key": "oc-gpn-nauru",
+   "grossMWhPerYear": 354,
+   "reaches": 2
+  },
+  {
+   "provinceId": 400083,
+   "key": "oc-gpn-caroline-kosrae",
+   "grossMWhPerYear": 4164,
+   "reaches": 12
+  },
+  {
+   "provinceId": 400084,
+   "key": "oc-gpn-caroline-pohnpei",
+   "grossMWhPerYear": 111180,
+   "reaches": 40
+  },
+  {
+   "provinceId": 400087,
+   "key": "oc-gpn-palau",
+   "grossMWhPerYear": 12406,
+   "reaches": 25
+  },
+  {
+   "provinceId": 400088,
+   "key": "oc-gpn-northern-marianas-northern-islands",
+   "grossMWhPerYear": 15118,
+   "reaches": 6
+  },
+  {
+   "provinceId": 400089,
+   "key": "oc-gpn-northern-marianas-saipan",
+   "grossMWhPerYear": 1719,
+   "reaches": 6
+  },
+  {
+   "provinceId": 400090,
+   "key": "oc-gpn-northern-marianas-tinian",
+   "grossMWhPerYear": 3822,
+   "reaches": 6
+  },
+  {
+   "provinceId": 400091,
+   "key": "oc-gpn-northern-marianas-rota",
+   "grossMWhPerYear": 2845,
+   "reaches": 3
+  },
+  {
+   "provinceId": 400092,
+   "key": "oc-gum-guam",
+   "grossMWhPerYear": 98907,
+   "reaches": 61
+  },
+  {
+   "provinceId": 400123,
+   "key": "oc-gbr-isle-of-man",
+   "grossMWhPerYear": 43387,
+   "reaches": 33
+  },
+  {
+   "provinceId": 400124,
+   "key": "oc-nor-svalbard",
+   "grossMWhPerYear": 15309318,
+   "reaches": 2725
+  },
+  {
+   "provinceId": 400125,
+   "key": "oc-aut-krk-island",
+   "grossMWhPerYear": 139538,
+   "reaches": 28
+  },
+  {
+   "provinceId": 400126,
+   "key": "oc-aut-cres-and-losinj",
+   "grossMWhPerYear": 14126,
+   "reaches": 16
+  },
+  {
+   "provinceId": 400128,
+   "key": "oc-gap-mar-residual",
+   "grossMWhPerYear": 588278,
+   "reaches": 5624
+  },
+  {
+   "provinceId": 400129,
+   "key": "oc-gap-fea-residual",
+   "grossMWhPerYear": 96232970,
+   "reaches": 1661
+  },
+  {
+   "provinceId": 400130,
+   "key": "oc-gap-ott-residual",
+   "grossMWhPerYear": 10667133,
+   "reaches": 1395
+  },
+  {
+   "provinceId": 400131,
+   "key": "oc-gap-grc-residual",
+   "grossMWhPerYear": 3408197,
+   "reaches": 499
+  },
+  {
+   "provinceId": 400132,
+   "key": "oc-gap-aut-residual",
+   "grossMWhPerYear": 4105,
+   "reaches": 7
+  },
+  {
+   "provinceId": 400133,
+   "key": "oc-gap-gbr-residual",
+   "grossMWhPerYear": 516016,
+   "reaches": 240
+  },
+  {
+   "provinceId": 400134,
+   "key": "oc-gap-rus-residual",
+   "grossMWhPerYear": 19808038,
+   "reaches": 1421
+  },
+  {
+   "provinceId": 400135,
+   "key": "oc-gap-rom-residual",
+   "grossMWhPerYear": 4102268,
+   "reaches": 536
+  },
+  {
+   "provinceId": 400137,
+   "key": "oc-gap-alg-residual",
+   "grossMWhPerYear": 1598838,
+   "reaches": 579
+  },
+  {
+   "provinceId": 400138,
+   "key": "oc-gap-chn-residual",
+   "grossMWhPerYear": 26845862,
+   "reaches": 1256
+  },
+  {
+   "provinceId": 400139,
+   "key": "oc-gap-bea-residual",
+   "grossMWhPerYear": 1365648,
+   "reaches": 369
+  },
+  {
+   "provinceId": 400140,
+   "key": "oc-gap-its-residual",
+   "grossMWhPerYear": 2279297,
+   "reaches": 771
+  },
+  {
+   "provinceId": 400141,
+   "key": "oc-gap-pai-residual",
+   "grossMWhPerYear": 162699,
+   "reaches": 112
+  },
+  {
+   "provinceId": 400142,
+   "key": "oc-gap-arg-residual",
+   "grossMWhPerYear": 16106364,
+   "reaches": 464
+  },
+  {
+   "provinceId": 400143,
+   "key": "oc-gap-can-residual",
+   "grossMWhPerYear": 12731174,
+   "reaches": 1220
+  },
+  {
+   "provinceId": 400144,
+   "key": "oc-gap-phl-residual",
+   "grossMWhPerYear": 348909,
+   "reaches": 326
+  },
+  {
+   "provinceId": 400145,
+   "key": "oc-gap-gng-residual",
+   "grossMWhPerYear": 612721,
+   "reaches": 148
+  },
+  {
+   "provinceId": 400146,
+   "key": "oc-gap-bpo-residual",
+   "grossMWhPerYear": 55121,
+   "reaches": 68
+  },
+  {
+   "provinceId": 400147,
+   "key": "oc-gap-fpo-residual",
+   "grossMWhPerYear": 2565,
+   "reaches": 7
+  },
+  {
+   "provinceId": 400148,
+   "key": "oc-gap-aus-residual",
+   "grossMWhPerYear": 175556,
+   "reaches": 183
+  },
+  {
+   "provinceId": 400149,
+   "key": "oc-gap-nzl-residual",
+   "grossMWhPerYear": 2800780,
+   "reaches": 231
+  },
+  {
+   "provinceId": 400150,
+   "key": "oc-gap-fji-residual",
+   "grossMWhPerYear": 40256,
+   "reaches": 39
+  },
+  {
+   "provinceId": 400153,
+   "key": "oc-gap-gpn-residual",
+   "grossMWhPerYear": 3514,
+   "reaches": 6
+  }
+ ]
+}

@@ -250,6 +250,8 @@ export interface HistoricalProvinceInput {
   readonly wageRUSDPerYearByProfession?: Readonly<Record<string, number>>;
   /** P5b (C-8): absolute latitude of the province's label point, degrees. */
   readonly absLatitudeDeg?: number;
+  /** P5b (C-12): gross theoretical hydro potential, MWh/year (HydroSHEDS RiverATLAS). */
+  readonly hydroPotentialMWhPerYear?: number;
   readonly sourceIds: readonly string[];
   readonly calibrationStatus: "source-backed" | "provisional";
 }
@@ -1124,6 +1126,13 @@ function parseProvinces(value: unknown, errors: string[]): HistoricalProvinceInp
     if (absLatitudeDeg !== undefined && !(absLatitudeDeg >= 0 && absLatitudeDeg <= 90)) {
       errors.push(`${path}.absLatitudeDeg must be in 0..90`);
     }
+    const hydroPotentialMWhPerYear =
+      record.hydroPotentialMWhPerYear === undefined
+        ? undefined
+        : numberField(record, "hydroPotentialMWhPerYear", path, errors);
+    if (hydroPotentialMWhPerYear !== undefined && !(hydroPotentialMWhPerYear >= 0)) {
+      errors.push(`${path}.hydroPotentialMWhPerYear must be non-negative`);
+    }
     const infrastructure =
       record.infrastructure === undefined
         ? undefined
@@ -1148,6 +1157,7 @@ function parseProvinces(value: unknown, errors: string[]): HistoricalProvinceInp
       ...(urbanShare === undefined ? {} : { urbanShare }),
       ...(wages === undefined ? {} : { wageRUSDPerYearByProfession: wages }),
       ...(absLatitudeDeg === undefined ? {} : { absLatitudeDeg }),
+      ...(hydroPotentialMWhPerYear === undefined ? {} : { hydroPotentialMWhPerYear }),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       calibrationStatus: status === "source-backed" ? "source-backed" : "provisional",
     };
@@ -2435,6 +2445,9 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       ...(province.pastureHa === undefined ? {} : { pastureHa: province.pastureHa }),
       ...(province.urbanShare === undefined ? {} : { urbanShare: province.urbanShare }),
       ...(province.absLatitudeDeg === undefined ? {} : { absLatitudeDeg: province.absLatitudeDeg }),
+      ...(province.hydroPotentialMWhPerYear === undefined
+        ? {}
+        : { hydroPotentialMWhPerYear: province.hydroPotentialMWhPerYear }),
       ...(province.wageRUSDPerYearByProfession === undefined
         ? {}
         : {

@@ -36,7 +36,7 @@ import {
 } from "./agriculture.js";
 import { FARM_LABOUR_ELASTICITY } from "./constants.js";
 import { depositRemaining } from "./resourceState.js";
-import { findDeposit } from "./resources.js";
+import { findDeposit, hydroCapacityPerDay } from "./resources.js";
 import type {
   BuildingDef,
   BuildingInstance,
@@ -938,6 +938,10 @@ export function runProductionCore(
   // P5b (plan §4.2): stock left in each deposit for today's extraction, in building
   // order; the day commits the takings through `extractFromDeposit`.
   const depositLeft = new Map<number, number>();
+  // P5b (C-12): river flow left today for each province's hydro stations, in building
+  // order. A province's stations all sit in its market and produce in the same wave (their
+  // output cannot be stored), so one call sees all of them.
+  const hydroLeft = new Map<number, number>();
 
   for (let buyerIndex = 0; buyerIndex < buildingIds.length; buyerIndex += 1) {
     const buildingId = buildingIds[buyerIndex] ?? 0;
@@ -982,6 +986,17 @@ export function runProductionCore(
       const quantity = executedTU * extractedPerTU >= left ? left : executedTU * extractedPerTU;
       depositLeft.set(depositId, left - quantity);
       extraction = { depositId, quantity };
+    }
+    // P5b (C-12): hydro stations share their province's daily flow (nothing is depleted).
+    if (definition.usesHydroPotential === true) {
+      let left = hydroLeft.get(building.provinceId);
+      if (left === undefined) {
+        const province = world.provinceEconomies.find((entry) => entry.id === building.provinceId);
+        left = province === undefined ? 0 : hydroCapacityPerDay(province);
+      }
+      const generatedPerTU = (definition.outputs[0]?.quantityPerThroughputUnit ?? 0) * technologyFactor;
+      if (generatedPerTU * executedTU > left) executedTU = generatedPerTU > 0 ? left / generatedPerTU : 0;
+      hydroLeft.set(building.provinceId, Math.max(0, left - generatedPerTU * executedTU));
     }
 
     for (const input of sortedInputs) {

@@ -12,7 +12,9 @@
  *   deposit yields nothing;
  * - optional inputs raise output with their fill; maintenance goods are bought and
  *   consumed; money is conserved throughout;
- * - save round trip of the deposit link and determinism of the day.
+ * - save round trip of the deposit link and determinism of the day;
+ * - hydro stations (C-12): a province's river flow caps their daily output without ever
+ *   being used up; the potential round-trips saves and is absent from worlds without it.
  */
 
 import {
@@ -22,6 +24,10 @@ import {
   depositRemaining,
   deserializeWorld,
   hashWorld,
+  HYDRO_DAYS_PER_YEAR,
+  HYDRO_TECHNICAL_SHARE,
+  hydroCapacityPerDay,
+  hydroRoomPerDay,
   lotTableFromLots,
   lotTableToLots,
   serializeWorld,
@@ -348,5 +354,83 @@ describe("P5b regressions found by the 1900 world (D-148)", () => {
     expect(losses.filter((loss) => loss.goodId === 0).reduce((total, loss) => total + loss.quantity, 0)).toBe(3.5 + 1e-12);
     // A storable good keeps the former rule: a remainder inside the tolerance stays.
     expect(lotTableToLots(table).filter((lot) => lot.goodId === 1)).toHaveLength(1);
+  });
+});
+
+describe("P5b hydro stations: a non-depleting cap from the province's rivers (C-12)", () => {
+  /** The farm (building 0) generates grain from river flow; its province has `potential`. */
+  function hydroScenario(potential: number | null): EconomyScenarioDef {
+    const scenario = productionScenario();
+    const station = scenario.definitions.buildings.find((entry) => entry.id === 0)!;
+    setBuildingRecipe(scenario, 0, [], [{ goodId: GRAIN_ID, quantityPerThroughputUnit: 10 }]);
+    station.usesHydroPotential = true;
+    const provinceId = scenario.buildingInstances.find((entry) => entry.id === 0)!.provinceId;
+    const province = scenario.population.provinceEconomies.find((entry) => entry.id === provinceId)!;
+    (province as { hydroPotentialMWhPerYear?: number | null }).hydroPotentialMWhPerYear = potential;
+    return scenario;
+  }
+  /** Annual gross potential whose technical share gives `perDay` a day. */
+  const potentialFor = (perDay: number): number => (perDay * HYDRO_DAYS_PER_YEAR) / HYDRO_TECHNICAL_SHARE;
+
+  test("the daily output is capped at the province's flow, and the flow is never used up", () => {
+    const open = hydroScenario(1e15);
+    const free = buildingResult(economyDay(createEconomyWorld(open, { seed: SEED }), open), 0)?.outputs[0]?.quantity ?? 0;
+    expect(free).toBeGreaterThan(0);
+
+    const capped = hydroScenario(potentialFor(free / 2));
+    const world = createEconomyWorld(capped, { seed: SEED });
+    const province = world.provinceEconomies.find((entry) => entry.id === world.buildings[0]!.provinceId)!;
+    expect(hydroCapacityPerDay(province)).toBeCloseTo(free / 2, 9);
+    const cashBefore = totalCash(world);
+    for (let day = 0; day < 3; day += 1) {
+      const out = buildingResult(economyDay(world, capped), 0)?.outputs[0]?.quantity ?? 0;
+      // Every day the same flow: nothing accumulates and nothing is depleted.
+      expect(out).toBeCloseTo(free / 2, 6);
+    }
+    expect(world.provinceEconomies.find((entry) => entry.id === province.id)?.hydroPotentialMWhPerYear).toBe(
+      potentialFor(free / 2),
+    );
+    expect(totalCash(world)).toBeCloseTo(cashBefore, 6);
+  });
+
+  test("a hydro station needs a province with potential; a hydro definition takes no inputs", () => {
+    expect(() => createEconomyWorld(hydroScenario(null), { seed: SEED })).toThrow(/without hydro potential/);
+    expect(() => createEconomyWorld(hydroScenario(0), { seed: SEED })).toThrow(/without hydro potential/);
+    const withInputs = hydroScenario(1e9);
+    setBuildingRecipe(withInputs, 0, [{ goodId: LIVESTOCK_ID, quantityPerThroughputUnit: 1 }], [
+      { goodId: GRAIN_ID, quantityPerThroughputUnit: 10 },
+    ]);
+    expect(() => assertValidEconomyDefinitions(withInputs.definitions)).toThrow(/cannot have recipe inputs/);
+    const notTrue = hydroScenario(1e9);
+    (notTrue.definitions.buildings.find((entry) => entry.id === 0) as unknown as { usesHydroPotential: unknown }).usesHydroPotential = false;
+    expect(() => assertValidEconomyDefinitions(notTrue.definitions)).toThrow(/must be true/);
+  });
+
+  test("room for construction is the flow less the stations' reference output", () => {
+    const scenario = hydroScenario(potentialFor(1_000));
+    const world = createEconomyWorld(scenario, { seed: SEED });
+    const building = world.buildings.find((entry) => entry.id === 0)!;
+    const definition = scenario.definitions.buildings.find((entry) => entry.id === 0)!;
+    const reference = definition.referenceThroughputPerDayAtLevelOne * building.level * building.condition * 10;
+    expect(hydroRoomPerDay(world, scenario.definitions, building.provinceId)).toBeCloseTo(1_000 - reference, 6);
+  });
+
+  test("saves carry the potential only where it exists; replay is identical", () => {
+    const scenario = hydroScenario(potentialFor(500));
+    const world = createEconomyWorld(scenario, { seed: SEED });
+    economyDay(world, scenario);
+    const text = serializeWorld(world);
+    expect(text).toContain("hydroPotentialMWhPerYear");
+    const restored = deserializeWorld(text);
+    expect(hashWorld(restored)).toBe(hashWorld(world));
+    economyDay(world, scenario);
+    economyDay(restored, clone(scenario));
+    expect(hashWorld(restored)).toBe(hashWorld(world));
+
+    const plain = productionScenario();
+    const plainWorld = createEconomyWorld(plain, { seed: SEED });
+    expect(plainWorld.provinceEconomies.every((entry) => entry.hydroPotentialMWhPerYear === null)).toBe(true);
+    expect(serializeWorld(plainWorld)).not.toContain("hydroPotentialMWhPerYear");
+    expect(deserializeWorld(serializeWorld(plainWorld)).provinceEconomies.every((entry) => entry.hydroPotentialMWhPerYear === null)).toBe(true);
   });
 });

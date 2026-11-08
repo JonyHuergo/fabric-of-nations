@@ -188,6 +188,7 @@ export {
 } from "./politicsActions.js";
 export {
   cancelConstruction,
+  hydroRoomPerDay,
   inheritedTechnique,
   runConstructionPhase,
   setConstructionPaused,

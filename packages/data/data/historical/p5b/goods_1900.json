@@ -371,8 +371,8 @@
   "key": "petrol",
   "name": "Petrol",
   "category": "industrial",
-  "basePrice1900RUSD": 442.859,
-  "transportCostPerUnit": 2.21429,
+  "basePrice1900RUSD": 528.494,
+  "transportCostPerUnit": 2.64247,
   "priceElasticity": 1,
   "spoilageRateAnnual": 0,
   "unitLabel": "t",
@@ -384,8 +384,8 @@
   "key": "fuel-oil",
   "name": "Diesel and fuel oil",
   "category": "industrial",
-  "basePrice1900RUSD": 151.381,
-  "transportCostPerUnit": 0.756905,
+  "basePrice1900RUSD": 133.102,
+  "transportCostPerUnit": 0.66551,
   "priceElasticity": 1,
   "spoilageRateAnnual": 0,
   "unitLabel": "t",
@@ -754,5 +754,18 @@
   "priceBasis": "defined-unit",
   "storable": false,
   "tradeable": false
+ },
+ {
+  "id": 57,
+  "key": "jewellery",
+  "name": "Jewellery and plate",
+  "category": "luxury",
+  "basePrice1900RUSD": 15.704,
+  "transportCostPerUnit": 0.07852,
+  "priceElasticity": 1,
+  "spoilageRateAnnual": 0,
+  "unitLabel": "unit-eq.",
+  "group": "consumer-manufactures",
+  "priceBasis": "defined-unit"
  }
 ]

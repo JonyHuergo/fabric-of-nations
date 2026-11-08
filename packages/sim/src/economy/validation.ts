@@ -1351,6 +1351,27 @@ export function assertValidBuildingDeposits(
   }
 }
 
+/**
+ * P5b (C-12): a hydro station must stand in a province with a positive hydro potential.
+ * (Its output is capped each day by `hydroCapacityPerDay`; this rejects a world that
+ * places one where no river flow was given.)
+ */
+export function assertValidHydroBuildings(
+  buildings: readonly BuildingInstance[],
+  provinces: readonly { readonly id: number; readonly hydroPotentialMWhPerYear: number | null }[],
+  definitions: EconomyDefinitions,
+): void {
+  const potentialByProvince = new Map(provinces.map((province) => [province.id, province.hydroPotentialMWhPerYear]));
+  const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
+  for (const building of buildings) {
+    if (definitionById.get(building.definitionId)?.usesHydroPotential !== true) continue;
+    const potential = potentialByProvince.get(building.provinceId);
+    if (potential === undefined || potential === null || !(potential > 0)) {
+      throw new RangeError(`hydro building ${String(building.id)} stands in a province without hydro potential`);
+    }
+  }
+}
+
 function assertValidEmployment(assignment: EmploymentAssignment): void {
   const record = requireRecord(assignment, "world.employment[]");
   requireInteger(record.id, "world.employment[].id", 0, 0xffff_ffff);

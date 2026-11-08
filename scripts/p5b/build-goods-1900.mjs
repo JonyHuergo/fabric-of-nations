@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * P5b (D-146): the 57-good catalogue of the 1900 world.
+ * P5b (D-146): the 58-good catalogue of the 1900 world.
  *
  * Inputs (committed):
  *   packages/data/data/historical/p5b/sources_1900.json      cited 1900 rows (prices, outputs, budget)
@@ -15,7 +15,7 @@
  *   scripts/p5b/catalogue.mjs                                authored goods and recipes
  *
  * Outputs (generated, committed), packages/data/data/historical/p5b/:
- *   goods_1900.json                  the 57 goods with reference prices
+ *   goods_1900.json                  the 58 goods with reference prices
  *   buildings_definitions_1900.json  P5 definitions plus the new buildings
  *   needs_1900.json                  P2b tiers plus the new goods' need items
  *   calibration_1900.json            every derived value with its rows and formula
@@ -97,6 +97,8 @@ const INPUTS = {
   mapAsia: join(DATA, "map/provinces_asia_1900.json"),
   mapOceania: join(DATA, "map/provinces_oceania_1900.json"),
   p3Currencies: join(DATA, "historical/p3/currencies_1900.json"),
+  // C-12: gross theoretical hydro potential by province (scripts/p5b/extract-hydro-riveratlas.mjs).
+  hydro: join(OUT, "hydro_province_1900.json"),
 };
 
 /**
@@ -106,6 +108,9 @@ const INPUTS = {
 const MINT_FUNDING_TREASURY_SHARE = 0.25;
 /** The simulation's MINT_MAX_DAILY_SALE_SHARE (economy/constants.ts), for warehouse sizing. */
 const MINT_MAX_DAILY_SALE_SHARE = 1 / 30;
+/** The simulation's HYDRO_TECHNICAL_SHARE and HYDRO_DAYS_PER_YEAR (economy/constants.ts), for hydro placement. */
+const HYDRO_TECHNICAL_SHARE = 0.33;
+const HYDRO_DAYS_PER_YEAR = 365.2425;
 /** The simulation's MINT_CHARGE (economy/constants.ts): the mint buys at price x (1 - charge). */
 const MINT_CHARGE = 0.002;
 
@@ -239,12 +244,20 @@ function build() {
     gold: () => usd1900("gold", priceRow("price-gold-mint") * (1000 / unit("g-per-troy-ounce")), ["price-gold-mint", "g-per-troy-ounce"], "statutory mint price per fine kg"),
     silver: () => usd1900("silver", priceRow("price-silver-commercial") * (1000 / unit("g-per-troy-ounce")), ["price-silver-commercial", "g-per-troy-ounce"], "commercial value per kg"),
     kerosene: () => usd1900("kerosene", kerosenePerT, ["price-refined-petroleum-export", "litres-per-us-gallon", "kerosene-kg-per-litre"], "refined petroleum for export per t"),
-    petrol: () => usd1900("petrol", kerosenePerT, ["price-refined-petroleum-export", "litres-per-us-gallon", "kerosene-kg-per-litre"],
-      "priced as kerosene per t until the naphtha export unit value is transcribed (provisional)", "provisional"),
-    "fuel-oil": () => usd1900("fuel-oil", priceRow("price-crude-petroleum") * unit("crude-oil-barrels-per-tonne") * 1.1,
-      ["price-crude-petroleum", "crude-oil-barrels-per-tonne"], "crude price per t x 1.1 until the residuum price is transcribed (provisional)", "provisional"),
-    electricity: () => usd1900("electricity", 10, [],
-      "wholesale (generation) price, 1.0 cent per kWh: between bulk hydro power at Niagara (about $20 per HP-year, 0.3 cent per kWh) and central-station income per kWh sold (about 3.4 cents, mostly lighting at retail); every reference price is wholesale. Transcription of the 1902 census pending (provisional)", "provisional"),
+    petrol: () => usd1900("petrol", (priceRow("price-naphtha-export") / unit("litres-per-us-gallon") / unit("naphtha-kg-per-litre")) * 1000,
+      ["price-naphtha-export", "litres-per-us-gallon", "naphtha-kg-per-litre"],
+      "naphtha export unit value (year to June 1900) per gallon / 3.785 L / 0.72 kg per L, per t (density provisional)", "provisional"),
+    "fuel-oil": () => usd1900("fuel-oil",
+      (priceRow("price-residuum-export") / (unit("gallons-per-barrel-petroleum") * unit("litres-per-us-gallon") * unit("residuum-kg-per-litre"))) * 1000,
+      ["price-residuum-export", "gallons-per-barrel-petroleum", "litres-per-us-gallon", "residuum-kg-per-litre"],
+      "residuum export unit value (year to June 1900) per 42-gallon barrel / (159 L x 0.95 kg per L), per t (density provisional)", "provisional"),
+    // The 1902 census average (income from the sale of current / kWh generated, 3.36 cents)
+    // is mostly retail lighting; at that price an aluminium works (22 MWh per t) would pay
+    // more for power than its metal fetches. Bulk power sold far cheaper (Niagara about 0.3
+    // cent), so the single reference price stays a bulk rate; the census row is a sourced
+    // cross-check (D-148).
+    electricity: () => usd1900("electricity", 10, ["price-electricity-central-stations-1902"],
+      "bulk (wholesale) rate, 1.0 cent per kWh, per MWh: between Niagara bulk power (about $20 per HP-year, 0.3 cent) and the 1902 central stations' average income per kWh generated (3.36 cents, census table 1, mostly lighting at retail); provisional", "provisional"),
     steel: () => usd1900("steel", steelUsdPerT, ["price-steel-billets-ds140"], "DS-140 1900 steel unit value"),
     copper: () => usd1900("copper", copperUsdPerT, ["price-copper-ingot", "kg-per-lb"], "copper, New York, per t"),
     aluminium: () => usd1900("aluminium", perLbToPerT(priceRow("price-aluminum-pittsburg")), ["price-aluminum-pittsburg", "kg-per-lb"], "aluminum at Pittsburg per t"),
@@ -276,6 +289,7 @@ function build() {
     computers: () => rusd1990("computers", price1990("price1990-personal-computer").value, ["price1990-personal-computer"], "1990 personal computer factory revenue / unit shipments (end-user dollars)", "secondary"),
     "mobile-phones": () => rusd1990("mobile-phones", price1990("price1990-cellular-phone").value, ["price1990-cellular-phone"], "1989 retail value per cellular telephone", "provisional"),
     pharmaceuticals: () => defined("pharmaceuticals", rusdPerUsd1900 / 100, "1 dose-eq = 1 US cent of 1900 drugs at wholesale"),
+    jewellery: () => defined("jewellery", rusdPerUsd1900, "1 unit = 1 US dollar of 1900 jewellery and plate at wholesale (D-152)"),
   };
   for (const key of ["commerce", "transport-services", "communication", "finance-services", "personal-services"]) {
     priceOf[key] = () => defined(key, 1, "1 service unit = the service whose 1900 US price, x 15.704, is 1 RUSD (D-146 C-6)");
@@ -354,8 +368,29 @@ function build() {
       .sort((left, right) => left.goodId - right.goodId);
   }
   const recipeTrace = {};
+  // D-152: jewellery. New metal worked in 1900 = the world's industrial consumption (Mint)
+  // x the US share of new metal (domestic bullion + foreign material; melted coin and old
+  // jewellery are not new). One unit of jewellery holds `metalShare` of its value in
+  // gold and silver, split by the value of the new metal at reference prices.
+  const arts = src.industrialArts1900;
+  const newShare = (metal) => (arts.usBars1900[metal].domesticBullion + arts.usBars1900[metal].foreignMaterial) / arts.usBars1900[metal].total;
+  const jewelleryMetal = {
+    metalShare: unit("jewellery-metal-share-of-value"),
+    newGoldKgPerYear: arts.printedTotals.goldKg * newShare("gold"),
+    newSilverKgPerYear: arts.printedTotals.silverKg * newShare("silver"),
+  };
+  jewelleryMetal.goldValuePerYear = jewelleryMetal.newGoldKgPerYear * priceRusd("gold");
+  jewelleryMetal.silverValuePerYear = jewelleryMetal.newSilverKgPerYear * priceRusd("silver");
+  jewelleryMetal.metalValuePerUnit = jewelleryMetal.metalShare * priceRusd("jewellery");
+  const metalValuePerYear = jewelleryMetal.goldValuePerYear + jewelleryMetal.silverValuePerYear;
+  jewelleryMetal.unitsPerYear = metalValuePerYear / jewelleryMetal.metalValuePerUnit;
+  const jewelleryInputs = {
+    gold: (jewelleryMetal.metalValuePerUnit * (jewelleryMetal.goldValuePerYear / metalValuePerYear)) / priceRusd("gold"),
+    silver: (jewelleryMetal.metalValuePerUnit * (jewelleryMetal.silverValuePerYear / metalValuePerYear)) / priceRusd("silver"),
+  };
+  const buildingSpecs = BUILDINGS.map((spec) => (spec.metalRecipe === true ? { ...spec, inputs: jewelleryInputs } : spec));
   let nextId = Math.max(...definitions.map((definition) => definition.id)) + 1;
-  for (const spec of BUILDINGS) {
+  for (const spec of buildingSpecs) {
     const jobs = Object.entries(spec.jobs).map(([key, share]) => {
       const profession = professionByKey.get(key);
       if (profession === undefined) throw new Error(`${spec.key}: unknown profession ${key}`);
@@ -417,6 +452,7 @@ function build() {
     if (spec.landUse !== undefined) definition.landUse = spec.landUse;
     if (spec.extracts !== undefined) definition.extracts = spec.extracts;
     if (spec.maxAbsLatitudeDeg !== undefined) definition.maxAbsLatitudeDeg = spec.maxAbsLatitudeDeg;
+    if (spec.usesHydroPotential === true) definition.usesHydroPotential = true;
     definitions.push(definition);
     recipeTrace[spec.key] = {
       outputPerTU: sig(outputPerTU),
@@ -510,6 +546,23 @@ function build() {
     }
     foodTrace.tiers[tierName] = { processedFoodValueRUSD: sig(value), carvedRUSD: sig(carved), added };
   }
+  // D-152: jewellery is a luxury need. Its per-capita quantity makes the 1900 luxury-tier
+  // population buy the new metal the world's jewellers worked in 1900.
+  const luxuryTier = needs.find((entry) => entry.tier === "luxury");
+  const luxuryPopulation = read(INPUTS.p2bPops).reduce((acc, pop) => acc + (pop.wealthLevel >= luxuryTier.activationWealthMin ? pop.population : 0), 0);
+  const jewelleryPerCapitaDay = sig(jewelleryMetal.unitsPerYear / 365 / luxuryPopulation);
+  luxuryTier.items.push({ goodKey: "jewellery", quantityPerCapitaPerDay: jewelleryPerCapitaDay });
+  needsTrace["luxury:jewellery"] = {
+    quantityPerCapitaPerDay: jewelleryPerCapitaDay,
+    rusdPerCapitaPerDay: sig(jewelleryPerCapitaDay * priceRusd("jewellery")),
+    luxuryPopulation,
+    newGoldKgPerYear: sig(jewelleryMetal.newGoldKgPerYear),
+    newSilverKgPerYear: sig(jewelleryMetal.newSilverKgPerYear),
+    jewelleryUnitsPerYear: sig(jewelleryMetal.unitsPerYear),
+    metalShare: jewelleryMetal.metalShare,
+    rowIds: ["mint-1901-arts", "jewellery-metal-share-of-value"],
+    status: "provisional",
+  };
   for (const tier of needs) tier.items.sort((left, right) => gid(left.goodKey) - gid(right.goodKey));
 
   const calibration = {
@@ -546,10 +599,13 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
       if (Array.isArray(province.label)) labelLatitude.set(province.id, Math.abs(province.label[1]));
     }
   }
+  // C-12: gross theoretical hydro potential (MWh/year) where the rivers have any.
+  const hydroPotential = new Map(read(INPUTS.hydro).provinces.map((entry) => [entry.provinceId, entry.grossMWhPerYear]));
   const provinces = read(INPUTS.p5Provinces).map((province) => {
     const latitude = labelLatitude.get(province.id);
     if (latitude === undefined) throw new Error(`province ${province.id} has no map label`);
-    return { ...province, absLatitudeDeg: round(latitude, 3) };
+    const hydro = hydroPotential.get(province.id);
+    return { ...province, absLatitudeDeg: round(latitude, 3), ...(hydro > 0 ? { hydroPotentialMWhPerYear: hydro } : {}) };
   });
   // B2: countries with sourced 1900 production of a gated good know its gate (A9, C-1).
   const oldCountries = read(INPUTS.p5Countries);
@@ -648,6 +704,16 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
     fertiliser: { gateKey: "chemical-fertilizer" },
     round,
     extraDemand: mintDemand,
+    hydro: {
+      technicalShare: HYDRO_TECHNICAL_SHARE,
+      daysPerYear: HYDRO_DAYS_PER_YEAR,
+      // C-12: the hydro share of 1900 electricity = the water wheels' share of the US
+      // central stations' prime movers in 1902 (sourced for the United States, provisional
+      // elsewhere), within each province's cap.
+      shareOfElectricity:
+        src.electricity1902.waterWheelHorsepower /
+        (src.electricity1902.waterWheelHorsepower + src.electricity1902.steamEngineHorsepower + src.electricity1902.otherHorsepower),
+    },
     territoryCoverage: new Map(Object.entries(p2bCalibration.territories).map(([key, territory]) => [key, { gdp: territory.population * territory.gdpPerHeadRUSD.value, shareBefore: territory.coveredShareOfGdp }])),
     rows: {
       laborShareAgriculture: rowValue("labour-share-agriculture"),
@@ -772,7 +838,13 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
   for (const [key, entry] of Object.entries(src.outputs1900)) {
     const good = goods.find((candidate) => candidate.key === key);
     if (good === undefined) continue;
-    const toSimUnit = OUTPUT_UNIT_TO_SIM[entry.unit];
+    const toSimUnit =
+      key === "jewellery"
+        ? {
+            factor: 1 / src.units.find((row) => row.id === "jewellery-metal-share-of-value").value,
+            note: "gross metal dollars / the metal share of value = jewellery units (includes old material; report only)",
+          }
+        : OUTPUT_UNIT_TO_SIM[entry.unit];
     const total = entry.entries.reduce((acc, [territory, value]) => acc + (AGGREGATE_OUTPUT_KEYS.has(territory) ? 0 : value), 0);
     const modelledPerYear = (placement.worldOutput.get(good.id) ?? 0) * 365;
     sourcedOutput[key] = {
@@ -815,13 +887,14 @@ const OUTPUT_UNIT_TO_SIM = {
   kg: { factor: 1, note: "kg" },
   "metric tons of sodium nitrate": { factor: 0.1647, note: "t NaNO3 x 0.1647 N" },
   "long tons": { factor: 1016.047, note: "long tons x 1,016.047 kg" },
+  "thousand bales of 500 lb": { factor: 226796.185, note: "thousand bales x 500 lb x 0.45359237 kg" },
 };
 
 const outputs = build();
 const DOC = join(ROOT, "docs/P5B_BEFORE_AFTER.md");
 const docText = beforeAfterReport(JSON.parse(outputs["calibration_1900.json"]));
 const PROVENANCE = join(ROOT, "docs/P5B_GOODS_PROVENANCE.md");
-const provenanceText = goodsProvenance(JSON.parse(outputs["goods_1900.json"]), JSON.parse(outputs["calibration_1900.json"]), read(INPUTS.sources));
+const provenanceText = goodsProvenance(JSON.parse(outputs["goods_1900.json"]), JSON.parse(outputs["calibration_1900.json"]), read(INPUTS.sources), read(INPUTS.hydro).meta);
 const inputSums = Object.fromEntries(Object.entries(INPUTS).map(([key, path]) => [key, sha256(readText(path))]));
 outputs["build_report.json"] = json({
   generator: "scripts/p5b/build-goods-1900.mjs",
@@ -847,7 +920,7 @@ if (CHECK) {
 }
 
 /** docs/P5B_GOODS_PROVENANCE.md: every good's reference price with its rows (generated). */
-function goodsProvenance(goods, calibration, sources) {
+function goodsProvenance(goods, calibration, sources, hydroMeta) {
   const rowCitation = new Map();
   for (const row of [...sources.prices1900, ...(sources.prices1990 ?? []), ...sources.units]) rowCitation.set(row.id, `${row.sourceId ?? ""}${row.locator ? `, ${row.locator}` : ""}`);
   const sourceTitle = new Map(sources.sources.map((source) => [source.id, `${source.title}${source.licence ?? source.license ? ` (${source.licence ?? source.license})` : ""}`]));
@@ -880,6 +953,21 @@ function goodsProvenance(goods, calibration, sources) {
   lines.push("");
   for (const [key, entry] of Object.entries(calibration.placement.goods)) if (entry.basis) lines.push(`- ${key}: ${entry.basis}`);
   lines.push("");
+  // C-12 (D-146 A8): attribution and licence of the hydro dataset, as its licence requires.
+  lines.push("## Hydro potential (C-12)");
+  lines.push("");
+  lines.push(`Province hydro potential (\`historical/p5b/hydro_province_1900.json\`, from \`${hydroMeta.generator}\`) is derived from **${hydroMeta.dataset}**: ${hydroMeta.citation}. Attributes: ${hydroMeta.attributeSources}. Source: ${hydroMeta.url}, ${hydroMeta.file}, accessed ${hydroMeta.accessDate}. Licence: **${hydroMeta.licence}**; the derived table is an adaptation (aggregated to the game's 1900 provinces), and the raw data are not redistributed.`);
+  lines.push("");
+  lines.push(`Method: ${hydroMeta.method}. Unit: ${hydroMeta.unit}. World gross potential ${hydroMeta.grossWorldPWhPerYear} PWh/year (${hydroMeta.grossUnplacedPWhPerYear} unplaced; ${hydroMeta.grossHeadwatersPWhPerYear} from headwater reaches).`);
+  lines.push("");
+  for (const limitation of hydroMeta.limitations) lines.push(`- ${limitation}`);
+  const electricity = calibration.placement.goods.electricity;
+  if (electricity?.hydroPerDay !== undefined) {
+    lines.push(`- 1900 hydro stations generate ${Number(electricity.hydroPerDay.toPrecision(4)).toLocaleString("en-US")} MWh a day of the ${Number(electricity.placedPerDay.toPrecision(4)).toLocaleString("en-US")} MWh placed (the 1902 US water-wheel share, within each province's cap).`);
+  }
+  lines.push("");
+  lines.push("The Hoes et al. (2017) site dataset (4TU.ResearchData) was not used: its General Terms of Use allow reuse only for non-commercial purposes (designer, 2026-11-08).");
+  lines.push("");
   return `${lines.join("\n")}\n`;
 }
 
@@ -892,7 +980,7 @@ function beforeAfterReport(calibration) {
   const lines = [];
   lines.push("# P5b before and after — covered GDP and 1900 output");
   lines.push("");
-  lines.push("Generated by `node scripts/p5b/build-goods-1900.mjs` from `packages/data/data/historical/p5b/calibration_1900.json`; do not edit by hand. \"Before\" is the P2b/P5 world (8 goods); \"after\" is the P5b world (57 goods) with the placement of D-148. Values are RUSD per year at opening prices (value added of the represented sectors).");
+  lines.push("Generated by `node scripts/p5b/build-goods-1900.mjs` from `packages/data/data/historical/p5b/calibration_1900.json`; do not edit by hand. \"Before\" is the P2b/P5 world (8 goods); \"after\" is the P5b world (58 goods) with the placement of D-148. Values are RUSD per year at opening prices (value added of the represented sectors).");
   lines.push("");
   lines.push("## World");
   lines.push("");

@@ -1,12 +1,13 @@
 /**
- * P5b (D-146): the authored catalogue of the 1900 world — the 57 goods (docs/P5B_PLAN.md
+ * P5b (D-146): the authored catalogue of the 1900 world — the 58 goods (docs/P5B_PLAN.md
  * §1) and the building recipes that make them. Every quantity here is a provisional
  * planning value with its reasoning in the comment or in `docs/P5B_PLAN.md` §1; the
  * builder (`build-goods-1900.mjs`) turns them into validated definitions, derives the
  * reference prices from the cited source rows and sizes outputs per throughput unit.
  *
  * Goods 0-7 keep the ids, keys and P2b prices of the existing catalogue (C-18); only
- * their names change. Goods 8-56 follow the plan's catalogue order.
+ * their names change. Goods 8-56 follow the plan's catalogue order; good 57, jewellery and
+ * plate, was added by the designer's decision of 2026-11-08 (D-152).
  */
 
 /** Goods: [id, key, name, unit, category, group, storable, tradeable]. */
@@ -68,6 +69,9 @@ export const GOODS = [
   [54, "communication", "Communication", "service unit", "service", "services", false, false],
   [55, "finance-services", "Finance and professional services", "service unit", "service", "services", false, false],
   [56, "personal-services", "Personal and recreation services", "service unit", "service", "services", false, false],
+  // D-152: jewellery, plate and watch cases, made from gold and silver by jewellers; a
+  // luxury need. 1 unit = 1 US dollar of 1900 wares at wholesale.
+  [57, "jewellery", "Jewellery and plate", "unit-eq.", "luxury", "consumer-manufactures"],
 ];
 
 /**
@@ -132,7 +136,7 @@ export const BUILDINGS = [
   { key: "coal-power-station", name: "Coal Power Station", sector: "energy", output: "electricity", inputs: { coal: 3 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation", maintenanceMix: ELECTRICAL_MAINTENANCE },
   { key: "oil-power-station", name: "Oil Power Station", sector: "energy", output: "electricity", inputs: { "fuel-oil": 0.6 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation", maintenanceMix: ELECTRICAL_MAINTENANCE },
   { key: "gas-power-station", name: "Gas Power Station", sector: "energy", output: "electricity", inputs: { "natural-gas": 0.6 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation", maintenanceMix: ELECTRICAL_MAINTENANCE },
-  { key: "hydro-station", name: "Hydroelectric Station", sector: "energy", output: "electricity", inputs: {}, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation", maintenanceMix: ELECTRICAL_MAINTENANCE },
+  { key: "hydro-station", name: "Hydroelectric Station", sector: "energy", output: "electricity", inputs: {}, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "electrical-generation", maintenanceMix: ELECTRICAL_MAINTENANCE, usesHydroPotential: true },
   { key: "nuclear-station", name: "Nuclear Power Station", sector: "energy", output: "electricity", inputs: { uranium: 0.00003 }, jobs: { laborers: 0.6, clerks: 0.2, academics: 0.2 }, gate: "nuclear-power", maintenanceMix: ELECTRICAL_MAINTENANCE },
   // Industrial materials
   { key: "steel-works", name: "Steel Works", sector: "manufacturing", output: "steel", inputs: { "iron-ore": 1.05, coal: 2 }, jobs: { laborers: 0.95, clerks: 0.05 }, gate: "steelmaking" },
@@ -160,6 +164,11 @@ export const BUILDINGS = [
   { key: "television-works", name: "Television Works", sector: "manufacturing", output: "televisions", inputs: { "electronic-components": 60, plastics: 0.005 }, jobs: { laborers: 0.8, clerks: 0.2 }, gate: "television" },
   { key: "computer-works", name: "Computer Works", sector: "manufacturing", output: "computers", inputs: { "electronic-components": 600, plastics: 0.005 }, jobs: { laborers: 0.6, clerks: 0.2, academics: 0.2 }, gate: "personal-computers" },
   { key: "phone-works", name: "Mobile Phone Works", sector: "manufacturing", output: "mobile-phones", inputs: { "electronic-components": 150, plastics: 0.0002 }, jobs: { laborers: 0.6, clerks: 0.2, academics: 0.2 }, gate: "mobile-telephony" },
+  // D-152: the jewellers' work is the value added; the gold and silver per unit come from
+  // the Director of the Mint's 1900 industrial consumption (new metal only) and the
+  // provisional metal share of value (`metalRecipe`, filled by the builder). Jewellers
+  // are labourers and clerks until P7 adds artisan professions (provisional).
+  { key: "jewellery-workshop", name: "Jeweller and Silversmith", sector: "manufacturing", output: "jewellery", inputs: {}, metalRecipe: true, jobs: { laborers: 0.8, clerks: 0.2 } },
   { key: "pharmaceutical-works", name: "Pharmaceutical Works", sector: "manufacturing", output: "pharmaceuticals", inputs: { chemicals: 0.00001 }, jobs: { laborers: 0.6, clerks: 0.2, academics: 0.2 } },
   // Services (jobs from the five current professions; P7 adds the rest)
   { key: "trading-house", name: "Trading House", sector: "services", output: "commerce", inputs: { paper: 0.000002 }, jobs: { clerks: 0.6, laborers: 0.4 } },

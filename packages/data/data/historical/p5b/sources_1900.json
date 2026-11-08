@@ -100,6 +100,60 @@
    "accessDate": "2026-11-07",
    "license": "Public domain (U.S. government work)",
    "notes": "Read from the page images of the archived scans; the tables cite EIA, Dataquest, the Electronic Industries Association, Dealerscope Merchandising, MVMA and the International Trade Administration."
+  },
+  {
+   "id": "census-electric-1902",
+   "title": "Central Electric Light and Power Stations, 1902 (Special Reports of the Census Office)",
+   "author": "U.S. Department of Commerce and Labor, Bureau of the Census (1905)",
+   "url": "https://archive.org/details/centralelectric00goog",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government work)",
+   "notes": "Google scan on archive.org; read from the page images. PDF page = book page + 16."
+  },
+  {
+   "id": "usda-yearbook-1901",
+   "title": "Yearbook of the United States Department of Agriculture 1901",
+   "author": "U.S. Department of Agriculture (1902)",
+   "url": "https://archive.org/details/yoa1901",
+   "accessDate": "2026-11-06",
+   "license": "Public domain (U.S. government work)",
+   "notes": "Read from the page images (archive.org scan); plates interleave, PDF page 210 = book page 200."
+  },
+  {
+   "id": "mint-1901-arts",
+   "title": "Annual Report of the Director of the Mint for the fiscal year ended June 30, 1901: gold and silver used in the industrial arts (the world's industrial consumption in 1900; bars furnished for manufactures and arts in the United States, 1900)",
+   "author": "U.S. Treasury, Bureau of the Mint",
+   "url": "https://archive.org/details/annualreportofdi1901unit_h3l5",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government work, 1901)",
+   "notes": "Book pp. 47 and 50 (PDF 53 and 56). Read from the page images."
+  },
+  {
+   "id": "colonial-abstract-38",
+   "title": "Statistical Abstract for the several Colonial and other Possessions of the United Kingdom in each year from 1886 to 1900, Thirty-eighth Number [Cd. 751]",
+   "author": "Board of Trade, Commercial, Labour and Statistical Department (1901)",
+   "url": "https://archive.org/details/statisticalabstr3638grea",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (UK Parliamentary paper of 1901, Crown copyright expired)",
+   "notes": "Bound with nos. 36 and 37; in the combined PDF, book page of no. 38 = PDF page - 640. Read from the page images."
+  },
+  {
+   "id": "koloniaal-verslag-1901",
+   "title": "Koloniaal Verslag van 1901 (Nederlandsch (Oost-) Indië), bijlage DDD: handels- en scheepvaartbeweging over het jaar 1900",
+   "author": "Ministerie van Koloniën (Netherlands)",
+   "url": "https://archive.org/details/UNIVERSITEITLEIDEN-DIG-KOLONIAAL-VERSLAG-1901",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (Public Domain Mark 1.0; Leiden University Libraries scan)",
+   "notes": "Read from the page images (PDF pp. 536-538)."
+  },
+  {
+   "id": "brazil-handbook-1901",
+   "title": "United States of Brazil: a geographical sketch, with special reference to economic conditions and prospects of future development",
+   "author": "Bureau of the American Republics, Washington (1901)",
+   "url": "https://archive.org/details/unitedstatesofbr1901bure",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government publication, 1901)",
+   "notes": "PDF page = book page + 6. Quotes the Brazilian Review (Rio de Janeiro) of July 1900. Read from the page images."
   }
  ],
  "units": [
@@ -242,6 +296,30 @@
    "status": "provisional",
    "sourceId": "p5b-provisional",
    "note": "Assumed mean empty weight of the 1990 US large-transport deliveries (Boeing 737/757/767/747, MD-80/MD-11 mix); engineering estimate, provisional (C-13 unit)."
+  },
+  {
+   "id": "naphtha-kg-per-litre",
+   "value": 0.72,
+   "unit": "kg per litre of naphtha (light distillates)",
+   "status": "provisional",
+   "sourceId": "p5b-provisional",
+   "note": "Petroleum naphtha and gasoline, specific gravity about 0.68-0.75."
+  },
+  {
+   "id": "residuum-kg-per-litre",
+   "value": 0.95,
+   "unit": "kg per litre of petroleum residuum",
+   "status": "provisional",
+   "sourceId": "p5b-provisional",
+   "note": "Heavy residual oil and tar, specific gravity about 0.92-0.98."
+  },
+  {
+   "id": "jewellery-metal-share-of-value",
+   "value": 0.5,
+   "unit": "share of the wholesale value of jewellery and plate that is gold and silver",
+   "status": "provisional",
+   "sourceId": "p5b-provisional",
+   "note": "No 1900 census figure transcribed (the Twelfth Census of manufactures' jewelry industry is not cached). Planning value: bullion about half the wholesale value of gold and silver wares, the rest the jewellers' work, other materials and margin."
   }
  ],
  "prices1900": [
@@ -580,6 +658,48 @@
    "locator": "Table II, p. 457: beans, medium, choice, 1900",
    "unit": "USD per bushel",
    "value": 2.0969,
+   "status": "sourced"
+  },
+  {
+   "id": "price-electricity-central-stations-1902",
+   "goodKey": "electricity",
+   "sourceId": "census-electric-1902",
+   "locator": "Table 1, p. 6 (PDF p. 22): central electric stations, 1902: income from sale of current $84,186,605 (private $77,349,749 + municipal $6,836,856, which includes estimated income from public lighting); output of stations 2,507,051,115 kWh (private 2,311,146,676 + municipal 195,904,439). Both totals equal the sum of their columns.",
+   "unit": "USD per kWh",
+   "quantity": 2507051115,
+   "valueUSD": 84186605,
+   "status": "sourced",
+   "note": "Calendar 1902 (the first census of the industry), used for 1900. Income per kWh generated: the stations sold their current directly, so it is the producers' price."
+  },
+  {
+   "id": "price-naphtha-export",
+   "goodKey": "petrol",
+   "sourceId": "statab-1901",
+   "locator": "Table 49, p. 217 (Part 4 PDF p. 49): domestic exports, year ending June 30, 1900: mineral oil, refined or manufactured, naphthas, including all lighter products of distillation, 21,988,093 gallons, $2,016,802",
+   "unit": "USD per gallon",
+   "quantity": 21988093,
+   "valueUSD": 2016802,
+   "status": "sourced"
+  },
+  {
+   "id": "price-residuum-export",
+   "goodKey": "fuel-oil",
+   "sourceId": "statab-1901",
+   "locator": "Table 49, p. 217 (Part 4 PDF p. 49): domestic exports, year ending June 30, 1900: residuum, including tar and all other from which the light bodies have been distilled, 395,933 barrels, $506,853",
+   "unit": "USD per barrel",
+   "quantity": 395933,
+   "valueUSD": 506853,
+   "status": "sourced"
+  },
+  {
+   "id": "price-illuminating-oil-export-statab",
+   "goodKey": "kerosene",
+   "role": "cross-check",
+   "sourceId": "statab-1901",
+   "locator": "Table 49, p. 217 (Part 4 PDF p. 49): domestic exports, year ending June 30, 1900: illuminating oil, 721,027,637 gallons, $55,979,566 (7.76 cents per gallon; table 159 gives 7.8 cents)",
+   "unit": "USD per gallon",
+   "quantity": 721027637,
+   "valueUSD": 55979566,
    "status": "sourced"
   }
  ],
@@ -1671,6 +1791,176 @@
      "other beet countries"
     ]
    ]
+  },
+  "cotton": {
+   "sourceId": "usda-yearbook-1901",
+   "locator": "p. 200 (PDF 210), table A, the world's commercial cotton crop, commercial year 1900, thousands of bales of 500 lb: crop of the United States 9,143; imports into Europe from Brazil 108, Egypt 1,022, Turkey etc. 49, Peru, West Indies etc. 27, East Indies 242 (total 1,448; total crop 10,591). p. 201 (PDF 211), table B, consumption 1900: India 1,254.",
+   "unit": "thousand bales of 500 lb",
+   "status": "provisional",
+   "total": 10591,
+   "note": "Table A gives the United States crop and the other countries' exports to Europe; every column reproduces the printed totals. British India = exports to Europe (242) + its mills' consumption (table B, 1,254); its exports to Japan and China and the hand-spun crop are not covered. China's large domestic crop is not covered. Peru, the West Indies etc. are an aggregate and are left out (renormalised).",
+   "entries": [
+    [
+     "usa-home",
+     9143,
+     "sourced",
+     "crop of the United States"
+    ],
+    [
+     "bin",
+     1496,
+     "estimated",
+     "East Indies imports into Europe 242 + India's consumption 1,254 (table B)"
+    ],
+    [
+     "egy",
+     1022,
+     "estimated",
+     "imports into Europe from Egypt (Egypt spun little of its crop)"
+    ],
+    [
+     "bra-home",
+     108,
+     "estimated",
+     "imports into Europe from Brazil"
+    ],
+    [
+     "ott-home",
+     49,
+     "estimated",
+     "imports into Europe from Turkey etc."
+    ],
+    [
+     "other",
+     27,
+     "estimated",
+     "Peru, West Indies etc. (aggregate)"
+    ]
+   ]
+  },
+  "jewellery": {
+   "sourceId": "mint-1901-arts",
+   "locator": "p. 50 (PDF 56): industrial consumption of gold and silver in 1900 by country (where the metal was worked)",
+   "unit": "US dollars of metal (gold value + silver commercial value)",
+   "status": "sourced",
+   "total": 100350300,
+   "note": "Territory shares of jewellery and plate making = each country's industrial consumption of gold and silver by value; gross of old material. 'Other countries' is an aggregate (left out, renormalised).",
+   "entries": [
+    [
+     "aut-home",
+     3563500,
+     "sourced",
+     "Austria-Hungary"
+    ],
+    [
+     "bel-home",
+     2088700,
+     "sourced",
+     "Belgium"
+    ],
+    [
+     "bra-home",
+     498400,
+     "sourced",
+     "Brazil"
+    ],
+    [
+     "central-america",
+     1800,
+     "sourced",
+     "Central America"
+    ],
+    [
+     "egy",
+     816100,
+     "sourced",
+     "Egypt"
+    ],
+    [
+     "fin",
+     156400,
+     "sourced",
+     "Finland"
+    ],
+    [
+     "fra-home",
+     17745800,
+     "sourced",
+     "France"
+    ],
+    [
+     "deu-home",
+     10129200,
+     "sourced",
+     "Germany"
+    ],
+    [
+     "gbr-home",
+     20310600,
+     "sourced",
+     "Great Britain"
+    ],
+    [
+     "ita-home",
+     3741500,
+     "sourced",
+     "Italy"
+    ],
+    [
+     "nld-home",
+     635600,
+     "sourced",
+     "Netherlands"
+    ],
+    [
+     "pry-home",
+     4000,
+     "sourced",
+     "Paraguay"
+    ],
+    [
+     "prt-home",
+     1524200,
+     "sourced",
+     "Portugal"
+    ],
+    [
+     "rus-home",
+     5117100,
+     "sourced",
+     "Russia"
+    ],
+    [
+     "sal-home",
+     24100,
+     "sourced",
+     "San Salvador"
+    ],
+    [
+     "swe-home",
+     520000,
+     "sourced",
+     "Sweden"
+    ],
+    [
+     "che-home",
+     5392700,
+     "sourced",
+     "Switzerland"
+    ],
+    [
+     "usa-home",
+     23761100,
+     "sourced",
+     "United States"
+    ],
+    [
+     "other",
+     4319500,
+     "estimated",
+     "Other countries"
+    ]
+   ]
   }
  },
  "technologyEvidence": [
@@ -2335,5 +2625,419 @@
    "quantity": 521,
    "status": "sourced"
   }
- ]
+ ],
+ "electricity1902": {
+  "sourceId": "census-electric-1902",
+  "locator": "Table 1, p. 6 (PDF p. 22): power plant equipment of central electric stations, 1902: steam engines 5,930 (1,379,941 horsepower); water wheels 1,390 (438,472 horsepower). Footnote 2: in addition, gas engines and auxiliary steam engines with a capacity of 26,635 horsepower.",
+  "steamEngineHorsepower": 1379941,
+  "waterWheelHorsepower": 438472,
+  "otherHorsepower": 26635,
+  "status": "sourced"
+ },
+ "industrialArts1900": {
+  "sourceId": "mint-1901-arts",
+  "locator": "p. 50 (PDF 56): the world's industrial consumption of gold and silver in 1900, by country",
+  "status": "sourced",
+  "note": "Gross of remelted old material. The gold value, silver weight and both silver value columns reproduce their printed totals; the gold weights sum to 112693 kg against the printed 112696 (a 3 kg discrepancy in the printed column; the printed total is used).",
+  "printedTotals": {
+   "goldKg": 112696,
+   "goldUSD": 74897600,
+   "silverKg": 1277146,
+   "silverCoiningUSD": 53078300,
+   "silverCommercialUSD": 25452700
+  },
+  "columns": [
+   "territory",
+   "goldKg",
+   "goldUSD",
+   "silverKg",
+   "silverCoiningUSD",
+   "silverCommercialUSD",
+   "name"
+  ],
+  "rows": [
+   [
+    "aut-home",
+    3709,
+    2464900,
+    55125,
+    2291000,
+    1098600,
+    "Austria-Hungary"
+   ],
+   [
+    "bel-home",
+    2543,
+    1690100,
+    20000,
+    831200,
+    398600,
+    "Belgium"
+   ],
+   [
+    "bra-home",
+    750,
+    498400,
+    0,
+    0,
+    0,
+    "Brazil"
+   ],
+   [
+    "central-america",
+    2,
+    1200,
+    31,
+    1300,
+    600,
+    "Central America"
+   ],
+   [
+    "egy",
+    1077,
+    715800,
+    5034,
+    209200,
+    100300,
+    "Egypt"
+   ],
+   [
+    "fin",
+    191,
+    128900,
+    1381,
+    57400,
+    27500,
+    "Finland"
+   ],
+   [
+    "fra-home",
+    20800,
+    13823700,
+    196800,
+    8179000,
+    3922100,
+    "France"
+   ],
+   [
+    "deu-home",
+    10743,
+    7139800,
+    150000,
+    6234000,
+    2989400,
+    "Germany"
+   ],
+   [
+    "gbr-home",
+    23812,
+    15825500,
+    225050,
+    9353100,
+    4485100,
+    "Great Britain"
+   ],
+   [
+    "ita-home",
+    5000,
+    3323000,
+    21000,
+    872800,
+    418500,
+    "Italy"
+   ],
+   [
+    "nld-home",
+    628,
+    417400,
+    10951,
+    455100,
+    218200,
+    "Netherlands"
+   ],
+   [
+    "pry-home",
+    3,
+    2000,
+    100,
+    4200,
+    2000,
+    "Paraguay"
+   ],
+   [
+    "prt-home",
+    2036,
+    1353100,
+    8585,
+    356800,
+    171100,
+    "Portugal"
+   ],
+   [
+    "rus-home",
+    4259,
+    2830500,
+    114733,
+    4768300,
+    2286600,
+    "Russia"
+   ],
+   [
+    "sal-home",
+    31,
+    20700,
+    168,
+    7000,
+    3400,
+    "San Salvador"
+   ],
+   [
+    "swe-home",
+    610,
+    405400,
+    5750,
+    239000,
+    114600,
+    "Sweden"
+   ],
+   [
+    "che-home",
+    6420,
+    4266700,
+    56500,
+    2348100,
+    1126000,
+    "Switzerland"
+   ],
+   [
+    "usa-home",
+    25079,
+    16667500,
+    355938,
+    14792800,
+    7093600,
+    "United States"
+   ],
+   [
+    "other",
+    5000,
+    3323000,
+    50000,
+    2078000,
+    996500,
+    "Other countries"
+   ]
+  ],
+  "usBars1900": {
+   "locator": "p. 47 (PDF 53): gold and silver bars furnished for use in manufactures and arts during the calendar year 1900 (Philadelphia mint, New York assay office and private refineries), by material used",
+   "unit": "USD (gold at its value; silver at its coining value)",
+   "gold": {
+    "domesticBullion": 14582627,
+    "unitedStatesCoin": 580805,
+    "foreignMaterial": 584903,
+    "oldMaterial": 3480612,
+    "total": 19228947
+   },
+   "silver": {
+    "domesticBullion": 13476829,
+    "unitedStatesCoin": 8681,
+    "foreignMaterial": 1215935,
+    "oldMaterial": 2296250,
+    "total": 16997695
+   },
+   "note": "Both columns reproduce their printed totals. New metal = domestic bullion + foreign material (gold 78.9 %, silver 86.4 %); melted coin (monetary stock) and old material are not new metal."
+  }
+ },
+ "crops1900": {
+  "description": "D-146 A12: 1900 figures for coffee, tea, cocoa, tobacco and rubber by producer, kg. Production where the source gives it, otherwise exports (marked). Transcribed but NOT used for placement until the main producers missing here are covered (the builder still pools these goods worldwide by province weight).",
+  "entries": [
+   {
+    "crop": "tea",
+    "territory": "bin",
+    "kind": "production",
+    "kg": 89566650.56553368,
+    "as": "197,460,664 lb",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 44, p. 246 (PDF 886): tea in India (including native states), 1900, production 197,460,664 lb on 522,487 acres",
+    "status": "sourced"
+   },
+   {
+    "crop": "coffee",
+    "territory": "bin",
+    "kind": "production",
+    "kg": 9789431.89011711,
+    "as": "21,582,003 lb",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 45, p. 247 (PDF 887): coffee in India, 1900, production 21,582,003 lb (footnote d: imperfect, no returns from several Nilgiri plantations)",
+    "status": "sourced"
+   },
+   {
+    "crop": "tea",
+    "territory": "cey",
+    "kind": "exports",
+    "kg": 67705285.03187911,
+    "as": "149,264,603 lb",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 59 (PDF 699): Ceylon exports, 1900, tea 149,264,603 lb (production not stated, p. 246 note a)",
+    "status": "sourced"
+   },
+   {
+    "crop": "cocoa",
+    "territory": "cey",
+    "kind": "exports",
+    "kg": 1711886.63429168,
+    "as": "33,697 cwt",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 59 (PDF 699): Ceylon exports, 1900, cocoa 33,697 cwt",
+    "status": "sourced"
+   },
+   {
+    "crop": "coffee",
+    "territory": "cey",
+    "kind": "exports",
+    "kg": 502536.80109248,
+    "as": "9,396 + 496 cwt",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 59 (PDF 699): Ceylon exports, 1900, coffee, plantation 9,396 cwt and native 496 cwt",
+    "status": "sourced"
+   },
+   {
+    "crop": "tobacco",
+    "territory": "cey",
+    "kind": "exports",
+    "kg": 2160268.1351451203,
+    "as": "42,523 cwt",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 59 (PDF 699): Ceylon exports, 1900, tobacco unmanufactured 42,523 cwt",
+    "status": "sourced"
+   },
+   {
+    "crop": "cocoa",
+    "territory": "bwa",
+    "kind": "exports",
+    "kg": 544670.9963417801,
+    "as": "1,200,794 lb",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 117 (PDF 757): Gold Coast exports, 1900, cocoa 1,200,794 lb",
+    "status": "sourced"
+   },
+   {
+    "crop": "coffee",
+    "territory": "bwa",
+    "kind": "exports",
+    "kg": 37739.33877637,
+    "as": "83,201 lb",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 117 (PDF 757): Gold Coast exports, 1900, coffee 83,201 lb",
+    "status": "sourced"
+   },
+   {
+    "crop": "rubber",
+    "territory": "bwa",
+    "kind": "exports",
+    "kg": 1566000.4418828,
+    "as": "3,452,440 lb",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 117 (PDF 757): Gold Coast exports, 1900, rubber (African) 3,452,440 lb",
+    "status": "sourced"
+   },
+   {
+    "crop": "cocoa",
+    "territory": "bwi",
+    "kind": "exports",
+    "kg": 1191315.0005680001,
+    "as": "23,450 cwt",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 133 (PDF 773): Jamaica exports, year ended 31 March 1901, cocoa 23,450 cwt",
+    "status": "sourced"
+   },
+   {
+    "crop": "coffee",
+    "territory": "bwi",
+    "kind": "exports",
+    "kg": 4364277.08971408,
+    "as": "85,907 cwt",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 133 (PDF 773): Jamaica exports, year ended 31 March 1901, coffee 85,907 cwt",
+    "status": "sourced"
+   },
+   {
+    "crop": "cocoa",
+    "territory": "bwi",
+    "kind": "exports",
+    "kg": 15780787.90229634,
+    "as": "34,790,682 lb",
+    "sourceId": "colonial-abstract-38",
+    "locator": "No. 21, p. 141 (PDF 781): Trinidad (with Tobago) exports, 1900, cocoa 34,790,682 lb",
+    "status": "sourced"
+   },
+   {
+    "crop": "coffee",
+    "territory": "dei",
+    "kind": "exports",
+    "kg": 48674822,
+    "as": "31,544 + 11,422 (parchment) + 151 (cherry) thousand kg + 7,917,722 kg government",
+    "sourceId": "koloniaal-verslag-1901",
+    "locator": "Bijlage DDD, PDF p. 537: general exports 1900 (thousands of kg), coffee hulled 31,544, in parchment 11,422, dried cherry 151; PDF p. 536 footnote j: government-account coffee 7,917,722 kg. Parchment counted at 0.8 and cherry at 0.5 of hulled weight (provisional).",
+    "status": "estimated"
+   },
+   {
+    "crop": "tea",
+    "territory": "dei",
+    "kind": "exports",
+    "kg": 7634000,
+    "as": "7,634 thousand kg",
+    "sourceId": "koloniaal-verslag-1901",
+    "locator": "Bijlage DDD, PDF p. 538: general exports 1900, tea 7,634 thousand kg",
+    "status": "sourced"
+   },
+   {
+    "crop": "cocoa",
+    "territory": "dei",
+    "kind": "exports",
+    "kg": 1342000,
+    "as": "1,342 thousand kg",
+    "sourceId": "koloniaal-verslag-1901",
+    "locator": "Bijlage DDD, PDF p. 536: general exports 1900, cocoa 1,342 thousand kg",
+    "status": "sourced"
+   },
+   {
+    "crop": "tobacco",
+    "territory": "dei",
+    "kind": "exports",
+    "kg": 54011000,
+    "as": "52,398 + 1,613 thousand kg",
+    "sourceId": "koloniaal-verslag-1901",
+    "locator": "Bijlage DDD, PDF p. 538: general exports 1900, tobacco for the European market 52,398 and for the native market 1,613 thousand kg",
+    "status": "sourced"
+   },
+   {
+    "crop": "coffee",
+    "territory": "bra-home",
+    "kind": "exports",
+    "kg": 538429500,
+    "as": "8,973,825 bags of 60 kg",
+    "sourceId": "brazil-handbook-1901",
+    "locator": "p. 134 (PDF 140): coffee exported, crop year 1899-1900, Rio de Janeiro 3,294,987 and Santos 5,678,838 bags of 60 kg (= 8,973,825, p. 134 text; 'the ports through which the whole trade is practically carried on')",
+    "status": "sourced"
+   },
+   {
+    "crop": "rubber",
+    "territory": "bra-home",
+    "kind": "receipts",
+    "kg": 25781176.578,
+    "as": "25,374 long tons",
+    "sourceId": "brazil-handbook-1901",
+    "locator": "p. 135 (PDF 141): entries of rubber to Para, 25,374 English tons 'in 1899-1900' (the sentence names the fiscal years 1897-98 and 1898-99; shipments 1898-99 were 25,246 tons)",
+    "status": "estimated"
+   }
+  ],
+  "coverage": {
+   "coffee": "Brazil, Dutch East Indies, India, Ceylon, Jamaica, Gold Coast. Missing: Venezuela, Colombia, Central America, Mexico, Haiti, Puerto Rico, Cuba (the Brazil handbook, p. 104, gives all America outside Brazil 426.8 M lb in 1898).",
+   "tea": "India, Ceylon, Dutch East Indies. Missing: China and Japan (the Board of Trade foreign-countries abstract is cached as OCR text only), and their domestic crops.",
+   "cocoa": "Trinidad, Jamaica, Ceylon, Gold Coast, Dutch East Indies. Missing: Ecuador, Brazil (Bahia), Venezuela, Sao Tome.",
+   "tobacco": "Ceylon and the Dutch East Indies (exports). Missing: the large producers that consumed their own crop (United States, India, China, Russia, Austria-Hungary, Turkey) and Cuba and the Philippines.",
+   "rubber": "Brazil and the Gold Coast. Missing: the Congo Free State, Lagos and other West African colonies, Peru and Bolivia (via Para), Central America."
+  }
+ }
 }

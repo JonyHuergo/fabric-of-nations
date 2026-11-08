@@ -1,6 +1,6 @@
 /**
  * P5b stage B (D-146 A5, plan §8, D-148): placement and calibration of the 1900 production
- * of the 57-good catalogue. Called by `build-goods-1900.mjs` with the definitions, needs and
+ * of the 58-good catalogue. Called by `build-goods-1900.mjs` with the definitions, needs and
  * goods it built and the P2b/P5 province world.
  *
  * Method:
@@ -21,7 +21,7 @@
  *     province and definition, owned by the province's capitalists, else its largest block.
  *  4. The eight P2b goods keep their producers, whose output scales with the good's new
  *     demand in the market (D-148); cotton moves from the commercial farms to cotton farms
- *     (C-8); markets with demand and no producer get the P2b basic producer.
+ *     at the USDA 1901 commercial-crop shares (C-8); markets with demand and no producer get the P2b basic producer.
  *  5. Steps 1-4 are iterated (Jacobi) until the capacities settle, because recipes and
  *     maintenance link every good (machinery is bought by the mines that feed it).
  *  6. Level and technique per building follow D-135 A3 at the market's prices and the
@@ -30,14 +30,16 @@
  *     divide it by (1 - e), so the day-0 harvest is unchanged (C-9).
  *
  * Gold and silver mines are sized by the D-140 mints' purchases (D-149, plan §13.7);
- * arsenals are not placed (A2); hydro stations wait for the Hoes et al. potential (A8).
+ * arsenals are not placed (A2). Hydro stations (C-12) take the 1902 US water-wheel share of
+ * each territory's electricity, inside its provinces' hydro capacity (HydroSHEDS
+ * RiverATLAS potential x the technical share), at most four provinces, largest capacity
+ * first; coal stations make the rest.
  */
 
 const AGGREGATE_KEYS = new Set(["other", "other-europe"]);
 const CENTRAL_AMERICA = ["gua-home", "hon-home", "sal-home", "nic-home", "cos-home"];
 /** Building definitions not placed in the 1900 world, with the reason (report). */
 export const NOT_PLACED_1900 = {
-  "hydro-station": "hydro potential (Hoes et al. 2017, D-146 A8) not yet extracted",
   "synthetic-rubber-plant": "gated by petrochemicals",
   "petrochemical-plant": "gated by petrochemicals",
   "nitrogen-fixation-plant": "gated by nitrogen fixation",
@@ -73,6 +75,7 @@ export function placeCatalogue(ctx) {
     goods, definitions, oldDefinitions, needs, oldNeeds, professions, provinces, pops, countries, oldCountries,
     markets, buildings, deposits, sources, technology, rows, workingAgeShare, fertiliser, round, territoryCoverage,
     extraDemand = new Map(),
+    hydro,
   } = ctx;
   const goodById = new Map(goods.map((good) => [good.id, good]));
   const goodByKey = new Map(goods.map((good) => [good.key, good]));
@@ -196,6 +199,7 @@ export function placeCatalogue(ctx) {
   const firstNewDefinitionId = Math.min(...definitions.filter((definition) => !oldDefByKey.has(definition.key)).map((definition) => definition.id));
   const producersOf = (goodId) =>
     definitions.filter((definition) => definition.jobs.length > 0 && definition.outputs[0]?.goodId === goodId && NOT_PLACED_1900[definition.key] === undefined && definition.id >= firstNewDefinitionId);
+  const hydroDefinition = definitions.find((definition) => definition.usesHydroPotential === true);
   const definitionFor = (territory, goodId) => {
     const province = territoryProvinces.get(territory)?.[0];
     const country = province === undefined ? undefined : countryOf.get(province.id);
@@ -248,7 +252,6 @@ export function placeCatalogue(ctx) {
   // 2. The P2b producers: their 1900 output by good (old definitions, old countries).
   const oldProducers = [];
   const warehouses = [];
-  const removedCotton = new Map();
   for (const row of buildings) {
     const oldDefinition = oldDefByKey.get(row.definitionKey);
     const definition = defByKey.get(row.definitionKey);
@@ -261,8 +264,6 @@ export function placeCatalogue(ctx) {
     const tfOld = techFactor(oldCountryOf.get(row.provinceId), oldDefinition.sector);
     const capacityOld = row.level * oldDefinition.referenceThroughputPerDayAtLevelOne * prodMod(oldDefinition) * (row.technique ?? 1);
     const outputs = new Map(oldDefinition.outputs.map((output) => [output.goodId, capacityOld * output.quantityPerThroughputUnit * tfOld]));
-    const cotton = definition.outputs.some((output) => output.goodId === gid("cotton")) ? 0 : outputs.get(gid("cotton")) ?? 0;
-    if (cotton > 0) removedCotton.set(province.territoryKey, (removedCotton.get(province.territoryKey) ?? 0) + cotton);
     oldProducers.push({ row, province, oldDefinition, definition, capacityOld, outputs, mainGood: definition.outputs[0].goodId });
   }
   const oldIntermediate = new Map();
@@ -365,6 +366,31 @@ export function placeCatalogue(ctx) {
       for (const entry of weights) addEntry(entry.province, definition, (quantity * entry.weight) / sum, entry.deposit, "p5b");
     };
     /**
+     * C-12: up to `wanted` of a territory's electricity from hydro stations, at most four
+     * provinces with the largest daily hydro capacity (potential x technical share / days),
+     * each given at most its capacity, split by capacity. Returns what was placed.
+     */
+    const placeHydro = (territory, wanted) => {
+      if (!(wanted > 0) || hydroDefinition === undefined) return 0;
+      const first = territoryProvinces.get(territory)?.[0];
+      const gate = techKeyById.get(hydroDefinition.requiredTechnologyId);
+      if (first === undefined || !knows(countryOf.get(first.id), gate)) return 0;
+      const sites = (territoryProvinces.get(territory) ?? [])
+        .filter((province) => marketOfProvince.get(province.id) !== undefined && ownerOf(province.id) !== null && province.hydroPotentialMWhPerYear > 0)
+        .map((province) => ({ province, capacity: (province.hydroPotentialMWhPerYear * hydro.technicalShare) / hydro.daysPerYear }))
+        .sort((left, right) => right.capacity - left.capacity || left.province.id - right.province.id)
+        .slice(0, MAX_PROVINCES_PER_TERRITORY);
+      const total = sites.reduce((acc, site) => acc + site.capacity, 0);
+      if (!(total > 0)) return 0;
+      let placed = 0;
+      for (const site of sites) {
+        const quantity = Math.min(site.capacity, (wanted * site.capacity) / total);
+        addEntry(site.province, hydroDefinition, quantity, undefined, "p5b");
+        placed += quantity;
+      }
+      return placed;
+    };
+    /**
      * Minimum size (D-148): a tradeable good's territory target below MIN_LEVELS levels
      * goes to the targets of at least that size in the same market, else to those
      * worldwide, in proportion to their quantity; with none, to the largest target.
@@ -438,15 +464,8 @@ export function placeCatalogue(ctx) {
         continue;
       }
       const shareKey = SHARE_PROXY[good.key] ?? good.key;
-      let shares = sources.outputs1900[shareKey];
+      const shares = sources.outputs1900[shareKey];
       let basis = shares === undefined ? null : `sourced shares${shareKey === good.key ? "" : ` of ${shareKey}`} (${shares.locator})`;
-      if (shares === undefined && good.key === "cotton") {
-        // Provisional until the USDA Yearbook 1901 cotton table is transcribed: the P2b
-        // joint cotton of each territory, kept where a cotton farm can stand.
-        const entries1900 = [...removedCotton].filter(([territory]) => definitionFor(territory, good.id) !== undefined).sort((left, right) => left[0].localeCompare(right[0]));
-        shares = { entries: entries1900.map(([territory, value]) => [territory, value]) };
-        basis = "provisional: P2b joint-cotton territories inside the cotton band";
-      }
       const targets = new Map();
       if (shares !== undefined) {
         const list = [];
@@ -501,7 +520,9 @@ export function placeCatalogue(ctx) {
       const placedTargets = consolidate(good, targets, entryReport);
       for (const [territory, quantity] of [...placedTargets].sort((left, right) => left[0].localeCompare(right[0]))) {
         const definition = definitionFor(territory, good.id);
-        placeInTerritory(territory, definition, quantity);
+        const hydroPlaced = good.id === hydroDefinition?.outputs[0].goodId ? placeHydro(territory, quantity * hydro.shareOfElectricity) : 0;
+        if (hydroPlaced > 0) entryReport.hydroPerDay = (entryReport.hydroPerDay ?? 0) + hydroPlaced;
+        placeInTerritory(territory, definition, quantity - hydroPlaced);
         entryReport.placedPerDay += quantity;
       }
     }

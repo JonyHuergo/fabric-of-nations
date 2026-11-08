@@ -61,6 +61,15 @@ export interface ProvinceEconomy {
    * `maxAbsLatitudeDeg` (crop bands) work only where it is at or below that limit.
    */
   absLatitudeDeg: number | null;
+  /**
+   * P5b (C-12, D-146 A8): gross theoretical hydropower potential of the province's
+   * rivers, MWh per year (sum over river reaches of water density x g x mean discharge x
+   * elevation drop; HydroSHEDS RiverATLAS, D-148). Static geography, never depleted.
+   * Hydro stations generate at most `HYDRO_TECHNICAL_SHARE` of it, spread evenly over
+   * the year. Null where no potential was given (legacy worlds, fixtures): a hydro
+   * station cannot work there.
+   */
+  hydroPotentialMWhPerYear: number | null;
 }
 
 /** Authoritative population block state. */
@@ -248,6 +257,8 @@ export interface ProvinceEconomyInitialDef {
   wageRUSDPerYearByProfession?: readonly number[];
   /** P5b absolute centroid latitude in degrees; defaults to null (no crop-band limit). */
   absLatitudeDeg?: number | null;
+  /** P5b gross theoretical hydro potential, MWh/year; defaults to null (no hydro). */
+  hydroPotentialMWhPerYear?: number | null;
 }
 
 export interface PopulationScenarioDef {

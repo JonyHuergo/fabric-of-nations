@@ -120,6 +120,10 @@ export function assertValidProvinceEconomy(province: ProvinceEconomy): void {
     const latitude = requireFiniteNumber(record.absLatitudeDeg, "province.absLatitudeDeg");
     if (latitude < 0 || latitude > 90) throw new RangeError("province.absLatitudeDeg must be in 0..90");
   }
+  if (record.hydroPotentialMWhPerYear !== null) {
+    const potential = requireFiniteNumber(record.hydroPotentialMWhPerYear, "province.hydroPotentialMWhPerYear");
+    if (potential < 0) throw new RangeError("province.hydroPotentialMWhPerYear must be non-negative");
+  }
   for (const field of ["unrest", "infrastructure", "urbanShare"] as const) {
     const rate = requireFiniteNumber(record[field], `province.${field}`);
     if (rate < 0 || rate > 1) {
@@ -669,6 +673,7 @@ export function createPopulationWorld(
       urbanShare: province.urbanShare ?? 0,
       wageRUSDPerYearByProfession: [...(province.wageRUSDPerYearByProfession ?? [])],
       absLatitudeDeg: province.absLatitudeDeg ?? null,
+      hydroPotentialMWhPerYear: province.hydroPotentialMWhPerYear ?? null,
     }));
 
   const world: World = {

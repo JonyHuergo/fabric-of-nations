@@ -81,7 +81,9 @@ export const SIM_VERSION = "0.29.0";
  * P5b (schema 33, D-146) adds `BuildingInstance.depositId` (the deposit an extraction
  * building works), `ProvinceEconomy.absLatitudeDeg` (crop bands) and three
  * industrial-policy sectors (mining, energy, services). Schema-32 worlds are reported
- * as incompatible.
+ * as incompatible. `ProvinceEconomy.hydroPotentialMWhPerYear` (C-12) joined schema 33
+ * before any release as an optional encoded field (absent = null), so schema-33 worlds
+ * without hydro data encode as before.
  */
 export const WORLD_SCHEMA_VERSION = 33;
 

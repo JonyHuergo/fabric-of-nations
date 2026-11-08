@@ -459,11 +459,11 @@
    },
    {
     "goodId": 16,
-    "quantity": 83164
+    "quantity": 82716
    },
    {
     "goodId": 17,
-    "quantity": 3970
+    "quantity": 4291
    },
    {
     "goodId": 18,
@@ -471,11 +471,11 @@
    },
    {
     "goodId": 19,
-    "quantity": 1272
+    "quantity": 1257
    },
    {
     "goodId": 20,
-    "quantity": 86
+    "quantity": 85
    },
    {
     "goodId": 21,
@@ -483,7 +483,7 @@
    },
    {
     "goodId": 22,
-    "quantity": 407
+    "quantity": 408
    },
    {
     "goodId": 23,
@@ -491,7 +491,7 @@
    },
    {
     "goodId": 24,
-    "quantity": 68
+    "quantity": 67
    },
    {
     "goodId": 25,
@@ -503,23 +503,23 @@
    },
    {
     "goodId": 27,
-    "quantity": 2297
+    "quantity": 2483
    },
    {
     "goodId": 28,
-    "quantity": 515
+    "quantity": 557
    },
    {
     "goodId": 29,
-    "quantity": 990
+    "quantity": 1070
    },
    {
     "goodId": 31,
-    "quantity": 1345
+    "quantity": 1329
    },
    {
     "goodId": 32,
-    "quantity": 89
+    "quantity": 88
    },
    {
     "goodId": 33,
@@ -527,7 +527,7 @@
    },
    {
     "goodId": 34,
-    "quantity": 52
+    "quantity": 53
    },
    {
     "goodId": 35,
@@ -539,15 +539,15 @@
    },
    {
     "goodId": 37,
-    "quantity": 14461
+    "quantity": 14069
    },
    {
     "goodId": 38,
-    "quantity": 1298
+    "quantity": 1282
    },
    {
     "goodId": 39,
-    "quantity": 2
+    "quantity": 3
    },
    {
     "goodId": 40,
@@ -596,6 +596,10 @@
    {
     "goodId": 51,
     "quantity": 2887730
+   },
+   {
+    "goodId": 57,
+    "quantity": 62812
    }
   ],
   "resourceRequirements": [],
@@ -2150,21 +2154,21 @@
   "inputs": [
    {
     "goodId": 17,
-    "quantityPerThroughputUnit": 173.988
+    "quantityPerThroughputUnit": 168.827
    }
   ],
   "outputs": [
    {
     "goodId": 27,
-    "quantityPerThroughputUnit": 100.913
+    "quantityPerThroughputUnit": 97.9195
    },
    {
     "goodId": 28,
-    "quantityPerThroughputUnit": 22.6185
+    "quantityPerThroughputUnit": 21.9475
    },
    {
     "goodId": 29,
-    "quantityPerThroughputUnit": 43.4971
+    "quantityPerThroughputUnit": 42.2067
    }
   ],
   "jobs": [
@@ -2282,13 +2286,13 @@
   "inputs": [
    {
     "goodId": 29,
-    "quantityPerThroughputUnit": 378.148
+    "quantityPerThroughputUnit": 324.411
    }
   ],
   "outputs": [
    {
     "goodId": 30,
-    "quantityPerThroughputUnit": 630.246
+    "quantityPerThroughputUnit": 540.686
    }
   ],
   "jobs": [
@@ -2459,7 +2463,8 @@
     "goodId": 39,
     "quantityPerLevelPerDay": 0.0236483
    }
-  ]
+  ],
+  "usesHydroPotential": true
  },
  {
   "id": 40,
@@ -4073,6 +4078,70 @@
  },
  {
   "id": 64,
+  "key": "jewellery-workshop",
+  "name": "Jeweller and Silversmith",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 25,
+    "quantityPerThroughputUnit": 2.91312
+   },
+   {
+    "goodId": 26,
+    "quantityPerThroughputUnit": 36.178
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 57,
+    "quantityPerThroughputUnit": 5314.5
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 800
+   },
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 200
+   }
+  ],
+  "constructionCostRUSD": 8683046,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 356.84,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "manufacturing",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 14543.7
+   },
+   {
+    "goodId": 38,
+    "quantity": 396.459
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 2.49035
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.10183
+   }
+  ]
+ },
+ {
+  "id": 65,
   "key": "pharmaceutical-works",
   "name": "Pharmaceutical Works",
   "referenceThroughputPerDayAtLevelOne": 1,
@@ -4136,7 +4205,7 @@
   ]
  },
  {
-  "id": 65,
+  "id": 66,
   "key": "trading-house",
   "name": "Trading House",
   "referenceThroughputPerDayAtLevelOne": 1,
@@ -4196,7 +4265,7 @@
   ]
  },
  {
-  "id": 66,
+  "id": 67,
   "key": "transport-company",
   "name": "Railway and Shipping Company",
   "referenceThroughputPerDayAtLevelOne": 1,
@@ -4267,7 +4336,7 @@
   ]
  },
  {
-  "id": 67,
+  "id": 68,
   "key": "post-and-telegraph",
   "name": "Post and Telegraph Office",
   "referenceThroughputPerDayAtLevelOne": 1,
@@ -4326,7 +4395,7 @@
   ]
  },
  {
-  "id": 68,
+  "id": 69,
   "key": "bank-and-office",
   "name": "Bank and Office",
   "referenceThroughputPerDayAtLevelOne": 1,
@@ -4390,7 +4459,7 @@
   ]
  },
  {
-  "id": 69,
+  "id": 70,
   "key": "personal-services",
   "name": "Personal and Recreation Services",
   "referenceThroughputPerDayAtLevelOne": 1,

@@ -401,6 +401,7 @@ function projectTypeSnapshots(definitions: EconomyDefinitions): readonly Snapsho
       constructionWorkers: definition.constructionWorkers,
       plannedJobs: roundDisplay(constructionPlannedJobs(definition), 2),
       sector: definition.sector,
+      usesHydroPotential: definition.usesHydroPotential === true,
       dailyUpkeepRUSDAtLevelOne: roundDisplay(definition.dailyUpkeepRUSDAtLevelOne, 6),
       workingCapitalRUSD: roundDisplay(constructionWorkingCapital(definition), 6),
       outputs: definition.outputs

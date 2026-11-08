@@ -210,6 +210,10 @@
    {
     "goodKey": "personal-services",
     "quantityPerCapitaPerDay": 0.209459
+   },
+   {
+    "goodKey": "jewellery",
+    "quantityPerCapitaPerDay": 0.00271601
    }
   ]
  }

@@ -167,8 +167,11 @@ describe("M14 monetary equivalence and determinism", () => {
   // at their reference price in every market; gold and silver mines sized by the mints.
   // Re-pinned for the 1990 reference prices of later goods (Statistical Abstract 1992,
   // D-148 transcriptions): their opening market prices change; no 1900 producer.
+  // Re-pinned on 2026-11-08, by design (D-148 additions, D-152): province hydro potential
+  // (RiverATLAS) and 72 hydro stations, cotton at the USDA 1901 shares, petrol and fuel
+  // oil at their 1900 export values, jewellery (good 57) with 44 jewellers, 6,299 buildings.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("5ab72a0a3534f480");
+    expect(hashWorld(world)).toBe("361b93de28dfa214");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {

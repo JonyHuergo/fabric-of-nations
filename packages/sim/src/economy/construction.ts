@@ -69,11 +69,12 @@ import {
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import { constructionProgressFactor } from "./politics.js";
 import { hasResearchedTechnology } from "./technology.js";
-import { depositForNewBuilding } from "./resources.js";
+import { depositForNewBuilding, hydroCapacityPerDay } from "./resources.js";
 import { canonicalizeStockLots } from "./inventory.js";
 import type { MarketSettlementResult } from "./settlement.js";
 import { assertValidFinanceState } from "./validation.js";
 import type {
+  BuildingDef,
   BuildingInstance,
   ConstructionProject,
   ConstructionState,
@@ -964,6 +965,40 @@ function assertBuildableDefinition(
   }
 }
 
+/** P5b (C-12): a hydro definition's output per level-one day at reference throughput. */
+function hydroReferenceOutputPerDay(definition: BuildingDef, level = 1, condition = 1): number {
+  return (
+    definition.referenceThroughputPerDayAtLevelOne *
+    level *
+    condition *
+    (definition.outputs[0]?.quantityPerThroughputUnit ?? 0)
+  );
+}
+
+/**
+ * P5b (C-12): a province's daily hydro capacity less the reference output of the hydro
+ * stations in it and of the hydro projects under way there (output units per day). May be
+ * negative where stations work at better techniques than the reference.
+ */
+export function hydroRoomPerDay(world: World, definitions: EconomyDefinitions, provinceId: Id): number {
+  const province = world.provinceEconomies.find((entry) => entry.id === provinceId);
+  if (province === undefined) throw new RangeError(`unknown province ${String(provinceId)}`);
+  let room = hydroCapacityPerDay(province);
+  for (const building of world.buildings) {
+    if (building.provinceId !== provinceId) continue;
+    const definition = definitions.buildings.find((entry) => entry.id === building.definitionId);
+    if (definition?.usesHydroPotential !== true) continue;
+    room -= hydroReferenceOutputPerDay(definition, building.level, building.condition);
+  }
+  for (const project of world.construction.projects) {
+    if (project.provinceId !== provinceId || constructionProjectIsTerminal(project.status)) continue;
+    const definition = definitions.buildings.find((entry) => entry.id === project.definitionId);
+    if (definition?.usesHydroPotential !== true) continue;
+    room -= hydroReferenceOutputPerDay(definition);
+  }
+  return room;
+}
+
 /** Validate a project start without mutating. */
 export function validateConstructionStart(
   world: World,
@@ -1005,6 +1040,14 @@ export function validateConstructionStart(
     province.absLatitudeDeg > definition.maxAbsLatitudeDeg
   ) {
     throw new RangeError(`province ${String(province.id)} lies outside this building's latitude band`);
+  }
+  // P5b (C-12): a hydro station needs room under its province's river flow for one more
+  // level-one station at reference output, after the stations already there.
+  if (definition.usesHydroPotential === true) {
+    const room = hydroRoomPerDay(world, definitions, province.id);
+    if (!(room >= hydroReferenceOutputPerDay(definition))) {
+      throw new RangeError(`province ${String(province.id)} has no hydro potential left for this building`);
+    }
   }
   if (!world.profitDistribution.enabled) {
     throw new RangeError(

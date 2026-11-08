@@ -217,6 +217,26 @@ export const MINT_MAX_DAILY_SALE_SHARE = 1 / 30;
  */
 export const MINT_RESUME_SALE_DAYS = 30;
 
+/**
+ * P5b (C-12, D-146 A8, D-148) hydro stations. PROVISIONAL, documented values.
+ *
+ * HYDRO_TECHNICAL_SHARE (dimensionless, share of a province's gross theoretical
+ * potential `ProvinceEconomy.hydroPotentialMWhPerYear`): the most of it the province's
+ * hydro stations can generate in a year with any technique. Hoes et al. (2017, PLOS ONE
+ * 12(2): e0171844, CC BY 4.0) put the gross theoretical world potential at 52 PWh/year and
+ * summarise the literature's technical potential as about 8 to 26 PWh/year; the mid-point
+ * 17 / 52 = 0.33. Provisional: one share for every province (terrain, storage and
+ * distance to load vary).
+ */
+export const HYDRO_TECHNICAL_SHARE = 0.33;
+/**
+ * HYDRO_DAYS_PER_YEAR (days per year): the annual potential is a long-term mean flow
+ * (1971–2000 naturalised discharge), spread evenly over the mean Gregorian year, so a
+ * province's stations generate at most potential x share / 365.2425 MWh a day. Seasonal
+ * flow is not modelled. Structural.
+ */
+export const HYDRO_DAYS_PER_YEAR = 365.2425;
+
 // M10 (D-081). Provisional strategic constants; none is calibrated.
 /** Maximum army formations in one world. */
 export const MAX_ARMIES = 200;

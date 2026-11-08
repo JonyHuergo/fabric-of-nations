@@ -382,6 +382,16 @@ function assertBuilding(
       throw new RangeError(`${path}.maxAbsLatitudeDeg must be in (0, 90]`);
     }
   }
+  let usesHydroPotential: true | undefined;
+  if (record.usesHydroPotential !== undefined) {
+    if (record.usesHydroPotential !== true) throw new TypeError(`${path}.usesHydroPotential must be true when present`);
+    if (outputs.length !== 1) throw new RangeError(`${path}: a hydro building must have exactly one output`);
+    if (inputs.length > 0) throw new RangeError(`${path}: a hydro building cannot have recipe inputs`);
+    if (extracts !== undefined || landUse !== undefined) {
+      throw new RangeError(`${path}: a hydro building cannot also extract or farm`);
+    }
+    usesHydroPotential = true;
+  }
   const building: BuildingDef = {
     id: requireInteger(record.id, `${path}.id`, 0, 0xffff_ffff),
     key: requireString(record.key, `${path}.key`, { minLength: 1 }),
@@ -423,6 +433,7 @@ function assertBuilding(
       ? {}
       : { maintenanceInputs: maintenanceInputs as NonNullable<BuildingDef["maintenanceInputs"]> }),
     ...(maxAbsLatitudeDeg === undefined ? {} : { maxAbsLatitudeDeg }),
+    ...(usesHydroPotential === undefined ? {} : { usesHydroPotential }),
   };
   if (typeof record.isEssentialInfrastructure !== "boolean") {
     throw new TypeError(`${path}.isEssentialInfrastructure must be a boolean`);

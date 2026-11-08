@@ -219,6 +219,14 @@ export interface BuildingDef {
    * `ProvinceEconomy.absLatitudeDeg` when both are present.
    */
   maxAbsLatitudeDeg?: number;
+  /**
+   * P5b (C-12): the building generates from its province's river flow. All such
+   * buildings in a province together produce at most `HYDRO_TECHNICAL_SHARE` x
+   * `ProvinceEconomy.hydroPotentialMWhPerYear` / `HYDRO_DAYS_PER_YEAR` of their single
+   * output a day (a non-depleting cap, shared in building-id order); construction needs
+   * room under that cap. Absent: no such limit.
+   */
+  usesHydroPotential?: true;
 }
 
 /** P5 (D-143): the land kinds a building can farm (HYDE 3.3 cropland and grazing land). */

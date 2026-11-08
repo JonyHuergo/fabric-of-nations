@@ -19,7 +19,12 @@ import { dayIndexToCivilDate } from "../calendar.js";
 import { drawUnitFloat } from "../rng.js";
 import type { DayIndex, Id } from "../types.js";
 import type { World } from "../world.js";
-import { RESOURCE_DISCOVERY_MONTHLY_HAZARD, RESOURCE_DISCOVERY_PURPOSE } from "./constants.js";
+import {
+  HYDRO_DAYS_PER_YEAR,
+  HYDRO_TECHNICAL_SHARE,
+  RESOURCE_DISCOVERY_MONTHLY_HAZARD,
+  RESOURCE_DISCOVERY_PURPOSE,
+} from "./constants.js";
 import { buildProvinceOwnerMap } from "./country.js";
 import { depositRemaining, type Deposit } from "./resourceState.js";
 import { hasResearchedTechnology } from "./technology.js";
@@ -116,6 +121,17 @@ export function depositForNewBuilding(world: World, resource: Deposit["resource"
     if (best === null || depositRemaining(deposit) > depositRemaining(best)) best = deposit;
   }
   return best === null ? null : best.id;
+}
+
+/**
+ * P5b (C-12): the most a province's hydro stations can generate in one day, in the
+ * output's unit (MWh): technical share x gross theoretical annual potential / days per
+ * year. Zero where the province has no potential. Never depleted: every day starts with
+ * the same flow.
+ */
+export function hydroCapacityPerDay(province: { readonly hydroPotentialMWhPerYear: number | null }): number {
+  const potential = province.hydroPotentialMWhPerYear;
+  return potential === null ? 0 : (potential * HYDRO_TECHNICAL_SHARE) / HYDRO_DAYS_PER_YEAR;
 }
 
 /**

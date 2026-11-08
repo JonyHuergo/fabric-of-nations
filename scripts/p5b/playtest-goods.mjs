@@ -1,5 +1,5 @@
 /**
- * P5b (plan section 11.5) browser check of the 57-good screens at the phone reference
+ * P5b (plan section 11.5) browser check of the 58-good screens at the phone reference
  * size (844x390).
  *
  * Usage:
@@ -120,7 +120,7 @@ try {
   await sleep(800);
   await press(app, "Markets");
   let body = await waitForText(app, "goods traded", 30_000);
-  check("home market counts the goods traded of 57", /\d+ of 57 goods traded/.test(body), body.match(/\d+ of 57 goods traded/)?.[0] ?? null);
+  check("home market counts the goods traded of 58", /\d+ of 58 goods traded/.test(body), body.match(/\d+ of 58 goods traded/)?.[0] ?? null);
   const searchHeight = await heightOf(app, 'input[aria-label="Search goods"]');
   check("goods search field is at least 44 pt", searchHeight !== null && searchHeight >= 44, String(searchHeight));
   const chipHeight = await buttonHeight(app, "Capital and transport equipment");
@@ -179,6 +179,17 @@ try {
   await reveal(app, "· needs ");
   await sleep(400);
   await shot(app, "p5b-844x390-construction");
+  // C-12: a hydro station shows the target province's river flow (or why there is none).
+  await press(app, "Energy ·", false);
+  await sleep(800);
+  await press(app, "Hydroelectric Station", false);
+  await sleep(2500);
+  body = await app.text();
+  const hydroNote = body.match(/River flow for hydro stations:[^)]*\)\.|No hydro potential in this province[^:]*: [^.]*\.|The province's river flow appears here[^.]*\./)?.[0] ?? null;
+  check("a hydro station shows the province's river flow", hydroNote !== null, hydroNote);
+  await reveal(app, hydroNote === null ? "Hydroelectric Station" : hydroNote.slice(0, 20));
+  await sleep(400);
+  await shot(app, "p5b-844x390-construction-hydro");
 
   await app.step("Money screen");
   await press(app, "Money");

@@ -46,7 +46,7 @@ import {
   createCountryAIState,
 } from "./aiState.js";
 import { canonicalizeStockLots } from "./inventory.js";
-import { assertValidBuildingDeposits } from "./validation.js";
+import { assertValidBuildingDeposits, assertValidHydroBuildings } from "./validation.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import {
   assertValidProfitDistributionPolicy,
@@ -1514,6 +1514,7 @@ export function createEconomyWorld(
   );
   // P5b (plan §4.2): extraction buildings work a discovered deposit of their kind.
   assertValidBuildingDeposits(world.buildings, world.resources.deposits, scenario.definitions);
+  assertValidHydroBuildings(world.buildings, world.provinceEconomies, scenario.definitions);
 
   assertValidWorld(world);
   return world;

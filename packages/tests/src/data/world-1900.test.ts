@@ -18,6 +18,7 @@ import {
   type CountryAction,
   type EconomyScenarioDef,
   countryProvinceIds,
+  hydroCapacityPerDay,
 } from "@century/sim";
 import {
   PROTOCOL_VERSION,
@@ -241,6 +242,69 @@ describe("M11 world initialization", () => {
       }
     }
     expect(sawEvaluation).toBe(true);
+  });
+});
+
+describe("P5b 1900 world: hydro stations and jewellery (C-12, D-152)", () => {
+  const scenario = loadM11World();
+  const definitionByKey = new Map(scenario.definitions.buildings.map((definition) => [definition.key, definition]));
+  const goodByKey = new Map(scenario.definitions.goods.map((good) => [good.key, good]));
+
+  test("hydro stations stand only where the rivers have potential, and the opening day stays under the cap", () => {
+    const hydro = definitionByKey.get("hydro-station");
+    expect(hydro?.usesHydroPotential).toBe(true);
+    const world = createEconomyWorld(scenario, { seed: 20_261_023 });
+    const stations = world.buildings.filter((building) => building.definitionId === hydro?.id);
+    expect(stations.length).toBeGreaterThan(0);
+    const provinceById = new Map(world.provinceEconomies.map((province) => [province.id, province]));
+    const referenceByProvince = new Map<number, number>();
+    for (const station of stations) {
+      const province = provinceById.get(station.provinceId);
+      expect(province?.hydroPotentialMWhPerYear ?? 0).toBeGreaterThan(0);
+      referenceByProvince.set(
+        station.provinceId,
+        (referenceByProvince.get(station.provinceId) ?? 0) +
+          station.level * station.technique * (hydro?.outputs[0]?.quantityPerThroughputUnit ?? 0),
+      );
+    }
+    // Placement gives a province's stations at most its daily capacity (before the
+    // technology factor, which the production cap then bounds as well).
+    for (const [provinceId, output] of referenceByProvince) {
+      const province = provinceById.get(provinceId)!;
+      expect(output).toBeLessThanOrEqual(hydroCapacityPerDay(province) * (1 + 1e-9));
+    }
+    // Provinces carry the potential only where the RiverATLAS table gives one.
+    expect(world.provinceEconomies.filter((province) => province.hydroPotentialMWhPerYear !== null).length).toBeGreaterThan(1_000);
+    // Regression (2026-11-08): with some provinces null and others not, the save's column
+    // table still has one set of fields and every potential round-trips.
+    expect(world.provinceEconomies.some((province) => province.hydroPotentialMWhPerYear === null)).toBe(true);
+    const restored = deserializeWorld(serializeWorld(world));
+    expect(restored.provinceEconomies.map((province) => province.hydroPotentialMWhPerYear)).toEqual(
+      world.provinceEconomies.map((province) => province.hydroPotentialMWhPerYear),
+    );
+  });
+
+  test("jewellery is a luxury need made by jewellers from gold and silver", () => {
+    const jewellery = goodByKey.get("jewellery");
+    expect(jewellery?.category).toBe("luxury");
+    const workshop = definitionByKey.get("jewellery-workshop");
+    const inputs = new Set(workshop?.inputs.map((input) => input.goodId));
+    expect(inputs.has(goodByKey.get("gold")!.id)).toBe(true);
+    expect(inputs.has(goodByKey.get("silver")!.id)).toBe(true);
+    expect(workshop?.outputs[0]?.goodId).toBe(jewellery?.id);
+    expect(workshop?.jobs.length).toBeGreaterThan(0);
+    const luxury = scenario.population.definitions.needs.find((tier) => tier.tier === "luxury");
+    expect(luxury?.items.some((item) => item.goodKey === "jewellery" && item.quantityPerCapitaPerDay > 0)).toBe(true);
+    for (const tier of scenario.population.definitions.needs) {
+      if (tier.tier !== "luxury") expect(tier.items.some((item) => item.goodKey === "jewellery")).toBe(false);
+    }
+    // Workshops stand where the 1900 metal was worked (Mint, industrial consumption).
+    const owners = new Set(
+      scenario.buildingInstances
+        .filter((building) => building.definitionId === workshop?.id)
+        .map((building) => scenario.countries?.find((country) => country.provinceIds.includes(building.provinceId))?.id),
+    );
+    for (const tag of ["FRA", "GBR", "USA", "DEU", "CHE"]) expect(owners.has(tagId(scenario, tag))).toBe(true);
   });
 });
 

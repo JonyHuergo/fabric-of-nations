@@ -12,6 +12,8 @@ import {
   dayIndexToCivilDate,
   depositRemaining,
   harvestWeatherFactor,
+  hydroCapacityPerDay,
+  hydroRoomPerDay,
   planOwnConsumption,
   RESOURCE_UNITS,
   technologyProductivityFactor,
@@ -119,5 +121,13 @@ export function provinceLandSnapshot(
     farmOutputToday: quantities(output),
     keptToday: quantities(kept),
     deposits,
+    // P5b (C-12): the province's river flow for hydro stations, null where it has none.
+    hydro:
+      province.hydroPotentialMWhPerYear !== null && province.hydroPotentialMWhPerYear > 0
+        ? {
+            capacityMWhPerDay: round(hydroCapacityPerDay(province), 1),
+            roomMWhPerDay: round(hydroRoomPerDay(world, definitions, province.id), 1),
+          }
+        : null,
   };
 }
