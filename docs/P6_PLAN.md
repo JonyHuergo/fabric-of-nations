@@ -1,6 +1,6 @@
 # P6 plan — Engel demand, saving and housing
 
-**Status:** for designer approval. Nothing in this plan is implemented. Step 1 of the
+**Status:** for designer approval; Q1 decided (b) on 2026-11-08, Q2–Q16 pending. Nothing in this plan is implemented. Step 1 of the
 assignment (the aluminium unit in the P5b report) is done (`630ddb4`); every other step
 waits for the decisions in **§0**.
 **Branch:** `prosperity/p6-demand` (from `main` at `051d7f0`; local commits only).
@@ -24,7 +24,7 @@ the GDD and earlier decisions are in **§10**. None has been settled silently.
 
 | # | Question | Options | Recommendation |
 |---|---|---|---|
-| Q1 | **Form of the demand system.** A pure linear expenditure system (LES) has constant marginal budget shares, so as income grows each category's share tends to its marginal share. Fitted to the 1901 US budgets, food's marginal share is 0.31, so a rich country never spends much less than about 31 % of its consumption on food (US 1990: about 15 %). | (a) Pure LES with the 1901 marginal shares; the asymptote is a known limit, left to P15. (b) LES with marginal shares that depend on real supernumerary income, interpolated in log income between two sourced anchors: the 1901 US wage-earner budgets and the 1990 US Consumer Expenditure Survey. At any income the Engel curves are still linear; every anchor set sums to 1, so adding-up holds exactly. | **(b)** if the designer accepts the departure from the program's wording; otherwise (a) with the limit stated in the GDD. Both satisfy the acceptance test (food share falls with income). |
+| Q1 | **Form of the demand system.** A pure linear expenditure system (LES) has constant marginal budget shares, so as income grows each category's share tends to its marginal share. Fitted to the 1901 US budgets, food's marginal share is 0.31, so a rich country never spends much less than about 31 % of its consumption on food (US 1990: about 15 %). | (a) Pure LES with the 1901 marginal shares; the asymptote is a known limit, left to P15. (b) LES with marginal shares that depend on real supernumerary income, interpolated in log income between two sourced anchors: the 1901 US wage-earner budgets and the 1990 US Consumer Expenditure Survey. At any income the Engel curves are still linear; every anchor set sums to 1, so adding-up holds exactly. | **Decided (designer, 2026-11-08): (b).** The designer asked for a comparison with Victoria 3's pop needs; the refinements it suggests are in §2.5 (Q13–Q16, pending). |
 | Q2 | **Subsistence (committed) quantities.** The 1901 Engel curves identify the marginal shares but not the subsistence total: any subsistence total fits the same lines (Appendix A). | (a) Physical committed quantities: food = the existing subsistence basket (1,966 kcal, the P4 food requirement), clothing = the existing basic tier, fuel = a cooking-and-heating minimum, every other category 0. (b) Infer them from an assumed Frisch parameter. | **(a)**: it keeps the P4 calorie link, uses quantities already sourced, and leaves no free parameter. |
 | Q3 | **The farm-gate demand distortion (D-135).** P2b divided retail budget dollars by wholesale reference prices, which overstates physical quantities; this is behind the 12 territories above 100 % of GDP. | (a) Retail margins: every unit a household buys carries sourced quantities of commerce and transport services (as C-20 already does for fuel, lighting and the other non-food categories), so households pay a retail price and the margins are output of the service sectors. Margins scale with the block's urban share (rural households buy near the farm gate). (b) One retail mark-up factor per good with no service output. | **(a)**: causal, adds service value added, and P8's transport wedge can later act on the transport part. |
 | Q4 | **Who owns and pays for dwellings before companies (P9) and credit (P11)?** | (a) **Owner-occupied:** each population block owns the dwellings it lives in and buys new ones with its saving from a new *residential builder* building, through the ordinary market. No rent flows in P6; landlords, rent and mortgages arrive with P9–P11. (b) A province stock owned by landlord households, a province rent market (rent price state, rent postings) and a landlord investment rule in P6. | **(a)**: it reuses market clearing, employment and recipes, needs no new account kinds or investment rule ahead of P10, and in 1900 a wage earner's 5 % saving is close to the cost of keeping a dwelling standard (§4.6). (b) is a larger stage that pre-empts P10. |
@@ -36,6 +36,11 @@ the GDD and earlier decisions are in **§10**. None has been settled silently.
 | Q10 | **Saves.** | (a) D-120: schema-33 saves are listed as incompatible, never deleted. (b) A 33 → 34 load migration: all new state can be derived (dwellings from population and the province's 1900 persons per dwelling, smoothed income from the last day's wages). | **(a)**, as every Prosperity stage so far; (b) on request. |
 | Q11 | **Player levers.** | (a) None new in P6: housing and consumption respond to incomes, prices, taxes and welfare that the player already sets. (b) A public-housing E3 project class. | **(a)**; public housing as a later lever (P14 lists the new levers). |
 | Q12 | **The P5b cloth factor** (`TEXTILE_CALIBRATION.clothDemandFactor` 0.52, D-148 item 13). | (a) Remove it: clothing demand comes from the LES at retail prices; re-measure cotton and wool and report. (b) Keep it on top of the LES. | **(a)**; if modelled cotton then leaves 0.85–1.15 of the 1900 crop, the result goes to the designer before any new factor. |
+
+| Q13 | **Food quality ladder** (§2.5): food's composition shifts from grain toward meat, dairy and processed food as income rises (Bennett's law). | (a) Interpolate the within-category weights α between the two anchors, like the marginal shares. (b) Keep fixed α; the shift comes only from the grain-heavy committed basket against the supernumerary mix. | **(a)**, sourced from the 1901 food-article weights and the 1990 survey's food breakdown. |
+| Q14 | **Adult equivalents** (§2.5): children need less than adults. | (a) Demand per adult equivalent from the blocks' age arrays, with a sourced 1890s dietary scale (Atwater, USDA; public domain), and the 1901 families re-expressed per adult equivalent with their composition (Table V-A). (b) Per person. | **(a)**. |
+| Q15 | **Inertia** (§2.5): daily prices and wages move; spending patterns should not jump with them. | (a) The LES reads income smoothed over a year (permanent income) and category prices smoothed over 30 days; no cap needed. (b) 30-day income, current prices. | **(a)**. |
+| Q16 | **National tastes** (§2.5): tea in Britain, coffee in the United States, no beef demand among Hindus. | (a) Country-specific α within a category where a sourced 1900 per-capita consumption table exists; elsewhere the US weights. (b) One set of weights everywhere (P15). | **(a)** for coffee, tea and cocoa, sugar and alcohol, where per-capita tables exist; it also bears on the coffee-tea-cocoa calibration. |
 
 Also for the designer, not blocking: the performance hold (§9.4) and the order of steps (§12).
 
@@ -172,6 +177,53 @@ commerce and transport service units per unit of g bought by an urban household.
   (`CATEGORY_GOODS`), expressed per unit.
 - Effect: the physical quantity per retail dollar falls (P2b's wholesale divisor goes), the
   service sectors gain the margin's value added, and the household's spending is unchanged.
+
+### 2.5 Comparison with Victoria 3 (designer's request on Q1)
+
+Read on 2026-11-08 from the community wiki (Needs and Pops pages, last checked by their
+editors against versions 1.10–1.13) and search excerpts of developer diary 13; the diaries
+themselves were behind a browser check. Mechanisms only; no game data is used.
+
+**How it works there.**
+- Each wealth level (1 to 60+) has a *buy package*: an amount of money at base prices per
+  need category, per 10,000 working adults, with dependants counted as half an adult.
+- Categories form a ladder. Basic food, simple clothing and crude items rise, peak and then
+  vanish at higher wealth, replaced by luxury food, standard clothing and household items.
+  Services, leisure, luxury items and similar needs grow faster and faster with wealth. So the
+  food share falls by construction of the curves.
+- Wealth is a slow state variable: it rises while income exceeds the package's cost and falls
+  otherwise, drifting to the consumption a pop can sustain. Standard of living (wealth plus
+  modifiers) drives birth and death rates and loyalty. Pops below an *expected* standard of
+  living, which rises with literacy, grow radical.
+- Inside a need, goods are shared by fixed weights, with minimum and maximum shares, weekly
+  change caps and cultural *obsessions* and *taboos*. The shares follow each good's share of
+  market supply, not its price: pops never look at prices. Players have long complained about
+  this substitution.
+
+**What the P6 design already does differently, and why.**
+- *Sourced Engel curves, not designed ones.* Q1b gets the falling food share from the 1901 and
+  1990 budgets instead of authored per-level curves.
+- *Price substitution.* CES shares respond to relative prices (§2.3), which the acceptance
+  test requires; supply-share substitution would not pass it.
+- *Physical food.* Committed quantities are kilocalories (P4), not money at base prices; and
+  farm households keep their own food explicitly (P5a), where Victoria 3 lets peasants buy a
+  small fraction of the package.
+- *Bennett's law in part.* The grain-heavy committed basket against the meat- and dairy-heavy
+  supernumerary mix already moves the diet up the ladder as income rises.
+
+**What is worth taking (Q13–Q16 in §0, pending).**
+- **Q13, a food ladder:** let the within-category weights move with income between the two
+  anchors, so the diet shifts toward meat, dairy and processed food, as its basic-to-luxury
+  food ladder does, but sourced.
+- **Q14, adult equivalents:** count children at a sourced dietary scale; the blocks already
+  carry age arrays.
+- **Q15, inertia:** its slow wealth drift keeps consumption steady. Here, permanent (one-year
+  smoothed) income and 30-day smoothed category prices do the same job without a cap.
+- **Q16, national tastes:** its obsessions and taboos, but only where a 1900 per-capita
+  consumption table supports them (coffee against tea, sugar, alcohol). No authored culture
+  modifiers.
+- **Later, not P6:** its expected standard of living, unrest from consumption below a
+  reference that rises with literacy, fits P14's story layer, beside P6's crowding term.
 
 ---
 
