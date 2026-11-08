@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-11-08T05:01:52.851Z",
+  "startedAt": "2026-11-08T13:29:07.728Z",
   "viewport": "844,390",
   "checks": [
     {
@@ -10,7 +10,7 @@
     {
       "name": "home market counts the goods traded of 58",
       "passed": true,
-      "detail": "39 of 58 goods traded"
+      "detail": "38 of 58 goods traded"
     },
     {
       "name": "goods search field is at least 44 pt",
@@ -108,5 +108,5 @@
     "docs/images/p5b/p5b-844x390-construction-hydro.png",
     "docs/images/p5b/p5b-844x390-money.png"
   ],
-  "finishedAt": "2026-11-08T05:02:32.340Z"
+  "finishedAt": "2026-11-08T13:29:47.247Z"
 }

@@ -8784,6 +8784,47 @@ C-9, C-19, C-22.
 7. **Jewellery (D-152).** Good 57 and the Jeweller and Silversmith building. The catalogue now has 58 goods and 71 building definitions; 44 workshops are placed at the Mint's 1900 country shares of industrial consumption.
    - **Modelled ÷ sourced 1900 output:** gold 0.27 → 0.48, silver 0.005 → 0.18. The rest is the monetary demand deferred to P11.
 8. **Measured after these additions** (`docs/P5B_BEFORE_AFTER.md`): 6,299 buildings; covered value added 59.6 % of world GDP (58.4 % before these additions).
+9. **A12 crops placed at their recorded 1900 producers** (supersedes item 6 for placement).
+   - **Batch 2 transcriptions** (`crops1900`, read from the page images; licences in `docs/P5B_GOODS_PROVENANCE.md`):
+     - *Tobacco:* the USDA Yearbook 1905, pp. 714–715, total tobacco crop of 33 producers in 1900 (2,201,193,000 lb; the rows and subtotals reproduce the printed totals). The 1906 Yearbook's headnote to the same table (p. 605) says China, Persia, Central America except Guatemala and the West Indies except Cuba and Porto Rico have no statistics.
+     - *Tea:* the Board of Trade foreign-countries abstract no. 30 (page images of the volume whose OCR text was cached): China's exports in 1900, 1,383,027 piculs (black, green, brick and tablet; p. 159), and Japan's, 45,886,000 kin including Formosa's trade (p. 163).
+     - *Coffee:* Ukers, *All About Coffee* (1922), pp. 192–194: the 1900 exports of Mexico, Guatemala, Costa Rica and the Dominican Republic, Salvador's for January–June 1900, Porto Rico's for 1900–01 and Colombia's for the year to June 1899; Venezuela's "about 1,000,000 bags" of 46 kg a year (Bureau of the American Republics, *Venezuela*, 1904, pp. 148 and 528).
+     - *Cocoa:* Walter Baker & Co., *Cocoa and Chocolate*, 1899 (p. 7) and 1904 (p. 8): the mean of the two "recent estimates" for Ecuador, Venezuela and the African crop (São Tomé, less the Gold Coast's recorded exports), and Brazil's 1904 figure.
+     - *Rubber:* *The India Rubber World*, 1 February 1901: rubber arriving at Antwerp in 1900, "largely from the Congo" (12,535,677 lb, p. 136), standing for the Congo Free State; Lagos's 1900 exports (colonial abstract no. 38, p. 113).
+   - **World estimates:**
+     - coffee: the 1898 crop, 2,106,083,288 lb (Brazil handbook, p. 104, citing the Bureau of American Republics Bulletin, 1899);
+     - cocoa: the mean of Baker's 150 and 252 million lb;
+     - tobacco: the USDA total;
+     - rubber: Henry A. Gould Co.'s 1900 deliveries for consumption in the United States and Europe, 38,966 long tons (*India Rubber World*, p. 146);
+     - tea: no world total was found, so its figure is the recorded sum (coverage 1 by construction).
+   - **Rule** (`scripts/p5b/placement.mjs`, `A12_MIN_COVERAGE` = 0.75, provisional): an A12 good uses its sourced shares only when the recorded producers that can host its producer in the 1900 world hold at least 75 % of the world estimate (coffee, tea and cocoa combined by kg). Below that, the shares would move more than a quarter of world output to the wrong producers, so the good keeps the local-and-pooled rule and the report says so. When the rule passes:
+     1. producers the sources name without a figure make their own modelled demand (China and Japan's own tea; the USDA list for tobacco);
+     2. the rest of world demand goes to each recorded producer in proportion to its kg against the world estimate;
+     3. the share no recorded producer holds keeps the local-and-pooled rule.
+     A production row wins over an export row for the same crop and territory. Exports, receipts, another year, half a year and means stand for 1900 production and are marked `estimated`.
+   - **Coverage before → after** (batch 1 → batch 1 + 2, against the same world estimates): coffee 63.0 → 81.2 %, tea 59.7 → 100 %, cocoa 22.6 → 84.4 %, tobacco 5.6 → 100 %, rubber 69.1 → 84.1 %. By good: coffee-tea-cocoa 59.5 → 85.4 %, tobacco 5.6 → 100 %, rubber 69.1 → 84.1 %. All three now use sourced shares (before: local demand, then pooled worldwide).
+   - **Modelled ÷ sourced 1900 output:** coffee-tea-cocoa 2.26, tobacco 0.95, rubber 0.42. The modelled demand for coffee, tea and cocoa is about twice the world estimate, and for rubber about 40 % of it; neither is recalibrated here.
+   - **Consequences:**
+     - 6,168 buildings (6,299 before);
+     - covered value added 59.3 % of world GDP (59.6 %);
+     - plantations stand in Brazil, India, China, the Dutch East Indies, Ceylon and the coffee republics; tobacco farms in India, China, the Philippines, the Dutch East Indies, Russia and the United States; rubber estates in Brazil, the Congo and British West Africa.
+     - Concentrated output raises the B7 warehouse capacity per level of the three goods: it is the largest market's five-day output (coffee-tea-cocoa 214,053 → 7,209,700 kg).
+     - The 1900-world hash is re-pinned by design.
+   - **Not covered:** Haiti, Nicaragua and Cuba coffee; the Centrals, Angola and the French and German colonies for rubber; Peru and Bolivia, whose rubber sits inside Pará's receipts; China's domestic tea crop, which has no figure (self-supplied).
+10. **Electricity price: options for the designer** (no change made). The census of central stations (1902) gives:
+    - all stations: 3.36 cents/kWh (sale of current ÷ output, table 1);
+    - private stations driven by water alone: 1.52 cents/kWh ($3,771,862 for 248,749,668 kWh, table 40, p. 48), of which almost half the income was power ("all other electric service" $1,858,793);
+    - motor service: about 12 % of private stations' gross income, at about 10 cents/kWh before discounts (2–15 cents); Niagara Falls 3 cents/kWh, or $25 per horsepower a year above 25 hp (p. 39). At continuous use that is 0.38 cent/kWh (6,535 kWh per horsepower-year).
+    - The census does not split kWh between lighting and power, so a sourced bulk price per kWh cannot be derived from it.
+    Options:
+    - (a) the water-only stations' 1.52 cents as the reference price: sourced, still half lighting; aluminium's power cost at 22 MWh per t becomes $334 against its 1900 price of about $705;
+    - (b) separate lighting and power goods (retail at 3.36 cents, bulk between 0.38 and 1.52 cents): a new good, recipes and a protocol change;
+    - (c) keep the provisional 1.0 cent, bounded by the sourced 0.38 and 1.52 cents, with the census rows as cross-checks.
+11. **Cotton: what drives the 2.5× gap** (no change made).
+    - *The yardstick.* The USDA 1901 commercial crop (10,591,000 bales) leaves out China, Asiatic Russia, India's home-grown mill use beyond exports and most small producers. The USDA Yearbook 1905 (pp. 709–710) gives a 1900 world crop of 15,893,591 bales (500 lb gross, 478 lb lint): India 2,262,467 (exports and mill consumption), China 1,192,000 (Ellison's estimate from net imports and an assumed 2¼ lb a head), Asiatic Russia 633,065, Egypt 1,124,632. Against it, modelled cotton (6,679 M kg) is 1.94× the lint (3,446 M kg). Even that crop understates China and leaves out India's hand-spun cotton.
+    - *The recipe.* The textile mill makes 275.4 kg of cloth from 266.7 kg of cotton and 50 kg of wool, so every textile fibre except wool is cotton: linen, hemp, jute and silk have no good. Wool is a joint product of the ranch: output is 11.3× demand.
+    - *The demand.* Workshops use 0.5 kg of cloth per garment. Modelled clothing output is 30.6 M garments a day, about 7 per person a year (the basic tier alone asks 3.65; comfort adds 10.2 and luxury 5.1 garments and 5.1 kg of cloth). Of the cloth producers buy, clothing workshops take 95 % (workshops 69 %, peasant workshops 26 %) and furniture works 5 %; luxury households buy cloth directly as well.
+    - *Possible calibrations, for the designer:* report against the 1905 world crop; raise the wool share of the mill recipe toward the wool surplus; a fibre good for flax, hemp and jute (a later phase); or revise the comfort and luxury clothing quantities. The last also bears on the P5a clothing shortage.
 
 ## D-149 — D-140 in P5b: metal standards, the mint window and the 1900 money stocks
 
@@ -9036,3 +9077,27 @@ output: gold 0.27, silver 0.005.
   `m3-economy-v13` (unreleased); the 1900-world hash is re-pinned by design.
 - The A7 report shows the split of modelled gold and silver demand between jewellery and
   the mints, against the sourced 1900 output.
+
+### Addition of 2026-11-08: census figures for the metal share (proposal, not applied)
+
+The Twelfth Census, vol. VII (Manufactures, part 1), table 1, gives for 1900 (read from the
+page images; `sources_1900.json` `industrialArts1900.census1900`):
+
+| Industry | Value of products | Cost of materials | Page |
+|---|---:|---:|---|
+| Jewelry | $46,501,181 | $22,356,067 | 10 |
+| Silversmithing | $2,936,462 | $1,229,158 | 14 |
+| Silverware | $10,569,121 | $4,554,487 | 14 |
+| Plated and britannia ware | $12,608,770 | $5,875,312 | 13 |
+| Total | $72,615,534 | $34,015,024 | |
+
+- All materials (gold, silver, stones, base metal, fuel) are 46.8 % of the value of
+  products (jewelry alone 48.1 %): an upper bound on the metal share.
+- The Mint's US industrial consumption of 1900 (gold $16,667,500 plus silver at commercial
+  value $7,093,600 = $23,761,100, gross of old material) is 32.7 % of the four industries'
+  value. Part of that metal went to watch cases, dentistry, gold leaf and other trades, so
+  the metal share of jewellery and plate is at most about 0.33.
+- **Proposal:** `jewellery-metal-share-of-value` 0.5 → 0.33 (estimated, upper bound). The
+  same metal would then make 1.5× the jewellery units, so the luxury need quantity rises in
+  proportion; modelled gold and silver demand is unchanged by construction. It stays 0.5
+  until the designer decides.

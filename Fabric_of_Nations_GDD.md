@@ -6663,7 +6663,8 @@ adoption and establishment, and protocol 22. Its performance step is held by the
 designer (the 1900 day is 593 ms in Node against the 450 ms budget). On 2026-11-08 it
 gained province hydro potential (HydroSHEDS RiverATLAS, CC BY 4.0) capping hydro stations,
 sourced cotton shares and fuel prices, and jewellery as a 58th good made by jewellers from
-gold and silver (D-148, D-152); the monetary demand for gold and silver (free coinage, a
+gold and silver (D-148, D-152), and coffee, tea and cocoa, tobacco and rubber were placed at
+their recorded 1900 producers under a coverage rule (D-148); the monetary demand for gold and silver (free coinage, a
 growing circulation) is deferred to P11 (D-152).
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated

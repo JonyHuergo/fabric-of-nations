@@ -5,8 +5,9 @@
 (D-143) accepted on 2026-11-06 (D-146). P5b (the goods catalogue and D-140) implemented
 for review on 2026-11-07 (D-147 to D-151, `P5B_COMPLETION_REPORT.md`) and extended on
 2026-11-08 (hydro potential from HydroSHEDS RiverATLAS, sourced cotton shares and fuel
-prices, jewellery as the 58th good, D-152); its performance step is held by the designer
-and some source transcriptions remain provisional; the monetary demand for gold and silver
+prices, jewellery as the 58th good, D-152; coffee, tea and cocoa, tobacco and rubber placed
+at their recorded 1900 producers under a coverage rule, D-148); its performance step is held
+by the designer and some source transcriptions remain provisional; the monetary demand for gold and silver
 moves to P11 (D-152).\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\

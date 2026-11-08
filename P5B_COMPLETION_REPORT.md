@@ -5,7 +5,9 @@
 placement, data version v13), D-149 (D-140: metal standards and the mint window),
 D-150 (currency actions), D-151 (protocol 22 and the phone screens), D-152 (demand for
 gold and silver: jewellery in P5b, monetary demand to P11). The additions of 2026-11-08
-(hydro, transcriptions, jewellery) are recorded in D-148 and D-152 and summarised in §7.
+(hydro, transcriptions, jewellery) are recorded in D-148 and D-152 and summarised in §7; the
+A12 crop placement and the open-item findings of the same day are in §8 (D-148 items 9–11,
+D-152 addition).
 **Versions:** world schema 33, simulation 0.29.0, data `m3-economy-v13`, worker protocol
 22, map bridge protocol 3.
 **Status:** implemented for the designer's review, with the open items of §6 and §7. The
@@ -160,8 +162,9 @@ tests passed.** `pnpm typecheck` (libraries built, every package): **0 errors.**
 **Not done (uncompleted plan items)**
 - Performance (plan §5): held by the designer; the 450 ms budget is not met.
 - Superseded on 2026-11-08 (§7): cotton by country, naphtha and residuum, the 1902
-  electricity census, hydro potential and jewellery are done; the A12 crop tables are
-  transcribed but not used for placement; the 1990 plastics price stays provisional.
+  electricity census, hydro potential and jewellery are done; the A12 crop tables, at
+  first transcribed only, are used for placement since §8; the 1990 plastics price stays
+  provisional.
 - No tablet-size playtest; no device test (designer's).
 
 **Acceptance criteria not verified**
@@ -217,6 +220,7 @@ tests passed.** `pnpm typecheck` (libraries built, every package): **0 errors.**
 - **Cotton:** demand is 2.5× the 1900 commercial crop (China's crop and hand spinning are not in the source).
 - **Jewellery:** the metal share of its value (0.5) is provisional; the 1900 census of manufactures (jewellery industry) is not cached.
 - **A12 crops:** still pooled worldwide. Missing producers: Latin American coffee outside Brazil; Chinese and Japanese tea (cached as OCR text only); Ecuadorian, Bahian and São Tomé cocoa; the self-consuming tobacco producers; Congo rubber.
+- *These four items are taken up in §8: the A12 crops are placed; electricity, cotton and jewellery have findings and proposals for the designer.*
 - **Hydro:** the hydro share outside the United States, and the technical share, are provisional.
 - **Not run:** performance work and `pnpm bench` (designer's hold).
 
@@ -239,3 +243,108 @@ tests passed.** `pnpm typecheck` (libraries built, every package): **0 errors.**
 | `pnpm bench`, perfPhases | not run (designer's hold) |
 
 The `--check` mode of the hydro extraction recomputes the table from the cache (about an hour); it was not re-run after the final extraction. Without the cache it only confirms that the committed table parses.
+
+## 8. Continuation of 2026-11-08: A12 crop placement and the open items
+
+### 8.1 Behaviour
+
+1. **A12 crops at their recorded 1900 producers (D-148 additions, item 9).**
+   - **Sources (batch 2 of `crops1900`).** All were read from page images and are public domain; licences and attribution are in `docs/P5B_GOODS_PROVENANCE.md`.
+     - USDA Yearbook 1905: tobacco crops of 33 producers in 1900. The rows reproduce the printed total of 2,201,193,000 lb.
+     - USDA Yearbook 1906, headnote: China, Persia, most of Central America and the West Indies have no tobacco statistics.
+     - Board of Trade foreign-countries abstract no. 30: China's and Japan's 1900 tea exports. These are the page images of the volume previously cached only as OCR text.
+     - Ukers, *All About Coffee* (1922): coffee exports of Mexico, Guatemala, Salvador (January–June 1900), Costa Rica, Colombia (1899), Porto Rico and the Dominican Republic.
+     - Bureau of the American Republics, *Venezuela* (1904): about 1,000,000 bags of 46 kg of coffee a year.
+     - Walter Baker & Co., *Cocoa and Chocolate* (1899 and 1904): cocoa for Ecuador, Venezuela, Brazil and São Tomé, and the world total.
+     - *India Rubber World* (1 February 1901): the Congo via Antwerp, and Gould's 1900 deliveries as the world estimate.
+     - Colonial abstract no. 38: Lagos rubber.
+   - **Coverage rule.** `A12_MIN_COVERAGE` is 0.75 (provisional), set in `scripts/p5b/placement.mjs`. When the rule passes:
+     1. producers named without a figure make their own demand;
+     2. the rest of world demand goes to the recorded producers in proportion to their kg, measured against the world estimate;
+     3. the unrecorded share keeps the local-and-pooled rule.
+
+     Below the threshold a good keeps pooling, and the report says so.
+   - **Result.** All three goods now use sourced shares:
+
+     | Good | Coverage before | Coverage after | Modelled ÷ sourced |
+     |---|---:|---:|---:|
+     | coffee-tea-cocoa | 59.5 % | 85.4 % | 2.26 |
+     | tobacco | 5.6 % | 100 % | 0.95 |
+     | rubber | 69.1 % | 84.1 % | 0.42 |
+
+     Per crop, `docs/P5B_BEFORE_AFTER.md` (generated) gives coffee 63.0 → 81.2 %, tea 59.7 → 100 % (recorded sum), cocoa 22.6 → 84.4 %, tobacco 5.6 → 100 % and rubber 69.1 → 84.1 %.
+   - **Effect on the 1900 world.**
+     - 6,168 buildings (6,299 before).
+     - Covered value added 59.3 % of world GDP (59.6 % before).
+     - The B7 warehouse capacity per level of the three goods rises: it follows the largest market's output, so coffee-tea-cocoa goes from 214,053 to 7,209,700 kg.
+     - The 1900-world hash is re-pinned by design.
+2. **Electricity (D-148 additions, item 10): options for the designer; nothing changed.**
+   - The census does not split kWh between lighting and power.
+   - It gives 1.52 cents/kWh for private stations driven by water alone, with half of their sales from power (table 40, p. 48).
+   - Large motors at Niagara paid $25 per horsepower a year (p. 39), which is 0.38 cent/kWh at continuous use.
+   - Options: (a) 1.52 cents as the single price; (b) separate lighting and power goods; (c) keep 1.0 cent, now bounded by the sourced 0.38 and 1.52 cents.
+3. **Cotton (D-148 additions, item 11): what drives the gap; nothing changed.**
+   - *Yardstick.* Against the USDA 1905 world crop for 1900 (15,893,591 bales, which includes China, Asiatic Russia and India's mill use) modelled cotton is 1.94× the lint, not 2.49×. That crop still understates China (2¼ lb a head) and leaves out India's hand-spun cotton.
+   - *Recipe.* The textile recipe takes only cotton and wool, so linen, hemp, jute and silk demand falls on cotton. Wool output is 11.3× its demand.
+   - *Demand.* Clothing needs come to about 7 garments a person a year, at 0.5 kg of cloth each.
+   - Calibration options are listed in D-148, item 11.
+4. **Jewellery (D-152 addition): proposal; nothing changed.**
+   - The 1900 census gives the value of products and cost of materials of jewellery, silversmithing, silverware and plated ware: materials are 46.8 % of value.
+   - The Mint's US industrial gold and silver of 1900 is at most 32.7 % of those industries' value.
+   - Proposal: metal share 0.5 → 0.33.
+
+### 8.2 Files
+
+- **Generator:** `scripts/p5b/placement.mjs` (A12 rule, `a12Records`) and `scripts/p5b/build-goods-1900.mjs` (A12 rows in the modelled ÷ sourced table, a coverage section).
+- **Source rows:** `sources_1900.json`:
+  - `crops1900`: batch 2, world estimates, self-supplied producers;
+  - `industrialArts1900.census1900`;
+  - `electricity1902.options`;
+  - `cottonWorld1900`;
+  - the picul and kin units;
+  - eight new sources.
+- **Regenerated:** the p5b tables, `docs/P5B_BEFORE_AFTER.md`, `docs/P5B_GOODS_PROVENANCE.md`, the worker scenario and the app worker bundle.
+- **Tests:**
+  - `data/world-1900.test.ts`: three A12 tests (the USDA rows reproduce the printed total; each good passes the rule; the producers stand where 1900 grew the crops);
+  - `architecture/naming-audits.test.ts`: hash re-pinned by design.
+- **Documents:** `DECISIONS.md` (D-148 items 9–11, D-152 addition), this report, the program and GDD status lines.
+- **Git-ignored caches** under `.cache-p5b/`, one new folder per source:
+  - `yoa1903` to `yoa1906`, `yoa1910`
+  - `bot-foreign-abstract-29`
+  - `ukers-coffee-1922`
+  - `iba-venezuelageograp00inte`, `iba-coffee-1909`, `iba-bulletin-1899`
+  - `baker-cocoa-1899`, `baker-cocoa-1904`
+  - `irw-1901-02`
+  - `census-manufactures-1900`
+  - `us-statab-foreign-1909`
+  - `webb-new-dictionary-1911`, `mulhall-dictionary-1899`
+
+  Webb and Mulhall were consulted and not used: Webb has no 1900 figures, and Mulhall gives tea exports only.
+- **Tool:** `.cache-p5b/tools/findtext.mjs` searches a PDF's text layer.
+
+### 8.3 Open items for the designer
+
+- Electricity: choose option (a), (b) or (c) (D-148 item 10).
+- Cotton: choose a calibration, if any (D-148 item 11).
+- Jewellery: apply the 0.33 metal share or keep 0.5 (D-152 addition).
+- A12 calibration: coffee-tea-cocoa demand is 2.26× the world estimate and rubber 0.42×; neither is recalibrated.
+- Still not covered: Haiti, Nicaragua and Cuba coffee; Centrals and Angolan rubber; China's domestic tea (self-supplied without a figure).
+- Not run: performance work and `pnpm bench` (held at the designer's request).
+
+### 8.4 Commands executed and results
+
+| Command | Result |
+|---|---|
+| `node scripts/p5b/build-goods-1900.mjs`, then `node scripts/p2/build-province-scenario.mjs` | regenerated; `--check` of both current |
+| `node scripts/p2b/build-money-calibration.mjs --check`, `node scripts/p5/build-p5-world.mjs --check` | current |
+| `pnpm -F @century/sim-worker scenario:build`, `pnpm -F @century/app build:worker` (and `:check`) | current |
+| `node scripts/docs/decisions-index.mjs --check` | current (152 decisions) |
+| `pnpm test` (first run) | 1 failed of 1,433: the 1900-world hash (re-pinned by design, D-148 item 9) |
+| the three affected suites (naming audits, 1900 world, generated drift) | 44 of 44 passed |
+| `pnpm typecheck` | 0 errors |
+| `pnpm app:export` | web, iOS and Android bundles exported |
+| `pnpm -F @century/app export:web`, then `node scripts/p5b/playtest-goods.mjs` | 19/19 checks passed at 844 x 390, no console errors, exceptions or failed loads (no UI change; run because the worker data changed) |
+| `pnpm test` (final run) | **101 of 101 suites, 1,433 of 1,433 tests passed** (1,834 s) |
+| `pnpm bench`, perfPhases | not run (skipped at the designer's request) |
+
+No device result is claimed.
