@@ -1,4 +1,4 @@
-# P5b completion report — the goods catalogue (58 goods) and D-140
+# P5b completion report — the goods catalogue (59 goods) and D-140
 
 **Branch:** `prosperity/p5-land` (local commits only; nothing pushed).
 **Decisions:** D-146 (designer decisions), D-147 (simulation mechanics), D-148 (1900
@@ -7,7 +7,8 @@ D-150 (currency actions), D-151 (protocol 22 and the phone screens), D-152 (dema
 gold and silver: jewellery in P5b, monetary demand to P11). The additions of 2026-11-08
 (hydro, transcriptions, jewellery) are recorded in D-148 and D-152 and summarised in §7; the
 A12 crop placement and the open-item findings of the same day are in §8 (D-148 items 9–11,
-D-152 addition).
+D-152 addition); the designer's decisions of the same day (raw silk, electricity, jewellery,
+the cotton and wool proposal) are in §9 (D-148 item 12).
 **Versions:** world schema 33, simulation 0.29.0, data `m3-economy-v13`, worker protocol
 22, map bridge protocol 3.
 **Status:** implemented for the designer's review, with the open items of §6 and §7. The
@@ -345,6 +346,75 @@ The `--check` mode of the hydro extraction recomputes the table from the cache (
 | `pnpm app:export` | web, iOS and Android bundles exported |
 | `pnpm -F @century/app export:web`, then `node scripts/p5b/playtest-goods.mjs` | 19/19 checks passed at 844 x 390, no console errors, exceptions or failed loads (no UI change; run because the worker data changed) |
 | `pnpm test` (final run) | **101 of 101 suites, 1,433 of 1,433 tests passed** (1,834 s) |
+| `pnpm bench`, perfPhases | not run (skipped at the designer's request) |
+
+No device result is claimed.
+
+## 9. Second continuation of 2026-11-08: the designer's decisions
+
+The designer chose electricity option (a), accepted the jewellery metal share of 0.33, asked for raw silk as a good in the textile recipe and for a cotton and wool calibration proposal, and authorised downloads for the remaining crop gaps (D-148 item 12, D-152 addition).
+
+### 9.1 Behaviour
+
+1. **A12 batch 3.**
+   - Coffee: Haiti's 1897–98 exports; Nicaragua's crop interpolated to 1900; Salvador's 1901 exports in place of its half year (Ukers, pp. 280–281).
+   - Rubber: Angola and the Ivory Coast (Kramrisch & Co., *India Rubber World*, March 1901, p. 179); Bolivia, 3,496,240 kg (*Bolivia*, 1904, p. 84), moved out of Pará's receipts.
+   - Coverage after: coffee 85.4 %, rubber 91.4 %; coffee-tea-cocoa 88.4 %.
+2. **Electricity:** reference price 1.52 cents per kWh (census 1902, table 40), 238 RUSD per MWh. Opening demand is 7,172 MWh a day (10,600 before).
+3. **Raw silk (good 58):**
+   - priced from the 1900 import value ($3.96 per lb);
+   - made by 48 *Sericulture and Silk Reeling* farms at the Lyons estimate's 1900 shares;
+   - an optional textile-mill input at the 1900 silk-to-cotton ratio (0.00536 kg per kg of cotton, elasticity 0.05).
+
+   Modelled ÷ sourced silk is 1.68; demand is 1.94×, like cotton, and the residual cap trims output.
+4. **Jewellery:** metal share 0.33 (1900 census); 49 jewellers.
+5. **Cotton and wool proposal** (D-148 item 12, not applied), four changes applied together:
+   - clothing and textile need quantities × 0.52;
+   - cotton placed and reported at the 1905 Yearbook's world crop;
+   - ranch wool 533 → 34.4 kg per throughput unit (world wool output = the listed 1900 clip, 913 M kg; it is 14,150 M kg today, worth about 323 bn RUSD a year at reference prices);
+   - mill fibre 246.7 kg of cotton and 70 kg of wool per throughput unit.
+
+   Expected: cotton about 0.93× and wool about 1.0× of their 1900 figures. The ranch's value added and covered GDP fall.
+6. **Measured:** 6,209 buildings; covered value added 59.5 % of world GDP.
+
+### 9.2 Files
+
+- `scripts/p5b/catalogue.mjs`: good 58, the silk farm, `SILK_OPTIONAL`.
+- `scripts/p5b/build-goods-1900.mjs`: silk price and optional input, electricity price, `lb` unit.
+- `scripts/p5b/placement.mjs`: `transferFrom`.
+- `scripts/p5b/playtest-goods.mjs`: 59 goods.
+- `sources_1900.json`: batch 3, `outputs1900.silk`, `woolWorld1900`, two price rows, the jewellery unit row, three new sources.
+- The regenerated tables and documents, the worker scenario and the app bundle.
+- Tests:
+  - `data/world-1900.test.ts`: a silk test; Angola and Bolivia rubber estates;
+  - `architecture/naming-audits.test.ts`: hash re-pinned by design.
+- `DECISIONS.md`, this report, and the program and GDD status lines.
+- New git-ignored caches:
+  - `irw-1901-01` to `irw-1901-12` (OCR text; PDFs of February and March)
+  - `iba-bolivia-1904`
+  - `cherington-wool-1916`
+  - `nawm-bulletin-34`, `nawm-bulletin-36` (consulted, not used)
+
+### 9.3 Open items for the designer
+
+- Cotton and wool: apply the four-part proposal, or not (D-148 item 12).
+- A12 calibration: coffee-tea-cocoa demand is 2.26× the world estimate and rubber 0.42×.
+- Not covered: the Centrals and East Indian rubber, Peru's caucho (inside Pará's receipts), Honduras and Cuba coffee, Grenada and Haitian cocoa.
+- Not run: performance work and `pnpm bench` (held at the designer's request).
+
+### 9.4 Commands executed and results
+
+| Command | Result |
+|---|---|
+| `node scripts/p5b/build-goods-1900.mjs`, then `node scripts/p2/build-province-scenario.mjs` | regenerated; `--check` of both current |
+| `node scripts/p2b/build-money-calibration.mjs --check`, `node scripts/p5/build-p5-world.mjs --check` | current |
+| `pnpm -F @century/sim-worker scenario:build`, `pnpm -F @century/app build:worker` (and `:check`) | current |
+| `node scripts/docs/decisions-index.mjs --check` | current (152 decisions) |
+| naming audits, 1900 world and goods catalogue suites (before the re-pin) | 1 failed of 58: the 1900-world hash, re-pinned by design |
+| `pnpm typecheck` | 0 errors |
+| `pnpm app:export` | web, iOS and Android bundles exported |
+| `node scripts/p5b/playtest-goods.mjs` | 19/19 checks passed at 844 x 390 (59 goods counted), no console errors, exceptions or failed loads |
+| `pnpm test` (full run, after the re-pin) | **101 of 101 suites, 1,434 of 1,434 tests passed** (1,855 s) |
 | `pnpm bench`, perfPhases | not run (skipped at the designer's request) |
 
 No device result is claimed.

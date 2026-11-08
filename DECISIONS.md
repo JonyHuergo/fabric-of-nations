@@ -8811,7 +8811,7 @@ C-9, C-19, C-22.
      - Concentrated output raises the B7 warehouse capacity per level of the three goods: it is the largest market's five-day output (coffee-tea-cocoa 214,053 → 7,209,700 kg).
      - The 1900-world hash is re-pinned by design.
    - **Not covered:** Haiti, Nicaragua and Cuba coffee; the Centrals, Angola and the French and German colonies for rubber; Peru and Bolivia, whose rubber sits inside Pará's receipts; China's domestic tea crop, which has no figure (self-supplied).
-10. **Electricity price: options for the designer** (no change made). The census of central stations (1902) gives:
+10. **Electricity price: options for the designer** (the designer chose option (a) on 2026-11-08; applied in item 12). The census of central stations (1902) gives:
     - all stations: 3.36 cents/kWh (sale of current ÷ output, table 1);
     - private stations driven by water alone: 1.52 cents/kWh ($3,771,862 for 248,749,668 kWh, table 40, p. 48), of which almost half the income was power ("all other electric service" $1,858,793);
     - motor service: about 12 % of private stations' gross income, at about 10 cents/kWh before discounts (2–15 cents); Niagara Falls 3 cents/kWh, or $25 per horsepower a year above 25 hp (p. 39). At continuous use that is 0.38 cent/kWh (6,535 kWh per horsepower-year).
@@ -8820,11 +8820,38 @@ C-9, C-19, C-22.
     - (a) the water-only stations' 1.52 cents as the reference price: sourced, still half lighting; aluminium's power cost at 22 MWh per t becomes $334 against its 1900 price of about $705;
     - (b) separate lighting and power goods (retail at 3.36 cents, bulk between 0.38 and 1.52 cents): a new good, recipes and a protocol change;
     - (c) keep the provisional 1.0 cent, bounded by the sourced 0.38 and 1.52 cents, with the census rows as cross-checks.
-11. **Cotton: what drives the 2.5× gap** (no change made).
+11. **Cotton: what drives the 2.5× gap** (no change made; the calibration proposal is in item 12).
     - *The yardstick.* The USDA 1901 commercial crop (10,591,000 bales) leaves out China, Asiatic Russia, India's home-grown mill use beyond exports and most small producers. The USDA Yearbook 1905 (pp. 709–710) gives a 1900 world crop of 15,893,591 bales (500 lb gross, 478 lb lint): India 2,262,467 (exports and mill consumption), China 1,192,000 (Ellison's estimate from net imports and an assumed 2¼ lb a head), Asiatic Russia 633,065, Egypt 1,124,632. Against it, modelled cotton (6,679 M kg) is 1.94× the lint (3,446 M kg). Even that crop understates China and leaves out India's hand-spun cotton.
     - *The recipe.* The textile mill makes 275.4 kg of cloth from 266.7 kg of cotton and 50 kg of wool, so every textile fibre except wool is cotton: linen, hemp, jute and silk have no good. Wool is a joint product of the ranch: output is 11.3× demand.
     - *The demand.* Workshops use 0.5 kg of cloth per garment. Modelled clothing output is 30.6 M garments a day, about 7 per person a year (the basic tier alone asks 3.65; comfort adds 10.2 and luxury 5.1 garments and 5.1 kg of cloth). Of the cloth producers buy, clothing workshops take 95 % (workshops 69 %, peasant workshops 26 %) and furniture works 5 %; luxury households buy cloth directly as well.
     - *Possible calibrations, for the designer:* report against the 1905 world crop; raise the wool share of the mill recipe toward the wool surplus; a fibre good for flax, hemp and jute (a later phase); or revise the comfort and luxury clothing quantities. The last also bears on the P5a clothing shortage.
+12. **Decisions of 2026-11-08 (second continuation)** — the designer chose electricity option (a), accepted the jewellery metal share of 0.33 (D-152 addition), asked for raw silk as a good in the textile recipe and for a cotton and wool calibration proposal, and authorised downloads for the remaining crop gaps.
+    - **A12 batch 3** (read from page images; `crops1900`):
+      - coffee: Haiti's 1897–98 exports (67,437,000 lb; Ukers p. 281); Nicaragua's crop interpolated between 1890–91 (11,540,000 lb) and 1907–08 (over 20,000,000 lb) to 16,267,647 lb (p. 280); Salvador's 1901 exports (50,101,000 lb, p. 280) replace its half-year figure.
+      - rubber: Angola, 2,393 long tons from Benguela and Loanda; the Ivory Coast, the Gold Coast and Ivory Coast's "over 2000 tons" less the Gold Coast's recorded exports (Kramrisch & Co.'s review of 1900, *India Rubber World*, 1 March 1901, p. 179); Bolivia, 3,496,240 kg (Bureau of the American Republics, *Bolivia*, 1904, p. 84), moved out of Pará's receipts (`transferFrom`) because it went down the Amazon.
+      - Coverage after batch 3: coffee 85.4 %, rubber 91.4 %; coffee-tea-cocoa 88.4 % of the combined world estimate. Grenada has no export table in the colonial abstract, so cocoa stays at 84.4 %. Still missing: the Centrals and East Indian rubber, Peru's caucho (inside Pará's receipts), and Honduras and Cuba coffee.
+    - **Electricity, option (a), applied.** The reference price is the private water-power stations' 1.52 cents per kWh (census 1902, table 40; `price-electricity-water-stations-1902`), 238 RUSD per MWh (157 before). Aluminium still earns a positive value added. Modelled electricity demand at opening prices falls from 10,600 to 7,172 MWh a day, and hydro stations make 1,704 MWh of it.
+    - **Raw silk (good 58), applied.**
+      - *Price:* raw silk, year to June 1900, $3.96 per lb (Statistical Abstract 1901, table 157, p. 453).
+      - *Producer:* *Sericulture and Silk Reeling* (agriculture, peasants, cropland, crop band to 46°, provisional), appended to the catalogue so earlier definition ids stay. It is placed at the 1900 shares of the Lyons estimate (USDA Yearbook 1905, pp. 731–732: 40,724,000 lb; China, Japan and India count exports only): 48 farms, the most in China, Italy, India and Japan.
+      - *Recipe:* the textile mill buys silk as an optional input (`SILK_OPTIONAL`) at the 1900 world ratio of raw silk to cotton lint, 0.00536 kg per kg of cotton, with the minor-material elasticity 0.05 (silk is about 5 % of the cloth's value). A market without silk still weaves.
+      - *Measured:* modelled silk is 1.68× the Lyons figure. Its demand is 1.94× (the same ratio as cotton against the 1905 world crop), and the residual cap holds back new output in Japan, the Ottoman Empire, Spain, Greece and Russia.
+    - **Jewellery** (D-152 addition): metal share 0.33, applied; 49 jewellers.
+    - **Measured** (`docs/P5B_BEFORE_AFTER.md`): 6,209 buildings; covered value added 59.5 % of world GDP.
+    - **Cotton and wool: calibration proposal** (not applied; for the designer).
+      - *Findings.*
+        - Cotton: modelled cotton (6,678 M kg) is 1.94× the 1900 world lint (USDA Yearbook 1905: 15,893,591 bales × 478 lb = 3,446 M kg).
+        - Wool demand: the mills' wool demand (1,254 M kg a year) is close to the 1900 clip. Cherington, *The Wool Industry* (1916), p. 33, lists 2,013 million lb (913 M kg) for the eight largest producers; the 1914 world figure on the same page is 2,872 million lb.
+        - Wool output: the ranch makes 533 kg of wool per 4,000 kg of meat, so world wool output is 14,150 M kg, 11.3× demand and about 15× the listed clip. At reference prices that wool is worth about 323 bn RUSD a year, against 617 bn RUSD of covered value added: P2b's ranch calibration carries a wool value that 1900 never produced.
+      - *Proposal* (four changes, to be applied together):
+        1. **Cloth demand:** multiply the clothing and textile need quantities of every tier by 0.52 (the ratio of the 1900 world lint to modelled cotton). Garments fall from about 7 to 3.6 per person a year at 0.5 kg of cloth each; the 1901 budget weights between the tiers are kept. This also reduces the P5a clothing shortage.
+        2. **Cotton shares:** place cotton at the 1905 Yearbook's 1900 world crop, which adds China, Asiatic Russia, Mexico and Peru and counts all of India's mill use. Report against that crop instead of the 1901 commercial crop.
+        3. **Ranch wool:** reduce the joint output per throughput unit from 533 kg to 34.4 kg (× 913 / 14,150), so world wool output equals the listed 1900 clip (a lower bound).
+        4. **Mill fibre mix:** keep the mill's 316.7 kg of fibre per 275.4 kg of cloth, but raise wool from 50 to 70 kg and lower cotton from 266.7 to 246.7 kg, so the mills take the 1900 clip after change 1. Expected: modelled cotton about 0.93× and wool about 1.0× of their 1900 figures; silk follows cotton (its ratio is per kg of cotton).
+      - *Consequences to accept:*
+        - The ranch loses most of its wool revenue (12,177 of 19,280 RUSD per throughput unit at reference prices), so its 300 buildings re-solve technique or level under D-135 A3. Covered value added falls.
+        - Workshops and peasant workshops shrink with clothing demand.
+        - Both changes re-pin the 1900 world. Flax, hemp and jute stay outside the model (a later fibre good).
 
 ## D-149 — D-140 in P5b: metal standards, the mint window and the 1900 money stocks
 
@@ -9078,7 +9105,7 @@ output: gold 0.27, silver 0.005.
 - The A7 report shows the split of modelled gold and silver demand between jewellery and
   the mints, against the sourced 1900 output.
 
-### Addition of 2026-11-08: census figures for the metal share (proposal, not applied)
+### Addition of 2026-11-08: census figures for the metal share (accepted and applied)
 
 The Twelfth Census, vol. VII (Manufactures, part 1), table 1, gives for 1900 (read from the
 page images; `sources_1900.json` `industrialArts1900.census1900`):
@@ -9099,5 +9126,6 @@ page images; `sources_1900.json` `industrialArts1900.census1900`):
   the metal share of jewellery and plate is at most about 0.33.
 - **Proposal:** `jewellery-metal-share-of-value` 0.5 → 0.33 (estimated, upper bound). The
   same metal would then make 1.5× the jewellery units, so the luxury need quantity rises in
-  proportion; modelled gold and silver demand is unchanged by construction. It stays 0.5
-  until the designer decides.
+  proportion; modelled gold and silver demand is unchanged by construction. Accepted by
+  the designer on 2026-11-08 and applied (`sources_1900.json` unit row, status
+  estimated; D-148 item 12); 49 jewellers are placed.
