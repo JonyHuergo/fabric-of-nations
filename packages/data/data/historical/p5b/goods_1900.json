@@ -397,8 +397,8 @@
   "key": "electricity",
   "name": "Electricity",
   "category": "industrial",
-  "basePrice1900RUSD": 157.04,
-  "transportCostPerUnit": 0.7852,
+  "basePrice1900RUSD": 238.124,
+  "transportCostPerUnit": 1.19062,
   "priceElasticity": 1,
   "spoilageRateAnnual": 0,
   "unitLabel": "MWh",
@@ -767,5 +767,18 @@
   "unitLabel": "unit-eq.",
   "group": "consumer-manufactures",
   "priceBasis": "defined-unit"
+ },
+ {
+  "id": 58,
+  "key": "silk",
+  "name": "Raw silk",
+  "category": "raw",
+  "basePrice1900RUSD": 137.101,
+  "transportCostPerUnit": 0.685504,
+  "priceElasticity": 1,
+  "spoilageRateAnnual": 0,
+  "unitLabel": "kg",
+  "group": "fibres-forest",
+  "priceBasis": "1900-wholesale"
  }
 ]

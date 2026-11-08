@@ -4,7 +4,7 @@
   "marketBKey": "customs-omn",
   "kind": "sea",
   "distanceUnits": 0.9,
-  "baseCapacityRUSDPerDay": 8537.27,
+  "baseCapacityRUSDPerDay": 8537.25,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -17,7 +17,7 @@
   "marketBKey": "customs-bra",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 316548.49,
+  "baseCapacityRUSDPerDay": 314925.55,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -30,7 +30,7 @@
   "marketBKey": "customs-pry",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 9962.73,
+  "baseCapacityRUSDPerDay": 9962.7,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -43,7 +43,7 @@
   "marketBKey": "customs-ury",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 106293.67,
+  "baseCapacityRUSDPerDay": 106234.1,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -56,7 +56,7 @@
   "marketBKey": "customs-nzl",
   "kind": "sea",
   "distanceUnits": 0.7,
-  "baseCapacityRUSDPerDay": 165317.04,
+  "baseCapacityRUSDPerDay": 165309.34,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -82,7 +82,7 @@
   "marketBKey": "customs-ott",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 29802.83,
+  "baseCapacityRUSDPerDay": 30623.5,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -95,7 +95,7 @@
   "marketBKey": "customs-arg",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 33947.55,
+  "baseCapacityRUSDPerDay": 36112.09,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -108,7 +108,7 @@
   "marketBKey": "customs-bra",
   "kind": "land",
   "distanceUnits": 0.7,
-  "baseCapacityRUSDPerDay": 33947.55,
+  "baseCapacityRUSDPerDay": 36112.09,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -121,7 +121,7 @@
   "marketBKey": "customs-chl",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 33947.55,
+  "baseCapacityRUSDPerDay": 36112.09,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -134,7 +134,7 @@
   "marketBKey": "customs-pry",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 9962.73,
+  "baseCapacityRUSDPerDay": 9962.7,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -147,7 +147,7 @@
   "marketBKey": "customs-aut",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 704113.37,
+  "baseCapacityRUSDPerDay": 713102.36,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -160,7 +160,7 @@
   "marketBKey": "customs-arg",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 381707.53,
+  "baseCapacityRUSDPerDay": 381568.44,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -173,7 +173,7 @@
   "marketBKey": "customs-afg",
   "kind": "land",
   "distanceUnits": 3.8,
-  "baseCapacityRUSDPerDay": 31306.17,
+  "baseCapacityRUSDPerDay": 31271.19,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -186,7 +186,7 @@
   "marketBKey": "customs-kor",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 119430.19,
+  "baseCapacityRUSDPerDay": 119415.5,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -199,7 +199,7 @@
   "marketBKey": "customs-npl",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 34676.11,
+  "baseCapacityRUSDPerDay": 34662.92,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -212,7 +212,7 @@
   "marketBKey": "customs-bra",
   "kind": "land",
   "distanceUnits": 0.8,
-  "baseCapacityRUSDPerDay": 37300.43,
+  "baseCapacityRUSDPerDay": 37291.24,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -225,7 +225,7 @@
   "marketBKey": "customs-ecu",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 15410.22,
+  "baseCapacityRUSDPerDay": 15405.82,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -238,7 +238,7 @@
   "marketBKey": "customs-pru",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 33333.24,
+  "baseCapacityRUSDPerDay": 33338.15,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -251,7 +251,7 @@
   "marketBKey": "customs-ven",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 37300.43,
+  "baseCapacityRUSDPerDay": 37291.24,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -264,7 +264,7 @@
   "marketBKey": "customs-col",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 6988.5,
+  "baseCapacityRUSDPerDay": 6986.59,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -277,7 +277,7 @@
   "marketBKey": "customs-aut",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 6269199.25,
+  "baseCapacityRUSDPerDay": 6279719.95,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -290,7 +290,7 @@
   "marketBKey": "customs-bel",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 1277177.77,
+  "baseCapacityRUSDPerDay": 1278686.63,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -303,7 +303,7 @@
   "marketBKey": "customs-dnk",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 383193.49,
+  "baseCapacityRUSDPerDay": 383023.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -316,7 +316,7 @@
   "marketBKey": "customs-esp",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 1741716.25,
+  "baseCapacityRUSDPerDay": 1741633.82,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -329,7 +329,7 @@
   "marketBKey": "customs-fra",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 5143168.81,
+  "baseCapacityRUSDPerDay": 5170129.32,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -342,7 +342,7 @@
   "marketBKey": "customs-nld",
   "kind": "land",
   "distanceUnits": 0.7,
-  "baseCapacityRUSDPerDay": 1049285.85,
+  "baseCapacityRUSDPerDay": 1048888.96,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -355,7 +355,7 @@
   "marketBKey": "customs-nzl",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 165317.04,
+  "baseCapacityRUSDPerDay": 165309.34,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -368,7 +368,7 @@
   "marketBKey": "customs-prt",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 357574.32,
+  "baseCapacityRUSDPerDay": 359095.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -381,7 +381,7 @@
   "marketBKey": "customs-rus",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 2631665.59,
+  "baseCapacityRUSDPerDay": 2631677.53,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -394,7 +394,7 @@
   "marketBKey": "customs-sok",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 69958.65,
+  "baseCapacityRUSDPerDay": 69829.62,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -420,7 +420,7 @@
   "marketBKey": "customs-pru",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 15410.22,
+  "baseCapacityRUSDPerDay": 15405.82,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -446,7 +446,7 @@
   "marketBKey": "customs-mar",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 86202.24,
+  "baseCapacityRUSDPerDay": 86141.26,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -459,7 +459,7 @@
   "marketBKey": "customs-prt",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 357574.32,
+  "baseCapacityRUSDPerDay": 359095.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -485,7 +485,7 @@
   "marketBKey": "customs-bel",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 1277177.77,
+  "baseCapacityRUSDPerDay": 1278686.63,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -498,7 +498,7 @@
   "marketBKey": "customs-bra",
   "kind": "land",
   "distanceUnits": 0.6,
-  "baseCapacityRUSDPerDay": 316548.49,
+  "baseCapacityRUSDPerDay": 314925.55,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -511,7 +511,7 @@
   "marketBKey": "customs-can",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 848378.12,
+  "baseCapacityRUSDPerDay": 848364.01,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -524,7 +524,7 @@
   "marketBKey": "customs-che",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 704113.37,
+  "baseCapacityRUSDPerDay": 713102.36,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -537,7 +537,7 @@
   "marketBKey": "customs-chn",
   "kind": "land",
   "distanceUnits": 2.4,
-  "baseCapacityRUSDPerDay": 5143168.81,
+  "baseCapacityRUSDPerDay": 5170129.32,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -550,7 +550,7 @@
   "marketBKey": "customs-dar",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 4239.81,
+  "baseCapacityRUSDPerDay": 4226.38,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -563,7 +563,7 @@
   "marketBKey": "customs-esp",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 1741716.25,
+  "baseCapacityRUSDPerDay": 1741633.82,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -576,7 +576,7 @@
   "marketBKey": "customs-eth",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 169996.24,
+  "baseCapacityRUSDPerDay": 169835.45,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -589,7 +589,7 @@
   "marketBKey": "customs-ita",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 3751190.42,
+  "baseCapacityRUSDPerDay": 3841999.03,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -615,7 +615,7 @@
   "marketBKey": "customs-mar",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 86202.24,
+  "baseCapacityRUSDPerDay": 86141.26,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -628,7 +628,7 @@
   "marketBKey": "customs-nld",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 1049285.85,
+  "baseCapacityRUSDPerDay": 1048888.96,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -641,7 +641,7 @@
   "marketBKey": "customs-nzl",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 165317.04,
+  "baseCapacityRUSDPerDay": 165309.34,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -654,7 +654,7 @@
   "marketBKey": "customs-ott",
   "kind": "land",
   "distanceUnits": 0.6,
-  "baseCapacityRUSDPerDay": 954434.19,
+  "baseCapacityRUSDPerDay": 954866.98,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -667,7 +667,7 @@
   "marketBKey": "customs-prt",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 357574.32,
+  "baseCapacityRUSDPerDay": 359095.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -680,7 +680,7 @@
   "marketBKey": "customs-sok",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 69958.65,
+  "baseCapacityRUSDPerDay": 69829.62,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -693,7 +693,7 @@
   "marketBKey": "customs-tha",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 50914.88,
+  "baseCapacityRUSDPerDay": 50890.31,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -719,7 +719,7 @@
   "marketBKey": "customs-wad",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 6997.77,
+  "baseCapacityRUSDPerDay": 6997.74,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -732,7 +732,7 @@
   "marketBKey": "customs-afg",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 31306.17,
+  "baseCapacityRUSDPerDay": 31271.19,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -745,7 +745,7 @@
   "marketBKey": "customs-bel",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 1277177.77,
+  "baseCapacityRUSDPerDay": 1278686.63,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -758,7 +758,7 @@
   "marketBKey": "customs-bra",
   "kind": "land",
   "distanceUnits": 1,
-  "baseCapacityRUSDPerDay": 316548.49,
+  "baseCapacityRUSDPerDay": 314925.55,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -771,7 +771,7 @@
   "marketBKey": "customs-can",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 848378.12,
+  "baseCapacityRUSDPerDay": 848364.01,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -784,7 +784,7 @@
   "marketBKey": "customs-chn",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 6243303.21,
+  "baseCapacityRUSDPerDay": 6304903.34,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -797,7 +797,7 @@
   "marketBKey": "customs-cub",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 79899.11,
+  "baseCapacityRUSDPerDay": 79898.93,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -810,7 +810,7 @@
   "marketBKey": "customs-dar",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 4239.81,
+  "baseCapacityRUSDPerDay": 4226.38,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -823,7 +823,7 @@
   "marketBKey": "customs-deu",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 8415498.67,
+  "baseCapacityRUSDPerDay": 8427689.82,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -836,7 +836,7 @@
   "marketBKey": "customs-dnk",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 383193.49,
+  "baseCapacityRUSDPerDay": 383023.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -849,7 +849,7 @@
   "marketBKey": "customs-dom",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 6016.15,
+  "baseCapacityRUSDPerDay": 6014.17,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -862,7 +862,7 @@
   "marketBKey": "customs-eth",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 169996.24,
+  "baseCapacityRUSDPerDay": 169835.45,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -875,7 +875,7 @@
   "marketBKey": "customs-fra",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 5143168.81,
+  "baseCapacityRUSDPerDay": 5170129.32,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -888,7 +888,7 @@
   "marketBKey": "customs-gua",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 20088.91,
+  "baseCapacityRUSDPerDay": 20084.8,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -901,7 +901,7 @@
   "marketBKey": "customs-hti",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 11822.25,
+  "baseCapacityRUSDPerDay": 20690.3,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -914,7 +914,7 @@
   "marketBKey": "customs-ita",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 3751190.42,
+  "baseCapacityRUSDPerDay": 3841999.03,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -940,7 +940,7 @@
   "marketBKey": "customs-mex",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 301287.02,
+  "baseCapacityRUSDPerDay": 301179.29,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -953,7 +953,7 @@
   "marketBKey": "customs-nld",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 1049285.85,
+  "baseCapacityRUSDPerDay": 1048888.96,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -966,7 +966,7 @@
   "marketBKey": "customs-npl",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 34676.11,
+  "baseCapacityRUSDPerDay": 34662.92,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -979,7 +979,7 @@
   "marketBKey": "customs-nzl",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 165317.04,
+  "baseCapacityRUSDPerDay": 165309.34,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -992,7 +992,7 @@
   "marketBKey": "customs-omn",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 8537.27,
+  "baseCapacityRUSDPerDay": 8537.25,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1018,7 +1018,7 @@
   "marketBKey": "customs-ott",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 954434.19,
+  "baseCapacityRUSDPerDay": 954866.98,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1031,7 +1031,7 @@
   "marketBKey": "customs-per",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 314250.28,
+  "baseCapacityRUSDPerDay": 317626.09,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1044,7 +1044,7 @@
   "marketBKey": "customs-prt",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 357574.32,
+  "baseCapacityRUSDPerDay": 359095.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1057,7 +1057,7 @@
   "marketBKey": "customs-shm",
   "kind": "sea",
   "distanceUnits": 0.6,
-  "baseCapacityRUSDPerDay": 16917.05,
+  "baseCapacityRUSDPerDay": 16853.42,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1070,7 +1070,7 @@
   "marketBKey": "customs-sok",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 69958.65,
+  "baseCapacityRUSDPerDay": 69829.62,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1083,7 +1083,7 @@
   "marketBKey": "customs-tha",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 50914.88,
+  "baseCapacityRUSDPerDay": 50890.31,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1109,7 +1109,7 @@
   "marketBKey": "customs-ven",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 71422.43,
+  "baseCapacityRUSDPerDay": 71396.72,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1122,7 +1122,7 @@
   "marketBKey": "customs-zar",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 40894.82,
+  "baseCapacityRUSDPerDay": 40862.99,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1135,7 +1135,7 @@
   "marketBKey": "customs-bgr",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 29802.83,
+  "baseCapacityRUSDPerDay": 30623.5,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1174,7 +1174,7 @@
   "marketBKey": "customs-hon",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 3597.16,
+  "baseCapacityRUSDPerDay": 3597.15,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1187,7 +1187,7 @@
   "marketBKey": "customs-sal",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 12814.26,
+  "baseCapacityRUSDPerDay": 13282.77,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1200,7 +1200,7 @@
   "marketBKey": "customs-cos",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 3597.16,
+  "baseCapacityRUSDPerDay": 3597.15,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1213,7 +1213,7 @@
   "marketBKey": "customs-nic",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 2990.7,
+  "baseCapacityRUSDPerDay": 3597.15,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1226,7 +1226,7 @@
   "marketBKey": "customs-sal",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 3597.16,
+  "baseCapacityRUSDPerDay": 3597.15,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1239,7 +1239,7 @@
   "marketBKey": "customs-cub",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 11822.25,
+  "baseCapacityRUSDPerDay": 20690.3,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1252,7 +1252,7 @@
   "marketBKey": "customs-dom",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 6016.15,
+  "baseCapacityRUSDPerDay": 6014.17,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1278,7 +1278,7 @@
   "marketBKey": "customs-aut",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 3751190.42,
+  "baseCapacityRUSDPerDay": 3841999.03,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1291,7 +1291,7 @@
   "marketBKey": "customs-che",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 704113.37,
+  "baseCapacityRUSDPerDay": 713102.36,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1304,7 +1304,7 @@
   "marketBKey": "customs-eth",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 169996.24,
+  "baseCapacityRUSDPerDay": 169835.45,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1317,7 +1317,7 @@
   "marketBKey": "customs-chn",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 2574507.02,
+  "baseCapacityRUSDPerDay": 2574506.99,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1330,7 +1330,7 @@
   "marketBKey": "customs-kor",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 119430.19,
+  "baseCapacityRUSDPerDay": 119415.5,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1343,7 +1343,7 @@
   "marketBKey": "customs-gua",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 20088.91,
+  "baseCapacityRUSDPerDay": 20084.8,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1356,7 +1356,7 @@
   "marketBKey": "customs-hon",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 3597.16,
+  "baseCapacityRUSDPerDay": 3597.15,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1395,7 +1395,7 @@
   "marketBKey": "customs-cos",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 2990.7,
+  "baseCapacityRUSDPerDay": 5222.74,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1408,7 +1408,7 @@
   "marketBKey": "customs-aus",
   "kind": "sea",
   "distanceUnits": 1.1,
-  "baseCapacityRUSDPerDay": 1049285.85,
+  "baseCapacityRUSDPerDay": 1048888.96,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1421,7 +1421,7 @@
   "marketBKey": "customs-bel",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 1049285.85,
+  "baseCapacityRUSDPerDay": 1048888.96,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1434,7 +1434,7 @@
   "marketBKey": "customs-bra",
   "kind": "land",
   "distanceUnits": 0.8,
-  "baseCapacityRUSDPerDay": 316548.49,
+  "baseCapacityRUSDPerDay": 314925.55,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1447,7 +1447,7 @@
   "marketBKey": "customs-tha",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 50914.88,
+  "baseCapacityRUSDPerDay": 50890.31,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1460,7 +1460,7 @@
   "marketBKey": "customs-ven",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 71422.43,
+  "baseCapacityRUSDPerDay": 71396.72,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1473,7 +1473,7 @@
   "marketBKey": "customs-dnk",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 255361.63,
+  "baseCapacityRUSDPerDay": 255387.2,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1486,7 +1486,7 @@
   "marketBKey": "customs-aut",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 954434.19,
+  "baseCapacityRUSDPerDay": 954866.98,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1512,7 +1512,7 @@
   "marketBKey": "customs-omn",
   "kind": "land",
   "distanceUnits": 4.1,
-  "baseCapacityRUSDPerDay": 8537.27,
+  "baseCapacityRUSDPerDay": 8537.25,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1525,7 +1525,7 @@
   "marketBKey": "customs-per",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 314250.28,
+  "baseCapacityRUSDPerDay": 317626.09,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1538,7 +1538,7 @@
   "marketBKey": "customs-shm",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 16917.05,
+  "baseCapacityRUSDPerDay": 16853.42,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1551,7 +1551,7 @@
   "marketBKey": "customs-wad",
   "kind": "sea",
   "distanceUnits": 0.9,
-  "baseCapacityRUSDPerDay": 6997.77,
+  "baseCapacityRUSDPerDay": 6997.74,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1564,7 +1564,7 @@
   "marketBKey": "customs-afg",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 31306.17,
+  "baseCapacityRUSDPerDay": 31271.19,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1577,7 +1577,7 @@
   "marketBKey": "customs-omn",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 8537.27,
+  "baseCapacityRUSDPerDay": 8537.25,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1590,7 +1590,7 @@
   "marketBKey": "customs-shm",
   "kind": "sea",
   "distanceUnits": 0.9,
-  "baseCapacityRUSDPerDay": 16917.05,
+  "baseCapacityRUSDPerDay": 16853.42,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1603,7 +1603,7 @@
   "marketBKey": "customs-aus",
   "kind": "sea",
   "distanceUnits": 1,
-  "baseCapacityRUSDPerDay": 357574.32,
+  "baseCapacityRUSDPerDay": 359095.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1616,7 +1616,7 @@
   "marketBKey": "customs-bel",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 357574.32,
+  "baseCapacityRUSDPerDay": 359095.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1629,7 +1629,7 @@
   "marketBKey": "customs-chn",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 357574.32,
+  "baseCapacityRUSDPerDay": 359095.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1655,7 +1655,7 @@
   "marketBKey": "customs-mar",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 86202.24,
+  "baseCapacityRUSDPerDay": 86141.26,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1681,7 +1681,7 @@
   "marketBKey": "customs-zar",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 40894.82,
+  "baseCapacityRUSDPerDay": 40862.99,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1694,7 +1694,7 @@
   "marketBKey": "customs-bol",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 33333.24,
+  "baseCapacityRUSDPerDay": 33338.15,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1707,7 +1707,7 @@
   "marketBKey": "customs-bra",
   "kind": "land",
   "distanceUnits": 1,
-  "baseCapacityRUSDPerDay": 33333.24,
+  "baseCapacityRUSDPerDay": 33338.15,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1720,7 +1720,7 @@
   "marketBKey": "customs-chl",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 33333.24,
+  "baseCapacityRUSDPerDay": 33338.15,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1733,7 +1733,7 @@
   "marketBKey": "customs-bra",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 9962.73,
+  "baseCapacityRUSDPerDay": 9962.7,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1746,7 +1746,7 @@
   "marketBKey": "customs-aut",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 50318.9,
+  "baseCapacityRUSDPerDay": 50318.77,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1759,7 +1759,7 @@
   "marketBKey": "customs-bgr",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 29802.83,
+  "baseCapacityRUSDPerDay": 30623.5,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1772,7 +1772,7 @@
   "marketBKey": "customs-afg",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 31306.17,
+  "baseCapacityRUSDPerDay": 31271.19,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1785,7 +1785,7 @@
   "marketBKey": "customs-aut",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 2631665.59,
+  "baseCapacityRUSDPerDay": 2631677.53,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1798,7 +1798,7 @@
   "marketBKey": "customs-chn",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 2631665.59,
+  "baseCapacityRUSDPerDay": 2631677.53,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1811,7 +1811,7 @@
   "marketBKey": "customs-jpn",
   "kind": "sea",
   "distanceUnits": 0.7,
-  "baseCapacityRUSDPerDay": 2574507.02,
+  "baseCapacityRUSDPerDay": 2574506.99,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1824,7 +1824,7 @@
   "marketBKey": "customs-kor",
   "kind": "sea",
   "distanceUnits": 0.7,
-  "baseCapacityRUSDPerDay": 119430.19,
+  "baseCapacityRUSDPerDay": 119415.5,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1837,7 +1837,7 @@
   "marketBKey": "customs-nor",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 255361.63,
+  "baseCapacityRUSDPerDay": 255387.2,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1850,7 +1850,7 @@
   "marketBKey": "customs-npl",
   "kind": "sea",
   "distanceUnits": 1.3,
-  "baseCapacityRUSDPerDay": 34676.11,
+  "baseCapacityRUSDPerDay": 34662.92,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1863,7 +1863,7 @@
   "marketBKey": "customs-ott",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 954434.19,
+  "baseCapacityRUSDPerDay": 954866.98,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1876,7 +1876,7 @@
   "marketBKey": "customs-per",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 314250.28,
+  "baseCapacityRUSDPerDay": 317626.09,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1889,7 +1889,7 @@
   "marketBKey": "customs-rom",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 50318.9,
+  "baseCapacityRUSDPerDay": 50318.77,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1902,7 +1902,7 @@
   "marketBKey": "customs-swe",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 612566.93,
+  "baseCapacityRUSDPerDay": 613233.63,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1915,7 +1915,7 @@
   "marketBKey": "customs-nic",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 2990.7,
+  "baseCapacityRUSDPerDay": 5222.74,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1928,7 +1928,7 @@
   "marketBKey": "customs-aut",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 19855.13,
+  "baseCapacityRUSDPerDay": 19855.07,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1941,7 +1941,7 @@
   "marketBKey": "customs-bgr",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 19855.13,
+  "baseCapacityRUSDPerDay": 19855.07,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1967,7 +1967,7 @@
   "marketBKey": "customs-ott",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 19855.13,
+  "baseCapacityRUSDPerDay": 19855.07,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1980,7 +1980,7 @@
   "marketBKey": "customs-rom",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 19855.13,
+  "baseCapacityRUSDPerDay": 19855.07,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -1993,7 +1993,7 @@
   "marketBKey": "customs-dnk",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 383193.49,
+  "baseCapacityRUSDPerDay": 383023.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2006,7 +2006,7 @@
   "marketBKey": "customs-nor",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 255361.63,
+  "baseCapacityRUSDPerDay": 255387.2,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2019,7 +2019,7 @@
   "marketBKey": "customs-bra",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 106293.67,
+  "baseCapacityRUSDPerDay": 106234.1,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2032,7 +2032,7 @@
   "marketBKey": "customs-pry",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 9962.73,
+  "baseCapacityRUSDPerDay": 9962.7,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2045,7 +2045,7 @@
   "marketBKey": "customs-can",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 848378.12,
+  "baseCapacityRUSDPerDay": 848364.01,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2058,7 +2058,7 @@
   "marketBKey": "customs-cub",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 79899.11,
+  "baseCapacityRUSDPerDay": 79898.93,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2071,7 +2071,7 @@
   "marketBKey": "customs-deu",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 9556768.91,
+  "baseCapacityRUSDPerDay": 9566459.24,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2084,7 +2084,7 @@
   "marketBKey": "customs-dnk",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 383193.49,
+  "baseCapacityRUSDPerDay": 383023.54,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2097,7 +2097,7 @@
   "marketBKey": "customs-dom",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 6016.15,
+  "baseCapacityRUSDPerDay": 6014.17,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2110,7 +2110,7 @@
   "marketBKey": "customs-hti",
   "kind": "sea",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 11822.25,
+  "baseCapacityRUSDPerDay": 20690.3,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2123,7 +2123,7 @@
   "marketBKey": "customs-mex",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 301287.02,
+  "baseCapacityRUSDPerDay": 301179.29,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2136,7 +2136,7 @@
   "marketBKey": "customs-bra",
   "kind": "land",
   "distanceUnits": 0.8,
-  "baseCapacityRUSDPerDay": 71422.43,
+  "baseCapacityRUSDPerDay": 71396.72,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2149,7 +2149,7 @@
   "marketBKey": "customs-ecu",
   "kind": "sea",
   "distanceUnits": 1,
-  "baseCapacityRUSDPerDay": 15410.22,
+  "baseCapacityRUSDPerDay": 15405.82,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",
@@ -2162,7 +2162,7 @@
   "marketBKey": "customs-dar",
   "kind": "land",
   "distanceUnits": 0.5,
-  "baseCapacityRUSDPerDay": 4239.81,
+  "baseCapacityRUSDPerDay": 4226.38,
   "status": "provisional",
   "sourceIds": [
    "project-authored-p2",

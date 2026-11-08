@@ -358,7 +358,21 @@ describe("P5b 1900 world: A12 crops at their recorded 1900 producers (D-148 addi
       expect(tobacco.get(territory) ?? 0).toBeGreaterThan(0);
     }
     const rubber = levelsIn("rubber-estate");
-    for (const territory of ["bra-home", "cfs", "bwa"]) expect(rubber.get(territory) ?? 0).toBeGreaterThan(0);
+    for (const territory of ["bra-home", "cfs", "bwa", "ang", "bol-home"]) expect(rubber.get(territory) ?? 0).toBeGreaterThan(0);
+  });
+
+  test("raw silk is reeled where the Lyons estimate puts it and is an optional textile input (item 12)", () => {
+    const scenario = loadM11World();
+    const silk = scenario.definitions.goods.find((good) => good.key === "silk");
+    expect(silk?.category).toBe("raw");
+    const mill = scenario.definitions.buildings.find((definition) => definition.key === "textile-mill");
+    const optional = mill?.optionalInputs?.find((item) => item.goodId === silk?.id);
+    const cotton = mill?.inputs.find((input) => input.goodId === scenario.definitions.goods.find((good) => good.key === "cotton")?.id);
+    // kg of silk per kg of cotton = the 1900 world ratio (40,724,000 lb / 15,893,591 bales x 478 lb).
+    expect(optional!.quantityPerThroughputUnit / cotton!.quantityPerThroughputUnit).toBeCloseTo(40_724_000 / (15_893_591 * 478), 5);
+    expect(optional!.outputElasticity).toBeGreaterThan(0);
+    const farms = levelsIn("silk-farm");
+    for (const territory of ["ita-home", "chn-home", "jpn-home", "fra-home"]) expect(farms.get(territory) ?? 0).toBeGreaterThan(0);
   });
 });
 

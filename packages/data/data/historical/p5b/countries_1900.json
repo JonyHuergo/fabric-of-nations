@@ -78,14 +78,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 3765848884.87,
+  "initialTreasuryCashRUSD": 3771031920,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 25628209451.35,
+   "maxOutstandingPrincipalRUSD": 25663482218.25,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -99,7 +99,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 6529515851.55
+   "institutionFundingRUSDPerYear": 6538502592.94
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -113,7 +113,7 @@
     "chemical-fertilizer",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 2004363836.37,
+   "educationFundingRUSDPerYear": 2007122494.11,
    "researchStaffShare": 0.18
   },
   "sourceIds": [
@@ -378,14 +378,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1197946235.03,
+  "initialTreasuryCashRUSD": 1199681645.93,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 0,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 8152535580.03,
+   "maxOutstandingPrincipalRUSD": 8164345792.07,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -399,7 +399,7 @@
     "labor": "labor-protected",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 2077090496.75
+   "institutionFundingRUSDPerYear": 2080099484.44
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -413,7 +413,7 @@
     "chemical-fertilizer",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 637603946.63,
+   "educationFundingRUSDPerYear": 638527614.83,
    "researchStaffShare": 0.18
   },
   "sourceIds": [
@@ -535,14 +535,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1354980228.15,
+  "initialTreasuryCashRUSD": 1356359647.47,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 9221218947.2,
+   "maxOutstandingPrincipalRUSD": 9230606484.59,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -556,7 +556,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 2349368004.06
+   "institutionFundingRUSDPerYear": 2351759746.42
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -570,7 +570,7 @@
     "chemical-fertilizer",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 721184904.47,
+   "educationFundingRUSDPerYear": 721919097.03,
    "researchStaffShare": 0.18
   },
   "sourceIds": [
@@ -795,14 +795,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 730050658.66,
+  "initialTreasuryCashRUSD": 733888487.08,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 4968306419.66,
+   "maxOutstandingPrincipalRUSD": 4994424480.63,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -816,7 +816,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1265817480.7
+   "institutionFundingRUSDPerYear": 1272471800.17
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -830,7 +830,7 @@
     "chemical-fertilizer",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 388567673.23,
+   "educationFundingRUSDPerYear": 390610348,
    "researchStaffShare": 0.18
   },
   "sourceIds": [
@@ -1017,14 +1017,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 374617596.26,
+  "initialTreasuryCashRUSD": 374619296.27,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 2549432681.63,
+   "maxOutstandingPrincipalRUSD": 2549444250.93,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1038,7 +1038,7 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 649540543.94
+   "institutionFundingRUSDPerYear": 649543491.55
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1051,7 +1051,7 @@
     "electrical-generation",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 199389297.17,
+   "educationFundingRUSDPerYear": 199390202,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -1095,14 +1095,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 366481074.3,
+  "initialTreasuryCashRUSD": 366481070.23,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 2494060175.91,
+   "maxOutstandingPrincipalRUSD": 2494060148.18,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1116,7 +1116,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 635432821.95
+   "institutionFundingRUSDPerYear": 635432814.89
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1127,7 +1127,7 @@
     "printing-industry",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 195058653.31,
+   "educationFundingRUSDPerYear": 195058651.14,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -1186,14 +1186,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 533929358.6,
+  "initialTreasuryCashRUSD": 546855964.16,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 3633617240.86,
+   "maxOutstandingPrincipalRUSD": 3721588310.57,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1207,7 +1207,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 925767421.16
+   "institutionFundingRUSDPerYear": 948180555.22
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1219,7 +1219,7 @@
     "steelmaking",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 284182592.1,
+   "educationFundingRUSDPerYear": 291062746.22,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -1305,14 +1305,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 247933307.75,
+  "initialTreasuryCashRUSD": 247921574.89,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 1687292011.76,
+   "maxOutstandingPrincipalRUSD": 1687212164.65,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1326,7 +1326,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 429885667.9
+   "institutionFundingRUSDPerYear": 429865324.57
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1338,7 +1338,7 @@
     "steelmaking",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 131961895.2,
+   "educationFundingRUSDPerYear": 131955650.41,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -1423,14 +1423,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 50900703.83,
+  "initialTreasuryCashRUSD": 51117250.05,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 346401021.12,
+   "maxOutstandingPrincipalRUSD": 347874710.57,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1444,7 +1444,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 88255520.26
+   "institutionFundingRUSDPerYear": 88630984.59
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1455,7 +1455,7 @@
     "printing-industry",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 27091774.82,
+   "educationFundingRUSDPerYear": 27207031.02,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -1524,14 +1524,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 149365840.57,
+  "initialTreasuryCashRUSD": 149309342.92,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 1016498315.29,
+   "maxOutstandingPrincipalRUSD": 1016113824.6,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1545,7 +1545,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 258981879.92
+   "institutionFundingRUSDPerYear": 258883919.98
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1558,7 +1558,7 @@
     "printing-industry",
     "chemical-fertilizer"
    ],
-   "educationFundingRUSDPerYear": 79499602.45,
+   "educationFundingRUSDPerYear": 79469531.71,
    "researchStaffShare": 0.18
   },
   "sourceIds": [
@@ -1610,14 +1610,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 181806255.05,
+  "initialTreasuryCashRUSD": 182021042.44,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 1237269185.89,
+   "maxOutstandingPrincipalRUSD": 1238730905.82,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1631,7 +1631,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 315229543.34
+   "institutionFundingRUSDPerYear": 315601958.1
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1645,7 +1645,7 @@
     "chemical-fertilizer",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 96765933.52,
+   "educationFundingRUSDPerYear": 96880253.59,
    "researchStaffShare": 0.18
   },
   "sourceIds": [
@@ -1703,14 +1703,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 100230538.32,
+  "initialTreasuryCashRUSD": 101510121.13,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 682111605.62,
+   "maxOutstandingPrincipalRUSD": 690819712.97,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1724,7 +1724,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 173787347.49
+   "institutionFundingRUSDPerYear": 176005985.71
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1737,7 +1737,7 @@
     "printing-industry",
     "chemical-fertilizer"
    ],
-   "educationFundingRUSDPerYear": 53347458.29,
+   "educationFundingRUSDPerYear": 54028513.1,
    "researchStaffShare": 0.18
   },
   "sourceIds": [
@@ -1790,14 +1790,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 87198902.93,
+  "initialTreasuryCashRUSD": 87293806.57,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 593425763.1,
+   "maxOutstandingPrincipalRUSD": 594071622.92,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1811,7 +1811,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 151192104.71
+   "institutionFundingRUSDPerYear": 151356655.88
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1824,7 +1824,7 @@
     "electrical-generation",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 46411402.3,
+   "educationFundingRUSDPerYear": 46461914.53,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -1876,14 +1876,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 36350727.61,
+  "initialTreasuryCashRUSD": 36354367.72,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 247382220.97,
+   "maxOutstandingPrincipalRUSD": 247406993.48,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1897,7 +1897,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 63027662.4
+   "institutionFundingRUSDPerYear": 63033973.9
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1909,7 +1909,7 @@
     "electrical-generation",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 19347585.65,
+   "educationFundingRUSDPerYear": 19349523.09,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -1953,14 +1953,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 54547593.17,
+  "initialTreasuryCashRUSD": 54523400.99,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 371219660.04,
+   "maxOutstandingPrincipalRUSD": 371055021.92,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1974,7 +1974,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 94578774.97
+   "institutionFundingRUSDPerYear": 94536828.72
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1984,7 +1984,7 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 29032822.73,
+   "educationFundingRUSDPerYear": 29019946.5,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -2093,14 +2093,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 2826377.28,
+  "initialTreasuryCashRUSD": 2826369.31,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 19234704.07,
+   "maxOutstandingPrincipalRUSD": 19234649.86,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2114,14 +2114,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 4900588.37
+   "institutionFundingRUSDPerYear": 4900574.56
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 1504332.38,
+   "educationFundingRUSDPerYear": 1504328.14,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -2221,14 +2221,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 7162895.57,
+  "initialTreasuryCashRUSD": 7162876.31,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 48746562.45,
+   "maxOutstandingPrincipalRUSD": 48746431.38,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2242,14 +2242,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 12419574.33
+   "institutionFundingRUSDPerYear": 12419540.94
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 3812433.6,
+   "educationFundingRUSDPerYear": 3812423.35,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -2287,14 +2287,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 4242433.02,
+  "initialTreasuryCashRUSD": 4359254.82,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 28871567.98,
+   "maxOutstandingPrincipalRUSD": 29666590.18,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2308,14 +2308,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 7355853.76
+   "institutionFundingRUSDPerYear": 7558408.29
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 2258024.58,
+   "educationFundingRUSDPerYear": 2320202.69,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -2404,14 +2404,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 135863707.63,
+  "initialTreasuryCashRUSD": 135925315.18,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 924610536.01,
+   "maxOutstandingPrincipalRUSD": 925029801.68,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2425,14 +2425,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 235570852.61
+   "institutionFundingRUSDPerYear": 235677672.48
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 72313125.29,
+   "educationFundingRUSDPerYear": 72345915.76,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -2812,14 +2812,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 888734211.31,
+  "initialTreasuryCashRUSD": 897502990.19,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 6048215743.74,
+   "maxOutstandingPrincipalRUSD": 6107891027.75,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2833,14 +2833,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1540955120.07
+   "institutionFundingRUSDPerYear": 1556159097.3
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 473026605.09,
+   "educationFundingRUSDPerYear": 477693766.15,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -2881,14 +2881,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 17000887.72,
+  "initialTreasuryCashRUSD": 16998796.17,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 115698299.27,
+   "maxOutstandingPrincipalRUSD": 115684065.37,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2902,14 +2902,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 29477435.03
+   "institutionFundingRUSDPerYear": 29473808.54
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 9048680.81,
+   "educationFundingRUSDPerYear": 9047567.58,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -2952,14 +2952,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 44733527.03,
+  "initialTreasuryCashRUSD": 45214074.06,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 304430749.97,
+   "maxOutstandingPrincipalRUSD": 307701077.67,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2973,14 +2973,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 77562399.02
+   "institutionFundingRUSDPerYear": 78395608.09
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 23809310.09,
+   "educationFundingRUSDPerYear": 24065080.07,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3018,14 +3018,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 4456433.08,
+  "initialTreasuryCashRUSD": 4451453.27,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 30327929.7,
+   "maxOutstandingPrincipalRUSD": 30294040.02,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3039,14 +3039,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 7726903.36
+   "institutionFundingRUSDPerYear": 7718269
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 2371925.58,
+   "educationFundingRUSDPerYear": 2369275.09,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3080,14 +3080,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 4936144.04,
+  "initialTreasuryCashRUSD": 4934266.65,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 33592567.61,
+   "maxOutstandingPrincipalRUSD": 33579791.17,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3101,14 +3101,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 8558662.79
+   "institutionFundingRUSDPerYear": 8555407.63
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 2627250.56,
+   "educationFundingRUSDPerYear": 2626251.33,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3151,14 +3151,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 7247733.7,
+  "initialTreasuryCashRUSD": 7244235.49,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 49323922.18,
+   "maxOutstandingPrincipalRUSD": 49300115.34,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3172,14 +3172,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 12566673.16
+   "institutionFundingRUSDPerYear": 12560607.69
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 3857588.49,
+   "educationFundingRUSDPerYear": 3855726.58,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3214,14 +3214,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1215280.2,
+  "initialTreasuryCashRUSD": 1215277.01,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 8270500.6,
+   "maxOutstandingPrincipalRUSD": 8270478.91,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3235,14 +3235,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 2107145.44
+   "institutionFundingRUSDPerYear": 2107139.92
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 646829.91,
+   "educationFundingRUSDPerYear": 646828.21,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3284,14 +3284,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 24198965.28,
+  "initialTreasuryCashRUSD": 24176076.59,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 164684290.25,
+   "maxOutstandingPrincipalRUSD": 164528522.89,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3305,14 +3305,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 41958010.6
+   "institutionFundingRUSDPerYear": 41918324.43
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 12879839.94,
+   "educationFundingRUSDPerYear": 12867657.49,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3419,14 +3419,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 12270888.77,
+  "initialTreasuryCashRUSD": 12262208.26,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 83508637,
+   "maxOutstandingPrincipalRUSD": 83449562.4,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3440,14 +3440,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 21276202.31
+   "institutionFundingRUSDPerYear": 21261151.37
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 6531150.46,
+   "educationFundingRUSDPerYear": 6526530.28,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3483,14 +3483,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 5821377.58,
+  "initialTreasuryCashRUSD": 5816846.8,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 39616959.84,
+   "maxOutstandingPrincipalRUSD": 39586125.92,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3504,14 +3504,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 10093548.2
+   "institutionFundingRUSDPerYear": 10085692.38
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 3098413.95,
+   "educationFundingRUSDPerYear": 3096002.45,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3636,14 +3636,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 42888206.63,
+  "initialTreasuryCashRUSD": 42872872.52,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 291872556.77,
+   "maxOutstandingPrincipalRUSD": 291768201.61,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3657,14 +3657,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 74362841.84
+   "institutionFundingRUSDPerYear": 74336254.39
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 22827142.83,
+   "educationFundingRUSDPerYear": 22818981.29,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3718,14 +3718,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 2859656.71,
+  "initialTreasuryCashRUSD": 2859071.91,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 19461184.82,
+   "maxOutstandingPrincipalRUSD": 19457205,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3739,14 +3739,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 4958290.79
+   "institutionFundingRUSDPerYear": 4957276.81
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 1522045.27,
+   "educationFundingRUSDPerYear": 1521734.01,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3796,14 +3796,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 512055.55,
+  "initialTreasuryCashRUSD": 512053.87,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 3484756.61,
+   "maxOutstandingPrincipalRUSD": 3484745.23,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3817,14 +3817,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 887840.94
+   "institutionFundingRUSDPerYear": 887838.04
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 272540.31,
+   "educationFundingRUSDPerYear": 272539.42,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3870,14 +3870,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1824109.46,
+  "initialTreasuryCashRUSD": 1890802.52,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 12413843.69,
+   "maxOutstandingPrincipalRUSD": 12867718.39,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3891,14 +3891,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 3162780.03
+   "institutionFundingRUSDPerYear": 3278417.53
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 970877.79,
+   "educationFundingRUSDPerYear": 1006375,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -3947,14 +3947,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 425725.46,
+  "initialTreasuryCashRUSD": 743456.82,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 2897243.54,
+   "maxOutstandingPrincipalRUSD": 5059541.05,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3968,14 +3968,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 738155.26
+   "institutionFundingRUSDPerYear": 1289062.1
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 226591.33,
+   "educationFundingRUSDPerYear": 395703.07,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -4014,14 +4014,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 994812.57,
+  "initialTreasuryCashRUSD": 994541.35,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 6770124.29,
+   "maxOutstandingPrincipalRUSD": 6768278.47,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4035,14 +4035,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1724881.87
+   "institutionFundingRUSDPerYear": 1724411.59
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 529486.55,
+   "educationFundingRUSDPerYear": 529342.19,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -4111,14 +4111,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 5309715.64,
+  "initialTreasuryCashRUSD": 5308407.77,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 36134881.88,
+   "maxOutstandingPrincipalRUSD": 36125981.21,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4132,14 +4132,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 9206389.72
+   "institutionFundingRUSDPerYear": 9204122.02
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 2826083.13,
+   "educationFundingRUSDPerYear": 2825387.02,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -4196,14 +4196,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 10166983.54,
+  "initialTreasuryCashRUSD": 10163322.73,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 69190663.66,
+   "maxOutstandingPrincipalRUSD": 69165750.3,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4217,14 +4217,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 17628291.04
+   "institutionFundingRUSDPerYear": 17621943.66
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 5411352.06,
+   "educationFundingRUSDPerYear": 5409403.61,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -4280,14 +4280,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 2193645.1,
+  "initialTreasuryCashRUSD": 2193019.16,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 14928691.45,
+   "maxOutstandingPrincipalRUSD": 14924431.64,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4301,14 +4301,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 3803509.08
+   "institutionFundingRUSDPerYear": 3802423.78
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 1167562.23,
+   "educationFundingRUSDPerYear": 1167229.07,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -4364,14 +4364,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 4744986.62,
+  "initialTreasuryCashRUSD": 4745686.28,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 32291659.81,
+   "maxOutstandingPrincipalRUSD": 32296421.22,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4385,14 +4385,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 8227219.5
+   "institutionFundingRUSDPerYear": 8228432.61
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 2525507.5,
+   "educationFundingRUSDPerYear": 2525879.89,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -4434,14 +4434,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 4832433.05,
+  "initialTreasuryCashRUSD": 5140556.29,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 32886770.03,
+   "maxOutstandingPrincipalRUSD": 34983680.29,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4455,14 +4455,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 8378840.77
+   "institutionFundingRUSDPerYear": 8913088.35
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 2572050.64,
+   "educationFundingRUSDPerYear": 2736048.48,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -4513,14 +4513,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 54336067.32,
+  "initialTreasuryCashRUSD": 54316267.65,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 369780136.36,
+   "maxOutstandingPrincipalRUSD": 369645391.09,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4534,7 +4534,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 94212015.34
+   "institutionFundingRUSDPerYear": 94177685.15
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -4544,7 +4544,7 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 28920238.62,
+   "educationFundingRUSDPerYear": 28909700.29,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -4601,14 +4601,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 105948098.29,
+  "initialTreasuryCashRUSD": 105897314.34,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 721022042.27,
+   "maxOutstandingPrincipalRUSD": 720676435.83,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4622,7 +4622,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 183700888.79
+   "institutionFundingRUSDPerYear": 183612835.71
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -4632,7 +4632,7 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 56390615.56,
+   "educationFundingRUSDPerYear": 56363585.93,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -4683,14 +4683,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 15130904.61,
+  "initialTreasuryCashRUSD": 15122424.41,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 102972265.87,
+   "maxOutstandingPrincipalRUSD": 102914554.48,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4704,7 +4704,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 26235115.78
+   "institutionFundingRUSDPerYear": 26220412.16
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -4714,7 +4714,7 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 8053386.88,
+   "educationFundingRUSDPerYear": 8048873.32,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -4764,14 +4764,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1418194.52,
+  "initialTreasuryCashRUSD": 1418190.81,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 9651419.21,
+   "maxOutstandingPrincipalRUSD": 9651393.93,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4785,14 +4785,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 2458973.77
+   "institutionFundingRUSDPerYear": 2458967.32
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 754830.56,
+   "educationFundingRUSDPerYear": 754828.58,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -4844,14 +4844,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 45060677.62,
+  "initialTreasuryCashRUSD": 44829651.93,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 306657149.37,
+   "maxOutstandingPrincipalRUSD": 305084920.9,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4865,14 +4865,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 78129637.64
+   "institutionFundingRUSDPerYear": 77729067.69
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 23983435.19,
+   "educationFundingRUSDPerYear": 23860472.33,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -4914,14 +4914,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1682897.46,
+  "initialTreasuryCashRUSD": 2945263.61,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 11452835.68,
+   "maxOutstandingPrincipalRUSD": 20043776.33,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4935,14 +4935,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 2917935.89
+   "institutionFundingRUSDPerYear": 5106722.56
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 895718.04,
+   "educationFundingRUSDPerYear": 1567609.34,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -4979,14 +4979,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 856399.3,
+  "initialTreasuryCashRUSD": 856117.75,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 5828162.86,
+   "maxOutstandingPrincipalRUSD": 5826246.78,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5000,14 +5000,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1484890.38
+   "institutionFundingRUSDPerYear": 1484402.21
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 455816.43,
+   "educationFundingRUSDPerYear": 455666.57,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -5051,14 +5051,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 120766625.32,
+  "initialTreasuryCashRUSD": 120764617.5,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 821868445.38,
+   "maxOutstandingPrincipalRUSD": 821854781.24,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5072,7 +5072,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 209394380.52
+   "institutionFundingRUSDPerYear": 209390899.2
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -5083,7 +5083,7 @@
     "printing-industry",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 64277740.25,
+   "educationFundingRUSDPerYear": 64276671.59,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -5126,14 +5126,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 204827436.34,
+  "initialTreasuryCashRUSD": 204735936.89,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 1393938153.23,
+   "maxOutstandingPrincipalRUSD": 1393315460.41,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5147,7 +5147,7 @@
     "labor": "labor-protected",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 355145422.27
+   "institutionFundingRUSDPerYear": 354986773.55
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -5158,7 +5158,7 @@
     "printing-industry",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 109018900.82,
+   "educationFundingRUSDPerYear": 108970200.47,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -5215,14 +5215,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 23532880.91,
+  "initialTreasuryCashRUSD": 23531784.08,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 160151301.68,
+   "maxOutstandingPrincipalRUSD": 160143837.34,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5236,7 +5236,7 @@
     "labor": "labor-protected",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 40803102.73
+   "institutionFundingRUSDPerYear": 40801200.97
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -5247,7 +5247,7 @@
     "printing-industry",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 12525318.17,
+   "educationFundingRUSDPerYear": 12524734.39,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -5286,14 +5286,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 11373638.43,
+  "initialTreasuryCashRUSD": 11373612.6,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 77402465.34,
+   "maxOutstandingPrincipalRUSD": 77402289.61,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5307,14 +5307,14 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 19720481.27
+   "institutionFundingRUSDPerYear": 19720436.49
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 6053591.17,
+   "educationFundingRUSDPerYear": 6053577.42,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -5401,14 +5401,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 892015757.74,
+  "initialTreasuryCashRUSD": 893513379.58,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 6070548068.22,
+   "maxOutstandingPrincipalRUSD": 6080740024.24,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5422,7 +5422,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1546644915.41
+   "institutionFundingRUSDPerYear": 1549241606.32
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -5435,7 +5435,7 @@
     "electrical-generation",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 474773200.13,
+   "educationFundingRUSDPerYear": 475570305.69,
    "researchStaffShare": 0.12
   },
   "sourceIds": [
@@ -5536,14 +5536,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 9958613.51,
+  "initialTreasuryCashRUSD": 9940246.45,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 67772616.64,
+   "maxOutstandingPrincipalRUSD": 67647621.01,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5557,14 +5557,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 17267003.2
+   "institutionFundingRUSDPerYear": 17235157.01
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 5300447.62,
+   "educationFundingRUSDPerYear": 5290671.81,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -5598,14 +5598,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 996132.16,
+  "initialTreasuryCashRUSD": 996128.92,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 6779104.65,
+   "maxOutstandingPrincipalRUSD": 6779082.58,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5619,14 +5619,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1727169.87
+   "institutionFundingRUSDPerYear": 1727164.25
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 530188.9,
+   "educationFundingRUSDPerYear": 530187.17,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -5660,14 +5660,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 603536.26,
+  "initialTreasuryCashRUSD": 601624.5,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 4107321.91,
+   "maxOutstandingPrincipalRUSD": 4094311.55,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5681,14 +5681,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1046457.17
+   "institutionFundingRUSDPerYear": 1043142.41
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 321230.69,
+   "educationFundingRUSDPerYear": 320213.16,
    "researchStaffShare": 0.08
   },
   "sourceIds": [
@@ -5723,14 +5723,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 2408142.33,
+  "initialTreasuryCashRUSD": 2399084.82,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 16388436.69,
+   "maxOutstandingPrincipalRUSD": 16326796.49,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5744,14 +5744,14 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 4175420.74
+   "institutionFundingRUSDPerYear": 4159716.14
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 1281727.85,
+   "educationFundingRUSDPerYear": 1276907.02,
    "researchStaffShare": 0.08
   },
   "sourceIds": [

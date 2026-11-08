@@ -173,8 +173,13 @@ describe("M14 monetary equivalence and determinism", () => {
   // Re-pinned on 2026-11-08, by design (D-148 additions, item 9): coffee-tea-cocoa, tobacco
   // and rubber placed at their recorded 1900 producers under the A12 coverage rule instead
   // of worldwide pooling; 6,168 buildings and the warehouse capacities that follow.
+  // Re-pinned on 2026-11-08, by design (designer's decisions of that day): A12 batch 3
+  // (Haiti, Nicaragua, Angola, Ivory Coast, Bolivia), raw silk as good 58 with sericulture
+  // farms and an optional textile-mill input (D-148 item 12), electricity at the census
+  // water-station price of 1.52 cents (item 10, option a) and the jewellery metal share
+  // of 0.33 (D-152 addition).
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("ad9e28862dfb28c0");
+    expect(hashWorld(world)).toBe("81f5cf0bf41d72c1");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {

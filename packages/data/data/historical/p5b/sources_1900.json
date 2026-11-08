@@ -157,12 +157,12 @@
   },
   {
    "id": "usda-yearbook-1905",
-   "title": "Yearbook of the United States Department of Agriculture 1905: total tobacco crop of countries named, 1900-1904",
+   "title": "Yearbook of the United States Department of Agriculture 1905: total tobacco crop of countries named, 1900-1904; cotton crop of countries named, 1900-1904; raw silk production of countries named, 1900-1904",
    "author": "U.S. Department of Agriculture (1906)",
    "url": "https://archive.org/details/yoa1905",
    "accessDate": "2026-11-08",
    "license": "Public domain (U.S. government work)",
-   "notes": "pp. 714-715 = PDF 788-789. Read from the page images."
+   "notes": "pp. 709-710 = PDF 783-784 (cotton), pp. 714-715 = PDF 788-789 (tobacco), pp. 731-732 = PDF 805-806 (raw silk). Read from the page images."
   },
   {
    "id": "usda-yearbook-1906",
@@ -226,6 +226,33 @@
    "accessDate": "2026-11-08",
    "license": "Public domain (U.S. government work)",
    "notes": "Read from the page images (PDF 9, 12 and 13 of the part file)."
+  },
+  {
+   "id": "india-rubber-world-1901-03",
+   "title": "The India Rubber World, vol. 23, no. 6 (1 March 1901): An English report on African rubbers (Kramrisch & Co.'s review of 1900)",
+   "author": "India Rubber Publishing Co., New York",
+   "url": "https://archive.org/details/sim_rubber-world_1901-03-01_23_6",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (published 1901 in the United States)",
+   "notes": "p. 179 (PDF 19). Read from the page image."
+  },
+  {
+   "id": "iba-bolivia-1904",
+   "title": "Bolivia: geographical sketch, natural resources, laws, economic conditions, actual development, prospects of future growth",
+   "author": "International Bureau of the American Republics, Washington (1904)",
+   "url": "https://archive.org/details/cu31924019964976",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government publication, 1904)",
+   "notes": "p. 84 = PDF 108 (plates interleave). Read from the page image."
+  },
+  {
+   "id": "cherington-wool-1916",
+   "title": "The Wool Industry: commercial problems of the American woolen and worsted manufacture",
+   "author": "Paul T. Cherington (Chicago and New York: A. W. Shaw Company, 1916)",
+   "url": "https://archive.org/details/cu31924013981174",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (published 1916 in the United States; the author died in 1943)",
+   "notes": "p. 33 = PDF 49. Read from the page image."
   }
  ],
  "units": [
@@ -387,11 +414,11 @@
   },
   {
    "id": "jewellery-metal-share-of-value",
-   "value": 0.5,
+   "value": 0.33,
    "unit": "share of the wholesale value of jewellery and plate that is gold and silver",
-   "status": "provisional",
-   "sourceId": "p5b-provisional",
-   "note": "No 1900 census figure transcribed (the Twelfth Census of manufactures' jewelry industry is not cached). Planning value: bullion about half the wholesale value of gold and silver wares, the rest the jewellers' work, other materials and margin."
+   "status": "estimated",
+   "sourceId": "census-manufactures-1900",
+   "note": "Accepted by the designer on 2026-11-08 (D-152 addition): the Mint's US industrial gold and silver of 1900 ($23,761,100) is 32.7 % of the 1900 value of products of jewelry, silversmithing, silverware and plated ware ($72,615,534; census, industrialArts1900.census1900), an upper bound because part of the metal went to other trades."
   },
   {
    "id": "kg-per-picul",
@@ -789,6 +816,27 @@
    "quantity": 721027637,
    "valueUSD": 55979566,
    "status": "sourced"
+  },
+  {
+   "id": "price-raw-silk-import",
+   "goodKey": "silk",
+   "sourceId": "census-statab-1901",
+   "locator": "Table 157, p. 453: annual import prices, year ending June 30, 1900: silk, raw or as reeled from the cocoon, $3.96 per pound",
+   "unit": "USD per lb",
+   "value": 3.96,
+   "status": "sourced",
+   "note": "Import (foreign market) value; most US raw silk came from Japan, China and Italy."
+  },
+  {
+   "id": "price-electricity-water-stations-1902",
+   "goodKey": "electricity",
+   "sourceId": "census-electric-1902",
+   "locator": "Table 40, p. 48 (PDF 71): private stations using water power exclusively, 1902: income from sale of current $3,771,862 (arc lighting $425,586, incandescent lighting $1,487,483, all other electric service $1,858,793); output 248,749,668 kWh",
+   "unit": "USD per kWh",
+   "quantity": 248749668,
+   "valueUSD": 3771862,
+   "status": "sourced",
+   "note": "1.52 cents per kWh; about half of the income was power ('all other electric service'). The reference price of electricity since the designer chose option (a) on 2026-11-08 (D-148 item 10)."
   }
  ],
  "outputs1900": {
@@ -2049,6 +2097,88 @@
      "Other countries"
     ]
    ]
+  },
+  "silk": {
+   "sourceId": "usda-yearbook-1905",
+   "locator": "pp. 731-732 (PDF 805-806): raw silk production of countries named, 1900 (estimate of the Silk Manufacturers' Association of Lyons; pounds)",
+   "unit": "lb",
+   "status": "sourced",
+   "total": 40724000,
+   "note": "The country rows and the three regional totals (12,498,000; 3,894,000; 24,332,000) reproduce the printed grand total. China, Japan and India count exports only.",
+   "entries": [
+    [
+     "fra-home",
+     1623000,
+     "sourced",
+     "France 1,623,000"
+    ],
+    [
+     "ita-home",
+     10000000,
+     "sourced",
+     "Italy 10,000,000"
+    ],
+    [
+     "esp-home",
+     185000,
+     "sourced",
+     "Spain 185,000"
+    ],
+    [
+     "aut-home",
+     690000,
+     "sourced",
+     "Austria-Hungary 690,000"
+    ],
+    [
+     "ott-home",
+     2161000,
+     "sourced",
+     "Anatolia 838,000, Syria and Cyprus 992,000, Salonika and Adrianople 331,000 (Ottoman Empire; Cyprus not split)"
+    ],
+    [
+     "bgr-home",
+     168000,
+     "sourced",
+     "Balkan States 168,000 (placed in Bulgaria, provisional)"
+    ],
+    [
+     "grc-home",
+     110000,
+     "sourced",
+     "Greece and Crete 110,000"
+    ],
+    [
+     "rus-home",
+     772000,
+     "sourced",
+     "Caucasus 772,000"
+    ],
+    [
+     "per-home",
+     683000,
+     "sourced",
+     "Persia and Turkestan (exports) 683,000"
+    ],
+    [
+     "chn-home",
+     14621000,
+     "sourced",
+     "China, exports from Shanghai 10,199,000 and Canton 4,422,000"
+    ],
+    [
+     "jpn-home",
+     9094000,
+     "sourced",
+     "Japan, exports from Yokohama 9,094,000"
+    ],
+    [
+     "bin",
+     617000,
+     "sourced",
+     "British India, exports from Calcutta 617,000"
+    ]
+   ]
   }
  },
  "technologyEvidence": [
@@ -2739,7 +2869,7 @@
     "note": "Average power rate about 10 cents per kWh without discounts (range 2-15 cents); Niagara Falls 3 cents per kWh, or a flat $35 per horsepower a year up to 10 hp, $30 up to 25 hp and $25 above 25 hp. Motor service was somewhat over 12 % of private stations' gross income.",
     "niagaraLargeUSDPerHPYear": 25
    },
-   "note": "The census does not split kWh between lighting and power (D-148 additions, item 10). Not applied: the reference price stays 1.0 cent until the designer decides."
+   "note": "The census does not split kWh between lighting and power (D-148 additions, item 10). The designer chose option (a) on 2026-11-08: the water-only stations' 1.52 cents is the reference price (price-electricity-water-stations-1902)."
   }
  },
  "industrialArts1900": {
@@ -3003,11 +3133,11 @@
    },
    "usMetalUSD": 23761100,
    "metalShareUpperBound": 0.32721786498189215,
-   "note": "All materials (gold, silver, stones, base metal, fuel) are 46.8 % of the value of products of the four industries. The Mint's US industrial consumption of 1900 (gold $16,667,500 plus silver at its commercial value $7,093,600, gross of old material) is 32.7 % of that value; part of it went to watch cases, dentistry, gold leaf and other trades, so the metal share of jewellery and plate is at most about 0.33. Not applied: 'jewellery-metal-share-of-value' stays 0.5 until the designer decides (D-152 addition)."
+   "note": "All materials (gold, silver, stones, base metal, fuel) are 46.8 % of the value of products of the four industries. The Mint's US industrial consumption of 1900 (gold $16,667,500 plus silver at its commercial value $7,093,600, gross of old material) is 32.7 % of that value; part of it went to watch cases, dentistry, gold leaf and other trades, so the metal share of jewellery and plate is at most about 0.33. Applied: 'jewellery-metal-share-of-value' is 0.33 since the designer's acceptance of 2026-11-08 (D-152 addition)."
   }
  },
  "crops1900": {
-  "description": "D-146 A12: 1900 figures for coffee, tea, cocoa, tobacco and rubber by producer, kg. Production where the source gives it, otherwise exports or market receipts (marked; status 'estimated' where exports of another year, half a year or a mean of two estimates stand for 1900). When a territory has both a production and an export row for a crop, placement uses the production row. worldEstimates give each crop's world figure for the coverage rule; selfSupplied lists producers that the sources name but do not record. Batch 1 is the first set of 2026-11-08; batch 2 closes the A12 gaps. Placement rule: scripts/p5b/placement.mjs (D-148 additions, item 9).",
+  "description": "D-146 A12: 1900 figures for coffee, tea, cocoa, tobacco and rubber by producer, kg. Production where the source gives it, otherwise exports or market receipts (marked; status 'estimated' where exports of another year, half a year or a mean of two estimates stand for 1900). When a territory has both a production and an export row for a crop, placement uses the production row. worldEstimates give each crop's world figure for the coverage rule; selfSupplied lists producers that the sources name but do not record. Batch 1 is the first set of 2026-11-08; batches 2 and 3 close the A12 gaps. A row with `transferFrom` moves its kg out of that territory's row of the same crop (rubber shipped through Para). Placement rule: scripts/p5b/placement.mjs (D-148 additions, item 9).",
   "entries": [
    {
     "crop": "tea",
@@ -3233,12 +3363,12 @@
     "crop": "coffee",
     "territory": "sal-home",
     "kind": "exports",
-    "kg": 21114884.48801424,
-    "as": "46,550,352 lb (January-June 1900)",
+    "kg": 22725431.32937,
+    "as": "50,101,000 lb (1901)",
     "sourceId": "ukers-coffee-1922",
-    "locator": "p. 192 (PDF 240): coffee exports from Salvador, first six months of 1900 (a consular report), total 46,550,352 lb (the destinations sum to the total). Half a year only: a lower bound for 1900",
+    "locator": "p. 280 (PDF 336): Salvador, 'the figures for 1901 being 50,101,000 pounds' (exports; annual production 50-75 million lb, about 5 million consumed at home). Replaces the January-June 1900 figure of p. 192 (46,550,352 lb)",
     "status": "estimated",
-    "batch": 2
+    "batch": 3
    },
    {
     "crop": "coffee",
@@ -3745,14 +3875,70 @@
     "locator": "pp. 714-715 (PDF 788-789): total tobacco crop of countries named, 1900: Fiji 14,000 lb",
     "status": "sourced",
     "batch": 2
+   },
+   {
+    "crop": "coffee",
+    "territory": "hti-home",
+    "kind": "exports",
+    "kg": 30588908.655690003,
+    "as": "67,437,000 lb (1897-98)",
+    "sourceId": "ukers-coffee-1922",
+    "locator": "p. 281 (PDF 337): Haiti's exports 'fell back to 67,437,000 pounds in 1897-98; and ten years later, were 63,848,000 pounds'; some 8,000,000 lb consumed yearly at home. The 1897-98 figure stands for 1900",
+    "status": "estimated",
+    "batch": 3
+   },
+   {
+    "crop": "coffee",
+    "territory": "nic-home",
+    "kind": "production",
+    "kg": 7378880.583735295,
+    "as": "16,267,647 lb (interpolated)",
+    "sourceId": "ukers-coffee-1922",
+    "locator": "p. 280 (PDF 336): Nicaragua's production 11,540,000 lb in 1890-91 and 'more than 20,000,000 pounds' in 1907-08; linear interpolation to 1900",
+    "status": "estimated",
+    "batch": 3
+   },
+   {
+    "crop": "rubber",
+    "territory": "ang",
+    "kind": "receipts",
+    "kg": 2431400.2527584,
+    "as": "1,510 + 678 + 205 tons",
+    "sourceId": "india-rubber-world-1901-03",
+    "locator": "p. 179: Kramrisch & Co.'s review of 1900: 'From Benguela, 1510 tons ... Loando, 678 tons (and 205 tons thimbles, etc.)'; long tons (the Liverpool trade unit, provisional). Part of Angola's rubber went via the Congo to Antwerp and is in the Congo row",
+    "status": "estimated",
+    "batch": 3
+   },
+   {
+    "crop": "rubber",
+    "territory": "fwa",
+    "kind": "receipts",
+    "kg": 466093.3757171999,
+    "as": "over 2,000 tons (Gold Coast and Ivory Coast) less the Gold Coast's 3,452,440 lb",
+    "sourceId": "india-rubber-world-1901-03",
+    "locator": "p. 179: 'From the Gold Coast and Ivory Coast they are increasing, and for 1900 imports amounted to over 2000 tons'; less the Gold Coast's recorded 1900 exports (colonial abstract no. 38), the rest the Ivory Coast (French West Africa); a lower bound",
+    "status": "estimated",
+    "batch": 3
+   },
+   {
+    "crop": "rubber",
+    "territory": "bol-home",
+    "kind": "exports",
+    "kg": 3496240,
+    "as": "3,496,240 kg",
+    "sourceId": "iba-bolivia-1904",
+    "locator": "p. 84 (PDF 108): production of rubber in Bolivia, 1900, 3,496,240 kilograms valued at 10,403,959 bolivianos (Bolivian authorities). Shipped down the Amazon, so it is taken out of Para's receipts (transferFrom)",
+    "status": "sourced",
+    "batch": 3,
+    "transferFrom": "bra-home"
    }
   ],
   "coverage": {
-   "coffee": "Recorded: Brazil, Dutch East Indies, India, Ceylon, Jamaica, Gold Coast (batch 1); Mexico, Guatemala, Salvador (half year), Costa Rica, Colombia (1899), Venezuela (estimate), Porto Rico, Dominican Republic (batch 2). Missing: Haiti, Nicaragua, Cuba, Arabia, Abyssinia and East Africa.",
+   "coffee": "Recorded: Brazil, Dutch East Indies, India, Ceylon, Jamaica, Gold Coast (batch 1); Mexico, Guatemala, Costa Rica, Colombia (1899), Venezuela (estimate), Porto Rico, Dominican Republic (batch 2); Haiti (1897-98), Nicaragua (interpolated), Salvador (1901) (batch 3). Missing: Cuba, Honduras, Arabia (Aden's re-exports), Abyssinia and East Africa.",
    "tea": "Recorded: India, Ceylon, Dutch East Indies (batch 1); China and Japan exports (batch 2). Domestic crops of China and Japan: self-supplied.",
    "cocoa": "Recorded: Trinidad, Jamaica, Ceylon, Gold Coast, Dutch East Indies (batch 1); Ecuador, Venezuela, Brazil, Sao Tome (Baker estimates, batch 2). Missing: Haiti, Santo Domingo, Grenada, Surinam, Cuba, Colombia, Peru.",
    "tobacco": "Recorded: the USDA 1900 table (33 territories, batch 2) and Ceylon's exports. China, Persia, Central America except Guatemala and the West Indies except Cuba and Porto Rico: self-supplied (no statistics).",
-   "rubber": "Recorded: Brazil (Para receipts, which include Peruvian and Bolivian rubber shipped down the Amazon), the Gold Coast (batch 1); the Congo via Antwerp and Lagos (batch 2). Missing: Centrals (Central America, Mexico, Colombia, Ecuador, Peruvian caucho), Angola, the French and German colonies, the East Indies."
+   "rubber": "Recorded: Brazil (Para receipts, less Bolivia's rubber; Peru's caucho and Iquitos rubber stay inside), the Gold Coast (batch 1); the Congo via Antwerp and Lagos (batch 2); Angola, the Ivory Coast and Bolivia (batch 3). Missing: Centrals (Central America, Mexico, Colombia, Ecuador, Peruvian caucho), Kamerun, Gabon, East Africa, Madagascar, the East Indies."
   },
   "worldEstimates": {
    "coffee": {
@@ -3875,5 +4061,49 @@
    ]
   ],
   "note": "Report only (D-148 additions, item 11): the cotton placement shares stay the USDA 1901 commercial crop (C-8). The listed rows are the largest; the total is the printed world total."
+ },
+ "woolWorld1900": {
+  "sourceId": "cherington-wool-1916",
+  "locator": "p. 33 (PDF 49): world's wool production in millions of pounds, 1900: United States 288.6, United Kingdom (fleece washed) 141, continent of Europe (fleece washed) 450, Australia 409.4, New Zealand 156.2, Argentina 439.6, Uruguay 88.2, South Africa 40.0",
+  "status": "sourced",
+  "unit": "million lb (greasy, except the two fleece-washed columns)",
+  "rows": [
+   [
+    "usa-home",
+    288.6
+   ],
+   [
+    "gbr-home",
+    141
+   ],
+   [
+    "continent-of-europe",
+    450
+   ],
+   [
+    "aus-home",
+    409.4
+   ],
+   [
+    "nzl-home",
+    156.2
+   ],
+   [
+    "arg-home",
+    439.6
+   ],
+   [
+    "ury-home",
+    88.2
+   ],
+   [
+    "south-africa",
+    40
+   ]
+  ],
+  "totalListedMillionLb": 2013,
+  "world1914MillionLb": 2872,
+  "world1914Locator": "same page: computed world's wool production 1914 (including carpet wools), 2,872 million lb, of which Asia 273 and Russia (Europe) 320 (Bulletin of the National Association of Wool Manufacturers, January 1915)",
+  "note": "Report only (D-148 additions, item 12): the eight producers listed cover most of the 1900 clip; Asia and most of Russia are outside them."
  }
 }

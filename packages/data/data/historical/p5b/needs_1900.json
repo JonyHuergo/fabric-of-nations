@@ -89,7 +89,7 @@
    },
    {
     "goodKey": "electricity",
-    "quantityPerCapitaPerDay": 0.0000210252,
+    "quantityPerCapitaPerDay": 0.0000138659,
     "requiredTechnologyKey": "electrical-generation"
    },
    {
@@ -180,7 +180,7 @@
    },
    {
     "goodKey": "electricity",
-    "quantityPerCapitaPerDay": 0.0000210252,
+    "quantityPerCapitaPerDay": 0.0000138659,
     "requiredTechnologyKey": "electrical-generation"
    },
    {
@@ -213,7 +213,7 @@
    },
    {
     "goodKey": "jewellery",
-    "quantityPerCapitaPerDay": 0.00271601
+    "quantityPerCapitaPerDay": 0.00411517
    }
   ]
  }

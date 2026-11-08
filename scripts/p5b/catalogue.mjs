@@ -1,5 +1,5 @@
 /**
- * P5b (D-146): the authored catalogue of the 1900 world — the 58 goods (docs/P5B_PLAN.md
+ * P5b (D-146): the authored catalogue of the 1900 world — the 59 goods (docs/P5B_PLAN.md
  * §1) and the building recipes that make them. Every quantity here is a provisional
  * planning value with its reasoning in the comment or in `docs/P5B_PLAN.md` §1; the
  * builder (`build-goods-1900.mjs`) turns them into validated definitions, derives the
@@ -7,7 +7,8 @@
  *
  * Goods 0-7 keep the ids, keys and P2b prices of the existing catalogue (C-18); only
  * their names change. Goods 8-56 follow the plan's catalogue order; good 57, jewellery and
- * plate, was added by the designer's decision of 2026-11-08 (D-152).
+ * plate, was added by the designer's decision of 2026-11-08 (D-152), and good 58, raw silk, by
+ * the designer's request of the same day (D-148 additions, item 12).
  */
 
 /** Goods: [id, key, name, unit, category, group, storable, tradeable]. */
@@ -72,6 +73,9 @@ export const GOODS = [
   // D-152: jewellery, plate and watch cases, made from gold and silver by jewellers; a
   // luxury need. 1 unit = 1 US dollar of 1900 wares at wholesale.
   [57, "jewellery", "Jewellery and plate", "unit-eq.", "luxury", "consumer-manufactures"],
+  // D-148 additions, item 12 (designer, 2026-11-08): raw silk, reeled from the cocoon by
+  // sericulture farms and bought by textile mills.
+  [58, "silk", "Raw silk", "kg", "raw", "fibres-forest"],
 ];
 
 /**
@@ -176,6 +180,10 @@ export const BUILDINGS = [
   { key: "post-and-telegraph", name: "Post and Telegraph Office", sector: "services", output: "communication", inputs: {}, jobs: { clerks: 0.7, laborers: 0.3 }, maintenanceMix: ELECTRICAL_MAINTENANCE },
   { key: "bank-and-office", name: "Bank and Office", sector: "services", output: "finance-services", inputs: { paper: 0.000003 }, jobs: { clerks: 0.7, capitalists: 0.15, academics: 0.15 } },
   { key: "personal-services", name: "Personal and Recreation Services", sector: "services", output: "personal-services", inputs: {}, jobs: { laborers: 0.7, clerks: 0.3 } },
+  // D-148 additions, item 12 (appended so earlier definition ids stay): sericulture —
+  // mulberry, silkworms and reeling, a peasant craft in 1900 (Lyons, Lombardy, the Levant,
+  // China, Japan); crop band to 46° (Friuli and Tyrol), provisional.
+  { key: "silk-farm", name: "Sericulture and Silk Reeling", sector: "agriculture", output: "silk", inputs: {}, jobs: { peasants: 1 }, landUse: "cropland", maxAbsLatitudeDeg: 46 },
 ];
 
 /**
@@ -188,6 +196,15 @@ export const MAINTENANCE_MIX = { machinery: 0.5, "construction-materials": 0.5 }
 export const CONSTRUCTION_MATERIAL_SHARE = 0.2;
 export const CONSTRUCTION_MATERIAL_MIX = { "construction-materials": 0.6, machinery: 0.4 };
 
+/**
+ * Raw silk as an optional input of the textile mill (D-148 additions, item 12): kg of silk
+ * per kg of cotton the mill spins = the 1900 world ratio of raw silk (Lyons estimate,
+ * 40,724,000 lb, USDA Yearbook 1905 pp. 731-732) to cotton lint (15,893,591 bales x 478 lb,
+ * pp. 709-710), so modelled silk and cotton demand keep the 1900 proportion. Optional with
+ * the minor-material elasticity (about its 5 % share of the cloth's value): a market
+ * without silk still weaves (provisional).
+ */
+export const SILK_OPTIONAL = { buildings: ["textile-mill"], perKgCotton: 40724000 / (15893591 * 478), outputElasticity: MINOR_INPUT_ELASTICITY };
 /** Fertiliser as an optional input of the farms that can use it (C-9): kg N per kg grain, elasticity. */
 export const FERTILISER_OPTIONAL = { buildings: ["commercial-farm", "commercial-farm-peasant", "mechanized-farm"], perOutput: 0.002, outputElasticity: 0.2 };
 

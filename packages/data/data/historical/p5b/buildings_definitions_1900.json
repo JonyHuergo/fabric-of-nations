@@ -314,6 +314,13 @@
     "quantity": 16.666667
    }
   ],
+  "optionalInputs": [
+   {
+    "goodId": 58,
+    "quantityPerThroughputUnit": 1.42945,
+    "outputElasticity": 0.05
+   }
+  ],
   "maintenanceInputs": [
    {
     "goodId": 37,
@@ -439,7 +446,7 @@
    },
    {
     "goodId": 11,
-    "quantity": 7209700
+    "quantity": 7208130
    },
    {
     "goodId": 12,
@@ -447,7 +454,7 @@
    },
    {
     "goodId": 13,
-    "quantity": 74843
+    "quantity": 64374
    },
    {
     "goodId": 14,
@@ -459,11 +466,11 @@
    },
    {
     "goodId": 16,
-    "quantity": 82742
+    "quantity": 82452
    },
    {
     "goodId": 17,
-    "quantity": 4283
+    "quantity": 4247
    },
    {
     "goodId": 18,
@@ -471,11 +478,11 @@
    },
    {
     "goodId": 19,
-    "quantity": 1260
+    "quantity": 1267
    },
    {
     "goodId": 20,
-    "quantity": 85
+    "quantity": 86
    },
    {
     "goodId": 21,
@@ -503,19 +510,19 @@
    },
    {
     "goodId": 27,
-    "quantity": 2478
+    "quantity": 2457
    },
    {
     "goodId": 28,
-    "quantity": 556
+    "quantity": 551
    },
    {
     "goodId": 29,
-    "quantity": 1068
+    "quantity": 1059
    },
    {
     "goodId": 31,
-    "quantity": 1332
+    "quantity": 1340
    },
    {
     "goodId": 32,
@@ -539,11 +546,11 @@
    },
    {
     "goodId": 37,
-    "quantity": 25776
+    "quantity": 25643
    },
    {
     "goodId": 38,
-    "quantity": 1285
+    "quantity": 1293
    },
    {
     "goodId": 39,
@@ -599,7 +606,11 @@
    },
    {
     "goodId": 57,
-    "quantity": 62812
+    "quantity": 95170
+   },
+   {
+    "goodId": 58,
+    "quantity": 9277
    }
   ],
   "resourceRequirements": [],
@@ -2222,13 +2233,13 @@
   "inputs": [
    {
     "goodId": 16,
-    "quantityPerThroughputUnit": 1215.4
+    "quantityPerThroughputUnit": 680.056
    }
   ],
   "outputs": [
    {
     "goodId": 30,
-    "quantityPerThroughputUnit": 405.134
+    "quantityPerThroughputUnit": 226.685
    }
   ],
   "jobs": [
@@ -2286,13 +2297,13 @@
   "inputs": [
    {
     "goodId": 29,
-    "quantityPerThroughputUnit": 324.411
+    "quantityPerThroughputUnit": 158.203
    }
   ],
   "outputs": [
    {
     "goodId": 30,
-    "quantityPerThroughputUnit": 540.686
+    "quantityPerThroughputUnit": 263.672
    }
   ],
   "jobs": [
@@ -2350,13 +2361,13 @@
   "inputs": [
    {
     "goodId": 18,
-    "quantityPerThroughputUnit": 176.534
+    "quantityPerThroughputUnit": 112.32
    }
   ],
   "outputs": [
    {
     "goodId": 30,
-    "quantityPerThroughputUnit": 294.224
+    "quantityPerThroughputUnit": 187.201
    }
   ],
   "jobs": [
@@ -2415,7 +2426,7 @@
   "outputs": [
    {
     "goodId": 30,
-    "quantityPerThroughputUnit": 265.725
+    "quantityPerThroughputUnit": 175.243
    }
   ],
   "jobs": [
@@ -2474,13 +2485,13 @@
   "inputs": [
    {
     "goodId": 23,
-    "quantityPerThroughputUnit": 0.00770949
+    "quantityPerThroughputUnit": 0.00507075
    }
   ],
   "outputs": [
    {
     "goodId": 30,
-    "quantityPerThroughputUnit": 256.983
+    "quantityPerThroughputUnit": 169.025
    }
   ],
   "jobs": [
@@ -2670,21 +2681,21 @@
   "inputs": [
    {
     "goodId": 16,
-    "quantityPerThroughputUnit": 3.0374
+    "quantityPerThroughputUnit": 4.00604
    },
    {
     "goodId": 21,
-    "quantityPerThroughputUnit": 20.2493
+    "quantityPerThroughputUnit": 26.7069
    },
    {
     "goodId": 30,
-    "quantityPerThroughputUnit": 111.371
+    "quantityPerThroughputUnit": 146.888
    }
   ],
   "outputs": [
    {
     "goodId": 33,
-    "quantityPerThroughputUnit": 5.06234
+    "quantityPerThroughputUnit": 6.67673
    }
   ],
   "jobs": [
@@ -2937,17 +2948,17 @@
   "inputs": [
    {
     "goodId": 18,
-    "quantityPerThroughputUnit": 14.7013
+    "quantityPerThroughputUnit": 15.3705
    },
    {
     "goodId": 30,
-    "quantityPerThroughputUnit": 19.6017
+    "quantityPerThroughputUnit": 20.494
    }
   ],
   "outputs": [
    {
     "goodId": 35,
-    "quantityPerThroughputUnit": 9.80085
+    "quantityPerThroughputUnit": 10.247
    }
   ],
   "jobs": [
@@ -4084,17 +4095,17 @@
   "inputs": [
    {
     "goodId": 25,
-    "quantityPerThroughputUnit": 2.91312
+    "quantityPerThroughputUnit": 1.43482
    },
    {
     "goodId": 26,
-    "quantityPerThroughputUnit": 36.178
+    "quantityPerThroughputUnit": 17.819
    }
   ],
   "outputs": [
    {
     "goodId": 57,
-    "quantityPerThroughputUnit": 5314.5
+    "quantityPerThroughputUnit": 3966.05
    }
   ],
   "jobs": [
@@ -4512,5 +4523,58 @@
     "quantityPerLevelPerDay": 0.112523
    }
   ]
+ },
+ {
+  "id": 71,
+  "key": "silk-farm",
+  "name": "Sericulture and Silk Reeling",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 58,
+    "quantityPerThroughputUnit": 139.131
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 0,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 5744.65
+   },
+   {
+    "goodId": 38,
+    "quantity": 156.599
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983674
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402223
+   }
+  ],
+  "landUse": "cropland",
+  "maxAbsLatitudeDeg": 46
  }
 ]

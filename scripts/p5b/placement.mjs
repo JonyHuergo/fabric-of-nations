@@ -124,6 +124,17 @@ export function a12Records(crops) {
     good.crops[crop].recordedBatch1Kg += chosen(rows, 1);
     good.crops[crop].territories += 1;
   }
+  // A row with `transferFrom` names output already counted in another territory's row of
+  // the same crop (Bolivian rubber in Para's receipts): it moves, it does not add.
+  for (const entry of crops?.entries ?? []) {
+    if (entry.transferFrom === undefined) continue;
+    const good = byGood.get(A12_CROP_GOOD[entry.crop]);
+    const left = (good.recorded.get(entry.transferFrom) ?? 0) - entry.kg;
+    if (!(left > 0)) throw new Error(`crops1900: ${entry.crop} ${entry.territory} moves more than ${entry.transferFrom} records`);
+    good.recorded.set(entry.transferFrom, left);
+    good.crops[entry.crop].recordedKg -= entry.kg;
+    if (entry.batch <= 1) good.crops[entry.crop].recordedBatch1Kg -= entry.kg;
+  }
   for (const good of byGood.values()) {
     for (const [crop, entry] of Object.entries(good.crops)) {
       const estimate = crops.worldEstimates?.[crop]?.kg;

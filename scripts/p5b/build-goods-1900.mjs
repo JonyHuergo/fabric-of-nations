@@ -62,6 +62,7 @@ import {
   GOODS,
   MAINTENANCE_MIX,
   MAINTENANCE_SHARE_OF_UPKEEP,
+  SILK_OPTIONAL,
 } from "./catalogue.mjs";
 import { NOT_PLACED_1900, placeCatalogue } from "./placement.mjs";
 
@@ -221,6 +222,7 @@ function build() {
       0.8 * perLbToPerKg(priceRow("price-coffee-rio-7")) + 0.2 * perLbToPerKg(priceRow("price-tea-formosa")),
       ["price-coffee-rio-7", "price-tea-formosa", "kg-per-lb"], "0.8 coffee (cocoa priced as coffee) + 0.2 tea per kg (weights by 1900 world output, provisional)", "provisional"),
     tobacco: () => usd1900("tobacco", perLbToPerKg(priceRow("price-tobacco-leaf-export")), ["price-tobacco-leaf-export", "kg-per-lb"], "leaf tobacco export price per kg"),
+    silk: () => usd1900("silk", perLbToPerKg(priceRow("price-raw-silk-import")), ["price-raw-silk-import", "kg-per-lb"], "raw silk import value (year to June 1900) per kg"),
     rubber: () => usd1900("rubber", perLbToPerKg(priceRow("price-rubber-para")), ["price-rubber-para", "kg-per-lb"], "Para rubber, fine, New York, per kg"),
     timber: () => usd1900("timber",
       ((priceRow("price-lumber-spruce") + priceRow("price-lumber-yellow-pine") + priceRow("price-lumber-hemlock")) / 3) / unit("m3-per-thousand-board-feet"),
@@ -251,13 +253,13 @@ function build() {
       (priceRow("price-residuum-export") / (unit("gallons-per-barrel-petroleum") * unit("litres-per-us-gallon") * unit("residuum-kg-per-litre"))) * 1000,
       ["price-residuum-export", "gallons-per-barrel-petroleum", "litres-per-us-gallon", "residuum-kg-per-litre"],
       "residuum export unit value (year to June 1900) per 42-gallon barrel / (159 L x 0.95 kg per L), per t (density provisional)", "provisional"),
-    // The 1902 census average (income from the sale of current / kWh generated, 3.36 cents)
-    // is mostly retail lighting; at that price an aluminium works (22 MWh per t) would pay
-    // more for power than its metal fetches. Bulk power sold far cheaper (Niagara about 0.3
-    // cent), so the single reference price stays a bulk rate; the census row is a sourced
-    // cross-check (D-148).
-    electricity: () => usd1900("electricity", 10, ["price-electricity-central-stations-1902"],
-      "bulk (wholesale) rate, 1.0 cent per kWh, per MWh: between Niagara bulk power (about $20 per HP-year, 0.3 cent) and the 1902 central stations' average income per kWh generated (3.36 cents, census table 1, mostly lighting at retail); provisional", "provisional"),
+    // D-148 item 10, option (a) (designer, 2026-11-08): the private stations driven by water
+    // alone (census 1902, table 40), about half of whose income was power, set the single
+    // reference price. The all-station average (3.36 cents, table 1) is mostly retail
+    // lighting; Niagara's large-motor rate (5 per horsepower-year, 0.38 cent at continuous
+    // use) bounds it from below.
+    electricity: () => usd1900("electricity", priceRow("price-electricity-water-stations-1902") * 1000, ["price-electricity-water-stations-1902"],
+      "income from the sale of current / kWh of the private stations using water power exclusively, 1902 (census table 40: ,771,862 / 248,749,668 kWh = 1.52 cents), per MWh"),
     steel: () => usd1900("steel", steelUsdPerT, ["price-steel-billets-ds140"], "DS-140 1900 steel unit value"),
     copper: () => usd1900("copper", copperUsdPerT, ["price-copper-ingot", "kg-per-lb"], "copper, New York, per t"),
     aluminium: () => usd1900("aluminium", perLbToPerT(priceRow("price-aluminum-pittsburg")), ["price-aluminum-pittsburg", "kg-per-lb"], "aluminum at Pittsburg per t"),
@@ -357,6 +359,18 @@ function build() {
         outputElasticity: FERTILISER_OPTIONAL.outputElasticity,
       }];
     }
+  }
+  // D-148 item 12: raw silk as an optional input of the textile mill, at the 1900 world ratio
+  // of raw silk to cotton lint per kg of cotton the mill spins.
+  for (const definition of definitions) {
+    if (!SILK_OPTIONAL.buildings.includes(definition.key)) continue;
+    const cottonPerTU = definition.inputs.find((input) => input.goodId === gid("cotton"))?.quantityPerThroughputUnit;
+    if (!(cottonPerTU > 0)) throw new Error(`${definition.key} spins no cotton`);
+    definition.optionalInputs = [...(definition.optionalInputs ?? []), {
+      goodId: gid("silk"),
+      quantityPerThroughputUnit: sig(cottonPerTU * SILK_OPTIONAL.perKgCotton),
+      outputElasticity: SILK_OPTIONAL.outputElasticity,
+    }];
   }
   // D-146 A6: the P2b definitions also buy half their money upkeep as maintenance goods.
   for (const definition of definitions) {
@@ -901,6 +915,7 @@ const OUTPUT_UNIT_TO_SIM = {
   "metric tons of sodium nitrate": { factor: 0.1647, note: "t NaNO3 x 0.1647 N" },
   "long tons": { factor: 1016.047, note: "long tons x 1,016.047 kg" },
   "thousand bales of 500 lb": { factor: 226796.185, note: "thousand bales x 500 lb x 0.45359237 kg" },
+  lb: { factor: 0.45359237, note: "lb x 0.45359237 kg" },
 };
 
 const outputs = build();
