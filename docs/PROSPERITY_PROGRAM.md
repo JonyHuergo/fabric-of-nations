@@ -11,7 +11,9 @@ electricity at the 1902 census water-station price, the jewellery metal share fr
 census, cotton and wool calibrated to the 1900 world fibre supply); its performance step is held
 by the designer and some source transcriptions remain provisional; the monetary demand for gold and silver
 moves to P11 (D-152). P5b was merged into `main` on 2026-11-08; its unresolved items are
-listed in `P5B_COMPLETION_REPORT.md` §11.\
+listed in `P5B_COMPLETION_REPORT.md` §11. P6 (Engel demand, saving and housing; D-153) was
+implemented and merged into `main` on 2026-11-08; its unresolved items are listed in
+`P6_COMPLETION_REPORT.md` §7, and the flax, hemp and jute fibre good moves to P7.\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\
 **Goal:** a country that never goes to war and never engages in diplomacy must still be
@@ -317,7 +319,7 @@ P2b farm-gate demand distortion behind the territories above 100 % of GDP (D-135
 construction demand for housing, which, with P8 infrastructure and P10 investment, is where
 most 1900 steel, timber and construction materials went (steel is 0.25 of 1900 output today).
 
-**Status (2026-11-08, D-153).** Plan `docs/P6_PLAN.md` approved (Q1–Q16) and implemented on
+**Status (2026-11-08, D-153).** Plan `docs/P6_PLAN.md` approved (Q1–Q16), implemented on
 `prosperity/p6-demand`: a linear expenditure system with an income-dependent marginal-share
 schedule anchored on sourced budgets (Belgium 1853, United States 1901 and 1990), retail margins
 (the farm-gate fix), adult equivalents, smoothed income and prices, saving by stratum, and an
@@ -332,6 +334,13 @@ P10 and P11. P7 adds housing to migration ("toward jobs and housing").
 demand falls on cotton (modelled cotton 1.45× the 1900 world crop) and the P5b acceptance test
 "cotton and wool follow the 1900 world fibre supply" fails; it is kept as P7's acceptance test.
 P7 also adds housing to migration ("toward jobs and housing").
+
+**Carried into P7 from P6 (2026-11-08; `P6_COMPLETION_REPORT.md` §7).** Besides the fibre good and
+housing in migration: blocks without covered jobs (clerks, capitalists, academics) live on their
+savings until wages and the nine professions arrive; several poor countries' lower classes start
+below subsistence; the 1900 food gluts (grain, produce) persist; the generator's 1900 incomes are
+estimates that the labour market should replace with measured wages; no long run of the P6 world
+has been made.
 
 - Monthly wage adjustment per (customs territory, profession) with provincial
   differentials from vacancy and unemployment rates; floors from minimum-wage law and

@@ -5,7 +5,8 @@
 decided as recorded in its §0).
 **Versions:** world schema 34, simulation 0.30.0, data `m3-economy-v14`, worker protocol 23,
 map bridge protocol 4.
-**Status:** implemented for review; the designer chose option (a) for clothing and scheduled the
+**Status:** merged into `main` on the designer's instruction of 2026-11-08, with the unresolved
+items listed in §7. The designer chose option (a) for clothing and scheduled the
 flax, hemp and jute fibre good in P7 (D-153 addition). One P5b acceptance test (cotton within
 0.85–1.15 of the 1900 crop; now 1.45×) fails and is kept as P7's acceptance test (§5.1).
 
@@ -148,3 +149,74 @@ Earlier run on `817a16c`: 100 of 103 suites (the map-mode registry list, fixed i
 - Performance (designer's hold): no benchmark run; household demand rows grow because every
   block now buys every category.
 - No tablet playtest, no device test.
+
+## 7. Unresolved items at the close of P6 (consolidated, 2026-11-08)
+
+This section is the single list to carry forward. Figures are from the final generator run
+(`docs/P6_BEFORE_AFTER.md`) unless stated otherwise.
+
+### 7.1 Acceptance criteria not met or not verified
+
+- **Cotton (P5b acceptance test, D-148 item 13):** modelled cotton is 1.45× the 1900 world crop
+  (band 0.85–1.15); `data/world-1900` › "cotton and wool follow the 1900 world fibre supply"
+  fails. Cause: all non-wool cloth demand falls on cotton. **Scheduled in P7:** a fibre good for
+  flax, hemp and jute; the test is P7's acceptance test.
+- **Performance:** not measured (designer's hold). Every block now buys every category, so
+  household demand rows grow several-fold; no `pnpm bench`, perfPhases or perfBench was run.
+- **No long run:** only short runs (tests, a seven-day diagnosis). No multi-year run of the
+  P6 1900 world has been made; long-run saving, idle cash and housing behaviour are unmeasured.
+- **Devices:** only the 844 × 390 web playtest; no tablet or device test.
+
+### 7.2 Market behaviour in the first week (US market, measured before option (a))
+
+- Grain −21 % and produce −12 % (the food gluts of P5a), timber −15 %, dairy +7 %.
+- Clothing +27 %: wool output covers 25 % of mill demand (the fibre item above).
+- Dwellings −30 %: builders are sized to replacement plus growth; household orders reach that
+  flow after about a month (30-day gap closing). Unsold dwellings are stored.
+- Meat stays within the D-136 bound (test passes).
+
+### 7.3 Calibration and data (provisional unless stated)
+
+- **Demand schedule:** three knots from local slopes (Belgium 1853, US 1901, US 1990); negative
+  slopes set to 0 (the 1901 raw slopes summed to 0.92). The fit to each set's levels is not
+  reported per class. The Engel Quet is taken as one adult equivalent, 1853 prices as equal to
+  1900, the 1990 consumer unit as 2.0 adult equivalents. Tobacco has no 1990 share; household
+  goods, tobacco and transport have none at the 1853 knot.
+- **Committed basket:** P2b subsistence food and basic clothing (× 0.52) per adult equivalent;
+  the firewood minimum (0.0004 m³ a day) is provisional.
+- **Margins:** food margins from the 1901 retail prices (grain and processed food include
+  milling); the 0.6/0.4 commerce/transport split and all non-food margins are provisional.
+- **Saving:** μ lower 0.94 calibrated (1901 surplus); middle 0.85 and upper 0.60, the 4 % wealth
+  drawdown and the 30-day reserve are provisional. No pre-1929 US personal-saving series was
+  found.
+- **Housing:** depreciation 0.5 % a year (bracketed, not fitted); the income elasticity 0.46
+  needs the 1990 persons per occupied unit confirmed from the 1992 Statistical Abstract;
+  dwelling price the US 1900 non-farm average for every market (scaled by price level);
+  materials recipe provisional; persons per dwelling sourced for 14 countries (Webb 1911),
+  median 5.2 elsewhere; Germany uses households as dwellings.
+- **Crowding:** mortality weights 0.5/0.3 and the unrest weight 0.1 are provisional (Russell
+  1888 gives order of magnitude only).
+- **Tastes:** eight countries (Webb, c. 1901); two OCR readings (France and Italy sugar) not yet
+  checked against the page image; income effects removed by GDP per head ratio (provisional).
+- **Incomes:** the generator's 1900 income = wage × participation × working-age share. Several
+  poor countries' lower classes start below subsistence and dissave (Germany's lower stratum
+  −0.1 %); blocks without covered jobs live on their savings until P7/P10.
+
+### 7.4 Coverage and output
+
+- Covered value added 49.9 % of world GDP (P5b close 40.7 %): government services, non-housing
+  investment and housing services are outside coverage.
+- 21 territories exceed 100 % of GDP (P5b: 12): colonies and microstates with export crops at
+  sourced shares.
+- Modelled ÷ sourced: steel 0.48, iron ore 0.30, copper ore and tin about 0.6 (investment
+  demand: P8 infrastructure, P10 company investment); gold 0.52 and silver 0.21 (monetary
+  demand, P11); coffee-tea-cocoa 1.19; rubber 1.12; aluminium 1.39.
+
+### 7.5 Simplifications to revisit in later stages
+
+- No rent, landlords, mortgages or housing services as value added (P9–P11).
+- Household bond coupons and redemptions count as income (P11).
+- Migration does not read housing (P7: "toward jobs and housing").
+- The tier path remains for legacy worlds (plan Q9a); retire it when the fixtures migrate.
+- No player lever for public housing (P14 levers); E3 can already build residential builders.
+- The web autosave still exceeds the storage quota on the 1900 world (P7b).

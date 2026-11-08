@@ -6673,7 +6673,8 @@ P6 (D-153, plan `docs/P6_PLAN.md`) replaces the need tiers as household demand i
 world with a linear expenditure system (sourced marginal-share schedule, retail margins, adult
 equivalents, national tastes), adds saving by profession stratum and an owner-occupied dwelling
 stock built by residential builders, whose crowding above the 1900 level raises mortality and
-unrest; schema 34, protocol 23. Legacy worlds keep the tiers of §6.4.
+unrest; schema 34, protocol 23. Legacy worlds keep the tiers of §6.4. P6 was merged into
+`main` on 2026-11-08; its open items are in `P6_COMPLETION_REPORT.md` §7.
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair
