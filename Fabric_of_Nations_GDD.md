@@ -6660,7 +6660,11 @@ from deposits, goods that cannot be stored, maintenance and optional inputs, a 1
 placement sized by modelled demand at sourced country shares (data `m3-economy-v13`),
 gold, silver and paper currencies with a mint window and the 1900 money stocks, currency
 adoption and establishment, and protocol 22. Its performance step is held by the
-designer (the 1900 day is 593 ms in Node against the 450 ms budget).
+designer (the 1900 day is 593 ms in Node against the 450 ms budget). On 2026-11-08 it
+gained province hydro potential (HydroSHEDS RiverATLAS, CC BY 4.0) capping hydro stations,
+sourced cotton shares and fuel prices, and jewellery as a 58th good made by jewellers from
+gold and silver (D-148, D-152); the monetary demand for gold and silver (free coinage, a
+growing circulation) is deferred to P11 (D-152).
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair

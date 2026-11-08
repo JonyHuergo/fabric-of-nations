@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-11-07T23:26:05.864Z",
+  "startedAt": "2026-11-08T05:01:52.851Z",
   "viewport": "844,390",
   "checks": [
     {
@@ -8,9 +8,9 @@
       "detail": "{\"width\":844,\"height\":390}"
     },
     {
-      "name": "home market counts the goods traded of 57",
+      "name": "home market counts the goods traded of 58",
       "passed": true,
-      "detail": "38 of 57 goods traded"
+      "detail": "39 of 58 goods traded"
     },
     {
       "name": "goods search field is at least 44 pt",
@@ -30,7 +30,7 @@
     {
       "name": "goods not traded here are folded and counted",
       "passed": true,
-      "detail": "7 not traded here"
+      "detail": "6 not traded here"
     },
     {
       "name": "search finds steel with its price per t",
@@ -61,6 +61,11 @@
       "name": "a locked project type names its technology",
       "passed": true,
       "detail": "Mechanized Farm · needs Mechanized agriculture"
+    },
+    {
+      "name": "a hydro station shows the province's river flow",
+      "passed": true,
+      "detail": "River flow for hydro stations: 15.9k MWh a day, 15.6k MWh left (a new station needs 265.7 MWh)."
     },
     {
       "name": "Money screen shows the gold standard and the mint's metal",
@@ -100,7 +105,8 @@
     "docs/images/p5b/p5b-844x390-markets-focus.png",
     "docs/images/p5b/p5b-844x390-production.png",
     "docs/images/p5b/p5b-844x390-construction.png",
+    "docs/images/p5b/p5b-844x390-construction-hydro.png",
     "docs/images/p5b/p5b-844x390-money.png"
   ],
-  "finishedAt": "2026-11-07T23:26:37.394Z"
+  "finishedAt": "2026-11-08T05:02:32.340Z"
 }

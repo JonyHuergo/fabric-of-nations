@@ -3,8 +3,11 @@
 **Status:** P0–P2b accepted; the performance stages (D-137, D-139) accepted as complete on
 2026-11-04. P3 (D-141), P4 (D-142, with the natural-fertility ceiling of D-144) and P5a
 (D-143) accepted on 2026-11-06 (D-146). P5b (the goods catalogue and D-140) implemented
-for review on 2026-11-07 (D-147 to D-151, `P5B_COMPLETION_REPORT.md`); its performance
-step is held by the designer and some source transcriptions remain provisional.\
+for review on 2026-11-07 (D-147 to D-151, `P5B_COMPLETION_REPORT.md`) and extended on
+2026-11-08 (hydro potential from HydroSHEDS RiverATLAS, sourced cotton shares and fuel
+prices, jewellery as the 58th good, D-152); its performance step is held by the designer
+and some source transcriptions remain provisional; the monetary demand for gold and silver
+moves to P11 (D-152).\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\
 **Goal:** a country that never goes to war and never engages in diplomacy must still be
@@ -341,6 +344,13 @@ close and go bankrupt; P11 banks, deposits, loans and bonds with an emergent int
 rate; P12 state and mixed ownership, nationalisation and privatisation as player
 actions; P13 stock exchanges, share issuance and trading, market capitalisation,
 mergers.
+
+**P11 also takes the monetary demand for gold and silver (D-152, 2026-11-08):** free
+coinage by new issue (mints and central banks buying metal at a fixed price against new
+currency), gold and silver mines against that unlimited buyer, the D-149 mint-cash
+question, a circulation that grows with the economy (with token silver coinage), and
+India's rupee coinage and Eastern hoarding. Plan: `docs/P5B_GOLD_SILVER_PLAN.md` §4.1–4.2.
+P5b models only jewellery and plate (D-152).
 
 ### P14 — Story layer
 

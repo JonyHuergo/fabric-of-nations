@@ -1,14 +1,16 @@
-# P5b completion report — the 57-good catalogue and D-140
+# P5b completion report — the goods catalogue (58 goods) and D-140
 
 **Branch:** `prosperity/p5-land` (local commits only; nothing pushed).
 **Decisions:** D-146 (designer decisions), D-147 (simulation mechanics), D-148 (1900
 placement, data version v13), D-149 (D-140: metal standards and the mint window),
-D-150 (currency actions), D-151 (protocol 22 and the phone screens).
+D-150 (currency actions), D-151 (protocol 22 and the phone screens), D-152 (demand for
+gold and silver: jewellery in P5b, monetary demand to P11). The additions of 2026-11-08
+(hydro, transcriptions, jewellery) are recorded in D-148 and D-152 and summarised in §7.
 **Versions:** world schema 33, simulation 0.29.0, data `m3-economy-v13`, worker protocol
 22, map bridge protocol 3.
-**Status:** implemented for the designer's review, with the open items of §6. The
+**Status:** implemented for the designer's review, with the open items of §6 and §7. The
 performance step (plan §5, §12 step 5) was held at the designer's request on 2026-11-07
-and is not done.
+and is not done; no benchmark was run in this session (skipped at the designer's request).
 
 ## 1. Commits
 
@@ -157,14 +159,83 @@ tests passed.** `pnpm typecheck` (libraries built, every package): **0 errors.**
 
 **Not done (uncompleted plan items)**
 - Performance (plan §5): held by the designer; the 450 ms budget is not met.
-- Transcriptions still provisional: cotton by country (USDA 1901 table A gives only the US
-  crop and European imports by origin), coffee, tea, cocoa, tobacco and rubber export
-  tables (A12), 1902 central-station electricity, naphtha and residuum unit values, the 1990
-  plastics price, and the Hoes et al. (2017) hydro potential (would need a download; hydro
-  stations are not placed). The 1990 prices of eight later goods were transcribed.
-- Jewellery and arts demand for gold and silver (A7's uncovered share is reported instead).
+- Superseded on 2026-11-08 (§7): cotton by country, naphtha and residuum, the 1902
+  electricity census, hydro potential and jewellery are done; the A12 crop tables are
+  transcribed but not used for placement; the 1990 plastics price stays provisional.
 - No tablet-size playtest; no device test (designer's).
 
 **Acceptance criteria not verified**
 - Ordinary day ≤ 450 ms and goods-scaled phases ≤ 2x (A11): not met (593 ms).
 - `pnpm bench` after D-149: not run (designer's hold).
+
+## 7. Additions of 2026-11-08
+
+### 7.1 Behaviour
+
+1. **Hydro (C-12, D-146 A8).**
+   - **Source.** Hoes et al. (2017) was dropped because its 4TU terms allow only non-commercial reuse (designer). Province potential now comes from HydroSHEDS RiverATLAS v1.0 (CC BY 4.0; attribution in `docs/P5B_GOODS_PROVENANCE.md`).
+   - **Extraction.** `scripts/p5b/extract-hydro-riveratlas.mjs` reads the git-ignored cache, which the designer downloaded because figshare refuses scripts. It computes outlet-to-outlet drops of conditioned elevations × mean discharge, giving 49.8 PWh/year gross in 1,622 provinces (Hoes et al.: 52).
+   - **Simulation.**
+     - `ProvinceEconomy.hydroPotentialMWhPerYear`: an optional encoded field in the unreleased schema 33.
+     - `BuildingDef.usesHydroPotential` marks the hydro station.
+     - A daily, non-depleting cap at `HYDRO_TECHNICAL_SHARE` 0.33 × potential ÷ 365.2425.
+     - A construction room check (`hydroRoomPerDay`) and a world validator.
+   - **1900 placement.** 72 hydro stations generate 23.8 % of electricity (the 1902 US water-wheel share), within each province's cap.
+   - **Phone.** Protocol 22 adds the focused province's hydro capacity and room; the Construction screen shows the river flow left for a hydro station.
+2. **Transcriptions (D-148 additions).**
+   - Cotton shares from the USDA Yearbook 1901, tables A and B.
+   - Petrol and fuel oil from the 1900 export unit values (Statistical Abstract 1901, table 49).
+   - The 1902 central-station census (3.36 cents a kWh). It is kept as a cross-check only: at that price aluminium works lose money, so the reference price stays the provisional 1.0-cent bulk rate.
+   - A12 crop figures from three newly cached sources approved by the designer (colonial abstract no. 38, Koloniaal Verslag 1901, the 1901 Brazil handbook): transcribed in `sources_1900.json` `crops1900`, not yet used for placement.
+   - The Statistical Abstract 1992 has no plastics quantity.
+3. **Jewellery (D-152).** Good 57, *Jewellery and plate*, made by *Jeweller and Silversmith* workshops from gold, silver and labour.
+   - It is a luxury need calibrated to the Mint's 1900 world industrial consumption, new metal only.
+   - The 44 workshops stand where the metal was worked in 1900.
+   - Free coinage, a growing circulation and India's silver are deferred to P11 (program updated). The plan is `docs/P5B_GOLD_SILVER_PLAN.md`.
+
+### 7.2 Files
+
+- **Created:**
+  - `scripts/p5b/extract-hydro-riveratlas.mjs`
+  - `packages/data/data/historical/p5b/hydro_province_1900.json` (derived, CC BY 4.0)
+  - `docs/P5B_GOLD_SILVER_PLAN.md`
+- **Simulation:** `population/types.ts`, `population/state.ts`, `serialization.ts`, `constants.ts`, `economy/constants.ts`, `types.ts`, `definitions.ts`, `production.ts`, `construction.ts`, `resources.ts`, `validation.ts`, `state.ts`, `index.ts`.
+- **Data loader:** `packages/data/src/historical.ts`.
+- **Worker and app:** `landSnapshot.ts`, `protocol.ts`, `snapshot.ts`, `ConstructionScreen.tsx`, the generated bundles.
+- **Generator:** `catalogue.mjs`, `build-goods-1900.mjs`, `placement.mjs`, `playtest-goods.mjs`; `sources_1900.json` (authored rows) and the regenerated p5b tables and scenarios.
+- **Tests:** `economy/goods-catalogue.test.ts` (four hydro tests), `data/world-1900.test.ts` (1900 hydro and jewellery, save round trip of mixed potentials), `fixtures/provinces.ts`, `architecture/naming-audits.test.ts` (1900-world hash re-pinned by design).
+- **Documents:** `DECISIONS.md` (D-148 additions, D-149 note, D-152), `docs/PROSPERITY_PROGRAM.md` (status, P11), `Fabric_of_Nations_GDD.md` (status), generated `docs/P5B_BEFORE_AFTER.md` and `docs/P5B_GOODS_PROVENANCE.md`.
+
+### 7.3 Measurements (Node diagnostics; no device result is claimed)
+
+- 6,299 buildings; covered value added 59.6 % of world GDP (58.4 % before).
+- Modelled ÷ sourced 1900 output: gold 0.48 (0.27 before), silver 0.18 (0.005 before), cotton 2.49 (first measured: demand exceeds the 1900 commercial crop), coal 0.89, sugar 0.85.
+
+### 7.4 Open items for the designer
+
+- **Electricity:** one reference price cannot serve both retail lighting (3.36 cents) and bulk power (about 0.3 cent).
+- **Cotton:** demand is 2.5× the 1900 commercial crop (China's crop and hand spinning are not in the source).
+- **Jewellery:** the metal share of its value (0.5) is provisional; the 1900 census of manufactures (jewellery industry) is not cached.
+- **A12 crops:** still pooled worldwide. Missing producers: Latin American coffee outside Brazil; Chinese and Japanese tea (cached as OCR text only); Ecuadorian, Bahian and São Tomé cocoa; the self-consuming tobacco producers; Congo rubber.
+- **Hydro:** the hydro share outside the United States, and the technical share, are provisional.
+- **Not run:** performance work and `pnpm bench` (designer's hold).
+
+
+### 7.5 Commands executed (2026-11-08) and results
+
+| Command | Result |
+|---|---|
+| `node --max-old-space-size=8192 scripts/p5b/extract-hydro-riveratlas.mjs` | wrote `hydro_province_1900.json`: 1,622 provinces, 49.8 PWh/year gross (8,340,795 reaches; 68,848 unplaced, 0.57 PWh/year) |
+| `node scripts/p5b/build-goods-1900.mjs`, then `node scripts/p2/build-province-scenario.mjs` | regenerated; `--check` of both current |
+| `node scripts/p2b/build-money-calibration.mjs --check`, `node scripts/p5/build-p5-world.mjs --check` | current |
+| `pnpm -F @century/sim-worker scenario:build`, `pnpm -F @century/app build:worker` (and `:check`) | current |
+| `node scripts/docs/decisions-index.mjs --check` | current (152 decisions) |
+| `node scripts/m14/monetary-terminology-audit.mjs` | passed |
+| `pnpm test` (first run) | 8 failed of 1,430: seven from the save's column table (provinces with and without a hydro potential had different fields; fixed: the field is written for every province or none, with a regression check) and the 1900-world hash (re-pinned by design) |
+| `pnpm test` (final run, after the fix) | **101 of 101 suites, 1,430 of 1,430 tests passed** |
+| `pnpm typecheck` (final run) | **0 errors** |
+| `pnpm -F @century/app export:web`, then `node scripts/p5b/playtest-goods.mjs` | 19/19 checks passed at 844 x 390 (new: 58 goods counted; a hydro station shows the province's river flow), no console errors, exceptions or failed loads |
+| `pnpm app:export` | web, iOS and Android bundles exported |
+| `pnpm bench`, perfPhases | not run (designer's hold) |
+
+The `--check` mode of the hydro extraction recomputes the table from the cache (about an hour); it was not re-run after the final extraction. Without the cache it only confirms that the committed table parses.
