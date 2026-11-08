@@ -253,6 +253,33 @@
    "accessDate": "2026-11-08",
    "license": "Public domain (published 1916 in the United States; the author died in 1943)",
    "notes": "p. 33 = PDF 49. Read from the page image."
+  },
+  {
+   "id": "iba-monthly-bulletin-10",
+   "title": "Monthly Bulletin of the Bureau of the American Republics, vol. X",
+   "author": "Bureau of the American Republics, Washington (1901)",
+   "url": "https://archive.org/details/monthlybulletin1001bure",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government publication, 1901)",
+   "notes": "pp. 700 and 1080. Read from the page images (grayscale PDF)."
+  },
+  {
+   "id": "iba-monthly-bulletin-11",
+   "title": "Monthly Bulletin of the Bureau of the American Republics, vol. XI",
+   "author": "Bureau of the American Republics, Washington (1901)",
+   "url": "https://archive.org/details/monthlybulletin1101bure",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government publication, 1901)",
+   "notes": "pp. 12 and 897. Read from the page images (grayscale PDF)."
+  },
+  {
+   "id": "iba-monthly-bulletin-12",
+   "title": "Monthly Bulletin of the Bureau of the American Republics, vol. XII",
+   "author": "Bureau of the American Republics, Washington (1902)",
+   "url": "https://archive.org/details/monthlybulletin1202bure",
+   "accessDate": "2026-11-08",
+   "license": "Public domain (U.S. government publication, 1902)",
+   "notes": "pp. 29 and 759. Read from the page images (grayscale PDF)."
   }
  ],
  "units": [
@@ -1929,48 +1956,204 @@
    ]
   },
   "cotton": {
-   "sourceId": "usda-yearbook-1901",
-   "locator": "p. 200 (PDF 210), table A, the world's commercial cotton crop, commercial year 1900, thousands of bales of 500 lb: crop of the United States 9,143; imports into Europe from Brazil 108, Egypt 1,022, Turkey etc. 49, Peru, West Indies etc. 27, East Indies 242 (total 1,448; total crop 10,591). p. 201 (PDF 211), table B, consumption 1900: India 1,254.",
-   "unit": "thousand bales of 500 lb",
-   "status": "provisional",
-   "total": 10591,
-   "note": "Table A gives the United States crop and the other countries' exports to Europe; every column reproduces the printed totals. British India = exports to Europe (242) + its mills' consumption (table B, 1,254); its exports to Japan and China and the hand-spun crop are not covered. China's large domestic crop is not covered. Peru, the West Indies etc. are an aggregate and are left out (renormalised).",
+   "sourceId": "usda-yearbook-1905",
+   "locator": "pp. 709-710 (PDF 783-784): cotton crop of countries named, 1900 (bales of 500 lb gross, or 478 lb of lint net)",
+   "unit": "bales of 500 lb gross (478 lb lint)",
+   "status": "sourced",
+   "total": 15893591,
+   "note": "Every continental subtotal (North America 10,230,168; South America 258,200; Europe 17,201; Asia 4,238,964; Africa 1,148,811; Oceania 247) and the printed world total reproduce. China and India are understated (net imports x 2 1/4 lb a head; exports and mill use only, no hand-spun cotton).",
    "entries": [
     [
      "usa-home",
-     9143,
+     10123027,
      "sourced",
-     "crop of the United States"
+     "United States, continental 10,123,027 (linters not included)"
     ],
     [
-     "bin",
-     1496,
+     "gua-home",
+     147,
      "estimated",
-     "East Indies imports into Europe 242 + India's consumption 1,254 (table B)"
+     "Guatemala 147 (official estimate for 1903)"
     ],
     [
-     "egy",
-     1022,
+     "mex-home",
+     100527,
+     "sourced",
+     "Mexico 100,527"
+    ],
+    [
+     "bwi",
+     667,
+     "sourced",
+     "Grenada 616 and St. Vincent 51 (exports)"
+    ],
+    [
+     "hti-home",
+     5800,
      "estimated",
-     "imports into Europe from Egypt (Egypt spun little of its crop)"
+     "Haiti 5,800 (average production)"
     ],
     [
      "bra-home",
-     108,
+     209000,
      "estimated",
-     "imports into Europe from Brazil"
+     "Brazil 209,000 (estimated from exports and an assumed home consumption of about 50,000,000 lb)"
+    ],
+    [
+     "col-home",
+     5200,
+     "estimated",
+     "Colombia and Venezuela 5,200 (average production as unofficially estimated; placed in Colombia, provisional)"
+    ],
+    [
+     "pru-home",
+     44000,
+     "estimated",
+     "Peru 44,000 (estimated from exports and an assumed home consumption of about 5,000,000 lb)"
+    ],
+    [
+     "bgr-home",
+     590,
+     "estimated",
+     "Bulgaria 590"
+    ],
+    [
+     "crt-home",
+     690,
+     "estimated",
+     "Crete 690"
+    ],
+    [
+     "grc-home",
+     8200,
+     "estimated",
+     "Greece 8,200"
+    ],
+    [
+     "ita-home",
+     2700,
+     "estimated",
+     "Italy 2,700"
+    ],
+    [
+     "mlt",
+     421,
+     "sourced",
+     "Malta 421"
     ],
     [
      "ott-home",
-     49,
+     67600,
      "estimated",
-     "imports into Europe from Turkey etc."
+     "Turkey (European) 4,600 and Asiatic Turkey 63,000 (average production as unofficially estimated)"
     ],
     [
-     "other",
-     27,
+     "bin",
+     2262467,
+     "sourced",
+     "British India 2,262,467 (exports and mill consumption)"
+    ],
+    [
+     "cey",
+     559,
+     "sourced",
+     "Ceylon 559 (exports)"
+    ],
+    [
+     "chn-home",
+     1192000,
      "estimated",
-     "Peru, West Indies etc. (aggregate)"
+     "China 1,192,000 (estimate of Ellison, based upon net imports and an assumed annual per capita consumption of 2 1/4 lb)"
+    ],
+    [
+     "cyp",
+     2269,
+     "sourced",
+     "Cyprus 2,269"
+    ],
+    [
+     "dei",
+     14274,
+     "sourced",
+     "Dutch East Indies 14,274 (exports)"
+    ],
+    [
+     "fic",
+     5015,
+     "sourced",
+     "French Indo-China 5,015 (exports)"
+    ],
+    [
+     "jpn-home",
+     28217,
+     "sourced",
+     "Japan 28,217"
+    ],
+    [
+     "per-home",
+     32000,
+     "estimated",
+     "Persia 32,000"
+    ],
+    [
+     "phl",
+     6098,
+     "sourced",
+     "Philippine Islands 6,098 (census for 1902)"
+    ],
+    [
+     "rus-home",
+     633065,
+     "estimated",
+     "Asiatic Russia: Transcaucasia 56,000 (average production) and Central Asia 577,065"
+    ],
+    [
+     "bwa",
+     95,
+     "sourced",
+     "Gambia 1, Gold Coast 44 and Lagos 50 (exports)"
+    ],
+    [
+     "egy",
+     1124632,
+     "sourced",
+     "Egypt 1,124,632 (Davies, Benachi & Co., as quoted by Ellison)"
+    ],
+    [
+     "eri",
+     12,
+     "sourced",
+     "Eritrea 12"
+    ],
+    [
+     "fwa",
+     99,
+     "sourced",
+     "Senegal 99 (exports)"
+    ],
+    [
+     "fso",
+     3,
+     "sourced",
+     "Somali Coast 3 (exports)"
+    ],
+    [
+     "sud",
+     23970,
+     "estimated",
+     "Sudan (Egyptian) 23,970 (estimated from exports and home consumption)"
+    ],
+    [
+     "fji",
+     7,
+     "sourced",
+     "Fiji 7 (exports)"
+    ],
+    [
+     "fpo",
+     240,
+     "sourced",
+     "Tahiti 240 (exports)"
     ]
    ]
   },
@@ -3450,13 +3633,13 @@
    {
     "crop": "cocoa",
     "territory": "ecu-home",
-    "kind": "exports",
-    "kg": 18597287.17,
-    "as": "mean of 33,500,000 and 48,500,000 lb",
-    "sourceId": "baker-cocoa-1899-1904",
-    "locator": "1899 ed. p. 7 (PDF 13): Guayaquil about 33,500,000 lb; 1904 ed. p. 8 (PDF 12): about 48,500,000 lb. The two 'recent estimates' bracket 1900; the mean is used",
+    "kind": "production",
+    "kg": 17557956.343215,
+    "as": "381,617.55 quintals (1900 crop)",
+    "sourceId": "iba-monthly-bulletin-11",
+    "locator": "vol. XI (1901), p. 897 (PDF 915): Ecuador, 'the crop of cacao in 1900 ... falling in 1900 to 381,617.55 quintals' (Report of the President of the Chamber of Commerce of Guayaquil). Quintal of 100 Spanish pounds = 46.0093 kg (provisional). Replaces Baker's estimate",
     "status": "estimated",
-    "batch": 2
+    "batch": 4
    },
    {
     "crop": "cocoa",
@@ -3880,12 +4063,12 @@
     "crop": "coffee",
     "territory": "hti-home",
     "kind": "exports",
-    "kg": 30588908.655690003,
-    "as": "67,437,000 lb (1897-98)",
-    "sourceId": "ukers-coffee-1922",
-    "locator": "p. 281 (PDF 337): Haiti's exports 'fell back to 67,437,000 pounds in 1897-98; and ten years later, were 63,848,000 pounds'; some 8,000,000 lb consumed yearly at home. The 1897-98 figure stands for 1900",
-    "status": "estimated",
-    "batch": 3
+    "kg": 32714343.16478097,
+    "as": "72,122,781 lb (1899-1900)",
+    "sourceId": "iba-monthly-bulletin-12",
+    "locator": "vol. XII (1902), p. 29 (PDF 105): Haiti, coffee exported, 1899-1900, 72,122,781 lb (report of the Belgian Consul-General for the Antilles). Replaces Ukers's 1897-98 figure (67,437,000 lb)",
+    "status": "sourced",
+    "batch": 4
    },
    {
     "crop": "coffee",
@@ -3931,14 +4114,70 @@
     "status": "sourced",
     "batch": 3,
     "transferFrom": "bra-home"
+   },
+   {
+    "crop": "cocoa",
+    "territory": "dom-home",
+    "kind": "exports",
+    "kg": 5094367.1214720905,
+    "as": "11,231,157 lb",
+    "sourceId": "iba-monthly-bulletin-10",
+    "locator": "vol. X (1901), p. 700 (PDF 712): Santo Domingo, exports in 1900, cacao 11,231,157 pounds (Statistician of the Treasury Department)",
+    "status": "sourced",
+    "batch": 4
+   },
+   {
+    "crop": "tobacco",
+    "territory": "dom-home",
+    "kind": "exports",
+    "kg": 7889278.56751034,
+    "as": "17,392,882 lb",
+    "sourceId": "iba-monthly-bulletin-10",
+    "locator": "vol. X (1901), p. 700 (PDF 712): Santo Domingo, exports in 1900, leaf tobacco 17,392,882 pounds",
+    "status": "sourced",
+    "batch": 4
+   },
+   {
+    "crop": "rubber",
+    "territory": "ecu-home",
+    "kind": "exports",
+    "kg": 500544.16981107,
+    "as": "1,103,511 lb",
+    "sourceId": "iba-monthly-bulletin-12",
+    "locator": "vol. XII (1902), p. 759 (PDF 867): Ecuador, exports of rubber ('goma elastica') in 1900, 1,103,511 libras (Chamber of Commerce of Guayaquil); English pounds (the same page converts 15 centavos a kilogram to 6.80 a libra)",
+    "status": "sourced",
+    "batch": 4
+   },
+   {
+    "crop": "rubber",
+    "territory": "cos-home",
+    "kind": "exports",
+    "kg": 75517,
+    "as": "75,517 kg",
+    "sourceId": "iba-monthly-bulletin-10",
+    "locator": "vol. X (1901), p. 1080 (PDF 1114): Costa Rica, commerce of 1900, 'crude rubber to the extent of 75,517 kilograms'",
+    "status": "sourced",
+    "batch": 4
+   },
+   {
+    "crop": "rubber",
+    "territory": "pru-home",
+    "kind": "receipts",
+    "kg": 1786000,
+    "as": "893 + 893 tons",
+    "sourceId": "iba-monthly-bulletin-11",
+    "locator": "vol. XI (1901), p. 12 (PDF 18): rubber production of 1900 in the Amazon valley (British Consul at Para): Iquitos (Peru) 893 tons, Caucho 893 tons. Caucho placed in Peru and tons taken as metric (provisional); counted in Para's receipts, so moved out of Brazil (transferFrom)",
+    "status": "estimated",
+    "batch": 4,
+    "transferFrom": "bra-home"
    }
   ],
   "coverage": {
-   "coffee": "Recorded: Brazil, Dutch East Indies, India, Ceylon, Jamaica, Gold Coast (batch 1); Mexico, Guatemala, Costa Rica, Colombia (1899), Venezuela (estimate), Porto Rico, Dominican Republic (batch 2); Haiti (1897-98), Nicaragua (interpolated), Salvador (1901) (batch 3). Missing: Cuba, Honduras, Arabia (Aden's re-exports), Abyssinia and East Africa.",
+   "coffee": "Recorded: Brazil, Dutch East Indies, India, Ceylon, Jamaica, Gold Coast (batch 1); Mexico, Guatemala, Costa Rica, Colombia (1899), Venezuela (estimate), Porto Rico, Dominican Republic (batch 2); Haiti (1899-1900), Nicaragua (interpolated), Salvador (1901) (batch 3). Missing: Cuba, Honduras, Arabia (Aden's re-exports), Abyssinia and East Africa.",
    "tea": "Recorded: India, Ceylon, Dutch East Indies (batch 1); China and Japan exports (batch 2). Domestic crops of China and Japan: self-supplied.",
-   "cocoa": "Recorded: Trinidad, Jamaica, Ceylon, Gold Coast, Dutch East Indies (batch 1); Ecuador, Venezuela, Brazil, Sao Tome (Baker estimates, batch 2). Missing: Haiti, Santo Domingo, Grenada, Surinam, Cuba, Colombia, Peru.",
-   "tobacco": "Recorded: the USDA 1900 table (33 territories, batch 2) and Ceylon's exports. China, Persia, Central America except Guatemala and the West Indies except Cuba and Porto Rico: self-supplied (no statistics).",
-   "rubber": "Recorded: Brazil (Para receipts, less Bolivia's rubber; Peru's caucho and Iquitos rubber stay inside), the Gold Coast (batch 1); the Congo via Antwerp and Lagos (batch 2); Angola, the Ivory Coast and Bolivia (batch 3). Missing: Centrals (Central America, Mexico, Colombia, Ecuador, Peruvian caucho), Kamerun, Gabon, East Africa, Madagascar, the East Indies."
+   "cocoa": "Recorded: Trinidad, Jamaica, Ceylon, Gold Coast, Dutch East Indies (batch 1); Venezuela, Brazil, Sao Tome (Baker estimates, batch 2); Ecuador's 1900 crop and Santo Domingo's exports (batch 4). Missing: Haiti, Grenada, Surinam, Cuba, Colombia, Peru.",
+   "tobacco": "Recorded: the USDA 1900 table (33 territories, batch 2), Ceylon's exports and Santo Domingo's exports (batch 4). China, Persia, Central America except Guatemala and the West Indies except Cuba and Porto Rico: self-supplied (no statistics).",
+   "rubber": "Recorded: Brazil (Para receipts, less Bolivia and Peru), the Gold Coast (batch 1); the Congo via Antwerp and Lagos (batch 2); Angola, the Ivory Coast and Bolivia (batch 3); Ecuador, Costa Rica and Peru (Iquitos and caucho) (batch 4). Missing: Mexico, the rest of Central America, Colombia, Kamerun, Gabon, East Africa, Madagascar, the East Indies."
   },
   "worldEstimates": {
    "coffee": {
@@ -4014,54 +4253,6 @@
    }
   }
  },
- "cottonWorld1900": {
-  "sourceId": "usda-yearbook-1905",
-  "locator": "pp. 709-710 (PDF 783-784): cotton crop of countries named, 1900 (bales of 500 lb gross, 478 lb of lint net)",
-  "status": "sourced",
-  "totalBales": 15893591,
-  "lintLbPerBale": 478,
-  "rows": [
-   [
-    "usa-home",
-    10123027
-   ],
-   [
-    "bin",
-    2262467,
-    "exports and mill consumption"
-   ],
-   [
-    "chn-home",
-    1192000,
-    "estimate of Ellison, based upon net imports and an assumed annual per capita consumption of 2 1/4 lb"
-   ],
-   [
-    "egy",
-    1124632,
-    "Davies, Benachi & Co., as quoted by Ellison"
-   ],
-   [
-    "rus-home",
-    633065,
-    "Asiatic Russia: Transcaucasia 56,000 (average production), Central Asia 577,065"
-   ],
-   [
-    "bra-home",
-    209000,
-    "estimated from exports and an assumed home consumption of about 50,000,000 lb"
-   ],
-   [
-    "mex-home",
-    100527
-   ],
-   [
-    "ott-home",
-    63000,
-    "Asiatic Turkey, average production as unofficially estimated"
-   ]
-  ],
-  "note": "Report only (D-148 additions, item 11): the cotton placement shares stay the USDA 1901 commercial crop (C-8). The listed rows are the largest; the total is the printed world total."
- },
  "woolWorld1900": {
   "sourceId": "cherington-wool-1916",
   "locator": "p. 33 (PDF 49): world's wool production in millions of pounds, 1900: United States 288.6, United Kingdom (fleece washed) 141, continent of Europe (fleece washed) 450, Australia 409.4, New Zealand 156.2, Argentina 439.6, Uruguay 88.2, South Africa 40.0",
@@ -4105,5 +4296,51 @@
   "world1914MillionLb": 2872,
   "world1914Locator": "same page: computed world's wool production 1914 (including carpet wools), 2,872 million lb, of which Asia 273 and Russia (Europe) 320 (Bulletin of the National Association of Wool Manufacturers, January 1915)",
   "note": "Report only (D-148 additions, item 12): the eight producers listed cover most of the 1900 clip; Asia and most of Russia are outside them."
+ },
+ "cottonCommercial1900": {
+  "sourceId": "usda-yearbook-1901",
+  "locator": "p. 200 (PDF 210), table A, the world's commercial cotton crop, commercial year 1900, thousands of bales of 500 lb: crop of the United States 9,143; imports into Europe from Brazil 108, Egypt 1,022, Turkey etc. 49, Peru, West Indies etc. 27, East Indies 242 (total 1,448; total crop 10,591). p. 201 (PDF 211), table B, consumption 1900: India 1,254.",
+  "unit": "thousand bales of 500 lb",
+  "status": "provisional",
+  "total": 10591,
+  "note": "Table A gives the United States crop and the other countries' exports to Europe; every column reproduces the printed totals. British India = exports to Europe (242) + its mills' consumption (table B, 1,254); its exports to Japan and China and the hand-spun crop are not covered. China's large domestic crop is not covered. Peru, the West Indies etc. are an aggregate and are left out (renormalised). Superseded for placement on 2026-11-08 by the 1905 Yearbook's world crop (D-148 item 13); kept as the record of C-8's first shares.",
+  "entries": [
+   [
+    "usa-home",
+    9143,
+    "sourced",
+    "crop of the United States"
+   ],
+   [
+    "bin",
+    1496,
+    "estimated",
+    "East Indies imports into Europe 242 + India's consumption 1,254 (table B)"
+   ],
+   [
+    "egy",
+    1022,
+    "estimated",
+    "imports into Europe from Egypt (Egypt spun little of its crop)"
+   ],
+   [
+    "bra-home",
+    108,
+    "estimated",
+    "imports into Europe from Brazil"
+   ],
+   [
+    "ott-home",
+    49,
+    "estimated",
+    "imports into Europe from Turkey etc."
+   ],
+   [
+    "other",
+    27,
+    "estimated",
+    "Peru, West Indies etc. (aggregate)"
+   ]
+  ]
  }
 }

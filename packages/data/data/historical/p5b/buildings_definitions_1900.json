@@ -119,7 +119,7 @@
    },
    {
     "goodId": 4,
-    "quantityPerThroughputUnit": 533.333333
+    "quantityPerThroughputUnit": 34.4
    }
   ],
   "jobs": [
@@ -273,11 +273,11 @@
   "inputs": [
    {
     "goodId": 3,
-    "quantityPerThroughputUnit": 266.666667
+    "quantityPerThroughputUnit": 246.666667
    },
    {
     "goodId": 4,
-    "quantityPerThroughputUnit": 50
+    "quantityPerThroughputUnit": 70
    }
   ],
   "outputs": [
@@ -317,7 +317,7 @@
   "optionalInputs": [
    {
     "goodId": 58,
-    "quantityPerThroughputUnit": 1.42945,
+    "quantityPerThroughputUnit": 1.32224,
     "outputElasticity": 0.05
    }
   ],
@@ -446,15 +446,15 @@
    },
    {
     "goodId": 11,
-    "quantity": 7208130
+    "quantity": 7207840
    },
    {
     "goodId": 12,
-    "quantity": 290317
+    "quantity": 288042
    },
    {
     "goodId": 13,
-    "quantity": 64374
+    "quantity": 59283
    },
    {
     "goodId": 14,
@@ -466,11 +466,11 @@
    },
    {
     "goodId": 16,
-    "quantity": 82452
+    "quantity": 80049
    },
    {
     "goodId": 17,
-    "quantity": 4247
+    "quantity": 4770
    },
    {
     "goodId": 18,
@@ -478,11 +478,11 @@
    },
    {
     "goodId": 19,
-    "quantity": 1267
+    "quantity": 941
    },
    {
     "goodId": 20,
-    "quantity": 86
+    "quantity": 64
    },
    {
     "goodId": 21,
@@ -498,7 +498,7 @@
    },
    {
     "goodId": 24,
-    "quantity": 67
+    "quantity": 51
    },
    {
     "goodId": 25,
@@ -510,23 +510,23 @@
    },
    {
     "goodId": 27,
-    "quantity": 2457
+    "quantity": 2759
    },
    {
     "goodId": 28,
-    "quantity": 551
+    "quantity": 619
    },
    {
     "goodId": 29,
-    "quantity": 1059
+    "quantity": 1190
    },
    {
     "goodId": 31,
-    "quantity": 1340
+    "quantity": 994
    },
    {
     "goodId": 32,
-    "quantity": 88
+    "quantity": 66
    },
    {
     "goodId": 33,
@@ -546,11 +546,11 @@
    },
    {
     "goodId": 37,
-    "quantity": 25643
+    "quantity": 22735
    },
    {
     "goodId": 38,
-    "quantity": 1293
+    "quantity": 944
    },
    {
     "goodId": 39,
@@ -570,7 +570,7 @@
    },
    {
     "goodId": 43,
-    "quantity": 51
+    "quantity": 54
    },
    {
     "goodId": 44,
@@ -610,7 +610,7 @@
    },
    {
     "goodId": 58,
-    "quantity": 9277
+    "quantity": 4641
    }
   ],
   "resourceRequirements": [],

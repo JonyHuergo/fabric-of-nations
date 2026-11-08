@@ -27,7 +27,7 @@
   "items": [
    {
     "goodKey": "clothing",
-    "quantityPerCapitaPerDay": 0.01
+    "quantityPerCapitaPerDay": 0.0052
    }
   ]
  },
@@ -45,7 +45,7 @@
    },
    {
     "goodKey": "clothing",
-    "quantityPerCapitaPerDay": 0.02803
+    "quantityPerCapitaPerDay": 0.0145756
    },
    {
     "goodKey": "food-products",
@@ -132,11 +132,11 @@
    },
    {
     "goodKey": "textiles",
-    "quantityPerCapitaPerDay": 0.014015
+    "quantityPerCapitaPerDay": 0.0072878
    },
    {
     "goodKey": "clothing",
-    "quantityPerCapitaPerDay": 0.014015
+    "quantityPerCapitaPerDay": 0.0072878
    },
    {
     "goodKey": "food-products",

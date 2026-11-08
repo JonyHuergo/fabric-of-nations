@@ -63,6 +63,7 @@ import {
   MAINTENANCE_MIX,
   MAINTENANCE_SHARE_OF_UPKEEP,
   SILK_OPTIONAL,
+  TEXTILE_CALIBRATION,
 } from "./catalogue.mjs";
 import { NOT_PLACED_1900, placeCatalogue } from "./placement.mjs";
 
@@ -360,6 +361,21 @@ function build() {
       }];
     }
   }
+  // D-148 item 13: cotton and wool calibration of the P2b ranch and textile mill.
+  for (const definition of definitions) {
+    if (definition.key === "ranch") {
+      const wool = definition.outputs.find((output) => output.goodId === gid("wool"));
+      if (wool === undefined) throw new Error("ranch makes no wool");
+      wool.quantityPerThroughputUnit = TEXTILE_CALIBRATION.ranchWoolPerTU;
+    }
+    if (definition.key === "textile-mill") {
+      for (const [key, quantity] of Object.entries(TEXTILE_CALIBRATION.millFibrePerTU)) {
+        const input = definition.inputs.find((entry) => entry.goodId === gid(key));
+        if (input === undefined) throw new Error(`textile-mill buys no ${key}`);
+        input.quantityPerThroughputUnit = quantity;
+      }
+    }
+  }
   // D-148 item 12: raw silk as an optional input of the textile mill, at the 1900 world ratio
   // of raw silk to cotton lint per kg of cotton the mill spins.
   for (const definition of definitions) {
@@ -516,6 +532,15 @@ function build() {
   }
   const needs = oldNeeds.map((tier) => ({ ...tier, items: tier.items.map((item) => ({ ...item })) }));
   const needsTrace = {};
+  // D-148 item 13: cloth demand at the 1900 world fibre supply (TEXTILE_CALIBRATION).
+  for (const tier of needs) {
+    for (const item of tier.items) {
+      if (item.goodKey !== "clothing" && item.goodKey !== "textiles") continue;
+      const before = item.quantityPerCapitaPerDay;
+      item.quantityPerCapitaPerDay = sig(before * TEXTILE_CALIBRATION.clothDemandFactor);
+      needsTrace[`${tier.tier}:${item.goodKey}`] = { quantityPerCapitaPerDay: item.quantityPerCapitaPerDay, p2bQuantityPerCapitaPerDay: before, factor: TEXTILE_CALIBRATION.clothDemandFactor, status: "estimated" };
+    }
+  }
   for (const tierName of ["comfort", "luxury"]) {
     const tier = needs.find((entry) => entry.tier === tierName);
     const share = tierName === "comfort" ? comfortShare : 1 - comfortShare;
@@ -916,6 +941,7 @@ const OUTPUT_UNIT_TO_SIM = {
   "long tons": { factor: 1016.047, note: "long tons x 1,016.047 kg" },
   "thousand bales of 500 lb": { factor: 226796.185, note: "thousand bales x 500 lb x 0.45359237 kg" },
   lb: { factor: 0.45359237, note: "lb x 0.45359237 kg" },
+  "bales of 500 lb gross (478 lb lint)": { factor: 478 * 0.45359237, note: "bales x 478 lb of lint x 0.45359237 kg" },
 };
 
 const outputs = build();

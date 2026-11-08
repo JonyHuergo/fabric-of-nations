@@ -205,6 +205,25 @@ export const CONSTRUCTION_MATERIAL_MIX = { "construction-materials": 0.6, machin
  * without silk still weaves (provisional).
  */
 export const SILK_OPTIONAL = { buildings: ["textile-mill"], perKgCotton: 40724000 / (15893591 * 478), outputElasticity: MINOR_INPUT_ELASTICITY };
+/**
+ * Cotton and wool calibration (D-148 additions, item 13; designer, 2026-11-08), measured
+ * against the 1900 world cotton lint (USDA Yearbook 1905, pp. 709-710: 15,893,591 bales x
+ * 478 lb = 3,446 M kg) and the 1900 wool clip of the eight largest producers (Cherington
+ * 1916, p. 33: 2,013 million lb = 913 M kg). Status: estimated (one calibration pass on the
+ * generator run of 2026-11-08, not re-fitted on every build).
+ *  - clothDemandFactor (dimensionless): multiplies the clothing and textile need quantities
+ *    of every tier (P2b historical_1900_needs.json). 0.52 = world lint / modelled cotton
+ *    before calibration (3,446 / 6,678 M kg a year), so households buy about 3.6 garments a
+ *    year instead of 7; the tiers keep their 1901 budget proportions.
+ *  - ranchWoolPerTU (kg per throughput unit): the ranch's joint wool output, 533.333 in
+ *    P2b. 34.4 = 533.333 x 913 / 14,146 (the modelled world wool output before calibration,
+ *    M kg a year), so world wool output equals the listed 1900 clip (a lower bound; the
+ *    clip is mostly greasy wool while the good is priced as Boston wool, provisional).
+ *  - millFibrePerTU (kg per throughput unit): the textile mill's fibre, 266.667 cotton +
+ *    50 wool in P2b. The 316.667 kg of fibre per 275.362 kg of cloth are kept; wool rises to
+ *    70 so that, after the cloth-demand factor, the mills take the 1900 clip.
+ */
+export const TEXTILE_CALIBRATION = { clothDemandFactor: 0.52, ranchWoolPerTU: 34.4, millFibrePerTU: { cotton: 246.666667, wool: 70 } };
 /** Fertiliser as an optional input of the farms that can use it (C-9): kg N per kg grain, elasticity. */
 export const FERTILISER_OPTIONAL = { buildings: ["commercial-farm", "commercial-farm-peasant", "mechanized-farm"], perOutput: 0.002, outputElasticity: 0.2 };
 

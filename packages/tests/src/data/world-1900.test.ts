@@ -374,6 +374,23 @@ describe("P5b 1900 world: A12 crops at their recorded 1900 producers (D-148 addi
     const farms = levelsIn("silk-farm");
     for (const territory of ["ita-home", "chn-home", "jpn-home", "fra-home"]) expect(farms.get(territory) ?? 0).toBeGreaterThan(0);
   });
+
+  test("cotton and wool follow the 1900 world fibre supply (item 13)", () => {
+    const modelled = (calibration as unknown as { placement: { modelledOverSourced: Record<string, { modelledOverSourced: number }> } }).placement.modelledOverSourced;
+    // Cotton against the USDA 1905 world crop of 1900 (lint): within 15 %.
+    expect(modelled.cotton!.modelledOverSourced).toBeGreaterThan(0.85);
+    expect(modelled.cotton!.modelledOverSourced).toBeLessThan(1.15);
+    const scenario = loadM11World();
+    const goodId = (key: string) => scenario.definitions.goods.find((good) => good.key === key)!.id;
+    const ranch = scenario.definitions.buildings.find((definition) => definition.key === "ranch")!;
+    expect(ranch.outputs.find((output) => output.goodId === goodId("wool"))!.quantityPerThroughputUnit).toBeCloseTo(34.4, 6);
+    const mill = scenario.definitions.buildings.find((definition) => definition.key === "textile-mill")!;
+    const fibre = (key: string) => mill.inputs.find((input) => input.goodId === goodId(key))!.quantityPerThroughputUnit;
+    expect(fibre("cotton") + fibre("wool")).toBeCloseTo(316.666667, 4);
+    // Cotton farms stand in China and Asiatic Russia, which the commercial crop left out.
+    const cottonFarms = levelsIn("cotton-farm");
+    for (const territory of ["usa-home", "bin", "egy", "chn-home", "rus-home"]) expect(cottonFarms.get(territory) ?? 0).toBeGreaterThan(0);
+  });
 });
 
 describe("M11 country selection and persistence", () => {

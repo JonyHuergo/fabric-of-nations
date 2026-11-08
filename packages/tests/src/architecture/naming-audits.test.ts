@@ -178,8 +178,12 @@ describe("M14 monetary equivalence and determinism", () => {
   // farms and an optional textile-mill input (D-148 item 12), electricity at the census
   // water-station price of 1.52 cents (item 10, option a) and the jewellery metal share
   // of 0.33 (D-152 addition).
+  // Re-pinned on 2026-11-08, by design (D-148 item 13, designer's approval): cloth demand
+  // x 0.52, cotton at the 1905 Yearbook's world crop, ranch wool 34.4 kg per throughput
+  // unit, mill fibre 246.7 cotton + 70 wool; A12 batch 4 (Haiti 1899-1900, Ecuador and
+  // Santo Domingo cocoa, Ecuador, Costa Rica and Peru rubber); 6,241 buildings.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("81f5cf0bf41d72c1");
+    expect(hashWorld(world)).toBe("e5a8eecc9d898cee");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {
