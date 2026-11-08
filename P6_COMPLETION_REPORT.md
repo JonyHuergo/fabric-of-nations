@@ -5,8 +5,9 @@
 decided as recorded in its §0).
 **Versions:** world schema 34, simulation 0.30.0, data `m3-economy-v14`, worker protocol 23,
 map bridge protocol 4.
-**Status:** implemented for review, with two open items for the designer (§6.1) and two
-acceptance tests failing on the 1900 data (§5.1).
+**Status:** implemented for review; the designer chose option (a) for clothing and scheduled the
+flax, hemp and jute fibre good in P7 (D-153 addition). One P5b acceptance test (cotton within
+0.85–1.15 of the 1900 crop; now 1.45×) fails and is kept as P7's acceptance test (§5.1).
 
 ## 1. Commits
 
@@ -18,6 +19,8 @@ acceptance tests failing on the 1900 data (§5.1).
 | `78171d9` | Province fixture with the housing reference |
 | `fe3e258` | Generator and sources, D-153, status lines |
 | `817a16c` | Data v14, loader, protocol 23, phone screens, crowding lens, test re-pins |
+| `74e4f90` | This report; map-mode registry test |
+| `b9bbd09` | Option (a): committed clothing at the 1900 fibre supply; fibre good to P7 |
 
 ## 2. Files
 
@@ -70,19 +73,20 @@ acceptance tests failing on the 1900 data (§5.1).
 
 ## 4. Measurements (generator and Node; no device result is claimed)
 
-From `docs/P6_BEFORE_AFTER.md`:
-- Covered value added 524.9 bn RUSD, **50.6 %** of world GDP (P5b close 40.7 %).
+From `docs/P6_BEFORE_AFTER.md` (final, after option (a)):
+- Covered value added 517.2 bn RUSD, **49.9 %** of world GDP (P5b close 40.7 %).
 - Territories above 100 % of GDP: **21** (P5b: 12) — colonies and microstates with export
   crops at sourced shares (mco, lie, cos, bra, dom, mal, bwi, fji, …).
-- Modelled ÷ sourced: coffee-tea-cocoa 2.36 → **1.15**; steel 0.25 → 0.48; iron ore 0.16 →
-  0.30; tobacco 0.90; sugar 0.77; rubber 0.42 → 1.10; **cotton 0.97 → 1.76** and silk 1.76;
-  wool output covers 20 % of mill demand.
-- Planned 1900 food shares: United States 51.7 %, Germany 55.1 %, France 56.2 %, Italy
-  61.5 %, Japan 63.5 %, Russia 65.5 %, China 65.6 %.
-- 7,140 buildings, of which 420 residential builders.
-- One week of the 1900 world (US market): meat +0.7 % (inside the D-136 bound), dairy +7 %,
-  clothing +27 % (wool), grain −21 % and produce −12 % (food gluts, as in P5a), timber −15 %,
-  dwellings −30 % (start-up month).
+- Modelled ÷ sourced: coffee-tea-cocoa 2.36 → **1.19**; steel 0.25 → 0.48; iron ore 0.16 →
+  0.30; tobacco 0.92; sugar 0.79; rubber 0.42 → 1.12; **cotton 0.97 → 1.45** and silk 1.45;
+  wool output covers 25 % of mill demand.
+- Planned 1900 food shares: United States 52.5 %, Germany 56.4 %, China 72.9 % (per country in
+  the generated report).
+- 7,205 buildings.
+- One week of the 1900 world (US market; measured before option (a)): meat +0.7 % (inside the
+  D-136 bound), dairy +7 %, clothing +27 % (wool), grain −21 % and produce −12 % (food gluts,
+  as in P5a), timber −15 %, dwellings −30 % (start-up month). The D-136 meat test passes after
+  option (a) as well.
 
 ## 5. Commands and results
 
@@ -94,39 +98,32 @@ From `docs/P6_BEFORE_AFTER.md`:
 | `node scripts/m14/monetary-terminology-audit.mjs` | passed |
 | `pnpm typecheck` | 0 errors |
 | `pnpm test` (on `ec909f8`, before the data and re-pins) | 12 suites failed, all re-pins or stale generated files, fixed in `817a16c` |
-| `pnpm test` (final, on `817a16c`) | see §5.1 |
-| `pnpm -F @century/app export:web`, then `node scripts/p5b/playtest-goods.mjs` | 24/24 at 844 × 390, no console errors, exceptions or failed loads |
+| `pnpm test` (on `817a16c`, and final on `b9bbd09`) | see §5.1 |
+| `pnpm app:export`, then `node scripts/p5b/playtest-goods.mjs` (on `b9bbd09`) | web, iOS and Android exported; 24/24 at 844 × 390, no console errors, exceptions or failed loads |
 | `pnpm bench`, perfPhases, perfBench | not run (skipped at the designer's request) |
 
 ### 5.1 Final test run
 
-`pnpm test` on `817a16c` (2,084 s): **100 of 103 suites, 1,451 of 1,454 tests passed.**
-Failures:
-- `map/style` — the mode registry list lacked the new lens; updated after the run (17/17
-  pass on re-run).
-- `data/world-1900` › cotton and wool follow the 1900 world fibre supply (D-148 item 13):
-  modelled cotton 1.76× against the 0.85–1.15 band.
-- `data/p6-world` › acceptance (data): food's committed share 0.655 is below its first-knot
-  marginal share 0.661.
+`pnpm test` on `b9bbd09` (2,113 s): **102 of 103 suites, 1,453 of 1,454 tests passed.**
+The one failure is the P5b acceptance test `data/world-1900` › cotton and wool follow the 1900
+world fibre supply (D-148 item 13): modelled cotton 1.45× against the 0.85–1.15 band. The
+designer scheduled the flax, hemp and jute fibre good in P7 and the test is kept, unweakened,
+as its acceptance test. The P6 acceptance tests (food share falls with income, substitution,
+dwelling conservation, determinism, save round trip) all pass.
 
-The last two are the clothing item of §6.1 and are left failing for the designer's decision;
-neither test was weakened. `pnpm app:export` exported web, iOS and Android; the playtest on
-the final bundle passed 24/24.
+Earlier run on `817a16c`: 100 of 103 suites (the map-mode registry list, fixed in
+`74e4f90`, and the two clothing tests resolved or scheduled above).
 
 ## 6. Open items, assumptions and deviations
 
 ### 6.1 For the designer
 
-1. **Clothing and the food-share condition (Q12a consequence).** Removing the cloth factor
-   doubled the committed clothing quantity (P2b basic tier, 0.01 garments a day). Results:
-   cotton 1.76×, wool 20 % of demand, clothing +27 % a week, and the committed food share
-   (0.655) is just below food's marginal share at the first knot (0.661), so the food share is
-   flat-to-rising in a narrow band just above subsistence; the 1900 acceptance test
-   `p6-world` fails on this. Experiment (not committed): with the fibre-calibrated committed
-   clothing (0.0052) the condition holds (0.73–0.76) but cotton stays 1.46×, because the 1901
-   US clothing marginal share (0.24) is high for the world. Options: (a) committed clothing at
-   0.0052; (b) also a world clothing knot from a non-US budget; (c) a fibre good for flax,
-   hemp and jute.
+1. **Clothing (decided 2026-11-08).** Removing the cloth factor had doubled the committed
+   clothing quantity, so food's committed share (0.655) fell below its first-knot marginal share
+   (0.661) and cotton rose to 1.76×. The designer chose option (a), committed clothing at the
+   1900 fibre supply (0.0052 garments a day per person): the food share now falls with income
+   from subsistence (committed food share 0.73–0.76) and cotton is 1.45×. Option (c), a fibre
+   good for flax, hemp and jute, is scheduled in P7; option (b) is not pursued.
 2. **Dwelling start-up.** Builders are sized to replacement plus growth; households reach that
    flow after about a month, so dwelling prices fall at first (storable stock).
 
