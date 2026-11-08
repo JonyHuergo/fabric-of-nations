@@ -8838,7 +8838,7 @@ C-9, C-19, C-22.
       - *Measured:* modelled silk is 1.68× the Lyons figure. Its demand is 1.94× (the same ratio as cotton against the 1905 world crop), and the residual cap holds back new output in Japan, the Ottoman Empire, Spain, Greece and Russia.
     - **Jewellery** (D-152 addition): metal share 0.33, applied; 49 jewellers.
     - **Measured** (`docs/P5B_BEFORE_AFTER.md`): 6,209 buildings; covered value added 59.5 % of world GDP.
-    - **Cotton and wool: calibration proposal** (not applied; for the designer).
+    - **Cotton and wool: calibration proposal** (approved by the designer and applied in item 13).
       - *Findings.*
         - Cotton: modelled cotton (6,678 M kg) is 1.94× the 1900 world lint (USDA Yearbook 1905: 15,893,591 bales × 478 lb = 3,446 M kg).
         - Wool demand: the mills' wool demand (1,254 M kg a year) is close to the 1900 clip. Cherington, *The Wool Industry* (1916), p. 33, lists 2,013 million lb (913 M kg) for the eight largest producers; the 1914 world figure on the same page is 2,872 million lb.
@@ -8852,6 +8852,28 @@ C-9, C-19, C-22.
         - The ranch loses most of its wool revenue (12,177 of 19,280 RUSD per throughput unit at reference prices), so its 300 buildings re-solve technique or level under D-135 A3. Covered value added falls.
         - Workshops and peasant workshops shrink with clothing demand.
         - Both changes re-pin the 1900 world. Flax, hemp and jute stay outside the model (a later fibre good).
+13. **Cotton and wool calibration applied; A12 batch 4** (designer, 2026-11-08: "apply and also finish closing the crop gap").
+    - **Calibration** (`scripts/p5b/catalogue.mjs` `TEXTILE_CALIBRATION`, status estimated), as proposed in item 12:
+      1. the clothing and textile need quantities of every tier × 0.52 (basic clothing 0.01 → 0.0052 garments a day; comfort 0.02803 → 0.01458; luxury clothing and textiles 0.014015 → 0.007288);
+      2. cotton placed at the USDA Yearbook 1905 world crop of 1900 (`outputs1900.cotton`, 32 territories: every continental subtotal and the total of 15,893,591 bales reproduce; the 1901 commercial-crop table is kept as `cottonCommercial1900`);
+      3. the ranch's wool output 533.333 → 34.4 kg per throughput unit;
+      4. the textile mill's fibre 246.667 kg of cotton and 70 kg of wool per throughput unit (316.667 in total, unchanged).
+    - **Measured** (`docs/P5B_BEFORE_AFTER.md`):
+      - modelled ÷ sourced 1900 output: cotton 0.97 (2.49 against the commercial crop before), silk 0.97 (silk follows cotton per kg); wool output 912 M kg a year against the listed clip of 913 (output ÷ demand 0.96; 11.3 before);
+      - levels: ranch 77,120 → 46,767 (the A3 rule re-solves its technique once the wool value goes), textile mills 11,640 → 5,002, workshops 8,042 → 4,212, peasant workshops 6,400 → 4,394; cotton farms stand in China and Asiatic Russia;
+      - covered value added 59.5 % → 40.7 % of world GDP, below the P2b "before" figure (46.5 %), which itself carried the ranch's wool. The fiscal values recomputed from coverage (P2b rule 14) follow.
+    - **A12 batch 4** (Monthly Bulletin of the Bureau of the American Republics, page images):
+      - coffee: Haiti's 1899–1900 exports, 72,122,781 lb (vol. XII, p. 29), replace the 1897–98 figure;
+      - cocoa: Ecuador's 1900 crop, 381,617.55 quintals (vol. XI, p. 897; 46.0093 kg per quintal, provisional), replaces Baker's estimate; Santo Domingo's 1900 exports, 11,231,157 lb (vol. X, p. 700);
+      - tobacco: Santo Domingo's 1900 exports, 17,392,882 lb (vol. X, p. 700);
+      - rubber: Ecuador 1,103,511 lb (vol. XII, p. 759; English pounds, by the page's own conversion); Costa Rica 75,517 kg (vol. X, p. 1080); Peru, Iquitos 893 and caucho 893 tons of Pará's 1900 receipts by origin (vol. XI, p. 12; caucho placed in Peru and tons taken as metric, provisional), moved out of Brazil.
+      - Coverage now: coffee 85.6 %, tea 100 %, cocoa 88.9 %, tobacco 100 %, rubber 92.9 %; coffee-tea-cocoa 88.8 % of the combined world estimate.
+    - **Searched and not found** (the residual keeps the local-and-pooled rule):
+      - The Dutch East Indies' rubber is lumped with gums and resins in the Koloniaal Verslag.
+      - The colonial abstract gives the Straits and India by value and country only, and has no Grenada export table.
+      - Mexico's rubber is small (178,668 kg in 1902) and has no 1900 figure; no 1900 figures were found for the rest of Central America or Colombia.
+      - Cuba's and Honduras's coffee, and Haiti's cocoa, have no 1900 figures.
+    - **Consequences:** 6,241 buildings; the 1900-world hash is re-pinned by design. Coffee-tea-cocoa demand is 2.36× the world estimate and rubber 0.42×; neither is recalibrated.
 
 ## D-149 — D-140 in P5b: metal standards, the mint window and the 1900 money stocks
 

@@ -8,7 +8,8 @@ gold and silver: jewellery in P5b, monetary demand to P11). The additions of 202
 (hydro, transcriptions, jewellery) are recorded in D-148 and D-152 and summarised in §7; the
 A12 crop placement and the open-item findings of the same day are in §8 (D-148 items 9–11,
 D-152 addition); the designer's decisions of the same day (raw silk, electricity, jewellery,
-the cotton and wool proposal) are in §9 (D-148 item 12).
+the cotton and wool proposal) are in §9 (D-148 item 12); the calibration as applied and A12
+batch 4 are in §10 (D-148 item 13).
 **Versions:** world schema 33, simulation 0.29.0, data `m3-economy-v13`, worker protocol
 22, map bridge protocol 3.
 **Status:** implemented for the designer's review, with the open items of §6 and §7. The
@@ -415,6 +416,73 @@ The designer chose electricity option (a), accepted the jewellery metal share of
 | `pnpm app:export` | web, iOS and Android bundles exported |
 | `node scripts/p5b/playtest-goods.mjs` | 19/19 checks passed at 844 x 390 (59 goods counted), no console errors, exceptions or failed loads |
 | `pnpm test` (full run, after the re-pin) | **101 of 101 suites, 1,434 of 1,434 tests passed** (1,855 s) |
+| `pnpm bench`, perfPhases | not run (skipped at the designer's request) |
+
+No device result is claimed.
+
+## 10. Third continuation of 2026-11-08: cotton and wool calibration, A12 batch 4
+
+The designer approved the cotton and wool proposal and asked to finish closing the crop gap (D-148 item 13).
+
+### 10.1 Behaviour
+
+1. **Calibration** (`TEXTILE_CALIBRATION`, status estimated):
+   - clothing and textile need quantities × 0.52 in every tier;
+   - cotton placed at the 1905 Yearbook's world crop of 1900 (32 territories, now including China and Asiatic Russia);
+   - ranch wool 34.4 kg per throughput unit (533.3 before);
+   - mill fibre 246.7 kg cotton plus 70 kg wool per throughput unit.
+
+   Result:
+
+   | | Before | After |
+   |---|---:|---:|
+   | Modelled ÷ sourced cotton | 2.49 (commercial crop) | 0.97 (world crop) |
+   | Modelled ÷ sourced silk | 1.68 | 0.97 |
+   | Wool output ÷ demand | 11.3 | 0.96 (912 M kg against the listed 913 M kg clip) |
+   | Ranch levels | 77,120 | 46,767 |
+   | Textile mill levels | 11,640 | 5,002 |
+   | Covered value added (share of world GDP) | 59.5 % | 40.7 % |
+2. **A12 batch 4** (Bureau of the American Republics Monthly Bulletins, vols. X–XII, page images):
+   - coffee: Haiti 1899–1900;
+   - cocoa: Ecuador's 1900 crop and Santo Domingo's exports;
+   - tobacco: Santo Domingo's exports;
+   - rubber: Ecuador, Costa Rica, and Peru (Iquitos and caucho, moved out of Pará's figure).
+
+   Coverage: coffee 85.6 %, tea 100 %, cocoa 88.9 %, tobacco 100 %, rubber 92.9 %; coffee-tea-cocoa 88.8 %.
+3. **Searched, nothing usable:** Dutch East Indies rubber (lumped with gums), the Straits and India (values only), Grenada (no export table), Mexico (178,668 kg in 1902 only), the rest of Central America, Colombia, Cuba and Honduras coffee, and Haitian cocoa. These stay in the local-and-pooled residual.
+4. **Measured:** 6,241 buildings.
+
+### 10.2 Files
+
+- `scripts/p5b/catalogue.mjs` (`TEXTILE_CALIBRATION`), `scripts/p5b/build-goods-1900.mjs` (ranch, mill, need factor, cotton bale unit).
+- `sources_1900.json`: `outputs1900.cotton` from the 1905 world crop, `cottonCommercial1900` kept, batch 4, three bulletin sources.
+- The regenerated tables and documents, the worker scenario and the app bundle.
+- Tests:
+  - `data/world-1900.test.ts`: cotton and wool calibration test;
+  - `architecture/naming-audits.test.ts`: hash re-pinned by design.
+- `DECISIONS.md` (D-148 item 13), this report, the status lines.
+- New git-ignored caches: `iba-monthly-bulletins` (OCR text of 40 volumes), `iba-mb-monthlybulletin1001bure`, `-1101bure` and `-1202bure` (grayscale PDFs).
+
+### 10.3 Open items for the designer
+
+- Covered value added is now 40.7 % of world GDP, below the P2b "before" figure, which carried the ranch's wool.
+- Coffee-tea-cocoa demand is 2.36× its world estimate and rubber 0.42×; neither is recalibrated.
+- Flax, hemp and jute have no good.
+- Not run: performance work and `pnpm bench` (held at the designer's request).
+
+### 10.4 Commands executed and results
+
+| Command | Result |
+|---|---|
+| `node scripts/p5b/build-goods-1900.mjs`, then `node scripts/p2/build-province-scenario.mjs` | regenerated; `--check` of both current |
+| `node scripts/p2b/build-money-calibration.mjs --check`, `node scripts/p5/build-p5-world.mjs --check` | current |
+| `pnpm -F @century/sim-worker scenario:build`, `pnpm -F @century/app build:worker` (and `:check`) | current |
+| `node scripts/docs/decisions-index.mjs --check` | current (152 decisions) |
+| naming audits, 1900 world and goods catalogue suites (before the re-pin) | 1 failed of 59: the 1900-world hash, re-pinned by design |
+| `pnpm typecheck` | 0 errors |
+| `pnpm app:export` | web, iOS and Android bundles exported |
+| `node scripts/p5b/playtest-goods.mjs` | 19/19 checks passed at 844 x 390, no console errors, exceptions or failed loads |
+| `pnpm test` (full run, after the re-pin) | **101 of 101 suites, 1,435 of 1,435 tests passed** (1,899 s) |
 | `pnpm bench`, perfPhases | not run (skipped at the designer's request) |
 
 No device result is claimed.

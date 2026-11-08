@@ -8,7 +8,7 @@ for review on 2026-11-07 (D-147 to D-151, `P5B_COMPLETION_REPORT.md`) and extend
 prices, jewellery as the 58th good, D-152; coffee, tea and cocoa, tobacco and rubber placed
 at their recorded 1900 producers under a coverage rule, D-148; raw silk as the 59th good,
 electricity at the 1902 census water-station price, the jewellery metal share from the 1900
-census); its performance step is held
+census, cotton and wool calibrated to the 1900 world fibre supply); its performance step is held
 by the designer and some source transcriptions remain provisional; the monetary demand for gold and silver
 moves to P11 (D-152).\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is

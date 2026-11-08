@@ -6666,7 +6666,8 @@ sourced cotton shares and fuel prices, and jewellery as a 58th good made by jewe
 gold and silver (D-148, D-152), and coffee, tea and cocoa, tobacco and rubber were placed at
 their recorded 1900 producers under a coverage rule, raw silk became a 59th good in the
 textile recipe, and electricity and the jewellery metal share were sourced from the 1902
-and 1900 censuses (D-148, D-152); the monetary demand for gold and silver (free coinage, a
+and 1900 censuses, and cotton and wool were calibrated to the 1900 world fibre supply
+(D-148, D-152); the monetary demand for gold and silver (free coinage, a
 growing circulation) is deferred to P11 (D-152).
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
