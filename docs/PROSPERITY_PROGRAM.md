@@ -2,8 +2,9 @@
 
 **Status:** P0–P2b accepted; the performance stages (D-137, D-139) accepted as complete on
 2026-11-04. P3 (D-141), P4 (D-142, with the natural-fertility ceiling of D-144) and P5a
-(D-143) accepted on 2026-11-06 (D-146). P5b (the goods catalogue and D-140) in progress
-(`docs/P5B_PLAN.md`).\
+(D-143) accepted on 2026-11-06 (D-146). P5b (the goods catalogue and D-140) implemented
+for review on 2026-11-07 (D-147 to D-151, `P5B_COMPLETION_REPORT.md`); its performance
+step is held by the designer and some source transcriptions remain provisional.\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\
 **Goal:** a country that never goes to war and never engages in diplomacy must still be

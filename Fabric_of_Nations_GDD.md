@@ -6655,6 +6655,12 @@ On 2026-11-06 the designer accepted P3, P4 and P5a and approved the P5b plan (D-
 the 57-good catalogue, its recipes, extraction and 1900 production, together with D-140
 (money as metal and paper), which is assigned to P5b. A save storage-backend stage
 follows P7, and a map-pipeline repair stage is scheduled.
+P5b is implemented for review on 2026-11-07 (D-147 to D-151): 57 goods with extraction
+from deposits, goods that cannot be stored, maintenance and optional inputs, a 1900
+placement sized by modelled demand at sourced country shares (data `m3-economy-v13`),
+gold, silver and paper currencies with a mint window and the 1900 money stocks, currency
+adoption and establishment, and protocol 22. Its performance step is held by the
+designer (the 1900 day is 593 ms in Node against the 450 ms budget).
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair

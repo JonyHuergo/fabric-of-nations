@@ -103,7 +103,9 @@ end; a recipe input within float tolerance of its reservation; the in-transit sh
 
 ### 4.1 Final test and typecheck run
 
-FINAL_TEST_RESULT
+`pnpm test` on 2026-11-07 after commit `0c00cd0`: **101 of 101 suites, 1,424 of 1,424
+tests passed.** `pnpm typecheck` (libraries built, every package): **0 errors.** The
+700,000-character snapshot bound, which failed after stage B, passes with protocol 22.
 
 ## 5. Measurements (Node diagnostics; no device result is claimed)
 
