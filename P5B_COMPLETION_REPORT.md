@@ -9,11 +9,12 @@ gold and silver: jewellery in P5b, monetary demand to P11). The additions of 202
 A12 crop placement and the open-item findings of the same day are in §8 (D-148 items 9–11,
 D-152 addition); the designer's decisions of the same day (raw silk, electricity, jewellery,
 the cotton and wool proposal) are in §9 (D-148 item 12); the calibration as applied and A12
-batch 4 are in §10 (D-148 item 13).
+batch 4 are in §10 (D-148 item 13). §11 lists every item not completely resolved at the
+close of P5b.
 **Versions:** world schema 33, simulation 0.29.0, data `m3-economy-v13`, worker protocol
 22, map bridge protocol 3.
-**Status:** implemented for the designer's review, with the open items of §6 and §7. The
-performance step (plan §5, §12 step 5) was held at the designer's request on 2026-11-07
+**Status:** merged into `main` on the designer's instruction of 2026-11-08, with the
+unresolved items listed in §11. The performance step (plan §5, §12 step 5) was held at the designer's request on 2026-11-07
 and is not done; no benchmark was run in this session (skipped at the designer's request).
 
 ## 1. Commits
@@ -486,3 +487,71 @@ The designer approved the cotton and wool proposal and asked to finish closing t
 | `pnpm bench`, perfPhases | not run (skipped at the designer's request) |
 
 No device result is claimed.
+
+## 11. Unresolved items at the close of P5b (consolidated, 2026-11-08)
+
+This section replaces the scattered open-item lists of §6–§10 as the single list to carry forward. It covers everything that is not completely resolved. The figures are from the final generator run (`docs/P5B_BEFORE_AFTER.md`) unless stated otherwise.
+
+### 11.1 Acceptance criteria not met or not verified
+
+- **Performance (A11, plan §5):**
+  - The ordinary 1900 day measured 593 ms in Node against the 450 ms budget (2026-11-07, before the 2026-11-08 additions). The performance step was held by the designer and has not been done.
+  - `pnpm bench` and perfPhases were not run after D-149 (designer's hold). No measurement exists for the final world (59 goods, 6,241 buildings).
+- **No dynamic run of the final world.** The 92-day stability run (no failure; metal currencies convertible) and the market-health observations below predate the 2026-11-08 changes: hydro, jewellery, A12 placement, silk, the electricity price, the cotton and wool calibration. The test suite runs short simulations of the final world and passes; a long run has not been repeated.
+- **Devices:** no tablet-size playtest and no device test (designer's). Only the 844 × 390 web playtest was run.
+
+### 11.2 Calibration gaps (modelled ÷ sourced 1900 output)
+
+- **Heavy industry and minerals are well below 1900:**
+
+  | Good | Modelled ÷ sourced |
+  |---|---:|
+  | iron ore | 0.16 |
+  | steel | 0.25 |
+  | copper ore | 0.33 |
+  | tin | 0.35 |
+  | bauxite | 0.41 |
+  | nitrates | 0.25 |
+  | crude oil | 0.79 |
+  | coal | 0.86 |
+
+  Modelled demand for these comes from recipes and maintenance only. In 1900 most steel, timber and construction materials went into railways, buildings, ships and new plant: investment demand that arrives with housing (P6), infrastructure (P8) and company investment (P10).
+- **Gold 0.48 and silver 0.18:** the rest of 1900 output is monetary demand, deferred to P11 (D-152).
+- **Coffee-tea-cocoa 2.36× and rubber 0.42×** their world estimates. The household quantities come from the 1901 US budget at reference prices and were not recalibrated; rubber's only 1900 buyers are belting, hose, cable and tyres.
+- **Aluminium: report bug.** The modelled ÷ sourced table shows 0.00 because the source table is in kg and the good is in tonnes. Modelled 9,988 t against 7,743 t sourced is about 1.29. To fix: give the aluminium row a kg-to-t conversion in `build-goods-1900.mjs` (`OUTPUT_UNIT_TO_SIM`).
+- **Covered value added is 40.7 % of world GDP**, below the P2b "before" figure of 46.5 %, which carried the ranch's unrealistic wool. Twelve of 134 territories are above 100 % (the P2b farm-gate demand, a D-135 distortion left to P6). The residual cap (plan §8) still trims new sectors in Spain, Greece, Japan, the Ottoman Empire, Portugal, Russia and four microstates.
+- **Measured before the latest changes and not re-measured:**
+  - machinery, construction materials and fertiliser at the price ceiling in many markets in a 92-day run (route capacity, freight funding; fertiliser made only in gate markets);
+  - the food gluts and the clothing shortage of P5a (clothing demand has since been halved);
+  - Japanese, Spanish and Portuguese households short of services.
+
+### 11.3 Provisional data and assumptions
+
+- **A12 crops** (coverage of the world estimate: coffee 85.6 %, tea 100 %, cocoa 88.9 %, tobacco 100 %, rubber 92.9 %):
+  - tea has no world total, so its figure is the recorded sum, and China's and Japan's domestic tea is self-supplied without a figure;
+  - estimated rows: Venezuela coffee (about 1,000,000 bags), Nicaragua (interpolated), Colombia (1899), Salvador (1901), the Baker cocoa means, Angola and the Ivory Coast (Liverpool tons), the Congo (Antwerp arrivals), Peru (caucho placed in Peru, tons taken as metric), Ecuador cocoa (46 kg quintal);
+  - missing producers: East Indian and Central American (except Costa Rica) rubber, Mexican rubber, Cuban and Honduran coffee, and Haitian, Grenadan, Surinamese and Colombian cocoa;
+  - the coverage threshold (`A12_MIN_COVERAGE` 0.75) is provisional.
+- **Cotton and wool** (`TEXTILE_CALIBRATION`, estimated, one pass):
+  - the factors were fitted once on 2026-11-08 and are not re-fitted on each build;
+  - the wool clip is mostly greasy wool while the good is priced as Boston wool;
+  - the listed clip (eight producers) leaves out Russia and Asia;
+  - flax, hemp and jute have no good;
+  - China's cotton (net imports × 2¼ lb a head) and India's hand-spun cotton are understated in the source itself.
+- **Silk:** China, Japan and India count exports only, so their domestic silk is not modelled. The crop band (46°) is provisional.
+- **Electricity:**
+  - 1.52 cents/kWh is the water-only stations' average, still about half lighting;
+  - the hydro share outside the United States (the 1902 US water-wheel share) is provisional, as is the technical share 0.33;
+  - opening electricity demand fell from 10,600 to 7,172 MWh a day with the new price.
+- **Jewellery:** the metal share of 0.33 is an upper bound. Jewellers are labourers and clerks until P7's artisan professions.
+- **Other provisional values:** the 1990 plastics price (placeholder); refinery yields; ore grades; machinery and electrical-equipment prices (materials-share rule); ship price; the densities of naphtha and residuum; the hydro method's headwater rule.
+- **D-140 / D-149** (from §6):
+  - a mint without cash cannot defend its currency against a metal inflow;
+  - four currencies revalue once on day 1;
+  - paper currencies, aggregates and dependencies of the Mint table are not activated.
+
+### 11.4 Known defects and carried-over stages
+
+- The web autosave fails with a storage-quota error on the 1900 world (P7b, storage backend). P5b makes saves larger.
+- The map rebuild scripts do not reproduce the committed map (map-pipeline repair stage). The map steps were not run.
+- `.cache-p5b/` (git-ignored) holds every downloaded source and the transcription tools. It is not in the repository, so a fresh clone cannot re-read the page images without re-downloading them; the URLs are in `sources_1900.json`.

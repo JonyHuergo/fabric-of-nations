@@ -10,7 +10,8 @@ at their recorded 1900 producers under a coverage rule, D-148; raw silk as the 5
 electricity at the 1902 census water-station price, the jewellery metal share from the 1900
 census, cotton and wool calibrated to the 1900 world fibre supply); its performance step is held
 by the designer and some source transcriptions remain provisional; the monetary demand for gold and silver
-moves to P11 (D-152).\
+moves to P11 (D-152). P5b was merged into `main` on 2026-11-08; its unresolved items are
+listed in `P5B_COMPLETION_REPORT.md` §11.\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\
 **Goal:** a country that never goes to war and never engages in diplomacy must still be
@@ -307,6 +308,14 @@ proposed during P3 and is now assigned here.
 
 Acceptance: food expenditure share falls with income (property test); substitution moves
 demand toward the cheaper good; housing conserved through construction and depreciation.
+
+**Carried into P6 from P5b (2026-11-08; `P5B_COMPLETION_REPORT.md` §11).** The goods
+catalogue itself was built in P5b (59 goods). P6 takes the demand-side items P5b left:
+household quantities still come from the 1901 US budget at reference prices (coffee, tea and
+cocoa 2.36× the 1900 world estimate; clothing scaled once by 0.52 in D-148 item 13); the
+P2b farm-gate demand distortion behind the territories above 100 % of GDP (D-135); and
+construction demand for housing, which, with P8 infrastructure and P10 investment, is where
+most 1900 steel, timber and construction materials went (steel is 0.25 of 1900 output today).
 
 ### P7 — Labour market, wages, social mobility, urbanisation
 
