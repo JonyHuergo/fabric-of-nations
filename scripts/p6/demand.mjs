@@ -3,7 +3,7 @@
  * builder (`scripts/p5b/build-goods-1900.mjs`, P6 stage). docs/P6_PLAN.md §2–§5.
  *
  * 1. Committed basket per adult equivalent (plan Q2a, Q14): the P2b subsistence food and
- *    basic clothing per person ÷ the 1900 world's adult equivalents per person (Atwater
+ *    basic clothing (× the 1900 fibre-supply factor 0.52, D-153) per person ÷ the 1900 world's adult equivalents per person (Atwater
  *    scale on the P4 age structures), plus a firewood cooking minimum (provisional).
  * 2. Retail margins (plan Q3a): food from the 1901 retail prices paid (Bulletin 59
  *    quantities, the 1901 food-article weights) against the reference prices; other goods
@@ -32,6 +32,8 @@
  */
 
 /** Mirror of the simulation's coefficients (checked by test). */
+import { TEXTILE_CALIBRATION } from "../p5b/catalogue.mjs";
+
 export const P6_COEFFICIENTS = {
   marginalPropensityToConsume: { lower: 0.94, middle: 0.85, upper: 0.6 },
   wealthConsumptionRatePerYear: 0.04,
@@ -151,7 +153,13 @@ export function buildP6Demand(ctx) {
   const basic = oldNeeds.find((tier) => tier.tier === "basic");
   const committed = {};
   for (const item of subsistence.items) committed[item.goodKey] = item.quantityPerCapitaPerDay / worldAeRatio;
-  for (const item of basic.items) committed[item.goodKey] = (committed[item.goodKey] ?? 0) + item.quantityPerCapitaPerDay / worldAeRatio;
+  // Committed clothing at the 1900 world fibre supply (D-148 item 13: the P2b basic tier
+  // × TEXTILE_CALIBRATION.clothDemandFactor 0.52; designer, 2026-11-08, option (a) of the
+  // P6 clothing item). Supernumerary clothing follows the schedule.
+  for (const item of basic.items) {
+    const factor = item.goodKey === "clothing" || item.goodKey === "textiles" ? TEXTILE_CALIBRATION.clothDemandFactor : 1;
+    committed[item.goodKey] = (committed[item.goodKey] ?? 0) + (factor * item.quantityPerCapitaPerDay) / worldAeRatio;
+  }
   committed.timber = FIREWOOD_COMMITTED_PER_AE;
   trace.committed = { worldAdultEquivalentsPerPerson: worldAeRatio, perAdultEquivalentPerDay: committed, rowIds: ["p2b subsistence and basic tiers", "atwater-1902", "p4 age structures"], firewood: "provisional" };
 

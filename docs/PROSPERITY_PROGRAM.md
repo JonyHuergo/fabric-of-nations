@@ -327,6 +327,12 @@ P10 and P11. P7 adds housing to migration ("toward jobs and housing").
 
 ### P7 — Labour market, wages, social mobility, urbanisation
 
+**Added from P6 (designer, 2026-11-08; D-153 addition):** a fibre good for flax, hemp and jute
+(farms, the textile mill recipe, sourced 1900 output by country). Until then all non-wool cloth
+demand falls on cotton (modelled cotton 1.45× the 1900 world crop) and the P5b acceptance test
+"cotton and wool follow the 1900 world fibre supply" fails; it is kept as P7's acceptance test.
+P7 also adds housing to migration ("toward jobs and housing").
+
 - Monthly wage adjustment per (customs territory, profession) with provincial
   differentials from vacancy and unemployment rates; floors from minimum-wage law and
   the peasant alternative income.

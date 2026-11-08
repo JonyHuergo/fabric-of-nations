@@ -9210,3 +9210,16 @@ tier path (plan Q9a).
   blocks without covered jobs live on their savings until P7/P10; household bond coupons and
   redemptions count as income until P11; rent, landlords, mortgages and housing services as
   value added are not modelled (P9–P11).
+
+### Addition of 2026-11-08: committed clothing and the fibre good (designer)
+
+- **Option (a), applied.** The committed clothing quantity is the P2b basic tier × the 1900
+  fibre-supply factor 0.52 (D-148 item 13), cited in `scripts/p6/demand.mjs`. Removing the factor
+  (Q12a) had doubled it, putting food's committed share (0.655) below its first-knot marginal
+  share (0.661), so the food share rose slightly just above subsistence. Now: committed food
+  share 0.73–0.76; cotton 1.76 → 1.45 of the 1900 world crop; wool output 25 % of demand.
+- **Option (c), scheduled in P7:** a fibre good for flax, hemp and jute. Until then the P5b test
+  "cotton and wool follow the 1900 world fibre supply" fails (cotton 1.45×) and is kept as P7's
+  acceptance test; it is not weakened.
+- Option (b) (a non-US clothing budget) is not pursued: the Belgian 1853 clothing share (0.20)
+  is close to the US one (0.24), and no poorer public-domain budget by income class is known.

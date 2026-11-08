@@ -185,9 +185,10 @@ describe("M14 monetary equivalence and determinism", () => {
   // Re-pinned on 2026-11-08, by design (P6, D-153): the demand system replaces the tiers
   // (placement by its 1900 quantities, the cloth factor removed), good 59 dwelling and the
   // residential builder, block incomes, dwellings and housing references, schema 34 and
-  // data m3-economy-v14.
+  // data m3-economy-v14. Re-pinned again the same day, by design (D-153 addition, designer's
+  // option (a)): committed clothing at the 1900 fibre-supply factor 0.52.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("ee45f584207dc7ae");
+    expect(hashWorld(world)).toBe("bfd55c27e7ef866d");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {

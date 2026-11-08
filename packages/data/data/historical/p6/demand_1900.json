@@ -64,7 +64,7 @@
    "goods": [
     {
      "goodKey": "clothing",
-     "committedPerAdultEquivalentPerDay": 0.013455017,
+     "committedPerAdultEquivalentPerDay": 0.0069966088,
      "retailCommercePerUnit": 5.74208,
      "retailTransportPerUnit": 0
     },
@@ -255,7 +255,7 @@
  ],
  "knots": [
   {
-   "consumptionRatio": 1.4613655,
+   "consumptionRatio": 1.5973891,
    "marginalShares": {
     "food": 0.660616179,
     "clothing": 0.2042891137,
@@ -303,7 +303,7 @@
    }
   },
   {
-   "consumptionRatio": 5.1420877,
+   "consumptionRatio": 5.6207123,
    "marginalShares": {
     "food": 0.4088007088,
     "clothing": 0.2436513591,
@@ -353,7 +353,7 @@
    }
   },
   {
-   "consumptionRatio": 18.948514,
+   "consumptionRatio": 20.712239,
    "marginalShares": {
     "food": 0.1844434602,
     "clothing": 0.09755095537,
