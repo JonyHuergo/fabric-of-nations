@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-11-08T22:19:01.006Z",
+  "startedAt": "2026-11-08T23:01:47.332Z",
   "viewport": "844,390",
   "checks": [
     {
@@ -30,7 +30,7 @@
     {
       "name": "goods not traded here are folded and counted",
       "passed": true,
-      "detail": "6 not traded here"
+      "detail": "7 not traded here"
     },
     {
       "name": "search finds steel with its price per t",
@@ -65,7 +65,7 @@
     {
       "name": "a hydro station shows the province's river flow",
       "passed": true,
-      "detail": "River flow for hydro stations: 15.9k MWh a day, 15.2k MWh left (a new station needs 175.2 MWh)."
+      "detail": "River flow for hydro stations: 15.9k MWh a day, 15.3k MWh left (a new station needs 175.2 MWh)."
     },
     {
       "name": "Money screen shows the gold standard and the mint's metal",
@@ -135,5 +135,5 @@
     "docs/images/p5b/p6-844x390-households.png",
     "docs/images/p5b/p6-844x390-crowding-lens.png"
   ],
-  "finishedAt": "2026-11-08T22:19:42.821Z"
+  "finishedAt": "2026-11-08T23:02:29.114Z"
 }
