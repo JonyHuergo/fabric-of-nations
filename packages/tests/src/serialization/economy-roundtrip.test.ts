@@ -1,4 +1,5 @@
 ﻿import { prePhase4Digest } from "../fixtures/p4Encoding.js";
+import { prePhase7Digest } from "../fixtures/p7Encoding.js";
 import { prePhase5Digest } from "../fixtures/p5Encoding.js";
 import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
 import { prePhase6Digest } from "../fixtures/p6Encoding.js";
@@ -81,7 +82,9 @@ describe("M3a schema-25 serialization", () => {
     // P6 schema 34 (D-153): encoding only — restoring schema 33, simulation 0.29.0 and
     // data m3-economy-v13 reproduces the P5b digest.
     expect(prePhase6Digest(cloneWorld())).toBe("e33dd890a6d41eda");
-    expect(hashWorld(cloneWorld())).toBe("239ec16ebc4fd258");
+    // P7 schema 35 (D-154): encoding only — restoring schema 34 and simulation 0.30.0 reproduces the P6 digest; this world has no labour market.
+    expect(prePhase7Digest(cloneWorld())).toBe("239ec16ebc4fd258");
+    expect(hashWorld(cloneWorld())).toBe("2fabeeb0bb537eaa");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

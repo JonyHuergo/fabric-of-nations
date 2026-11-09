@@ -569,9 +569,9 @@ describe("P3 month-end closing valuations", () => {
   test("each close records the specified valuations, ascending, and saves round-trip them", () => {
     // P4 (D-142) raised the schema to 31 (block demography, annual record) and P5
     // (D-143) to 32 (deposits, closing balances), P5b (D-146) to 33 (deposit link,
-    // province latitude, three sectors) and P6 (D-153) to 34 (demand and housing state);
-    // the closing valuations are unchanged.
-    expect(WORLD_SCHEMA_VERSION).toBe(34);
+    // province latitude, three sectors), P6 (D-153) to 34 (demand and housing state) and
+    // P7 (D-154) to 35 (labour market); the closing valuations are unchanged.
+    expect(WORLD_SCHEMA_VERSION).toBe(35);
     const { world } = runToFirstClose();
     const summary = world.finance.periodSummaries[0];
     expect(summary?.closingValuations).toEqual([

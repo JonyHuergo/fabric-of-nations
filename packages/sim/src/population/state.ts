@@ -6,6 +6,7 @@
  * different simulation.
  */
 
+import { emptyLabourMarketState } from "../economy/labourState.js";
 import { emptyResourceState } from "../economy/resourceState.js";
 import { emptyDemographyReport } from "../economy/demographyReportState.js";
 import {
@@ -280,7 +281,9 @@ export function assertValidPopulationState(world: World): void {
     }
     accountOwners.add(account.id);
   }
+  const retiredBlockIds = new Set<number>(world.labourMarket.retiredPopBlockIds);
   for (const account of world.finance.accounts) {
+    if (account.ownerKind === "popBlock" && account.ownerId !== null && retiredBlockIds.has(account.ownerId)) continue;
     if (account.ownerKind === "popBlock" && (account.ownerId === null || !blockIds.has(account.ownerId))) {
       throw new RangeError(
         `popBlock financial account ${String(account.id)} references unknown popBlock`,
@@ -750,6 +753,7 @@ export function createPopulationWorld(
     moneyCoefficients: { ...DEFAULT_MONEY_COEFFICIENTS },
     demography: emptyDemographyReport(),
     resources: emptyResourceState(),
+    labourMarket: emptyLabourMarketState(),
     politics: {
       enabled: false,
       eventQueue: [],

@@ -76,6 +76,8 @@ import {
   requireUint32,
 } from "./validation.js";
 import { recordWorldValidation } from "./validationStats.js";
+import { assertValidLabourMarketState, emptyLabourMarketState } from "./economy/labourState.js";
+import type { LabourMarketState } from "./economy/types.js";
 
 /** Diagnostic counters and bounded buffers. None of these affect game outcomes. */
 export interface SimulationDiagnostics {
@@ -165,6 +167,11 @@ export interface World {
   demography: DemographyReportState;
   /** P5 natural-resource deposits: stock, extraction and discovery (D-143 §4). */
   resources: ResourceState;
+  /**
+   * P7 (D-154) labour market: wages, staffing ceilings, institution employment, the
+   * block-id allocator and retired blocks. Disabled and empty in legacy worlds (plan Q21).
+   */
+  labourMarket: LabourMarketState;
   diagnostics: SimulationDiagnostics;
 }
 
@@ -301,6 +308,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     moneyCoefficients: { ...DEFAULT_MONEY_COEFFICIENTS },
     demography: emptyDemographyReport(),
     resources: emptyResourceState(),
+    labourMarket: emptyLabourMarketState(),
     diagnostics: {
       invariantFailureCount: 0,
       invalidActionCount: 0,
@@ -434,6 +442,13 @@ export function assertValidWorld(
     new Set(world.provinceEconomies.map((province) => province.id)),
     null,
   );
+  assertValidLabourMarketState(world.labourMarket, {
+    marketIds: world.markets.map((market) => market.id),
+    provinceMarket: new Map(world.provinceEconomies.map((province) => [province.id, province.marketId])),
+    buildingIds: new Set(world.buildings.map((building) => building.id)),
+    blockIds: new Set(world.popBlocks.map((block) => block.id)),
+    countryIds: new Set(world.countries.map((country) => country.id)),
+  });
 }
 
 /**

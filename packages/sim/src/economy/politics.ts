@@ -8,6 +8,7 @@
  * Influence and support are derived indicators, never spendable resources.
  */
 
+import { administrationPostsFunded, institutionProfession, institutionStaff, labourEligibleWorkforce } from "./labourMarket.js";
 import {
   dayIndexToCivilDate,
   civilDateToDayIndex,
@@ -412,6 +413,17 @@ export function assertValidPoliticsDefinitions(
     ) {
       throw new RangeError(`${lawPath}.laborMinimumWageRUSDPerYear is out of range`);
     }
+    // P7 (plan §4.5): optional minimum-wage coverage of farm employees and domestic service.
+    let laborMinimumWageCoverage: { farmEmployees: boolean; domesticService: boolean } | undefined;
+    if (law.laborMinimumWageCoverage !== undefined) {
+      const coverage = requireRecord(law.laborMinimumWageCoverage, `${lawPath}.laborMinimumWageCoverage`);
+      for (const field of ["farmEmployees", "domesticService"] as const) {
+        if (typeof coverage[field] !== "boolean") {
+          throw new TypeError(`${lawPath}.laborMinimumWageCoverage.${field} must be a boolean`);
+        }
+      }
+      laborMinimumWageCoverage = { farmEmployees: coverage.farmEmployees === true, domesticService: coverage.domesticService === true };
+    }
     const laborHoursPerWeek =
       law.laborHoursPerWeek === undefined
         ? 0
@@ -483,6 +495,7 @@ export function assertValidPoliticsDefinitions(
       educationQualityBonus,
       requiredTechnologyIds,
       laborMinimumWageRUSDPerYear,
+      ...(laborMinimumWageCoverage === undefined ? {} : { laborMinimumWageCoverage }),
       laborHoursPerWeek,
       healthStaffFloor,
       currencyRegime,
@@ -1185,7 +1198,19 @@ export function refreshInstitution(
   const literacy = population > 0 ? literacyWeighted / population : 0;
   const infrastructure = provinceCount > 0 ? infrastructureWeighted / provinceCount : DEFAULT_INFRASTRUCTURE;
   const clerkShare = population > 0 ? staff / population : 0;
-  const staffingRatio = clamp(clerkShare / ADMIN_TARGET_CLERK_SHARE, 0, 1);
+  let staffingRatio = clamp(clerkShare / ADMIN_TARGET_CLERK_SHARE, 0, 1);
+  // P7 (D-154, plan Q4): in a labour-market world the administration's staff are the
+  // bureaucrats it employs; staffing is its filled share of the posts its budget funds
+  // (the funding ratio below still measures the budget against the benchmark).
+  if (world.labourMarket.enabled) {
+    const employed = institutionStaff(world, country.id, "administration");
+    const funded = administrationPostsFunded(world, definitions, country);
+    staffingRatio = funded > 0 ? clamp(employed / funded, 0, 1) : 0;
+    for (const key of Object.keys(staffedByProfession)) delete staffedByProfession[Number(key)];
+    const bureaucrat = institutionProfession(definitions, "administration");
+    if (bureaucrat !== undefined && employed > 0) staffedByProfession[bureaucrat.id] = employed;
+    staff = employed;
+  }
   // P2b: administration is staffed at the country's own clerk wages (D-135).
   const fundingBenchmark =
     population *
@@ -1810,6 +1835,18 @@ export function runUnrestPhase(
       (employedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
     );
   }
+  // P7 (D-154, plan §13 item 13): a labour-market world counts institution staff as
+  // employed and measures unemployment against the eligible labour force.
+  const labour = world.labourMarket.enabled;
+  if (labour) {
+    for (const assignment of world.labourMarket.institutionEmployment) {
+      employedByBlock.set(
+        assignment.popBlockId,
+        (employedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
+      );
+    }
+  }
+  const professionById = new Map((definitions?.professions ?? []).map((profession) => [profession.id, profession]));
   // D-137: provinces and their blocks by id once; a province's blocks in ascending id
   // are the country's blocks filtered to it, which the per-province scan read.
   const lookups = buildPoliticsLookups(world);
@@ -1824,6 +1861,7 @@ export function runUnrestPhase(
       let unmetPopulation = 0;
       let workingAge = 0;
       let employed = 0;
+      let eligibleLabour = 0;
       for (const block of lookups.blocksByProvince.get(provinceId) ?? []) {
         const count = populationTotal(block);
         provincePopulation += count;
@@ -1835,6 +1873,10 @@ export function runUnrestPhase(
         }
         workingAge += blockWorkingAge;
         employed += employedByBlock.get(block.id) ?? 0;
+        if (labour) {
+          const profession = professionById.get(block.professionId);
+          if (profession !== undefined) eligibleLabour += labourEligibleWorkforce(block, profession);
+        }
       }
       if (!(provincePopulation > 0)) {
         province.unrest = roundTo(
@@ -1845,7 +1887,13 @@ export function runUnrestPhase(
       }
       const militancy = weightedMilitancy / provincePopulation;
       const unmet = unmetPopulation / provincePopulation;
-      const unemployment = workingAge > 0 ? clamp(1 - employed / workingAge, 0, 1) : 0;
+      const unemployment = labour
+        ? eligibleLabour > 0
+          ? clamp(1 - employed / eligibleLabour, 0, 1)
+          : 0
+        : workingAge > 0
+          ? clamp(1 - employed / workingAge, 0, 1)
+          : 0;
       const overload = Math.min(country.institutions.overload, 1);
       // P6 (D-153): housing worse than the province's 1900 level adds unrest.
       const crowding = provinceCrowding(

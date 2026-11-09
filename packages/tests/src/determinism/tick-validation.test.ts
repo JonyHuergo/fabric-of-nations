@@ -48,6 +48,7 @@ import { loadM5EightPolities } from "@century/data";
 import { GRAIN_ID, productionWorld, reservation } from "../fixtures/m3c.js";
 import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
 import { prePhase6Digest } from "../fixtures/p6Encoding.js";
+import { prePhase7Digest } from "../fixtures/p7Encoding.js";
 
 const SEED = 20_261_023;
 
@@ -89,7 +90,10 @@ const PRE_P5B_HASH_AFTER_22_TICKS = "d1580017f60be441";
 const PRE_P6_HASH_AFTER_22_TICKS = "1b0c4a1e37334b84";
 // P6 schema 34 (D-153) re-pins it: encoding only (schema, simulation and data version
 // strings); restoring them gives the P5b hash (asserted). The world has no demand system.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "9b91fb62e7376098";
+const PRE_P7_HASH_AFTER_22_TICKS = "9b91fb62e7376098";
+// P7 schema 35 (D-154) re-pins it: encoding only (schema and simulation version strings);
+// restoring them gives the P6 hash (asserted). The world has no labour market.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "74795cbc041b566a";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {
@@ -121,6 +125,7 @@ describe("Batch 5 validation boundary and determinism", () => {
     expect(world.dayIndex).toBe(22);
     expect(prePhase5bDigest(world)).toBe(PRE_P5B_HASH_AFTER_22_TICKS);
     expect(prePhase6Digest(world)).toBe(PRE_P6_HASH_AFTER_22_TICKS);
+    expect(prePhase7Digest(world)).toBe(PRE_P7_HASH_AFTER_22_TICKS);
     expect(hashWorld(world)).toBe(PRE_BATCH5_HASH_AFTER_22_TICKS);
   });
 

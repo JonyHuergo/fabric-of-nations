@@ -758,3 +758,130 @@ export const RESOURCE_DISCOVERY_MONTHLY_HAZARD = 1 / 120;
  * (housing worse than people are used to). Dimensionless; PROVISIONAL.
  */
 export const UNREST_CROWDING_WEIGHT = 0.1;
+
+/*
+ * P7 (D-154) labour market, wages, social mobility and urbanisation. Every coefficient
+ * below is PROVISIONAL (P15 calibrates against wage curves, pre-1914 wage series and
+ * occupational change); units, cadence and intended effect are stated with each.
+ *
+ * Wage rule (cadence: first civil day of a month, from the month's employment refresh):
+ *   Δln W_mp = κ↑·max(0, v − u) − κ↓·max(0, u − v) + π·Δln P_m    (customs territory m)
+ *   Δln d_rp = κ_d·((v_rp − u_rp) − (v_mp − u_mp)), then d rescaled to a population-weighted
+ *   mean of 1 over the territory (a normalisation, not a clamp)
+ * with u = unemployed eligible ÷ eligible labour force and v = unfilled offered slots ÷
+ * offered slots. Effective wage = max(W·d, floors) (plan §4.2).
+ */
+
+/**
+ * κ↑, monthly log-wage rise per unit excess of the vacancy rate over the unemployment
+ * rate, 1/month. Tight markets raise wages faster than slack ones lower them (downward
+ * stickiness). PROVISIONAL.
+ */
+export const WAGE_RISE_PER_GAP = 0.1;
+
+/**
+ * κ↓, monthly log-wage fall per unit excess of unemployment over vacancies, 1/month. At
+ * 10 % unemployment and no vacancies a wage falls 0.4 % a month, about 5 % a year: an
+ * unemployment elasticity of about −0.1 per year once prices settle (the wage curve,
+ * Blanchflower & Oswald 1994). PROVISIONAL.
+ */
+export const WAGE_FALL_PER_GAP = 0.04;
+
+/** π, share of the month's consumer-price change passed into wages, dimensionless. PROVISIONAL. */
+export const WAGE_PRICE_PASS_THROUGH = 0.5;
+
+/** κ_d, monthly log-differential change per unit of the province's relative gap, 1/month. PROVISIONAL. */
+export const WAGE_DIFFERENTIAL_PER_GAP = 0.05;
+
+/**
+ * Smoothing of the peasant alternative income (plan §4.2), weight of the new month,
+ * dimensionless: 1/12 makes it a one-year exponential average. PROVISIONAL.
+ */
+export const PEASANT_ALTERNATIVE_MONTHLY_WEIGHT = 1 / 12;
+
+/**
+ * η, monthly change of a building's staffing ceiling per unit of (R − 1), 1/month, where
+ * R is the value added per throughput unit at smoothed prices ÷ its wage bill (plan §4.3).
+ * Hiring to the point where revenue covers the wage, over a few months. PROVISIONAL.
+ */
+export const STAFFING_CEILING_RATE = 0.5;
+
+/**
+ * Lowest staffing used to evaluate a land-using building's marginal product, so the
+ * marginal product of the first worker stays finite (FARM_LABOUR_ELASTICITY < 1).
+ * Dimensionless; a numerical bound, not a behaviour. PROVISIONAL.
+ */
+export const STAFFING_MARGINAL_FLOOR = 0.05;
+
+/**
+ * γ, exponent of minimum-wage compliance in administration quality (plan §4.5):
+ * compliance = quality^γ; the paid wage = market + compliance × max(0, floor − market).
+ * Dimensionless. PROVISIONAL.
+ */
+export const MINIMUM_WAGE_COMPLIANCE_EXPONENT = 1;
+
+/*
+ * Mobility between professions inside a province (plan §5.2), first civil day of a
+ * month after the wage and ceiling updates. Expected income (Harris–Todaro):
+ *   E = wage × (1 − u) × H   (wage professions);  measured income per worker × H
+ *   (self-employed and owners, whose wage only splits income from profit).
+ *   Pressure P = ln(E_b ÷ E_a) − θ;  flow = min(gated movers, ρ·max(0, P)·N_A,
+ *   (vacancies_b + β·labour force_b) in persons).
+ */
+
+/** θ, log expected-income gap needed before anyone changes profession (moving cost and attachment). PROVISIONAL. */
+export const MOBILITY_THRESHOLD = 0.1;
+
+/** ρ, monthly share of a block that moves per unit pressure, 1/month. PROVISIONAL. */
+export const MOBILITY_RATE_PER_PRESSURE = 0.02;
+
+/** β, share of the destination's labour force that may arrive ahead of jobs each month. PROVISIONAL. */
+export const MOBILITY_AHEAD_OF_JOBS_SHARE = 0.05;
+
+/**
+ * Most of a block's population that may leave it by mobility in one month,
+ * dimensionless. A bound standing in for frictions the model does not represent
+ * (documented, not a repair). PROVISIONAL.
+ */
+export const MOBILITY_MONTHLY_MAX_FRACTION = 0.02;
+
+/*
+ * Training places (plan §5.3) use the E5 TRAINEES_PER_INSTRUCTOR above: a trained
+ * profession's monthly entries ≤ its share of the training instructors × trainees per
+ * instructor ÷ (course length in years × 12).
+ */
+
+/*
+ * Migration between provinces in a labour-market world (plan §6.2): same profession,
+ * monthly; pressure = ln(E_destination ÷ E_source) − θ_m with the same expected income
+ * and housing factor; the D-052 border rule and the 1 % inflow cap stay.
+ */
+
+/** θ_m, log expected-income gap needed to move between provinces. PROVISIONAL. */
+export const LABOUR_MIGRATION_THRESHOLD = 0.2;
+
+/** ρ_m, monthly share of a block that migrates per unit pressure, 1/month. PROVISIONAL. */
+export const LABOUR_MIGRATION_RATE_PER_PRESSURE = 0.01;
+
+/*
+ * Housing in the decision (plan §6.3): H = min(1, D ÷ D*)^η_h × (1 + K_h·max(0, c − 1))^−1,
+ * D and D* the destination's dwellings and desired dwellings, c its crowding.
+ */
+
+/** η_h, elasticity of the pull in the dwelling shortfall, dimensionless. PROVISIONAL. */
+export const HOUSING_PULL_ELASTICITY = 0.5;
+
+/** K_h, pull lost per unit crowding above the 1900 level, dimensionless. PROVISIONAL. */
+export const HOUSING_PULL_CROWDING_WEIGHT = 0.5;
+
+/** Monthly labour reports kept in `World.labourMarket.history`. */
+export const LABOUR_HISTORY_MONTHS = 12;
+
+/** Keyed-draw purposes of the labour market (GDD §16.1). */
+export const LABOUR_RETENTION_PURPOSE = "labour.retain";
+export const LABOUR_FILL_PURPOSE = "labour.fill";
+export const INSTITUTION_PROVINCE_PURPOSE = "labour.institution-province";
+export const MOBILITY_ORDER_PURPOSE = "mobility.order";
+export const MOBILITY_AGE_REMAINDER_PURPOSE = "mobility.age-remainder";
+export const LABOUR_MIGRATION_ORDER_PURPOSE = "labour-migration.order";
+export const LABOUR_MIGRATION_DESTINATION_PURPOSE = "labour-migration.destination";

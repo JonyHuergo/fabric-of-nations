@@ -18,6 +18,8 @@
  * corruption and is not a security signature.
  */
 
+import { decodeLabourMarket, encodeLabourMarket, type SerializedLabourMarket } from "./economy/labourState.js";
+import type { LabourMarketState } from "./economy/types.js";
 import {
   decodeSerializedResourceState,
   encodeResourceState,
@@ -1041,6 +1043,8 @@ export type SerializedWorld = {
   readonly demography: DemographyReportState;
   /** P5 natural-resource deposits (D-143 §4), as columns. */
   readonly resources: SerializedResourceState;
+  /** P7 (D-154): written only when the labour market is enabled; absent means disabled. */
+  readonly labourMarket?: SerializedLabourMarket;
   readonly military: SerializedMilitaryState;
   /** M12a provincial ownership/control state; definitions and geometry are static. */
   readonly provinces: SerializedProvinceState;
@@ -1858,6 +1862,7 @@ export function encodeWorld(world: World): SerializedWorld {
     },
     demography: encodeDemographyReport(world.demography),
     resources: encodeResourceState(world.resources),
+    ...(world.labourMarket.enabled ? { labourMarket: encodeLabourMarket(world.labourMarket) } : {}),
     priceIndex: {
       basket: [...world.priceIndex.basket]
         .sort((left, right) => left.goodId - right.goodId)
@@ -4397,6 +4402,12 @@ function decodeWorldPayload(value: unknown): World {
   } catch (error) {
     throw new SaveFormatError(errorMessage(error));
   }
+  let labourMarket: LabourMarketState;
+  try {
+    labourMarket = decodeLabourMarket(payload.labourMarket, "save payload.labourMarket");
+  } catch (error) {
+    throw new SaveFormatError(errorMessage(error));
+  }
   const monetary = decodeMonetaryState(payload.monetary, "save payload.monetary");
   const military = decodeMilitaryState(payload.military, "save payload.military");
   const provinces = decodeProvinceState(payload.provinces);
@@ -4442,6 +4453,7 @@ function decodeWorldPayload(value: unknown): World {
     moneyCoefficients,
     demography,
     resources,
+    labourMarket,
     diagnostics: {
       invariantFailureCount,
       invalidActionCount,

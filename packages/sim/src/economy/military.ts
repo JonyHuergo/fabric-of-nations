@@ -658,6 +658,10 @@ function reconcileRecruitmentEmployment(
     for (const assignment of world.employment) {
       if (assignment.popBlockId === block.id) assigned += assignment.workers;
     }
+    // P7 (D-154): institution staff hold jobs too; they are released after building jobs.
+    for (const assignment of world.labourMarket.institutionEmployment) {
+      if (assignment.popBlockId === block.id) assigned += assignment.workers;
+    }
     let excess = assigned - availableWorkingAge;
     if (excess <= 0) continue;
     const assignments = world.employment
@@ -670,6 +674,15 @@ function reconcileRecruitmentEmployment(
       excess -= release;
     }
     world.employment = world.employment.filter((assignment) => assignment.workers > 0);
+    if (excess > 0) {
+      for (const assignment of world.labourMarket.institutionEmployment.filter((entry) => entry.popBlockId === block.id)) {
+        if (excess <= 0) break;
+        const release = Math.min(assignment.workers, excess);
+        assignment.workers -= release;
+        excess -= release;
+      }
+      world.labourMarket.institutionEmployment = world.labourMarket.institutionEmployment.filter((assignment) => assignment.workers > 0);
+    }
   }
   if (removedAny) world.employmentDirty = true;
 }

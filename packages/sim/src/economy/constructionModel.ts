@@ -19,6 +19,7 @@ import {
   CONSTRUCTION_WORKING_CAPITAL_DAYS,
 } from "./constants.js";
 import { eligibleWorkforceForBlock } from "./employment.js";
+import { labourEligibleWorkforce } from "./labourMarket.js";
 import type {
   BuildingDef,
   ConstructionProject,
@@ -130,6 +131,13 @@ export function constructionIdleWorkersByBlock(
       (assigned.get(assignment.popBlockId) ?? 0) + assignment.workers,
     );
   }
+  // P7 (D-154): institution staff are employed too; eligibility is the labour rule.
+  const labour = world.labourMarket.enabled;
+  if (labour) {
+    for (const assignment of world.labourMarket.institutionEmployment) {
+      assigned.set(assignment.popBlockId, (assigned.get(assignment.popBlockId) ?? 0) + assignment.workers);
+    }
+  }
   const professionById = new Map(
     definitions.professions.map((profession) => [profession.id, profession]),
   );
@@ -138,7 +146,7 @@ export function constructionIdleWorkersByBlock(
     if (!provinceIds.has(block.provinceId)) continue;
     const profession = professionById.get(block.professionId);
     if (profession === undefined) continue;
-    const eligible = eligibleWorkforceForBlock(block, profession);
+    const eligible = labour ? labourEligibleWorkforce(block, profession) : eligibleWorkforceForBlock(block, profession);
     const already = assigned.get(block.id) ?? 0;
     const available = Math.floor(eligible - already);
     idle.set(block.id, Math.max(0, available));

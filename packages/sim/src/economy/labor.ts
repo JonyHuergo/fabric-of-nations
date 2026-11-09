@@ -16,11 +16,14 @@
  * new profession, payment, or duplicate people.
  */
 
+import { buildLabourWageTable, institutionPayroll, institutionStaff } from "./labourMarket.js";
+import { healthStaffFloor, laborHoursFactor } from "./labourLaws.js";
+export { healthStaffFloor, laborHoursFactor, laborMinimumWageRUSDPerYear } from "./labourLaws.js";
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD, RATE_DECIMAL_PLACES } from "../population/constants.js";
 import { populationTotal, workingAgePopulation } from "../population/state.js";
 import { localWageIndex } from "./localWages.js";
-import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
+import type { Day, Id, Rate } from "../types.js";
 import {
   requireFiniteNumber,
   requireInteger,
@@ -37,12 +40,7 @@ import {
   HEALTH_QUALITY_LITERACY_WEIGHT,
   HEALTH_QUALITY_STAFFING_WEIGHT,
   HEALTH_TARGET_STAFF_PER_CAPITA,
-  LABOR_HOURS_CAPACITY_MIN,
   LABOR_HOURS_MORTALITY_IMPROVEMENT,
-  LABOR_MIN_HOURS_PER_WEEK,
-  LABOR_STANDARD_HOURS_PER_WEEK,
-  MAX_LABOR_HOURS_PER_WEEK,
-  MAX_LABOR_MINIMUM_WAGE_RUSD_PER_YEAR,
   MAX_TRAINING_BUDGET_RUSD_PER_YEAR,
   MAX_TRAINING_STIPEND_RUSD_PER_YEAR,
   MIN_COMBINED_MORTALITY_FACTOR,
@@ -57,7 +55,6 @@ import {
   TRAINING_QUALITY_LITERACY_WEIGHT,
   TRAINING_TIME_SHARE,
 } from "./constants.js";
-import { lawDefinition } from "./politics.js";
 import { deriveEducation } from "./technology.js";
 import type {
   Country,
@@ -65,7 +62,6 @@ import type {
   JournalLine,
   LaborPolicyInput,
   LaborPolicyState,
-  LawDef,
 } from "./types.js";
 import {
   buildCountryPopulationIndex,
@@ -96,15 +92,6 @@ function countryBlocks(
   return countryPopBlocks(world, country.id, index);
 }
 
-function lawInSlot(
-  country: Country,
-  definitions: EconomyDefinitions | undefined,
-  slot: "labor" | "health",
-): LawDef | null {
-  const politics = definitions?.politics;
-  if (politics === undefined) return null;
-  return lawDefinition(politics, country.laws[slot]);
-}
 
 /** Neutral E5 policy for worlds without labor/health inputs. */
 export function neutralLaborPolicyState(): LaborPolicyState {
@@ -231,33 +218,7 @@ export function assertValidLaborPolicyState(
   }
 }
 
-/** Statutory minimum-wage floor for a country, or 0 when none applies. */
-export function laborMinimumWageRUSDPerYear(
-  country: Country,
-  definitions: EconomyDefinitions | undefined,
-): MoneyRUSD {
-  const law = lawInSlot(country, definitions, "labor");
-  if (law === null) return 0;
-  return clamp(law.laborMinimumWageRUSDPerYear, 0, MAX_LABOR_MINIMUM_WAGE_RUSD_PER_YEAR);
-}
 
-/**
- * Effective hours factor for capacity and wages. The provisional 60-hour week is
- * the baseline; a statutory shorter week scales both proportionally.
- */
-export function laborHoursFactor(
-  country: Country,
-  definitions: EconomyDefinitions | undefined,
-): Rate {
-  const law = lawInSlot(country, definitions, "labor");
-  if (law === null || !(law.laborHoursPerWeek > 0)) return 1;
-  const hours = clamp(
-    law.laborHoursPerWeek,
-    LABOR_MIN_HOURS_PER_WEEK,
-    MAX_LABOR_HOURS_PER_WEEK,
-  );
-  return clamp(hours / LABOR_STANDARD_HOURS_PER_WEEK, LABOR_HOURS_CAPACITY_MIN, 1);
-}
 
 /** Mortality factor from a shorter statutory week, bounded and one-directional. */
 export function laborHoursMortalityFactor(
@@ -268,15 +229,6 @@ export function laborHoursMortalityFactor(
   return 1 - LABOR_HOURS_MORTALITY_IMPROVEMENT * (1 - factor);
 }
 
-/** Enacted health-law minimum staff share, or 0. */
-export function healthStaffFloor(
-  country: Country,
-  definitions: EconomyDefinitions | undefined,
-): Rate {
-  const law = lawInSlot(country, definitions, "health");
-  if (law === null) return 0;
-  return clamp(law.healthStaffFloor, 0, 1);
-}
 
 /** Derived public-health service from the existing administration clerk base. */
 export interface HealthDerived {
@@ -322,8 +274,15 @@ export function deriveHealth(
     const profession = professionById.get(block.professionId);
     if (profession !== undefined && keys.has(profession.key)) clerkPopulation += count;
   }
-  const healthStaff = clerkPopulation * share;
-  const administrationStaff = clerkPopulation - healthStaff;
+  let healthStaff = clerkPopulation * share;
+  let administrationStaff = clerkPopulation - healthStaff;
+  // P7 (D-154, plan Q3): in a labour-market world the health service's staff are the
+  // medics it employs and the administration's the bureaucrats it employs.
+  if (world.labourMarket.enabled) {
+    healthStaff = institutionStaff(world, country.id, "health");
+    administrationStaff = institutionStaff(world, country.id, "administration");
+    clerkPopulation = healthStaff + administrationStaff;
+  }
   const staffingRatio =
     population > 0
       ? clamp(healthStaff / population / HEALTH_TARGET_STAFF_PER_CAPITA, 0, 1)
@@ -544,6 +503,7 @@ export function runTrainingPhase(
   const professionById = new Map(
     definitions.professions.map((profession) => [profession.id, profession]),
   );
+  const labourWages = world.labourMarket.enabled ? buildLabourWageTable(world, definitions) : null;
 
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     const derived = derivedByCountry.get(country.id);
@@ -551,7 +511,19 @@ export function runTrainingPhase(
     if (!(derived.participation > 0)) continue;
     const labor = country.labor ?? neutralLaborPolicyState();
     const eligible = trainingEligibleBlocks(world, country, populationIndex);
-    const requestedPayroll = labor.trainingBudgetRUSDPerYear / yearDays;
+    // P7 (D-154, plan Q4): a labour-market world pays the training institution's
+    // assigned instructors the market wage; elsewhere the budget goes to the academics.
+    const owedInstructors =
+      labourWages !== null
+        ? institutionPayroll(world, definitions, country.id, ["training"], yearDays, labourWages).map((entry) => ({
+            id: entry.popBlockId,
+            weight: entry.population,
+          }))
+        : null;
+    const requestedPayroll =
+      owedInstructors === null
+        ? labor.trainingBudgetRUSDPerYear / yearDays
+        : owedInstructors.reduce((total, entry) => total + entry.weight, 0);
     const requestedStipend =
       (labor.trainingStipendPerTraineeRUSDPerYear * derived.trainees) / yearDays;
     const requested = requestedPayroll + requestedStipend;
@@ -564,13 +536,15 @@ export function runTrainingPhase(
     const stipendPaid = requestedStipend * scale;
 
     if (payrollPaid > 0) {
-      const academicBlocks = countryBlocks(world, country, populationIndex)
-        .filter(
-          (block) =>
-            populationTotal(block) > 0 &&
-            academicProfessionKeys.has(professionById.get(block.professionId)?.key ?? ""),
-        )
-        .map((block) => ({ id: block.id, weight: populationTotal(block) }));
+      const academicBlocks =
+        owedInstructors ??
+        countryBlocks(world, country, populationIndex)
+          .filter(
+            (block) =>
+              populationTotal(block) > 0 &&
+              academicProfessionKeys.has(professionById.get(block.professionId)?.key ?? ""),
+          )
+          .map((block) => ({ id: block.id, weight: populationTotal(block) }));
       const allocations = allocateExact(payrollPaid, academicBlocks);
       const lines: JournalLine[] = [];
       for (const block of academicBlocks) {

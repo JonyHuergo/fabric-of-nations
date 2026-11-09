@@ -40,6 +40,7 @@ import {
   isTerminalDayIndex,
 } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
+import { buildLabourWageTable, institutionPayroll } from "./labourMarket.js";
 import { populationTotal } from "../population/state.js";
 import type { DayIndex, Id } from "../types.js";
 import {
@@ -519,6 +520,10 @@ function executeFiscalPhase(
     Id,
     { requested: number; paid: number; shortfall: number }
   >();
+  const labourWages =
+    world.labourMarket.enabled && options.economyDefinitions !== undefined
+      ? buildLabourWageTable(world, options.economyDefinitions)
+      : null;
   if (politics !== undefined && world.politics.enabled) {
     for (const plan of plans) {
       const country = plan.group.country;
@@ -527,14 +532,24 @@ function executeFiscalPhase(
         throw new RangeError(`invalid administration funding for country ${String(country.id)}`);
       }
       if (!(requested > 0)) continue;
-      const eligible = plan.group.blocks.filter((block) => {
-        if (!(block.population > 0)) return false;
-        const key = professionKeyById.get(block.professionId) ?? "";
-        return administrationProfessionKeys.has(key);
-      });
+      // P7 (D-154, plan Q3, Q4): in a labour-market world the administration and the
+      // health service pay their assigned staff the market wage; elsewhere the M8
+      // payroll is shared by the administration professions' population.
+      const owed =
+        labourWages !== null && options.economyDefinitions !== undefined
+          ? institutionPayroll(world, options.economyDefinitions, country.id, ["administration", "health"], yearDays, labourWages)
+          : null;
+      const eligible =
+        owed ??
+        plan.group.blocks.filter((block) => {
+          if (!(block.population > 0)) return false;
+          const key = professionKeyById.get(block.professionId) ?? "";
+          return administrationProfessionKeys.has(key);
+        });
+      const owedTotal = owed === null ? requested : owed.reduce((total, entry) => total + entry.population, 0);
       const available = index.get("country", country.id, "treasury-cash").balanceRUSD;
       const payableCeiling = Math.max(0, available - plan.reserveTargetRUSD);
-      const payable = eligible.length > 0 ? Math.min(requested, payableCeiling) : 0;
+      const payable = eligible.length > 0 ? Math.min(owedTotal, payableCeiling) : 0;
       const allocations =
         payable > 0 ? allocateProportionally(payable, eligible) : new Map<Id, number>();
       if (payable > 0) {
@@ -558,14 +573,14 @@ function executeFiscalPhase(
           targetEntityId: null,
         });
       }
-      const shortfall = Math.max(0, requested - payable);
+      const shortfall = Math.max(0, owedTotal - payable);
       administrationByCountry.set(country.id, {
-        requested,
+        requested: owedTotal,
         paid: payable,
         shortfall,
       });
       accumulateBudgetMemo(stagedFinance, country.id, {
-        administrationRequestedRUSD: requested,
+        administrationRequestedRUSD: owedTotal,
         administrationShortfallRUSD: shortfall,
       });
     }

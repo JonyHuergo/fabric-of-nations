@@ -6,6 +6,8 @@
  * production, market clearing, wages, or pricing.
  */
 
+import { initialiseLabourMarket } from "./labourInit.js";
+import { refreshLabourEmployment } from "./labourMarket.js";
 import { normaliseFarmTechniques } from "./agriculture.js";
 import { assertValidResourceState, createResourceState } from "./resourceState.js";
 import { calibrateDemographyForCountries } from "./demographyFactors.js";
@@ -1499,6 +1501,11 @@ export function createEconomyWorld(
   world.construction.nextBuildingId =
     world.buildings.reduce((max, building) => Math.max(max, building.id), 0) + 1;
 
+  // P7 (D-154): the labour market starts from the P2b province wages (plan §4.1); its
+  // first refresh employs the institutions' staff (medics among them), so the P4
+  // calibration below sees the health service the first day will have.
+  initialiseLabourMarket(world, scenario.definitions);
+  if (world.labourMarket.enabled) refreshLabourEmployment(world, scenario.definitions, world.startDayIndex);
   // P4 (D-142): the blocks were calibrated with neutral factors; fix their residuals
   // under the countries' start-of-game health, sanitation and contraception.
   calibrateDemographyForCountries(world, scenario.definitions);

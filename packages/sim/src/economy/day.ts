@@ -8,6 +8,7 @@
  */
 
 import { cloneResourceState } from "./resourceState.js";
+import { cloneLabourMarketState } from "./labourState.js";
 import { extractFromDeposit, runDiscoveryPhase, type DiscoveryPhaseResult } from "./resources.js";
 import {
   accumulateDemography,
@@ -86,6 +87,7 @@ import {
 } from "./construction.js";
 import { runDebtPhase, type DebtPhaseResult } from "./debt.js";
 import { runMigrationPhase, type MigrationDayResult } from "./migration.js";
+import { runLabourMonthPhase, type LabourMonthPhaseResult } from "./mobility.js";
 import {
   runTradeArrivals,
   runTradeDispatchPhase,
@@ -321,6 +323,7 @@ export function cloneWorld(
     },
     demography: cloneDemographyReport(source.demography),
     resources: cloneResourceState(source.resources),
+    labourMarket: cloneLabourMarketState(source.labourMarket),
     priceIndex: {
       ...source.priceIndex,
       basket: source.priceIndex.basket.map((item) => ({ ...item })),
@@ -1312,6 +1315,20 @@ function closeMonthEndIfDue(world: World, dayIndex: DayIndex): FinanceCloseResul
 }
 
 /** Run one integrated economic day on the supplied (already staged) world. */
+/** The day's migration summary in a labour-market world (flows are reported by the labour phase). */
+function labourMigrationResult(dayIndex: DayIndex, phase: LabourMonthPhaseResult | null): MigrationDayResult {
+  return {
+    ran: phase?.ran === true,
+    dayIndex,
+    flows: [],
+    totalPeople: (phase?.mobilityPeople ?? 0) + (phase?.migrationPeople ?? 0),
+    totalFinancialTransferRUSD: 0,
+    sourceBlocksConsidered: 0,
+    destinationsCappedByInflowLimit: 0,
+    employmentRefresh: phase?.employmentRefresh ?? null,
+  };
+}
+
 export function runEconomicDay(
   world: World,
   populationDefinitions: PopulationDefinitions,
@@ -1432,10 +1449,16 @@ export function runEconomicDay(
   // day's market phase. The migration phase owns the post-flow employment repair
   // when it moves people, so the integrated day does not repeat it.
   observe?.("migration");
-  const migration = runMigrationPhase(world, economyDefinitions, dayIndex, {
-    validateWorld: false,
-    restoreOnFailure: options.integrity !== "phase",
-  });
+  // P7 (D-154): a labour-market world replaces M5 migration with the monthly labour
+  // phase (wages, ceilings, mobility, migration, retirement; plan §5.1). The staged
+  // day (or the rollback runner in phase mode) restores the world on failure.
+  const labourMonth = world.labourMarket.enabled ? runLabourMonthPhase(world, economyDefinitions, dayIndex) : null;
+  const migration = world.labourMarket.enabled
+    ? labourMigrationResult(dayIndex, labourMonth)
+    : runMigrationPhase(world, economyDefinitions, dayIndex, {
+        validateWorld: false,
+        restoreOnFailure: options.integrity !== "phase",
+      });
   if (migration.employmentRefresh !== null) {
     employment = migration.employmentRefresh;
   }

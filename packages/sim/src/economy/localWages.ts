@@ -15,6 +15,7 @@
  */
 
 import { populationTotal } from "../population/state.js";
+import { buildLabourWageTable } from "./labourMarket.js";
 import type { Id } from "../types.js";
 import type { World } from "../world.js";
 import type { EconomyDefinitions } from "./types.js";
@@ -29,6 +30,21 @@ export function localWageIndex(
 ): number {
   if (definitions === undefined || professionKeys.size === 0) return 1;
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
+  // P7 (D-154): a labour-market world prices its staff at the current paid wages.
+  if (world.labourMarket.enabled && definitions.labourMarket !== undefined) {
+    const wages = buildLabourWageTable(world, definitions);
+    let localLabour = 0;
+    let referenceLabour = 0;
+    for (const block of blocks) {
+      const profession = professionById.get(block.professionId);
+      if (profession === undefined || !professionKeys.has(profession.key)) continue;
+      const people = populationTotal(block);
+      if (people <= 0) continue;
+      localLabour += people * wages.paid(block.provinceId, profession.id, true);
+      referenceLabour += people * profession.baseWage1900RUSDPerYear;
+    }
+    return localLabour > 0 && referenceLabour > 0 ? localLabour / referenceLabour : 1;
+  }
   let wagesByProvince = provinceWages;
   if (wagesByProvince === undefined) {
     const built = new Map<Id, readonly number[]>();

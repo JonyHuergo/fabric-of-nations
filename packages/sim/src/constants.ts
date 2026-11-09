@@ -29,9 +29,13 @@
  * control, claims and special-status state plus the deterministic ownership and
  * control mutations. P6 (0.30.0, D-153) adds the linear expenditure system of
  * households, smoothed income and prices, saving by stratum, and the dwelling stock
- * with its depreciation, crowding mortality and unrest.
+ * with its depreciation, crowding mortality and unrest. P7 (0.31.0, D-154) adds the
+ * labour market: monthly wages per customs territory and profession with provincial
+ * differentials and floors, staffing ceilings, institutions as employers, own-province
+ * work, mobility and migration through a conserving reclassification with block
+ * creation and retirement, urbanisation and the minimum wage's coverage and compliance.
  */
-export const SIM_VERSION = "0.30.0";
+export const SIM_VERSION = "0.31.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;
@@ -91,8 +95,13 @@ export const SIM_VERSION = "0.30.0";
  * dwelling; per market the smoothed prices. They are encoded on every record of a
  * world that has them and on none otherwise. Schema-33 worlds are reported as
  * incompatible (D-120).
+ * P7 (schema 35, D-154) adds `World.labourMarket` (territory wages, provincial
+ * differentials and alternative incomes, staffing ceilings, institution assignments, the
+ * block-id allocator, retired blocks and the monthly history). It is encoded only when
+ * the labour market is enabled; legacy worlds encode as before. Schema-34 worlds are
+ * reported as incompatible (D-120).
  */
-export const WORLD_SCHEMA_VERSION = 34;
+export const WORLD_SCHEMA_VERSION = 35;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 2;

@@ -20,6 +20,7 @@
  * guard for the same result object.
  */
 
+import { buildLabourWageTable, jobIsCovered, type LabourWageTable } from "./labourMarket.js";
 import {
   assertValidDayIndex,
   dayIndexToCivilDate,
@@ -59,6 +60,7 @@ import type {
   PendingTransaction,
 } from "./market.js";
 import type {
+  BuildingDef,
   BuildingInstance,
   EconomyDefinitions,
   EmploymentAssignment,
@@ -995,6 +997,12 @@ function buildWageGroups(
     readonly minimumWageRUSDPerYear: number;
     readonly hoursFactor: number;
   },
+  /**
+   * P7 (D-154): in a labour-market world, the building's own-province effective wage
+   * with the minimum wage's coverage and compliance (plan §4.1, §4.5); absent: the P2b
+   * table and the E5 floor.
+   */
+  labour?: { readonly wages: LabourWageTable; readonly definition: BuildingDef },
 ): WageGroup[] {
   const groups = new Map<Id, WageGroup>();
   for (const assignment of lookup.assignmentsByBuilding.get(building.id) ?? []) {
@@ -1006,10 +1014,17 @@ function buildWageGroups(
     // E5: statutory floor and hours standard scale the wage obligation; the block's
     // vocational qualification adds a premium. All three are real labor-market
     // channels, not display modifiers.
-    const annualBase = Math.max(
-      provinceWageRUSDPerYear(lookup.wagesByProvince.get(block.provinceId), profession),
-      laborStandards.minimumWageRUSDPerYear,
-    );
+    const annualBase =
+      labour === undefined
+        ? Math.max(
+            provinceWageRUSDPerYear(lookup.wagesByProvince.get(block.provinceId), profession),
+            laborStandards.minimumWageRUSDPerYear,
+          )
+        : labour.wages.paid(
+            building.provinceId,
+            profession.id,
+            jobIsCovered(labour.definition, profession, labour.wages.coverage(building.provinceId), labour.wages.domesticServiceKeys),
+          );
     const dailyWage =
       (annualBase * laborStandards.hoursFactor * qualificationWageFactor(block)) /
       yearDays;
@@ -1233,6 +1248,7 @@ function settleMarketDaysInternal(
     const yearDays = daysInYear(dayIndexToCivilDate(dayIndex).year);
     const wageSettlements: WageSettlement[] = [];
     const wageLookup = buildWageLookup(world);
+    const labourWages = world.labourMarket.enabled ? buildLabourWageTable(world, definitions) : undefined;
     const wageEntries: JournalEntryInput[] = [];
     for (const building of inIdOrder(world.buildings)) {
       if (!building.operational) continue;
@@ -1255,6 +1271,7 @@ function settleMarketDaysInternal(
                 hoursFactor: laborHoursFactor(owner, definitions),
               };
         })(),
+        labourWages === undefined ? undefined : { wages: labourWages, definition },
       );
       if (grossGroups.length === 0) continue;
       // P5 (D-143 §2): the owner block's kept food is a wage in kind, up to its cash

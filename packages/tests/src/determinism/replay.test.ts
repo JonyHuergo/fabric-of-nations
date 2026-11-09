@@ -1,4 +1,5 @@
 ﻿import { prePhase4Digest } from "../fixtures/p4Encoding.js";
+import { prePhase7Digest } from "../fixtures/p7Encoding.js";
 import { prePhase5Digest } from "../fixtures/p5Encoding.js";
 import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
 import { prePhase6Digest } from "../fixtures/p6Encoding.js";
@@ -62,7 +63,9 @@ describe("determinism", () => {
     // P6 schema 34 (D-153): encoding only — restoring schema 33, simulation 0.29.0 and
     // data m3-economy-v13 reproduces the P5b digest; this world has no demand system.
     expect(prePhase6Digest(world)).toBe("88433b30fbb759be");
-    expect(hashWorld(world)).toBe("a9195048d679521e");
+    // P7 schema 35 (D-154): encoding only — restoring schema 34 and simulation 0.30.0 reproduces the P6 digest; this world has no labour market.
+    expect(prePhase7Digest(world)).toBe("a9195048d679521e");
+    expect(hashWorld(world)).toBe("1ae35968cf7255ce");
   });
 
   test("a one-year economic simulation is deterministic and save/resume safe", () => {

@@ -1571,6 +1571,7 @@ export function assertValidEconomyState(
   }
 
   const popBlockIds = new Set<number>(world.popBlocks.map((block) => block.id));
+  const retiredBlockIds = new Set<number>(world.labourMarket.retiredPopBlockIds);
   const countryIds = new Set<number>(world.countries.map((country) => country.id));
   // Generic owner-reference invariant: every owner-owned account must point at
   // an existing owner, regardless of subtype or category. This intentionally
@@ -1592,7 +1593,13 @@ export function assertValidEconomyState(
         );
       }
     } else if (account.ownerKind === "popBlock") {
-      if (account.ownerId === null || !popBlockIds.has(account.ownerId)) {
+      // P7 (D-154): a retired block's accounts are kept for the ledger, its cash and
+      // other assets at zero (plan §5.4 item 7).
+      if (account.ownerId !== null && retiredBlockIds.has(account.ownerId)) {
+        if (account.category === "asset" && Math.abs(account.balanceRUSD) > 0) {
+          throw new RangeError(`retired popBlock ${String(account.ownerId)} still holds ${account.subtype} ${String(account.balanceRUSD)}`);
+        }
+      } else if (account.ownerId === null || !popBlockIds.has(account.ownerId)) {
         throw new RangeError(
           `popBlock-owned ${account.subtype} account ${String(account.id)} references unknown popBlock owner ${String(account.ownerId)}`,
         );
@@ -1662,6 +1669,16 @@ export function assertValidEconomyState(
       throw new RangeError(
         `employment assignment references unknown popBlock ${String(assignment.popBlockId)}`,
       );
+    }
+    assignedByBlock.set(
+      assignment.popBlockId,
+      (assignedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
+    );
+  }
+  // P7 (D-154): institution staff hold their one job too (plan Q4).
+  for (const assignment of world.labourMarket.institutionEmployment) {
+    if (!blockById.has(assignment.popBlockId)) {
+      throw new RangeError(`institution assignment references unknown popBlock ${String(assignment.popBlockId)}`);
     }
     assignedByBlock.set(
       assignment.popBlockId,

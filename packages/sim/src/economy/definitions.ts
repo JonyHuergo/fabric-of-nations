@@ -34,6 +34,7 @@ import {
 } from "./types.js";
 import { assertValidPoliticsDefinitions } from "./politics.js";
 import { assertValidTechnologyDefinitions } from "./technology.js";
+import { assertValidLabourDefinitions } from "./labourInit.js";
 
 function assertNonNegative(value: unknown, path: string): number {
   const number = requireFiniteNumber(value, path);
@@ -587,4 +588,6 @@ export function assertValidEconomyDefinitions(definitions: EconomyDefinitions): 
       }
     }
   }
+  // P7 (D-154): profession roles, gates and the labour-market configuration.
+  assertValidLabourDefinitions(definitions);
 }

@@ -17,6 +17,11 @@ import type { DayIndex, Id } from "../types.js";
 import type { World } from "../world.js";
 import { buildProvinceOwnerMap } from "./country.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
+import {
+  assertValidLabourEmployment,
+  refreshLabourEmployment,
+  repairLabourEmploymentAfterDemography,
+} from "./labourMarket.js";
 import type {
   BuildingDef,
   BuildingInstance,
@@ -161,65 +166,8 @@ function keyedTie(
   });
 }
 
-/**
- * Largest-remainder apportionment of `total` integer units across weights.
- * Callers must ensure `total <= sum(weights)`. Equal remainders use the supplied
- * keyed tie keys ascending; the original index is only a final collision fallback.
- */
-function apportionLargestRemainder(
-  total: number,
-  weights: readonly number[],
-  tieKeys: readonly number[],
-): number[] {
-  if (!Number.isInteger(total) || total < 0) {
-    throw new RangeError("apportionment total must be a non-negative integer");
-  }
-  const allocations = new Array<number>(weights.length).fill(0);
-  if (total === 0 || weights.length === 0) return allocations;
-  let totalWeight = 0;
-  for (let index = 0; index < weights.length; index += 1) {
-    const weight = weights[index] ?? 0;
-    if (!Number.isInteger(weight) || weight < 0) {
-      throw new RangeError("apportionment weights must be non-negative integers");
-    }
-    totalWeight += weight;
-  }
-  if (totalWeight === 0) return allocations;
-  if (total > totalWeight) {
-    throw new RangeError("apportionment total cannot exceed the sum of weights");
-  }
-
-  let allocated = 0;
-  const remainders: Array<{ index: number; remainder: number; tie: number }> = [];
-  for (let index = 0; index < weights.length; index += 1) {
-    const weight = weights[index] ?? 0;
-    const exact = (total * weight) / totalWeight;
-    const whole = Math.floor(exact);
-    allocations[index] = whole;
-    allocated += whole;
-    if (whole < weight) {
-      remainders.push({
-        index,
-        remainder: exact - whole,
-        tie: tieKeys[index] ?? 0,
-      });
-    }
-  }
-
-  let leftover = total - allocated;
-  remainders.sort(
-    (left, right) =>
-      right.remainder - left.remainder || left.tie - right.tie || left.index - right.index,
-  );
-  for (let index = 0; index < leftover; index += 1) {
-    const candidate = remainders[index];
-    if (candidate === undefined) {
-      throw new RangeError("largest-remainder apportionment ran out of capacity");
-    }
-    allocations[candidate.index] = (allocations[candidate.index] ?? 0) + 1;
-  }
-  return allocations;
-}
+export { apportionLargestRemainder } from "./apportion.js";
+import { apportionLargestRemainder } from "./apportion.js";
 
 function assignmentKey(popBlockId: Id, buildingInstanceId: Id, professionId: Id): string {
   return `${String(popBlockId)}:${String(buildingInstanceId)}:${String(professionId)}`;
@@ -333,6 +281,11 @@ export function assertValidEmploymentState(
   world: World,
   definitions: EconomyDefinitions,
 ): void {
+  // P7 (D-154): a labour-market world has its own rules (own province, ceilings, institutions).
+  if (world.labourMarket.enabled) {
+    assertValidLabourEmployment(world, definitions);
+    return;
+  }
   validateAssignments(world, definitions, world.employment);
 }
 
@@ -362,6 +315,11 @@ export function refreshEmployment(
   assertValidEconomyDefinitions(definitions);
   if (definitions.dataVersion !== world.dataVersion || definitions.scenarioId !== world.scenarioId) {
     throw new RangeError("economy definitions do not match the world data/scenario identity");
+  }
+  // P7 (D-154): the labour-market allocator (own province, ceilings, institutions).
+  if (world.labourMarket.enabled) {
+    if (definitions.labourMarket === undefined) throw new RangeError("labour-market world needs labour-market definitions");
+    return refreshLabourEmployment(world, definitions, dayIndex);
   }
 
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
@@ -740,6 +698,7 @@ export function repairEmploymentAfterDemography(
   world: World,
   definitions: EconomyDefinitions,
 ): boolean {
+  if (world.labourMarket.enabled) return repairLabourEmploymentAfterDemography(world, definitions);
   const professionById = new Map(definitions.professions.map((p) => [p.id, p]));
   const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
   const byBlock = new Map<Id, EmploymentAssignment[]>();

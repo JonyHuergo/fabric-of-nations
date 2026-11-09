@@ -21,6 +21,7 @@
   type PopulationScenarioDef,
   type World,
 } from "@century/sim";
+import { prePhase7Digest } from "../fixtures/p7Encoding.js";
 import { prePhase5Digest } from "../fixtures/p5Encoding.js";
 import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
 import { prePhase6Digest } from "../fixtures/p6Encoding.js";
@@ -135,7 +136,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // above restores m3-economy-v12 and still gives the P5 digest.
     // P6 schema 34 (D-153): encoding only; restoring the three version strings gives the P5b digest.
     expect(prePhase6Digest(world)).toBe("2a0c4e6417cc51e6");
-    expect(hashWorld(world)).toBe("3237a586f4216a60");
+    // P7 schema 35 (D-154): encoding only — restoring schema 34 and simulation 0.30.0 reproduces the P6 digest; this world has no labour market.
+    expect(prePhase7Digest(world)).toBe("3237a586f4216a60");
+    expect(hashWorld(world)).toBe("b7069848e4da0fd2");
     const restored = deserializeWorld(serializeWorld(world));
     expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(tick(restored).advanced).toBe(false);
@@ -358,7 +361,9 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // above restores m3-economy-v12 and still gives the P5 digest.
     // P6 schema 34 (D-153): encoding only; restoring the three version strings gives the P5b digest.
     expect(prePhase6Digest(world)).toBe("96854a837daea17d");
-    expect(hashWorld(world)).toBe("4f0c32c95770d5bb");
+    // P7 schema 35 (D-154): encoding only — restoring schema 34 and simulation 0.30.0 reproduces the P6 digest; this world has no labour market.
+    expect(prePhase7Digest(world)).toBe("4f0c32c95770d5bb");
+    expect(hashWorld(world)).toBe("47a6009fd9a82dd1");
   });
 });
 

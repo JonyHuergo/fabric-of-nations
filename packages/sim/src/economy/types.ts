@@ -100,6 +100,68 @@ export interface ProfessionDef {
   trainingCostRUSD: MoneyRUSD;
   /** Labor productivity modifier; strictly positive and dimensionless. */
   laborProductivityModifier: number;
+  /**
+   * P7 (D-154): behaviour roles. Behaviour comes from roles, never from profession keys
+   * (GDD §6.2). Absent in legacy definitions, which keep their key-based lookups.
+   */
+  roles?: ProfessionRole[];
+  /** P7 (plan §5.3): entry gates of the profession; absent or empty means none. */
+  gates?: ProfessionGate[];
+  /** P7: legal entry. A closed profession takes no movers (exit only). Default open. */
+  entry?: "open" | "closed";
+  /** P7 (plan §3.2, §6.1): where the profession's people live. Default by job. */
+  settlement?: ProfessionSettlement;
+  /** P7 training course length in years (professions with the training gate). */
+  courseLengthYears?: number;
+  /** P7 capital a mover's household needs per person to enter (capital gate), RUSD. */
+  entryCapitalRUSD?: MoneyRUSD;
+}
+
+/** P7 (D-154) behaviour roles of a profession. */
+export const PROFESSION_ROLES = [
+  "subsistence",
+  "wage-labour",
+  "owns-capital",
+  "management",
+  "research",
+  "training",
+  "owner-operator",
+  "military-enlisted",
+  "military-command",
+  "education",
+  "health",
+  "technical",
+  "administration",
+  "clergy",
+  "owns-land",
+] as const;
+export type ProfessionRole = (typeof PROFESSION_ROLES)[number];
+
+/** P7 entry gates (plan §5.3). */
+export const PROFESSION_GATES = ["literacy", "training", "capital", "law"] as const;
+export type ProfessionGate = (typeof PROFESSION_GATES)[number];
+
+/** P7 settlement of a profession's people (plan §3.2 last column). */
+export const PROFESSION_SETTLEMENTS = ["rural", "urban", "by-job"] as const;
+export type ProfessionSettlement = (typeof PROFESSION_SETTLEMENTS)[number];
+
+/**
+ * P7 (plan Q3, Q4): public institutions that employ staff. Each is staffed by the
+ * professions holding the role of the same name.
+ */
+export const INSTITUTION_KINDS = ["administration", "health", "education", "research", "training"] as const;
+export type InstitutionKind = (typeof INSTITUTION_KINDS)[number];
+
+/**
+ * P7 (D-154): the labour-market configuration. Its presence in the definitions turns
+ * the labour market on (plan Q21); legacy definitions omit it and keep static wages.
+ */
+export interface LabourMarketDefinitions {
+  /**
+   * Building definition keys whose jobs are domestic service (minimum-wage coverage,
+   * plan §4.5). Farm employment is every job of an agriculture-sector building.
+   */
+  domesticServiceBuildingKeys: string[];
 }
 
 export interface GoodQuantityDef {
@@ -244,6 +306,8 @@ export interface EconomyDefinitions {
    * `World.politics.enabled = false` and no M8 effects (D-076).
    */
   politics?: PoliticsDefinitions;
+  /** P7 (D-154): present in labour-market worlds only (plan Q21). */
+  labourMarket?: LabourMarketDefinitions;
   /**
    * M9 validated technology content. Omitted for legacy fixtures, which then have
    * `World.technology.enabled = false` and no M9 effects (D-077).
@@ -1262,6 +1326,12 @@ export interface LawDef {
    */
   laborMinimumWageRUSDPerYear: MoneyRUSD;
   /**
+   * P7 (plan §4.5): which employees the floor covers in a labour-market world. The
+   * self-employed are never covered. Absent: farm employees and domestic service are
+   * both covered (the E5 behaviour of flooring every wage obligation).
+   */
+  laborMinimumWageCoverage?: { farmEmployees: boolean; domesticService: boolean };
+  /**
    * E5 labor-slot standard working week in hours, or 0 when the law does not set
    * one. The provisional 60-hour baseline scales capacity and wages; shorter weeks
    * reduce output and pay and modestly improve mortality.
@@ -2259,4 +2329,79 @@ export interface EconomyScenarioDef {
   moneyCoefficients?: MoneyCoefficients;
   /** P5 natural-resource deposits (D-143 §4); omitted means none. */
   deposits?: DepositInitialDef[];
+}
+
+/**
+ * P7 (D-154, plan §4.1): the wage state of one customs territory (market). Arrays are
+ * indexed by profession id and have one entry per profession definition.
+ */
+export interface LabourTerritoryState {
+  marketId: Id;
+  /** W_mp, the territory's reference wage, RUSD a year per worker. */
+  referenceWageRUSDPerYear: number[];
+  /** W_mp before the last monthly update (reporting the month's change). */
+  previousReferenceWageRUSDPerYear: number[];
+  /** The territory's consumer price index at the last update (1 at world creation). */
+  priceIndexAtUpdate: number;
+}
+
+/** P7 (plan §4.1, §4.2): the wage state of one province. */
+export interface LabourProvinceState {
+  provinceId: Id;
+  /** d_rp, dimensionless, population-weighted mean 1 over the territory's provinces. */
+  differential: number[];
+  /**
+   * The peasant alternative income a_r, RUSD a year per employed peasant, smoothed over
+   * a year; 0 where the province has no peasant employment.
+   */
+  peasantAlternativeIncomeRUSDPerYear: number;
+}
+
+/** P7 (plan Q4): workers of one block employed by one public institution of a country. */
+export interface InstitutionAssignment {
+  id: Id;
+  popBlockId: Id;
+  countryId: Id;
+  institution: InstitutionKind;
+  workers: number;
+}
+
+/** P7 (plan §4.3): a building's staffing ceiling, stored only where it is below 1. */
+export interface StaffingCeiling {
+  buildingId: Id;
+  /** c in [0, 1). */
+  ceiling: number;
+}
+
+/** P7: one month's mobility and migration totals (bounded history, reporting only). */
+export interface LabourMonthReport {
+  dayIndex: Day;
+  /** People who changed profession inside their province. */
+  mobilityPeople: number;
+  /** People who moved between provinces. */
+  migrationPeople: number;
+  blocksCreated: number;
+  blocksRetired: number;
+  /** Net people gained (positive) or lost per profession id, mobility and migration. */
+  netByProfession: number[];
+}
+
+/** P7 (D-154): the labour market. Disabled and empty in legacy worlds (plan Q21). */
+export interface LabourMarketState {
+  enabled: boolean;
+  /** One per market, ascending market id. */
+  territories: LabourTerritoryState[];
+  /** One per province with a market, ascending province id. */
+  provinces: LabourProvinceState[];
+  /** Ascending id. */
+  institutionEmployment: InstitutionAssignment[];
+  nextInstitutionAssignmentId: Id;
+  /** Ascending building id; buildings at ceiling 1 are absent. */
+  staffingCeilings: StaffingCeiling[];
+  /** Persisted allocator for blocks created by mobility and migration (plan §5.4). */
+  nextPopBlockId: Id;
+  /** Blocks removed by retirement; their accounts are kept for the ledger. Ascending. */
+  retiredPopBlockIds: Id[];
+  /** At most LABOUR_HISTORY_MONTHS reports, oldest first. */
+  history: LabourMonthReport[];
 }

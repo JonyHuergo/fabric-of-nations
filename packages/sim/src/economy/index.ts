@@ -24,6 +24,11 @@ export * from "./day.js";
 export * from "./technology.js";
 export * from "./labor.js";
 export * from "./localWages.js";
+export * from "./labourMarket.js";
+export * from "./labourInit.js";
+export { cloneLabourMarketState, assertValidLabourMarketState, encodeLabourMarket, decodeLabourMarket, type SerializedLabourMarket } from "./labourState.js";
+export * from "./reclassify.js";
+export * from "./mobility.js";
 export {
   assertValidTradePolicyState,
   shipmentFunding,
