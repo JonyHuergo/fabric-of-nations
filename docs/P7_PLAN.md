@@ -1,8 +1,9 @@
 # P7 plan — Labour market, wages, social mobility, urbanisation
 
-**Status:** draft for designer approval; nothing is implemented. Q1 (the profession set) was
-decided by the designer in conversation on 2026-11-08 before this plan was written; every other
-question in §0 is open.
+**Status:** draft; nothing is implemented. Q1 (the profession set) was decided by the designer
+in conversation on 2026-11-08 before this plan was written. On 2026-11-08 the designer approved
+the recommendations of Q2–Q14 and Q17–Q22, deferred the fibre good (Q15, Q16: not resolved now,
+§8 kept for reference) and asked for the costs of the minimum wage, now §4.5 and Q23 (open).
 **Branch:** `prosperity/p7-labour` (from `main` at `5a7eb22`; local commits only).
 **Inputs read:** AGENTS.md; `docs/PROSPERITY_PROGRAM.md` (P7 with "Added from P6" and "Carried
 into P7 from P6", P7b, stage map); GDD §5.4.4 (M5 migration and labour access), §6.2, §6.3,
@@ -33,27 +34,28 @@ GDD and earlier decisions are in **§13**. None has been settled silently.
 | # | Question | Options | Recommendation |
 |---|---|---|---|
 | Q1 | **The profession set.** | (a) The GDD's nine. (b) Sixteen professions, behaviour from data roles, stratum a default rather than a fixed class (§3). | **Decided (designer, 2026-11-08): (b)**: Peasants, Farmers, Laborers (including skilled manual workers), Attendants, Servicemen, Officers, Clerks, Shopkeepers, Teachers, Medics, Engineers, Academics, Bureaucrats, Clergy, Capitalists, Aristocrats. |
-| Q2 | **Servicemen, Officers and Clergy in P7.** No system employs them yet: armies remove recruits from blocks (`military.ts`), and there is no religion. | (a) Define them in data with their roles; populate them in the military-revamp and religion stages. In 1900 their people stay in the professions the occupation mapping gives as interim (§3.4). (b) Populate them now with interim employers (army personnel as Servicemen; a church service funded by donations). | **(a)**: (b) pulls military and religion design into P7. The engine is built for all sixteen, so populating them later is a data and generator change. |
-| Q3 | **Medics and the health service.** Health staff are today a share of the administration clerks (D-078 item 9). | (a) The health service employs Medics: health slots = health share × administration funding ÷ the Medic wage; administration slots = the rest ÷ the Bureaucrat wage. The player's health-share lever is unchanged. (b) Keep clerks as health staff; Medics wait. | **(a)**: it removes the documented simplification and gives health a gated, scarce profession. It changes health staff counts and so P4 mortality; the 1900 health factor is re-measured and reported. |
-| Q4 | **Public institutions as employers.** Administration payroll is paid to every block of the administration profession in proportion to its population (`fiscal.ts`), while the same people can also hold building jobs: one person can be paid twice, against GDD §6.7. | (a) Administration, schools, universities and research, and the health service post job slots, filled by the same allocator as buildings and paid per assigned worker at the market wage from the treasury; funding sets the number of slots (funding ÷ local wage). (b) Keep the proportional payroll. | **(a)**: one person holds one job; Bureaucrats, Teachers, Academics and Medics get covered jobs (a P6 carry-over); a fixed budget buys fewer staff when wages rise. |
-| Q5 | **Where a worker may work.** Today a resident may take a job anywhere in their own country (D-052), and is paid their *home* province's wage. | (a) A worker works in their own province; moving to another province is migration (§6). The wage is the employing province's. (b) National access as now, with provincial wages. | **(a)**: provincial wage differentials and migration only mean something if people cannot commute across the country. The 1900 buildings were split over provinces by the population of the professions they employ (D-131), so local matching starts close; the residue is reported. |
-| Q6 | **The wage rule** (§4.1). | (a) Monthly, per (customs territory, profession): Δln W = κ↑·max(0, v − u) − κ↓·max(0, u − v) + π·Δln P, with v the vacancy rate, u the unemployment rate and P the territory's consumer price index; a provincial differential moves with the province's own v − u against the territory's, renormalised to a population-weighted mean of 1. (b) Symmetric adjustment, no price term. (c) Wages set to clear each month (marginal revenue product). | **(a)**: the vacancy and unemployment rates are already measured; asymmetry carries downward stickiness; the price term is GDD §7.7's "inflation/price conditions". (c) jumps and has no history. |
-| Q7 | **Wage floors** (§4.2). | (a) Effective wage ≥ max(statutory minimum wage (E5), the province's peasant alternative income) for every wage profession where the province has a peasant block; the alternative is the peasant blocks' income per worker over the last month (wage, distributed profit and food kept). (b) Minimum wage only. | **(a)**: the program names both floors; the alternative income is the Lewis reservation wage, measured, not authored. |
-| Q8 | **Hiring and layoffs** (§4.3). | (a) Each building keeps a staffing ceiling c ∈ [0, 1]; monthly c ← clamp(c + η·(R − 1)) where R = notional value added per throughput unit at smoothed market prices ÷ the wage bill per throughput unit at current wages (upkeep excluded: it is paid whether or not the building works). Slots offered = floor(slots × c). (b) Bang-bang: full slots if R ≥ 1, none otherwise. | **(a)**: "hire to the point where revenue covers the wage" with adjustment over months; heterogeneous techniques (D-135 A3) make the least productive buildings shed first. Closure and bankruptcy stay in P10. |
-| Q9 | **Peasant farms.** | (a) Work-sharing: buildings of the `subsistence` role employ every eligible member of their owner's profession up to their slots, with no layoff rule; income is the average product (P5's land returns make the marginal product fall). (b) The hiring rule for peasant farms too. | **(a)**: the surplus-labour sector of the dual economy (GDD §17J.1). Without it peasants would become unemployed instead of underemployed. |
-| Q10 | **Mobility pressure** (§5.2). | (a) Harris–Todaro expected income: a flow from block A to profession B in the same province when ln(E_B ÷ E_A) exceeds a threshold, with E = wage × (1 − unemployment rate) × a housing factor (§6.3); rate provisional; bounded by the gated movers and by B's vacancies plus a share of its labour force. (b) The M5 form (vacancy and wealth gaps). | **(a)**: it lets towns attract people faster than jobs (urban unemployment) and lets demotion happen when a profession's unemployment rises. |
-| Q11 | **Who moves.** | (a) Households: movers are split over the source's sex and age cells in proportion (the M5 largest-remainder rule), so age structure is carried. (b) Age-selective (young adults weighted up, children following). | **(a)** for P7, as M5; (b) as a later calibration if the long run shows towns ageing wrongly. |
-| Q12 | **Qualification gates** (§5.3). | (a) Selective literacy (movers into a literate profession are taken from the source's literate working-age people, by age, so literate persons are conserved); training capacity (entries into trained professions per month ≤ the country's training places, paid at the training cost); capital (entry into owner professions requires the source's cash per person ≥ the profession's entry capital, carried with the movers); legal hooks (a profession can be closed to entry; Aristocrats are closed). (b) Keep today's block-level thresholds (literacy and wealth level). | **(a)**: today's all-or-nothing block thresholds cannot gate flows; (a) is causal and conserving. |
-| Q13 | **Dwellings when people move** (§6.4). | (a) Movers who keep their settlement (rural to rural, urban to urban, in the same province) carry a pro-rata share of the source's dwellings; movers who change settlement or province leave their dwellings with the source and crowd the destination until it builds. (b) Always leave them (the P6 migration rule). | **(a)**: a peasant who becomes a farmer in the same village keeps their house; a peasant who goes to town does not. |
-| Q14 | **Block creation and retirement** (§5.4). | (a) A flow to a profession with no block in the province creates one through a validated operation (new id from a persisted allocator, accounts opened, attributes from the movers); a block is retired when it has no people, no employment and owns nothing; owned buildings and residual cash pass to the block that received most of its people, through ordinary postings. (b) Keep empty blocks. | **(a)**, as D-117 requires. |
-| Q15 | **The fibre good** (§8). The program says "the textile mill recipe", but the P5b acceptance test fixes the mill's cotton + wool at 316.667 kg per throughput unit. | (a) A separate **bast-fibre mill** (linen, hemp and jute spinning and weaving) that makes the same *textiles* good from bast fibre, placed at the sourced 1900 producers (Belfast, Dundee, Calcutta, Russia, France, Germany, Austria, Belgium); the textile mill's recipe and the test are untouched. (b) Bast fibre as a third input of the textile mill, with the test's mass-balance line amended to cotton + wool + bast = 316.667 by design. | **(a)**: the industries were separate and sat in different places; it keeps the acceptance test exactly as written. |
-| Q16 | **Jute.** Most 1900 jute became sacking and bagging, which has no demand in the model. | (a) All bast fibres (flax, hemp, jute) become textiles; the measured cotton ratio is reported. (b) Flax and hemp only; jute waits for a packaging demand. (c) Jute with its own packaging demand (sacks bought per tonne of grain, sugar, coffee and cotton shipped). | **(a)**, measured: the cotton band is met for 1.33–2.65 million t of bast textiles (§8.3). If the sourced total lands outside the band, the result comes to the designer before any change, as with Q12 of P6. |
-| Q17 | **1900 occupation data** (§3.3). | (a) Sourced census occupation tables mapped to the sixteen professions through a documented mapping (occupation group × status in employment × sector), for every territory with a c. 1900 census; elsewhere a recorded proxy (shares regressed on GDP per head and urban share over the sourced countries), provisional. (b) Keep the P2 authored mix and only split it. | **(a)**: the current mix is authored (`project-authored-1900`, OWID sector shares); clerks at 10.8 % and capitalists at 5.1 % of the 1900 world are catch-alls. |
-| Q18 | **1900 incomes** (P6 carry-over). | (a) The generator computes each block's 1900 income from its employment in the placed buildings and institutions (the same allocation rule as day 1) × the 1900 wages, plus distributed profits and food kept; demand, placement and incomes are iterated to a fixed point (convergence reported). (b) Keep the estimate wage × participation × working-age share. | **(a)**: the program asks for measured wages; (b) pays every working-age participant, employed or not. |
-| Q19 | **Interest groups in P7.** The seven groups take members by profession key (`politics.json`). | (a) Data-only remap to the sixteen professions (§3.5); new groups (Devout, Petite bourgeoisie) wait for the politics stage. (b) Add the groups now. | **(a)**. |
-| Q20 | **Saves.** | (a) D-120: schema-34 saves listed as incompatible, never deleted. (b) A migration. | **(a)**, as every Prosperity stage. |
-| Q21 | **Legacy worlds** (M2–M11 fixtures, the M5 sample). | (a) Keep their professions and static wages: the labour market runs only where the definitions carry a labour-market configuration (as P6 kept the tier path). (b) Convert every fixture. | **(a)**: preserves accepted behaviour and the legacy known answers. |
-| Q22 | **The long run** (P6 carry-over). | (a) Ten years of the 1900 world in the background, reported as trajectories (agricultural share, unemployment, wages, urban share, population conservation, food gluts); no timing. (b) Twenty-five years. | **(a)**; (b) on request. The performance hold is respected: the run is a behaviour check, not a benchmark. |
+| Q2 | **Servicemen, Officers and Clergy in P7.** No system employs them yet: armies remove recruits from blocks (`military.ts`), and there is no religion. | (a) Define them in data with their roles; populate them in the military-revamp and religion stages. In 1900 their people stay in the professions the occupation mapping gives as interim (§3.4). (b) Populate them now with interim employers (army personnel as Servicemen; a church service funded by donations). | **Approved (designer, 2026-11-08): (a)**: (b) pulls military and religion design into P7. The engine is built for all sixteen, so populating them later is a data and generator change. |
+| Q3 | **Medics and the health service.** Health staff are today a share of the administration clerks (D-078 item 9). | (a) The health service employs Medics: health slots = health share × administration funding ÷ the Medic wage; administration slots = the rest ÷ the Bureaucrat wage. The player's health-share lever is unchanged. (b) Keep clerks as health staff; Medics wait. | **Approved (designer, 2026-11-08): (a)**: it removes the documented simplification and gives health a gated, scarce profession. It changes health staff counts and so P4 mortality; the 1900 health factor is re-measured and reported. |
+| Q4 | **Public institutions as employers.** Administration payroll is paid to every block of the administration profession in proportion to its population (`fiscal.ts`), while the same people can also hold building jobs: one person can be paid twice, against GDD §6.7. | (a) Administration, schools, universities and research, and the health service post job slots, filled by the same allocator as buildings and paid per assigned worker at the market wage from the treasury; funding sets the number of slots (funding ÷ local wage). (b) Keep the proportional payroll. | **Approved (designer, 2026-11-08): (a)**: one person holds one job; Bureaucrats, Teachers, Academics and Medics get covered jobs (a P6 carry-over); a fixed budget buys fewer staff when wages rise. |
+| Q5 | **Where a worker may work.** Today a resident may take a job anywhere in their own country (D-052), and is paid their *home* province's wage. | (a) A worker works in their own province; moving to another province is migration (§6). The wage is the employing province's. (b) National access as now, with provincial wages. | **Approved (designer, 2026-11-08): (a)**: provincial wage differentials and migration only mean something if people cannot commute across the country. The 1900 buildings were split over provinces by the population of the professions they employ (D-131), so local matching starts close; the residue is reported. |
+| Q6 | **The wage rule** (§4.1). | (a) Monthly, per (customs territory, profession): Δln W = κ↑·max(0, v − u) − κ↓·max(0, u − v) + π·Δln P, with v the vacancy rate, u the unemployment rate and P the territory's consumer price index; a provincial differential moves with the province's own v − u against the territory's, renormalised to a population-weighted mean of 1. (b) Symmetric adjustment, no price term. (c) Wages set to clear each month (marginal revenue product). | **Approved (designer, 2026-11-08): (a)**: the vacancy and unemployment rates are already measured; asymmetry carries downward stickiness; the price term is GDD §7.7's "inflation/price conditions". (c) jumps and has no history. |
+| Q7 | **Wage floors** (§4.2). | (a) Effective wage ≥ max(statutory minimum wage (E5), the province's peasant alternative income) for every wage profession where the province has a peasant block; the alternative is the peasant blocks' income per worker over the last month (wage, distributed profit and food kept). (b) Minimum wage only. | **Approved (designer, 2026-11-08): (a)**: the program names both floors; the alternative income is the Lewis reservation wage, measured, not authored. |
+| Q8 | **Hiring and layoffs** (§4.3). | (a) Each building keeps a staffing ceiling c ∈ [0, 1]; monthly c ← clamp(c + η·(R − 1)) where R = notional value added per throughput unit at smoothed market prices ÷ the wage bill per throughput unit at current wages (upkeep excluded: it is paid whether or not the building works). Slots offered = floor(slots × c). (b) Bang-bang: full slots if R ≥ 1, none otherwise. | **Approved (designer, 2026-11-08): (a)**: "hire to the point where revenue covers the wage" with adjustment over months; heterogeneous techniques (D-135 A3) make the least productive buildings shed first. Closure and bankruptcy stay in P10. |
+| Q9 | **Peasant farms.** | (a) Work-sharing: buildings of the `subsistence` role employ every eligible member of their owner's profession up to their slots, with no layoff rule; income is the average product (P5's land returns make the marginal product fall). (b) The hiring rule for peasant farms too. | **Approved (designer, 2026-11-08): (a)**: the surplus-labour sector of the dual economy (GDD §17J.1). Without it peasants would become unemployed instead of underemployed. |
+| Q10 | **Mobility pressure** (§5.2). | (a) Harris–Todaro expected income: a flow from block A to profession B in the same province when ln(E_B ÷ E_A) exceeds a threshold, with E = wage × (1 − unemployment rate) × a housing factor (§6.3); rate provisional; bounded by the gated movers and by B's vacancies plus a share of its labour force. (b) The M5 form (vacancy and wealth gaps). | **Approved (designer, 2026-11-08): (a)**: it lets towns attract people faster than jobs (urban unemployment) and lets demotion happen when a profession's unemployment rises. |
+| Q11 | **Who moves.** | (a) Households: movers are split over the source's sex and age cells in proportion (the M5 largest-remainder rule), so age structure is carried. (b) Age-selective (young adults weighted up, children following). | **Approved (designer, 2026-11-08): (a)** for P7, as M5; (b) as a later calibration if the long run shows towns ageing wrongly. |
+| Q12 | **Qualification gates** (§5.3). | (a) Selective literacy (movers into a literate profession are taken from the source's literate working-age people, by age, so literate persons are conserved); training capacity (entries into trained professions per month ≤ the country's training places, paid at the training cost); capital (entry into owner professions requires the source's cash per person ≥ the profession's entry capital, carried with the movers); legal hooks (a profession can be closed to entry; Aristocrats are closed). (b) Keep today's block-level thresholds (literacy and wealth level). | **Approved (designer, 2026-11-08): (a)**: today's all-or-nothing block thresholds cannot gate flows; (a) is causal and conserving. |
+| Q13 | **Dwellings when people move** (§6.4). | (a) Movers who keep their settlement (rural to rural, urban to urban, in the same province) carry a pro-rata share of the source's dwellings; movers who change settlement or province leave their dwellings with the source and crowd the destination until it builds. (b) Always leave them (the P6 migration rule). | **Approved (designer, 2026-11-08): (a)**: a peasant who becomes a farmer in the same village keeps their house; a peasant who goes to town does not. |
+| Q14 | **Block creation and retirement** (§5.4). | (a) A flow to a profession with no block in the province creates one through a validated operation (new id from a persisted allocator, accounts opened, attributes from the movers); a block is retired when it has no people, no employment and owns nothing; owned buildings and residual cash pass to the block that received most of its people, through ordinary postings. (b) Keep empty blocks. | **Approved (designer, 2026-11-08): (a)**, as D-117 requires. |
+| Q15 | **The fibre good** (§8). The program says "the textile mill recipe", but the P5b acceptance test fixes the mill's cotton + wool at 316.667 kg per throughput unit. | (a) A separate **bast-fibre mill** (linen, hemp and jute spinning and weaving) that makes the same *textiles* good from bast fibre, placed at the sourced 1900 producers (Belfast, Dundee, Calcutta, Russia, France, Germany, Austria, Belgium); the textile mill's recipe and the test are untouched. (b) Bast fibre as a third input of the textile mill, with the test's mass-balance line amended to cotton + wool + bast = 316.667 by design. | **Deferred (designer, 2026-11-08): not resolved in this plan.** Proposed: (a): the industries were separate and sat in different places; it keeps the acceptance test exactly as written. |
+| Q16 | **Jute.** Most 1900 jute became sacking and bagging, which has no demand in the model. | (a) All bast fibres (flax, hemp, jute) become textiles; the measured cotton ratio is reported. (b) Flax and hemp only; jute waits for a packaging demand. (c) Jute with its own packaging demand (sacks bought per tonne of grain, sugar, coffee and cotton shipped). | **Deferred (designer, 2026-11-08): not resolved in this plan.** Proposed: (a), measured: the cotton band is met for 1.33–2.65 million t of bast textiles (§8.3). If the sourced total lands outside the band, the result comes to the designer before any change, as with Q12 of P6. |
+| Q17 | **1900 occupation data** (§3.3). | (a) Sourced census occupation tables mapped to the sixteen professions through a documented mapping (occupation group × status in employment × sector), for every territory with a c. 1900 census; elsewhere a recorded proxy (shares regressed on GDP per head and urban share over the sourced countries), provisional. (b) Keep the P2 authored mix and only split it. | **Approved (designer, 2026-11-08): (a)**: the current mix is authored (`project-authored-1900`, OWID sector shares); clerks at 10.8 % and capitalists at 5.1 % of the 1900 world are catch-alls. |
+| Q18 | **1900 incomes** (P6 carry-over). | (a) The generator computes each block's 1900 income from its employment in the placed buildings and institutions (the same allocation rule as day 1) × the 1900 wages, plus distributed profits and food kept; demand, placement and incomes are iterated to a fixed point (convergence reported). (b) Keep the estimate wage × participation × working-age share. | **Approved (designer, 2026-11-08): (a)**: the program asks for measured wages; (b) pays every working-age participant, employed or not. |
+| Q19 | **Interest groups in P7.** The seven groups take members by profession key (`politics.json`). | (a) Data-only remap to the sixteen professions (§3.5); new groups (Devout, Petite bourgeoisie) wait for the politics stage. (b) Add the groups now. | **Approved (designer, 2026-11-08): (a)**. |
+| Q20 | **Saves.** | (a) D-120: schema-34 saves listed as incompatible, never deleted. (b) A migration. | **Approved (designer, 2026-11-08): (a)**, as every Prosperity stage. |
+| Q21 | **Legacy worlds** (M2–M11 fixtures, the M5 sample). | (a) Keep their professions and static wages: the labour market runs only where the definitions carry a labour-market configuration (as P6 kept the tier path). (b) Convert every fixture. | **Approved (designer, 2026-11-08): (a)**: preserves accepted behaviour and the legacy known answers. |
+| Q22 | **The long run** (P6 carry-over). | (a) Ten years of the 1900 world in the background, reported as trajectories (agricultural share, unemployment, wages, urban share, population conservation, food gluts); no timing. (b) Twenty-five years. | **Approved (designer, 2026-11-08): (a)**; (b) on request. The performance hold is respected: the run is a behaviour check, not a benchmark. |
+| Q23 | **Costs of the minimum wage** (§4.5). Today the E5 floor is a pure transfer: employment does not respond to it (D-078). | (a) Its costs come from modelled channels: lost jobs through the hiring rule, a regional bite from one national floor, coverage (never the self-employed; farm and domestic employees by law option) with spill-over into uncovered work, partial compliance from administration quality plus the law's administrative load, a dearer public payroll, prices and unemployment unrest; with a preview of jobs at risk before enactment. (b) Lost jobs through the hiring rule only. | **(a)**: every cost is a mechanism the model already has or P7 adds; no penalty term. Open. |
 
 Also for the designer, not blocking: the block count (§11.2), the order of steps (§15).
 
@@ -74,11 +76,14 @@ P7 (program P7, GDD §17J.3) delivers:
    validated, conserving operations (D-117).
 5. **Urbanisation:** rural-to-urban migration toward jobs and housing; migration reads P6
    crowding and the desired dwelling stock.
-6. **From P6:** the fibre good (cotton back to 0.85–1.15 of the 1900 crop); blocks without covered
-   jobs; measured 1900 incomes; a long run.
+6. **From P6:** blocks without covered jobs; measured 1900 incomes; a long run. The fibre good
+   (cotton back to 0.85–1.15 of the 1900 crop) is **deferred by the designer** (Q15, Q16).
 7. **Acceptance:** in a growing no-input economy the agricultural employment share falls;
    unemployment lowers wages; people are conserved through mobility and block creation and
-   retirement; determinism; save round trip; the P5b cotton test passes.
+   retirement; determinism; save round trip. The P5b cotton test ("cotton and wool follow the 1900
+   world fibre supply") stays failing while the fibre good is deferred; it is kept and not weakened,
+   and the completion report lists it as unmet.
+8. **The minimum wage with costs** (§4.5, Q23).
 
 **Unchanged:** market clearing and settlement (wages still paid after the market, pro rata when
 cash is short), the P6 demand system and saving, the P4 demographic causes, money and trade,
@@ -269,7 +274,8 @@ state:
 
 ### 4.2 Floors (Q7)
 
-- **Statutory:** the E5 minimum wage (`labor-minimum-wage`) as today, applied to the effective wage.
+- **Statutory:** the E5 minimum wage (`labor-minimum-wage`), applied to the effective wage of
+  covered employment only, with the enforcement and coverage rules of §4.5 (Q23).
 - **Peasant alternative income:** in a province with a peasant block, a = (wages + distributed
   profits + food kept at market prices) of the peasant blocks over the last month ÷ their employed
   peasants, smoothed over a year. Every wage profession's effective wage in the province is at
@@ -302,6 +308,56 @@ Wages enter the block's smoothed income (P6) as today; unemployment lowers it, c
 toward the committed basket and drawdown (λ) supports it; saving by stratum is unchanged (the
 stratum default of §3.2). Owner incomes come through M5a profit distribution, which the 1900
 world already enables. Measured incomes replace the generator's estimate (Q18, §9.2).
+
+### 4.5 The minimum wage and its costs (Q23)
+
+**Today the floor costs nothing.** E5 applies one national annual floor (RUSD, so constant in real
+terms) to every wage obligation; employment does not respond to wages (D-078 records this as a
+limitation). A higher floor is a transfer from employers to workers whose only cost is wages an
+employer cannot pay (reported as unpaid). Real minimum wages have costs; P7 makes them causal.
+
+**Costs (all from modelled channels; no penalty term):**
+
+1. **Lost jobs.** R (§4.3) is computed with the wage actually owed, floor included. Buildings whose
+   value added per worker falls below the floor lower their staffing ceiling: the least productive
+   first (low technique, labour-intensive recipes, poor provinces).
+2. **Regional bite.** One national floor sits far above the market wage in poor provinces and
+   below it in rich ones, so unemployment concentrates in poor provinces and migration (§6.2)
+   carries people toward rich ones. Emergent from provincial wages; nothing authored.
+3. **Coverage and the uncovered sector.** The floor covers employees of buildings and
+   institutions. It never covers the self-employed: work-sharing peasant farms (Q9) and the own
+   income of farmers and shopkeepers. Whether farm employees and domestic service (attendants in
+   personal services) are covered is part of the law option (data `coverage`); many historical
+   laws left them out (for example the US Fair Labor Standards Act of 1938; to cite from the act).
+   People who lose covered jobs move by mobility (§5) into uncovered work, whose income then falls
+   (informal work grows).
+4. **Enforcement.** Covered employers comply in proportion to administration quality (M8,
+   derived): the paid wage = market wage + compliance × max(0, floor − market wage), with
+   compliance = administration quality ^ γ, γ provisional 1. A weak state's floor is partly paper.
+   The law option adds its `institutionLoad` (an existing law field) to the administration, so
+   enforcing it draws on administrative capacity used elsewhere.
+5. **The public payroll.** Institutions pay the floor too, so a fixed budget buys fewer
+   bureaucrats, teachers and medics (slots = funding ÷ wage, §4.3).
+6. **Prices.** Shed output raises the market price of the goods affected (ordinary clearing), part
+   of which falls on the minimum-wage earners themselves.
+7. **Unrest.** Unemployment already raises unrest (M8). Its rate is today 1 − employed ÷
+   working-age persons, which counts everyone outside the labour force as unemployed; P7 uses the
+   labour-market unemployment rate instead (§13).
+
+**Benefits stay real:** covered workers who keep their jobs earn more, raising their consumption
+(P6), and through income their fertility and mortality causes (P4); wage dispersion narrows.
+
+**Not modelled, stated in the UI and the report:** monopsony (an employer with wage-setting power,
+where a modest floor can raise employment), efficiency wages, and pay rises spreading up the wage
+scale. P7's labour market is competitive, so a binding floor always costs some jobs; how many
+depends on how far it sits above the market wage. Studies of modest floors find small employment
+effects, which is consistent with a floor close to the market wage here; a monopsony refinement is
+a later item.
+
+**Preview before enacting** (GDD §17A.12.3): the Labour screen's minimum-wage row shows, for the
+proposed floor, covered workers, workers now paid below it, and jobs at risk = filled slots in
+covered buildings whose R at the proposed floor is below 1, labelled a short-run estimate that
+leaves out the movements of prices and people.
 
 ---
 
@@ -434,7 +490,11 @@ grows: unemployment rises and wages fall. Both are deterministic and run in the 
 
 ---
 
-## 8. The fibre good (Q15, Q16)
+## 8. The fibre good (Q15, Q16) — deferred
+
+**Deferred by the designer on 2026-11-08: not resolved in this plan and not in the implementation
+order (§15).** The analysis below is kept for when the question is taken up. P7's measured incomes
+change clothing demand, so the cotton ratio of §8.3 is re-measured and reported at the close of P7.
 
 ### 8.1 Goods and buildings
 
@@ -481,7 +541,7 @@ shortage remains a reported item).
 
 `scripts/p7/build-labour-1900.mjs`, chained after `build-goods-1900.mjs` and `scripts/p6`, with
 `--check`: professions (sixteen) and participation; 1900 occupation shares (§3.3); job-slot and
-owner remap (§3.4); institution slots; 1900 wages; the fibre good, farms and mills; incomes and
+owner remap (§3.4); institution slots; 1900 wages; incomes and
 placement iterated (§9.2); reports `docs/P7_BEFORE_AFTER.md` and `docs/P7_LABOUR_PROVENANCE.md`
 (licences and attribution of every P7 source row). The P2 profession split and the P4 urban-share
 order read the new settlement column.
@@ -496,7 +556,7 @@ Owner income = the placed buildings' value added less wages and upkeep, distribu
 
 | Carry-over (P6 §7) | P7 treatment | Expected |
 |---|---|---|
-| Cotton 1.45× (P5b acceptance test) | §8: bast-fibre mill | inside 0.85–1.15 if B lands in the band (§8.3); otherwise to the designer |
+| Cotton 1.45× (P5b acceptance test) | deferred (Q15, Q16) | re-measured after P7's incomes; the test stays failing and is reported |
 | Blocks without covered jobs (clerks, capitalists, academics) | Q4 institution slots; attendants and clerks in services; owners paid through profits | uncovered only for unpopulated professions and for real unemployment |
 | Poor countries' lower classes below subsistence | measured employment and wages, peasant work-sharing | fewer; any left reported by country |
 | 1900 food gluts (grain, produce) | commercial farms shed labour when R < 1; peasants do not | smaller gluts; reported from the long run |
@@ -521,6 +581,7 @@ with the reason in the test. Legacy known answers get encoding-only proofs
   `World.nextPopBlockId`; `EmploymentAssignment.employer` (building or institution); monthly
   mobility and migration totals in the bounded history; `ProvinceEconomy.wageRUSDPerYearByProfession`
   removed. Definitions: `ProfessionDef.roles`, `entry`, `settlement`, course length, entry capital;
+  `LawDef` minimum-wage `coverage` (farm employees, domestic service) and the compliance exponent;
   the labour-market coefficients in `economy/constants.ts` with units, justification and status.
 - **Serialization:** column tables for the new records (typed arrays where dense); sparse when a
   world has no labour market (legacy).
@@ -542,7 +603,9 @@ path for web, iOS and Android.
 
 1. **Labour screen, new "Labour market" section** (country): one row per populated profession —
    workers, unemployment rate, vacancies, wage in the display currency with last month's change —
-   in a `Disclosure` list; above it the agricultural employment share and the urban share.
+   in a `Disclosure` list; above it the agricultural employment share and the urban share. The
+   existing minimum-wage control gains the §4.5 preview (covered workers, workers paid below the
+   proposed floor, jobs at risk, compliance), labelled a short-run estimate.
 2. **Population screen:** the sixteen professions grouped (rural, manual and service, military,
    office and commerce, professional, state and church, owners) with persons; a "Mobility this
    month" disclosure (net flows by profession, people created and retired blocks).
@@ -552,8 +615,9 @@ path for web, iOS and Android.
 5. **Snapshot:** per-territory profession rows and a per-province unemployment and urban-share
    array; the size estimate is reported against the bound.
 6. **Playtest** (extended): the Labour market section renders with figures, the Population groups
-   and mobility rows, the province panel rows, the Unemployment lens colours the map, 61 goods
-   counted; no console errors at 844 × 390.
+   and mobility rows, the province panel rows, the minimum-wage preview, the Unemployment lens
+   colours the map, 60 goods counted (no new good while the fibre good is deferred); no console
+   errors at 844 × 390.
 
 ### 11.2 Performance (designer's hold)
 
@@ -585,8 +649,14 @@ Tests first where practical; every coefficient has a unit test of its formula.
    with mobility and creation months inside the replay window.
 8. **Save round trip (acceptance):** schema 35 encode → decode → identical hash, including created
    and retired blocks, wages and ceilings; schema 34 rejected with the D-120 message.
-9. **Fibre (acceptance):** the P5b test passes unchanged; bast-fibre farm and mill placement
-   follows the sources.
+9. **Minimum wage (§4.5):** a floor above R's break-even lowers the staffing ceiling of the
+   least productive covered buildings first; one national floor raises unemployment more in a
+   low-wage province than a high-wage one, and migration then moves people toward the high-wage
+   one; uncovered work (peasants, self-employed, excluded sectors) is never floored and gains
+   movers; the paid wage follows compliance × administration quality; institution slots fall with
+   the floor; the preview's jobs at risk equal the slots whose R at the proposed floor is below 1;
+   unrest reads the labour-market unemployment rate. The P5b cotton test is not counted: it stays
+   failing while the fibre good is deferred.
 10. **Generator:** `--check`; every P7 parameter traces to a source row or is marked provisional;
     the income fixed point converges.
 11. **Legacy path (Q21):** existing M2–P6 suites pass unchanged.
@@ -612,7 +682,15 @@ Tests first where practical; every coefficient has a unit test of its formula.
 8. **D-117 "about 8,000 blocks".** Recorded with the new estimate (§11.2).
 9. **GDD §9.1 membership by profession.** Unchanged in form; weights remapped (§3.5).
 10. **Program "the textile mill recipe" for the fibre good.** Q15 proposes a separate mill so the
-    P5b test is untouched.
+    P5b test is untouched; the question is deferred by the designer.
+11. **Program P7 acceptance "the P5b cotton test passes".** Not reachable while the fibre good is
+    deferred; resolution: the program's P7 entry records the deferral and the test stays failing,
+    unchanged.
+12. **D-078 / GDD §17A.9.1 "employment quantity is not wage-elastic in E5".** Removed by §4.3 and
+    §4.5: the floor now acts on employment, coverage and compliance.
+13. **The unrest unemployment term** (`politics.ts`: 1 − employed ÷ working-age persons) counts
+    people outside the labour force as unemployed. Resolution: the labour-market unemployment rate
+    (unemployed eligible ÷ eligible labour force); the 1900 unrest residual is re-measured.
 
 ---
 
@@ -633,14 +711,15 @@ Tests first where practical; every coefficient has a unit test of its formula.
 ## 15. Implementation order after approval
 
 1. **Sources:** `.cache-p7/` (git-ignored first); occupation tables, 1900 wages of the new
-   professions, flax, hemp and jute output and spinning; `packages/data/data/historical/p7/sources_1900.json`
-   with licences.
+   professions, the minimum-wage coverage example; `packages/data/data/historical/p7/sources_1900.json`
+   with licences. (Flax, hemp and jute wait for the fibre decision.)
 2. **Simulation, tests first:** profession roles and validation; the reclassification operation
    (creation, retirement); labour-market state and the wage rule; floors; staffing ceilings and
    work-sharing; own-province access; institution employment; mobility and migration with housing;
-   urbanisation; selective literacy and training gates; schema 35; the legacy path. `pnpm test`
+   urbanisation; selective literacy and training gates; the minimum wage's coverage, compliance and
+   preview (§4.5); the unrest unemployment rate; schema 35; the legacy path. `pnpm test`
    (background) and `pnpm typecheck`. Commit.
-3. **Generator and data:** the fibre good, farm and mill; sixteen professions; remaps; occupation
+3. **Generator and data:** sixteen professions; remaps; occupation
    shares; wages; the income fixed point; placement; reports; data v15; province scenario, P2b and
    P5 `--check`s, worker scenario and app worker bundle rebuilt. Designer review of the before/after
    before the hash is re-pinned. Commit.
