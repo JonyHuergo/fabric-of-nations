@@ -1,9 +1,9 @@
 # P7 plan — Labour market, wages, social mobility, urbanisation
 
-**Status:** draft; nothing is implemented. Q1 (the profession set) was decided by the designer
+**Status:** approved by the designer on 2026-11-08; implementation not started. Q1 (the profession set) was decided by the designer
 in conversation on 2026-11-08 before this plan was written. On 2026-11-08 the designer approved
 the recommendations of Q2–Q14 and Q17–Q22, deferred the fibre good (Q15, Q16: not resolved now,
-§8 kept for reference) and asked for the costs of the minimum wage, now §4.5 and Q23 (open).
+§8 kept for reference) and asked for the costs of the minimum wage, now §4.5 and Q23, approved the same day. The plan is approved; implementation follows §15.
 **Branch:** `prosperity/p7-labour` (from `main` at `5a7eb22`; local commits only).
 **Inputs read:** AGENTS.md; `docs/PROSPERITY_PROGRAM.md` (P7 with "Added from P6" and "Carried
 into P7 from P6", P7b, stage map); GDD §5.4.4 (M5 migration and labour access), §6.2, §6.3,
@@ -55,7 +55,7 @@ GDD and earlier decisions are in **§13**. None has been settled silently.
 | Q20 | **Saves.** | (a) D-120: schema-34 saves listed as incompatible, never deleted. (b) A migration. | **Approved (designer, 2026-11-08): (a)**, as every Prosperity stage. |
 | Q21 | **Legacy worlds** (M2–M11 fixtures, the M5 sample). | (a) Keep their professions and static wages: the labour market runs only where the definitions carry a labour-market configuration (as P6 kept the tier path). (b) Convert every fixture. | **Approved (designer, 2026-11-08): (a)**: preserves accepted behaviour and the legacy known answers. |
 | Q22 | **The long run** (P6 carry-over). | (a) Ten years of the 1900 world in the background, reported as trajectories (agricultural share, unemployment, wages, urban share, population conservation, food gluts); no timing. (b) Twenty-five years. | **Approved (designer, 2026-11-08): (a)**; (b) on request. The performance hold is respected: the run is a behaviour check, not a benchmark. |
-| Q23 | **Costs of the minimum wage** (§4.5). Today the E5 floor is a pure transfer: employment does not respond to it (D-078). | (a) Its costs come from modelled channels: lost jobs through the hiring rule, a regional bite from one national floor, coverage (never the self-employed; farm and domestic employees by law option) with spill-over into uncovered work, partial compliance from administration quality plus the law's administrative load, a dearer public payroll, prices and unemployment unrest; with a preview of jobs at risk before enactment. (b) Lost jobs through the hiring rule only. | **(a)**: every cost is a mechanism the model already has or P7 adds; no penalty term. Open. |
+| Q23 | **Costs of the minimum wage** (§4.5). Today the E5 floor is a pure transfer: employment does not respond to it (D-078). | (a) Its costs come from modelled channels: lost jobs through the hiring rule, a regional bite from one national floor, coverage (never the self-employed; farm and domestic employees by law option) with spill-over into uncovered work, partial compliance from administration quality plus the law's administrative load, a dearer public payroll, prices and unemployment unrest; with a preview of jobs at risk before enactment. (b) Lost jobs through the hiring rule only. | **Approved (designer, 2026-11-08): (a)**: every cost is a mechanism the model already has or P7 adds; no penalty term. |
 
 Also for the designer, not blocking: the block count (§11.2), the order of steps (§15).
 
