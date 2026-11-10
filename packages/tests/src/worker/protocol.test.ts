@@ -384,8 +384,19 @@ describe("M11d app snapshot contract", () => {
     const result = newGameResult(unitedKingdom.countryId);
     const country = result.snapshot.countries.find((entry) => entry.id === unitedKingdom.countryId);
     expect(country).toBeDefined();
-    // Documented regression: this pool exceeded the old 100M protocol bound.
-    expect(country?.constructionLabor.idleWorkers).toBeGreaterThan(100_000_000);
     expect(() => parseWorkerEvent(result)).not.toThrow();
+    // Documented regression: the empire's idle pool exceeded the old 100M protocol bound.
+    // P7 (D-154 step 3) employs most of it on day 1 (about 48M idle), so the bound is
+    // exercised with the same snapshot carrying a pool above 100M.
+    const large = {
+      ...result,
+      snapshot: {
+        ...result.snapshot,
+        countries: result.snapshot.countries.map((entry) =>
+          entry.id === unitedKingdom.countryId ? { ...entry, constructionLabor: { ...entry.constructionLabor, idleWorkers: 150_000_000 } } : entry,
+        ),
+      },
+    };
+    expect(() => parseWorkerEvent(large)).not.toThrow();
   });
 });

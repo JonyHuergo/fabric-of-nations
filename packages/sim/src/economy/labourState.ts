@@ -36,6 +36,8 @@ export function emptyLabourMarketState(): LabourMarketState {
     provinces: [],
     institutionEmployment: [],
     nextInstitutionAssignmentId: 1,
+    householdEmployment: [],
+    nextHouseholdAssignmentId: 1,
     staffingCeilings: [],
     nextPopBlockId: 0,
     retiredPopBlockIds: [],
@@ -59,6 +61,8 @@ export function cloneLabourMarketState(state: LabourMarketState): LabourMarketSt
     })),
     institutionEmployment: state.institutionEmployment.map((entry) => ({ ...entry })),
     nextInstitutionAssignmentId: state.nextInstitutionAssignmentId,
+    householdEmployment: state.householdEmployment.map((entry) => ({ ...entry })),
+    nextHouseholdAssignmentId: state.nextHouseholdAssignmentId,
     staffingCeilings: state.staffingCeilings.map((entry) => ({ ...entry })),
     nextPopBlockId: state.nextPopBlockId,
     retiredPopBlockIds: [...state.retiredPopBlockIds],
@@ -91,6 +95,7 @@ export function assertValidLabourMarketState(state: LabourMarketState, context: 
       state.territories.length > 0 ||
       state.provinces.length > 0 ||
       state.institutionEmployment.length > 0 ||
+      state.householdEmployment.length > 0 ||
       state.staffingCeilings.length > 0 ||
       state.retiredPopBlockIds.length > 0 ||
       state.history.length > 0
@@ -148,6 +153,18 @@ export function assertValidLabourMarketState(state: LabourMarketState, context: 
     if (!context.countryIds.has(entry.countryId)) throw new RangeError(`${path} references an unknown country`);
     if (!(INSTITUTION_KINDS as readonly string[]).includes(entry.institution)) throw new RangeError(`${path}.institution is unknown`);
   }
+  requireInteger(state.nextHouseholdAssignmentId, "world.labourMarket.nextHouseholdAssignmentId", 1, Number.MAX_SAFE_INTEGER);
+  let previousHousehold = 0;
+  for (const [index, entry] of state.householdEmployment.entries()) {
+    const path = `world.labourMarket.householdEmployment[${String(index)}]`;
+    if (!(entry.id > previousHousehold)) throw new RangeError(`${path} must be in ascending id`);
+    previousHousehold = entry.id;
+    if (!(entry.id < state.nextHouseholdAssignmentId)) throw new RangeError(`${path}.id must be below the allocator`);
+    requireInteger(entry.workers, `${path}.workers`, 1, Number.MAX_SAFE_INTEGER);
+    if (!context.blockIds.has(entry.popBlockId)) throw new RangeError(`${path} references an unknown block`);
+    if (!context.blockIds.has(entry.employerBlockId)) throw new RangeError(`${path} references an unknown employer block`);
+    if (entry.employerBlockId === entry.popBlockId) throw new RangeError(`${path}: a block cannot employ itself`);
+  }
   let previousRetired = -1;
   for (const id of state.retiredPopBlockIds) {
     if (!(id > previousRetired)) throw new RangeError("world.labourMarket.retiredPopBlockIds must be ascending and unique");
@@ -178,6 +195,9 @@ export interface SerializedLabourMarket {
   readonly peasantAlternative: readonly number[];
   readonly institutionEmployment: readonly [number, number, number, string, number][];
   readonly nextInstitutionAssignmentId: number;
+  /** P7 (§4.1): [id, employer block, servant block, workers]; absent when none ever existed. */
+  readonly householdEmployment?: readonly [number, number, number, number][];
+  readonly nextHouseholdAssignmentId?: number;
   readonly staffingCeilings: readonly [number, number][];
   readonly nextPopBlockId: number;
   readonly retiredPopBlockIds: readonly number[];
@@ -197,6 +217,12 @@ export function encodeLabourMarket(state: LabourMarketState): SerializedLabourMa
     peasantAlternative: state.provinces.map((entry) => entry.peasantAlternativeIncomeRUSDPerYear),
     institutionEmployment: state.institutionEmployment.map((entry) => [entry.id, entry.popBlockId, entry.countryId, entry.institution, entry.workers]),
     nextInstitutionAssignmentId: state.nextInstitutionAssignmentId,
+    ...(state.householdEmployment.length === 0 && state.nextHouseholdAssignmentId === 1
+      ? {}
+      : {
+          householdEmployment: state.householdEmployment.map((entry) => [entry.id, entry.employerBlockId, entry.popBlockId, entry.workers] as [number, number, number, number]),
+          nextHouseholdAssignmentId: state.nextHouseholdAssignmentId,
+        }),
     staffingCeilings: state.staffingCeilings.map((entry) => [entry.buildingId, entry.ceiling]),
     nextPopBlockId: state.nextPopBlockId,
     retiredPopBlockIds: [...state.retiredPopBlockIds],
@@ -267,6 +293,16 @@ export function decodeLabourMarket(value: unknown, path: string): LabourMarketSt
     provinces,
     institutionEmployment,
     nextInstitutionAssignmentId: requireInteger(record.nextInstitutionAssignmentId, `${path}.nextInstitutionAssignmentId`, 1, Number.MAX_SAFE_INTEGER),
+    householdEmployment: (record.householdEmployment === undefined ? [] : requireArray(record.householdEmployment, `${path}.householdEmployment`)).map((raw, index) => {
+      const row = requireArray(raw, `${path}.householdEmployment[${String(index)}]`);
+      return {
+        id: requireInteger(row[0], `${path}.householdEmployment[${String(index)}][0]`, 1, Number.MAX_SAFE_INTEGER),
+        employerBlockId: requireInteger(row[1], `${path}.householdEmployment[${String(index)}][1]`, 0, 0xffff_ffff),
+        popBlockId: requireInteger(row[2], `${path}.householdEmployment[${String(index)}][2]`, 0, 0xffff_ffff),
+        workers: requireInteger(row[3], `${path}.householdEmployment[${String(index)}][3]`, 1, Number.MAX_SAFE_INTEGER),
+      };
+    }),
+    nextHouseholdAssignmentId: record.nextHouseholdAssignmentId === undefined ? 1 : requireInteger(record.nextHouseholdAssignmentId, `${path}.nextHouseholdAssignmentId`, 1, Number.MAX_SAFE_INTEGER),
     staffingCeilings,
     nextPopBlockId: requireInteger(record.nextPopBlockId, `${path}.nextPopBlockId`, 0, 0xffff_ffff),
     retiredPopBlockIds: numberArray(record.retiredPopBlockIds, `${path}.retiredPopBlockIds`),

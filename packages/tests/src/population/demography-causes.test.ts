@@ -44,6 +44,7 @@ import {
   hashWorld,
   NEUTRAL_DEMOGRAPHY_FACTORS,
   populationTotal,
+  refreshEmployment,
   runTicks,
   serializeWorld,
   tick,
@@ -443,6 +444,9 @@ describe("P4 player levers reach the levels (D-142)", () => {
     country.technology.researched.sort((left, right) => left.technologyId - right.technologyId);
     const knowledgeOnly = demographyFactorsByCountry(world, scenario.definitions).get(country.id)!;
     country.institutions.healthStaffShare = 0.5;
+    // P7 (D-154): in a labour-market world the health service's staff are the medics it
+    // employs, so the lever acts through the next hiring.
+    refreshEmployment(world, scenario.definitions, world.dayIndex, { force: true });
     const staffed = demographyFactorsByCountry(world, scenario.definitions).get(country.id)!;
     expect(knowledgeOnly.contraception).toBeCloseTo(0.15, 12);
     expect(before.contraception).toBe(0);

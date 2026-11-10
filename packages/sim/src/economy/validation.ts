@@ -7,6 +7,7 @@
  * violations, and period-summary violations are.
  */
 
+import { assertValidJobMix } from "./buildingJobs.js";
 import { assertValidDayIndex, civilDateToDayIndex, dayIndexToCivilDate, daysInMonth } from "../calendar.js";
 import { CAMPAIGN_TERMINAL_DAY_INDEX } from "../constants.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
@@ -1317,6 +1318,29 @@ function assertValidBuilding(building: BuildingInstance): void {
   // P5b: null, or the id of the deposit the building extracts (cross-checked against
   // the deposits and the definition by `assertValidBuildingDeposits`).
   if (record.depositId !== null) requireInteger(record.depositId, "world.buildings[].depositId", 0, 0xffff_ffff);
+  // P7 (R8): absent/null, or the building's own job mix (checked against its definition by
+  // `assertValidBuildingJobMixes`).
+  if (record.jobMix !== undefined && record.jobMix !== null) {
+    if (!Array.isArray(record.jobMix)) throw new TypeError("world.buildings[].jobMix must be an array");
+    for (const job of record.jobMix as unknown[]) {
+      const entry = job as Record<string, unknown>;
+      requireInteger(entry.professionId, "world.buildings[].jobMix[].professionId", 0, 0xffff_ffff);
+      const workers = requireFiniteNumber(entry.workersPerThroughputUnit, "world.buildings[].jobMix[].workersPerThroughputUnit");
+      if (workers < 0) throw new RangeError("world.buildings[].jobMix[].workersPerThroughputUnit must be non-negative");
+    }
+  }
+}
+
+/** P7 (R8): every building job mix names known professions and keeps its definition's total workers. */
+export function assertValidBuildingJobMixes(buildings: readonly BuildingInstance[], definitions: EconomyDefinitions): void {
+  const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
+  const professionIds = new Set(definitions.professions.map((profession) => profession.id));
+  for (const building of buildings) {
+    if (building.jobMix === undefined || building.jobMix === null) continue;
+    const definition = definitionById.get(building.definitionId);
+    if (definition === undefined) throw new RangeError(`building ${String(building.id)} references a missing definition`);
+    assertValidJobMix(definition, building.jobMix, professionIds, `building ${String(building.id)}.jobMix`);
+  }
 }
 
 /**

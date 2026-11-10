@@ -9223,3 +9223,149 @@ tier path (plan Q9a).
   acceptance test; it is not weakened.
 - Option (b) (a non-US clothing budget) is not pursued: the Belgian 1853 clothing share (0.20)
   is close to the US one (0.24), and no poorer public-domain budget by income class is known.
+
+
+## D-154 (step 3) — P7: the 1900 occupation distribution, the day-1 labour market and new employers
+
+**Status:** designer decisions of 2026-11-09 on `docs/P7_DAY1_LABOUR_PROPOSAL.md`,
+`docs/P7_OCCUPATIONS_1900.md` ("distribute the whole working world … in the most historically
+accurate and realistic way") and `docs/P7_EMPLOYERS_PROPOSAL.md` ("yes, all of it");
+implemented on `prosperity/p7-labour`, committed 2026-11-10 with the digest pins unchanged.
+Provisional values throughout; the 1900-world hash re-pin waits for the designer's review of
+the before/after.
+**Amends:** D-154 steps 1-2 (the plan's labour market) for the 1900 world.
+
+### Decision
+
+1. **Occupations (`scripts/p7/occupations.mjs`, rules R1-R11 of P7_OCCUPATIONS_1900.md).**
+   Every territory's sixteen-profession shares come from Webb's census groups corrected by
+   status-in-employment, farm-holding, horse-census, army and domestic-servant sources (213
+   keyed `distributionRows` in `historical/p7/sources_1900.json`, each read on the page), or from
+   a least-squares proxy on ln real GDP per head and urban share with the agriculture re-split
+   by the same agrarian rules. Peasants 2-5 ha, farmers 5 ha and over (Europe and settler
+   colonies); market orientation elsewhere; Russia's farmers from the 1899-1901 horse census
+   (3+ horses); aristocrats from estate sources; Spain and Portugal take Italy's agrarian shares;
+   East Asia takes Japan's landlord share. The old GDP-ramp rules (`AGRI_EMPLOYEE_SHARE`,
+   `AGRI_FARMER_SHARE`, `ARISTOCRAT_SHARE`, `fitShareProxy`) are removed.
+2. **Day-1 rules (P7_DAY1_LABOUR_PROPOSAL §3).** R1: owners (capital, land) are outside the
+   labour force (counts only; they may still hold management jobs). R2: a block working in a
+   building it owns is paid the residual, not a wage (settlement), and a self-employed or
+   owning profession counts as employed wherever its province has such a building
+   (work-sharing in the counts; assignments stay within slots). R3: after placement, non-owner
+   blocks follow the placed jobs inside each territory by iterative proportional fitting that
+   keeps the P4 province totals exactly and the census totals (fixes D1). R5: u* = 0.04
+   (generator). R7: the placement workforce cap counts ungated professions only (fixes D2).
+   R8: literacy 0.98 for clerks and academics; each building's own job mix (new optional
+   `BuildingInstance.jobMix`, schema 35 before release, absent = the definition's jobs): the
+   clerk share per territory sized to its census clerks, hired hands on peasant farms, farmer
+   jobs on peasant farms where the census has no peasants (and the reverse); technique scaled so
+   output per staffed unit is unchanged. Two more steps of the same rule (2026-11-10): (d) the
+   census engineers that no definition job or post holds take laborer jobs of the territory's
+   mining, manufacturing, textile, food and energy plants (owner workshops excluded), at most
+   `ENGINEER_SHARE_CAP` 0.1 of them (provisional); (e) a professional practice's professional
+   jobs are re-split by the territory's medics, engineers and teachers left without a job or
+   post, academics (its owners) keeping the rest and at least `PRACTICE_ACADEMIC_FLOOR` 0.1
+   (provisional). The R3 split counts institution posts (spread by population, as the
+   simulation spreads them) as jobs of teachers, medics and bureaucrats; academics are seeded by
+   their practices only (their posts would draw them where no practice is).
+3. **R4/R6 not implemented (deviation, reasoned).** The uncovered-share state was the interim
+   scope for a labour market whose employers covered half the census workforce. With the new
+   employers (items 4-5) the residual is about 4 % of the eligible (generator day-1 rule) and
+   shows as unemployment, which is what it is.
+3a. **R9 (generator).** Institution budgets are split by function shares, not by the census
+   wage bill (which gave US health 59 % of administration and research 79 % of education, the
+   census academics and medics being mostly lawyers, clergy and self-employed physicians).
+   Sourced on 2026-11-10 from US all-government expenditure by function, 1902 (HSUS 1975 series
+   Y 533-566, book pp.1120-1121; the general-expenditure columns sum to the printed 1,578):
+   health = (hospitals 45 + health 18) ÷ the civil part of general expenditure (1,578 less
+   defence 165, postal 126, education 258, highways 175, air and water transport 22, veterans
+   141, interest 97 = 594), 10.6 %; research = state institutions of higher education 13 ÷
+   education 258, 5.0 % (public budgets only); training 6 % of education stays provisional (no
+   series line). `institutionFunctionShares` reads the keyed rows `usa-1902-gov-*`. Posts stay
+   bounded by the people who can fill them (the hiring draws on the eligible); the medic wage
+   keeps step 1's rule.
+4. **Placement (generator).** Movable buildings (no land use, deposit or hydro potential) follow the workers
+   inside each territory (level, level × technique and cash kept per definition and
+   territory); capitalist and aristocrat buildings pay the sourced labour share (0.58 non-farm,
+   0.50 farm) by level × k and technique ÷ k within 95 % of the territory's ungated workforce
+   (option C). Building rows rise from 7,643 to 16,424 (performance to be tested by the
+   designer).
+5. **New employers.** `shop` (commerce; owner shopkeepers, shop assistants) and
+   `professional-practice` (finance and professional services; owner academics with medics,
+   engineers, teachers and clerks) take a share of each trading house's and bank's levels:
+   0.616 (German trade census 1907, persons in establishments of up to five) and 0.5
+   (provisional). Households employ domestic servants (new `householdEmployment` in the labour
+   state, transaction kind `domestic-service`): after firms and institutions, each province's
+   middle and upper blocks with income hire floor(s × eligible non-owner workers) servants from
+   the unemployed of the ungated wage-labour professions, s the census share of domestic
+   servants in its territory (Jahrbuch 1909 p.14*, Webb p.443, Census of India 1901; a fit on
+   ln real GDP elsewhere), paid the province's wage × 240/330 (HSUS D 757 ÷ D 755) from the
+   employer's household cash held before the day's wages (today's wages stay for the fiscal
+   phase, whose income tax is a share of them); an employer short of such cash pays what it has
+   and the rest stays unpaid, with the wage rule's ulp guard. Settlement reconciles household
+   cash with these payments: the servant's as wage income, the employer's as spending outside
+   the market.
+5a. **Medical practice (2026-11-10).** New definition `medical-practice` (services, sells
+   personal services; jobs medics and attendants; owner medics, so R2 work-sharing covers the
+   self-employed physicians, nurses and midwives of 1900). In each territory the personal-services
+   levels that give its medics without a health post their jobs, (1 − u*) × eligible − posts,
+   become medical practices, at most `MEDICAL_SHARE_CAP` 0.5 of the levels (provisional);
+   output, technique-adjusted, and cash are kept.
+5b. **Conversions keep output (fix, 2026-11-10).** The catalogue sizes a definition's output
+   per level from its jobs' reference wage bill, so a professional-practice level makes 47 % of a
+   bank level's finance services; step 3 kept the technique and so lost about half the converted
+   output, contrary to its own rule. Converted rows (practices, medical practices; shops already
+   matched) now take technique × the ratio of output per level. Measured in the generator: every
+   good's potential output after the P7 round is within 0.5 % of placement.
+5c. **Census corrections (2026-11-10).** (i) A census table with teaching or medicine rows but
+   not both: the remaining "professions" keep the US composition less only the professions that
+   have rows of their own (the UK 1901 row is "professional less clergy and teachers", so its
+   medical men were lost to academics; the UK now has 190,000 medics). (ii) Mexico becomes a
+   census territory: the 1900 census summary by Bertillon classes (Resumen general del censo,
+   1905, pp.55 and 60-63, national totals; each equals the sum of its four regions): agriculture
+   3,157,487, mining 97,345, industry 757,754, transport 57,672, commerce 238,133, armed forces
+   38,852, public administration 25,188, liberal professions 62,207, owners and rentiers 22,733
+   (capitalists, provisional), domestic work 95,198 men (the class's 3,785,682 women are left
+   out: it does not separate servants from home duties), various occupations 360,014 (Webb's
+   "others"). Agriculture is split by the agrarian rules (fit and estate default).
+5d. **Named producers keep their own demand (2026-11-10, approved by the designer).** A change to
+   D-148's minimum-size rule: a producer the A12 sources name without a figure, which makes its
+   own demand, keeps that target when it is below `MIN_LEVELS` (1) but at least
+   `SELF_SUPPLY_MIN_LEVELS` 0.5 levels (provisional: the size that rounds to one level), instead
+   of being consolidated into the other producers; it receives no other territory's demand.
+   Reported per good as `keptSelfSupplied`. Cause: with the proxy fit moved by the UK and Mexico
+   census points, China's own tobacco demand fell to 1,187 a day, 0.76 of a level (0.92 without
+   the Mexico census; the medical practice has no effect), and China lost its tobacco farms,
+   contrary to D-148 item 9. Effect: only tobacco changes; China keeps one level.
+
+### Consequences
+
+- Generator day-1 unemployment of the 1900 world falls from 50.6 % (step 3) to 3.0 % (3.7 %
+  before items 5a-5c and the job-mix steps (d)-(e)); measured
+  opening incomes rise (world and per territory in `docs/P7_BEFORE_AFTER.md`) and now exceed the
+  P6 estimate that sized demand (one-pass rule Q18; reported, not iterated).
+- The UK keeps the highest unemployment (12.9 %): its placed economy covers 27 % of its GDP
+  (P5b/P6 coverage: export industry, shipping, finance), a follow-up outside P7; its laborer jobs
+  are 3.3 M for 5.3 M eligible laborers.
+- Day-1 unemployment of the professionals: teachers 6.5 %, medics 2.9 %, engineers 11.1 %
+  (were 28 %, 72 % and 88 %); bureaucrats 14.7 % and clerks 14.8 % remain (posts and clerk
+  jobs where the people are not, and the US clerks' 40 %: fewer clerk jobs than census clerks).
+- Mexico's unemployment is 2.6 %; the world's medics fall from 4.52 M persons (the
+  proxy fit moves with the UK and Mexico points; 4.12 M after both).
+- China keeps one tobacco-farm level by item 5d (building rows 16,424).
+- `pnpm test` now ends with "JavaScript heap out of memory" after about 90 minutes, before the last
+  suite (naming audits, run alone: only the 1900-world hash fails): the single-process run's 4 GB
+  heap no longer holds the larger scenario (16,424 building rows); not changed (performance hold).
+- Tests restated for the new semantics, intent kept: Brazil's lead in plantations is measured
+  in output capacity (level × technique; levels now measure staffing), and the protocol's
+  >100M labour-pool bound is exercised on the same snapshot with a 150M pool (the UK's idle
+  pool fell from over 100M to about 48M).
+- The app worker bundle grows from 7.5 MB to 16.5 MB with the larger scenario.
+
+### Not done (recorded)
+
+- The phone UI for owners and servants (plan step 4, protocol 24, after the step-3 review and
+  commit); an income gradient of servant-keeping beyond the census share; the training share of
+  education (no 1900 series); Mexico's agrarian status (no peón or holdings table in the 1900
+  summary: the fit stands in) and any Chinese occupation or tenure source (none found for
+  1900-1910); the UK coverage (P5b/P6).

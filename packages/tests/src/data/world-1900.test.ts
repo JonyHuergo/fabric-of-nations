@@ -318,7 +318,7 @@ describe("P5b 1900 world: A12 crops at their recorded 1900 producers (D-148 addi
     placement: { goods: Record<string, { a12?: { coverage: number; minCoverage: number; usesSourcedShares: boolean } }> };
   };
   const provinces = p5b("provinces_1900.json") as { id: number; territoryKey: string }[];
-  const buildings = p5b("buildings_1900.json") as { provinceId: number; definitionKey: string; level: number }[];
+  const buildings = p5b("buildings_1900.json") as { provinceId: number; definitionKey: string; level: number; technique: number }[];
   const territoryOf = new Map(provinces.map((province) => [province.id, province.territoryKey]));
   const levelsIn = (definitionKey: string) => {
     const levels = new Map<string, number>();
@@ -327,6 +327,16 @@ describe("P5b 1900 world: A12 crops at their recorded 1900 producers (D-148 addi
       levels.set(territory, (levels.get(territory) ?? 0) + building.level);
     }
     return levels;
+  };
+  // Output capacity (level × technique). P7 (D-154 step 3) pays the sourced labour share by
+  // level × k and technique ÷ k, so levels measure staffing and level × technique measures output.
+  const capacityIn = (definitionKey: string) => {
+    const capacity = new Map<string, number>();
+    for (const building of buildings.filter((row) => row.definitionKey === definitionKey)) {
+      const territory = territoryOf.get(building.provinceId)!;
+      capacity.set(territory, (capacity.get(territory) ?? 0) + building.level * building.technique);
+    }
+    return capacity;
   };
 
   test("the USDA 1900 tobacco rows reproduce the printed total", () => {
@@ -351,8 +361,9 @@ describe("P5b 1900 world: A12 crops at their recorded 1900 producers (D-148 addi
     for (const territory of ["bra-home", "bin", "chn-home", "dei", "cey", "ven-home", "col-home", "gua-home"]) {
       expect(plantations.get(territory) ?? 0).toBeGreaterThan(0);
     }
-    // Brazil, the largest recorded coffee producer, has the most plantation levels.
-    expect(Math.max(...plantations.values())).toBe(plantations.get("bra-home"));
+    // Brazil, the largest recorded coffee producer, has the most plantation output capacity.
+    const plantationCapacity = capacityIn("plantation");
+    expect(Math.max(...plantationCapacity.values())).toBe(plantationCapacity.get("bra-home"));
     const tobacco = levelsIn("tobacco-farm");
     for (const territory of ["usa-home", "bin", "rus-home", "aut-home", "chn-home", "cub-home"]) {
       expect(tobacco.get(territory) ?? 0).toBeGreaterThan(0);

@@ -872,7 +872,7 @@ try {
       dayIndex: 5,
       seed: 1,
       simVersion: "0.27.0",
-      dataVersion: "m3-economy-v14",
+      dataVersion: "m3-economy-v15",
       scenarioId: "m11-world-1900",
       checksum: "00000000",
     });

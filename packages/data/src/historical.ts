@@ -61,6 +61,7 @@ import {
   type MonetaryCurrencyInput,
   type MoneyCoefficients,
   type DemandSystemDef,
+  type LabourMarketDefinitions,
   type NeedTierDef,
   type PoliticsDefinitions,
   type PopulationDefinitions,
@@ -146,6 +147,10 @@ export interface HistoricalScenarioDefinitions {
   readonly technology: string;
   /** P6 (D-153): the demand system (linear expenditure system); absent: need tiers. */
   readonly demandSystem?: string;
+  /** P7 (D-154): the labour-market configuration; absent: static wages (legacy). */
+  readonly labourMarket?: string;
+  /** P7 (D-154): the politics content; absent: the shared politics.json. */
+  readonly politics?: string;
 }
 
 export interface HistoricalProfitDistributionInput {
@@ -233,6 +238,8 @@ export interface HistoricalCountryInput {
   readonly politics?: CountryPoliticsInput;
   /** M9 provisional researched technologies and education funding. */
   readonly technology?: CountryTechnologyInput;
+  /** P7 (D-154): the training budget and the health share of the administration budget. */
+  readonly labor?: { readonly trainingBudgetRUSDPerYear: number; readonly healthStaffShare: number };
   readonly sourceIds: readonly string[];
   readonly occupationSourceIds: readonly string[];
 }
@@ -323,6 +330,8 @@ export interface HistoricalBuildingInput {
   readonly technique?: number;
   /** P5b: id of the deposit an extraction building works (deposits file id). */
   readonly depositId?: number;
+  /** P7 (D-154, R8): the building's own job mix (profession ids), when it differs from its definition's jobs. */
+  readonly jobMix?: readonly { readonly professionId: number; readonly workersPerThroughputUnit: number }[];
   readonly status: "provisional" | "calibrated";
 }
 
@@ -763,6 +772,12 @@ function readMeta(value: unknown, errors: string[]): HistoricalScenarioMeta {  c
       ...(definitions.demandSystem === undefined
         ? {}
         : { demandSystem: stringField(definitions, "demandSystem", "meta.definitions", errors) }),
+      ...(definitions.labourMarket === undefined
+        ? {}
+        : { labourMarket: stringField(definitions, "labourMarket", "meta.definitions", errors) }),
+      ...(definitions.politics === undefined
+        ? {}
+        : { politics: stringField(definitions, "politics", "meta.definitions", errors) }),
     },
     ...(profitDistribution === undefined ? {} : { profitDistribution }),
     ...(countryAI === undefined ? {} : { countryAI }),
@@ -1061,6 +1076,16 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
                   }),
             } satisfies CountryTechnologyInput;
           })();
+    const labor =
+      record.labor === undefined
+        ? undefined
+        : (() => {
+            const laborRecord = assertRecord(record.labor, `${path}.labor`, errors);
+            return {
+              trainingBudgetRUSDPerYear: numberField(laborRecord, "trainingBudgetRUSDPerYear", `${path}.labor`, errors),
+              healthStaffShare: numberField(laborRecord, "healthStaffShare", `${path}.labor`, errors),
+            };
+          })();
     return {
       id: numberField(record, "id", path, errors),
       tag: stringField(record, "tag", path, errors, { maxLength: MAX_COUNTRY_TAG_LENGTH }),
@@ -1105,6 +1130,7 @@ function parseCountries(value: unknown, errors: string[]): HistoricalCountryInpu
       ...(debt === undefined ? {} : { debt }),
       ...(politics === undefined ? {} : { politics }),
       ...(technology === undefined ? {} : { technology }),
+      ...(labor === undefined ? {} : { labor }),
       immigrationOpen: booleanField(record, "immigrationOpen", path, errors),
       sourceIds: stringArrayField(record, "sourceIds", path, errors),
       occupationSourceIds: stringArrayField(record, "occupationSourceIds", path, errors),
@@ -1303,6 +1329,17 @@ function parseBuildings(value: unknown, errors: string[]): HistoricalBuildingInp
             return { technique };
           })()),
       ...(record.depositId === undefined ? {} : { depositId: numberField(record, "depositId", path, errors) }),
+      ...(record.jobMix === undefined
+        ? {}
+        : {
+            jobMix: (Array.isArray(record.jobMix) ? record.jobMix : (errors.push(`${path}.jobMix must be an array`), [])).map((entry: unknown, index: number) => {
+              const job = assertRecord(entry, `${path}.jobMix[${String(index)}]`, errors);
+              return {
+                professionId: numberField(job, "professionId", `${path}.jobMix[${String(index)}]`, errors),
+                workersPerThroughputUnit: numberField(job, "workersPerThroughputUnit", `${path}.jobMix[${String(index)}]`, errors),
+              };
+            }),
+          }),
       status: status === "calibrated" ? "calibrated" : "provisional",
     };
   });
@@ -2060,7 +2097,10 @@ export function validateM5HistoricalData(
       warnings.push(
         `country ${JSON.stringify(country.tag)} occupation composition is provisional; M5 has no profession-promotion mechanism`,
       );
-    } else {
+    } else if (data.meta.definitions.labourMarket === undefined) {
+      // P7 (D-154): a labour-market world takes its occupation mix from the sourced P7
+      // shares (historical/p7), so the M11 authored peasant-share target applies only to
+      // the five-profession worlds.
       const total = countryPopulation.get(country.id) ?? 0;
       const share = total > 0 ? (countryPeasants.get(country.id) ?? 0) / total : 0;
       const tolerance = occupationTarget.toleranceAbsolute ?? 0;
@@ -2342,7 +2382,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     sexRatioAtBirth: number;
     fertilityMultipliers: PopulationDefinitions["fertilityMultipliers"];
   }>(data.meta.definitions.demography);
-  const politics = readJson<PoliticsDefinitions>("politics.json");
+  const politics = readJson<PoliticsDefinitions>(data.meta.definitions.politics ?? "politics.json");
   assertValidPoliticsDefinitions(politics, "politics");
   const technology = readJson<TechnologyDefinitions>(data.meta.definitions.technology);
   assertValidTechnologyDefinitions(technology, "technology");
@@ -2355,6 +2395,10 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     buildings,
     politics,
     technology,
+    // P7 (D-154): the labour market runs only where the scenario names its configuration.
+    ...(data.meta.definitions.labourMarket === undefined
+      ? {}
+      : { labourMarket: readJson<LabourMarketDefinitions>(data.meta.definitions.labourMarket) }),
   };
   assertValidEconomyDefinitions(economyDefinitions);
 
@@ -2532,6 +2576,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
         initialOperatingCashRUSD: building.operatingCashRUSD,
         ...(building.technique === undefined ? {} : { technique: building.technique }),
         ...(building.depositId === undefined ? {} : { depositId: building.depositId }),
+        ...(building.jobMix === undefined ? {} : { jobMix: building.jobMix.map((job) => ({ professionId: job.professionId, workersPerThroughputUnit: job.workersPerThroughputUnit })) }),
       };
     },
   );
@@ -2639,6 +2684,7 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
       ...(country.debt === undefined ? {} : { debt: { ...country.debt } }),
       ...(country.politics === undefined ? {} : { politics: { ...country.politics } }),
       ...(country.technology === undefined ? {} : { technology: { ...country.technology } }),
+      ...(country.labor === undefined ? {} : { labor: { ...country.labor } }),
       immigrationOpen: country.immigrationOpen,
     }));
 

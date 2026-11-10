@@ -9,25 +9,25 @@
    "goods": [
     {
      "goodKey": "grain",
-     "committedPerAdultEquivalentPerDay": 0.70907939,
+     "committedPerAdultEquivalentPerDay": 0.70904063,
      "retailCommercePerUnit": 0.31025218,
      "retailTransportPerUnit": 0.20683479
     },
     {
      "goodKey": "livestock",
-     "committedPerAdultEquivalentPerDay": 0.040365051,
+     "committedPerAdultEquivalentPerDay": 0.040362844,
      "retailCommercePerUnit": 1.6585856,
      "retailTransportPerUnit": 1.1057237
     },
     {
      "goodKey": "fish",
-     "committedPerAdultEquivalentPerDay": 0.040365051,
+     "committedPerAdultEquivalentPerDay": 0.040362844,
      "retailCommercePerUnit": 1.0167623,
      "retailTransportPerUnit": 0.67784156
     },
     {
      "goodKey": "food-products",
-     "committedPerAdultEquivalentPerDay": 0.040365051,
+     "committedPerAdultEquivalentPerDay": 0.040362844,
      "retailCommercePerUnit": 0.27077599,
      "retailTransportPerUnit": 0.18051733
     },
@@ -64,7 +64,7 @@
    "goods": [
     {
      "goodKey": "clothing",
-     "committedPerAdultEquivalentPerDay": 0.0069966088,
+     "committedPerAdultEquivalentPerDay": 0.0069962264,
      "retailCommercePerUnit": 5.74208,
      "retailTransportPerUnit": 0
     },
@@ -255,7 +255,7 @@
  ],
  "knots": [
   {
-   "consumptionRatio": 1.5973891,
+   "consumptionRatio": 1.597462,
    "marginalShares": {
     "food": 0.660616179,
     "clothing": 0.2042891137,
@@ -303,7 +303,7 @@
    }
   },
   {
-   "consumptionRatio": 5.6207123,
+   "consumptionRatio": 5.6209689,
    "marginalShares": {
     "food": 0.4088007088,
     "clothing": 0.2436513591,
@@ -353,7 +353,7 @@
    }
   },
   {
-   "consumptionRatio": 20.712239,
+   "consumptionRatio": 20.713184,
    "marginalShares": {
     "food": 0.1844434602,
     "clothing": 0.09755095537,

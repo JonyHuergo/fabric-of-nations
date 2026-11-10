@@ -20,6 +20,7 @@ export function prePhase6Digest(world: World): string {
     ...encoded,
     schemaVersion: PRE_P6_SCHEMA,
     simVersion: PRE_P6_SIM_VERSION,
-    dataVersion: typeof encoded.dataVersion === "string" && encoded.dataVersion === "m3-economy-v14" ? PRE_P6_DATA_VERSION : encoded.dataVersion,
+    // P7 (D-154): data m3-economy-v15 restores to v13 as well (no P7 field in a legacy world).
+    dataVersion: encoded.dataVersion === "m3-economy-v14" || encoded.dataVersion === "m3-economy-v15" ? PRE_P6_DATA_VERSION : encoded.dataVersion,
   });
 }

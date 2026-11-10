@@ -192,6 +192,19 @@ export const BUILDINGS = [
   // brick, lime and cement, nails and hardware, paint and glass; the rest of the price is
   // building labour (D-135 A3 sizing).
   { key: "residential-builder", name: "Residential Builder", sector: "manufacturing", output: "dwelling", inputs: { timber: 40, "construction-materials": 25, steel: 0.4, chemicals: 0.1 }, jobs: { laborers: 0.9, clerks: 0.1 } },
+  // P7 (D-154, docs/P7_EMPLOYERS_PROPOSAL.md §4.2-4.3; appended so earlier definition ids
+  // stay): owner-run establishments. The shop sells the retail margin (commerce) with its
+  // shopkeeper and shop assistants; the professional practice sells finance and professional
+  // services with its professionals and clerks. Placement never chooses them (the trading
+  // house and the bank come first in catalogue order); the P7 job remap converts a sourced
+  // share of each territory's trading-house and bank levels into them (scripts/p7).
+  { key: "shop", name: "Shop", sector: "services", output: "commerce", inputs: { paper: 0.000002 }, jobs: { clerks: 0.6, laborers: 0.4 } },
+  { key: "professional-practice", name: "Professional Practice", sector: "services", output: "finance-services", inputs: { paper: 0.000003 }, jobs: { academics: 0.85, clerks: 0.15 } },
+  // P7 (D-154): the medical practice — physicians, nurses and midwives working on their own
+  // account, with their assistants; it sells personal services (medical care is a household
+  // service here). The P7 job remap converts part of each territory's personal-services
+  // levels into it, sized to the medics without a post (scripts/p7).
+  { key: "medical-practice", name: "Medical Practice", sector: "services", output: "personal-services", inputs: {}, jobs: { academics: 0.8, laborers: 0.2 } },
 ];
 
 /**

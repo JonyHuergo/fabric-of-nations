@@ -10,6 +10,7 @@
  * No production, market clearing, wages, or pricing is implemented here.
  */
 
+import { buildingJobs } from "./buildingJobs.js";
 import { assertValidDayIndex, dayIndexToCivilDate, isTerminalDayIndex } from "../calendar.js";
 import { workingAgePopulation } from "../population/state.js";
 import { drawUint32 } from "../rng.js";
@@ -75,7 +76,7 @@ export function jobSlotsForBuilding(
   professionId: Id,
 ): number {
   if (!building.operational) return 0;
-  const job = definition.jobs.find((candidate) => candidate.professionId === professionId);
+  const job = buildingJobs(definition, building).find((candidate) => candidate.professionId === professionId);
   if (job === undefined) return 0;
   const raw =
     job.workersPerThroughputUnit *
@@ -663,7 +664,7 @@ export function refreshEmployment(
     if (definition === undefined) {
       throw new RangeError(`building ${String(building.id)} has no definition`);
     }
-    for (const job of definition.jobs) {
+    for (const job of buildingJobs(definition, building)) {
       const slots = jobSlotsForBuilding(definition, building, job.professionId);
       const assigned = assignedBySlot.get(`${String(building.id)}:${String(job.professionId)}`) ?? 0;
       unfilledSlots += Math.max(0, slots - assigned);

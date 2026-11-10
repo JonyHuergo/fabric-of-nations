@@ -20,6 +20,7 @@
  *   world unchanged.
  */
 
+import { buildingJobs } from "./buildingJobs.js";
 import { assertValidDayIndex, dayIndexToCivilDate, isTerminalDayIndex } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD, RATE_DECIMAL_PLACES, WEALTH_DECIMAL_PLACES } from "../population/constants.js";
 import {
@@ -163,7 +164,7 @@ function provinceSignalState(
     if (!building.operational) continue;
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined) continue;
-    for (const job of definition.jobs) {
+    for (const job of buildingJobs(definition, building)) {
       const key = signalKey(building.provinceId, job.professionId);
       slots.set(
         key,

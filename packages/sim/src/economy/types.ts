@@ -162,6 +162,13 @@ export interface LabourMarketDefinitions {
    * plan §4.5). Farm employment is every job of an agriculture-sector building.
    */
   domesticServiceBuildingKeys: string[];
+  /**
+   * P7 (D-154, docs/P7_EMPLOYERS_PROPOSAL.md §4.1): households employing domestic servants.
+   * Per province, the servants its households employ per eligible non-owner worker (the
+   * census share of domestic servants in the occupied population of its territory),
+   * dimensionless in [0, 1). Absent or empty: no household employment.
+   */
+  domesticServiceShares?: { provinceId: Id; share: number }[];
 }
 
 export interface GoodQuantityDef {
@@ -344,6 +351,14 @@ export interface BuildingInstance {
    * building that extracts nothing. Fixed for the life of the building.
    */
   depositId: Id | null;
+  /**
+   * P7 (D-154, R8): this building's own job mix, replacing the definition's jobs, or
+   * null/absent for the definition's. Set by the 1900 generator from the territory's
+   * census (clerk share, hired hands on peasant farms, the territory's farm profession);
+   * the total workers per throughput unit equal the definition's. Fixed for the life of
+   * the building.
+   */
+  jobMix?: readonly ProfessionJobDef[] | null;
 }
 
 /**
@@ -556,6 +571,9 @@ export const CASH_NEUTRAL_TRANSACTION_KINDS = [
   "mint-purchase",
   "mint-sale",
   "metal-revaluation",
+  // P7 (D-154): a household pays its domestic servants (consumption of the employer,
+  // wage income of the servants).
+  "domestic-service",
 ] as const;
 
 /**
@@ -2053,6 +2071,8 @@ export interface BuildingInstanceInitialDef {  id: Id;
   technique?: number;
   /** P5b: the deposit an extraction building works; defaults to null. */
   depositId?: Id | null;
+  /** P7 (R8): the building's own job mix; defaults to the definition's jobs. */
+  jobMix?: ProfessionJobDef[] | null;
 }
 
 export interface MarketInitialDef {
@@ -2366,6 +2386,18 @@ export interface InstitutionAssignment {
   workers: number;
 }
 
+/**
+ * P7 (D-154, docs/P7_EMPLOYERS_PROPOSAL.md §4.1): servants of one block employed by a
+ * household block of the same province. The employer pays the servants' wage from its
+ * household cash; the service is the employer's consumption.
+ */
+export interface HouseholdAssignment {
+  id: Id;
+  employerBlockId: Id;
+  popBlockId: Id;
+  workers: number;
+}
+
 /** P7 (plan §4.3): a building's staffing ceiling, stored only where it is below 1. */
 export interface StaffingCeiling {
   buildingId: Id;
@@ -2396,6 +2428,9 @@ export interface LabourMarketState {
   /** Ascending id. */
   institutionEmployment: InstitutionAssignment[];
   nextInstitutionAssignmentId: Id;
+  /** P7 (§4.1): households' servants, ascending id. */
+  householdEmployment: HouseholdAssignment[];
+  nextHouseholdAssignmentId: Id;
   /** Ascending building id; buildings at ceiling 1 are absent. */
   staffingCeilings: StaffingCeiling[];
   /** Persisted allocator for blocks created by mobility and migration (plan §5.4). */

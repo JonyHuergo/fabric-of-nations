@@ -1,0 +1,145 @@
+{
+ "standardSchedule": {
+  "sourceYear": 1950,
+  "maleAnnualDeathsPer1000ByAgeBand": [
+   60.098821,
+   5.940957,
+   3.669887,
+   4.894042,
+   6.909946,
+   7.571599,
+   8.169097,
+   9.066696,
+   11.324114,
+   14.513307,
+   20.258141,
+   27.948733,
+   41.440639,
+   58.511856,
+   83.066236,
+   121.56458,
+   211.242501
+  ],
+  "femaleAnnualDeathsPer1000ByAgeBand": [
+   56.09593,
+   6.060894,
+   3.61235,
+   4.253557,
+   5.144964,
+   5.663041,
+   6.42165,
+   6.975347,
+   8.191738,
+   9.823448,
+   13.243836,
+   17.961051,
+   28.164687,
+   42.51961,
+   65.563939,
+   101.571991,
+   190.693882
+  ],
+  "ageSpecificBirthsPer1000Women": [
+   90.086,
+   227.047,
+   241.617,
+   196.565,
+   134.261,
+   65.363,
+   10.429
+  ]
+ },
+ "sexRatioAtBirth": 1.05,
+ "fertilityMultipliers": [
+  {
+   "professionId": 0,
+   "multiplier": 1
+  },
+  {
+   "professionId": 1,
+   "multiplier": 1
+  },
+  {
+   "professionId": 2,
+   "multiplier": 1
+  },
+  {
+   "professionId": 3,
+   "multiplier": 1
+  },
+  {
+   "professionId": 4,
+   "multiplier": 1
+  },
+  {
+   "professionId": 5,
+   "multiplier": 1
+  },
+  {
+   "professionId": 6,
+   "multiplier": 1
+  },
+  {
+   "professionId": 7,
+   "multiplier": 1
+  },
+  {
+   "professionId": 8,
+   "multiplier": 1
+  },
+  {
+   "professionId": 9,
+   "multiplier": 1
+  },
+  {
+   "professionId": 10,
+   "multiplier": 1
+  },
+  {
+   "professionId": 11,
+   "multiplier": 1
+  },
+  {
+   "professionId": 12,
+   "multiplier": 1
+  },
+  {
+   "professionId": 13,
+   "multiplier": 1
+  },
+  {
+   "professionId": 14,
+   "multiplier": 1
+  },
+  {
+   "professionId": 15,
+   "multiplier": 1
+  }
+ ],
+ "foodEnergy": [
+  {
+   "goodKey": "grain",
+   "kcalPerUnit": 3400
+  },
+  {
+   "goodKey": "livestock",
+   "kcalPerUnit": 2300
+  },
+  {
+   "goodKey": "fish",
+   "kcalPerUnit": 1000
+  },
+  {
+   "goodKey": "food-products",
+   "kcalPerUnit": 2500
+  }
+ ],
+ "provenance": {
+  "status": "partially source-backed",
+  "confidence": "medium",
+  "sourceName": "UN World Population Prospects 2024, world estimates for 1950 (age pattern only); food composition tables (dietary energy)",
+  "sourceUrl": "https://population.un.org/wpp/",
+  "accessDate": "2026-10-23",
+  "notes": "P4 (D-124, D-142): the standard schedule is the WPP 2024 world 1950 ASFR (TFR 4.83) and sex-specific central death rates by five-year band, used only as the age pattern; each block's fertility and child/adult mortality levels multiply it and are derived from simulated causes, starting from sourced 1900 levels (historical/p4/demography_1900.json). WPP 1951-2000 schedules are no longer inputs (validation targets only; see calibration/wpp_age_sex_reference.json and docs/P4_WPP_COMPARISON.md). The provisional 1900/1949 world schedules are removed. Sex ratio at birth 1.05 remains provisional. Food energy per kg, PROVISIONAL: grain 3,400 kcal (FAO food balance sheet conversion factors: wheat 3,340, milled rice 3,600, maize 3,650 kcal/kg, weighted toward wheat and rice); livestock (meat, carcass-weight mix) 2,300 kcal (FAO: bovine 2,350, ovine 2,600, pig meat 3,000+, poultry 1,700); fish 1,000 kcal (FAO fresh fish 800-1,200); food-products (flour, bread, sugar, dairy and preserved food mix) 2,500 kcal. The 1900 subsistence basket (0.527 kg grain, 0.03 kg each of livestock, fish and food-products per person per day) provides 1,966 kcal."
+ }
+}

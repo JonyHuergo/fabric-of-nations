@@ -271,6 +271,10 @@ export const SEMANTIC_LINE_RULES: Readonly<
     { subtype: "wage-expense", side: "debit" },
     { subtype: "wage-income", side: "credit" },
   ],
+  "domestic-service": [
+    { subtype: "consumption-expense", side: "debit" },
+    { subtype: "wage-income", side: "credit" },
+  ],
   upkeep: [
     { subtype: "upkeep-expense", side: "debit" },
     { subtype: "system-income", side: "credit" },

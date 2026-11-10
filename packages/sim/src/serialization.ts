@@ -930,6 +930,12 @@ export type SerializedBuilding = {
   readonly operatingCashAccountId: number;
   readonly technique: number;
   readonly depositId: number | null;
+  /**
+   * P7 (R8): the building's own job mix, null for the definition's jobs. Encoded on every
+   * building when any building has one (the column table needs the same fields on each row),
+   * absent otherwise (as hydroPotentialMWhPerYear).
+   */
+  readonly jobMix?: readonly { readonly professionId: number; readonly workersPerThroughputUnit: number }[] | null;
 };
 
 /** Encoded employment assignment. */
@@ -1373,6 +1379,7 @@ export function encodeWorld(world: World): SerializedWorld {
   assertValidWorld(world);
   // P5b (C-12): the hydro field is written for every province or for none.
   const encodeHydro = world.provinceEconomies.some((entry) => entry.hydroPotentialMWhPerYear !== null);
+  const encodeJobMix = world.buildings.some((building) => building.jobMix !== undefined && building.jobMix !== null);
   // P6 (D-153): the demand and housing fields are written for every record or for none,
   // so worlds without a demand system keep their earlier encoding.
   const encodeDemand = worldHasDemandState(world);
@@ -1589,6 +1596,14 @@ export function encodeWorld(world: World): SerializedWorld {
         operatingCashAccountId: building.operatingCashAccountId,
         technique: building.technique,
         depositId: building.depositId,
+        ...(encodeJobMix
+          ? {
+              jobMix:
+                building.jobMix === undefined || building.jobMix === null
+                  ? null
+                  : building.jobMix.map((job) => ({ professionId: job.professionId, workersPerThroughputUnit: job.workersPerThroughputUnit })),
+            }
+          : {}),
       })),
     employment: [...world.employment]
       .sort((left, right) => left.id - right.id)
@@ -3850,6 +3865,17 @@ function decodeBuilding(value: unknown, path: string): BuildingInstance {
     ),
     technique: requireFiniteNumber(record.technique, `${path}.technique`),
     depositId: record.depositId === null ? null : requireUint32(record.depositId, `${path}.depositId`),
+    ...(record.jobMix === undefined || record.jobMix === null
+      ? {}
+      : {
+          jobMix: requireArray(record.jobMix, `${path}.jobMix`).map((entry, index) => {
+            const job = requireRecord(entry, `${path}.jobMix[${String(index)}]`);
+            return {
+              professionId: requireUint32(job.professionId, `${path}.jobMix[${String(index)}].professionId`),
+              workersPerThroughputUnit: requireFiniteNumber(job.workersPerThroughputUnit, `${path}.jobMix[${String(index)}].workersPerThroughputUnit`),
+            };
+          }),
+        }),
   };
 }
 

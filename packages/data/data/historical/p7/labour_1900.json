@@ -1,0 +1,6515 @@
+{
+ "domesticServiceBuildingKeys": [
+  "personal-services"
+ ],
+ "domesticServiceShares": [
+  {
+   "provinceId": 1001,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1002,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1003,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1004,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1005,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1006,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1007,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1008,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1009,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1010,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1011,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1012,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1013,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1014,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1015,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1016,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1017,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1018,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1019,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1020,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1021,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1022,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1023,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1024,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1025,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1026,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1027,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1028,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1029,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1030,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1031,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1032,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1033,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1034,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1035,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1036,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1037,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1038,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1039,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1040,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1041,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1042,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1043,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1044,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1045,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1046,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1047,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1048,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1049,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 1050,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 1051,
+   "share": 0.0619922
+  },
+  {
+   "provinceId": 2001,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2002,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2003,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2004,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2005,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2006,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2007,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2008,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2009,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2010,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2011,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2012,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2013,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2014,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2015,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2016,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2017,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2018,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2019,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2020,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2021,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2022,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2023,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2024,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2025,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2026,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2027,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2028,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2029,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2030,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2031,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2032,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2033,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 2034,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 3001,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3002,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3003,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3004,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3005,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3006,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3007,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3008,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3009,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3010,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3011,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3012,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3013,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3014,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3015,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3016,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3017,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3018,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3019,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3020,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3021,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3022,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3023,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3024,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3025,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3026,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3027,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3028,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3029,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3030,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3031,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3032,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3033,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3034,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3035,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3036,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3037,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3038,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3039,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3040,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3041,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3042,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3043,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3044,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3045,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3046,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3047,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3048,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3049,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3050,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3051,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3052,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3053,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3054,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3055,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3056,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3057,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3058,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3059,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3060,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3061,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3062,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3063,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3064,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3065,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3066,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3067,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3068,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3069,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3070,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3071,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3072,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3073,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3074,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3075,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3076,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3077,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3078,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3079,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3080,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3081,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3082,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3083,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3084,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3085,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3086,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3087,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3088,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3089,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3090,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3091,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3092,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 3093,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 4001,
+   "share": 0.0581261
+  },
+  {
+   "provinceId": 4002,
+   "share": 0.0581261
+  },
+  {
+   "provinceId": 4003,
+   "share": 0.0581261
+  },
+  {
+   "provinceId": 4004,
+   "share": 0.0581261
+  },
+  {
+   "provinceId": 4005,
+   "share": 0.0581261
+  },
+  {
+   "provinceId": 4006,
+   "share": 0.0581261
+  },
+  {
+   "provinceId": 4007,
+   "share": 0.0581261
+  },
+  {
+   "provinceId": 4008,
+   "share": 0.0581261
+  },
+  {
+   "provinceId": 4009,
+   "share": 0.0581261
+  },
+  {
+   "provinceId": 4010,
+   "share": 0.0581261
+  },
+  {
+   "provinceId": 4011,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4012,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4013,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4014,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4015,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4016,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4017,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4018,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4019,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4020,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4021,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4022,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4023,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4024,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4025,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4026,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4027,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4028,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4029,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4030,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4031,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4032,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4033,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4034,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4035,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4036,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4037,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4038,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4039,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4040,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4041,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4042,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4043,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4044,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4045,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4046,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4047,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4048,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4049,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4050,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4051,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4052,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4053,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4054,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4055,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4056,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4057,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4058,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4059,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4060,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4061,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4062,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4063,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4064,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4065,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4066,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4067,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4068,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4069,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4070,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4071,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4072,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4073,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4074,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4075,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4076,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4077,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4078,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4079,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4080,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4081,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4082,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4083,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4084,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4085,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4086,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4087,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4088,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4089,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4090,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4091,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4092,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4093,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4094,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4095,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4096,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4097,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4098,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4099,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4100,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4101,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4102,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4103,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4104,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4105,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4106,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4107,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4108,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 4109,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 6001,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6002,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6003,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6004,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6005,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6006,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6007,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6008,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6009,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6010,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6011,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6012,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6013,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6014,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6015,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6016,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6017,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6018,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 6019,
+   "share": 0.0296264
+  },
+  {
+   "provinceId": 7001,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7002,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7003,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7004,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7005,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7006,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7007,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7008,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7009,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7010,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7011,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7012,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7013,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7014,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7015,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7016,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7017,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7018,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7019,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7020,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7021,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7022,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7023,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7024,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7025,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7026,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7027,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7028,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7029,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7030,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7031,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7032,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7033,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7034,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7035,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7036,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7037,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7038,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7039,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7040,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7041,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7042,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7043,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7044,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7045,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7046,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7047,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7048,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7049,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 7050,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 8001,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8002,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8003,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8004,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8005,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8006,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8007,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8008,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8009,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8010,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8011,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8012,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8013,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8014,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8015,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8016,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8017,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8018,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 8020,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 9001,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9002,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9003,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9004,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9005,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9006,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9007,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9008,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9009,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9010,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9011,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 9012,
+   "share": 0.102284
+  },
+  {
+   "provinceId": 10001,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 10002,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 10003,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 10004,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 10005,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 10006,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 10007,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 10008,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 10009,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 10010,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 10011,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 11001,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11002,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11003,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11004,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11005,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11006,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11007,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11008,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11009,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11010,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11011,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11012,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11013,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11014,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11015,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11016,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11017,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11018,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11019,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11020,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11021,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11022,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11023,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11024,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11025,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 11026,
+   "share": 0.0553789
+  },
+  {
+   "provinceId": 12001,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12002,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12003,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12004,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12005,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12006,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12007,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12008,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12009,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12010,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12011,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12012,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12013,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12014,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12015,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12016,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12017,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12018,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12019,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12020,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 12021,
+   "share": 0.107778
+  },
+  {
+   "provinceId": 13001,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13002,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13003,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13004,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13005,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13006,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13007,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13008,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13009,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13010,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13011,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13012,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13013,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13014,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13015,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13016,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13017,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13018,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 13019,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 14001,
+   "share": 0.0834291
+  },
+  {
+   "provinceId": 14002,
+   "share": 0.0834291
+  },
+  {
+   "provinceId": 14003,
+   "share": 0.0834291
+  },
+  {
+   "provinceId": 14004,
+   "share": 0.0834291
+  },
+  {
+   "provinceId": 14005,
+   "share": 0.0834291
+  },
+  {
+   "provinceId": 14006,
+   "share": 0.0553044
+  },
+  {
+   "provinceId": 14007,
+   "share": 0.0553044
+  },
+  {
+   "provinceId": 15001,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 15002,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 15003,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 15004,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 15005,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 15006,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 15007,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 15008,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 15009,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 15011,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 16001,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 16002,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 16003,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 16004,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 16005,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 17001,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 17002,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 17003,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 18001,
+   "share": 0.0461204
+  },
+  {
+   "provinceId": 18002,
+   "share": 0.0461204
+  },
+  {
+   "provinceId": 18003,
+   "share": 0.0461204
+  },
+  {
+   "provinceId": 18004,
+   "share": 0.0461204
+  },
+  {
+   "provinceId": 19001,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 19002,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 19003,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 19004,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 19005,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 19006,
+   "share": 0.0449619
+  },
+  {
+   "provinceId": 20001,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 20002,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 20003,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 20004,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 20005,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 20006,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 20007,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 21001,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 21002,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 21003,
+   "share": 0.0733061
+  },
+  {
+   "provinceId": 22001,
+   "share": 0.068397
+  },
+  {
+   "provinceId": 23001,
+   "share": 0.0619922
+  },
+  {
+   "provinceId": 24001,
+   "share": 0.0582209
+  },
+  {
+   "provinceId": 25001,
+   "share": 0.0684381
+  },
+  {
+   "provinceId": 60001,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60002,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60003,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60004,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60005,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60006,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60007,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60008,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60009,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60010,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60011,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60012,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60013,
+   "share": 0.0450217
+  },
+  {
+   "provinceId": 60014,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60015,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60016,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60017,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60018,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60019,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60020,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60021,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60022,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60023,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60024,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60025,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60026,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60027,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60028,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60030,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60031,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60032,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60033,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60034,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60035,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60036,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60037,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60038,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60039,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60040,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60041,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60042,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60043,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60044,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60045,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60046,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60047,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60048,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60049,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60050,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60051,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60052,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 60053,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 66001,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 100001,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100002,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100003,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100004,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100005,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100006,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100007,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100008,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100009,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100010,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100011,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100012,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100013,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100014,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100015,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100016,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100017,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100018,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100019,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100020,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100021,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100022,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100023,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100024,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100025,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100026,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100027,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100028,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100029,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100030,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100031,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100032,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100033,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100034,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100035,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100036,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100037,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100038,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100039,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100040,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100041,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100042,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100043,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100044,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100045,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100046,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100047,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100048,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100049,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100050,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100051,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100052,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100053,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100054,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100055,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100056,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100057,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100058,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100059,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100060,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100061,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100062,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100063,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100064,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100065,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100066,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100067,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100068,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100069,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100070,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100071,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100072,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100073,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100074,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100075,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100076,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100077,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100078,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100079,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100080,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100081,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100082,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100083,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100084,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100085,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100086,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100087,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100088,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100089,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100090,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100091,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100092,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100093,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100094,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100095,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100096,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100097,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100098,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100099,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100100,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100101,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100102,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100103,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100104,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100105,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100106,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100107,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100108,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100109,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100110,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100111,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100112,
+   "share": 0.0538829
+  },
+  {
+   "provinceId": 100113,
+   "share": 0.0538829
+  },
+  {
+   "provinceId": 100114,
+   "share": 0.0538829
+  },
+  {
+   "provinceId": 100115,
+   "share": 0.0538829
+  },
+  {
+   "provinceId": 100116,
+   "share": 0.0538829
+  },
+  {
+   "provinceId": 100117,
+   "share": 0.0538829
+  },
+  {
+   "provinceId": 100118,
+   "share": 0.0538829
+  },
+  {
+   "provinceId": 100119,
+   "share": 0.0538829
+  },
+  {
+   "provinceId": 100120,
+   "share": 0.0538829
+  },
+  {
+   "provinceId": 100121,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100122,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100123,
+   "share": 0.0412441
+  },
+  {
+   "provinceId": 100124,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100125,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100126,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100127,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100128,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100129,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100130,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100131,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100132,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100133,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100134,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100135,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100136,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100137,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100138,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100139,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100140,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100141,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100142,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100143,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100144,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100145,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100146,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100147,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100148,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100149,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100150,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100151,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100152,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100153,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100154,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100155,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100156,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100157,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100158,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100159,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100160,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100161,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100162,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100163,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 100164,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100165,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100166,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100167,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100168,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 100169,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100170,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100171,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100172,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100173,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100174,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100175,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100176,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100177,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100178,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100179,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100180,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100181,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100182,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100183,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100184,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100185,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100186,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100187,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100188,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100189,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100190,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100191,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100192,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100193,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100194,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100195,
+   "share": 0.0143213
+  },
+  {
+   "provinceId": 100196,
+   "share": 0.038815
+  },
+  {
+   "provinceId": 100197,
+   "share": 0.0532759
+  },
+  {
+   "provinceId": 100198,
+   "share": 0.0532759
+  },
+  {
+   "provinceId": 100199,
+   "share": 0.0532759
+  },
+  {
+   "provinceId": 100200,
+   "share": 0.0532759
+  },
+  {
+   "provinceId": 100201,
+   "share": 0.0358888
+  },
+  {
+   "provinceId": 100202,
+   "share": 0.0358888
+  },
+  {
+   "provinceId": 100203,
+   "share": 0.0358888
+  },
+  {
+   "provinceId": 100204,
+   "share": 0.0358888
+  },
+  {
+   "provinceId": 100205,
+   "share": 0.0358888
+  },
+  {
+   "provinceId": 100206,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100207,
+   "share": 0.0546039
+  },
+  {
+   "provinceId": 100208,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 100209,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100210,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100211,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100212,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100213,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100214,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100215,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100216,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100217,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100218,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100219,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100220,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100221,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100222,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100223,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100224,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100225,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100226,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100227,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100228,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100229,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100230,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100231,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100232,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 100233,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100234,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100235,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100236,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100237,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 100238,
+   "share": 0.0423354
+  },
+  {
+   "provinceId": 200001,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200002,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200003,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200004,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 200005,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 200007,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 200008,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 200009,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 200010,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 200011,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 200012,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 200013,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 200014,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 200015,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200016,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200019,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200020,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200021,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200022,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200023,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200024,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200025,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200026,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200027,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200028,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200029,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200030,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200031,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200032,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200033,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200034,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200035,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200036,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200037,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200038,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200039,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200040,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200041,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200042,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200043,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200044,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200045,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200046,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200047,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200048,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200049,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200050,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200051,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200052,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200053,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200054,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200055,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200056,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200057,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200058,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200059,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200060,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200061,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200062,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200063,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200064,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200065,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200066,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200067,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200068,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200069,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200070,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200071,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200072,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200073,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200074,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200075,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200076,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200077,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200078,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200079,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200080,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200081,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200082,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200083,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200084,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200085,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200086,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200087,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200088,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200089,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200090,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200091,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200092,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200093,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200094,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200095,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200096,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200097,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200098,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200099,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200100,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200101,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200102,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200103,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200104,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200105,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200106,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200107,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200108,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200109,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200110,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200111,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200112,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200113,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200114,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200115,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200116,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200117,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200118,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200119,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200120,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200121,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200122,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200123,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200124,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200125,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200126,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200127,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200128,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200129,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200130,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200131,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200132,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200133,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200134,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200135,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200136,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200137,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200138,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200139,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200140,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200141,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200142,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200143,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200144,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200145,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200146,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200147,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200148,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200149,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200150,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200151,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200152,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200153,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200154,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200155,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200156,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200157,
+   "share": 0.0472543
+  },
+  {
+   "provinceId": 200158,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200159,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200160,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200161,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200162,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200163,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200164,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200165,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200166,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200167,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200168,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200169,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200170,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200171,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200172,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200173,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200174,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200175,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200176,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200177,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200178,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200179,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200180,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200181,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200182,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200183,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200184,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200185,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200186,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200187,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200188,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200189,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200190,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200191,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200192,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200193,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200194,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200195,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200196,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200197,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200198,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200199,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200200,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200201,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200202,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200203,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200204,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200205,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200206,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200207,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200208,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200209,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200210,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200211,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200212,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200213,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200214,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200215,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200216,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200217,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200218,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200219,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200220,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200221,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200222,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200223,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200224,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200225,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200226,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200227,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200228,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200229,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200230,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200231,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200232,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200233,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200234,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200235,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200236,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200237,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200238,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200239,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200240,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200241,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200242,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200243,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200244,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200245,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200246,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 200247,
+   "share": 0.0460434
+  },
+  {
+   "provinceId": 200248,
+   "share": 0.0460434
+  },
+  {
+   "provinceId": 200249,
+   "share": 0.0460434
+  },
+  {
+   "provinceId": 200250,
+   "share": 0.0460434
+  },
+  {
+   "provinceId": 200251,
+   "share": 0.0460434
+  },
+  {
+   "provinceId": 200252,
+   "share": 0.0460434
+  },
+  {
+   "provinceId": 200253,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200254,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200255,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200256,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200257,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200258,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200259,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 200260,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 300001,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300002,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300003,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300004,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300005,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300006,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300007,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300008,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300009,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300010,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300011,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300012,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300013,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300014,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300015,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300016,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300017,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300018,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300019,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300020,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300021,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300022,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300023,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300024,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300025,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300026,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300027,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300028,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300029,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300030,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300031,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300032,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300033,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300034,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300035,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300036,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300037,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300038,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300039,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300040,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300041,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300042,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300043,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300044,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300045,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300046,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300047,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300048,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300049,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300050,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300051,
+   "share": 0.0536854
+  },
+  {
+   "provinceId": 300052,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300053,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300054,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300055,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300056,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300057,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300058,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300059,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300060,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300061,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300062,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300063,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 300064,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300065,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300066,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300067,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300068,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300069,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300070,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300071,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300072,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300073,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300074,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300075,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300076,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300077,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300078,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300079,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300080,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300081,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300082,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300083,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300084,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300085,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300086,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300087,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300088,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300089,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300090,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300091,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300092,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300093,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300094,
+   "share": 0.0509973
+  },
+  {
+   "provinceId": 300095,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300096,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300097,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300098,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300099,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300100,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300101,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300102,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300103,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300104,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300105,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300106,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300107,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300108,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300109,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300110,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300111,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300112,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300113,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300114,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300115,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300116,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300117,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300118,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300119,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300120,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300121,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300122,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300123,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300124,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300125,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300127,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300128,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300129,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300130,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300131,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300132,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300133,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300134,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300135,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300136,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300137,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300138,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300139,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300140,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300141,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300142,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300143,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300144,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300145,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300146,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300147,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300148,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300149,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300150,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300151,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300152,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300153,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300154,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300155,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300156,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300157,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300158,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300159,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300160,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300161,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300162,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300163,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300164,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300165,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300166,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300167,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300168,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300169,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300170,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300171,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300172,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300173,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300174,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300175,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300176,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300177,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300178,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300179,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300180,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300181,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300182,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300183,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300184,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300185,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300186,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300187,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300188,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300189,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300190,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300191,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300192,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300193,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300194,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300195,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300196,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300197,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300198,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300199,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300200,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300201,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300202,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300203,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300204,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300205,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300206,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300207,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300208,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300209,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300210,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300211,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300212,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300213,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300214,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300215,
+   "share": 0.0412912
+  },
+  {
+   "provinceId": 300216,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300217,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300218,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300219,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300220,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300221,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300222,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300223,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300224,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300225,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300226,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300227,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300228,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300229,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300230,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300231,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300232,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300233,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300234,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300235,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300236,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300237,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300238,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300239,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300240,
+   "share": 0.0512441
+  },
+  {
+   "provinceId": 300241,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300242,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300243,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300244,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300245,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300246,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300247,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300248,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300249,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300250,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300251,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300252,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300253,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300254,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300255,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300256,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300257,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300258,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300259,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300260,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300261,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300262,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300263,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300264,
+   "share": 0.0414464
+  },
+  {
+   "provinceId": 300265,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300266,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300267,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300268,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300269,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300270,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300271,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300272,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300273,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300274,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300275,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300276,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300277,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300278,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300279,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300280,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300281,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300282,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300283,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300284,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300285,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300286,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300287,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300288,
+   "share": 0.0412044
+  },
+  {
+   "provinceId": 300289,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300290,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300291,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300292,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300293,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300294,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300295,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300296,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300297,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300298,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300299,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300300,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300301,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300302,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300303,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300304,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300305,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300306,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300307,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300308,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300309,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300310,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300311,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300312,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300313,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300314,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300315,
+   "share": 0.0626843
+  },
+  {
+   "provinceId": 300316,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300317,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300318,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300319,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300320,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300321,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300322,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300323,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300324,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300325,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300326,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300327,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300328,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300329,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300330,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300331,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300332,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300333,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300334,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300335,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300336,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300337,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300338,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300339,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 300340,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300341,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300342,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300343,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300344,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300345,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300346,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300347,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300348,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300349,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300350,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300351,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300352,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300353,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300354,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300355,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300356,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300357,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300358,
+   "share": 0.0626898
+  },
+  {
+   "provinceId": 300359,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300360,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300361,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300362,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300363,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300364,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300365,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300366,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300367,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300368,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300369,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300370,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300371,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300372,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300373,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300374,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300375,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300376,
+   "share": 0.0468459
+  },
+  {
+   "provinceId": 300377,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300378,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300379,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300380,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300381,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300382,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300383,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300384,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300385,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300386,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300387,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300388,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300389,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300390,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300391,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300392,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300393,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300394,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300395,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300396,
+   "share": 0.0371436
+  },
+  {
+   "provinceId": 300397,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300398,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300399,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300400,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300401,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300402,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300403,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300404,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 300405,
+   "share": 0.0498423
+  },
+  {
+   "provinceId": 300406,
+   "share": 0.0498423
+  },
+  {
+   "provinceId": 300407,
+   "share": 0.0498423
+  },
+  {
+   "provinceId": 300408,
+   "share": 0.0498423
+  },
+  {
+   "provinceId": 300409,
+   "share": 0.0498423
+  },
+  {
+   "provinceId": 300410,
+   "share": 0.0498423
+  },
+  {
+   "provinceId": 300411,
+   "share": 0.0498423
+  },
+  {
+   "provinceId": 300412,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300413,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300414,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300415,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300416,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300417,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300418,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300419,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300420,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300421,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300422,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300423,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300424,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300425,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300426,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300427,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300428,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300429,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300430,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300431,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300432,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300433,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300434,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300435,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300437,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300441,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300442,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300443,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300445,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300446,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300447,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300448,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300450,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300454,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300455,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 300456,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 300457,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 300458,
+   "share": 0.0485009
+  },
+  {
+   "provinceId": 300459,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300460,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300461,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300462,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 300465,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 300467,
+   "share": 0.0553044
+  },
+  {
+   "provinceId": 300468,
+   "share": 0.0553044
+  },
+  {
+   "provinceId": 300469,
+   "share": 0.0382335
+  },
+  {
+   "provinceId": 400001,
+   "share": 0.0746817
+  },
+  {
+   "provinceId": 400002,
+   "share": 0.0746817
+  },
+  {
+   "provinceId": 400003,
+   "share": 0.0746817
+  },
+  {
+   "provinceId": 400004,
+   "share": 0.0746817
+  },
+  {
+   "provinceId": 400005,
+   "share": 0.0746817
+  },
+  {
+   "provinceId": 400006,
+   "share": 0.0746817
+  },
+  {
+   "provinceId": 400007,
+   "share": 0.0746817
+  },
+  {
+   "provinceId": 400008,
+   "share": 0.0746817
+  },
+  {
+   "provinceId": 400012,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400013,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400014,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400015,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400016,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400017,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400018,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400019,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400020,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400021,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400022,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400023,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400024,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400025,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400026,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400027,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400028,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400029,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400037,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400038,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400039,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400040,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400041,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400042,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400043,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400044,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400045,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400046,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400047,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400048,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400049,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400050,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400051,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400052,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400053,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400054,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400055,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400056,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400057,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400058,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400059,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400060,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400063,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400064,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400065,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400066,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400067,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400068,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400069,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400070,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400071,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400072,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400073,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400074,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400075,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400076,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400077,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400078,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400079,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400080,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400081,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400082,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400083,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400084,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400085,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400086,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400087,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400088,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400089,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400090,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400091,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400092,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400097,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400099,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400102,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400103,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400123,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 400124,
+   "share": 0.112216
+  },
+  {
+   "provinceId": 400125,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 400126,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 400128,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 400129,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 400130,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 400131,
+   "share": 0.0524893
+  },
+  {
+   "provinceId": 400132,
+   "share": 0.0389805
+  },
+  {
+   "provinceId": 400133,
+   "share": 0.0952756
+  },
+  {
+   "provinceId": 400134,
+   "share": 0.0517249
+  },
+  {
+   "provinceId": 400135,
+   "share": 0.0461204
+  },
+  {
+   "provinceId": 400137,
+   "share": 0.0468502
+  },
+  {
+   "provinceId": 400138,
+   "share": 0.0391478
+  },
+  {
+   "provinceId": 400139,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 400140,
+   "share": 0.0410592
+  },
+  {
+   "provinceId": 400141,
+   "share": 0.0534494
+  },
+  {
+   "provinceId": 400142,
+   "share": 0.0683928
+  },
+  {
+   "provinceId": 400143,
+   "share": 0.068626
+  },
+  {
+   "provinceId": 400144,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400145,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400146,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400147,
+   "share": 0.039637
+  },
+  {
+   "provinceId": 400148,
+   "share": 0.0746817
+  },
+  {
+   "provinceId": 400149,
+   "share": 0.0759748
+  },
+  {
+   "provinceId": 400150,
+   "share": 0.039637
+  }
+ ]
+}

@@ -874,6 +874,15 @@ export const HOUSING_PULL_ELASTICITY = 0.5;
 /** K_h, pull lost per unit crowding above the 1900 level, dimensionless. PROVISIONAL. */
 export const HOUSING_PULL_CROWDING_WEIGHT = 0.5;
 
+/**
+ * P7 (D-154, docs/P7_EMPLOYERS_PROPOSAL.md §4.1): a domestic servant's cash wage as a share of
+ * the paid wage of the servant's profession in the province, dimensionless. Sourced: Historical
+ * Statistics of the United States 1975, D 757 (domestic service, 1901) $240 ÷ D 755 (personal
+ * services, 1900) $330. Board and lodging come on top in kind (bought by the employer's
+ * consumption).
+ */
+export const DOMESTIC_WAGE_RATIO = 240 / 330;
+
 /** Monthly labour reports kept in `World.labourMarket.history`. */
 export const LABOUR_HISTORY_MONTHS = 12;
 

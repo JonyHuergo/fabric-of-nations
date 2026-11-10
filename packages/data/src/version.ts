@@ -1,5 +1,5 @@
 /** Version of the static JSON data package. */
-export const DATA_PACKAGE_VERSION = "m3-economy-v14";
+export const DATA_PACKAGE_VERSION = "m3-economy-v15";
 
 /** M3 data is provisional; not source-verified historical calibration. */
 export const DATA_PACKAGE_STATUS = "provisional" as const;

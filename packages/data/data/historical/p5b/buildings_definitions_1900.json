@@ -124,8 +124,12 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
-    "workersPerThroughputUnit": 1000
+    "professionId": 1,
+    "workersPerThroughputUnit": 400
+   },
+   {
+    "professionId": 5,
+    "workersPerThroughputUnit": 600
    }
   ],
   "constructionCostRUSD": 3429750,
@@ -176,8 +180,12 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
-    "workersPerThroughputUnit": 1000
+    "professionId": 1,
+    "workersPerThroughputUnit": 400
+   },
+   {
+    "professionId": 5,
+    "workersPerThroughputUnit": 600
    }
   ],
   "constructionCostRUSD": 3429750,
@@ -351,12 +359,12 @@
   ],
   "jobs": [
    {
-    "professionId": 2,
-    "workersPerThroughputUnit": 333.333333
-   },
-   {
     "professionId": 1,
     "workersPerThroughputUnit": 666.666667
+   },
+   {
+    "professionId": 9,
+    "workersPerThroughputUnit": 333.333333
    }
   ],
   "constructionCostRUSD": 9898736.67,
@@ -434,43 +442,43 @@
    },
    {
     "goodId": 8,
-    "quantity": 6695480
+    "quantity": 7266010
    },
    {
     "goodId": 9,
-    "quantity": 7985250
+    "quantity": 8348110
    },
    {
     "goodId": 10,
-    "quantity": 6573240
+    "quantity": 6067150
    },
    {
     "goodId": 11,
-    "quantity": 4095280
+    "quantity": 4204380
    },
    {
     "goodId": 12,
-    "quantity": 308805
+    "quantity": 337100
    },
    {
     "goodId": 13,
-    "quantity": 157281
+    "quantity": 134092
    },
    {
     "goodId": 14,
-    "quantity": 30154
+    "quantity": 30194
    },
    {
     "goodId": 15,
-    "quantity": 263
+    "quantity": 324
    },
    {
     "goodId": 16,
-    "quantity": 82647
+    "quantity": 76515
    },
    {
     "goodId": 17,
-    "quantity": 5512
+    "quantity": 5043
    },
    {
     "goodId": 18,
@@ -478,19 +486,19 @@
    },
    {
     "goodId": 19,
-    "quantity": 1784
+    "quantity": 1735
    },
    {
     "goodId": 20,
-    "quantity": 102
+    "quantity": 99
    },
    {
     "goodId": 21,
-    "quantity": 94
+    "quantity": 81
    },
    {
     "goodId": 22,
-    "quantity": 646
+    "quantity": 622
    },
    {
     "goodId": 23,
@@ -498,7 +506,7 @@
    },
    {
     "goodId": 24,
-    "quantity": 81
+    "quantity": 78
    },
    {
     "goodId": 25,
@@ -510,35 +518,35 @@
    },
    {
     "goodId": 27,
-    "quantity": 3189
+    "quantity": 2917
    },
    {
     "goodId": 28,
-    "quantity": 715
+    "quantity": 654
    },
    {
     "goodId": 29,
-    "quantity": 1375
+    "quantity": 1258
    },
    {
     "goodId": 31,
-    "quantity": 1885
+    "quantity": 1834
    },
    {
     "goodId": 32,
-    "quantity": 105
+    "quantity": 102
    },
    {
     "goodId": 33,
-    "quantity": 26
+    "quantity": 23
    },
    {
     "goodId": 34,
-    "quantity": 122
+    "quantity": 113
    },
    {
     "goodId": 35,
-    "quantity": 13
+    "quantity": 12
    },
    {
     "goodId": 36,
@@ -546,15 +554,15 @@
    },
    {
     "goodId": 37,
-    "quantity": 32491
+    "quantity": 27791
    },
    {
     "goodId": 38,
-    "quantity": 1549
+    "quantity": 1501
    },
    {
     "goodId": 39,
-    "quantity": 3
+    "quantity": 2
    },
    {
     "goodId": 40,
@@ -570,7 +578,7 @@
    },
    {
     "goodId": 43,
-    "quantity": 134
+    "quantity": 157
    },
    {
     "goodId": 44,
@@ -578,7 +586,7 @@
    },
    {
     "goodId": 45,
-    "quantity": 146391
+    "quantity": 121393
    },
    {
     "goodId": 46,
@@ -602,15 +610,15 @@
    },
    {
     "goodId": 51,
-    "quantity": 6692580
+    "quantity": 5563740
    },
    {
     "goodId": 57,
-    "quantity": 115264
+    "quantity": 100989
    },
    {
     "goodId": 58,
-    "quantity": 6949
+    "quantity": 6874
    },
    {
     "goodId": 59,
@@ -715,12 +723,8 @@
   ],
   "jobs": [
    {
-    "professionId": 2,
-    "workersPerThroughputUnit": 333.333333
-   },
-   {
     "professionId": 0,
-    "workersPerThroughputUnit": 666.666667
+    "workersPerThroughputUnit": 1000
    }
   ],
   "constructionCostRUSD": 7612230,
@@ -890,8 +894,12 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
-    "workersPerThroughputUnit": 1000
+    "professionId": 1,
+    "workersPerThroughputUnit": 400
+   },
+   {
+    "professionId": 5,
+    "workersPerThroughputUnit": 600
    }
   ],
   "constructionCostRUSD": 3429750,
@@ -942,8 +950,12 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
-    "workersPerThroughputUnit": 1000
+    "professionId": 1,
+    "workersPerThroughputUnit": 400
+   },
+   {
+    "professionId": 5,
+    "workersPerThroughputUnit": 600
    }
   ],
   "constructionCostRUSD": 3429750,
@@ -994,12 +1006,8 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
-    "workersPerThroughputUnit": 800
-   },
-   {
     "professionId": 1,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 1000
    }
   ],
   "constructionCostRUSD": 4115702,
@@ -1056,12 +1064,8 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
-    "workersPerThroughputUnit": 500
-   },
-   {
     "professionId": 1,
-    "workersPerThroughputUnit": 500
+    "workersPerThroughputUnit": 1000
    }
   ],
   "constructionCostRUSD": 5144630,
@@ -1112,7 +1116,7 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
+    "professionId": 1,
     "workersPerThroughputUnit": 1000
    }
   ],
@@ -1165,8 +1169,12 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
-    "workersPerThroughputUnit": 1000
+    "professionId": 1,
+    "workersPerThroughputUnit": 400
+   },
+   {
+    "professionId": 5,
+    "workersPerThroughputUnit": 600
    }
   ],
   "constructionCostRUSD": 3429750,
@@ -1217,8 +1225,12 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
-    "workersPerThroughputUnit": 1000
+    "professionId": 1,
+    "workersPerThroughputUnit": 400
+   },
+   {
+    "professionId": 5,
+    "workersPerThroughputUnit": 600
    }
   ],
   "constructionCostRUSD": 3429750,
@@ -1342,7 +1354,7 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
+    "professionId": 1,
     "workersPerThroughputUnit": 1000
    }
   ],
@@ -1408,7 +1420,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 150
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 50
    }
   ],
   "constructionCostRUSD": 8683046,
@@ -2193,7 +2209,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 100
+    "workersPerThroughputUnit": 75
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 25
    }
   ],
   "constructionCostRUSD": 7771278,
@@ -2253,7 +2273,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 150
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 50
    }
   ],
   "constructionCostRUSD": 8683046,
@@ -2317,7 +2341,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 150
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 50
    }
   ],
   "constructionCostRUSD": 8683046,
@@ -2381,7 +2409,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 150
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 50
    }
   ],
   "constructionCostRUSD": 8683046,
@@ -2440,7 +2472,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 150
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 50
    }
   ],
   "constructionCostRUSD": 8683046,
@@ -2505,11 +2541,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 150
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 200
+    "professionId": 12,
+    "workersPerThroughputUnit": 250
    }
   ],
   "constructionCostRUSD": 8331904,
@@ -2577,7 +2613,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 50
+    "workersPerThroughputUnit": 37.5
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 12.5
    }
   ],
   "constructionCostRUSD": 7315394,
@@ -2641,7 +2681,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 50
+    "workersPerThroughputUnit": 37.5
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 12.5
    }
   ],
   "constructionCostRUSD": 7315394,
@@ -2709,7 +2753,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 100
+    "workersPerThroughputUnit": 75
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 25
    }
   ],
   "constructionCostRUSD": 7771278,
@@ -2769,11 +2817,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 100
+    "workersPerThroughputUnit": 75
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 50
+    "professionId": 12,
+    "workersPerThroughputUnit": 75
    }
   ],
   "constructionCostRUSD": 7683492.5,
@@ -2840,11 +2888,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 100
+    "workersPerThroughputUnit": 75
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 100
+    "professionId": 12,
+    "workersPerThroughputUnit": 125
    }
   ],
   "constructionCostRUSD": 7595707,
@@ -2908,7 +2956,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 100
+    "workersPerThroughputUnit": 75
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 25
    }
   ],
   "constructionCostRUSD": 7771278,
@@ -2972,11 +3024,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 100
+    "workersPerThroughputUnit": 75
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 100
+    "professionId": 12,
+    "workersPerThroughputUnit": 125
    }
   ],
   "constructionCostRUSD": 7595707,
@@ -3040,11 +3092,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 100
+    "workersPerThroughputUnit": 75
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 100
+    "professionId": 12,
+    "workersPerThroughputUnit": 125
    }
   ],
   "constructionCostRUSD": 7595707,
@@ -3156,11 +3208,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 100
+    "workersPerThroughputUnit": 75
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 100
+    "professionId": 12,
+    "workersPerThroughputUnit": 125
    }
   ],
   "constructionCostRUSD": 7595707,
@@ -3224,7 +3276,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 150
+    "workersPerThroughputUnit": 112.5
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 37.5
    }
   ],
   "constructionCostRUSD": 8227162,
@@ -3296,11 +3352,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 150
+    "workersPerThroughputUnit": 112.5
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 50
+    "professionId": 12,
+    "workersPerThroughputUnit": 87.5
    }
   ],
   "constructionCostRUSD": 8139376.5,
@@ -3380,11 +3436,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 150
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 200
+    "professionId": 12,
+    "workersPerThroughputUnit": 250
    }
   ],
   "constructionCostRUSD": 8331904,
@@ -3460,7 +3516,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 150
+    "workersPerThroughputUnit": 112.5
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 37.5
    }
   ],
   "constructionCostRUSD": 8227162,
@@ -3519,11 +3579,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 150
+    "workersPerThroughputUnit": 112.5
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 150
+    "professionId": 12,
+    "workersPerThroughputUnit": 187.5
    }
   ],
   "constructionCostRUSD": 7963805.5,
@@ -3587,7 +3647,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 100
+    "workersPerThroughputUnit": 75
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 25
    }
   ],
   "constructionCostRUSD": 7771278,
@@ -3651,7 +3715,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 150
+    "workersPerThroughputUnit": 112.5
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 37.5
    }
   ],
   "constructionCostRUSD": 8227162,
@@ -3983,11 +4051,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 150
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 200
+    "professionId": 12,
+    "workersPerThroughputUnit": 250
    }
   ],
   "constructionCostRUSD": 8331904,
@@ -4051,11 +4119,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 150
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 200
+    "professionId": 12,
+    "workersPerThroughputUnit": 250
    }
   ],
   "constructionCostRUSD": 8331904,
@@ -4118,7 +4186,7 @@
     "workersPerThroughputUnit": 800
    },
    {
-    "professionId": 2,
+    "professionId": 9,
     "workersPerThroughputUnit": 200
    }
   ],
@@ -4179,11 +4247,11 @@
    },
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 200
+    "workersPerThroughputUnit": 150
    },
    {
-    "professionId": 4,
-    "workersPerThroughputUnit": 200
+    "professionId": 12,
+    "workersPerThroughputUnit": 250
    }
   ],
   "constructionCostRUSD": 8331904,
@@ -4238,12 +4306,12 @@
   ],
   "jobs": [
    {
-    "professionId": 1,
-    "workersPerThroughputUnit": 400
-   },
-   {
     "professionId": 2,
     "workersPerThroughputUnit": 600
+   },
+   {
+    "professionId": 6,
+    "workersPerThroughputUnit": 400
    }
   ],
   "constructionCostRUSD": 12330118,
@@ -4298,12 +4366,12 @@
   ],
   "jobs": [
    {
-    "professionId": 1,
-    "workersPerThroughputUnit": 800
-   },
-   {
     "professionId": 2,
     "workersPerThroughputUnit": 200
+   },
+   {
+    "professionId": 6,
+    "workersPerThroughputUnit": 800
    }
   ],
   "constructionCostRUSD": 8683046,
@@ -4364,12 +4432,12 @@
   ],
   "jobs": [
    {
-    "professionId": 1,
-    "workersPerThroughputUnit": 300
-   },
-   {
     "professionId": 2,
     "workersPerThroughputUnit": 700
+   },
+   {
+    "professionId": 6,
+    "workersPerThroughputUnit": 300
    }
   ],
   "constructionCostRUSD": 13241886,
@@ -4429,14 +4497,10 @@
   "jobs": [
    {
     "professionId": 2,
-    "workersPerThroughputUnit": 700
+    "workersPerThroughputUnit": 850
    },
    {
     "professionId": 3,
-    "workersPerThroughputUnit": 150
-   },
-   {
-    "professionId": 4,
     "workersPerThroughputUnit": 150
    }
   ],
@@ -4487,12 +4551,12 @@
   ],
   "jobs": [
    {
-    "professionId": 1,
-    "workersPerThroughputUnit": 700
-   },
-   {
     "professionId": 2,
     "workersPerThroughputUnit": 300
+   },
+   {
+    "professionId": 6,
+    "workersPerThroughputUnit": 700
    }
   ],
   "constructionCostRUSD": 9594814,
@@ -4542,8 +4606,12 @@
   ],
   "jobs": [
    {
-    "professionId": 0,
-    "workersPerThroughputUnit": 1000
+    "professionId": 1,
+    "workersPerThroughputUnit": 400
+   },
+   {
+    "professionId": 5,
+    "workersPerThroughputUnit": 600
    }
   ],
   "constructionCostRUSD": 3429750,
@@ -4646,6 +4714,193 @@
    {
     "goodId": 38,
     "quantityPerLevelPerDay": 0.182275
+   }
+  ]
+ },
+ {
+  "id": 73,
+  "key": "shop",
+  "name": "Shop",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 15,
+    "quantityPerThroughputUnit": 0.118745
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 52,
+    "quantityPerThroughputUnit": 59372.3
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 6,
+    "workersPerThroughputUnit": 400
+   },
+   {
+    "professionId": 9,
+    "workersPerThroughputUnit": 600
+   }
+  ],
+  "constructionCostRUSD": 12330118,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 506.72,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "services",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 20652.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 562.981
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 3.53635
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.144601
+   }
+  ]
+ },
+ {
+  "id": 74,
+  "key": "professional-practice",
+  "name": "Professional Practice",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 15,
+    "quantityPerThroughputUnit": 0.0973838
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 55,
+    "quantityPerThroughputUnit": 32461.3
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 2,
+    "workersPerThroughputUnit": 150
+   },
+   {
+    "professionId": 4,
+    "workersPerThroughputUnit": 467.5
+   },
+   {
+    "professionId": 10,
+    "workersPerThroughputUnit": 68
+   },
+   {
+    "professionId": 11,
+    "workersPerThroughputUnit": 212.5
+   },
+   {
+    "professionId": 12,
+    "workersPerThroughputUnit": 102
+   }
+  ],
+  "constructionCostRUSD": 6734808.5,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 276.77,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "services",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11280.5
+   },
+   {
+    "goodId": 38,
+    "quantity": 307.504
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.93159
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0789823
+   }
+  ]
+ },
+ {
+  "id": 75,
+  "key": "medical-practice",
+  "name": "Medical Practice",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 56,
+    "quantityPerThroughputUnit": 26215.7
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 6,
+    "workersPerThroughputUnit": 200
+   },
+   {
+    "professionId": 11,
+    "workersPerThroughputUnit": 800
+   }
+  ],
+  "constructionCostRUSD": 5454942,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 224.18,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "services",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 9136.75
+   },
+   {
+    "goodId": 38,
+    "quantity": 249.067
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.56451
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0639727
    }
   ]
  }

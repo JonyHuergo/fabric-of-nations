@@ -10,6 +10,7 @@
  * inventory is changed. An invalid reservation set is rejected before mutation.
  */
 
+import { buildingJobs } from "./buildingJobs.js";
 import { QUANTITY_TOLERANCE } from "../population/constants.js";
 import { assertValidWorldForTick, type World } from "../world.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
@@ -440,7 +441,7 @@ export function computeBuildingCapacity(
   }
   let assignedWorkers = 0;
   for (const workers of assigned.values()) assignedWorkers += workers;
-  const requiredWorkersByProfession = definition.jobs
+  const requiredWorkersByProfession = buildingJobs(definition, building)
     .map((job) => ({
       professionId: job.professionId,
       requiredWorkers:

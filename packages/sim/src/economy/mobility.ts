@@ -32,6 +32,7 @@
  * cash, literate persons, dwellings and urban persons.
  */
 
+import { buildingJobs } from "./buildingJobs.js";
 import { dayIndexToCivilDate, isTerminalDayIndex } from "../calendar.js";
 import { blockCrowding, blockHasHousing, desiredDwellings } from "../population/housing.js";
 import { roundTo } from "../population/definitions.js";
@@ -224,7 +225,7 @@ function buildPhaseIndex(world: World, definitions: EconomyDefinitions, dayIndex
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined || !building.operational) continue;
     const urban = !buildingIsRural(definition);
-    for (const job of definition.jobs) {
+    for (const job of buildingJobs(definition, building)) {
       const profession = professionById.get(job.professionId);
       if (profession === undefined) continue;
       const offered = offeredJobSlots(definition, building, profession, ceilings.get(building.id) ?? 1);

@@ -68,6 +68,8 @@ import {
 import { NOT_PLACED_1900, placeCatalogue } from "./placement.mjs";
 import { buildP6Demand, P6_COEFFICIENTS } from "../p6/demand.mjs";
 import { p6BeforeAfterReport, p6Provenance } from "../p6/report.mjs";
+import { buildP7Labour, p7IncomeRound } from "../p7/build-labour-1900.mjs";
+import { p7BeforeAfterReport, p7Provenance } from "../p7/report.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const DATA = join(ROOT, "packages/data/data");
@@ -108,7 +110,16 @@ const INPUTS = {
   p4Demography: join(DATA, "historical/p4/demography_1900.json"),
   p6Demand: join(ROOT, "scripts/p6/demand.mjs"),
   p6Report: join(ROOT, "scripts/p6/report.mjs"),
+  // P7 (D-154): labour sources, the generator modules and the politics content it remaps.
+  p7Sources: join(DATA, "historical/p7/sources_1900.json"),
+  p7Labour: join(ROOT, "scripts/p7/labour.mjs"),
+  p7LabourBuild: join(ROOT, "scripts/p7/labour-build.mjs"),
+  p7Build: join(ROOT, "scripts/p7/build-labour-1900.mjs"),
+  p7Report: join(ROOT, "scripts/p7/report.mjs"),
+  politics: join(DATA, "politics.json"),
+  demographyDefinitions: join(DATA, "demography.json"),
 };
+const P7_OUT = join(DATA, "historical/p7");
 const P6_OUT = join(DATA, "historical/p6");
 
 /**
@@ -635,7 +646,8 @@ function build() {
  * fiscal values and route capacities. Mutates `definitions` (warehouse capacity) and
  * `calibration` (placement report and coverage).
  */
-function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p5Definitions, p2bRow, technology, src, calibration, gid }) {
+function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions: professionsIn, p5Definitions, p2bRow, technology, src, calibration, gid }) {
+  let professions = professionsIn;
   const p2bCalibration = read(INPUTS.p2bCalibration);
   // B1: provinces with |label latitude| (crop bands, C-8).
   const labelLatitude = new Map();
@@ -732,10 +744,30 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
   // P6 (D-153): the demand system's 1900 quantities, incomes and housing.
   const p6Sources = read(INPUTS.p6Sources);
   const p4 = read(INPUTS.p4Demography);
-  const pops = read(INPUTS.p2bPops);
+  // P7 (D-154): sixteen professions, sourced occupation shares, the job remap and the
+  // 1900 wages; the blocks below are the P7 blocks (p7/pops_1900.json).
+  const p7 = buildP7Labour({
+    sources: read(INPUTS.p7Sources),
+    politics: read(INPUTS.politics),
+    demographyDefinitions: read(INPUTS.demographyDefinitions),
+    oldPops: read(INPUTS.p2bPops),
+    oldProfessions: professions,
+    provinces,
+    definitions,
+    p2bCalibration,
+    p2bRow,
+    p4,
+  });
+  const pops = p7.pops;
+  professions = p7.professions;
   const mpdByTag = new Map(read(INPUTS.p2bSources).rows.filter((row) => row.id.startsWith("mpd-")).map((row) => [row.id.slice(4), row.value]));
   const knowsTechnology = (country, key) => key === null || key === undefined || (country?.technology?.researchedTechnologyKeys ?? []).includes(key);
-  const p6 = buildP6Demand({
+  // P7 (D-154, plan Q18 as decided by the designer on 2026-11-09: "one pass, measure
+  // once"): demand and placement from the P6 income estimate, as in P6; then the blocks'
+  // opening incomes are measured once from the placed world's day-1 employment and owner
+  // profits. An iterated fixed point has none here: placement sizes output to demand, so
+  // with profits income runs away and with wages only it collapses (reported).
+  const p6Estimate = buildP6Demand({
     goods,
     p6: p6Sources,
     src,
@@ -750,7 +782,14 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
     mpdByTag,
     knows: knowsTechnology,
     workingAgeShare: p2bCalibration.workingAgeShare,
+    urbanRows: p7.urbanRows,
   });
+  const placement = placeP5b(p6Estimate);
+  p7.finalRound = p7IncomeRound({ p7, pops, placement, goods, definitions, markets, provinces, countries: grantedCountries, coverage: (tag) => placement.coveredByCountry.get(tag) ?? 0, p2bRow, workingAgeShare: p2bCalibration.workingAgeShare });
+  // The blocks' 1900 incomes (housing references, the simulation's opening smoothed
+  // income) are the measured ones; the demand quantities used the estimate.
+  const p6 = { ...p6Estimate, incomeOf: p7.finalRound.incomeOf };
+  p7.estimateIncomeOf = p6Estimate.incomeOf;
   for (const province of provinces) province.housingReferencePersonsPerDwelling = p6.housingRefOf(province.id);
   calibration.p6 = { ...p6.trace, coefficients: P6_COEFFICIENTS };
   // Planned 1900 household spending by country (report; plan §6 consistency checks).
@@ -776,8 +815,9 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
     categoryShares: Object.fromEntries(Object.entries(row.categorySpendRUSDPerDay).map(([key, value]) => [key, sig(value / row.consumptionRUSDPerDay)])),
     blocksAboveIncome: row.blocksAboveIncome,
   }]));
-  const placement = placeCatalogue({
-    householdQuantities: (pop) => p6.quantitiesOf(pop).quantities,
+  function placeP5b(p6Round) {
+  return placeCatalogue({
+    householdQuantities: (pop) => p6Round.quantitiesOf(pop).quantities,
     goods,
     definitions,
     oldDefinitions: p5Definitions,
@@ -820,6 +860,7 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
       residualCapCoverage: 0.8,
     },
   });
+  }
 
   // B7: warehouse capacity per level and good (C-19). The eight P2b goods keep the P2b
   // capacity; every other storable good gets the placement's capacity, rounded up. Gold
@@ -847,7 +888,7 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
   // Markets: the opening stock of every storable good (D-136 rule, B8).
   const marketRows = markets.map((market) => ({
     ...market,
-    stockLots: placement.lotsByMarket.get(market.key),
+    stockLots: p7.finalRound.remapLots(placement.lotsByMarket.get(market.key), placement.buildingRows),
     sourceIds: [...new Set([...market.sourceIds, "p5b-catalogue"])],
   }));
 
@@ -857,7 +898,7 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
   const adminShare = (revenueShare - educationShare) * rowValue("administration-share-of-noneducation-revenue");
   const debtRatio = rowValue("us-gov-debt-1902") / rowValue("us-gdp-1902");
   const money = (value) => round(value, 2);
-  const countryRows = grantedCountries.map((country) => {
+  const countryRowsP5b = grantedCountries.map((country) => {
     const covered = placement.coveredByCountry.get(country.tag) ?? 0;
     const revenue = revenueShare * covered;
     return {
@@ -869,6 +910,8 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
       sourceIds: [...new Set([...country.sourceIds, "p5b-catalogue"])],
     };
   });
+  // P7 (D-154, plan Q3, Q4): institution posts split inside the sourced budgets.
+  const countryRows = p7.finalRound.countries(countryRowsP5b);
   const authorities = mintRows.map((row) => ({
     countryTag: row.countryTag,
     standard: row.standard,
@@ -970,15 +1013,18 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions, p
     warehouseCapacityPerLevel: Object.fromEntries([...placement.warehouseCapacity].map(([goodId, value]) => [goods[goodId].key, value])),
   };
   calibration.coverage = coverage;
+  calibration.p7 = p7.trace({ finalRound: p7.finalRound });
 
   return {
     outputs: {
       "provinces_1900.json": json(provinces),
       // P6 (D-153): the demand system and the blocks' 1900 incomes.
       "../p6/demand_1900.json": json(p6.demandSystem),
-      "../p6/pops_1900.json": json(pops.map((pop) => ({ ...pop, incomeRUSDPerCapitaDay: sig(p6.incomeOf(pop)) }))),
+      // P7 (D-154): the sixteen-profession blocks with their measured 1900 incomes.
+      "../p7/pops_1900.json": json(pops.map((pop) => ({ ...pop, incomeRUSDPerCapitaDay: sig(p6.incomeOf(pop)) }))),
+      ...p7.outputs({ finalRound: p7.finalRound }),
       "countries_1900.json": json(countryRows),
-      "buildings_1900.json": json(placement.buildingRows),
+      "buildings_1900.json": json(p7.finalRound.buildingRows),
       "markets_1900.json": json(marketRows),
       "trade_routes_1900.json": json(routeRows),
       "monetary_1900.json": json(monetaryFile),
@@ -1026,6 +1072,10 @@ const P6_PROVENANCE = join(ROOT, "docs/P6_DEMAND_PROVENANCE.md");
 const provenanceText = goodsProvenance(JSON.parse(outputs["goods_1900.json"]), JSON.parse(outputs["calibration_1900.json"]), read(INPUTS.sources), read(INPUTS.hydro).meta);
 const p6DocText = p6BeforeAfterReport(JSON.parse(outputs["calibration_1900.json"]), JSON.parse(outputs["../p6/demand_1900.json"]));
 const p6ProvenanceText = p6Provenance(read(INPUTS.p6Sources), JSON.parse(outputs["calibration_1900.json"]));
+const P7_DOC = join(ROOT, "docs/P7_BEFORE_AFTER.md");
+const p7DocText = p7BeforeAfterReport(JSON.parse(outputs["calibration_1900.json"]).p7);
+const P7_PROVENANCE = join(ROOT, "docs/P7_LABOUR_PROVENANCE.md");
+const p7ProvenanceText = p7Provenance(JSON.parse(outputs["calibration_1900.json"]).p7, read(INPUTS.p7Sources));
 const inputSums = Object.fromEntries(Object.entries(INPUTS).map(([key, path]) => [key, sha256(readText(path))]));
 outputs["build_report.json"] = json({
   generator: "scripts/p5b/build-goods-1900.mjs",
@@ -1039,6 +1089,8 @@ if (CHECK) {
   if (!existsSync(PROVENANCE) || readText(PROVENANCE) !== provenanceText) stale.push(["docs/P5B_GOODS_PROVENANCE.md"]);
   if (!existsSync(P6_DOC) || readText(P6_DOC) !== p6DocText) stale.push(["docs/P6_BEFORE_AFTER.md"]);
   if (!existsSync(P6_PROVENANCE) || readText(P6_PROVENANCE) !== p6ProvenanceText) stale.push(["docs/P6_DEMAND_PROVENANCE.md"]);
+  if (!existsSync(P7_DOC) || readText(P7_DOC) !== p7DocText) stale.push(["docs/P7_BEFORE_AFTER.md"]);
+  if (!existsSync(P7_PROVENANCE) || readText(P7_PROVENANCE) !== p7ProvenanceText) stale.push(["docs/P7_LABOUR_PROVENANCE.md"]);
   if (stale.length > 0) {
     console.error(`P5b outputs are stale: ${stale.map(([name]) => name).join(", ")}; run node scripts/p5b/build-goods-1900.mjs`);
     process.exit(1);
@@ -1047,11 +1099,14 @@ if (CHECK) {
 } else {
   mkdirSync(OUT, { recursive: true });
   mkdirSync(P6_OUT, { recursive: true });
+  mkdirSync(P7_OUT, { recursive: true });
   for (const [name, text] of Object.entries(outputs)) writeFileSync(join(OUT, name), text);
   writeFileSync(DOC, docText);
   writeFileSync(PROVENANCE, provenanceText);
   writeFileSync(P6_DOC, p6DocText);
   writeFileSync(P6_PROVENANCE, p6ProvenanceText);
+  writeFileSync(P7_DOC, p7DocText);
+  writeFileSync(P7_PROVENANCE, p7ProvenanceText);
   console.log(`wrote ${Object.keys(outputs).length} files to ${OUT}, docs/P5B_BEFORE_AFTER.md and docs/P5B_GOODS_PROVENANCE.md`);
 }
 

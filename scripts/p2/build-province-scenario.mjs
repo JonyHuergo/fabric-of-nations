@@ -67,6 +67,8 @@ const BUNDLES = [
   "provinces_oceania_1900",
 ];
 const CHECK = process.argv.includes("--check");
+/** P7 (D-154): settlement of the 1900 professions (docs/P7_PLAN.md §3.2). */
+const P7_SETTLEMENT = { peasants: "rural", laborers: "by-job", clerks: "urban", capitalists: "urban", academics: "urban" };
 
 const INPUTS = {
   territories: join(M11, "territories_1900.json"),
@@ -216,14 +218,18 @@ function build() {
     });
 
   // Population blocks.
+  // P7 (D-154, plan §3.3): the split reads the profession's settlement (rural, by job,
+  // urban; plan §3.2) instead of its key; for the five 1900 professions this is the P2 rule.
+  const settlementOf = (professionKey) => P7_SETTLEMENT[professionKey] ?? "urban";
   const weightFor = (professionKey, ids) => {
     const map = new Map();
     const urbanTotal = ids.reduce((acc, id) => acc + weight.get(id).urban, 0);
     for (const id of ids) {
       const { total, urban } = weight.get(id);
       let value;
-      if (professionKey === "peasants") value = total - urban;
-      else if (professionKey === "laborers") value = total;
+      const settlement = settlementOf(professionKey);
+      if (settlement === "rural") value = total - urban;
+      else if (settlement === "by-job") value = total;
       else value = urbanTotal > 0 ? urban : total;
       map.set(id, value);
     }
@@ -534,17 +540,20 @@ function build() {
     // with the capacity of the new coverage, and the 57-good buildings.
     markets: "historical/p5b/markets_1900.json",
     tradeRoutes: "historical/p5b/trade_routes_1900.json",
-    // P6 (D-153): the P2b blocks with their expected 1900 income (scripts/p5b/build-goods-1900.mjs).
-    populations: "historical/p6/pops_1900.json",
+    // P7 (D-154): the sixteen-profession blocks with their measured 1900 incomes and an
+    // empty employment table (the labour market's first refresh employs), built by
+    // scripts/p5b/build-goods-1900.mjs (P7 steps in scripts/p7/).
+    populations: "historical/p7/pops_1900.json",
     buildings: "historical/p5b/buildings_1900.json",
-    employment: "historical/p2b/employment_1900.json",
+    employment: "historical/p7/employment_1900.json",
     calibration: "historical/p2b/calibration_targets_1900.json",
     moneyCoefficients: "historical/p2b/money_coefficients_1900.json",
     // P3 (D-141): currencies, arrangements and sourced 1900 parities.
     currencies: "historical/p3/currencies_1900.json",
     // P4 (D-142): sourced 1900 demographic levels, age structures and urban shares,
     // built by scripts/p4/build-demography-1900.mjs.
-    demography: "historical/p4/demography_1900.json",
+    // P7 (D-154): the same with the blocks' urban shares by settlement order.
+    demography: "historical/p7/demography_1900.json",
     // P5 (D-143): natural-resource deposits (authored, USGS MRDS, SAGE/HYDE forest).
     deposits: "historical/p5/deposits_1900.json",
     // D-140 / D-149: the 1900 metal-standard authorities (Director of the Mint money
@@ -555,11 +564,17 @@ function build() {
     ...meta.definitions,
     // P5b (D-146, D-148): the 57-good catalogue, its buildings and need items.
     goods: "historical/p5b/goods_1900.json",
-    professions: "historical_1900_professions.json",
+    // P7 (D-154): sixteen professions with roles; the labour-market configuration; the
+    // politics content with the interest groups remapped to them (plan §3.5).
+    professions: "historical/p7/professions_1900.json",
     buildings: "historical/p5b/buildings_definitions_1900.json",
     needs: "historical/p5b/needs_1900.json",
     // P6 (D-153): the linear expenditure system of households.
     demandSystem: "historical/p6/demand_1900.json",
+    labourMarket: "historical/p7/labour_1900.json",
+    // P7 (D-154): demography definitions with a fertility multiplier for all sixteen.
+    demography: "historical/p7/demography_definitions_1900.json",
+    politics: "historical/p7/politics_1900.json",
   };
   meta.countryMeta = meta.countryMeta.map((entry) => {
     const out = {};
@@ -629,6 +644,22 @@ function build() {
         accessDate: "2026-11-02",
         license: "Government publication; figure cited",
         notes: "475,513 inhabitants (227,393 and 248,120 by sex); used for the Portuguese India territory (D-132).",
+      },
+      {
+        id: "webb-1911",
+        title: "Webb, The New Dictionary of Statistics (1911), \"Occupations\", pp. 428-448",
+        url: "https://archive.org/details/newdictionaryofs00webb",
+        accessDate: "2026-11-09",
+        license: "Public domain (published 1911; Internet Archive NOT_IN_COPYRIGHT)",
+        notes: "Census occupation groups c. 1900 of about twenty territories; the P7 occupation shares (historical/p7/sources_1900.json, D-154).",
+      },
+      {
+        id: "p7-labour",
+        title: "Fabric of Nations P7 labour market of 1900 (scripts/p7/)",
+        url: "internal:packages/data/data/historical/p7/sources_1900.json",
+        accessDate: "2026-11-09",
+        license: "Project data",
+        notes: "Sixteen professions, occupation shares (census or proxy), the job, owner and institution remaps and the measured opening incomes; trace in calibration_1900.json p7 (D-154).",
       },
   ];
   for (const source of p2Sources) {

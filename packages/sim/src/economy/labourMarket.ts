@@ -19,6 +19,7 @@
  * the allocator runs on the monthly or dirty refresh like the M3b allocator.
  */
 
+import { assertValidJobMix, buildingJobs } from "./buildingJobs.js";
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
 import { populationTotal, workingAgePopulation } from "../population/state.js";
 import { WORKING_AGE_END, WORKING_AGE_START } from "../population/constants.js";
@@ -51,6 +52,7 @@ import {
   type Country,
   type EconomyDefinitions,
   type EmploymentAssignment,
+  type HouseholdAssignment,
   type InstitutionAssignment,
   type InstitutionKind,
   type ProfessionDef,
@@ -166,7 +168,7 @@ export function jobIsCovered(
 /** Full job slots of a building for one profession (the M3 formula). */
 export function fullJobSlots(definition: BuildingDef, building: BuildingInstance, professionId: Id): number {
   if (!building.operational) return 0;
-  const job = definition.jobs.find((candidate) => candidate.professionId === professionId);
+  const job = buildingJobs(definition, building).find((candidate) => candidate.professionId === professionId);
   if (job === undefined) return 0;
   const raw = job.workersPerThroughputUnit * definition.referenceThroughputPerDayAtLevelOne * building.level * building.condition;
   if (!Number.isFinite(raw) || raw < 0) throw new RangeError("building job-slot capacity must be finite and non-negative");
@@ -471,11 +473,19 @@ export function measureLabourMarket(
     const counts = countsOf(block.provinceId);
     counts.employed[block.professionId] = (counts.employed[block.professionId] ?? 0) + assignment.workers;
   }
+  // P7 (§4.1): servants employed by households count as employed and as offered posts.
+  for (const assignment of world.labourMarket.householdEmployment) {
+    const block = blockById.get(assignment.popBlockId);
+    if (block === undefined) continue;
+    const counts = countsOf(block.provinceId);
+    counts.employed[block.professionId] = (counts.employed[block.professionId] ?? 0) + assignment.workers;
+    counts.offered[block.professionId] = (counts.offered[block.professionId] ?? 0) + assignment.workers;
+  }
   for (const building of world.buildings) {
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined || !building.operational) continue;
     const ceiling = ceilings.get(building.id) ?? 1;
-    for (const job of definition.jobs) {
+    for (const job of buildingJobs(definition, building)) {
       const profession = professionById.get(job.professionId);
       if (profession === undefined) continue;
       const offered = offeredJobSlots(definition, building, profession, ceiling);
@@ -490,6 +500,32 @@ export function measureLabourMarket(
       if (profession === undefined) continue;
       const counts = countsOf(provinceId);
       counts.offered[profession.id] = (counts.offered[profession.id] ?? 0) + slots;
+    }
+  }
+  // P7 (D-154, R1): owners (capital, land) are outside the labour force; their income is
+  // profit. R2: a self-employed or owner-operating profession is employed wherever its
+  // province has a building it owns or works as self-employed (work-sharing).
+  const ownerProfessionOf = ownerProfessionByBuilding(world);
+  const sharing = new Set<string>();
+  for (const building of world.buildings) {
+    const definition = definitionById.get(building.definitionId);
+    if (definition === undefined || !building.operational) continue;
+    for (const job of buildingJobs(definition, building)) {
+      const profession = professionById.get(job.professionId);
+      if (profession === undefined) continue;
+      if (isSelfEmployedProfession(profession) || ownerProfessionOf.get(building.id) === profession.id) sharing.add(`${String(building.provinceId)}:${String(profession.id)}`);
+    }
+  }
+  for (const [provinceId, counts] of byProvince) {
+    for (const profession of definitions.professions) {
+      if (professionHasRole(profession, "owns-capital") || professionHasRole(profession, "owns-land")) {
+        counts.eligible[profession.id] = 0;
+        counts.employed[profession.id] = 0;
+        counts.offered[profession.id] = 0;
+      } else if (sharing.has(`${String(provinceId)}:${String(profession.id)}`)) {
+        counts.employed[profession.id] = Math.max(counts.employed[profession.id] ?? 0, counts.eligible[profession.id] ?? 0);
+        counts.offered[profession.id] = Math.max(counts.offered[profession.id] ?? 0, counts.employed[profession.id] ?? 0);
+      }
     }
   }
   const marketByProvince = new Map(world.provinceEconomies.map((province) => [province.id, province.marketId]));
@@ -509,6 +545,106 @@ export function measureLabourMarket(
     }
   }
   return { byProvince, byMarket, professionCount: size };
+}
+
+/**
+ * P7 (D-154, R2): the profession of each private building's owner block (absent for state
+ * buildings and for owners that are not population blocks).
+ */
+export function ownerProfessionByBuilding(world: World): Map<Id, Id> {
+  const accountOwner = new Map<Id, Id>();
+  for (const account of world.finance.accounts) {
+    if (account.ownerKind === "popBlock" && account.subtype === "household-cash" && account.ownerId !== null) accountOwner.set(account.id, account.ownerId);
+  }
+  const professionOfBlock = new Map(world.popBlocks.map((block) => [block.id, block.professionId]));
+  const out = new Map<Id, Id>();
+  for (const building of world.buildings) {
+    if (building.ownerKind !== "private") continue;
+    const blockId = accountOwner.get(building.ownerAccountId);
+    const professionId = blockId === undefined ? undefined : professionOfBlock.get(blockId);
+    if (professionId !== undefined) out.set(building.id, professionId);
+  }
+  return out;
+}
+
+/**
+ * P7 (D-154, docs/P7_EMPLOYERS_PROPOSAL.md §4.1): households employ domestic servants, after
+ * firms and institutions have hired (they have priority, as measured). In each province with a
+ * domestic-service share s the households want floor(s × eligible non-owner workers) servants;
+ * the employers are the province's middle and upper blocks, weighted by population × smoothed
+ * income (no income, no servants); the servants are the unemployed of the province's ungated
+ * wage-labour professions, taken in proportion to their unemployed. Recomputed at every refresh;
+ * a pair (employer, servant block) keeps its assignment id. Deterministic: integer splits by
+ * largest remainder with ties to the lower index.
+ */
+function hireHouseholdServants(
+  world: World,
+  definitions: EconomyDefinitions,
+  unemployedByBlock: ReadonlyMap<Id, number>,
+  eligibleByBlock: ReadonlyMap<Id, number>,
+): { assignments: HouseholdAssignment[]; nextId: Id; hired: number } {
+  let nextId = world.labourMarket.nextHouseholdAssignmentId;
+  const shares = definitions.labourMarket?.domesticServiceShares ?? [];
+  if (shares.length === 0) return { assignments: [], nextId, hired: 0 };
+  const shareOf = new Map(shares.map((entry) => [entry.provinceId, entry.share]));
+  const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
+  const existing = new Map(world.labourMarket.householdEmployment.map((entry) => [`${String(entry.employerBlockId)}:${String(entry.popBlockId)}`, entry.id]));
+  const byProvince = new Map<Id, World["popBlocks"][number][]>();
+  for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
+    const list = byProvince.get(block.provinceId);
+    if (list === undefined) byProvince.set(block.provinceId, [block]);
+    else list.push(block);
+  }
+  const owner = (profession: ProfessionDef): boolean => professionHasRole(profession, "owns-capital") || professionHasRole(profession, "owns-land");
+  const servantProfession = (profession: ProfessionDef): boolean =>
+    professionHasRole(profession, "wage-labour") && !professionHasGate(profession, "literacy") && !professionHasGate(profession, "training");
+  const assignments: HouseholdAssignment[] = [];
+  let hired = 0;
+  for (const [provinceId, blocks] of [...byProvince].sort((left, right) => left[0] - right[0])) {
+    const share = shareOf.get(provinceId) ?? 0;
+    if (!(share > 0)) continue;
+    let workforce = 0;
+    for (const block of blocks) {
+      const profession = professionById.get(block.professionId);
+      if (profession !== undefined && !owner(profession)) workforce += eligibleByBlock.get(block.id) ?? 0;
+    }
+    const servants = blocks.filter((block) => {
+      const profession = professionById.get(block.professionId);
+      return profession !== undefined && servantProfession(profession) && (unemployedByBlock.get(block.id) ?? 0) > 0;
+    });
+    const employers = blocks.filter((block) => {
+      const profession = professionById.get(block.professionId);
+      return profession !== undefined && profession.stratum !== "lower" && block.incomeSmoothedRUSDPerCapitaDay > 0;
+    });
+    if (servants.length === 0 || employers.length === 0) continue;
+    const pool = servants.reduce((sum, block) => sum + (unemployedByBlock.get(block.id) ?? 0), 0);
+    const total = Math.min(Math.floor(share * workforce + 1e-9), pool);
+    if (total <= 0) continue;
+    const fromServant = apportionLargestRemainder(total, servants.map((block) => unemployedByBlock.get(block.id) ?? 0), servants.map((_, index) => index));
+    // Employers share the servants by total household income in whole RUSD cents a day (the
+    // apportionment takes integer weights); a province whose employers round to zero hires none.
+    const weights = employers.map((block) => Math.round(populationTotal(block) * block.incomeSmoothedRUSDPerCapitaDay * 100));
+    if (!weights.some((weight) => weight > 0)) continue;
+    servants.forEach((servant, servantIndex) => {
+      const count = fromServant[servantIndex] ?? 0;
+      if (count <= 0) return;
+      const split = apportionLargestRemainder(count, weights, employers.map((_, index) => index));
+      employers.forEach((employer, employerIndex) => {
+        const workers = split[employerIndex] ?? 0;
+        if (workers <= 0) return;
+        const key = `${String(employer.id)}:${String(servant.id)}`;
+        let id = existing.get(key);
+        if (id === undefined) {
+          id = nextId;
+          nextId += 1;
+        }
+        assignments.push({ id, employerBlockId: employer.id, popBlockId: servant.id, workers });
+        hired += workers;
+      });
+    });
+  }
+  assignments.sort((left, right) => left.id - right.id);
+  return { assignments, nextId, hired };
 }
 
 /** u = unemployed eligible ÷ eligible (0 when nobody is eligible). */
@@ -579,7 +715,7 @@ export function refreshLabourEmployment(
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined) throw new RangeError(`building ${String(building.id)} references a missing definition`);
     if (!building.operational) continue;
-    for (const job of definition.jobs) {
+    for (const job of buildingJobs(definition, building)) {
       const profession = professionById.get(job.professionId);
       if (profession === undefined) continue;
       const offered = offeredJobSlots(definition, building, profession, ceilings.get(building.id) ?? 1);
@@ -632,6 +768,8 @@ export function refreshLabourEmployment(
   let assignedWorkers = 0;
   let unemployedEligible = 0;
   const seenKeys = new Set<string>();
+  const unemployedByBlock = new Map<Id, number>();
+  const eligibleByBlock = new Map<Id, number>();
 
   for (const block of [...world.popBlocks].sort((left, right) => left.id - right.id)) {
     const profession = professionById.get(block.professionId);
@@ -762,7 +900,11 @@ export function refreshLabourEmployment(
       else keptInstitution.push(assignment);
     }
     unemployedEligible += Math.max(0, remaining);
+    unemployedByBlock.set(block.id, Math.max(0, remaining));
+    eligibleByBlock.set(block.id, eligible);
   }
+  const households = hireHouseholdServants(world, definitions, unemployedByBlock, eligibleByBlock);
+  unemployedEligible -= households.hired;
   // Assignments of blocks that no longer exist are released.
   for (const [blockId, list] of existingBuilding) {
     if (blockById.has(blockId)) continue;
@@ -787,6 +929,8 @@ export function refreshLabourEmployment(
   world.employment = keptBuilding;
   world.labourMarket.institutionEmployment = keptInstitution;
   world.labourMarket.nextInstitutionAssignmentId = nextInstitutionId;
+  world.labourMarket.householdEmployment = households.assignments;
+  world.labourMarket.nextHouseholdAssignmentId = households.nextId;
   world.employmentDirty = false;
   assertValidLabourEmployment(world, definitions);
   return {
@@ -809,6 +953,14 @@ export function refreshLabourEmployment(
  * profession holding the institution's role.
  */
 export function assertValidLabourEmployment(world: World, definitions: EconomyDefinitions): void {
+  const professionIdSet = new Set(definitions.professions.map((profession) => profession.id));
+  const definitionOf = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
+  for (const building of world.buildings) {
+    if (building.jobMix === undefined || building.jobMix === null) continue;
+    const definition = definitionOf.get(building.definitionId);
+    if (definition === undefined) throw new RangeError(`building ${String(building.id)} references a missing definition`);
+    assertValidJobMix(definition, building.jobMix, professionIdSet, `building ${String(building.id)}.jobMix`);
+  }
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
   const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
   const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
@@ -862,6 +1014,16 @@ export function assertValidLabourEmployment(world: World, definitions: EconomyDe
     }
     assignedByBlock.set(block.id, (assignedByBlock.get(block.id) ?? 0) + assignment.workers);
   }
+  const householdIds = new Set<Id>();
+  for (const assignment of world.labourMarket.householdEmployment) {
+    if (householdIds.has(assignment.id)) throw new RangeError(`duplicate household assignment id ${String(assignment.id)}`);
+    householdIds.add(assignment.id);
+    const block = blockById.get(assignment.popBlockId);
+    const employer = blockById.get(assignment.employerBlockId);
+    if (block === undefined || employer === undefined) throw new RangeError(`household assignment ${String(assignment.id)} has a broken reference`);
+    if (block.provinceId !== employer.provinceId) throw new RangeError(`household assignment ${String(assignment.id)} crosses provinces`);
+    assignedByBlock.set(block.id, (assignedByBlock.get(block.id) ?? 0) + assignment.workers);
+  }
   for (const [blockId, assigned] of assignedByBlock) {
     const block = blockById.get(blockId);
     const profession = block === undefined ? undefined : professionById.get(block.professionId);
@@ -881,17 +1043,23 @@ export function assertValidLabourEmployment(world: World, definitions: EconomyDe
 export function repairLabourEmploymentAfterDemography(world: World, definitions: EconomyDefinitions): boolean {
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
   const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
-  type Entry = { readonly kind: 0 | 1; readonly id: Id; readonly workers: number };
+  type Entry = { readonly kind: 0 | 1 | 2; readonly id: Id; readonly workers: number };
   const byBlock = new Map<Id, Entry[]>();
   const push = (blockId: Id, entry: Entry): void => {
     const list = byBlock.get(blockId);
     if (list === undefined) byBlock.set(blockId, [entry]);
     else list.push(entry);
   };
+  // P7 (§4.1): household servants are released first (they are rehired at the next refresh).
+  const liveBlocks = new Set(world.popBlocks.map((block) => block.id));
+  const originalHousehold = world.labourMarket.householdEmployment;
+  world.labourMarket.householdEmployment = originalHousehold.filter((entry) => liveBlocks.has(entry.popBlockId) && liveBlocks.has(entry.employerBlockId));
+  for (const assignment of world.labourMarket.householdEmployment) push(assignment.popBlockId, { kind: 2, id: assignment.id, workers: assignment.workers });
   for (const assignment of world.employment) push(assignment.popBlockId, { kind: 0, id: assignment.id, workers: assignment.workers });
   for (const assignment of world.labourMarket.institutionEmployment) push(assignment.popBlockId, { kind: 1, id: assignment.id, workers: assignment.workers });
   const reductionBuilding = new Map<Id, number>();
   const reductionInstitution = new Map<Id, number>();
+  const reductionHousehold = new Map<Id, number>();
   for (const [blockId, entries] of [...byBlock].sort((left, right) => left[0] - right[0])) {
     const block = blockById.get(blockId);
     const profession = block === undefined ? undefined : professionById.get(block.professionId);
@@ -899,7 +1067,7 @@ export function repairLabourEmploymentAfterDemography(world: World, definitions:
     const assigned = entries.reduce((sum, entry) => sum + entry.workers, 0);
     const excess = assigned - labourEligibleWorkforce(block, profession);
     if (excess <= 0) continue;
-    const ordered = [...entries].sort((left, right) => left.kind - right.kind || left.id - right.id);
+    const ordered = [...entries].sort((left, right) => (left.kind === 2 ? -1 : left.kind) - (right.kind === 2 ? -1 : right.kind) || left.id - right.id);
     const cuts = apportionLargestRemainder(
       excess,
       ordered.map((entry) => entry.workers),
@@ -909,10 +1077,18 @@ export function repairLabourEmploymentAfterDemography(world: World, definitions:
       const cut = cuts[index] ?? 0;
       if (cut <= 0) return;
       if (entry.kind === 0) reductionBuilding.set(entry.id, cut);
-      else reductionInstitution.set(entry.id, cut);
+      else if (entry.kind === 1) reductionInstitution.set(entry.id, cut);
+      else reductionHousehold.set(entry.id, cut);
     });
   }
-  if (reductionBuilding.size === 0 && reductionInstitution.size === 0) return false;
+  world.labourMarket.householdEmployment = world.labourMarket.householdEmployment
+    .map((assignment) => {
+      const cut = reductionHousehold.get(assignment.id) ?? 0;
+      return cut === 0 ? assignment : { ...assignment, workers: assignment.workers - cut };
+    })
+    .filter((assignment) => assignment.workers > 0);
+  const householdChanged = world.labourMarket.householdEmployment.length !== originalHousehold.length || world.labourMarket.householdEmployment.some((entry, index) => entry !== originalHousehold[index]);
+  if (reductionBuilding.size === 0 && reductionInstitution.size === 0) return householdChanged;
   const originalBuilding = world.employment;
   const originalInstitution = world.labourMarket.institutionEmployment;
   world.employment = originalBuilding
@@ -933,6 +1109,7 @@ export function repairLabourEmploymentAfterDemography(world: World, definitions:
   } catch {
     world.employment = originalBuilding;
     world.labourMarket.institutionEmployment = originalInstitution;
+    world.labourMarket.householdEmployment = originalHousehold;
     return false;
   }
 }
@@ -1109,7 +1286,7 @@ export function buildingProfitability(
   if (context.market === undefined) return null;
   const coverage = wages.coverage(building.provinceId);
   let wageBill = 0;
-  for (const job of definition.jobs) {
+  for (const job of buildingJobs(definition, building)) {
     const profession = context.professionById.get(job.professionId);
     if (profession === undefined || isSelfEmployedProfession(profession)) continue;
     const covered = jobIsCovered(definition, profession, coverage, wages.domesticServiceKeys);

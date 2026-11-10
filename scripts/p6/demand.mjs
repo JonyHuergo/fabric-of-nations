@@ -408,12 +408,15 @@ export function buildP6Demand(ctx) {
   const countryOfProvince = new Map();
   for (const country of countries) for (const id of country.provinceIds) countryOfProvince.set(id, country);
   const workingAgeShare = ctx.workingAgeShare;
-  const incomeOf = (pop) => {
-    const province = provinceById.get(pop.provinceId);
-    const profession = professionById.get(pop.professionKey);
-    const wage = province?.wageRUSDPerYearByProfession?.[pop.professionKey] ?? profession.baseWage1900RUSDPerYear;
-    return (wage * profession.participationRate * workingAgeShare) / 365;
-  };
+  // P7 (D-154, plan Q18): the caller may pass measured incomes; the estimate is the P6 rule.
+  const incomeOf =
+    ctx.incomeOf ??
+    ((pop) => {
+      const province = provinceById.get(pop.provinceId);
+      const profession = professionById.get(pop.professionKey);
+      const wage = province?.wageRUSDPerYearByProfession?.[pop.professionKey] ?? profession.baseWage1900RUSDPerYear;
+      return (wage * profession.participationRate * workingAgeShare) / 365;
+    });
   const housing = p6.housing1900;
   const housingRefOf = (provinceId) => {
     const entry = p4ById.get(provinceId);
@@ -437,7 +440,8 @@ export function buildP6Demand(ctx) {
     list.forEach((pop, i) => dwellingsOfPop.set(pop, (total * w[i]) / W));
   }
   // The block's own 1900 urban share (P4), as the simulation reads it.
-  const urbanOfBlock = new Map(p4.blocks.map((entry) => [`${entry.provinceId}|${entry.professionKey}`, entry.urbanShare]));
+  // P7 (D-154): the P7 blocks' urban shares when given (settlement order), else P4's.
+  const urbanOfBlock = new Map((ctx.urbanRows ?? p4.blocks).map((entry) => [`${entry.provinceId}|${entry.professionKey}`, entry.urbanShare]));
   const growthOf = (provinceId) => (p4ById.get(provinceId)?.model?.stableGrowthPer1000 ?? 0) / 1000;
 
   const system = resolve(demandSystem, goods);

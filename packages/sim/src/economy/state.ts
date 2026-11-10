@@ -6,6 +6,7 @@
  * production, market clearing, wages, or pricing.
  */
 
+import { assertValidJobMix, buildingJobs } from "./buildingJobs.js";
 import { initialiseLabourMarket } from "./labourInit.js";
 import { refreshLabourEmployment } from "./labourMarket.js";
 import { normaliseFarmTechniques } from "./agriculture.js";
@@ -48,7 +49,7 @@ import {
   createCountryAIState,
 } from "./aiState.js";
 import { canonicalizeStockLots } from "./inventory.js";
-import { assertValidBuildingDeposits, assertValidHydroBuildings } from "./validation.js";
+import { assertValidBuildingDeposits, assertValidBuildingJobMixes, assertValidHydroBuildings } from "./validation.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import {
   assertValidProfitDistributionPolicy,
@@ -291,6 +292,9 @@ function assertBuildingInstances(scenario: EconomyScenarioDef, accountIds: Reado
     if (instance.technique !== undefined) {
       const technique = requireFiniteNumber(instance.technique, `${path}.technique`);
       if (!(technique > 0)) throw new RangeError(`${path}.technique must be positive`);
+    }
+    if (instance.jobMix !== undefined && instance.jobMix !== null) {
+      assertValidJobMix(definition, instance.jobMix, new Set(scenario.definitions.professions.map((profession) => profession.id)), `${path}.jobMix`);
     }
     if (!accountIds.has(instance.operatingCashAccountId)) {
       throw new RangeError(`${path}.operatingCashAccountId references unknown account`);
@@ -560,7 +564,7 @@ function assertInitialEmployment(
       throw new RangeError(`${path} assigns a block below the profession wealth qualification`);
     }
     requireInteger(assignment.workers, `${path}.workers`, 1, Number.MAX_SAFE_INTEGER);
-    const job = definition.jobs.find((candidate) => candidate.professionId === assignment.professionId);
+    const job = buildingJobs(definition, instance).find((candidate) => candidate.professionId === assignment.professionId);
     if (job === undefined) {
       throw new RangeError(`${path} references a profession with no job slot`);
     }
@@ -607,7 +611,7 @@ function assertInitialEmployment(
     if (instance === undefined) throw new RangeError(`unknown building ${String(buildingId)}`);
     const definition = definitionsById.get(instance.definitionId);
     if (definition === undefined) throw new RangeError(`unknown building definition`);
-    const job = definition.jobs.find((candidate) => candidate.professionId === professionId);
+    const job = buildingJobs(definition, instance).find((candidate) => candidate.professionId === professionId);
     if (job === undefined) throw new RangeError(`unknown job`);
     const slots = Math.floor(
       job.workersPerThroughputUnit *
@@ -1432,6 +1436,7 @@ export function createEconomyWorld(
       operatingCashAccountId: instance.operatingCashAccountId,
       technique: instance.technique ?? 1,
       depositId: instance.depositId ?? null,
+      ...(instance.jobMix === undefined || instance.jobMix === null ? {} : { jobMix: instance.jobMix.map((job) => ({ professionId: job.professionId, workersPerThroughputUnit: job.workersPerThroughputUnit })) }),
     });
   }
   world.finance.nextAccountId = nextAccountId;
@@ -1523,6 +1528,7 @@ export function createEconomyWorld(
   );
   // P5b (plan §4.2): extraction buildings work a discovered deposit of their kind.
   assertValidBuildingDeposits(world.buildings, world.resources.deposits, scenario.definitions);
+  assertValidBuildingJobMixes(world.buildings, scenario.definitions);
   assertValidHydroBuildings(world.buildings, world.provinceEconomies, scenario.definitions);
 
   assertValidWorld(world);

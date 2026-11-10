@@ -1,7 +1,7 @@
 {
   "meta": {
     "scenarioId": "m11-world-1900",
-    "dataVersion": "m3-economy-v14",
+    "dataVersion": "m3-economy-v15",
     "status": "provisional",
     "description": "Authored 1900 world for M11/M11b country selection: 67 polities (66 selectable), 66 dependent territories, and 20 documented markets. Population totals are rounded historical estimates; occupation composition, market grouping, building levels, fiscal and technology starts are provisional authored inputs; map geometry is Natural Earth 1:50m aggregated with an explicit 1900 crosswalk. Polities without reliable 1900 polygon data use marker-only map approximations. Not a full historical reconstruction.",
     "startDayIndex": 0,
@@ -118,6 +118,22 @@
         "accessDate": "2026-11-06",
         "license": "Project authored from cited sources",
         "notes": "1900 prices, output shares, the 1901 budget and technology evidence in sources_1900.json; placement, levels and techniques from modelled demand (D-146 A5); trace in calibration_1900.json (D-148)."
+      },
+      {
+        "id": "webb-1911",
+        "title": "Webb, The New Dictionary of Statistics (1911), \"Occupations\", pp. 428-448",
+        "url": "https://archive.org/details/newdictionaryofs00webb",
+        "accessDate": "2026-11-09",
+        "license": "Public domain (published 1911; Internet Archive NOT_IN_COPYRIGHT)",
+        "notes": "Census occupation groups c. 1900 of about twenty territories; the P7 occupation shares (historical/p7/sources_1900.json, D-154)."
+      },
+      {
+        "id": "p7-labour",
+        "title": "Fabric of Nations P7 labour market of 1900 (scripts/p7/)",
+        "url": "internal:packages/data/data/historical/p7/sources_1900.json",
+        "accessDate": "2026-11-09",
+        "license": "Project data",
+        "notes": "Sixteen professions, occupation shares (census or proxy), the job, owner and institution remaps and the measured opening incomes; trace in calibration_1900.json p7 (D-154)."
       }
     ],
     "ageStructures": {
@@ -172,24 +188,26 @@
       "provinces": "historical/p5b/provinces_1900.json",
       "markets": "historical/p5b/markets_1900.json",
       "tradeRoutes": "historical/p5b/trade_routes_1900.json",
-      "populations": "historical/p6/pops_1900.json",
+      "populations": "historical/p7/pops_1900.json",
       "buildings": "historical/p5b/buildings_1900.json",
-      "employment": "historical/p2b/employment_1900.json",
+      "employment": "historical/p7/employment_1900.json",
       "calibration": "historical/p2b/calibration_targets_1900.json",
       "moneyCoefficients": "historical/p2b/money_coefficients_1900.json",
       "currencies": "historical/p3/currencies_1900.json",
-      "demography": "historical/p4/demography_1900.json",
+      "demography": "historical/p7/demography_1900.json",
       "deposits": "historical/p5/deposits_1900.json",
       "monetary": "historical/p5b/monetary_1900.json"
     },
     "definitions": {
       "goods": "historical/p5b/goods_1900.json",
-      "professions": "historical_1900_professions.json",
+      "professions": "historical/p7/professions_1900.json",
       "buildings": "historical/p5b/buildings_definitions_1900.json",
       "needs": "historical/p5b/needs_1900.json",
-      "demography": "demography.json",
+      "demography": "historical/p7/demography_definitions_1900.json",
       "technology": "technology.json",
-      "demandSystem": "historical/p6/demand_1900.json"
+      "demandSystem": "historical/p6/demand_1900.json",
+      "labourMarket": "historical/p7/labour_1900.json",
+      "politics": "historical/p7/politics_1900.json"
     },
     "countryMeta": [
       {

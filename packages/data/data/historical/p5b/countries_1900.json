@@ -78,14 +78,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 3083200005.98,
+  "initialTreasuryCashRUSD": 3210148945.13,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 20982492380.71,
+   "maxOutstandingPrincipalRUSD": 21846434111.13,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -99,7 +99,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 5345887189.86
+   "institutionFundingRUSDPerYear": 5566000937.34
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -113,20 +113,25 @@
     "chemical-fertilizer",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 1641025644.21,
-   "researchStaffShare": 0.18
+   "educationFundingRUSDPerYear": 1606078271.48,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 102515634.35,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 1,
@@ -378,14 +383,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1744390302.41,
+  "initialTreasuryCashRUSD": 1627512626.53,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 0,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 11871320757.1,
+   "maxOutstandingPrincipalRUSD": 11075918273.03,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -399,7 +404,7 @@
     "labor": "labor-protected",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 3024556873.92
+   "institutionFundingRUSDPerYear": 2821905450.38
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -413,20 +418,25 @@
     "chemical-fertilizer",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 928447461.8,
-   "researchStaffShare": 0.18
+   "educationFundingRUSDPerYear": 814265229.03,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 51974376.32,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 2,
@@ -535,14 +545,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1071915600.19,
+  "initialTreasuryCashRUSD": 978936205.52,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 7294843302.45,
+   "maxOutstandingPrincipalRUSD": 6662078825.15,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -556,7 +566,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1858568975.27
+   "institutionFundingRUSDPerYear": 1697354213.36
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -570,20 +580,25 @@
     "chemical-fertilizer",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 570524450.22,
-   "researchStaffShare": 0.18
+   "educationFundingRUSDPerYear": 489774211.64,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 31262183.72,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 3,
@@ -795,14 +810,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 682041938.8,
+  "initialTreasuryCashRUSD": 622039659.71,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 4641586584.22,
+   "maxOutstandingPrincipalRUSD": 4233245457.66,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -816,7 +831,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1182576302.71
+   "institutionFundingRUSDPerYear": 1078539777.5
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -830,20 +845,25 @@
     "chemical-fertilizer",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 363015149.79,
-   "researchStaffShare": 0.18
+   "educationFundingRUSDPerYear": 311214338.82,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 19864745.03,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 4,
@@ -1017,14 +1037,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 330247349.3,
+  "initialTreasuryCashRUSD": 346392115.03,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 2247474207.64,
+   "maxOutstandingPrincipalRUSD": 2357346231.29,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1038,7 +1058,7 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 572608027.6
+   "institutionFundingRUSDPerYear": 600601053.07
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1051,20 +1071,25 @@
     "electrical-generation",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 175773342.01,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 173304372.75,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 11061981.24,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 5,
@@ -1095,14 +1120,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 195123921.64,
+  "initialTreasuryCashRUSD": 174113671.08,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 1327901592.9,
+   "maxOutstandingPrincipalRUSD": 1184917867.71,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1116,7 +1141,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 338320728.83
+   "institutionFundingRUSDPerYear": 301891554.88
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1127,20 +1152,25 @@
     "printing-industry",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 103854228.92,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 87111280.09,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 5560294.47,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 6,
@@ -1186,14 +1216,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 294117627.46,
+  "initialTreasuryCashRUSD": 253509865.5,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 2001596025.3,
+   "maxOutstandingPrincipalRUSD": 1725242868.09,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1207,7 +1237,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 509963561.85
+   "institutionFundingRUSDPerYear": 439554728.8
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1219,20 +1249,25 @@
     "steelmaking",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 156543386.14,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 126834204.13,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 8095800.26,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 7,
@@ -1305,14 +1340,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 118865601.45,
+  "initialTreasuryCashRUSD": 104325732.15,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 808931166.3,
+   "maxOutstandingPrincipalRUSD": 709981148.03,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1326,7 +1361,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 206098240.43
+   "institutionFundingRUSDPerYear": 180887906.71
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1338,20 +1373,25 @@
     "steelmaking",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 63265924.95,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 52195488.25,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 3331626.91,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 8,
@@ -1423,14 +1463,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 37225874.22,
+  "initialTreasuryCashRUSD": 35162955.62,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 253337967.29,
+   "maxOutstandingPrincipalRUSD": 239298925.42,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1444,7 +1484,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 64545058.3
+   "institutionFundingRUSDPerYear": 60968212.77
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1455,20 +1495,25 @@
     "printing-industry",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 19813380.29,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 17592473.1,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 1122923.82,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 9,
@@ -1524,14 +1569,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 180056617.34,
+  "initialTreasuryCashRUSD": 171914887.59,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 1225362154.31,
+   "maxOutstandingPrincipalRUSD": 1169954207.32,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1545,7 +1590,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 312195888.12
+   "institutionFundingRUSDPerYear": 298079136.46
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1558,20 +1603,25 @@
     "printing-industry",
     "chemical-fertilizer"
    ],
-   "educationFundingRUSDPerYear": 95834693.14,
-   "researchStaffShare": 0.18
+   "educationFundingRUSDPerYear": 86011200.79,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 5490076.65,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 10,
@@ -1610,14 +1660,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 188152576.12,
+  "initialTreasuryCashRUSD": 169623642.2,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 1280458610.25,
+   "maxOutstandingPrincipalRUSD": 1154361304.24,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1631,7 +1681,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 326233278.56
+   "institutionFundingRUSDPerYear": 294106400.56
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1645,20 +1695,25 @@
     "chemical-fertilizer",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 100143747.35,
-   "researchStaffShare": 0.18
+   "educationFundingRUSDPerYear": 84864861.64,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 5416906.06,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 11,
@@ -1703,14 +1758,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 89796213.72,
+  "initialTreasuryCashRUSD": 81971066.36,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 611101571.95,
+   "maxOutstandingPrincipalRUSD": 557848103.25,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1724,7 +1779,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 155695520.15
+   "institutionFundingRUSDPerYear": 142127683.16
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1737,20 +1792,25 @@
     "printing-industry",
     "chemical-fertilizer"
    ],
-   "educationFundingRUSDPerYear": 47793814.6,
-   "researchStaffShare": 0.18
+   "educationFundingRUSDPerYear": 41011165.15,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 2617733.95,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 12,
@@ -1790,14 +1850,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 47945640.21,
+  "initialTreasuryCashRUSD": 42412214.94,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 326290551.52,
+   "maxOutstandingPrincipalRUSD": 288633230.14,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1811,7 +1871,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 83131805.69
+   "institutionFundingRUSDPerYear": 73537531.17
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1824,20 +1884,25 @@
     "electrical-generation",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 25518949.46,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 21219369.57,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 1354427.85,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 13,
@@ -1876,14 +1941,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 19660144.92,
+  "initialTreasuryCashRUSD": 17750602.12,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 133795679.85,
+   "maxOutstandingPrincipalRUSD": 120800425.88,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1897,7 +1962,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 34088257.87
+   "institutionFundingRUSDPerYear": 30777347.01
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1909,20 +1974,25 @@
     "electrical-generation",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 10464063.93,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 8880851.59,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 566862.87,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 14,
@@ -1953,14 +2023,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 37773501,
+  "initialTreasuryCashRUSD": 35550751.99,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 257064801.29,
+   "maxOutstandingPrincipalRUSD": 241938045.31,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -1974,7 +2044,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 65494575.34
+   "institutionFundingRUSDPerYear": 61640603.68
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -1984,20 +2054,25 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 20104853.3,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 17786492.55,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 1135308.04,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 15,
@@ -2028,14 +2103,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 7479212.21,
+  "initialTreasuryCashRUSD": 9334433.2,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 50899232.28,
+   "maxOutstandingPrincipalRUSD": 63524803.15,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2049,27 +2124,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 12968028.24
+   "institutionFundingRUSDPerYear": 16184751.8
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 3980792.36,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 4670135.43,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 298093.75,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 16,
@@ -2093,14 +2173,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 4586286.52,
+  "initialTreasuryCashRUSD": 5286405.27,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 31211637.85,
+   "maxOutstandingPrincipalRUSD": 35976244.86,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2114,27 +2194,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 7952053.17
+   "institutionFundingRUSDPerYear": 9165972.42
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 2441039.76,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 2644855.67,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 168820.58,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 17,
@@ -2156,14 +2241,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 578178.14,
+  "initialTreasuryCashRUSD": 727534.32,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 3934749.09,
+   "maxOutstandingPrincipalRUSD": 4951181.64,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2177,27 +2262,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1002489.33
+   "institutionFundingRUSDPerYear": 1261454.46
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 307733.9,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 363994.66,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 23233.7,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 18,
@@ -2221,14 +2311,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 11323793.8,
+  "initialTreasuryCashRUSD": 13240578.72,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 77063251.41,
+   "maxOutstandingPrincipalRUSD": 90107791.13,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2242,27 +2332,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 19634056.86
+   "institutionFundingRUSDPerYear": 22957524.66
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 6027061.49,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 6624429.63,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 422835.93,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 19,
@@ -2287,14 +2382,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 7551414.61,
+  "initialTreasuryCashRUSD": 8650666.47,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 51390600.41,
+   "maxOutstandingPrincipalRUSD": 58871478.61,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2308,27 +2403,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 13093218.26
+   "institutionFundingRUSDPerYear": 14999184.92
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 4019221.91,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 4328038.26,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 276257.76,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 20,
@@ -2404,14 +2504,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 99059375.95,
+  "initialTreasuryCashRUSD": 95031824.61,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 674141345.7,
+   "maxOutstandingPrincipalRUSD": 646732139.3,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2425,27 +2525,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 171756696.91
+   "institutionFundingRUSDPerYear": 164773421.39
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 52724109.99,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 47545628.32,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 3034827.34,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 21,
@@ -2467,14 +2572,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 4689020.83,
+  "initialTreasuryCashRUSD": 4269355.6,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 31910788.65,
+   "maxOutstandingPrincipalRUSD": 29054787.61,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2488,7 +2593,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 8130181.73
+   "institutionFundingRUSDPerYear": 7402534.17
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -2498,20 +2603,25 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 2495719.84,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 2136012.81,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 136341.24,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 22,
@@ -2531,14 +2641,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1105137.49,
+  "initialTreasuryCashRUSD": 1060075.45,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 7520932.42,
+   "maxOutstandingPrincipalRUSD": 7214266.02,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2552,7 +2662,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1916171.61
+   "institutionFundingRUSDPerYear": 1838039.62
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -2562,20 +2672,25 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 588206.72,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 530369.21,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 33853.35,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 23,
@@ -2595,14 +2710,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 43523.18,
+  "initialTreasuryCashRUSD": 46393.88,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 296193.84,
+   "maxOutstandingPrincipalRUSD": 315730.17,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2616,27 +2731,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 75463.81
+   "institutionFundingRUSDPerYear": 80441.25
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 23165.11,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 23211.45,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 1481.58,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 24,
@@ -2656,14 +2776,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 48112.03,
+  "initialTreasuryCashRUSD": 66622.17,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 327422.88,
+   "maxOutstandingPrincipalRUSD": 453392.32,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2677,27 +2797,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 83420.3
+   "institutionFundingRUSDPerYear": 115514.6
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 25607.51,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 33331.92,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 2127.57,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 25,
@@ -2717,14 +2842,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 250723.31,
+  "initialTreasuryCashRUSD": 249130.53,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 1706279.15,
+   "maxOutstandingPrincipalRUSD": 1695439.64,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2738,7 +2863,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 434723.18
+   "institutionFundingRUSDPerYear": 431961.51
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -2748,20 +2873,25 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 133446.87,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 124643.17,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 7955.95,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 26,
@@ -2812,14 +2942,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 675470685.23,
+  "initialTreasuryCashRUSD": 718899587.68,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 4596866398.11,
+   "maxOutstandingPrincipalRUSD": 4892418620.81,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2833,27 +2963,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1171182562.36
+   "institutionFundingRUSDPerYear": 1246482903.83
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 359517616.18,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 359674590.46,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 22957952.58,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 27,
@@ -2881,14 +3016,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 21103511.16,
+  "initialTreasuryCashRUSD": 23362200.6,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 143618403.35,
+   "maxOutstandingPrincipalRUSD": 158989749.31,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2902,27 +3037,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 36590876.28
+   "institutionFundingRUSDPerYear": 40507164.2
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 11232292.08,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 11688405.55,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 746068.44,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 28,
@@ -2952,14 +3092,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 25475190.4,
+  "initialTreasuryCashRUSD": 23527934.3,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 173369547.03,
+   "maxOutstandingPrincipalRUSD": 160117637.94,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -2973,27 +3113,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 44170826.98
+   "institutionFundingRUSDPerYear": 40794525.93
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 13559107.63,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 11771324.23,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 751361.12,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 29,
@@ -3018,14 +3163,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 7331110.15,
+  "initialTreasuryCashRUSD": 7576260.79,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 49891334.52,
+   "maxOutstandingPrincipalRUSD": 51559689.26,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3039,27 +3184,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 12711237.6
+   "institutionFundingRUSDPerYear": 13136298.46
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 3901965.4,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 3790499.46,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 241946.77,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 30,
@@ -3080,14 +3230,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 7752711.32,
+  "initialTreasuryCashRUSD": 8092854.66,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 52760510.45,
+   "maxOutstandingPrincipalRUSD": 55075331.14,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3101,27 +3251,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 13442241.84
+   "institutionFundingRUSDPerYear": 14032008.3
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 4126361.59,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 4048957.93,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 258444.12,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 31,
@@ -3151,14 +3306,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 11280904.33,
+  "initialTreasuryCashRUSD": 11833210.99,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 76771370.2,
+   "maxOutstandingPrincipalRUSD": 80530052.87,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3172,27 +3327,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 19559691.82
+   "institutionFundingRUSDPerYear": 20517323.22
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 6004233.67,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 5920305.69,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 377891.85,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 32,
@@ -3214,14 +3374,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1027633.15,
+  "initialTreasuryCashRUSD": 1051242.9,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 6993482.33,
+   "maxOutstandingPrincipalRUSD": 7154156.78,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3235,27 +3395,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1781788.69
+   "institutionFundingRUSDPerYear": 1822725.08
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 546955.23,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 525950.17,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 33571.29,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 33,
@@ -3284,14 +3449,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 21724206.65,
+  "initialTreasuryCashRUSD": 23574512.38,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 147842501.2,
+   "maxOutstandingPrincipalRUSD": 160434621.63,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3305,27 +3470,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 37667085.44
+   "institutionFundingRUSDPerYear": 40875286.55
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 11562655.73,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 11794627.83,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 752848.59,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 34,
@@ -3350,14 +3520,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1254707.01,
+  "initialTreasuryCashRUSD": 1553085.81,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 8538816.87,
+   "maxOutstandingPrincipalRUSD": 10569412,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3371,27 +3541,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 2175506.65
+   "institutionFundingRUSDPerYear": 2692858.56
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 667814.73,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 777028.54,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 49597.57,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 35,
@@ -3419,14 +3594,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 10959203.5,
+  "initialTreasuryCashRUSD": 11267955.2,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 74582058.75,
+   "maxOutstandingPrincipalRUSD": 76683245.89,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3440,27 +3615,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 19001902.41
+   "institutionFundingRUSDPerYear": 19537239.64
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 5833009.2,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 5637501.04,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 359840.49,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 36,
@@ -3483,14 +3663,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 3808995.72,
+  "initialTreasuryCashRUSD": 3544199.53,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 25921842.1,
+   "maxOutstandingPrincipalRUSD": 24119790.97,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3504,27 +3684,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 6604327.13
+   "institutionFundingRUSDPerYear": 6145203.31
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 2027328.63,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 1773208.02,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 113183.49,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 37,
@@ -3544,14 +3729,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 682642.1,
+  "initialTreasuryCashRUSD": 708251.53,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 4645670.94,
+   "maxOutstandingPrincipalRUSD": 4819954.07,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3565,27 +3750,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1183616.91
+   "institutionFundingRUSDPerYear": 1228020.5
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 363334.58,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 354347.23,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 22617.91,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 38,
@@ -3636,14 +3826,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 40197147.07,
+  "initialTreasuryCashRUSD": 41968075.92,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 273558747.58,
+   "maxOutstandingPrincipalRUSD": 285610674.44,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3657,27 +3847,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 69696877.66
+   "institutionFundingRUSDPerYear": 72767449.08
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 21394832.98,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 20997161.18,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 1340244.33,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 39,
@@ -3718,14 +3913,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 2881472.12,
+  "initialTreasuryCashRUSD": 3081917.18,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 19609647.96,
+   "maxOutstandingPrincipalRUSD": 20973762.18,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3739,27 +3934,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 4996116
+   "institutionFundingRUSDPerYear": 5343662.92
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 1533656.47,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 1541922.29,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 98420.57,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 40,
@@ -3796,14 +3996,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 828218.04,
+  "initialTreasuryCashRUSD": 933212.41,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 5636377.36,
+   "maxOutstandingPrincipalRUSD": 6350908.84,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3817,27 +4017,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1436027.57
+   "institutionFundingRUSDPerYear": 1618074.8
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 440817.02,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 466898.01,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 29802,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 41,
@@ -3870,14 +4075,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1957137.12,
+  "initialTreasuryCashRUSD": 2091992.17,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 13319153.67,
+   "maxOutstandingPrincipalRUSD": 14236899.86,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3891,27 +4096,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 3393433.52
+   "institutionFundingRUSDPerYear": 3627255.49
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 1041681.43,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 1046650.24,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 66807.46,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 42,
@@ -3947,14 +4157,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 806135.81,
+  "initialTreasuryCashRUSD": 870740.25,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 5486098.34,
+   "maxOutstandingPrincipalRUSD": 5925759.13,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -3968,27 +4178,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1397739.71
+   "institutionFundingRUSDPerYear": 1509755.81
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 429063.81,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 435642.4,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 27806.96,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 43,
@@ -4014,14 +4229,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 988241.85,
+  "initialTreasuryCashRUSD": 1047523.21,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 6725407.68,
+   "maxOutstandingPrincipalRUSD": 7128842.65,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4035,27 +4250,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1713489.04
+   "institutionFundingRUSDPerYear": 1816275.58
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 525989.3,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 524089.16,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 33452.5,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 44,
@@ -4111,14 +4331,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 7929332.5,
+  "initialTreasuryCashRUSD": 8271252.99,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 53962493.04,
+   "maxOutstandingPrincipalRUSD": 56289407.94,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4132,27 +4352,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 13748481.12
+   "institutionFundingRUSDPerYear": 14341328.92
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 4220367.79,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 4138212.88,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 264141.25,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 45,
@@ -4196,14 +4421,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 8446681.23,
+  "initialTreasuryCashRUSD": 8950240.85,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 57483271.98,
+   "maxOutstandingPrincipalRUSD": 60910210.19,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4217,27 +4442,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 14645499.77
+   "institutionFundingRUSDPerYear": 15518609.82
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 4495725.38,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 4477919.12,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 285824.63,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 46,
@@ -4280,14 +4510,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 3078105.16,
+  "initialTreasuryCashRUSD": 3287229.67,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 20947819.75,
+   "maxOutstandingPrincipalRUSD": 22371001.37,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4301,27 +4531,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 5337053.35
+   "institutionFundingRUSDPerYear": 5699649.38
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 1638313.92,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 1644642.73,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 104977.2,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 47,
@@ -4364,14 +4599,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 8690900.04,
+  "initialTreasuryCashRUSD": 8887310.59,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 59145285.23,
+   "maxOutstandingPrincipalRUSD": 60481942.89,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4385,27 +4620,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 15068944.95
+   "institutionFundingRUSDPerYear": 15409496.54
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 4625710.24,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 4446434.31,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 283814.96,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 48,
@@ -4434,14 +4674,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 5286016.7,
+  "initialTreasuryCashRUSD": 5255446.48,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 35973600.42,
+   "maxOutstandingPrincipalRUSD": 35765557.07,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4455,27 +4695,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 9165298.68
+   "institutionFundingRUSDPerYear": 9112293.71
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 2813469.43,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 2629366.6,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 167831.91,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 49,
@@ -4513,14 +4758,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 30711742.23,
+  "initialTreasuryCashRUSD": 28266078.57,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 209006517.93,
+   "maxOutstandingPrincipalRUSD": 192362732.58,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4534,7 +4779,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 53250359.7
+   "institutionFundingRUSDPerYear": 49009881.63
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -4544,20 +4789,25 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 16346249.51,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 14141877.96,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 902673.06,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 50,
@@ -4601,14 +4851,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 70016072.45,
+  "initialTreasuryCashRUSD": 65993564.72,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 476489265.67,
+   "maxOutstandingPrincipalRUSD": 449114383.21,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4622,7 +4872,7 @@
     "labor": "labor-association",
     "trade": "trade-open"
    },
-   "institutionFundingRUSDPerYear": 121399203.45
+   "institutionFundingRUSDPerYear": 114424672.93
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -4632,20 +4882,25 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 37265882.91,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 33017418.25,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 2107494.78,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 51,
@@ -4683,14 +4938,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 7226621.02,
+  "initialTreasuryCashRUSD": 6535078.01,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 49180241.34,
+   "maxOutstandingPrincipalRUSD": 44473995.91,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4704,7 +4959,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 12530066.37
+   "institutionFundingRUSDPerYear": 11331016.39
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -4714,20 +4969,25 @@
     "basic-sanitation",
     "printing-industry"
    ],
-   "educationFundingRUSDPerYear": 3846351.32,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 3269582.49,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 208696.76,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 52,
@@ -4764,14 +5024,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1388908.19,
+  "initialTreasuryCashRUSD": 1429776.83,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 9452113.23,
+   "maxOutstandingPrincipalRUSD": 9730241.75,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4785,27 +5045,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 2408194.9
+   "institutionFundingRUSDPerYear": 2479056.05
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 739242.98,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 715335.5,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 45659.71,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 53,
@@ -4844,14 +5109,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 48731534.83,
+  "initialTreasuryCashRUSD": 48584817.87,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 331638899.95,
+   "maxOutstandingPrincipalRUSD": 330640428.35,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4865,27 +5130,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 84494449.69
+   "institutionFundingRUSDPerYear": 84240060.63
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 25937239.94,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 24307601.19,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 1551549.01,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 54,
@@ -4914,14 +5184,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 3146173.9,
+  "initialTreasuryCashRUSD": 3207791.45,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 21411056.59,
+   "maxOutstandingPrincipalRUSD": 21830390.38,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -4935,27 +5205,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 5455076.12
+   "institutionFundingRUSDPerYear": 5561913.34
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 1674543.34,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 1604898.79,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 102440.35,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 55,
@@ -4979,14 +5254,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1407434.95,
+  "initialTreasuryCashRUSD": 1429418.04,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 9578195.71,
+   "maxOutstandingPrincipalRUSD": 9727800.02,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5000,27 +5275,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 2440318
+   "institutionFundingRUSDPerYear": 2478433.95
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 749103.8,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 715155.99,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 45648.26,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 56,
@@ -5051,14 +5331,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 79343687.56,
+  "initialTreasuryCashRUSD": 77252994.73,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 539967668.83,
+   "maxOutstandingPrincipalRUSD": 525739611.47,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5072,7 +5352,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 137572133.54
+   "institutionFundingRUSDPerYear": 133947130.93
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -5083,20 +5363,25 @@
     "printing-industry",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 42230483.18,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 38650654.02,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 2467063.02,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 57,
@@ -5126,14 +5411,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 176981926.12,
+  "initialTreasuryCashRUSD": 172657247.85,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 1204437567.8,
+   "maxOutstandingPrincipalRUSD": 1175006285.82,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5147,7 +5432,7 @@
     "labor": "labor-protected",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 306864754.09
+   "institutionFundingRUSDPerYear": 299366297.26
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -5158,20 +5443,25 @@
     "printing-industry",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 94198196.27,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 86382613.06,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 5513783.81,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 58,
@@ -5215,14 +5505,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 21075540.21,
+  "initialTreasuryCashRUSD": 20408055.49,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 143428049.12,
+   "maxOutstandingPrincipalRUSD": 138885530.62,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5236,7 +5526,7 @@
     "labor": "labor-protected",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 36542378.12
+   "institutionFundingRUSDPerYear": 35385042.23
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -5247,20 +5537,25 @@
     "printing-industry",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 11217404.61,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 10210409.25,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 651728.25,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 59,
@@ -5286,14 +5581,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 9952164.63,
+  "initialTreasuryCashRUSD": 9808367.31,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 67728729.28,
+   "maxOutstandingPrincipalRUSD": 66750127.15,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5307,27 +5602,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 17255821.65
+   "institutionFundingRUSDPerYear": 17006494.9
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 5297015.22,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 4907250.69,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 313228.77,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 60,
@@ -5401,14 +5701,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 488760695.24,
+  "initialTreasuryCashRUSD": 462461129.48,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 3326225202.35,
+   "maxOutstandingPrincipalRUSD": 3147245429.03,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5422,7 +5722,7 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 847450549.59
+   "institutionFundingRUSDPerYear": 801850357.77
   },
   "technology": {
    "researchedTechnologyKeys": [
@@ -5435,20 +5735,25 @@
     "electrical-generation",
     "geological-surveying"
    ],
-   "educationFundingRUSDPerYear": 260141681.76,
-   "researchStaffShare": 0.12
+   "educationFundingRUSDPerYear": 231375174.22,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 14768628.14,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 61,
@@ -5472,14 +5777,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 37180.71,
+  "initialTreasuryCashRUSD": 47435.77,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 253030.6,
+   "maxOutstandingPrincipalRUSD": 322820.66,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5493,27 +5798,32 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 64466.75
+   "institutionFundingRUSDPerYear": 82247.75
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 19789.34,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 23732.72,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 1514.85,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 62,
@@ -5536,14 +5846,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 15623369.65,
+  "initialTreasuryCashRUSD": 17067194.39,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 106323700.73,
+   "maxOutstandingPrincipalRUSD": 116149544.48,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5557,27 +5867,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 27088989.21
+   "institutionFundingRUSDPerYear": 29592402.59
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 8315500.2,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 8538934.03,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 545038.34,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 63,
@@ -5598,14 +5913,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1485106.65,
+  "initialTreasuryCashRUSD": 1664259.52,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 10106784.78,
+   "maxOutstandingPrincipalRUSD": 11325996.57,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5619,27 +5934,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 2574991.11
+   "institutionFundingRUSDPerYear": 2885620.01
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 790444.37,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 832650.17,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 53147.88,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 64,
@@ -5660,14 +5980,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 816342.71,
+  "initialTreasuryCashRUSD": 950952.41,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 5555560.66,
+   "maxOutstandingPrincipalRUSD": 6471637.13,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5681,27 +6001,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1415437.21
+   "institutionFundingRUSDPerYear": 1648833.77
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 434496.41,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 475773.56,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 30368.53,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 65,
@@ -5723,14 +6048,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 1960029.51,
+  "initialTreasuryCashRUSD": 2012066.28,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 13338837.61,
+   "maxOutstandingPrincipalRUSD": 13692970.09,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5744,27 +6069,32 @@
     "labor": "labor-repression",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 3398448.57
+   "institutionFundingRUSDPerYear": 3488673.89
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 1043220.9,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 1006662.31,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 64255.04,
+   "healthStaffShare": 0.106061
+  }
  },
  {
   "id": 66,
@@ -5784,14 +6114,14 @@
    "incomeTaxRate": 0.078,
    "welfareBudgetRUSDPerYear": 0
   },
-  "initialTreasuryCashRUSD": 899344.93,
+  "initialTreasuryCashRUSD": 1113696.61,
   "debt": {
    "enabled": true,
    "creditorKind": "country",
    "creditorId": 1,
    "annualCouponRate": 0.04,
    "termDays": 365,
-   "maxOutstandingPrincipalRUSD": 6120426.21,
+   "maxOutstandingPrincipalRUSD": 7579180.92,
    "refinanceOnMaturity": true,
    "arrearsGraceDays": 365
   },
@@ -5805,26 +6135,31 @@
     "labor": "labor-association",
     "trade": "trade-restricted"
    },
-   "institutionFundingRUSDPerYear": 1559352.79
+   "institutionFundingRUSDPerYear": 1931012.08
   },
   "technology": {
    "researchedTechnologyKeys": [
     "steam-power",
     "primary-schooling"
    ],
-   "educationFundingRUSDPerYear": 478674.13,
-   "researchStaffShare": 0.08
+   "educationFundingRUSDPerYear": 557196.55,
+   "researchStaffShare": 0.053604
   },
   "sourceIds": [
    "owid-population",
    "maddison-2023",
    "project-authored-1900",
    "p2b-money-calibration",
-   "p5b-catalogue"
+   "p5b-catalogue",
+   "p7-labour"
   ],
   "occupationSourceIds": [
    "owid-employment-by-sector",
    "project-authored-1900"
-  ]
+  ],
+  "labor": {
+   "trainingBudgetRUSDPerYear": 35565.74,
+   "healthStaffShare": 0.106061
+  }
  }
 ]

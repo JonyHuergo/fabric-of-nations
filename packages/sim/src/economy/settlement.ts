@@ -20,6 +20,7 @@
  * guard for the same result object.
  */
 
+import { DOMESTIC_WAGE_RATIO } from "./constants.js";
 import { buildLabourWageTable, jobIsCovered, type LabourWageTable } from "./labourMarket.js";
 import {
   assertValidDayIndex,
@@ -1005,9 +1006,14 @@ function buildWageGroups(
   labour?: { readonly wages: LabourWageTable; readonly definition: BuildingDef },
 ): WageGroup[] {
   const groups = new Map<Id, WageGroup>();
+  // P7 (D-154, R2): in a labour-market world a block working in a building it owns is paid
+  // the building's residual (profit), not a wage; the owner's account is the block's own.
+  const ownerAccount = labour === undefined ? undefined : index.account(building.ownerAccountId);
+  const ownerBlockId = ownerAccount !== undefined && ownerAccount.ownerKind === "popBlock" ? ownerAccount.ownerId : null;
   for (const assignment of lookup.assignmentsByBuilding.get(building.id) ?? []) {
     const block = lookup.blockById.get(assignment.popBlockId);
     if (block === undefined) throw new RangeError("employment assignment references an unknown block");
+    if (ownerBlockId !== null && ownerBlockId === block.id) continue;
     const profession = professions.get(assignment.professionId);
     if (profession === undefined) throw new RangeError("employment assignment references an unknown profession");
     const account = householdCash(index, block.id);
@@ -1396,6 +1402,61 @@ function settleMarketDaysInternal(
     if (wageEntries.length > 0) {
       postings.push(...postJournalBatch(world.finance, dayIndex, wageEntries, { adoptLines: true }));
     }
+    // P7 (D-154, docs/P7_EMPLOYERS_PROPOSAL.md §4.1): households pay their domestic servants the
+    // province's paid wage of the servant's profession × DOMESTIC_WAGE_RATIO, from the employer's
+    // household cash (consumption of the employer, wage income of the servant). The employer
+    // pays from the cash it held before today's wages: today's wages stay in its account for
+    // the fiscal phase, whose income tax is a share of them. An employer without such cash
+    // leaves the day unpaid; the next refresh rehires by income.
+    const householdEntries: JournalEntryInput[] = [];
+    const spent = new Map<Id, number>();
+    const domesticReceived = new Map<Id, number>();
+    if (labourWages !== undefined && world.labourMarket.householdEmployment.length > 0) {
+      const wagesToday = new Map<Id, number>();
+      for (const settlement of wageSettlements) {
+        for (const payment of settlement.payments) {
+          wagesToday.set(payment.popBlockId, (wagesToday.get(payment.popBlockId) ?? 0) + payment.paidRUSD);
+        }
+      }
+      for (const assignment of world.labourMarket.householdEmployment) {
+        const servant = wageLookup.blockById.get(assignment.popBlockId);
+        const employer = wageLookup.blockById.get(assignment.employerBlockId);
+        if (servant === undefined || employer === undefined) continue;
+        const covered = labourWages.coverage(servant.provinceId).domesticService;
+        const annual = labourWages.paid(servant.provinceId, servant.professionId, covered) * DOMESTIC_WAGE_RATIO;
+        const obligation = (annual * assignment.workers) / yearDays;
+        const employerCash = householdCash(index, employer.id);
+        const prior = spent.get(employer.id) ?? 0;
+        const limit = Math.max(0, employerCash.balanceRUSD - (wagesToday.get(employer.id) ?? 0));
+        let paid = Math.min(obligation, Math.max(0, limit - prior));
+        // The batch debits the employer's cash by the running sum of its payments; when the
+        // employer pays out its last spendable cash, `prior + paid` can exceed the limit by an
+        // ulp. As for wages above, step down by at least one ulp until the sum is affordable;
+        // the difference stays unpaid.
+        let roundingGuard = 0;
+        while (paid > 0 && prior + paid > limit && roundingGuard < 32) {
+          paid = Math.max(0, paid - Math.max(prior + paid - limit, Math.abs(paid) * Number.EPSILON * 2));
+          roundingGuard += 1;
+        }
+        if (!Number.isFinite(paid) || !(paid > 0) || prior + paid > limit) continue;
+        spent.set(employer.id, prior + paid);
+        domesticReceived.set(servant.id, (domesticReceived.get(servant.id) ?? 0) + paid);
+        householdEntries.push({
+          transactionKind: "domestic-service",
+          lines: [
+            { accountId: index.get("popBlock", employer.id, "consumption-expense").id, side: "debit", amountRUSD: paid },
+            { accountId: employerCash.id, side: "credit", amountRUSD: paid },
+            { accountId: householdCash(index, servant.id).id, side: "debit", amountRUSD: paid },
+            { accountId: index.get("popBlock", servant.id, "wage-income").id, side: "credit", amountRUSD: paid },
+          ],
+          sourceEntityId: employer.id,
+          targetEntityId: servant.id,
+        });
+      }
+      if (householdEntries.length > 0) {
+        postings.push(...postJournalBatch(world.finance, dayIndex, householdEntries, { adoptLines: true }));
+      }
+    }
 
     const upkeepSettlements: UpkeepSettlement[] = [];
     const upkeepEntries: JournalEntryInput[] = [];
@@ -1459,7 +1520,7 @@ function settleMarketDaysInternal(
       postings.push(...postJournalBatch(world.finance, dayIndex, upkeepEntries, { adoptLines: true }));
     }
     if (marketPostings !== null) {
-      retainDeferredPostings(world.finance, marketPostings, wageEntries.length + upkeepEntries.length);
+      retainDeferredPostings(world.finance, marketPostings, wageEntries.length + householdEntries.length + upkeepEntries.length);
     }
 
     // D-139: per-owner sums in canonical transaction order, in id-indexed tables. A
@@ -1545,8 +1606,9 @@ function settleMarketDaysInternal(
         const initialCash =
           openingCashByAccount.get(account.id) ?? 0;
         const purchases = purchasesByBlock[block.id] ?? 0;
-        const wages = wagesByBlock.get(block.id) ?? 0;
-        const expected = initialCash - purchases + wages;
+        // §4.1: a servant's pay is wage income; an employer's is household spending outside the market.
+        const wages = (wagesByBlock.get(block.id) ?? 0) + (domesticReceived.get(block.id) ?? 0);
+        const expected = initialCash - purchases - (spent.get(block.id) ?? 0) + wages;
         if (Math.abs(expected - account.balanceRUSD) > toleranceMoney(expected, account.balanceRUSD)) {
           throw new RangeError(`household cash does not reconcile for popBlock ${String(block.id)}`);
         }

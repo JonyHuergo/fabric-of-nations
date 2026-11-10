@@ -85,6 +85,12 @@ const A12_MIN_COVERAGE = 0.75;
 const MAX_PROVINCES_PER_TERRITORY = 4;
 /** Smallest territory target of a tradeable good, in levels (D-148, provisional). */
 const MIN_LEVELS = 1;
+/**
+ * Smallest own-demand target, in levels, that a producer the sources name without a figure
+ * keeps under the minimum-size rule (P7, D-154 item 5d; provisional): half a level, the size
+ * that rounds to one level (a placed level is at least 1 and otherwise rounded).
+ */
+const SELF_SUPPLY_MIN_LEVELS = 0.5;
 const ITERATIONS = 60;
 const CONVERGENCE = 1e-10;
 
@@ -493,13 +499,19 @@ export function placeCatalogue(ctx) {
     const consolidate = (good, targets, entryReport) => {
       if (good.storable === false || good.tradeable === false) return targets;
       const list = [...targets].sort((left, right) => left[0].localeCompare(right[0])).map(([territory, quantity]) => ({ territory, quantity, levels: levelsFor(territory, definitionFor(territory, good.id), quantity) }));
-      const big = list.filter((entry) => entry.levels >= MIN_LEVELS);
-      const small = list.filter((entry) => entry.levels < MIN_LEVELS);
+      // A producer the sources name without a figure (A12 self-supply) keeps its own demand when
+      // it rounds to at least one level (P7, D-154 item 5d); it receives no other territory's.
+      const named = new Set(entryReport.a12?.usesSourcedShares === true ? (entryReport.a12.selfSuppliedTerritories ?? []) : []);
+      const keeps = (entry) => named.has(entry.territory) && entry.levels < MIN_LEVELS && entry.levels >= SELF_SUPPLY_MIN_LEVELS;
+      const kept = list.filter(keeps);
+      const big = list.filter((entry) => !keeps(entry) && entry.levels >= MIN_LEVELS);
+      const small = list.filter((entry) => !keeps(entry) && entry.levels < MIN_LEVELS);
+      if (kept.length > 0) entryReport.keptSelfSupplied = kept.map((entry) => entry.territory);
       if (small.length === 0) return targets;
-      const out = new Map(big.map((entry) => [entry.territory, entry.quantity]));
+      const out = new Map([...kept, ...big].map((entry) => [entry.territory, entry.quantity]));
       if (big.length === 0) {
-        const largest = [...list].sort((left, right) => right.levels - left.levels || left.territory.localeCompare(right.territory))[0];
-        out.set(largest.territory, list.reduce((acc, entry) => acc + entry.quantity, 0));
+        const largest = [...small, ...kept].sort((left, right) => right.levels - left.levels || left.territory.localeCompare(right.territory))[0];
+        out.set(largest.territory, (out.get(largest.territory) ?? 0) + small.reduce((acc, entry) => acc + entry.quantity, 0));
       } else {
         const marketOfTerritory = (territory) => marketOfProvince.get(territoryProvinces.get(territory)[0].id).key;
         for (const entry of small) {
@@ -775,7 +787,10 @@ export function placeCatalogue(ctx) {
   const capped = {};
   for (const building of solved) {
     const territory = building.province.territoryKey;
-    const factor = Math.max(1, ...building.definition.jobs.map((job) => capFactor.get(`${territory}:${professionById.get(job.professionId).key}`) ?? 1));
+    // R7 (P7, D-154; fixes D2): only professions without a literacy or training gate cap a
+    // building; a shortage of gated workers shows as vacancies, not as fewer jobs for all.
+    const ungated = building.definition.jobs.filter((job) => !(professionById.get(job.professionId).gates ?? []).some((gate) => gate === "literacy" || gate === "training"));
+    const factor = Math.max(1, ...ungated.map((job) => capFactor.get(`${territory}:${professionById.get(job.professionId).key}`) ?? 1));
     if (factor === 1 || !Number.isFinite(factor)) continue;
     const level = Math.max(1, Math.round(building.level / factor));
     building.technique = (building.technique * building.level) / level;

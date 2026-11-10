@@ -99,6 +99,8 @@ export function initialiseLabourMarket(world: World, definitions: EconomyDefinit
     provinces: provinceStates,
     institutionEmployment: [],
     nextInstitutionAssignmentId: 1,
+    householdEmployment: [],
+    nextHouseholdAssignmentId: 1,
     staffingCeilings: [],
     nextPopBlockId: world.popBlocks.reduce((max, block) => Math.max(max, block.id), -1) + 1,
     retiredPopBlockIds: [],
@@ -112,6 +114,14 @@ export function initialiseLabourMarket(world: World, definitions: EconomyDefinit
  * professions a course length and capital-gated professions an entry capital.
  */
 export function assertValidLabourDefinitions(definitions: EconomyDefinitions): void {
+  const shares = definitions.labourMarket?.domesticServiceShares ?? [];
+  let previousProvince = -1;
+  for (const [index, entry] of shares.entries()) {
+    const path = `definitions.labourMarket.domesticServiceShares[${String(index)}]`;
+    if (!Number.isInteger(entry.provinceId) || entry.provinceId <= previousProvince) throw new RangeError(`${path}.provinceId must be an integer in ascending order`);
+    previousProvince = entry.provinceId;
+    if (!Number.isFinite(entry.share) || entry.share < 0 || entry.share >= 1) throw new RangeError(`${path}.share must be in [0, 1)`);
+  }
   const labour = definitions.labourMarket;
   for (const profession of definitions.professions) {
     const path = `economyDefinitions.professions[${String(profession.id)}]`;
