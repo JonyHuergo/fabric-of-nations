@@ -7,29 +7,29 @@ shares, day-1 employment and measured incomes). Day-1 employment is the generato
 (own province, full staffing, institution posts = budget ÷ wage); the simulation's first refresh
 applies the same rule.
 
-Blocks: 5,687 before, 20,724 after. Building owners changed: 5075. Incomes (plan Q18, designer's decision 2026-11-09, "one pass, measure once"): demand and placement use the P6 estimate (wage × participation × working-age share, here over the sixteen professions); the blocks' opening incomes are then measured once from day-1 employment and owner profits. The estimate column shows what placement assumed, the measured column what the blocks receive on day 1.
+Blocks: 5,687 before, 20,739 after. Building owners changed: 6440. Incomes (plan Q18, designer's decision 2026-11-09, "one pass, measure once"): demand and placement use the P6 estimate (wage × participation × working-age share, here over the sixteen professions); the blocks' opening incomes are then measured once from day-1 employment and owner profits. The estimate column shows what placement assumed, the measured column what the blocks receive on day 1.
 
 ## World population by profession (millions)
 
 | Profession | Before | After | Share after | Day-1 eligible | Day-1 offered | Day-1 employed | Unemployment |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| peasants | 885.43 | 564.25 | 35.6 % | 192.30 | 112.56 | 192.04 | 0.1 % |
-| laborers | 433.28 | 541.89 | 34.2 % | 123.12 | 137.78 | 117.02 | 5.0 % |
-| clerks | 165.30 | 26.44 | 1.7 % | 8.15 | 7.17 | 6.94 | 14.8 % |
+| peasants | 885.43 | 564.25 | 35.6 % | 192.30 | 103.70 | 192.03 | 0.1 % |
+| laborers | 433.28 | 541.89 | 34.2 % | 123.12 | 136.71 | 120.05 | 2.5 % |
+| clerks | 165.30 | 26.44 | 1.7 % | 8.15 | 7.17 | 7.02 | 13.8 % |
 | capitalists | 73.81 | 11.65 | 0.7 % | 0.00 | 0.05 | 0.00 | – |
-| academics | 26.32 | 18.28 | 1.2 % | 6.14 | 0.48 | 6.11 | 0.6 % |
-| farmers | – | 162.24 | 10.2 % | 55.29 | 23.51 | 54.55 | 1.3 % |
-| attendants | – | 131.25 | 8.3 % | 29.82 | 15.66 | 25.96 | 13.0 % |
+| academics | 26.32 | 18.28 | 1.2 % | 6.14 | 0.47 | 6.11 | 0.6 % |
+| farmers | – | 162.24 | 10.2 % | 55.29 | 20.86 | 54.73 | 1.0 % |
+| attendants | – | 131.25 | 8.3 % | 29.82 | 15.69 | 27.00 | 9.5 % |
 | servicemen | – | – | 0.0 % | 0.00 | 0.00 | 0.00 | – |
 | officers | – | – | 0.0 % | 0.00 | 0.00 | 0.00 | – |
-| shopkeepers | – | 84.36 | 5.3 % | 26.35 | 5.45 | 26.32 | 0.1 % |
-| teachers | – | 13.99 | 0.9 % | 4.70 | 7.95 | 4.39 | 6.5 % |
-| medics | – | 4.12 | 0.3 % | 1.39 | 1.48 | 1.35 | 2.9 % |
-| engineers | – | 5.91 | 0.4 % | 1.98 | 1.95 | 1.76 | 11.1 % |
-| bureaucrats | – | 14.66 | 0.9 % | 4.50 | 8.01 | 3.84 | 14.7 % |
+| shopkeepers | – | 84.36 | 5.3 % | 26.35 | 5.35 | 26.32 | 0.1 % |
+| teachers | – | 13.99 | 0.9 % | 4.70 | 7.45 | 4.39 | 6.6 % |
+| medics | – | 4.12 | 0.3 % | 1.39 | 1.41 | 1.35 | 2.9 % |
+| engineers | – | 5.91 | 0.4 % | 1.98 | 1.94 | 1.89 | 4.8 % |
+| bureaucrats | – | 14.66 | 0.9 % | 4.50 | 7.49 | 3.89 | 13.4 % |
 | clergy | – | – | 0.0 % | 0.00 | 0.00 | 0.00 | – |
 | aristocrats | – | 5.10 | 0.3 % | 0.00 | 0.00 | 0.00 | – |
-| **all** | 1584.13 | 1584.13 | 100 % | 453.74 | 322.04 | 440.28 | 3.0 % |
+| **all** | 1584.13 | 1584.13 | 100 % | 453.74 | 308.28 | 444.78 | 2.0 % |
 
 ## Countries
 
@@ -37,22 +37,22 @@ Income per person (RUSD a year): before = the P6 world's estimate (five professi
 
 | Territory | Source of shares | Peasants | Farmers | Laborers | Attendants | Shopkeepers | Clerks | Professionals* | Income before | Estimate | Measured | Unemployment |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| usa-home | census USA 1900 (Webb 1911) | 0.0 % | 28.6 % | 46.4 % | 7.6 % | 6.3 % | 4.9 % | 5.0 % | 1967 | 2140 | 2856 | 6.7 % |
-| gbr-home | census GBR 1901 (Webb 1911) | 1.5 % | 4.7 % | 56.3 % | 14.5 % | 9.2 % | 5.7 % | 6.5 % | 1835 | 1543 | 2115 | 12.9 % |
-| deu-home | census DEU 1907 (Webb 1911) | 13.9 % | 12.5 % | 44.3 % | 7.1 % | 12.8 % | 3.5 % | 4.7 % | 937 | 763 | 1105 | 1.4 % |
-| fra-home | census FRA 1901 (Webb 1911) | 15.4 % | 11.2 % | 37.6 % | 9.1 % | 17.3 % | 2.6 % | 6.1 % | 880 | 729 | 970 | 4.0 % |
-| rus-home | census RUS 1897 (Webb 1911) | 38.6 % | 10.2 % | 29.9 % | 9.0 % | 5.1 % | 1.8 % | 4.3 % | 67 | 52 | 109 | 1.4 % |
-| ita-home | census ITA 1901 (Webb 1911) | 26.7 % | 4.2 % | 46.4 % | 10.3 % | 5.5 % | 1.8 % | 4.1 % | 457 | 348 | 489 | 2.4 % |
-| aut-home | census AUT+HUN 1900 (Webb 1911) | 19.2 % | 23.5 % | 36.9 % | 5.8 % | 5.1 % | 1.8 % | 6.5 % | 476 | 416 | 601 | 1.6 % |
-| jpn-home | proxy | 26.8 % | 13.3 % | 36.5 % | 9.7 % | 6.4 % | 2.1 % | 3.9 % | 203 | 163 | 231 | 0.2 % |
-| chn-home | proxy | 47.5 % | 8.2 % | 27.6 % | 8.6 % | 3.7 % | 0.8 % | 2.5 % | 53 | 41 | 72 | 1.2 % |
-| bin | census IND 1901 (Webb 1911) | 41.4 % | 6.9 % | 37.2 % | 4.8 % | 4.1 % | 1.3 % | 3.3 % | 32 | 42 | 50 | 4.1 % |
-| esp-home | proxy | 22.4 % | 3.5 % | 45.3 % | 12.8 % | 7.5 % | 2.4 % | 4.9 % | 326 | 258 | 334 | 3.8 % |
-| bra-home | proxy | 47.4 % | 6.6 % | 26.2 % | 11.8 % | 3.6 % | 0.5 % | 2.9 % | 28 | 34 | 126 | 4.0 % |
-| mex-home | census MEX 1900 (Censo 1900) | 33.2 % | 13.9 % | 33.4 % | 9.1 % | 5.0 % | 1.7 % | 2.2 % | 95 | 130 | 167 | 2.6 % |
-| ott-home | proxy | 36.0 % | 11.6 % | 32.5 % | 9.3 % | 5.1 % | 1.4 % | 3.3 % | 106 | 89 | 134 | 0.8 % |
-| dei | proxy | 42.9 % | 9.9 % | 29.7 % | 8.7 % | 4.3 % | 1.0 % | 2.8 % | 44 | 57 | 73 | 2.2 % |
-| egy | proxy | 34.9 % | 11.2 % | 32.4 % | 10.4 % | 5.2 % | 1.4 % | 3.5 % | 66 | 89 | 131 | 1.1 % |
+| usa-home | census USA 1900 (Webb 1911) | 0.0 % | 28.6 % | 46.4 % | 7.6 % | 6.3 % | 4.9 % | 5.0 % | 1967 | 2140 | 2233 | 4.2 % |
+| gbr-home | census GBR 1901 (Webb 1911) | 1.5 % | 4.7 % | 56.3 % | 14.5 % | 9.2 % | 5.7 % | 6.5 % | 1835 | 1543 | 1677 | 12.7 % |
+| deu-home | census DEU 1907 (Webb 1911) | 13.9 % | 12.5 % | 44.3 % | 7.1 % | 12.8 % | 3.5 % | 4.7 % | 937 | 763 | 831 | 1.0 % |
+| fra-home | census FRA 1901 (Webb 1911) | 15.4 % | 11.2 % | 37.6 % | 9.1 % | 17.3 % | 2.6 % | 6.1 % | 880 | 729 | 717 | 3.3 % |
+| rus-home | census RUS 1897 (Webb 1911) | 38.6 % | 10.2 % | 29.9 % | 9.0 % | 5.1 % | 1.8 % | 4.3 % | 67 | 52 | 89 | 0.9 % |
+| ita-home | census ITA 1901 (Webb 1911) | 26.7 % | 4.2 % | 46.4 % | 10.3 % | 5.5 % | 1.8 % | 4.1 % | 457 | 348 | 408 | 3.3 % |
+| aut-home | census AUT+HUN 1900 (Webb 1911) | 19.2 % | 23.5 % | 36.9 % | 5.8 % | 5.1 % | 1.8 % | 6.5 % | 476 | 416 | 414 | 1.1 % |
+| jpn-home | proxy | 26.8 % | 13.3 % | 36.5 % | 9.7 % | 6.4 % | 2.1 % | 3.9 % | 203 | 163 | 183 | 0.2 % |
+| chn-home | proxy | 47.5 % | 8.2 % | 27.6 % | 8.6 % | 3.7 % | 0.8 % | 2.5 % | 53 | 41 | 54 | 1.1 % |
+| bin | census IND 1901 (Webb 1911) | 41.4 % | 6.9 % | 37.2 % | 4.8 % | 4.1 % | 1.3 % | 3.3 % | 32 | 42 | 42 | 0.3 % |
+| esp-home | proxy | 22.4 % | 3.5 % | 45.3 % | 12.8 % | 7.5 % | 2.4 % | 4.9 % | 326 | 258 | 286 | 3.6 % |
+| bra-home | proxy | 47.4 % | 6.6 % | 26.2 % | 11.8 % | 3.6 % | 0.5 % | 2.9 % | 28 | 34 | 122 | 1.5 % |
+| mex-home | census MEX 1900 (Censo 1900) | 33.2 % | 13.9 % | 33.4 % | 9.1 % | 5.0 % | 1.7 % | 2.2 % | 95 | 130 | 149 | 0.4 % |
+| ott-home | proxy | 36.0 % | 11.6 % | 32.5 % | 9.3 % | 5.1 % | 1.4 % | 3.3 % | 106 | 89 | 125 | 0.6 % |
+| dei | proxy | 42.9 % | 9.9 % | 29.7 % | 8.7 % | 4.3 % | 1.0 % | 2.8 % | 44 | 57 | 61 | 0.5 % |
+| egy | proxy | 34.9 % | 11.2 % | 32.4 % | 10.4 % | 5.2 % | 1.4 % | 3.5 % | 66 | 89 | 108 | 0.5 % |
 
 \* teachers, medics, engineers, academics and bureaucrats.
 
@@ -62,15 +62,15 @@ Posts are funded by the sourced budgets (P2b/P5b shares of covered value added);
 
 | Country | Health share of administration | Research share of education | Training budget (RUSD a year) | Education budget left (RUSD a year) |
 |---|---:|---:|---:|---:|
-| USA | 10.6 % | 5.4 % | 102515634 | 1606078271 |
-| GBR | 10.6 % | 5.4 % | 51974376 | 814265229 |
-| DEU | 10.6 % | 5.4 % | 31262184 | 489774212 |
-| FRA | 10.6 % | 5.4 % | 19864745 | 311214339 |
-| RUS | 10.6 % | 5.4 % | 11061981 | 173304373 |
-| JPN | 10.6 % | 5.4 % | 5560294 | 87111280 |
-| ITA | 10.6 % | 5.4 % | 8095800 | 126834204 |
-| AUT | 10.6 % | 5.4 % | 14768628 | 231375174 |
-| CHN | 10.6 % | 5.4 % | 22957953 | 359674590 |
+| USA | 10.6 % | 5.4 % | 102015021 | 1598235322 |
+| GBR | 10.6 % | 5.4 % | 51937430 | 813686409 |
+| DEU | 10.6 % | 5.4 % | 30238095 | 473730159 |
+| FRA | 10.6 % | 5.4 % | 19565580 | 306527412 |
+| RUS | 10.6 % | 5.4 % | 9835710 | 154092794 |
+| JPN | 10.6 % | 5.4 % | 5549615 | 86943962 |
+| ITA | 10.6 % | 5.4 % | 7900858 | 123780101 |
+| AUT | 10.6 % | 5.4 % | 14349356 | 224806571 |
+| CHN | 10.6 % | 5.4 % | 19523012 | 305860515 |
 
 ## Interim placement (plan Q2a)
 

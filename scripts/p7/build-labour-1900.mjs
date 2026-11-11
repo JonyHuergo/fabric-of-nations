@@ -21,7 +21,10 @@
  * person per day is then measured once = (its day-1 employed workers × its province wage
  * + the profits of the buildings it owns) ÷ persons ÷ 365; employment by the day-1 rule
  * (labour-build.mjs `dayOneEmployment`); profit = (value added at opening prices − wages)
- * at the province's staffing of the building's jobs − upkeep, at least 0. No fixed point
+ * at the province's staffing of the building's jobs − upkeep and maintenance, at least 0,
+ * with value added on the simulation's capacity (D-154 item 5g: inputs scale with the
+ * technique, deposit quality and labour productivity like outputs); wages only for people
+ * in slots (work-sharers beyond every slot are unpaid, as in the simulation). No fixed point
  * is iterated: placement sizes output to demand, so incomes with profits run away and
  * wage-only incomes collapse (the before/after report gives the gap).
  */
@@ -228,8 +231,24 @@ export function buildP7Labour({ sources, politics, demographyDefinitions, oldPop
  * One round of the income fixed point: budgets from the placement's coverage (the P5b
  * rule) with the institution policy, owners, day-1 employment, incomes.
  */
-export function p7IncomeRound({ p7, pops, placement, goods, definitions, markets, provinces, countries, coverage, p2bRow, workingAgeShare }) {
+export function p7IncomeRound({ p7, pops, placement, goods, definitions, markets, provinces, countries, coverage, p2bRow, workingAgeShare, depositQuality }) {
+  if (typeof depositQuality !== "function") throw new Error("P7 income round: depositQuality is required");
   const money = (value) => Math.round(value * 100) / 100;
+  /**
+   * D-154 item 5g (fix E1): a building's throughput units per day at full staffing, as the
+   * simulation's production counts them (production.ts): reference throughput × level ×
+   * technique × the job mix's labour-productivity modifier × the deposit's quality for an
+   * extraction building. Outputs and inputs are both per throughput unit, so value added is
+   * capacity × (output value − input value) per unit; maintenance inputs are per level.
+   */
+  const professionByIdAll = new Map(p7.professions.map((profession) => [profession.id, profession]));
+  const capacityOf = (row, definition) => {
+    const jobs = row.jobMix ?? definition.jobs;
+    const workers = sum(jobs.map((job) => job.workersPerThroughputUnit));
+    const productivity = workers > 0 ? sum(jobs.map((job) => job.workersPerThroughputUnit * professionByIdAll.get(job.professionId).laborProductivityModifier)) / workers : 1;
+    const quality = definition.extracts !== undefined ? depositQuality(row.depositId) : 1;
+    return definition.referenceThroughputPerDayAtLevelOne * row.level * (row.technique ?? 1) * productivity * quality;
+  };
   const revenueShare = p2bRow("us-gov-revenue-share-1902");
   const educationShare = p2bRow("us-school-revenue-1900") / p2bRow("us-gdp-1900");
   const adminShare = (revenueShare - educationShare) * p2bRow("administration-share-of-noneducation-revenue");
@@ -270,6 +289,9 @@ export function p7IncomeRound({ p7, pops, placement, goods, definitions, markets
     const valueAddedOf = (row) => {
       const definition = definitionOf.get(row.definitionKey);
       if (definition === undefined || !marketOfProvince.has(row.provinceId)) return 0;
+      // Not corrected by item 5g (pending the designer): this value added keeps outputs ×
+      // technique against inputs at the reference throughput; on the simulation's capacity
+      // the restore would add fewer jobs (world day-1 unemployment 2.0 → 3.1 %, USA 4.2 → 13.1 %).
       const tu = definition.referenceThroughputPerDayAtLevelOne * row.level;
       return (sum(definition.outputs.map((output) => output.quantityPerThroughputUnit * priceAt(row, output.goodId))) * (row.technique ?? 1) - sum(definition.inputs.map((input) => input.quantityPerThroughputUnit * priceAt(row, input.goodId)))) * tu * 365;
     };
@@ -343,14 +365,17 @@ export function p7IncomeRound({ p7, pops, placement, goods, definitions, markets
     const jobWorkers = sum(jobsOf.map((job) => job.workersPerThroughputUnit));
     const staffing = jobWorkers > 0 ? sum(jobsOf.map((job) => job.workersPerThroughputUnit * staffingOf(professionById.get(job.professionId).key))) / jobWorkers : 1;
     const outputFactor = definition.landUse !== undefined ? staffing ** FARM_LABOUR_ELASTICITY : staffing;
+    // Item 5g (E1): outputs and inputs on the simulation's capacity (technique, quality,
+    // labour productivity), not outputs × technique against inputs at the reference throughput.
     const value =
-      (sum(definition.outputs.map((output) => output.quantityPerThroughputUnit * price(output.goodId))) * (row.technique ?? 1) * tu -
-        sum(definition.inputs.map((input) => input.quantityPerThroughputUnit * price(input.goodId))) * tu) *
+      (sum(definition.outputs.map((output) => output.quantityPerThroughputUnit * price(output.goodId))) -
+        sum(definition.inputs.map((input) => input.quantityPerThroughputUnit * price(input.goodId)))) *
+      capacityOf(row, definition) *
       outputFactor;
     // R2: the owner profession's own jobs carry no wage (the residual pays them).
     const wages =
       sum((row.jobMix ?? definition.jobs).filter((job) => professionById.get(job.professionId).key !== row.ownerProfessionKey).map((job) => job.workersPerThroughputUnit * tu * staffingOf(professionById.get(job.professionId).key) * p7.provinceWage(row.provinceId, professionById.get(job.professionId).key))) / 365;
-    const upkeep = definition.dailyUpkeepRUSDAtLevelOne * row.level;
+    const upkeep = definition.dailyUpkeepRUSDAtLevelOne * row.level + sum((definition.maintenanceInputs ?? []).map((item) => item.quantityPerLevelPerDay * price(item.goodId))) * row.level;
     const net = value - wages - upkeep;
     if (net > 0) {
       const key = `${row.provinceId}|${row.ownerProfessionKey}`;
@@ -362,8 +387,12 @@ export function p7IncomeRound({ p7, pops, placement, goods, definitions, markets
     const key = `${pop.provinceId}|${pop.professionKey}`;
     // R2: jobs in buildings the profession owns are paid by the residual (profit), not a wage.
     const servants = employment.domestic.get(key) ?? 0;
+    // Item 5g (fix E2): R2 counts a work-sharing profession's people as employed, but only
+    // those in slots hold an assignment and a wage (the simulation's rule); people beyond
+    // every slot of the province share the residual of the buildings they own, unpaid.
+    const inSlots = Math.min((employment.employed.get(key) ?? 0) - servants, employment.offered.get(key) ?? 0);
     const wages =
-      Math.max(0, (employment.employed.get(key) ?? 0) - servants - (employment.ownOperated.get(key) ?? 0)) * p7.provinceWage(pop.provinceId, pop.professionKey) +
+      Math.max(0, inSlots - (employment.ownOperated.get(key) ?? 0)) * p7.provinceWage(pop.provinceId, pop.professionKey) +
       servants * p7.provinceWage(pop.provinceId, pop.professionKey) * DOMESTIC_WAGE_RATIO;
     incomeByKey.set(key, pop.population > 0 ? (wages + (profit.get(key) ?? 0)) / pop.population / 365 : 0);
   }

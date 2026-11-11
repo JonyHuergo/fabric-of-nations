@@ -193,6 +193,61 @@
    "license": "Public domain (work of the United States Government)",
    "attribution": "U.S. Bureau of the Census (1975), series Y 533-566, Federal, State, and Local Government Expenditure, by Function: 1902 to 1970.",
    "notes": "PDF page = book page - 1066. Series Y 533-549 on book p.1120, Y 550-566 on p.1121; 1902 row. Transactions between governments are excluded (the table's note)."
+  },
+  {
+   "id": "statab-us-1901",
+   "title": "Statistical Abstract of the United States, 1901 (Twenty-fourth Number)",
+   "author": "U.S. Treasury Department, Bureau of Statistics",
+   "publisher": "Washington: Government Printing Office, 1902",
+   "url": "https://www2.census.gov/library/publications/1902/compendia/statab/24ed/",
+   "accessDate": "2026-11-10",
+   "license": "Public domain (work of the United States Government)",
+   "attribution": "Statistical Abstract of the United States 1901; tables as given in each locator.",
+   "notes": "Scanned without a text layer; read from the page images of the census.gov part files (cached in .cache-p5b/census-statab-1901). Part file 1901-06.pdf page n = book page n + 319. Tables printed sideways are read rotated."
+  },
+  {
+   "id": "usda-yearbook-1900",
+   "title": "Yearbook of the United States Department of Agriculture, 1900",
+   "author": "U.S. Department of Agriculture",
+   "publisher": "Washington: Government Printing Office, 1901",
+   "url": "https://archive.org/details/yearbookofagricu1900unit",
+   "accessDate": "2026-11-10",
+   "license": "Public domain (work of the United States Government)",
+   "attribution": "USDA Yearbook 1900, Statistics of sugar for 1900, p. 819 (Willett & Gray).",
+   "notes": "Page image read: PDF page 908 = book p. 819 (cached in .cache-p5b/ia-pdf/yoa1900.pdf). The same table gives P5b's country shares of sugar."
+  },
+  {
+   "id": "statabs-british-india-1903-04",
+   "title": "Statistical Abstract relating to British India (number with the crops of 1903-04), bound in the volume catalogued \"from 1893-94 to 1902-03\"",
+   "author": "India Office, London",
+   "publisher": "London: His Majesty's Stationery Office (parliamentary paper), c. 1905",
+   "url": "https://archive.org/details/india.history.resource.108758",
+   "accessDate": "2026-11-10",
+   "license": "Public domain (UK parliamentary paper published over 120 years ago; Crown copyright expired)",
+   "attribution": "Statistical Abstract relating to British India, table No. 122, Crops under cultivation in 1903-4, in acres, pp. 134-135.",
+   "notes": "Page images read: PDF pages 428-429 = book pp. 134-135 (cached in .cache-p7/ind-statabs-1904/108758.pdf). The nearest year found with crops by administration: the 1901 number (archive item 108757) prints only the area by administration (table 104). British administrations only; the native states are not in the table. The table's footnote: the total is the area sown, the crop details conventional harvested areas, and every column used here sums to its printed total. The game's Indian provinces follow modern boundaries (point-in-polygon on the province map): Berar and the Nagpur country lie in the game's Bombay, Malabar in Travancore and Cochin, Bellary, South Canara, Dharwar and Coorg in Mysore, Darjeeling and the Duars in Bengal."
+  },
+  {
+   "id": "koloniaal-verslag-1901",
+   "title": "Koloniaal verslag van 1901, Nederlandsch (Oost-) Indië, Bijlage TT: Opgaven over 1900 betreffende de suikerindustrie op Java",
+   "author": "Ministerie van Koloniën",
+   "publisher": "Handelingen der Staten-Generaal, Bijlagen 1901-1902",
+   "url": "https://archive.org/details/UNIVERSITEITLEIDEN-DIG-KOLONIAAL-VERSLAG-1901",
+   "accessDate": "2026-11-10",
+   "license": "Public domain (Dutch parliamentary paper, 1901)",
+   "attribution": "Koloniaal verslag van 1901, Bijlage TT, Recapitulatie, pp. 16-17 (and note dd).",
+   "notes": "Page images read: PDF pages 480-481 of the cached scan (.cache-p5b/koloniaal-verslag-1901). Note dd gives, per residency, the 1900 payments of the sugar companies to the native population for wages and deliveries (f 36,132,788, 150 of the 156 companies in the government residencies); the residencies of the Vorstenlanden are not in it, their production is in the recapitulation."
+  },
+  {
+   "id": "brazil-handbook-1901",
+   "title": "United States of Brazil: a geographical sketch, with special reference to economic conditions and prospects of future development",
+   "author": "Bureau of the American Republics",
+   "publisher": "Washington: Government Printing Office, 1901",
+   "url": "https://archive.org/details/unitedstatesofbr1901bure",
+   "accessDate": "2026-11-10",
+   "license": "Public domain (work of the United States Government, 1901)",
+   "attribution": "Bureau of the American Republics (1901), state chapters: coffee exports of 1899 by state.",
+   "notes": "Page images read (PDF page = book page + 6, cached in .cache-p5b/brazil-1901). The chapter on Minas Geraes gives no coffee weight (its coffee left by the port of Rio)."
   }
  ],
  "occupationRows": [
@@ -5553,6 +5608,2699 @@
    "unit": "million USD",
    "value": 22,
    "status": "sourced"
+  }
+ ],
+ "provinceShareRows": [
+  {
+   "id": "pshare-usa-home-coal-mine-pennsylvania-anthracite",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Pennsylvania (anthracite)",
+   "provinces": [
+    "Pennsylvania"
+   ],
+   "value": 51221353,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-colorado-and-new-mexico-anthracite",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Colorado and New Mexico (anthracite)",
+   "provinces": [
+    "Colorado",
+    "New Mexico Territory"
+   ],
+   "value": 87861,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-maryland",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Maryland",
+   "provinces": [
+    "Maryland"
+   ],
+   "value": 3593471,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-ohio",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Ohio",
+   "provinces": [
+    "Ohio"
+   ],
+   "value": 16953705,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-pennsylvania-bituminous",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Pennsylvania (bituminous)",
+   "provinces": [
+    "Pennsylvania"
+   ],
+   "value": 71287791,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-west-virginia",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "West Virginia",
+   "provinces": [
+    "West Virginia"
+   ],
+   "value": 20220721,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-colorado",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Colorado",
+   "provinces": [
+    "Colorado"
+   ],
+   "value": 4626943,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-illinois",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Illinois",
+   "provinces": [
+    "Illinois"
+   ],
+   "value": 23007126,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-indiana",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Indiana",
+   "provinces": [
+    "Indiana"
+   ],
+   "value": 5789363,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-iowa",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Iowa",
+   "provinces": [
+    "Iowa"
+   ],
+   "value": 4645481,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-kansas",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Kansas",
+   "provinces": [
+    "Kansas"
+   ],
+   "value": 3989170,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-michigan",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Michigan",
+   "provinces": [
+    "Michigan"
+   ],
+   "value": 758460,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-missouri",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Missouri",
+   "provinces": [
+    "Missouri"
+   ],
+   "value": 3160806,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-montana",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Montana",
+   "provinces": [
+    "Montana"
+   ],
+   "value": 1483728,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-north-dakota",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "North Dakota",
+   "provinces": [
+    "North Dakota"
+   ],
+   "value": 115967,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-wyoming",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Wyoming",
+   "provinces": [
+    "Wyoming"
+   ],
+   "value": 3584466,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-california",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "California",
+   "provinces": [
+    "California"
+   ],
+   "value": 153311,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-idaho",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Idaho",
+   "provinces": [
+    "Idaho"
+   ],
+   "value": 9,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-oregon",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Oregon",
+   "provinces": [
+    "Oregon"
+   ],
+   "value": 52557,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-utah",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Utah",
+   "provinces": [
+    "Utah"
+   ],
+   "value": 1024131,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-washington",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Washington",
+   "provinces": [
+    "Washington"
+   ],
+   "value": 2209012,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-alabama",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Alabama",
+   "provinces": [
+    "Alabama"
+   ],
+   "value": 7494888,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-arkansas",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Arkansas",
+   "provinces": [
+    "Arkansas"
+   ],
+   "value": 1292808,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-georgia",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Georgia",
+   "provinces": [
+    "Georgia"
+   ],
+   "value": 281747,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-indian-territory",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Indian Territory",
+   "provinces": [
+    "Oklahoma Territory and Indian Territory"
+   ],
+   "value": 1716337,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-kentucky",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Kentucky",
+   "provinces": [
+    "Kentucky"
+   ],
+   "value": 4758094,
+   "status": "sourced",
+   "note": "Printed 4,758,094; the printed Southern total (23,000,485) and grand total (240,965,917) imply 4,758,004. The 90 tons do not change any share."
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-new-mexico",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "New Mexico",
+   "provinces": [
+    "New Mexico Territory"
+   ],
+   "value": 1127752,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-north-carolina",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "North Carolina",
+   "provinces": [
+    "North Carolina"
+   ],
+   "value": 15834,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-tennessee",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Tennessee",
+   "provinces": [
+    "Tennessee"
+   ],
+   "value": 3311216,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-texas",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Texas",
+   "provinces": [
+    "Texas"
+   ],
+   "value": 864619,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-coal-mine-virginia",
+   "sourceId": "statab-us-1901",
+   "locator": "table 86, pp. 357-358 (part file 1901-06.pdf pp. 38-39), 1900 column",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "coal-mine"
+   ],
+   "measure": "coal produced, calendar year 1900",
+   "unit": "long tons",
+   "unitName": "Virginia",
+   "provinces": [
+    "Virginia"
+   ],
+   "value": 2137280,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-alaska",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Alaska",
+   "provinces": [
+    "Alaska"
+   ],
+   "value": 8171000,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-arizona",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Arizona",
+   "provinces": [
+    "Arizona Territory"
+   ],
+   "value": 4193400,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-california",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "California",
+   "provinces": [
+    "California"
+   ],
+   "value": 15816200,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-colorado",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Colorado",
+   "provinces": [
+    "Colorado"
+   ],
+   "value": 28829400,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-georgia",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Georgia",
+   "provinces": [
+    "Georgia"
+   ],
+   "value": 116700,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-idaho",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Idaho",
+   "provinces": [
+    "Idaho"
+   ],
+   "value": 1724700,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-michigan",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Michigan",
+   "provinces": [
+    "Michigan"
+   ],
+   "value": 29000,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-montana",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Montana",
+   "provinces": [
+    "Montana"
+   ],
+   "value": 4698000,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-nevada",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Nevada",
+   "provinces": [
+    "Nevada"
+   ],
+   "value": 2006200,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-new-mexico",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "New Mexico",
+   "provinces": [
+    "New Mexico Territory"
+   ],
+   "value": 832900,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-north-carolina",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "North Carolina",
+   "provinces": [
+    "North Carolina"
+   ],
+   "value": 28500,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-oregon",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Oregon",
+   "provinces": [
+    "Oregon"
+   ],
+   "value": 1694700,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-south-carolina",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "South Carolina",
+   "provinces": [
+    "South Carolina"
+   ],
+   "value": 121000,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-south-dakota",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "South Dakota",
+   "provinces": [
+    "South Dakota"
+   ],
+   "value": 6177600,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-texas",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Texas",
+   "provinces": [
+    "Texas"
+   ],
+   "value": 1100,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-utah",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Utah",
+   "provinces": [
+    "Utah"
+   ],
+   "value": 3972200,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-gold-mine-washington",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), gold, 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "gold-mine"
+   ],
+   "measure": "estimated coining value of the gold product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Washington",
+   "provinces": [
+    "Washington"
+   ],
+   "value": 718200,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-alaska",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Alaska",
+   "provinces": [
+    "Alaska"
+   ],
+   "value": 94772,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-arizona",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Arizona",
+   "provinces": [
+    "Arizona Territory"
+   ],
+   "value": 3872970,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-california",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "California",
+   "provinces": [
+    "California"
+   ],
+   "value": 1217165,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-colorado",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Colorado",
+   "provinces": [
+    "Colorado"
+   ],
+   "value": 26484234,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-georgia",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Georgia",
+   "provinces": [
+    "Georgia"
+   ],
+   "value": 517,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-idaho",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Idaho",
+   "provinces": [
+    "Idaho"
+   ],
+   "value": 8312372,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-michigan",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Michigan",
+   "provinces": [
+    "Michigan"
+   ],
+   "value": 131879,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-montana",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Montana",
+   "provinces": [
+    "Montana"
+   ],
+   "value": 18353648,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-nevada",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Nevada",
+   "provinces": [
+    "Nevada"
+   ],
+   "value": 1756703,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-new-mexico",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "New Mexico",
+   "provinces": [
+    "New Mexico Territory"
+   ],
+   "value": 561519,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-north-carolina",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "North Carolina",
+   "provinces": [
+    "North Carolina"
+   ],
+   "value": 14481,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-oregon",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Oregon",
+   "provinces": [
+    "Oregon"
+   ],
+   "value": 149204,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-south-carolina",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "South Carolina",
+   "provinces": [
+    "South Carolina"
+   ],
+   "value": 517,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-south-dakota",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "South Dakota",
+   "provinces": [
+    "South Dakota"
+   ],
+   "value": 693269,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-texas",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Texas",
+   "provinces": [
+    "Texas"
+   ],
+   "value": 617244,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-utah",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Utah",
+   "provinces": [
+    "Utah"
+   ],
+   "value": 11982351,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-silver-mine-washington",
+   "sourceId": "statab-us-1901",
+   "locator": "table 23, p. 50 (part file 1901-02.pdf p. 50), silver (coining value), 1900 column (from the Report of the Director of the Mint)",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "silver-mine"
+   ],
+   "measure": "estimated coining value of the silver product, calendar year 1900",
+   "unit": "dollars",
+   "unitName": "Washington",
+   "provinces": [
+    "Washington"
+   ],
+   "value": 290263,
+   "status": "sourced",
+   "note": "The scan's 290,263 can be read 296,263; 290,263 makes the printed total 74,533,495."
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-alabama",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "Alabama",
+   "provinces": [
+    "Alabama"
+   ],
+   "value": 1005313,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-arkansas",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "Arkansas",
+   "provinces": [
+    "Arkansas"
+   ],
+   "value": 669385,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-florida",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "Florida",
+   "provinces": [
+    "Florida"
+   ],
+   "value": 41855,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-georgia",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "Georgia",
+   "provinces": [
+    "Georgia"
+   ],
+   "value": 1345699,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-louisiana",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "Louisiana",
+   "provinces": [
+    "Louisiana"
+   ],
+   "value": 699476,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-mississippi",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "Mississippi",
+   "provinces": [
+    "Mississippi"
+   ],
+   "value": 1203739,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-north-carolina",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "North Carolina",
+   "provinces": [
+    "North Carolina"
+   ],
+   "value": 503825,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-south-carolina",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "South Carolina",
+   "provinces": [
+    "South Carolina"
+   ],
+   "value": 830714,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-tennessee",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "Tennessee",
+   "provinces": [
+    "Tennessee"
+   ],
+   "value": 192263,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-texas",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "Texas",
+   "provinces": [
+    "Texas"
+   ],
+   "value": 2438555,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-virginia",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "Virginia",
+   "provinces": [
+    "Virginia"
+   ],
+   "value": 8007,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-cotton-farm-all-other",
+   "sourceId": "statab-us-1901",
+   "locator": "table 99, pp. 379-381 (part file 1901-06.pdf pp. 60-62), 1899 row, product",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "cotton crop of 1899",
+   "unit": "bales",
+   "unitName": "All other",
+   "provinces": [
+    "Oklahoma Territory and Indian Territory",
+    "Missouri",
+    "Kentucky"
+   ],
+   "value": 204007,
+   "status": "sourced",
+   "note": "Footnote b: produced chiefly in the Indian Territory, Missouri, Kentucky and Oklahoma."
+  },
+  {
+   "id": "pshare-usa-home-sugar-estate-louisiana",
+   "sourceId": "usda-yearbook-1900",
+   "locator": "p. 819 (PDF 908), sugar crop of the countries named, cane sugar, United States rows, 1900-1901",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "cane-sugar crop 1900-1901",
+   "unit": "long tons",
+   "unitName": "Louisiana",
+   "provinces": [
+    "Louisiana"
+   ],
+   "value": 270000,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-usa-home-sugar-estate-hawaiian-islands",
+   "sourceId": "usda-yearbook-1900",
+   "locator": "p. 819 (PDF 908), sugar crop of the countries named, cane sugar, United States rows, 1900-1901",
+   "territory": "usa-home",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "cane-sugar crop 1900-1901",
+   "unit": "long tons",
+   "unitName": "Hawaiian Islands",
+   "provinces": [
+    "Hawaii"
+   ],
+   "value": 306000,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-bengal",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Bengal",
+   "provinces": [
+    "Bengal",
+    "Eastern Bengal",
+    "Bihar",
+    "Orissa"
+   ],
+   "value": 80000,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-united-provinces-agra",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "United Provinces (Agra)",
+   "provinces": [
+    "United Provinces"
+   ],
+   "value": 820353,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-united-provinces-oudh",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "United Provinces (Oudh)",
+   "provinces": [
+    "United Provinces"
+   ],
+   "value": 15385,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-punjab",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Punjab",
+   "provinces": [
+    "Punjab",
+    "West Punjab"
+   ],
+   "value": 1047532,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-n-w-frontier-province",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "N.W. Frontier Province",
+   "provinces": [
+    "North-West Frontier"
+   ],
+   "value": 30729,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-upper-burma",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Upper Burma",
+   "provinces": [
+    "Burma"
+   ],
+   "value": 144723,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-lower-burma",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Lower Burma",
+   "provinces": [
+    "Burma"
+   ],
+   "value": 14917,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-central-provinces",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Central Provinces",
+   "provinces": [
+    "Central Provinces",
+    "Bombay"
+   ],
+   "value": 1305626,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-berar",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Berar",
+   "provinces": [
+    "Bombay"
+   ],
+   "value": 2851222,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-assam",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Assam",
+   "provinces": [
+    "Assam"
+   ],
+   "value": 3997,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-ajmer-merwara",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Ajmer-Merwara",
+   "provinces": [
+    "Rajputana"
+   ],
+   "value": 31882,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-madras",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Madras",
+   "provinces": [
+    "Madras",
+    "Mysore",
+    "Travancore and Cochin"
+   ],
+   "value": 1769911,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-bombay",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Bombay",
+   "provinces": [
+    "Bombay",
+    "Mysore"
+   ],
+   "value": 3571824,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-sind",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Sind",
+   "provinces": [
+    "Sind"
+   ],
+   "value": 207264,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-cotton-farm-pargana-manpur",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), cotton",
+   "territory": "bin",
+   "definitionKeys": [
+    "cotton-farm"
+   ],
+   "measure": "area under cotton, 1903-04",
+   "unit": "acres",
+   "unitName": "Pargana Manpur",
+   "provinces": [
+    "Central Provinces"
+   ],
+   "value": 232,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-plantation-bengal",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tea and coffee (acres added; one good in the game)",
+   "territory": "bin",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "area under tea and coffee, 1903-04",
+   "unit": "acres",
+   "unitName": "Bengal",
+   "provinces": [
+    "Bengal"
+   ],
+   "value": 135900,
+   "status": "sourced",
+   "note": "Tea 135,900, coffee none; the Bengal tea districts (Darjeeling, Jalpaiguri) lie in the game's Bengal."
+  },
+  {
+   "id": "pshare-bin-plantation-united-provinces-agra",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tea and coffee (acres added; one good in the game)",
+   "territory": "bin",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "area under tea and coffee, 1903-04",
+   "unit": "acres",
+   "unitName": "United Provinces (Agra)",
+   "provinces": [
+    "United Provinces"
+   ],
+   "value": 8259,
+   "status": "sourced",
+   "note": "Tea."
+  },
+  {
+   "id": "pshare-bin-plantation-punjab",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tea and coffee (acres added; one good in the game)",
+   "territory": "bin",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "area under tea and coffee, 1903-04",
+   "unit": "acres",
+   "unitName": "Punjab",
+   "provinces": [
+    "Punjab"
+   ],
+   "value": 9948,
+   "status": "sourced",
+   "note": "Tea (Kangra)."
+  },
+  {
+   "id": "pshare-bin-plantation-upper-burma",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tea and coffee (acres added; one good in the game)",
+   "territory": "bin",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "area under tea and coffee, 1903-04",
+   "unit": "acres",
+   "unitName": "Upper Burma",
+   "provinces": [
+    "Burma"
+   ],
+   "value": 1676,
+   "status": "sourced",
+   "note": "Tea 1,612 + coffee 64."
+  },
+  {
+   "id": "pshare-bin-plantation-lower-burma",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tea and coffee (acres added; one good in the game)",
+   "territory": "bin",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "area under tea and coffee, 1903-04",
+   "unit": "acres",
+   "unitName": "Lower Burma",
+   "provinces": [
+    "Burma"
+   ],
+   "value": 3,
+   "status": "sourced",
+   "note": "Coffee."
+  },
+  {
+   "id": "pshare-bin-plantation-assam",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tea and coffee (acres added; one good in the game)",
+   "territory": "bin",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "area under tea and coffee, 1903-04",
+   "unit": "acres",
+   "unitName": "Assam",
+   "provinces": [
+    "Assam"
+   ],
+   "value": 338524,
+   "status": "sourced",
+   "note": "Tea 338,278 + coffee 246."
+  },
+  {
+   "id": "pshare-bin-plantation-coorg",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tea and coffee (acres added; one good in the game)",
+   "territory": "bin",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "area under tea and coffee, 1903-04",
+   "unit": "acres",
+   "unitName": "Coorg",
+   "provinces": [
+    "Mysore"
+   ],
+   "value": 52420,
+   "status": "sourced",
+   "note": "Coffee."
+  },
+  {
+   "id": "pshare-bin-plantation-madras",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tea and coffee (acres added; one good in the game)",
+   "territory": "bin",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "area under tea and coffee, 1903-04",
+   "unit": "acres",
+   "unitName": "Madras",
+   "provinces": [
+    "Madras",
+    "Mysore",
+    "Travancore and Cochin"
+   ],
+   "value": 63723,
+   "status": "sourced",
+   "note": "Tea 12,282 + coffee 51,441."
+  },
+  {
+   "id": "pshare-bin-plantation-bombay",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tea and coffee (acres added; one good in the game)",
+   "territory": "bin",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "area under tea and coffee, 1903-04",
+   "unit": "acres",
+   "unitName": "Bombay",
+   "provinces": [
+    "Bombay",
+    "Mysore"
+   ],
+   "value": 73,
+   "status": "sourced",
+   "note": "Tea 8 + coffee 65."
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-bengal",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Bengal",
+   "provinces": [
+    "Bengal",
+    "Eastern Bengal",
+    "Bihar",
+    "Orissa"
+   ],
+   "value": 537900,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-united-provinces-agra",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "United Provinces (Agra)",
+   "provinces": [
+    "United Provinces"
+   ],
+   "value": 40148,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-united-provinces-oudh",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "United Provinces (Oudh)",
+   "provinces": [
+    "United Provinces"
+   ],
+   "value": 11675,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-punjab",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Punjab",
+   "provinces": [
+    "Punjab",
+    "West Punjab"
+   ],
+   "value": 53658,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-n-w-frontier-province",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "N.W. Frontier Province",
+   "provinces": [
+    "North-West Frontier"
+   ],
+   "value": 6286,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-upper-burma",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Upper Burma",
+   "provinces": [
+    "Burma"
+   ],
+   "value": 22605,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-lower-burma",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Lower Burma",
+   "provinces": [
+    "Burma"
+   ],
+   "value": 41214,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-central-provinces",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Central Provinces",
+   "provinces": [
+    "Central Provinces",
+    "Bombay"
+   ],
+   "value": 17373,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-berar",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Berar",
+   "provinces": [
+    "Bombay"
+   ],
+   "value": 15044,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-assam",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Assam",
+   "provinces": [
+    "Assam"
+   ],
+   "value": 4466,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-ajmer-merwara",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Ajmer-Merwara",
+   "provinces": [
+    "Rajputana"
+   ],
+   "value": 11,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-coorg",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Coorg",
+   "provinces": [
+    "Mysore"
+   ],
+   "value": 59,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-madras",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Madras",
+   "provinces": [
+    "Madras",
+    "Mysore",
+    "Travancore and Cochin"
+   ],
+   "value": 144799,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-bombay",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Bombay",
+   "provinces": [
+    "Bombay",
+    "Mysore"
+   ],
+   "value": 72218,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-tobacco-farm-sind",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 135 (PDF 429), tobacco",
+   "territory": "bin",
+   "definitionKeys": [
+    "tobacco-farm"
+   ],
+   "measure": "area under tobacco, 1903-04",
+   "unit": "acres",
+   "unitName": "Sind",
+   "provinces": [
+    "Sind"
+   ],
+   "value": 8196,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-bengal",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Bengal",
+   "provinces": [
+    "Bengal",
+    "Eastern Bengal",
+    "Bihar",
+    "Orissa"
+   ],
+   "value": 645400,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-united-provinces-agra",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "United Provinces (Agra)",
+   "provinces": [
+    "United Provinces"
+   ],
+   "value": 895453,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-united-provinces-oudh",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "United Provinces (Oudh)",
+   "provinces": [
+    "United Provinces"
+   ],
+   "value": 194277,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-punjab",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Punjab",
+   "provinces": [
+    "Punjab",
+    "West Punjab"
+   ],
+   "value": 330767,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-n-w-frontier-province",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "N.W. Frontier Province",
+   "provinces": [
+    "North-West Frontier"
+   ],
+   "value": 27224,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-upper-burma",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Upper Burma",
+   "provinces": [
+    "Burma"
+   ],
+   "value": 2311,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-lower-burma",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Lower Burma",
+   "provinces": [
+    "Burma"
+   ],
+   "value": 10797,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-central-provinces",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Central Provinces",
+   "provinces": [
+    "Central Provinces",
+    "Bombay"
+   ],
+   "value": 18002,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-berar",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Berar",
+   "provinces": [
+    "Bombay"
+   ],
+   "value": 1395,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-assam",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Assam",
+   "provinces": [
+    "Assam"
+   ],
+   "value": 40555,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-ajmer-merwara",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Ajmer-Merwara",
+   "provinces": [
+    "Rajputana"
+   ],
+   "value": 68,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-madras",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Madras",
+   "provinces": [
+    "Madras",
+    "Mysore",
+    "Travancore and Cochin"
+   ],
+   "value": 54740,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-bombay",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Bombay",
+   "provinces": [
+    "Bombay",
+    "Mysore"
+   ],
+   "value": 56838,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-sind",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Sind",
+   "provinces": [
+    "Sind"
+   ],
+   "value": 2413,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-bin-sugar-estate-pargana-manpur",
+   "sourceId": "statabs-british-india-1903-04",
+   "locator": "table No. 122, Crops under cultivation in 1903-4 (acres), British administrations, p. 134 (PDF 428), sugar cane",
+   "territory": "bin",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "area under sugar cane, 1903-04",
+   "unit": "acres",
+   "unitName": "Pargana Manpur",
+   "provinces": [
+    "Central Provinces"
+   ],
+   "value": 11,
+   "status": "sourced",
+   "partialCoverage": "british-administrations"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-preanger-regentschappen",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Preanger Regentschappen",
+   "provinces": [
+    "West Java"
+   ],
+   "value": 17000,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-cheribon",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Cheribon",
+   "provinces": [
+    "West Java"
+   ],
+   "value": 3390385,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-tagal",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Tagal",
+   "provinces": [
+    "Central Java"
+   ],
+   "value": 2636131,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-pekalongan",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Pekalongan",
+   "provinces": [
+    "Central Java"
+   ],
+   "value": 1078345,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-samarang",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Samarang",
+   "provinces": [
+    "Central Java"
+   ],
+   "value": 897319,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-japara",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Japara",
+   "provinces": [
+    "Central Java"
+   ],
+   "value": 2684443,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-soerabaja",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Soerabaja",
+   "provinces": [
+    "East Java"
+   ],
+   "value": 9246307,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-pasoeroean",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Pasoeroean",
+   "provinces": [
+    "East Java"
+   ],
+   "value": 3336766,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-probolinggo",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Probolinggo",
+   "provinces": [
+    "East Java"
+   ],
+   "value": 2933331,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-bezoeki",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Bezoeki",
+   "provinces": [
+    "East Java"
+   ],
+   "value": 2805423,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-banjoemas",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Banjoemas",
+   "provinces": [
+    "Central Java"
+   ],
+   "value": 1049222,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-bagelen",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Bagelen",
+   "provinces": [
+    "Central Java"
+   ],
+   "value": 183767,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-madioen",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Madioen",
+   "provinces": [
+    "East Java"
+   ],
+   "value": 1301145,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-kediri",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Kediri",
+   "provinces": [
+    "East Java"
+   ],
+   "value": 4573204,
+   "status": "sourced"
+  },
+  {
+   "id": "pshare-dei-sugar-estate-vorstenlanden",
+   "sourceId": "koloniaal-verslag-1901",
+   "locator": "Bijlage TT, Recapitulatie, note dd, p. 17 (PDF 481): payments by residency, and column 11 for the Vorstenlanden",
+   "territory": "dei",
+   "definitionKeys": [
+    "sugar-estate"
+   ],
+   "measure": "sugar companies' payments to the population for wages and deliveries, 1900",
+   "unit": "guilders",
+   "unitName": "Vorstenlanden",
+   "provinces": [
+    "Central Java"
+   ],
+   "value": 5916586,
+   "status": "sourced",
+   "note": "Derived: production 1,590,519 pikol (huurlanden, 29 companies) + 102,450 (overhuurde gronden in Soerakarta, 2) x f 36,132,788 / 10,339,018 pikol; their payments are not given (†)."
+  },
+  {
+   "id": "pshare-bra-home-plantation-sao-paulo",
+   "sourceId": "brazil-handbook-1901",
+   "locator": "state chapters: Bahia p. 72, Espirito Santo pp. 74-75, Rio de Janeiro pp. 94-95, Sao Paulo p. 103 (PDF + 6)",
+   "territory": "bra-home",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "coffee exports, 1899",
+   "unit": "kilograms",
+   "unitName": "Sao Paulo",
+   "provinces": [
+    "São Paulo"
+   ],
+   "value": 344138817,
+   "status": "sourced",
+   "partialCoverage": "four coffee states",
+   "extrapolate": [
+    "Minas Gerais"
+   ],
+   "note": "6,078,990 bags weighing 344,138,817 kilograms (Brazilian official statistics)."
+  },
+  {
+   "id": "pshare-bra-home-plantation-rio-de-janeiro",
+   "sourceId": "brazil-handbook-1901",
+   "locator": "state chapters: Bahia p. 72, Espirito Santo pp. 74-75, Rio de Janeiro pp. 94-95, Sao Paulo p. 103 (PDF + 6)",
+   "territory": "bra-home",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "coffee exports, 1899",
+   "unit": "kilograms",
+   "unitName": "Rio de Janeiro",
+   "provinces": [
+    "Rio de Janeiro"
+   ],
+   "value": 87105716,
+   "status": "sourced",
+   "partialCoverage": "four coffee states",
+   "extrapolate": [
+    "Minas Gerais"
+   ],
+   "note": "Report of the Secretary of the Treasury for 1900."
+  },
+  {
+   "id": "pshare-bra-home-plantation-espirito-santo",
+   "sourceId": "brazil-handbook-1901",
+   "locator": "state chapters: Bahia p. 72, Espirito Santo pp. 74-75, Rio de Janeiro pp. 94-95, Sao Paulo p. 103 (PDF + 6)",
+   "territory": "bra-home",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "coffee exports, 1899",
+   "unit": "kilograms",
+   "unitName": "Espirito Santo",
+   "provinces": [
+    "Espírito Santo"
+   ],
+   "value": 25902470,
+   "status": "sourced",
+   "partialCoverage": "four coffee states",
+   "extrapolate": [
+    "Minas Gerais"
+   ],
+   "note": "Official statistics."
+  },
+  {
+   "id": "pshare-bra-home-plantation-bahia",
+   "sourceId": "brazil-handbook-1901",
+   "locator": "state chapters: Bahia p. 72, Espirito Santo pp. 74-75, Rio de Janeiro pp. 94-95, Sao Paulo p. 103 (PDF + 6)",
+   "territory": "bra-home",
+   "definitionKeys": [
+    "plantation"
+   ],
+   "measure": "coffee exports, 1899",
+   "unit": "kilograms",
+   "unitName": "Bahia",
+   "provinces": [
+    "Bahia"
+   ],
+   "value": 13554223,
+   "status": "sourced",
+   "partialCoverage": "four coffee states",
+   "extrapolate": [
+    "Minas Gerais"
+   ]
   }
  ]
 }

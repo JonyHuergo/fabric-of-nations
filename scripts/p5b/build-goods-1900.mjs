@@ -646,6 +646,41 @@ function build() {
  * fiscal values and route capacities. Mutates `definitions` (warehouse capacity) and
  * `calibration` (placement report and coverage).
  */
+/**
+ * P7 (D-154 item 5f): the sourced 1900 shares of each producer inside its territory, from
+ * `provinceShareRows` of p7/sources_1900.json, keyed `definition|territory`. Every named
+ * province must exist in the row's territory; a definition and territory take one source.
+ */
+function provinceSharesFrom(p7Sources, provinces) {
+  const out = new Map();
+  for (const row of p7Sources.provinceShareRows ?? []) {
+    const provinceIds = row.provinces.map((name) => {
+      const found = provinces.filter((province) => province.territoryKey === row.territory && province.name === name);
+      if (found.length !== 1) throw new Error(`P7 province share ${row.id}: no single province ${name} in ${row.territory}`);
+      return found[0].id;
+    });
+    for (const definitionKey of row.definitionKeys) {
+      const key = `${definitionKey}|${row.territory}`;
+      const spec = out.get(key) ?? { basis: `${row.sourceId}: ${row.locator} (${row.measure}, ${row.unit})`, sourceId: row.sourceId, units: [], partialCoverage: row.partialCoverage ?? null, namedProvinceIds: new Set() };
+      if (spec.sourceId !== row.sourceId) throw new Error(`P7 province share ${key}: two sources`);
+      if ((spec.partialCoverage ?? null) !== (row.partialCoverage ?? null)) throw new Error(`P7 province share ${key}: mixed coverage`);
+      for (const id of provinceIds) spec.namedProvinceIds.add(id);
+      if (row.extrapolate !== undefined) {
+        if (row.partialCoverage === undefined) throw new Error(`P7 province share ${row.id}: extrapolate needs partialCoverage`);
+        spec.extrapolateIds ??= new Set();
+        for (const name of row.extrapolate) {
+          const found = provinces.filter((province) => province.territoryKey === row.territory && province.name === name);
+          if (found.length !== 1) throw new Error(`P7 province share ${row.id}: no single province ${name} in ${row.territory}`);
+          spec.extrapolateIds.add(found[0].id);
+        }
+      }
+      if (row.value > 0) spec.units.push({ name: row.unitName, value: row.value, provinceIds });
+      out.set(key, spec);
+    }
+  }
+  return out;
+}
+
 function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions: professionsIn, p5Definitions, p2bRow, technology, src, calibration, gid }) {
   let professions = professionsIn;
   const p2bCalibration = read(INPUTS.p2bCalibration);
@@ -785,7 +820,13 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions: p
     urbanRows: p7.urbanRows,
   });
   const placement = placeP5b(p6Estimate);
-  p7.finalRound = p7IncomeRound({ p7, pops, placement, goods, definitions, markets, provinces, countries: grantedCountries, coverage: (tag) => placement.coveredByCountry.get(tag) ?? 0, p2bRow, workingAgeShare: p2bCalibration.workingAgeShare });
+  const depositQualityById = new Map(read(INPUTS.deposits).map((deposit) => [deposit.id, deposit.quality]));
+  const depositQuality = (id) => {
+    const quality = depositQualityById.get(id);
+    if (!(quality > 0)) throw new Error(`P7 income round: unknown deposit ${id}`);
+    return quality;
+  };
+  p7.finalRound = p7IncomeRound({ p7, pops, placement, goods, definitions, markets, provinces, countries: grantedCountries, coverage: (tag) => placement.coveredByCountry.get(tag) ?? 0, p2bRow, workingAgeShare: p2bCalibration.workingAgeShare, depositQuality });
   // The blocks' 1900 incomes (housing references, the simulation's opening smoothed
   // income) are the measured ones; the demand quantities used the estimate.
   const p6 = { ...p6Estimate, incomeOf: p7.finalRound.incomeOf };
@@ -826,6 +867,7 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions: p
     professions,
     provinces,
     pops,
+    oldPops: read(INPUTS.p2bPops),
     countries: grantedCountries,
     oldCountries,
     markets,
@@ -837,6 +879,7 @@ function placeAndCalibrate({ goods, definitions, needs, oldNeeds, professions: p
     fertiliser: { gateKey: "chemical-fertilizer" },
     round,
     extraDemand: mintDemand,
+    provinceShares: provinceSharesFrom(read(INPUTS.p7Sources), provinces),
     hydro: {
       technicalShare: HYDRO_TECHNICAL_SHARE,
       daysPerYear: HYDRO_DAYS_PER_YEAR,

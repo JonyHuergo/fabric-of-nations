@@ -83,6 +83,20 @@ const A12_CROP_GOOD = { coffee: "coffee-tea-cocoa", tea: "coffee-tea-cocoa", coc
 const A12_MIN_COVERAGE = 0.75;
 /** Most provinces one territory spreads a new producer over (D-148, provisional). */
 const MAX_PROVINCES_PER_TERRITORY = 4;
+/**
+ * P7 (D-154 item 5f, docs/P7_PROVINCE_PLACEMENT_PROPOSAL.md, designer 2026-11-10): the
+ * professions whose people worked the 1900 farms, mines and forests. A producer tied to land,
+ * a deposit or a crop band is spread over every province of its territory that can host it, by
+ * sourced 1900 shares where a source gives them, otherwise by these provinces' eligible workers
+ * (working age x participation). The designer's principle: the availability or future
+ * availability of a resource has nothing to do with the initial buildings, so deposit stock,
+ * quality, hectares and potential decide only whether a province can host the producer.
+ */
+const SPREAD_WORKER_PROFESSIONS = ["laborers", "peasants", "farmers"];
+/** Logging camps follow the population (1900 timber was cut close to where it was used). */
+const POPULATION_WEIGHTED_RESOURCES = new Set(["timber"]);
+/** Smallest share of a spread producer, in levels, that keeps its own province (provisional). */
+const MIN_SPREAD_LEVELS = 1;
 /** Smallest territory target of a tradeable good, in levels (D-148, provisional). */
 const MIN_LEVELS = 1;
 /**
@@ -156,9 +170,10 @@ export function a12Records(crops) {
 
 export function placeCatalogue(ctx) {
   const {
-    goods, definitions, oldDefinitions, needs, oldNeeds, professions, provinces, pops, countries, oldCountries,
+    goods, definitions, oldDefinitions, needs, oldNeeds, professions, provinces, pops, oldPops, countries, oldCountries,
     markets, buildings, deposits, sources, technology, rows, workingAgeShare, fertiliser, round, territoryCoverage,
     extraDemand = new Map(),
+    provinceShares = new Map(),
     hydro,
     householdQuantities = null,
   } = ctx;
@@ -220,6 +235,19 @@ export function placeCatalogue(ctx) {
     const largest = [...list].filter((pop) => pop.population > 0).sort((left, right) => right.population - left.population || left.professionKey.localeCompare(right.professionKey))[0];
     return largest?.professionKey ?? null;
   };
+  // P7 (D-154 item 5f): eligible workers and population of each province, the weights of the
+  // spread producers.
+  const spreadWorkers = new Map();
+  const provincePopulation = new Map();
+  for (const pop of pops) {
+    provincePopulation.set(pop.provinceId, (provincePopulation.get(pop.provinceId) ?? 0) + pop.population);
+    if (!SPREAD_WORKER_PROFESSIONS.includes(pop.professionKey)) continue;
+    const participation = professionByKey.get(pop.professionKey)?.participationRate;
+    if (!(participation > 0)) throw new Error(`placement: profession ${pop.professionKey} has no participation rate`);
+    spreadWorkers.set(pop.provinceId, (spreadWorkers.get(pop.provinceId) ?? 0) + pop.population * workingAgeShare * participation);
+  }
+  /** A producer tied to land, a deposit or a crop band (spread over its territory, item 5f). */
+  const isSpread = (definition) => definition.extracts !== undefined || definition.landUse !== undefined || definition.maxAbsLatitudeDeg !== undefined;
   const urbanPopulation = new Map();
   const territoryPopulation = new Map();
   for (const pop of pops) {
@@ -259,23 +287,76 @@ export function placeCatalogue(ctx) {
       if (!inBand(definition, province)) continue;
       let weight;
       let deposit;
+      // P7 (item 5f): the deposit, land use and crop band decide whether the province can host
+      // the producer; its people decide how much (never the stock, hectares or quality).
       if (definition.extracts !== undefined) {
         deposit = bestDeposit(province.id, definition.extracts);
         if (deposit === undefined) continue;
-        weight = deposit.initialStock * deposit.quality;
       } else if (definition.landUse !== undefined) {
-        weight = definition.landUse === "cropland" ? province.arableLandHa : province.pastureHa;
-      } else if (definition.maxAbsLatitudeDeg !== undefined) {
-        weight = province.arableLandHa + 1;
+        const hectares = definition.landUse === "cropland" ? province.arableLandHa : province.pastureHa;
+        if (!(hectares > 0)) continue;
+      }
+      if (isSpread(definition)) {
+        weight = POPULATION_WEIGHTED_RESOURCES.has(definition.extracts) ? (provincePopulation.get(province.id) ?? 0) : (spreadWorkers.get(province.id) ?? 0);
       } else {
         weight = (urbanPopulation.get(province.id) ?? 0) + 1;
       }
       if (weight > 0) weights.push({ province, weight, deposit });
     }
     weights.sort((left, right) => right.weight - left.weight || left.province.id - right.province.id);
-    const chosen = weights.slice(0, MAX_PROVINCES_PER_TERRITORY);
+    const chosen = isSpread(definition) ? weights : weights.slice(0, MAX_PROVINCES_PER_TERRITORY);
     weightCache.set(cacheKey, chosen);
     return chosen;
+  };
+  /**
+   * P7 (item 5f): the share of each host province of a spread producer in its territory. A
+   * sourced unit (state, province, residency) splits its value over its host provinces by
+   * their workers; a unit with no host province is reported and its value goes to all host
+   * provinces by workers. A source that covers only part of the territory (`partialCoverage`,
+   * e.g. British India without the native states) gives each host province it does not name
+   * the named host provinces' value per worker. Without a source, the workers alone.
+   */
+  const spreadReport = {};
+  const spreadShares = (territory, definition, hosts) => {
+    const out = new Map(hosts.map((entry) => [entry, 0]));
+    const totalWeight = hosts.reduce((acc, entry) => acc + entry.weight, 0);
+    const spec = provinceShares.get(`${definition.key}|${territory}`);
+    if (spec === undefined) {
+      for (const entry of hosts) out.set(entry, entry.weight / totalWeight);
+      return out;
+    }
+    let total = spec.units.reduce((acc, unit) => acc + unit.value, 0);
+    const extrapolated = [];
+    if (spec.partialCoverage !== null) {
+      const named = hosts.filter((entry) => spec.namedProvinceIds.has(entry.province.id));
+      const namedWeight = named.reduce((acc, entry) => acc + entry.weight, 0);
+      if (namedWeight > 0) {
+        for (const entry of hosts) {
+          if (spec.namedProvinceIds.has(entry.province.id)) continue;
+          // `extrapolate` (when given) limits the extrapolation to the provinces the source
+          // is known to omit; other unnamed provinces get none.
+          if (spec.extrapolateIds !== undefined && !spec.extrapolateIds.has(entry.province.id)) continue;
+          const value = (total * entry.weight) / namedWeight;
+          extrapolated.push({ entry, value });
+        }
+        total += extrapolated.reduce((acc, item) => acc + item.value, 0);
+        for (const item of extrapolated) out.set(item.entry, item.value / total);
+      }
+    }
+    const orphans = [];
+    for (const unit of spec.units) {
+      const members = hosts.filter((entry) => unit.provinceIds.includes(entry.province.id));
+      const weight = members.reduce((acc, entry) => acc + entry.weight, 0);
+      if (members.length === 0 || !(weight > 0)) {
+        orphans.push({ unit: unit.name, share: unit.value / total });
+        continue;
+      }
+      for (const entry of members) out.set(entry, out.get(entry) + ((unit.value / total) * entry.weight) / weight);
+    }
+    const orphanShare = orphans.reduce((acc, orphan) => acc + orphan.share, 0);
+    if (orphanShare > 0) for (const entry of hosts) out.set(entry, out.get(entry) + (orphanShare * entry.weight) / totalWeight);
+    spreadReport[`${definition.key}|${territory}`] = { basis: spec.basis, orphans, extrapolated: extrapolated.map((item) => ({ provinceId: item.entry.province.id, share: item.value / total })) };
+    return out;
   };
   /**
    * New producer definitions of a good, in catalogue order (the P2b definitions keep their
@@ -304,9 +385,9 @@ export function placeCatalogue(ctx) {
 
   // 1. Household demand (new and P2b needs), by market|territory and good.
   const demandKey = (market, territory) => `${market.key}|${territory}`;
-  const householdDemand = (tiers) => {
+  const householdDemand = (tiers, blocks = pops) => {
     const demand = new Map();
-    for (const pop of pops) {
+    for (const pop of blocks) {
       const market = marketOfProvince.get(pop.provinceId);
       if (market === undefined || !(pop.population > 0)) continue;
       const country = countryOf.get(pop.provinceId);
@@ -347,7 +428,12 @@ export function placeCatalogue(ctx) {
     newHouseholds.set(key, row);
     for (const [goodId, quantity] of goodsDemand) row.set(goodId, (row.get(goodId) ?? 0) + quantity);
   }
-  const oldHouseholds = householdDemand(oldNeeds);
+  // The P2b producers were sized by the P2b blocks on the old tiers, so their scaling base
+  // (new demand ÷ old demand, step 3a) is the old tiers over those blocks, not over the
+  // current blocks (P7, D-154 item 5e: the P7 blocks' wealth mix lowered the base and
+  // over-placed livestock, food, fish and clothing by 6-18 %).
+  if (!Array.isArray(oldPops) || oldPops.length === 0) throw new Error("placement: oldPops (the P2b blocks) are required");
+  const oldHouseholds = householdDemand(oldNeeds, oldPops);
 
   // 2. The P2b producers: their 1900 output by good (old definitions, old countries).
   const oldProducers = [];
@@ -459,12 +545,32 @@ export function placeCatalogue(ctx) {
       if (!(va > 0)) return Number.POSITIVE_INFINITY;
       return ((quantity / (definition.outputs[0].quantityPerThroughputUnit * tf)) * va) / targetLevelDay(definition, province, market);
     };
-    /** A territory gets one province per level it needs, at most four, heaviest first. */
+    /**
+     * A territory's other producers get one province per level they need, at most four,
+     * heaviest first. A spread producer (item 5f) goes to every host province by its sourced
+     * 1900 shares or, without a source, by its workers; a province below MIN_SPREAD_LEVELS is
+     * dropped (smallest first) and the rest renormalised, keeping at least one.
+     */
     const placeInTerritory = (territory, definition, quantity) => {
-      const count = Math.min(MAX_PROVINCES_PER_TERRITORY, Math.max(1, Math.floor(levelsFor(territory, definition, quantity))));
-      const weights = provinceWeights(territory, definition).slice(0, count);
-      const sum = weights.reduce((acc, entry) => acc + entry.weight, 0);
-      for (const entry of weights) addEntry(entry.province, definition, (quantity * entry.weight) / sum, entry.deposit, "p5b");
+      if (!isSpread(definition)) {
+        const count = Math.min(MAX_PROVINCES_PER_TERRITORY, Math.max(1, Math.floor(levelsFor(territory, definition, quantity))));
+        const weights = provinceWeights(territory, definition).slice(0, count);
+        const sum = weights.reduce((acc, entry) => acc + entry.weight, 0);
+        for (const entry of weights) addEntry(entry.province, definition, (quantity * entry.weight) / sum, entry.deposit, "p5b");
+        return;
+      }
+      const hosts = provinceWeights(territory, definition);
+      const shares = spreadShares(territory, definition, hosts);
+      const levels = levelsFor(territory, definition, quantity);
+      let kept = [...shares].filter(([, share]) => share > 0);
+      while (kept.length > 1) {
+        const sum = kept.reduce((acc, [, share]) => acc + share, 0);
+        const smallest = kept.reduce((low, entry) => (entry[1] < low[1] || (entry[1] === low[1] && entry[0].province.id > low[0].province.id) ? entry : low));
+        if ((levels * smallest[1]) / sum >= MIN_SPREAD_LEVELS) break;
+        kept = kept.filter((entry) => entry !== smallest);
+      }
+      const sum = kept.reduce((acc, [, share]) => acc + share, 0);
+      for (const [entry, share] of kept) addEntry(entry.province, definition, (quantity * share) / sum, entry.deposit, "p5b");
     };
     /**
      * C-12: up to `wanted` of a territory's electricity from hydro stations, at most four
@@ -476,16 +582,35 @@ export function placeCatalogue(ctx) {
       const first = territoryProvinces.get(territory)?.[0];
       const gate = techKeyById.get(hydroDefinition.requiredTechnologyId);
       if (first === undefined || !knows(countryOf.get(first.id), gate)) return 0;
+      // P7 (item 5f): the four sites with the most workers, each bounded by its own capacity
+      // (a physical limit, not a weight); what a full site cannot take goes to the others.
       const sites = (territoryProvinces.get(territory) ?? [])
         .filter((province) => marketOfProvince.get(province.id) !== undefined && ownerOf(province.id) !== null && province.hydroPotentialMWhPerYear > 0)
-        .map((province) => ({ province, capacity: (province.hydroPotentialMWhPerYear * hydro.technicalShare) / hydro.daysPerYear }))
-        .sort((left, right) => right.capacity - left.capacity || left.province.id - right.province.id)
+        .map((province) => ({ province, capacity: (province.hydroPotentialMWhPerYear * hydro.technicalShare) / hydro.daysPerYear, workers: spreadWorkers.get(province.id) ?? 0 }))
+        .filter((site) => site.workers > 0)
+        .sort((left, right) => right.workers - left.workers || left.province.id - right.province.id)
         .slice(0, MAX_PROVINCES_PER_TERRITORY);
-      const total = sites.reduce((acc, site) => acc + site.capacity, 0);
-      if (!(total > 0)) return 0;
+      if (sites.length === 0) return 0;
+      const given = new Map(sites.map((site) => [site, 0]));
+      let open = [...sites];
+      let rest = wanted;
+      while (rest > 0 && open.length > 0) {
+        const workers = open.reduce((acc, site) => acc + site.workers, 0);
+        let spilled = 0;
+        for (const site of open) {
+          const add = (rest * site.workers) / workers;
+          const room = site.capacity - given.get(site);
+          given.set(site, given.get(site) + Math.min(add, room));
+          spilled += Math.max(0, add - room);
+        }
+        open = open.filter((site) => given.get(site) < site.capacity);
+        if (!(spilled > 0)) break;
+        rest = spilled;
+      }
       let placed = 0;
       for (const site of sites) {
-        const quantity = Math.min(site.capacity, (wanted * site.capacity) / total);
+        const quantity = given.get(site);
+        if (!(quantity > 0)) continue;
         addEntry(site.province, hydroDefinition, quantity, undefined, "p5b");
         placed += quantity;
       }
@@ -938,6 +1063,7 @@ export function placeCatalogue(ctx) {
     if (demand > 0 || output > 0) balance[good.key] = { demandPerDay: demand, outputPerDay: output, outputOverDemand: demand > 0 ? output / demand : null };
   }
   report.worldBalance = balance;
+  report.provinceShares = spreadReport;
   report.workforceCapFactorByTerritory = capped;
   report.fertiliserMarkets = markets.filter((market) => fertiliserKnownInMarket.get(market.key)).map((market) => market.key).sort();
   report.buildingsByDefinition = {};

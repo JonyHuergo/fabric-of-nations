@@ -9288,7 +9288,7 @@ the before/after.
    inside each territory (level, level × technique and cash kept per definition and
    territory); capitalist and aristocrat buildings pay the sourced labour share (0.58 non-farm,
    0.50 farm) by level × k and technique ÷ k within 95 % of the territory's ungated workforce
-   (option C). Building rows rise from 7,643 to 16,424 (performance to be tested by the
+   (option C). Building rows rise from 7,643 to 16,424, 16,365 after item 5e (performance to be tested by the
    designer).
 5. **New employers.** `shop` (commerce; owner shopkeepers, shop assistants) and
    `professional-practice` (finance and professional services; owner academics with medics,
@@ -9337,13 +9337,103 @@ the before/after.
    census points, China's own tobacco demand fell to 1,187 a day, 0.76 of a level (0.92 without
    the Mexico census; the medical practice has no effect), and China lost its tobacco farms,
    contrary to D-148 item 9. Effect: only tobacco changes; China keeps one level.
+5e. **The P2b producers' scaling base (fix, 2026-11-10, approved by the designer).** Placement
+   scales each P2b producer (grain, livestock, fish, textiles, clothing, food-products) by the
+   market's new demand ÷ its old demand, the old tiers over the blocks. Step 3 computed the old
+   side over the P7 blocks, whose wealth mix reaches fewer of the old tiers (old-tier
+   food-products 583.2 M a day against 667.6 M over the P2b blocks; livestock 257.2 M against
+   290.7 M; grain, which every block reaches, unchanged), and so placed livestock 1.180,
+   food-products 1.146, fish 1.092 and clothing 1.058 of world demand. The old side now uses the
+   P2b blocks that sized those producers (`oldPops`, required). Effect: livestock 1.000,
+   food-products 1.017, fish 1.001, textiles 1.001, clothing 1.005, grain 0.996; covered value
+   added 505.1 → 493.4 bn RUSD (47.6 % of GDP); China's coverage 74.1 → 63.0 %, Russia's
+   91.3 → 80.9 %; cotton modelled ÷ sourced 1.44 → 1.36; building rows 16,424 → 16,365; world
+   day-1 unemployment unchanged at 3.0 %. Regression test `p7-p2b-balance-1900`.
+5f. **Where the 1900 producers stand inside their territory (2026-11-10, designer: "Sources plus
+   a rule", "I approve everything"; docs/P7_PROVINCE_PLACEMENT_PROPOSAL.md).** Placement put
+   each P5b producer tied to land, a deposit or a crop band in at most four provinces, the
+   largest by deposit stock or hectares (US logging in Alaska, US coal equally in Wyoming and
+   Pennsylvania, Dutch East Indies sugar in Sumatra); 13.2 % of these producers' jobs had no
+   eligible worker in their province. Designer's principle, standing from now on: *the
+   availability or future availability of a resource has nothing to do with the initial
+   buildings in the region, otherwise there would be no reason to build.* Resources decide only
+   whether a province can host a producer. Now such a producer goes to every host province of
+   its territory (no four-province cap), by sourced 1900 shares where a source gives them
+   (`provinceShareRows` in p7/sources_1900.json, authored in `scripts/p7/province-shares.mjs`),
+   otherwise by the province's eligible laborers, peasants and farmers (working age ×
+   participation); logging camps by population (timber was cut near its use); hydro stations
+   at the four sites with most workers, each bounded by its capacity. A province below one level
+   (`MIN_SPREAD_LEVELS`, provisional) is dropped and the rest renormalised. A source unit spanning
+   several game provinces is split by workers; a unit with no host province is reported and goes
+   to all hosts by workers; a source covering part of a territory (`partialCoverage`) gives the
+   host provinces it does not name its value per worker (only `extrapolate` provinces when
+   listed). Sourced so far: USA coal (Statistical Abstract 1901 table 86), gold and silver
+   (table 23), cotton (table 99, 1899 crop), cane sugar (USDA Yearbook 1900 p. 819: Louisiana,
+   Hawaii); British India cotton, tea and coffee (plantations, acres added), tobacco and sugar
+   cane (Statistical Abstract relating to British India, table 122, crops of 1903-04, the nearest
+   year found by administration; British administrations, native states extrapolated except
+   for plantations); Dutch East Indies sugar (Koloniaal verslag 1901, Bijlage TT: payments by
+   residency, the Vorstenlanden converted from production); Brazil coffee (Bureau of the American
+   Republics 1901: exports of 1899 by state, Minas Gerais extrapolated). Not yet sourced (rule):
+   Germany, Japan, Russia, Austria-Hungary, China (no source), US copper, oil, logging, dairy and
+   market gardens. Effect: jobs beyond eligible workers 13.2 % → 0.3 % (Chile's nitrate
+   provinces, the French Antilles' sugar, one-level minimums on small islands); world day-1
+   unemployment 3.0 → 2.0 % (laborers 5.0 → 2.5 %, engineers 11.5 → 4.8 %; USA 6.8 → 4.2 %,
+   India 4.1 → 0.3 %); territory totals and covered value added unchanged; building rows
+   16,365 → 19,068 (+16.5 %; performance for the designer to test). Regression test
+   `p7-province-placement-1900`.
+5g. **Opening incomes measured with the simulation's accounting (fix, 2026-11-10, designer: "Yes,
+   do as you suggest", on `.cache-p7/proto-fixedpoint/REPORT.md`).** Two errors in the
+   generator's income rule (`p7IncomeRound`) made the measured 1900 incomes 26–56 % above the
+   estimate that sized demand. (E1) A building's profit took outputs × technique against inputs
+   at the reference throughput; the simulation's production counts both on its capacity
+   (reference throughput × level × technique × the job mix's labour-productivity modifier × the
+   deposit's quality), so plants with a high technique (US food processing 16.5, textile mills
+   9.1) showed value added several times their real one. Maintenance inputs are now charged with
+   the upkeep. (E2) R2 counts a work-sharing profession's people as employed, and the rule paid
+   every one of them a wage; only those in slots hold an assignment and a wage in the
+   simulation, so people beyond every slot of their province are now unpaid (they share the
+   residual of the buildings they own). Q18 stays one pass. Effect (generator, one pass):
+   world opening income 390 → 303 RUSD a head; USA 2,939 → 2,233 (estimate 2,140), UK
+   2,118 → 1,677, Germany 1,086 → 831, Russia 94 → 89, China 62 → 54, British India 53 → 42,
+   Brazil 133 → 122; household value desired ÷ placement's assumption, world 1.29 → 1.07, USA
+   1.29 → 1.00 (paper 1.35 → 0.97, commerce 1.20 → 1.00, personal services 1.44 → 1.01, finance
+   1.47 → 1.01 and household goods 1.98 → 1.18 of placed US output); placement, building rows,
+   covered value added and day-1 employment unchanged (only `p7/pops_1900.json`, the P7 trace
+   and `docs/P7_BEFORE_AFTER.md` change). Regression test `p7-incomes-1900`: no country of 1 M
+   persons or more opens with household income above its covered value added plus institution
+   payroll, within 5 % (servants' wages are counted for employer and servant; losses are floored
+   at zero); 27 countries failed before (USA 1.316 times), the largest now is Australia, 1.034.
+   The P2b test "runs a week and balanced goods hold their price" still fails, closer: US
+   livestock moves 6.4 % in a week (26.8 % before item 5f, about 25 % after it; bound 2 %).
+   **Accepted exception (designer, 2026-11-10):** the failure stays, reported and unchanged
+   (the test is not skipped, weakened or rewritten); its cause is to be found when the game is
+   more developed.
+   **Not changed (for the designer):** `restoreLabourShare` computes the value added it restores
+   the labour share against with the same E1 formula. On the simulation's capacity it adds fewer
+   jobs (laborer slots 136.7 → 128.1 M) and day-1 unemployment rises (world 2.0 → 3.1 %, USA
+   4.2 → 13.1 %, UK 12.7 → 25.7 %), because high-technique P2b plants whose real value added does
+   not cover their wages are no longer enlarged.
+   **Prototype of the Q18(a) fixed point (same report):** with the corrected rule, the loop
+   settles to about 1 % for territories of 1 M persons or more, but labour-short territories run
+   away (Montenegro 96 → 1,593 RUSD a head, Brazil 122 → 211): the placement's workforce cap
+   keeps output by raising the technique, so demand turns into output without workers and all
+   of its value added into profit. Bounding the uplift at its first-round value makes every
+   territory of 1 M or more steady by round 5, except for a ±1.3 % cycle from integer levels.
+   Not adopted; a causal guard and a stopping rule are the designer's to choose.
 
 ### Consequences
 
 - Generator day-1 unemployment of the 1900 world falls from 50.6 % (step 3) to 3.0 % (3.7 %
   before items 5a-5c and the job-mix steps (d)-(e)); measured
-  opening incomes rise (world and per territory in `docs/P7_BEFORE_AFTER.md`) and now exceed the
-  P6 estimate that sized demand (one-pass rule Q18; reported, not iterated).
+  opening incomes rise (world and per territory in `docs/P7_BEFORE_AFTER.md`); after item 5g
+  they are within a few per cent of the P6 estimate that sized demand in the rich territories
+  and above it in the poor and export economies (one-pass rule Q18; reported, not iterated).
+- Twenty territories, all export-crop economies at low price levels with workforce cap factors
+  of 3–22, have covered value added above their GDP, so their measured incomes exceed GDP (Brazil
+  122 RUSD a head against 104; plantation owners take 87 % of plantation value added under the
+  cap; coffee is priced at the coffee–tea composite, 52 % above the Rio No. 7 price). Follow-ups
+  outside P7 (P5b prices, P6 dwelling value).
 - The UK keeps the highest unemployment (12.9 %): its placed economy covers 27 % of its GDP
   (P5b/P6 coverage: export industry, shipping, finance), a follow-up outside P7; its laborer jobs
   are 3.3 M for 5.3 M eligible laborers.

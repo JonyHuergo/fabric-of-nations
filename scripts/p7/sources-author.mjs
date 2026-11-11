@@ -10,6 +10,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { PROVINCE_SHARE_SOURCES, addProvinceShares } from "./province-shares.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const OUT = join(ROOT, "packages/data/data/historical/p7/sources_1900.json");
@@ -328,6 +329,20 @@ sources.push(
     notes: "Page image read: leaf 587.",
   },
 );
+/**
+ * P7 (D-154 item 5f): 1900 production (or acreage, or value) by state, province or residency,
+ * which places the P5b producers tied to land, a deposit or a crop band inside their territory.
+ * Each row is one source unit as printed: `unitName`, the game provinces it covers
+ * (`provinces`, names in the territory; default the unit's own name), and the producer
+ * definitions it places.
+ */
+const provinceShareRows = [];
+const PS = (sourceId, locator, territory, definitionKeys, measure, unit, rows, options = {}) => {
+  for (const [unitName, value, provinces, note] of rows) {
+    const slug = unitName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    provinceShareRows.push({ id: `pshare-${territory}-${definitionKeys[0]}-${slug}`, sourceId, locator, territory, definitionKeys, measure, unit, unitName, provinces: provinces ?? [unitName], value, status: "sourced", ...(options.partialCoverage ? { partialCoverage: options.partialCoverage } : {}), ...(options.extrapolate ? { extrapolate: options.extrapolate } : {}), ...(note ? { note } : {}) });
+  }
+};
 const distributionRows = [];
 const DR = (sourceId, locator, subject, rows, unit = "persons") => {
   for (const [key, value, measure, note] of rows) distributionRows.push({ id: `dist-${key}`, key, sourceId, locator, subject, measure, unit, value, status: "sourced", ...(note ? { note } : {}) });
@@ -577,6 +592,9 @@ DR("hsus-1975-chY", `${Y533}, book p.1121`, "USA", [
   ["usa-1902-gov-air-water-transport", 22, "air and water transport and terminals (Y 559)"],
 ], "million USD");
 
+sources.push(...PROVINCE_SHARE_SOURCES);
+addProvinceShares(PS);
+
 for (const row of occ) {
   if (!GROUPS.includes(row.group)) throw new Error(`unknown group ${row.group}`);
   if (!Number.isFinite(row.value) || row.value <= 0) throw new Error(`bad value ${row.territory} ${row.group}`);
@@ -601,7 +619,8 @@ const occupationRows = occ.map((row) => {
 });
 const ids = new Set();
 for (const row of distributionRows) if (!Number.isFinite(row.value) || row.value <= 0 || !sources.some((source) => source.id === row.sourceId)) throw new Error(`bad distribution row ${row.key}`);
-for (const row of [...occupationRows, ...statusRows, ...wageRows, ...provisionalRows, ...coverageRows, ...distributionRows]) {
+for (const row of provinceShareRows) if (!Number.isFinite(row.value) || row.value < 0 || !sources.some((source) => source.id === row.sourceId) || row.provinces.length === 0) throw new Error(`bad province share row ${row.id}`);
+for (const row of [...occupationRows, ...statusRows, ...wageRows, ...provisionalRows, ...coverageRows, ...distributionRows, ...provinceShareRows]) {
   if (ids.has(row.id)) throw new Error(`duplicate row id ${row.id}`);
   ids.add(row.id);
 }
@@ -616,6 +635,7 @@ const out = {
   provisionalRows,
   coverageRows,
   distributionRows,
+  provinceShareRows,
 };
 const text = `${JSON.stringify(out, null, 1)}\n`;
 if (CHECK) {

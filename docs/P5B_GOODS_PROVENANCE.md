@@ -218,7 +218,7 @@ Method: gross theoretical potential, MWh/year: per reach, 1000 kg/m³ x 9.81 m/s
 - Gross theoretical potential at long-term mean flow: no seasonal flow, no technical, economic or environmental limits (the simulation applies one provisional technical share).
 - Discharge is the naturalised 1971-2000 mean at each reach's downstream end; the 1900 climate and any upstream use are not modelled.
 - Greenland is left out (no gradient data, and DEM outliers over the ice sheet).
-- 1900 hydro stations generate 18,480 MWh a day of the 77,780 MWh placed (the 1902 US water-wheel share, within each province's cap).
+- 1900 hydro stations generate 12,260 MWh a day of the 77,780 MWh placed (the 1902 US water-wheel share, within each province's cap).
 
 The Hoes et al. (2017) site dataset (4TU.ResearchData) was not used: its General Terms of Use allow reuse only for non-commercial purposes (designer, 2026-11-08).
 
