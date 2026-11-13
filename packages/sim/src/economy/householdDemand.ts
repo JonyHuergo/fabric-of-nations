@@ -229,12 +229,11 @@ export function buildLesHouseholdDemand(
       const committedTier = (system.categoryAtSubsistenceTier[category] ?? 0) === 1 ? 0 : 1;
       const commerce = urban * (system.commerceMargin[goodId] ?? 0);
       const transport = urban * (system.transportMargin[goodId] ?? 0);
-      for (const [tierIndex, quantity] of [
-        [committedTier, committedQuantity],
-        [2, superQuantity],
-      ] as const) {
+      // D-157: the committed tier, then tier 6, without a pair array per good.
+      for (let step = 0; step < 2; step += 1) {
+        const quantity = step === 0 ? committedQuantity : superQuantity;
         if (!(quantity > 0)) continue;
-        const target = desiredByTier[tierIndex] as Float64Array;
+        const target = desiredByTier[step === 0 ? committedTier : 2] as Float64Array;
         target[goodId] = (target[goodId] ?? 0) + quantity;
         if (commerce > 0) target[system.commerceGoodId] = (target[system.commerceGoodId] ?? 0) + quantity * commerce;
         if (transport > 0) target[system.transportGoodId] = (target[system.transportGoodId] ?? 0) + quantity * transport;

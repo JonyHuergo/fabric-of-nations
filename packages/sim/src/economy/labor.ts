@@ -16,7 +16,7 @@
  * new profession, payment, or duplicate people.
  */
 
-import { buildLabourWageTable, institutionPayroll, institutionStaff, popBlocksById } from "./labourMarket.js";
+import { buildLabourWageTable, institutionPayroll, institutionStaff, popBlocksById, type LabourWageTable } from "./labourMarket.js";
 import { healthStaffFloor, laborHoursFactor } from "./labourLaws.js";
 export { healthStaffFloor, laborHoursFactor, laborMinimumWageRUSDPerYear } from "./labourLaws.js";
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
@@ -257,6 +257,8 @@ export function deriveHealth(
   definitions: EconomyDefinitions | undefined,
   /** Shared per-phase lookups (D-137); built from `world` when omitted. */
   populationIndex?: CountryPopulationIndex,
+  /** D-157: the phase's wage table (see `localWageIndex`); built when omitted. */
+  wages?: () => LabourWageTable,
 ): HealthDerived {
   const share = clamp(country.institutions.healthStaffShare ?? 0, 0, 1);
   const keys = administrationKeys(definitions);
@@ -289,7 +291,7 @@ export function deriveHealth(
   const fundingBenchmark =
     population *
     world.moneyCoefficients.adminFundingPerCapitaPerYearRUSD *
-    localWageIndex(world, blocks, definitions, keys);
+    localWageIndex(world, blocks, definitions, keys, wages);
   const fundingRatio =
     fundingBenchmark > 0
       ? clamp(country.institutions.fundedAnnualRUSD / fundingBenchmark, 0, 1)
@@ -616,6 +618,7 @@ export function runTrainingPhase(
         countryBlocks(world, country, populationIndex),
         definitions,
         academicProfessionKeys,
+        () => labourWages,
       );
     const instructorBenchmark = derived.instructors * instructorCost;
     const fundingAdequacy =

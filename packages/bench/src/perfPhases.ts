@@ -4,9 +4,10 @@
  *
  * Runs the 1900 world through the rollback runner with the worker host's result
  * detail, unmeasured to `fromDay`, then reports the mean milliseconds per phase over
- * days `fromDay`..`toDay - 1` and the mean day. Defaults to days 2..12: ordinary days,
- * clear of the first month start and the first month end. Node diagnostic only; the
- * acceptance figures come from `perfBench`.
+ * days `fromDay`..`toDay - 1`, the mean day and the worst day. Defaults to days 2..12:
+ * ordinary days, clear of the first month start and the first month end; `0 32` is the
+ * whole first month with its month end (day 30) and the first monthly labour phase
+ * (day 31). Node diagnostic only; the acceptance figures come from `perfBench`.
  */
 
 import { loadM11World } from "@century/data";
@@ -43,17 +44,28 @@ function main(): void {
   const context: TickContext = { ...base, phaseObserver: observe };
   const days = toDay - fromDay;
   let dayTotal = 0;
+  let worstDay = fromDay;
+  let worstMs = 0;
   for (let day = fromDay; day < toDay; day += 1) {
     phase = "runner";
     const start = performance.now();
     since = start;
     runTicksWithRollback(runner, 1, context);
     observe("done");
-    dayTotal += performance.now() - start;
+    const elapsed = performance.now() - start;
+    dayTotal += elapsed;
+    if (elapsed > worstMs) {
+      worstMs = elapsed;
+      worstDay = day;
+    }
   }
   totals.delete("done");
   const rows = [...totals].sort((left, right) => right[1] - left[1]);
-  console.log(`days ${String(fromDay)}..${String(toDay - 1)}: mean day ${(dayTotal / days).toFixed(1)} ms`);
+  // D-157: the worst day as well, for a whole-month window (`perfPhases 0 32`).
+  console.log(
+    `days ${String(fromDay)}..${String(toDay - 1)}: mean day ${(dayTotal / days).toFixed(1)} ms; ` +
+      `worst day ${String(worstDay)} ${worstMs.toFixed(1)} ms`,
+  );
   for (const [name, total] of rows) {
     const mean = total / days;
     if (mean < 0.05) continue;

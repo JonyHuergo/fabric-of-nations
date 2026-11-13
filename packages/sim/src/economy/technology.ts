@@ -14,7 +14,7 @@
  * plain data and is recomputed into derived values on demand.
  */
 
-import { buildLabourWageTable, institutionPayroll, institutionStaff, popBlocksById } from "./labourMarket.js";
+import { buildLabourWageTable, institutionPayroll, institutionStaff, popBlocksById, type LabourWageTable } from "./labourMarket.js";
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
 import { CONTRACEPTION_MAX_REDUCTION, RATE_DECIMAL_PLACES } from "../population/constants.js";
 import { populationTotal, syncBlockLiteracy, workingAgePopulation } from "../population/state.js";
@@ -766,6 +766,8 @@ export function deriveEducation(
   definitions: EconomyDefinitions | undefined,
   /** Shared per-phase lookups (D-137); built from `world` when omitted. */
   populationIndex?: CountryPopulationIndex,
+  /** D-157: the phase's wage table (see `localWageIndex`); built when omitted. */
+  wages?: () => LabourWageTable,
 ): EducationDerived {
   const content = definitions?.technology;
   const blocks = countryBlocks(world, country, populationIndex);
@@ -874,6 +876,7 @@ export function deriveEducation(
       blocks,
       definitions,
       new Set(content.academicProfessionKeys),
+      wages,
     );
   const fundingAdequacy =
     fundingBenchmark > 0
@@ -1008,9 +1011,12 @@ export function runEducationPhase(
   // D-137: one set of country lookups for the whole phase; the payroll below changes
   // only balances, never the blocks, assignments or wage tables it reads.
   const populationIndex = buildCountryPopulationIndex(world);
+  // D-157: the phase's one wage table, for the derivations and the payroll below (built
+  // here instead of after the derivations, which change nothing).
+  const labourWages = buildLabourWageTable(world, definitions);
   const derivedByCountry = new Map<Id, EducationDerived>();
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
-    derivedByCountry.set(country.id, deriveEducation(world, country, definitions, populationIndex));
+    derivedByCountry.set(country.id, deriveEducation(world, country, definitions, populationIndex, () => labourWages));
   }
 
   // Stage the finance mutation. Posting errors leave the world untouched (direct
@@ -1025,7 +1031,6 @@ export function runEducationPhase(
     blocks: { id: Id; population: number }[];
   }[] = [];
   const entries: JournalEntryInput[] = [];
-  const labourWages = buildLabourWageTable(world, definitions);
   const payrollBlocks = popBlocksById(world);
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     const requested = country.education.fundedAnnualRUSD / yearDays;

@@ -955,23 +955,59 @@ export function refreshLabourEmployment(
  * buildings and institutions; institution assignments of the owner country and a
  * profession holding the institution's role.
  */
+/**
+ * D-157: `new Map(items.map((item) => [item.id, item]))` as a lookup (the last item of an id
+ * wins, as in the map): an id-indexed table when the ids are small non-negative integers,
+ * else the map. No pair array per item.
+ */
+function lookupById<T extends { readonly id: Id }>(items: readonly T[]): (id: Id) => T | undefined {
+  let max = -1;
+  let dense = true;
+  for (let index = 0; index < items.length; index += 1) {
+    const id = (items[index] as T).id;
+    if (!(Number.isInteger(id) && id >= 0)) {
+      dense = false;
+      break;
+    }
+    if (id > max) max = id;
+  }
+  if (dense && max <= items.length * 4 + 1024) {
+    const table = new Array<T | undefined>(max + 1).fill(undefined);
+    for (let index = 0; index < items.length; index += 1) {
+      const item = items[index] as T;
+      table[item.id] = item;
+    }
+    return (id) => (Number.isInteger(id) && id >= 0 && id < table.length ? table[id] : undefined);
+  }
+  const map = new Map<Id, T>();
+  for (const item of items) map.set(item.id, item);
+  return (id) => map.get(id);
+}
+
 export function assertValidLabourEmployment(world: World, definitions: EconomyDefinitions): void {
   const professionIdSet = new Set(definitions.professions.map((profession) => profession.id));
-  const definitionOf = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
+  // D-157: one definition lookup (the former `definitionOf` and `definitionById` were the same map).
+  const definitionById = lookupById(definitions.buildings);
+  const definitionOf = { get: definitionById };
   for (const building of world.buildings) {
     if (building.jobMix === undefined || building.jobMix === null) continue;
     const definition = definitionOf.get(building.definitionId);
     if (definition === undefined) throw new RangeError(`building ${String(building.id)} references a missing definition`);
     assertValidJobMix(definition, building.jobMix, professionIdSet, `building ${String(building.id)}.jobMix`);
   }
-  const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
-  const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
-  const buildingById = new Map(world.buildings.map((building) => [building.id, building]));
-  const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
+  const professionById = { get: lookupById(definitions.professions) };
+  const buildingById = { get: lookupById(world.buildings) };
+  const blockById = { get: lookupById(world.popBlocks) };
   const ceilings = ceilingMap(world);
+  // D-157: the staffing profession of each institution kind, found once per kind.
+  const institutionStaffProfession = new Map<InstitutionKind, ProfessionDef | undefined>();
   const owners = buildProvinceOwnerMap(world);
   const assignedByBlock = new Map<Id, number>();
-  const usedBySlot = new Map<string, number>();
+  // D-157: slot key building id × stride + profession id (the former `${building}:${profession}`
+  // text, in the same first-use order); profession ids are integers below the stride.
+  let stride = 1;
+  for (const profession of definitions.professions) if (profession.id + 1 > stride) stride = profession.id + 1;
+  const usedBySlot = new Map<number, number>();
   const ids = new Set<Id>();
   for (const assignment of world.employment) {
     const block = blockById.get(assignment.popBlockId);
@@ -987,15 +1023,14 @@ export function assertValidLabourEmployment(world: World, definitions: EconomyDe
       throw new RangeError(`employment assignment ${String(assignment.id)} is not of its block's profession`);
     }
     if (!building.operational) throw new RangeError(`employment assignment ${String(assignment.id)} references a non-operational building`);
-    const slotKey = `${String(building.id)}:${String(profession.id)}`;
+    const slotKey = building.id * stride + profession.id;
     usedBySlot.set(slotKey, (usedBySlot.get(slotKey) ?? 0) + assignment.workers);
     assignedByBlock.set(block.id, (assignedByBlock.get(block.id) ?? 0) + assignment.workers);
   }
   for (const [slotKey, used] of usedBySlot) {
-    const [buildingText, professionText] = slotKey.split(":");
-    const building = buildingById.get(Number(buildingText));
-    const profession = professionById.get(Number(professionText));
-    const definition = building === undefined ? undefined : definitionById.get(building.definitionId);
+    const building = buildingById.get(Math.floor(slotKey / stride));
+    const profession = professionById.get(slotKey % stride);
+    const definition = building === undefined ? undefined : definitionById(building.definitionId);
     if (building === undefined || profession === undefined || definition === undefined) throw new RangeError("broken slot reference");
     if (used > offeredJobSlots(definition, building, profession, ceilings.get(building.id) ?? 1)) {
       throw new RangeError(`building ${String(building.id)} profession ${String(profession.id)} exceeds its offered slots`);
@@ -1012,7 +1047,10 @@ export function assertValidLabourEmployment(world: World, definitions: EconomyDe
     if (owners.get(block.provinceId) !== assignment.countryId) {
       throw new RangeError(`institution assignment ${String(assignment.id)} is not in a province of its country`);
     }
-    if (institutionProfession(definitions, assignment.institution)?.id !== block.professionId) {
+    if (!institutionStaffProfession.has(assignment.institution)) {
+      institutionStaffProfession.set(assignment.institution, institutionProfession(definitions, assignment.institution));
+    }
+    if (institutionStaffProfession.get(assignment.institution)?.id !== block.professionId) {
       throw new RangeError(`institution assignment ${String(assignment.id)} is not of the institution's profession`);
     }
     assignedByBlock.set(block.id, (assignedByBlock.get(block.id) ?? 0) + assignment.workers);
@@ -1044,31 +1082,60 @@ export function assertValidLabourEmployment(world: World, definitions: EconomyDe
  * (state restored) when the result still fails validation.
  */
 export function repairLabourEmploymentAfterDemography(world: World, definitions: EconomyDefinitions): boolean {
-  const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
-  const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
+  return repairLabourEmploymentWithOutcome(world, definitions).repaired;
+}
+
+/**
+ * D-157: the repair above, also saying whether the repaired state passed
+ * `assertValidLabourEmployment` (only after trimming building or institution
+ * assignments; releasing servants alone is not validated here).
+ */
+export function repairLabourEmploymentWithOutcome(
+  world: World,
+  definitions: EconomyDefinitions,
+): { readonly repaired: boolean; readonly validated: boolean } {
+  const professionById = lookupById(definitions.professions);
+  const blockById = lookupById(world.popBlocks);
   type Entry = { readonly kind: 0 | 1 | 2; readonly id: Id; readonly workers: number };
-  const byBlock = new Map<Id, Entry[]>();
-  const push = (blockId: Id, entry: Entry): void => {
-    const list = byBlock.get(blockId);
-    if (list === undefined) byBlock.set(blockId, [entry]);
-    else list.push(entry);
-  };
   // P7 (§4.1): household servants are released first (they are rehired at the next refresh).
   const liveBlocks = new Set(world.popBlocks.map((block) => block.id));
   const originalHousehold = world.labourMarket.householdEmployment;
   world.labourMarket.householdEmployment = originalHousehold.filter((entry) => liveBlocks.has(entry.popBlockId) && liveBlocks.has(entry.employerBlockId));
-  for (const assignment of world.labourMarket.householdEmployment) push(assignment.popBlockId, { kind: 2, id: assignment.id, workers: assignment.workers });
-  for (const assignment of world.employment) push(assignment.popBlockId, { kind: 0, id: assignment.id, workers: assignment.workers });
-  for (const assignment of world.labourMarket.institutionEmployment) push(assignment.popBlockId, { kind: 1, id: assignment.id, workers: assignment.workers });
+  // D-157: each block's assigned workers, summed in the former entry order (servants, then
+  // building and institution assignments); entries are made only for the blocks with an
+  // excess, and their sort below orders them by kind and id exactly as before.
+  const assignedOf = new Map<Id, number>();
+  const add = (blockId: Id, workers: number): void => {
+    assignedOf.set(blockId, (assignedOf.get(blockId) ?? 0) + workers);
+  };
+  for (const assignment of world.labourMarket.householdEmployment) add(assignment.popBlockId, assignment.workers);
+  for (const assignment of world.employment) add(assignment.popBlockId, assignment.workers);
+  for (const assignment of world.labourMarket.institutionEmployment) add(assignment.popBlockId, assignment.workers);
+  const excessOf = new Map<Id, number>();
+  for (const [blockId, assigned] of assignedOf) {
+    const block = blockById(blockId);
+    const profession = block === undefined ? undefined : professionById(block.professionId);
+    if (block === undefined || profession === undefined) continue;
+    const excess = assigned - labourEligibleWorkforce(block, profession);
+    if (excess > 0) excessOf.set(blockId, excess);
+  }
+  const byBlock = new Map<Id, Entry[]>();
+  const push = (blockId: Id, entry: Entry): void => {
+    if (!excessOf.has(blockId)) return;
+    const list = byBlock.get(blockId);
+    if (list === undefined) byBlock.set(blockId, [entry]);
+    else list.push(entry);
+  };
+  if (excessOf.size > 0) {
+    for (const assignment of world.labourMarket.householdEmployment) push(assignment.popBlockId, { kind: 2, id: assignment.id, workers: assignment.workers });
+    for (const assignment of world.employment) push(assignment.popBlockId, { kind: 0, id: assignment.id, workers: assignment.workers });
+    for (const assignment of world.labourMarket.institutionEmployment) push(assignment.popBlockId, { kind: 1, id: assignment.id, workers: assignment.workers });
+  }
   const reductionBuilding = new Map<Id, number>();
   const reductionInstitution = new Map<Id, number>();
   const reductionHousehold = new Map<Id, number>();
   for (const [blockId, entries] of [...byBlock].sort((left, right) => left[0] - right[0])) {
-    const block = blockById.get(blockId);
-    const profession = block === undefined ? undefined : professionById.get(block.professionId);
-    if (block === undefined || profession === undefined) continue;
-    const assigned = entries.reduce((sum, entry) => sum + entry.workers, 0);
-    const excess = assigned - labourEligibleWorkforce(block, profession);
+    const excess = excessOf.get(blockId) ?? 0;
     if (excess <= 0) continue;
     const ordered = [...entries].sort((left, right) => (left.kind === 2 ? -1 : left.kind) - (right.kind === 2 ? -1 : right.kind) || left.id - right.id);
     const cuts = apportionLargestRemainder(
@@ -1091,7 +1158,7 @@ export function repairLabourEmploymentAfterDemography(world: World, definitions:
     })
     .filter((assignment) => assignment.workers > 0);
   const householdChanged = world.labourMarket.householdEmployment.length !== originalHousehold.length || world.labourMarket.householdEmployment.some((entry, index) => entry !== originalHousehold[index]);
-  if (reductionBuilding.size === 0 && reductionInstitution.size === 0) return householdChanged;
+  if (reductionBuilding.size === 0 && reductionInstitution.size === 0) return { repaired: householdChanged, validated: false };
   const originalBuilding = world.employment;
   const originalInstitution = world.labourMarket.institutionEmployment;
   world.employment = originalBuilding
@@ -1108,12 +1175,12 @@ export function repairLabourEmploymentAfterDemography(world: World, definitions:
     .filter((assignment) => assignment.workers > 0);
   try {
     assertValidLabourEmployment(world, definitions);
-    return true;
+    return { repaired: true, validated: true };
   } catch {
     world.employment = originalBuilding;
     world.labourMarket.institutionEmployment = originalInstitution;
     world.labourMarket.householdEmployment = originalHousehold;
-    return false;
+    return { repaired: false, validated: false };
   }
 }
 

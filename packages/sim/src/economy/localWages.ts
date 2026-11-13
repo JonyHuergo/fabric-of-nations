@@ -12,10 +12,14 @@
  * Inputs: the blocks (a country's), their provinces' wage tables, the profession
  * definitions. Units: dimensionless ratio, positive. Cadence: evaluated whenever a
  * service derivation runs. No state is written.
+ *
+ * D-157: a phase that derives every country from the same state passes `wages`, its one
+ * wage table (equal to the table this call would build: nothing it reads changes within
+ * such a phase); it is read only where a table is needed.
  */
 
 import { populationTotal } from "../population/state.js";
-import { buildLabourWageTable } from "./labourMarket.js";
+import { buildLabourWageTable, type LabourWageTable } from "./labourMarket.js";
 import type { World } from "../world.js";
 import type { EconomyDefinitions } from "./types.js";
 
@@ -24,11 +28,12 @@ export function localWageIndex(
   blocks: readonly World["popBlocks"][number][],
   definitions: EconomyDefinitions | undefined,
   professionKeys: ReadonlySet<string>,
+  wages?: () => LabourWageTable,
 ): number {
   if (definitions === undefined || professionKeys.size === 0) return 1;
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
   // P7 (D-154): staff are priced at the current paid wages.
-  const wages = buildLabourWageTable(world, definitions);
+  const table = wages === undefined ? buildLabourWageTable(world, definitions) : wages();
   let localLabour = 0;
   let referenceLabour = 0;
   for (const block of blocks) {
@@ -36,7 +41,7 @@ export function localWageIndex(
     if (profession === undefined || !professionKeys.has(profession.key)) continue;
     const people = populationTotal(block);
     if (people <= 0) continue;
-    localLabour += people * wages.paid(block.provinceId, profession.id, true);
+    localLabour += people * table.paid(block.provinceId, profession.id, true);
     referenceLabour += people * profession.baseWage1900RUSDPerYear;
   }
   return localLabour > 0 && referenceLabour > 0 ? localLabour / referenceLabour : 1;

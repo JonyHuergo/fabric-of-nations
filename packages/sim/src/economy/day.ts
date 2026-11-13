@@ -133,8 +133,9 @@ import {
 } from "./technology.js";
 import {
   assertValidEmploymentState,
+  isEmploymentRefreshDue,
   refreshEmploymentIfDue,
-  repairEmploymentAfterDemography,
+  repairEmploymentAfterDemographyWithOutcome,
 } from "./employment.js";
 import type {
   BuildingDef,
@@ -767,14 +768,15 @@ function economicWealthInputs(
     goodKey: good.key,
     unitPriceRUSD: referenceMarket?.updatedPrices[good.id] ?? 0,
   }));
+  // D-157: the world population is the same for every good (summed once, in the same order).
+  let population = 0;
+  for (const block of world.popBlocks) population += populationTotal(block);
   const supply = definitions.goods.map((good) => {
     let closing = 0;
     for (const market of markets) {
       const flow = market.inventory.find((entry) => entry.goodId === good.id);
       closing += flow?.closingStock ?? 0;
     }
-    let population = 0;
-    for (const block of world.popBlocks) population += populationTotal(block);
     return {
       goodKey: good.key,
       availableQuantityPerCapita: population > 0 ? closing / population : 0,
@@ -1195,13 +1197,20 @@ export function runEconomicDay(
   // refresh. D-126: trim the over-assigned blocks first; only a state that the
   // trim cannot make valid falls back to the dirty full refresh.
   observe?.("employment");
+  // D-157: whether the employment state was validated after its last change today.
+  let employmentValidated = false;
   try {
     assertValidEmploymentState(world, economyDefinitions);
+    employmentValidated = true;
   } catch {
-    if (!repairEmploymentAfterDemography(world, economyDefinitions)) {
+    const repair = repairEmploymentAfterDemographyWithOutcome(world, economyDefinitions);
+    if (!repair.repaired) {
       world.employmentDirty = true;
+    } else {
+      employmentValidated = repair.validated;
     }
   }
+  const refreshDue = isEmploymentRefreshDue(world, dayIndex);
   let employment = refreshEmploymentIfDue(world, economyDefinitions, dayIndex);
   observe?.("migration");
   // P7 (D-154): the monthly labour phase (wages, ceilings, mobility, migration,
@@ -1213,7 +1222,10 @@ export function runEconomicDay(
   if (migration.employmentRefresh !== null) {
     employment = migration.employmentRefresh;
   }
-  assertValidEmploymentState(world, economyDefinitions);
+  // D-157: the check is repeated only when the state may have changed since it last
+  // passed: an employment refresh or the monthly labour phase ran, or the state was not
+  // validated after the day's demography (a full pass, as before, in every such case).
+  if (!employmentValidated || refreshDue || labourMonth.ran) assertValidEmploymentState(world, economyDefinitions);
 
   // E6a pipeline step 2b: consignments whose transit time has elapsed are delivered
   // into their destination markets before that market clears. Delivery is exact-once

@@ -9771,3 +9771,284 @@ perfBench were not run. The app worker bundle grows from 37,034,028 to 37,052,22
 - **Index headings.** This entry is headed like D-154 and D-155 so the index check passes;
   indexing all three is a change of their three headings to `## D-15N — …` and a rerun of
   `scripts/docs/decisions-index.mjs`.
+
+## D-157 (performance) — The simulated day of the 1900 world: exact optimisations, measurements, the A11 budget
+
+**Status:** designer's task of 2026-11-13 ("the 1900-world simulated day becomes at least 5 times
+faster"), branch `perf/day-5x` from `main` at `4bec918`. The performance hold is lifted for this
+task. Every change leaves the simulation bit-for-bit identical (no state, schema, data version,
+save format or hash changes). **The 5× target is not met** (see "Target"): the remaining cost is
+spread over about twenty phases that D-137 and D-139 had already tuned, and the changes that
+would reach it need the designer's decision (a data layout of authoritative state, a change of
+summation order, or threads).
+**Amends:** P5b A11 (budget proposal below); D-133 (finance index cache); D-126 (repair outcome).
+
+### Decision
+
+Exact optimisations (each the same value by construction, checked by the hash test below):
+
+1. **Month-start labour phase: expected incomes memoised** (`mobility.ts`). `expectedIncome` (the
+   Harris–Todaro income of plan §5.2) reads only the block's own state and the phase index, which
+   is fixed for the phase; mobility and migration recomputed it for every candidate of every
+   source (about 20,000 sources × up to ~1,600 provinces), each time summing the block's 202 age
+   cells three times for the housing factor. It is now kept per source block and per destination
+   (province, profession) pair, and the entries of the source and destination of every move are
+   dropped after the move (a move changes no other block and no other pair's block).
+2. **Finance index extended, not rebuilt, when accounts are appended** (`accounts.ts`, D-133).
+   Migration creates blocks (13 on 1 February 1900) between its postings; each creation forced a
+   rebuild of the 481k-account index (with a cache entry whose `WeakMap.set` alone cost about
+   0.15 s). Accounts are only appended, with ids above every existing id, so the shared id map,
+   owner map and dense table are extended after the same duplicate checks; an index handed out
+   earlier answers exactly as before (lookups bounded by its own largest id, its own cash list,
+   its `byId` frozen to its own entries). Any other growth rebuilds as before.
+3. **Labour wage table built once per phase for the local wage index** (`localWages.ts`,
+   `labor.ts`, `technology.ts`, `demographyFactors.ts`). `localWageIndex` built the whole wage
+   table for every country in the demography factors, the training phase and the education
+   phase. The table snapshots only ownership, the labour-law slot and administration quality,
+   which none of these phases changes, so the phase's one table (the D-155 payroll table where the
+   phase has one) is the same table; the politics call, whose phase changes laws and quality, is
+   unchanged.
+4. **Employment validation** (`labourMarket.ts`, `day.ts`). Numeric slot keys instead of
+   `${building}:${profession}` text (same first-use order, so the same first error); id-indexed
+   lookups instead of four maps of pair arrays; the institution profession found once per kind.
+   The D-126 repair sums each block's assigned workers in the former order and builds entries
+   only for blocks with an excess. The check after the labour phase is skipped only when the
+   state passed the check (or the repair's validation) after the day's demography and neither an
+   employment refresh nor the monthly labour phase ran since; otherwise it runs as before.
+5. **Household demand (LES)** (`demandSystem.ts`, `householdDemand.ts`). The knot segment of the
+   block's expenditure ratio x is found once per block (it was searched once per category and
+   twice per good); each good's `weight × (price ÷ reference)^(1−σ)` is kept from the first loop
+   for the shares (the same expression, computed once); the per-good tuple array of the tier loop
+   is gone.
+6. **Month-end wealth inputs** (`day.ts`): the world population was summed once per good (60 ×
+   20,739 blocks); it is summed once, in the same order.
+7. **Age-cell split of a move** (`reclassify.ts`, `apportion.ts`): the keyed tie of a cell is
+   drawn only when the cell competes for a remainder (`apportionLargestRemainderBy`). Almost every
+   cell does, so this saves little; kept because it is the same result with less work.
+8. **Bench and test.** perfPhases also prints the worst day, so `perfPhases 0 32` gives the whole
+   first month's mean and worst day; the hash-equality test below. The app worker bundle is
+   regenerated (it embeds the simulation); the scenario output is unchanged.
+
+Measured savings, ordinary day (perfPhases medians): household demand −65 ms, employment −43 ms
+plus the post-labour check −64 ms (items 4, 5), education −24 ms, training −19 ms, demography
+−21 ms (item 3). Month start (day 31, medians of 3): the monthly labour phase 14,895 → 5,143 ms
+(items 1, 2, 7), the employment phase 498 → 400 ms. Month end (day 30, perfBench's wealth phase
+maximum): 468 → 77 ms (item 6).
+
+### Bit-for-bit identity
+
+`packages/tests/src/determinism/perf-hash-equality.test.ts` ticks the 1900 world (seed 20261023)
+in phase mode, one world in memory (D-155), and compares `hashWorld` with hashes recorded at
+`4bec918` before any change: 0 ticks `685bf3c4ccf4f842`, 1 `203ac9ed7427a6d3`, 31
+`ac6eb8ef4931a5a1`, 52 `5117ab7c9fa446c2`, 53 `9f47fe0e7bde51d8`. The rollback runner gives the
+same hashes. **62 ticks cannot be reached at `4bec918`**: day 53 (23 February 1900) throws in the
+fiscal phase, "insufficient funds; posting would make asset account 1368 negative: 0 +
+-1.7014045183604516e-15 < 0" (staged `tick` and the rollback runner alike; the runner restores
+the start of the day, hash `9f47fe0e7bde51d8`). The test pins that exact message as well; its
+floating-point residue is a bit-level check of the failing computation. The failure itself is a
+pre-existing simulation defect (a sub-ulp debit of an empty account), not changed here.
+
+### Measurements (desktop; not a device measurement)
+
+Environment: AMD Ryzen 5 2600 (6 cores, 12 threads), 7.9 GB RAM, Windows 11 Pro 10.0.26200,
+Node v24.22.1, `--max-old-space-size=4096`; nothing else running. Each figure is the median of
+3 runs (spread = max − min); baseline = `4bec918` built from its own sources, after = this
+branch. The JSON probe is perfPhases' loop with every day recorded (same runner, seed and
+`summary` detail).
+
+**Ordinary days 2–11 (perfPhases, ms per day)**
+
+| Phase | Baseline | After | Ratio |
+|---|---:|---:|---:|
+| settlement | 561.4 | 528.0 | 1.06× |
+| market-clearing | 506.3 | 535.0 | 0.95× |
+| market-household-demand | 306.7 | 241.7 | 1.27× |
+| employment | 147.5 | 104.4 | 1.41× |
+| demography | 146.2 | 125.3 | 1.17× |
+| training | 98.6 | 79.2 | 1.25× |
+| needs | 92.2 | 94.8 | 0.97× |
+| education | 86.3 | 62.5 | 1.38× |
+| trade-dispatch | 72.8 | 70.2 | 1.04× |
+| fiscal | 69.6 | 73.0 | 0.95× |
+| market-production-demand | 64.3 | 70.2 | 0.92× |
+| migration (post-labour check) | 64.3 | 0.0 | – |
+| unrest | 30.8 | 29.3 | 1.05× |
+| politics | 25.4 | 25.1 | 1.01× |
+| finance-close | 21.0 | 20.4 | 1.03× |
+| invariants-end | 20.3 | 17.6 | 1.16× |
+| ai | 17.9 | 18.6 | 0.96× |
+| invariants-start | 15.5 | 14.3 | 1.08× |
+| monetary | 14.9 | 14.8 | 1.01× |
+| fingerprint | 14.4 | 14.4 | 1.00× |
+| debt | 13.0 | 11.5 | 1.13× |
+| others (each < 7) | 15.3 | 16.3 | – |
+| **Mean day** | **2,405.6** | **2,185.4** | **1.10×** |
+
+Runs: baseline 2,314.0 / 2,625.2 / 2,405.6 (spread 311); after 2,205.2 / 2,185.4 / 1,961.3
+(spread 244). JSON probe: baseline 2,341.4 (spread 271), after 2,052.7 (spread 199), 1.14×.
+Phases this entry did not touch move by up to ±8 % between runs (market clearing, fiscal,
+production demand): run-to-run noise of this desktop.
+
+**Whole month, days 0–31 (JSON probe, ms per day)**
+
+| Phase | Baseline | After | Ratio |
+|---|---:|---:|---:|
+| market-clearing | 538.4 | 525.6 | 1.02× |
+| migration (the monthly labour phase) | 524.9 | 161.7 | 3.25× |
+| settlement | 521.9 | 516.3 | 1.01× |
+| market-household-demand | 304.2 | 221.6 | 1.37× |
+| employment | 168.9 | 111.9 | 1.51× |
+| demography | 153.3 | 127.5 | 1.20× |
+| training | 98.7 | 76.6 | 1.29× |
+| needs | 91.1 | 91.8 | 0.99× |
+| trade-dispatch | 88.8 | 85.7 | 1.04× |
+| education | 80.4 | 58.0 | 1.38× |
+| fiscal | 67.8 | 69.2 | 0.98× |
+| market-production-demand | 64.4 | 67.1 | 0.96× |
+| finance-close | 48.6 | 49.3 | 0.98× |
+| politics | 37.0 | 35.5 | 1.04× |
+| unrest | 31.6 | 31.1 | 1.02× |
+| validate-month-end | 29.9 | 30.6 | 0.98× |
+| ai | 23.8 | 22.5 | 1.06× |
+| wealth | 15.6 | 1.8 | 8.52× |
+| others (each < 18) | 103.7 | 98.3 | – |
+| **Mean day** | **3,027.2** | **2,366.9** | **1.28×** |
+
+Runs: baseline 2,923.4 / 3,045.0 / 3,027.2 (spread 122); after 2,502.9 / 2,366.9 / 2,366.0
+(spread 137). Worst day (day 31, 1 February 1900, the first monthly labour phase): baseline
+18,098 / 18,654 / 19,288 ms (median 18,654), after 9,207 / 8,520 / 8,461 ms (median 8,520),
+2.19×. Day 30 (the first month end): baseline 4,955 ms, after 3,837 ms (1.29×).
+
+**perfBench** (`node --max-old-space-size=4096 dist/perfBench.js 52`, medians of 3; baseline →
+after): host STEP day (tick + snapshot + JSON) mean 3,268 → 2,907 ms (1.12×); its tick 2,744 →
+2,376 ms (1.15×); snapshot build 517 → 520 ms; ordinary host days 2,878 → 2,697 ms (1.07×); day 31
+18,733 → 9,405 ms (1.99×); day 30 5,426 → 4,831 ms (1.12×); staged-mode tick 5,848 → 5,528 ms;
+new game (create + first checkpoint) 3,592 → 3,396 ms; SAVE 3,856 → 3,678 ms; LOAD 4,083 →
+3,974 ms. Every run, both builds: hashes at days 1, 31, 32, 52 equal (`203ac9ed7427a6d3`,
+`ac6eb8ef4931a5a1`, `75a4eb1bc3893051`, `5117ab7c9fa446c2`), "two independent runs identical",
+"staged mode equals phase mode" and the save round trip PASS. perfBench's last stage (host
+throughput, after the window) then stops on the day-53 failure in every run of both builds, so
+it writes no `--out` file; the 52-day window is the longest that avoids it.
+
+**Host throughput at the fastest speed** (perfBench's throughput loop from a new game, 30 days/s
+requested, `pump` until 30 days have passed, days 0–32; `scratch` script, not committed):
+baseline 0.345 / 0.346 / 0.341 days/s (median 0.345), after 0.419 / 0.418 / 0.428 (median 0.419),
+1.21×.
+
+**Web app at its top speed (30×)** — `scripts/p7/playtest-labour.mjs` at 844 × 390, the web
+export of each build, seconds from 1 January to February 1900: baseline 82 / 78 / 82 s (median
+82 s, 0.38 days/s), after 60 / 60 / 61 s (median 60 s, 0.52 days/s), 1.37×. 29/29 checks in all six
+runs; the in-game figures are the same (unemployment 3.9 %, 7.58 M changed profession, 2.64 M moved
+province, 13 blocks created). Not a device measurement.
+
+**Snapshot build** (Germany, its first call and the median of 7 repeats, 3 runs): day 0 first
+call 665 → 657 ms, repeat 491 → 474 ms; day 33 first call 824 → 709 ms, repeat 503 → 449 ms. The
+snapshot code is unchanged; it shares the demography factors (item 3). It is not what limits the
+app (about 18 % of a host day in perfBench), so it was left for later.
+
+**`pnpm bench`** (M1/M2 harness, 3 runs each, all PASS, p95 in ms, baseline → after, medians):
+M1 empty world 0.008 → 0.007; M2 aggregate 0.070 → 0.060; stress 200 blocks 2.98 → 2.79,
+1,000 blocks 14.3 → 14.1, 3,000 blocks 49.8 → 46.5, 6,000 blocks 105.5 → 100.4. These paths have
+no economy; the differences are run-to-run noise.
+
+### Target
+
+Not met. The task asked for an ordinary-day mean of at most 1/5 of the baseline (≤ 481 ms of
+2,406) and a whole-month mean of at most 1/5 (≤ 605 ms of 3,027). After: 2,185 ms (1.10×) and
+2,367 ms (1.28×). The month start, which held most of the algorithmic waste, is 2.19× faster;
+the ordinary day is not, because nothing in it is wasteful in the same way: after this entry
+the largest phases are settlement (24 % of the day), market clearing (24 %) and household demand
+(11 %), each already columnar (D-137, D-139), and the rest is twenty phases of 10–125 ms. The
+profile (desktop, ordinary days 2–4, V8 sampling with inlining off for attribution) has no
+function above 7 % of the day; garbage collection is about 10 %. Reaching 5× on the ordinary day
+needs a route below, each of which this task's rules reserve for the designer. Per the task
+(§2), work stopped here instead of cutting model detail (GDD §17J.2.1).
+
+### Proposals (not built; each needs the designer's decision)
+
+The profile after this entry has no phase above about a fifth of the day; the work is the
+per-row cost of 460,000 household demand rows, 58,000 production demands, 250,000 settled
+transactions, 56,000 postings and 20,739 blocks of 202 age cells, carried as JavaScript objects
+and maps, plus the garbage they leave (about a tenth of the day). Three routes reach several
+times faster, and each crosses a rule of this task:
+
+1. **Columnar authoritative state (a save-schema change).** Population cells, block scalars,
+   account balances and stock lots as typed arrays indexed by entity position, with the objects
+   as views. Every phase would then read and write contiguous arrays (demand, market clearing,
+   settlement, demography, needs, validation), the per-day indexes (finance index, block and
+   building maps) would disappear, and the GC would see a few large buffers instead of millions
+   of objects. Results can stay bit-identical if every summation keeps its order, but the save
+   format, `cloneWorld`, `hashWorld`'s encoding input and the validation layer change: schema 36
+   and a migration of saves. Estimated effect: the largest of the three; it is also what makes
+   route 3 possible.
+2. **Fused passes (a change of floating-point results).** Several phases recompute the same
+   per-block quantities (population, working age, eligible workforce, prices by market, owner
+   lookups) and sum them in different orders; settlement aggregates the market postings in a
+   second pass over the transactions it has just prepared. Fusing these passes and sharing one
+   per-day measurement would change summation order in places, so the world hash changes (not
+   the model). It needs the designer's acceptance of new known answers.
+3. **Threads (a runtime change).** Markets clear independently once demand is built (63 markets),
+   household demand and demography are independent per block, and the month-start migration's
+   pressure search is independent per source until moves are applied in draw order. On web a
+   worker pool with `SharedArrayBuffer` (cross-origin isolation required) and on the phone a
+   second JS runtime would split these phases; with route 1 the state can be shared without
+   copying. On a 6-core desktop the market phases would scale well; on a phone with 2 big and
+   4 small cores, perhaps 2–3× on those phases. Not built (outside this task).
+
+Without these, the next exact steps are smaller (each 20–80 ms of an ordinary day): the employment
+check (still two full passes on most days), the wage and domestic-service loops of settlement
+(object spreads per building), trade dispatch's rollback copies (the integrated day owns
+atomicity, as D-139 did for finance), the needs result objects in summary detail, and the
+month-end validation's rebuilt account map.
+
+### A11 budget proposal
+
+A11 (P5b) set the ordinary day at ≤ 450 ms in Node (1.5× the 301 ms of 2026-11-06); P5b step 4
+measured 564 ms, and P6 and P7 (the demand system, the labour market, the employers) brought the
+day to 2.4 s at `4bec918`. That figure is no longer a working budget. Proposed, for the designer:
+
+- **A11a, regression guard (reference desktop, Node, perfPhases, median of 3):** ordinary day
+  (days 2–11) ≤ 2,500 ms; whole first month (days 0–31) mean ≤ 2,700 ms; worst day of that month
+  ≤ 10,000 ms; a change that exceeds one of these reports why. (About 1.15× the D-157 figures;
+  the run-to-run spread of this desktop is about ±6 %.)
+- **A11b, phases that grow with the goods:** kept as written (≤ 2× their current time), with
+  D-157's per-phase table as the reference.
+- **A11c, the 5× aim:** ordinary day ≤ 480 ms and month mean ≤ 600 ms (1/5 of `4bec918`), and the
+  app's top speed ≥ 5× its `4bec918` rate, scheduled with whichever route below the designer
+  chooses; not reachable with exact, layout-preserving changes alone.
+
+### Consequences and open items
+
+- **Day 53 fails at `4bec918` and on this branch alike** (23 February 1900, fiscal phase,
+  account 1368, a debit of 1.7e-15 RUSD from a zero balance). The 1900 world cannot run past
+  23 February 1900 from a new game; the P7 playtest stops on 1 February and so does not reach it.
+  perfBench's throughput stage, which continues the host after its window, stops there too (any
+  window of at least 33 days plus 30 throughput days crosses day 53), so its throughput was
+  measured from a new game over days 0–29 instead (figures above). A behaviour fix (a tolerance
+  on sub-ulp debits of empty accounts, or the cause in the fiscal posting) is the designer's call;
+  it would change the 53-tick hash, which this entry pins.
+- **`pnpm map:atlas:check` fails on `main`** (stale `atlas-v1.html`; only minified identifiers
+  differ), also with this entry's changes stashed; the map was not touched, so the atlas was not
+  regenerated here.
+- **The snapshot build** (about 490 ms on day 0, 670 ms on its first call) is unchanged: the
+  simulation, not the snapshot, limits the app's rate (the snapshot is about 18 % of a STEP).
+- **Index heading:** headed like D-154 to D-156 so the index check passes.
+- **Tests.** `determinism/perf-hash-equality.test.ts` (new) passes; it runs 53 days of the 1900
+  world and takes about 20 minutes under ts-jest, so the full `pnpm test` grows from about 101 to
+  121 minutes (7,236 s; 110 suites, 1,462 tests). The eleven known failures of `main` fail with
+  the same received values: replay empty-world digest `6aef674f9648abdd`; WPP 1950
+  `9aaedfa0cfabe4f6`; tick-validation 22 ticks `b37dad865f6ff868`; economy-roundtrip M3a
+  `c7f29aa27a231428`; naming-audits 1900-world hash `685bf3c4ccf4f842`; the four P2b
+  money-calibration tests (`historical/p7/employment_1900.json`, 0, 17.14753424657534,
+  0.06354578421472346); demography-causes urban rows 5,687 of 20,739; world-1900 cotton
+  1.3558462628762207. No digest was re-pinned.
+- **Rollback tests (`determinism/rollback.test.ts`).** Their failure injection throws on the
+  n-th read of `definitions.buildings` in a day, and item 4 changed how often a day reads it
+  (once per employment check instead of twice; the post-labour check skipped when its state was
+  validated and unchanged). Three tests then reached the end of the day without the injected
+  failure. Traced read by read: reads 8 (the market's capacity index) and 9 (the production
+  demands) of an ordinary day at `4bec918` are reads 4 and 5 now, so those tests use 4 and 5 and
+  fail at the same place as before, with their assertions (rolled-back day, cause, hashes,
+  integrity failure) unchanged; D-155 made the same adjustment for the same reason. The suite
+  passes (11 of 11) after the change; the full run above had these 3 failures besides the
+  eleven known ones.

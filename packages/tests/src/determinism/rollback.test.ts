@@ -41,6 +41,11 @@ function context(scenario: EconomyScenarioDef): TickContext {
  * D-155: in the labour-market day the 3rd to 6th reads (0-based 2-5) fall inside the
  * post-demography employment check (D-126), which answers any failure with a repair or a
  * full refresh, so the injections use reads 6-9, which fail the day.
+ * D-157: the employment check reads `buildings` once instead of twice, and the check
+ * after the labour phase is skipped when the state it would check was validated and has
+ * not changed. On an ordinary day the employment check is now reads 2-3, and the former
+ * reads 8 (the market's capacity index) and 9 (the production demands) are reads 4 and 5;
+ * the tests that used 8 and 9 use 4 and 5, so each still fails at the same place.
  */
 function failingDefinitions(definitions: EconomyDefinitions): {
   readonly definitions: EconomyDefinitions;
@@ -154,7 +159,7 @@ describe("P1 rollback", () => {
     const world = createEconomyWorld(SCENARIO, { seed: SEED });
     const runner = createRollbackRunner(world);
     runTicksWithRollback(runner, 33, ctx);
-    injected.arm(9);
+    injected.arm(5);
     let caught: unknown;
     try {
       runTicksWithRollback(runner, 1, ctx);
@@ -196,7 +201,7 @@ describe("P1 rollback", () => {
     checkpointRollbackRunner(runner);
     runTicksWithRollback(runner, 3, ctx);
     const before = hashWorld(world);
-    injected.arm(8);
+    injected.arm(4);
     expect(() => runTicksWithRollback(runner, 1, ctx)).toThrow(DayRolledBackError);
     expect(hashWorld(world)).toBe(before);
   });
@@ -214,7 +219,7 @@ describe("P1 rollback", () => {
     if (market === undefined) throw new Error("fixture has no market");
     // Changed without a checkpoint: the replay cannot reproduce it.
     market.priceRUSD = market.priceRUSD.map((price) => price * 1.5);
-    injected.arm(8);
+    injected.arm(4);
     expect(() => runTicksWithRollback(runner, 1, ctx)).toThrow(IntegrityFailureError);
     // The live world is left at the last checkpoint, never at a partial day.
     expect(hashWorld(world)).toBe(REFERENCE[0]);

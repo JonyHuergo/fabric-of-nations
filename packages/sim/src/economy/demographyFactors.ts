@@ -38,6 +38,7 @@ import {
   technologyMortalityFactor,
   technologySanitationKnowledge,
 } from "./technology.js";
+import { buildLabourWageTable, type LabourWageTable } from "./labourMarket.js";
 import type { EconomyDefinitions } from "./types.js";
 
 /** Demographic causes of one country from its start-of-day state. */
@@ -46,9 +47,11 @@ export function demographyFactorsForCountry(
   definitions: EconomyDefinitions | undefined,
   country: World["countries"][number],
   countryPopulation: CountryPopulationIndex,
+  /** D-157: one wage table for all countries of the same state (see `localWageIndex`). */
+  wages?: () => LabourWageTable,
 ): DemographyCountryFactors & { readonly healthServiceOutput: number } {
   const technology = world.technology.enabled && definitions?.technology !== undefined;
-  const health = deriveHealth(world, country, definitions, countryPopulation);
+  const health = deriveHealth(world, country, definitions, countryPopulation, wages);
   const technologyFactor = technology ? technologyMortalityFactor(country, definitions) : 1;
   const hoursFactor = laborHoursMortalityFactor(country, definitions);
   return {
@@ -69,8 +72,11 @@ export function demographyFactorsByCountry(
   const result = new Map<Id, DemographyCountryFactors>();
   if (world.countries.length === 0) return result;
   const countryPopulation = buildCountryPopulationIndex(world);
+  // D-157: the derivations are pure, so one wage table (built on first need) serves all.
+  let table: LabourWageTable | undefined;
+  const wages = (): LabourWageTable => (table ??= buildLabourWageTable(world, definitions as EconomyDefinitions));
   for (const country of world.countries) {
-    const factors = demographyFactorsForCountry(world, definitions, country, countryPopulation);
+    const factors = demographyFactorsForCountry(world, definitions, country, countryPopulation, wages);
     result.set(country.id, {
       healthFactor: factors.healthFactor,
       sanitationCoverage: factors.sanitationCoverage,

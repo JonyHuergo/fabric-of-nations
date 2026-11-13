@@ -20,6 +20,7 @@ import {
   assertValidLabourEmployment,
   refreshLabourEmployment,
   repairLabourEmploymentAfterDemography,
+  repairLabourEmploymentWithOutcome,
 } from "./labourMarket.js";
 import type {
   BuildingDef,
@@ -198,6 +199,15 @@ export function repairEmploymentAfterDemography(
 ): boolean {
   requireLabourMarket(world);
   return repairLabourEmploymentAfterDemography(world, definitions);
+}
+
+/** D-157: `repairEmploymentAfterDemography`, also saying whether the repaired state was validated. */
+export function repairEmploymentAfterDemographyWithOutcome(
+  world: World,
+  definitions: EconomyDefinitions,
+): { readonly repaired: boolean; readonly validated: boolean } {
+  requireLabourMarket(world);
+  return repairLabourEmploymentWithOutcome(world, definitions);
 }
 
 /** Run employment evaluation only when the calendar or dirty state requires it. */

@@ -2338,22 +2338,68 @@ export function findAccountsBySubtype(
 
 /**
  * Built indexes per accounts array (D-133). An index is a read-only view whose
- * duplicate checks passed when it was built; appending accounts changes the array
- * length and forces a rebuild with the checks. Ids, owners and subtypes are
- * immutable, so a cached index always equals a fresh build.
+ * duplicate checks passed when it was built. Ids, owners and subtypes are immutable,
+ * so a cached index always equals a fresh build.
+ *
+ * D-157: accounts are only ever appended, each creator taking `finance.nextAccountId`, so
+ * new accounts have ids above every existing id. When the cached array has grown that
+ * way, the cached index is extended instead of rebuilt (a month-start migration creates
+ * blocks between its postings, and every rebuild of the 481k-account index, with its
+ * cache entry, cost about a quarter of a second): the id map, the owner map and the dense
+ * id table are shared and grow, the new accounts pass the duplicate checks a fresh build
+ * applies (otherwise the fresh build runs and reports them), and a new index object
+ * answers for the longer array. An index object handed out earlier answers exactly as it
+ * did: its lookups are bounded by the largest id it was built with, its `byId` becomes a
+ * view of its own entries, and it keeps its own cash list and lazily built tables. Any
+ * other growth (an id that does not increase, a sparse id range) rebuilds as before.
  */
-const financeIndexCache = new WeakMap<readonly FinancialAccount[], { readonly length: number; readonly index: FinanceIndex }>();
+interface FinanceIndexCore {
+  readonly accounts: readonly FinancialAccount[];
+  readonly byId: Map<Id, FinancialAccount>;
+  readonly byOwner: Map<number | string, FinancialAccount>;
+  /** Id-indexed table (shared; grows with the extension), or null for sparse ids. */
+  readonly dense: (FinancialAccount | undefined)[] | null;
+  maxId: number;
+}
+
+interface FinanceIndexCacheEntry {
+  length: number;
+  index: FinanceIndex;
+  /** Freezes `index` at its own accounts before the shared tables grow. */
+  retire: () => void;
+  cash: readonly FinancialAccount[];
+  readonly core: FinanceIndexCore;
+}
+
+const financeIndexCache = new WeakMap<readonly FinancialAccount[], FinanceIndexCacheEntry>();
 
 export function buildFinanceIndex(finance: FinanceState): FinanceIndex {
   const cached = financeIndexCache.get(finance.accounts);
   if (cached !== undefined && cached.length === finance.accounts.length) return cached.index;
-  const index = buildFinanceIndexUncached(finance);
-  financeIndexCache.set(finance.accounts, { length: finance.accounts.length, index });
-  return index;
+  if (cached !== undefined && cached.length < finance.accounts.length && extendFinanceIndex(cached)) {
+    return cached.index;
+  }
+  const accounts = requireArray(finance.accounts, "finance.accounts") as FinancialAccount[];
+  const entry = buildFinanceIndexEntry(accounts);
+  financeIndexCache.set(finance.accounts, entry);
+  return entry.index;
 }
 
-function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
-  const accounts = requireArray(finance.accounts, "finance.accounts") as FinancialAccount[];
+/**
+ * E6b external-counterparty accounts are per-country system accounts addressed by their
+ * explicit monetary-state ids; they are the documented duplicate exception (D-080). They
+ * are never looked up by owner/subtype.
+ */
+function isPerCountryExternalAccount(account: FinancialAccount): boolean {
+  return (
+    account.ownerKind === "system" &&
+    (account.subtype === "external-cash" ||
+      account.subtype === "external-currency-holding" ||
+      account.subtype === "external-equity")
+  );
+}
+
+function buildFinanceIndexEntry(accounts: readonly FinancialAccount[]): FinanceIndexCacheEntry {
   const byId = new Map<Id, FinancialAccount>();
   const byOwner = new Map<number | string, FinancialAccount>();
   const cash: FinancialAccount[] = [];
@@ -2363,14 +2409,7 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
     }
     byId.set(account.id, account);
     const key = ownerKey(account.ownerKind, account.ownerId, account.subtype);
-    // E6b external-counterparty accounts are per-country system accounts addressed by
-    // their explicit monetary-state ids; they are the documented duplicate exception
-    // (D-080). They are never looked up by owner/subtype.
-    const perCountryExternalAccount =
-      account.ownerKind === "system" &&
-      (account.subtype === "external-cash" ||
-        account.subtype === "external-currency-holding" ||
-        account.subtype === "external-equity");
+    const perCountryExternalAccount = isPerCountryExternalAccount(account);
     if (byOwner.has(key) && !perCountryExternalAccount) {
       throw new RangeError(
         `duplicate ${account.subtype} account for ${account.ownerKind} ${String(account.ownerId)}`,
@@ -2389,13 +2428,122 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
       ? new Array<FinancialAccount | undefined>(maxId + 1).fill(undefined)
       : null;
   if (dense !== null) for (const account of accounts) dense[account.id] = account;
+  const core: FinanceIndexCore = { accounts, byId, byOwner, dense, maxId };
+  const view = financeIndexView(core, maxId, cash);
+  return { length: accounts.length, index: view.index, retire: view.retire, cash, core };
+}
+
+/** D-157: extend the cached index by the appended accounts; false when a fresh build must run. */
+function extendFinanceIndex(entry: FinanceIndexCacheEntry): boolean {
+  const core = entry.core;
+  const accounts = core.accounts;
+  const dense = core.dense;
+  if (dense === null) return false;
+  const from = entry.length;
+  const to = accounts.length;
+  // Every check runs before a shared table changes.
+  let maxId = core.maxId;
+  const keys: (number | string)[] = [];
+  const newKeys = new Set<number | string>();
+  for (let position = from; position < to; position += 1) {
+    const account = accounts[position];
+    if (account === undefined || !Number.isSafeInteger(account.id) || !(account.id > maxId)) return false;
+    maxId = account.id;
+    const key = ownerKey(account.ownerKind, account.ownerId, account.subtype);
+    if (!isPerCountryExternalAccount(account)) {
+      if (core.byOwner.has(key) || newKeys.has(key)) return false;
+      newKeys.add(key);
+    }
+    keys.push(key);
+  }
+  if (!(maxId <= to * 4 + 1024)) return false;
+  entry.retire();
+  const added: FinancialAccount[] = [];
+  for (let position = from; position < to; position += 1) {
+    const account = accounts[position] as FinancialAccount;
+    core.byId.set(account.id, account);
+    if (!isPerCountryExternalAccount(account)) core.byOwner.set(keys[position - from] as number | string, account);
+    if (isCashAccount(account)) added.push(account);
+    while (dense.length < account.id) dense.push(undefined);
+    dense[account.id] = account;
+  }
+  core.maxId = maxId;
+  const cash = [...entry.cash, ...added];
+  cash.sort((left, right) => left.id - right.id);
+  const view = financeIndexView(core, maxId, cash);
+  entry.length = to;
+  entry.cash = cash;
+  entry.index = view.index;
+  entry.retire = view.retire;
+  return true;
+}
+
+/** The first `size` entries of a map whose later entries all have keys above `limitId`. */
+function boundedIdMap(
+  map: ReadonlyMap<Id, FinancialAccount>,
+  limitId: number,
+  size: number,
+): ReadonlyMap<Id, FinancialAccount> {
+  function* entries(): Generator<[Id, FinancialAccount]> {
+    let count = 0;
+    for (const entry of map) {
+      if (count >= size) return;
+      count += 1;
+      yield entry;
+    }
+  }
+  const view = {
+    get size(): number {
+      return size;
+    },
+    get(id: Id): FinancialAccount | undefined {
+      return id <= limitId ? map.get(id) : undefined;
+    },
+    has(id: Id): boolean {
+      return id <= limitId && map.has(id);
+    },
+    forEach(
+      callback: (value: FinancialAccount, key: Id, owner: ReadonlyMap<Id, FinancialAccount>) => void,
+      thisArg?: unknown,
+    ): void {
+      for (const [key, value] of entries()) {
+        callback.call(thisArg, value, key, view as unknown as ReadonlyMap<Id, FinancialAccount>);
+      }
+    },
+    entries,
+    *keys(): Generator<Id> {
+      for (const [key] of entries()) yield key;
+    },
+    *values(): Generator<FinancialAccount> {
+      for (const [, value] of entries()) yield value;
+    },
+    [Symbol.iterator]: entries,
+  };
+  return view as unknown as ReadonlyMap<Id, FinancialAccount>;
+}
+
+/**
+ * The index object over `core` as built for accounts with ids up to `limitId`. `retire`
+ * freezes its `byId` at its own entries before the shared map grows (D-157).
+ */
+function financeIndexView(
+  core: FinanceIndexCore,
+  limitId: number,
+  cash: readonly FinancialAccount[],
+): { readonly index: FinanceIndex; readonly retire: () => void } {
+  const { accounts, byOwner, dense } = core;
+  let byId: ReadonlyMap<Id, FinancialAccount> = core.byId;
+  const byIdSize = core.byId.size;
+  const retire = (): void => {
+    byId = boundedIdMap(core.byId, limitId, byIdSize);
+  };
   // Positions by account id, built on first use (D-139): an index rebuilt after every
   // account creation (migration) must not pay for tables nobody reads.
   let positions: Map<Id, number> | null = null;
   let densePositions: Int32Array | null = null;
   const buildPositions = (): void => {
     positions = new Map<Id, number>();
-    if (dense !== null) densePositions = new Int32Array(maxId + 1).fill(-1);
+    if (dense !== null) densePositions = new Int32Array(limitId + 1).fill(-1);
     for (let position = 0; position < accounts.length; position += 1) {
       const account = accounts[position] as FinancialAccount;
       if (densePositions !== null) {
@@ -2468,13 +2616,17 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
       const table = tableFor(ownerKind, subtype);
       if (ownerId >= table.length) return undefined;
       const id = table[ownerId] ?? -1;
-      return id < 0 ? undefined : dense[id];
+      // D-157: accounts appended after this index was built are not part of it.
+      return id < 0 || id > limitId ? undefined : dense[id];
     }
-    return byOwner.get(ownerKey(ownerKind, ownerId, subtype));
+    const found = byOwner.get(ownerKey(ownerKind, ownerId, subtype));
+    return found !== undefined && found.id > limitId ? undefined : found;
   };
-  return {
+  const index: FinanceIndex = {
     accounts,
-    byId,
+    get byId(): ReadonlyMap<Id, FinancialAccount> {
+      return byId;
+    },
     position(id) {
       if (positions === null) buildPositions();
       if (densePositions !== null) {
@@ -2487,6 +2639,7 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
       return tableFor(ownerKind, subtype);
     },
     account(id) {
+      if (id > limitId) return undefined;
       if (dense !== null && Number.isInteger(id) && id >= 0 && id < dense.length) return dense[id];
       return byId.get(id);
     },
@@ -2506,6 +2659,7 @@ function buildFinanceIndexUncached(finance: FinanceState): FinanceIndex {
       return cash;
     },
   };
+  return { index, retire };
 }
 
 /** One opening balance to apply. */

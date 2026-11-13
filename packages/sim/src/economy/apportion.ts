@@ -13,6 +13,20 @@ export function apportionLargestRemainder(
   weights: readonly number[],
   tieKeys: readonly number[],
 ): number[] {
+  return apportionLargestRemainderBy(total, weights, (index) => tieKeys[index] ?? 0);
+}
+
+/**
+ * D-157: `apportionLargestRemainder` with each tie key read on demand. `tieOf(index)` is
+ * called only for the units that compete for a remainder (whole share below the weight),
+ * the only keys the ordering reads, so for a pure `tieOf` the result is that of the array
+ * form with `tieKeys[index] = tieOf(index)`.
+ */
+export function apportionLargestRemainderBy(
+  total: number,
+  weights: readonly number[],
+  tieOf: (index: number) => number,
+): number[] {
   if (!Number.isInteger(total) || total < 0) {
     throw new RangeError("apportionment total must be a non-negative integer");
   }
@@ -43,7 +57,7 @@ export function apportionLargestRemainder(
       remainders.push({
         index,
         remainder: exact - whole,
-        tie: tieKeys[index] ?? 0,
+        tie: tieOf(index),
       });
     }
   }

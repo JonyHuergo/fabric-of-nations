@@ -133,10 +133,60 @@ interface PhaseIndex {
   readonly provinceUrban: ReadonlyMap<Id, number>;
   /** `${province}:${profession}` → [urban vacancies, all vacancies, urban offered, all offered]. */
   readonly settlementSlots: ReadonlyMap<string, [number, number, number, number]>;
+  /**
+   * D-157: memos of `expectedIncome` for the phase, which reads only the block's own state
+   * (people by age, literacy, dwellings, smoothed income) and this index (fixed for the
+   * phase). By source block id; and by (province, profession) pair for a destination,
+   * whose value is that of the pair's block in `blockByKey` (or of no block). After every
+   * move the entries of its source and destination blocks and of their pairs are dropped
+   * (`forgetMovedIncomes`); a move changes no other block and no other pair's block.
+   */
+  readonly incomeByBlock: Map<Id, number>;
+  readonly incomeByPair: Map<number, number>;
 }
 
 function countsOf(index: PhaseIndex, provinceId: Id): LabourCounts | undefined {
   return index.measured.byProvince.get(provinceId);
+}
+
+/** Numeric (province, profession) key, or -1 for an id outside the profession range. */
+function pairKey(index: PhaseIndex, provinceId: Id, professionId: Id): number {
+  const count = index.measured.professionCount;
+  return Number.isInteger(professionId) && professionId >= 0 && professionId < count && Number.isSafeInteger(provinceId * count)
+    ? provinceId * count + professionId
+    : -1;
+}
+
+/** D-157: a source block's expected income through the memo; the same value as a fresh call. */
+function sourceExpectedIncome(index: PhaseIndex, profession: ProfessionDef, block: PopBlock): number {
+  const known = index.incomeByBlock.get(block.id);
+  if (known !== undefined) return known;
+  const value = expectedIncome(index, block.provinceId, profession, block);
+  index.incomeByBlock.set(block.id, value);
+  return value;
+}
+
+/**
+ * D-157: the expected income of the destination block of (province, profession) as the
+ * phase finds it (`blockByKey`), through the memo; the same value as a fresh call.
+ */
+function destinationExpectedIncome(index: PhaseIndex, context: ReclassifyContext, provinceId: Id, profession: ProfessionDef): number {
+  const key = pairKey(index, provinceId, profession.id);
+  if (key >= 0) {
+    const known = index.incomeByPair.get(key);
+    if (known !== undefined) return known;
+  }
+  const value = expectedIncome(index, provinceId, profession, context.blockByKey.get(blockKey(provinceId, profession.id)));
+  if (key >= 0) index.incomeByPair.set(key, value);
+  return value;
+}
+
+/** D-157: a move changed its source and destination blocks; drop their memo entries. */
+function forgetMovedIncomes(index: PhaseIndex, source: PopBlock, destination: PopBlock): void {
+  index.incomeByBlock.delete(source.id);
+  index.incomeByBlock.delete(destination.id);
+  index.incomeByPair.delete(pairKey(index, source.provinceId, source.professionId));
+  index.incomeByPair.delete(pairKey(index, destination.provinceId, destination.professionId));
 }
 
 function expectedIncome(index: PhaseIndex, provinceId: Id, profession: ProfessionDef, block: PopBlock | undefined): number {
@@ -260,6 +310,8 @@ function buildPhaseIndex(world: World, definitions: EconomyDefinitions, dayIndex
     provincePull,
     provinceUrban,
     settlementSlots,
+    incomeByBlock: new Map(),
+    incomeByPair: new Map(),
   };
 }
 
@@ -319,7 +371,7 @@ function runMobility(index: PhaseIndex, context: ReclassifyContext, dayIndex: Da
     if (sourceProfession === undefined) continue;
     const provinceId = source.provinceId;
     const sourceEligible = labourEligibleWorkforce(source, sourceProfession);
-    const income = expectedIncome(index, provinceId, sourceProfession, source);
+    const income = sourceExpectedIncome(index, sourceProfession, source);
     const countryId = owners.get(provinceId);
     const cashPerPerson = householdCashBalance(context, source.id) / persons;
     const candidates: { profession: ProfessionDef; pressure: number; desired: number }[] = [];
@@ -331,8 +383,7 @@ function runMobility(index: PhaseIndex, context: ReclassifyContext, dayIndex: Da
       }
       const selective = professionHasGate(profession, "literacy");
       if (selective && movablePeople(source, true) <= 0) continue;
-      const destination = context.blockByKey.get(blockKey(provinceId, profession.id));
-      const pressure = Math.log(expectedIncome(index, provinceId, profession, destination) / income) - MOBILITY_THRESHOLD;
+      const pressure = Math.log(destinationExpectedIncome(index, context, provinceId, profession) / income) - MOBILITY_THRESHOLD;
       if (!(pressure > 0)) continue;
       candidates.push({ profession, pressure, desired: MOBILITY_RATE_PER_PRESSURE * pressure * persons });
     }
@@ -362,11 +413,12 @@ function runMobility(index: PhaseIndex, context: ReclassifyContext, dayIndex: Da
       }
       if (count < 1) continue;
       const carried = Math.max(0, 1 - Math.abs(urbanFraction(index, provinceId, profession) - source.urbanShare));
-      moveBlockPeople(context, source, provinceId, profession.id, count, {
+      const moved = moveBlockPeople(context, source, provinceId, profession.id, count, {
         selectiveLiterate: selective,
         destinationUrbanFraction: urbanFraction(index, provinceId, profession),
         carriedDwellingShare: carried,
       });
+      forgetMovedIncomes(index, source, moved.destination);
       roomUsed.set(key, (roomUsed.get(key) ?? 0) + count * workerPerMover);
       if (countryPlaces !== undefined) countryPlaces.set(profession.id, (countryPlaces.get(profession.id) ?? 0) - count);
       left -= count;
@@ -406,7 +458,7 @@ function runLabourMigration(index: PhaseIndex, context: ReclassifyContext, dayIn
     const profession = index.professionById.get(source.professionId);
     if (profession === undefined) continue;
     const sourceOwner = owners.get(source.provinceId) ?? null;
-    const income = expectedIncome(index, source.provinceId, profession, source);
+    const income = sourceExpectedIncome(index, profession, source);
     const eligible = labourEligibleWorkforce(source, profession);
     const workerPerMover = eligible > 0 ? eligible / persons : profession.participationRate;
     let best: { provinceId: Id; pressure: number; draw: number; people: number } | null = null;
@@ -416,13 +468,13 @@ function runLabourMigration(index: PhaseIndex, context: ReclassifyContext, dayIn
       if (destinationOwner !== sourceOwner) {
         if (destinationOwner === null || countryById.get(destinationOwner)?.immigrationOpen !== true) continue;
       }
-      const destination = context.blockByKey.get(blockKey(provinceId, profession.id));
-      const pressure = Math.log(expectedIncome(index, provinceId, profession, destination) / income) - LABOUR_MIGRATION_THRESHOLD;
+      const pressure = Math.log(destinationExpectedIncome(index, context, provinceId, profession) / income) - LABOUR_MIGRATION_THRESHOLD;
       if (!(pressure > 0)) continue;
       if (best !== null && pressure < best.pressure) continue;
       let people = Math.floor(persons * Math.min(MIGRATION_MONTHLY_MAX_FRACTION, LABOUR_MIGRATION_RATE_PER_PRESSURE * pressure));
       const cap = Math.floor((standing.get(provinceId) ?? 0) * MIGRATION_MONTHLY_INFLOW_CAP_FRACTION) - (inflow.get(provinceId) ?? 0);
       people = Math.min(people, cap);
+      const destination = context.blockByKey.get(blockKey(provinceId, profession.id));
       if (destination === undefined || populationTotal(destination) <= 0) {
         // Toward jobs only where the profession has no people yet.
         const room = roomOf(index, provinceId, profession.id) - (roomUsed.get(blockKey(provinceId, profession.id)) ?? 0);
@@ -437,11 +489,12 @@ function runLabourMigration(index: PhaseIndex, context: ReclassifyContext, dayIn
     if (best === null) continue;
     const destination = context.blockByKey.get(blockKey(best.provinceId, profession.id));
     const fraction = destination !== undefined && populationTotal(destination) > 0 ? destination.urbanShare : urbanFraction(index, best.provinceId, profession);
-    moveBlockPeople(context, source, best.provinceId, profession.id, best.people, {
+    const moved = moveBlockPeople(context, source, best.provinceId, profession.id, best.people, {
       selectiveLiterate: false,
       destinationUrbanFraction: fraction,
       carriedDwellingShare: 0,
     });
+    forgetMovedIncomes(index, source, moved.destination);
     inflow.set(best.provinceId, (inflow.get(best.provinceId) ?? 0) + best.people);
     const key = blockKey(best.provinceId, profession.id);
     roomUsed.set(key, (roomUsed.get(key) ?? 0) + best.people * workerPerMover);

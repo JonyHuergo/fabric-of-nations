@@ -33,7 +33,7 @@ import type { World } from "../world.js";
 import { postJournalBatch } from "./accounting.js";
 import { categoryForSubtype } from "./accounts.js";
 import { MOBILITY_AGE_REMAINDER_PURPOSE } from "./constants.js";
-import { apportionLargestRemainder } from "./apportion.js";
+import { apportionLargestRemainderBy } from "./apportion.js";
 import type { AccountSubtype, EconomyDefinitions, FinancialAccount } from "./types.js";
 import { WORKING_AGE_END, WORKING_AGE_START } from "../population/constants.js";
 
@@ -115,10 +115,10 @@ function splitCells(
   }
   const available = weights.reduce((sum, value) => sum + value, 0);
   if (count > available) throw new RangeError("reclassification moves more people than the source can provide");
-  const ties = weights.map((_, index) =>
+  // D-157: the keyed tie of a cell is drawn only when the cell competes for a remainder.
+  const allocation = apportionLargestRemainderBy(count, weights, (index) =>
     drawUint32({ seed: context.world.seed, day: context.dayIndex, entityId: source.id, purpose: MOBILITY_AGE_REMAINDER_PURPOSE, drawIndex: index }),
   );
-  const allocation = apportionLargestRemainder(count, weights, ties);
   return {
     male: Uint32Array.from(allocation.slice(0, ages)),
     female: Uint32Array.from(allocation.slice(ages)),

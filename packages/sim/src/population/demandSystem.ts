@@ -230,8 +230,12 @@ function segmentOf(knotRatio: Float64Array, x: number): number {
 
 /** G_k(x) = ∫₁ˣ β_k(u) du for x ≥ 1 (exact for the piecewise-linear schedule). */
 export function cumulativeSupernumeraryShare(system: ResolvedDemandSystem, category: number, x: number): number {
+  return cumulativeShareInSegment(system, category, x, segmentOf(system.knotRatio, x));
+}
+
+/** D-157: `cumulativeSupernumeraryShare` with the knot segment of x already found. */
+function cumulativeShareInSegment(system: ResolvedDemandSystem, category: number, x: number, segment: number): number {
   const { knotRatio, knotShare, knotCumulative } = system;
-  const segment = segmentOf(knotRatio, x);
   if (segment < 0) return (knotShare[0]?.[category] ?? 0) * (x - 1);
   const r0 = knotRatio[segment] ?? 0;
   const g0 = knotCumulative[segment]?.[category] ?? 0;
@@ -245,8 +249,12 @@ export function cumulativeSupernumeraryShare(system: ResolvedDemandSystem, categ
 
 /** α_g(x): the good's weight at ratio x (linear between knots, constant outside). */
 export function goodWeightAt(system: ResolvedDemandSystem, goodId: number, x: number): number {
+  return goodWeightInSegment(system, goodId, x, segmentOf(system.knotRatio, x));
+}
+
+/** D-157: `goodWeightAt` with the knot segment of x already found. */
+function goodWeightInSegment(system: ResolvedDemandSystem, goodId: number, x: number, segment: number): number {
   const { knotRatio, knotWeight } = system;
-  const segment = segmentOf(knotRatio, x);
   if (segment < 0) return knotWeight[0]?.[goodId] ?? 0;
   const w0 = knotWeight[segment]?.[goodId] ?? 0;
   if (segment === knotRatio.length - 1) return w0;
@@ -290,6 +298,8 @@ export interface DemandPlanOutput {
   /** Scratch per category (no allocation per block). */
   readonly scratchSpend: Float64Array;
   readonly scratchWeight: Float64Array;
+  /** D-157: scratch per good: weight × (price ÷ reference)^(1 − σ) of a good that takes a share, else NaN. */
+  readonly scratchGoodWeight: Float64Array;
   /** Scalars of the last plan. */
   committedCost: number;
   income: number;
@@ -306,6 +316,7 @@ export function createDemandPlanOutput(system: ResolvedDemandSystem): DemandPlan
     categorySpend: new Float64Array(system.categoryKeys.length),
     scratchSpend: new Float64Array(system.categoryKeys.length),
     scratchWeight: new Float64Array(system.categoryKeys.length),
+    scratchGoodWeight: new Float64Array(system.goodCount),
     committedCost: 0,
     income: 0,
     consumption: 0,
@@ -371,18 +382,25 @@ export function planHouseholdDemand(system: ResolvedDemandSystem, input: DemandP
   let spendClosed = 0;
   const spend = out.scratchSpend;
   const weightSum = out.scratchWeight;
+  // D-157: x is the same for every category and good, so its knot segment is found once;
+  // each good's weighted price term is kept for the shares below (the same value).
+  const segment = segmentOf(system.knotRatio, x);
+  const goodWeight = out.scratchGoodWeight;
   for (let category = 0; category < categoryCount; category += 1) {
-    const value = committedCost * cumulativeSupernumeraryShare(system, category, x);
+    const value = committedCost * cumulativeShareInSegment(system, category, x, segment);
     spend[category] = value;
     const sigma = system.categorySigma[category] ?? 1;
     let sum = 0;
     const goodIds = system.categoryGoods[category] as Int32Array;
     for (let index = 0; index < goodIds.length; index += 1) {
       const goodId = goodIds[index] as number;
+      goodWeight[goodId] = Number.NaN;
       if (input.available[goodId] !== 1 || !((retail[goodId] ?? 0) > 0)) continue;
-      const weight = goodWeightAt(system, goodId, x) * (input.taste?.[goodId] ?? 1);
+      const weight = goodWeightInSegment(system, goodId, x, segment) * (input.taste?.[goodId] ?? 1);
       if (!(weight > 0)) continue;
-      sum += weight * Math.pow((retail[goodId] ?? 0) / (system.referencePrice[goodId] ?? 1), 1 - sigma);
+      const term = weight * Math.pow((retail[goodId] ?? 0) / (system.referencePrice[goodId] ?? 1), 1 - sigma);
+      goodWeight[goodId] = term;
+      sum += term;
     }
     weightSum[category] = sum;
     if (sum > 0) spendOpen += value;
@@ -394,15 +412,13 @@ export function planHouseholdDemand(system: ResolvedDemandSystem, input: DemandP
     if (!(sum > 0)) continue;
     const categoryValue = (spend[category] ?? 0) * scale;
     categorySpend[category] = (categorySpend[category] ?? 0) + categoryValue;
-    const sigma = system.categorySigma[category] ?? 1;
     const goodIds = system.categoryGoods[category] as Int32Array;
     for (let index = 0; index < goodIds.length; index += 1) {
       const goodId = goodIds[index] as number;
       const price = retail[goodId] ?? 0;
-      if (input.available[goodId] !== 1 || !(price > 0)) continue;
-      const weight = goodWeightAt(system, goodId, x) * (input.taste?.[goodId] ?? 1);
-      if (!(weight > 0)) continue;
-      const share = (weight * Math.pow(price / (system.referencePrice[goodId] ?? 1), 1 - sigma)) / sum;
+      const term = goodWeight[goodId] ?? Number.NaN;
+      if (Number.isNaN(term)) continue;
+      const share = term / sum;
       supernumerary[goodId] = (categoryValue * share) / price;
     }
   }
