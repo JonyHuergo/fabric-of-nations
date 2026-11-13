@@ -84,12 +84,27 @@ function setLiteracy(block: PopBlock, rate: number): void {
 }
 
 describe("P4 1900 calibration (D-142)", () => {
-  const scenario = loadM11World();
-  const world = createEconomyWorld(scenario, { seed: 20_261_023 });
-  const sources = loadDemography1900("historical/p4/demography_1900.json");
-  const tolerance = sources.meta.acceptanceTolerances;
-  const factorsOf = demographyFactorsOfBlock(world, demographyFactorsByCountry(world, scenario.definitions));
-  const owner = new Map(world.provinces.ownership.map((row) => [row.provinceId, row.ownerPolityId]));
+  // D-155: built for this block's tests and released after them, not at collection.
+  let scenario: ReturnType<typeof loadM11World>;
+  let world: World;
+  let sources: ReturnType<typeof loadDemography1900>;
+  let tolerance: ReturnType<typeof loadDemography1900>["meta"]["acceptanceTolerances"];
+  let factorsOf: ReturnType<typeof demographyFactorsOfBlock>;
+  let owner: Map<number, number>;
+  beforeAll(() => {
+    scenario = loadM11World();
+    world = createEconomyWorld(scenario, { seed: 20_261_023 });
+    sources = loadDemography1900("historical/p4/demography_1900.json");
+    tolerance = sources.meta.acceptanceTolerances;
+    factorsOf = demographyFactorsOfBlock(world, demographyFactorsByCountry(world, scenario.definitions));
+    owner = new Map(world.provinces.ownership.map((row) => [row.provinceId, row.ownerPolityId]));
+  });
+  afterAll(() => {
+    scenario = undefined as never;
+    world = undefined as never;
+    factorsOf = undefined as never;
+    owner = undefined as never;
+  });
 
   test("every province has sourced levels and every block an urban share", () => {
     expect(sources.provinces).toHaveLength(world.provinceEconomies.length);

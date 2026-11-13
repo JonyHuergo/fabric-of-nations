@@ -65,7 +65,6 @@ function isHistorical(relativePath) {
     /_COMPLETION_REPORT\.md$/.test(name) ||
     relativePath === "DECISIONS.md" ||
     relativePath.startsWith("docs/images/") ||
-    relativePath === "packages/tests/src/fixtures/century-era-save.json" ||
     relativePath === "packages/tests/src/architecture/naming-audits.test.ts" ||
     relativePath === "scripts/m13/branding-audit.mjs" ||
     relativePath === "scripts/m13/playtest-rebrand.mjs" ||
@@ -268,10 +267,8 @@ if (!existsSync(join(ROOT, "docs/archive/milestones/M13_REBRANDING_REPORT.md")))
 
 const persistence = readFileSync(join(ROOT, "packages/sim-worker/src/persistence.ts"), "utf8");
 const serialization = readFileSync(join(ROOT, "packages/sim/src/serialization.ts"), "utf8");
-requireIncludes("save storage prefix", persistence, 'COMPRESSED_SAVE_PREFIX = "century-save-gzip1:"');
-requireIncludes("primary save storage key", persistence, '"century.m7.save.v1"');
-requireIncludes("previous save storage key", persistence, '"century.m7.save.v1.previous"');
-requireIncludes("staging save storage key", persistence, '"century.m7.save.v1.staging"');
+// D-155: the pre-D-137 stored form and the pre-library save keys are no longer read.
+requireIncludes("save storage prefix", persistence, 'STORED_SAVE_PREFIX = "fon-save-deflate2:"');
 requireIncludes("save envelope format", serialization, 'format: "century-save"');
 requireIncludes("save format parser", serialization, 'format !== "century-save"');
 

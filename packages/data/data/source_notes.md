@@ -1,5 +1,15 @@
 # M2.1 demographic sources and calibration status
 
+> **D-155 (2026-11-11).** The M2 population-target series
+> (`calibration/m2_population_targets.json`) was removed with the M2 calibration test.
+> The M2 multi-block and WPP-1950 validation scenarios, the M3 catalogue (`goods.json`,
+> `professions.json`, `buildings.json`, `m3_needs.json`) and
+> `scenarios/m3_small_economy.json` are unit-test scaffolding and now live in
+> `packages/tests/src/fixtures/data`; the notes below describe them as they were
+> written. `scenarios/m2_world_aggregate.json` and its basket `needs.json` stay here
+> because the 1900 world cites the aggregate as the source of its provisional age
+> structure (and the M1/M2 benchmark runs it).
+
 ## Status
 
 M2.1 has:

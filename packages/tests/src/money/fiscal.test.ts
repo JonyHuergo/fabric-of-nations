@@ -119,30 +119,29 @@ function settlementWithWages(
 }
 
 /** Add a populated block with no employment assignment to a fiscal scenario. */
-function withPopulatedUnemployedBlock(
-  scenario: EconomyScenarioDef,
-  id = 4,
-  financialAccountId = 500,
-): EconomyScenarioDef {
+/**
+ * A populated block without wage jobs. D-155: the labour market keeps one block per
+ * profession and province, so the fixture's own capitalist block (profession 3, which
+ * holds no wage job) is given the population instead of a second capitalist block.
+ */
+function withPopulatedUnemployedBlock(scenario: EconomyScenarioDef): EconomyScenarioDef {
   return {
     ...scenario,
     population: {
       ...scenario.population,
-      popBlocks: [
-        ...scenario.population.popBlocks,
-        {
-          id,
-          provinceId: 0,
-          professionId: 3,
-          financialAccountId,
-          maleAgeGroups: Array.from({ length: 17 }, () => 100),
-          femaleAgeGroups: Array.from({ length: 17 }, () => 100),
-          literacy: 0.2,
-          wealthLevel: 30,
-          initialSavingsRUSD: 100,
-          militancy: 0.1,
-        },
-      ],
+      popBlocks: scenario.population.popBlocks.map((block) =>
+        block.professionId === 3
+          ? {
+              ...block,
+              maleAgeGroups: Array.from({ length: 17 }, () => 100),
+              femaleAgeGroups: Array.from({ length: 17 }, () => 100),
+              literacy: 0.2,
+              wealthLevel: 30,
+              initialSavingsRUSD: 100,
+              militancy: 0.1,
+            }
+          : block,
+      ),
     },
   };
 }
@@ -709,33 +708,34 @@ describe("M4c budgeted welfare transfers", () => {
 
   test("excludes a zero-population block from welfare and tax", () => {
     const base = fiscalScenario({ rate: 0, budget: 36_500, treasuryCash: 1_000 });
-    const zeroBlock = {
-      id: 4,
-      provinceId: 0,
-      professionId: 0,
-      financialAccountId: 500,
-      maleAgeGroups: Array.from({ length: 17 }, () => 0),
-      femaleAgeGroups: Array.from({ length: 17 }, () => 0),
-      literacy: 0,
-      wealthLevel: 0,
-      initialSavingsRUSD: 0,
-      militancy: 0,
-    };
+    // D-155: one block per profession and province, so the zero-population block is the
+    // fixture's own peasant block emptied (formerly a second peasant block).
+    const zero = base.population.popBlocks.find((block) => block.professionId === 0)!;
     const scenario: EconomyScenarioDef = {
       ...base,
       population: {
         ...base.population,
-        popBlocks: [...base.population.popBlocks, zeroBlock],
+        popBlocks: base.population.popBlocks.map((block) =>
+          block.id === zero.id
+            ? {
+                ...block,
+                maleAgeGroups: Array.from({ length: 17 }, () => 0),
+                femaleAgeGroups: Array.from({ length: 17 }, () => 0),
+                initialSavingsRUSD: 0,
+              }
+            : block,
+        ),
       },
+      employment: base.employment.filter((assignment) => assignment.popBlockId !== zero.id),
     };
     const world = buildWorld(scenario);
     const economy = runDay(world, scenario);
-    const zeroFiscal = economy.fiscal.blocks.find((entry) => entry.popBlockId === 4);
+    const zeroFiscal = economy.fiscal.blocks.find((entry) => entry.popBlockId === zero.id);
     expect(zeroFiscal?.welfareReceivedRUSD).toBe(0);
     expect(zeroFiscal?.incomeTaxRUSD).toBe(0);
     expect(zeroFiscal?.endingCashAfterFiscalRUSD).toBe(0);
-    expect(populationTotal(world.popBlocks.find((block) => block.id === 4)!)).toBe(0);
-    expect(account(world, "popBlock", 4, "household-cash").balanceRUSD).toBe(0);
+    expect(populationTotal(world.popBlocks.find((block) => block.id === zero.id)!)).toBe(0);
+    expect(account(world, "popBlock", zero.id, "household-cash").balanceRUSD).toBe(0);
   });
 
   test("prevents cross-country tax or welfare leakage", () => {
@@ -1221,12 +1221,15 @@ describe("M4c integration, wealth effect, and determinism", () => {
         expectedTreasury,
         6,
       );
+      // D-155: on a labour-month day mobility moves people, with their savings, between
+      // blocks (P7 plan §5.4), a flow this cash formula does not count.
+      const moved = economy.migration.totalPeople > 0;
       for (const block of world.popBlocks) {
         const fiscalBlock = fiscal.blocks.find((entry) => entry.popBlockId === block.id);
         const settlementHousehold = economy.settlement.households.find(
           (entry) => entry.popBlockId === block.id,
         );
-        if (settlementHousehold === undefined) continue;
+        if (settlementHousehold === undefined || moved) continue;
         expect(account(world, "popBlock", block.id, "household-cash").balanceRUSD).toBeCloseTo(
           (openingCash.get(block.id) ?? 0) +
             settlementHousehold.wagesReceivedRUSD -

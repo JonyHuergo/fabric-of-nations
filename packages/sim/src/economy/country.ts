@@ -24,7 +24,6 @@ import {
   MAX_CURRENCY_KEY_LENGTH,
   MAX_CURRENCY_NAME_LENGTH,
   MAX_FOREIGN_ISSUER_KEY_LENGTH,
-  LEGACY_SUSD_CURRENCY_KEY,
   RUSD_CURRENCY_KEY,
 } from "../constants.js";
 import {
@@ -161,12 +160,10 @@ export function countryProvinceIds(world: World, countryId: Id): Id[] {
  * - `blocksByCountry`: each country's blocks in `world.popBlocks` order, exactly the
  *   blocks whose province `countryProvinceIds` returns for that country.
  * - `assignedByBlock`: assigned workers per block, summed in `world.employment` order.
- * - `wagesByProvince`: the non-empty province wage tables (P2b, D-135).
  */
 export interface CountryPopulationIndex {
   readonly blocksByCountry: ReadonlyMap<Id, readonly World["popBlocks"][number][]>;
   readonly assignedByBlock: ReadonlyMap<Id, number>;
-  readonly wagesByProvince: ReadonlyMap<Id, readonly number[]>;
 }
 
 export function buildCountryPopulationIndex(world: World): CountryPopulationIndex {
@@ -193,13 +190,7 @@ export function buildCountryPopulationIndex(world: World): CountryPopulationInde
       (assignedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
     );
   }
-  const wagesByProvince = new Map<Id, readonly number[]>();
-  for (const province of world.provinceEconomies) {
-    if (province.wageRUSDPerYearByProfession.length > 0) {
-      wagesByProvince.set(province.id, province.wageRUSDPerYearByProfession);
-    }
-  }
-  return { blocksByCountry, assignedByBlock, wagesByProvince };
+  return { blocksByCountry, assignedByBlock };
 }
 
 /** A country's blocks in `world.popBlocks` order, from the index when one is supplied. */
@@ -499,7 +490,7 @@ function assertCurrencyIssuer(value: unknown, path: string): CurrencyIssuer {
 function assertCurrencyKey(value: unknown, path: string): string {
   const key = requireString(value, path, { minLength: 1, maxLength: MAX_CURRENCY_KEY_LENGTH });
   const normalized = key.toLowerCase();
-  if (normalized === RUSD_CURRENCY_KEY || normalized === LEGACY_SUSD_CURRENCY_KEY) {
+  if (normalized === RUSD_CURRENCY_KEY) {
     throw new RangeError(`${path} is reserved for the RUSD unit of account`);
   }
   if (!CURRENCY_KEY_PATTERN.test(key)) {

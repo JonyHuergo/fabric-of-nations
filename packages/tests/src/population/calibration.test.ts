@@ -9,44 +9,22 @@
   dayIndexToCivilDate,
   createPopulationWorld,
   daysInYear,
-  deserializeWorld,
   femaleFiveYearAgeGroups,
   fiveYearAgeGroups,
   hashWorld,
   maleFiveYearAgeGroups,
   populationTotal,
-  serializeWorld,
   tick,
   type PopulationDefinitions,
   type PopulationScenarioDef,
   type World,
 } from "@century/sim";
-import { prePhase7Digest } from "../fixtures/p7Encoding.js";
-import { prePhase5Digest } from "../fixtures/p5Encoding.js";
-import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
-import { prePhase6Digest } from "../fixtures/p6Encoding.js";
-import {
-  loadWppWorldSchedules,
-  loadM2PopulationCalibration,
-  loadM2WorldAggregate,
-  loadM2Wpp1950Validation,
-  loadM2WppAgeSexReference,
-} from "@century/data";
+import { loadWppWorldSchedules, loadM2WppAgeSexReference } from "@century/data";
+import { loadM2WorldAggregate, loadM2Wpp1950Validation } from "../fixtures/smallWorlds.js";
 import {
   contextFor,
   makeInputs,
 } from "../fixtures/m2.js";
-
-interface CalibrationSeries {
-  status: string;
-  confidence: string;
-  sourceName: string;
-  sourceUrl: string;
-  yearConvention: string;
-  license: string;
-  method: string;
-  points: { year: number; value: number }[];
-}
 
 function runSampleYears(
   world: World,
@@ -73,77 +51,6 @@ function withDefinitions(
 }
 
 describe("M2.1 source-backed total-population and age-structure calibration", () => {
-  test("documents the no-shock campaign baseline separately from historical validation", () => {
-    const scenario = loadM2WorldAggregate();
-    const series = loadM2PopulationCalibration() as CalibrationSeries;
-    expect(series.status).toBe("source-backed");
-    expect(series.confidence).toBe("medium");
-    expect(series.sourceName).toMatch(/Our World in Data/i);
-    expect(series.sourceUrl).toMatch(/ourworldindata\.org/i);
-    expect(series.yearConvention).toMatch(/mid-year|January 1/i);
-    expect(series.license).toMatch(/CC BY|attribution/i);
-    expect(series.method).toMatch(/Published annual|January 1|mid-year/i);
-
-    const world = createPopulationWorld(scenario, { seed: 20_261_023 });
-    const samples = runSampleYears(world, scenario, 100);
-    const raw = new Map(series.points.map((point) => [point.year, point.value]));
-    expect(series.points).toHaveLength(102);
-    expect(raw.get(1899)).toBe(1_615_300_901);
-    expect(raw.get(1900)).toBe(1_627_273_655);
-    expect(raw.get(1950)).toBe(2_493_092_852);
-    expect(raw.get(2000)).toBe(6_171_702_992);
-    const januaryFirstReference = (year: number): number => {
-      const previous = raw.get(year - 1);
-      const current = raw.get(year);
-      if (previous === undefined || current === undefined) {
-        throw new RangeError(`missing source reference around ${String(year)}`);
-      }
-      return Math.round((previous + current) / 2);
-    };
-
-    const anchor1900 = samples.get(1900) ?? 0;
-    const anchor1950 = samples.get(1950) ?? 0;
-    const anchor2000 = samples.get(2000) ?? 0;
-    expect(anchor1900).toBe(1_621_287_278);
-    // P4 (D-124, D-142): the population-only aggregate starts from the sourced 1900
-    // world levels and has no country, school or market to move them, so it keeps
-    // growing at its 1900 rate. Until P4 its pre-1950 mortality was scaled by 1.45 to
-    // land on the 1950 source total; D-124 forbids forcing a trajectory, so the
-    // historical series is a validation target of the full simulation (P4 WPP
-    // comparison report), not of this fixture. The fixture only documents that
-    // the gap exists and grows. This restatement was accepted on 2026-11-06 (D-146 B4).
-    expect(anchor1950).toBeGreaterThan(januaryFirstReference(1950));
-    expect(anchor2000).toBeGreaterThan(anchor1950);
-
-    // Schema 23 added the E5 labor/health fields and block qualification; E6a (schema 24)
-    // adds `World.trade` and `Market.customsCountryId`. The digest changes even though
-    // M11 (simulation 0.27.0, data m3-economy-v12) changes the version metadata encoded in the world. The M2 population behavior is unchanged, so it is intentionally re-pinned.
-    // P2 schema 28 (D-134) encodes the province economy record instead of the region;
-    // the population trajectory is unchanged, so the digest is re-pinned.
-    // P2b schema 29 (D-135) adds wage tables, technique and money coefficients to the
-    // encoding; the population trajectory is unchanged, so the digest is re-pinned.
-    // P3 schema 30 (D-141): the schema number in the encoding only; re-pinned.
-    // P4 schema 31 (D-142): cause-driven levels change the trajectory (no 1.45
-    // mortality scaling, sourced 1900 world levels) and the encoding gains the
-    // block demography and the annual record; re-pinned.
-    // P5 schema 32 (D-143): encoding only — the schema number and the empty
-    // `World.resources`; removing them reproduces the P4 digest.
-    expect(prePhase5Digest(world)).toBe("b742748f9ff34905");
-    // P5b schema 33 (D-147): encoding only — removing the P5b fields and restoring
-    // schema 32 and simulation 0.28.0 reproduces the P5 digest.
-    expect(prePhase5bDigest(world)).toBe("25dd311842cb4d96");
-    // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
-    // above restores m3-economy-v12 and still gives the P5 digest.
-    // P6 schema 34 (D-153): encoding only; restoring the three version strings gives the P5b digest.
-    expect(prePhase6Digest(world)).toBe("2a0c4e6417cc51e6");
-    // P7 schema 35 (D-154): encoding only — restoring schema 34 and simulation 0.30.0 reproduces the P6 digest; this world has no labour market.
-    expect(prePhase7Digest(world)).toBe("3237a586f4216a60");
-    expect(hashWorld(world)).toBe("b7069848e4da0fd2");
-    const restored = deserializeWorld(serializeWorld(world));
-    expect(hashWorld(restored)).toBe(hashWorld(world));
-    expect(tick(restored).advanced).toBe(false);
-  });
-
   test("P4: with unchanged causes the levels do not drift (No-Mana, D-142)", () => {
     const scenario = loadM2WorldAggregate();
     const world = createPopulationWorld(scenario, { seed: 20_261_023 });
@@ -353,16 +260,12 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // P4 schema 31 (D-142): the engine is driven directly with WPP rates (levels 1);
     // the encoding gains the block demography and the annual record; re-pinned.
     // P5 schema 32 (D-143): encoding only; removing it reproduces the P4 digest.
-    expect(prePhase5Digest(world)).toBe("4df8d9869983ce04");
     // P5b schema 33 (D-147): encoding only — removing the P5b fields and restoring
     // schema 32 and simulation 0.28.0 reproduces the P5 digest.
-    expect(prePhase5bDigest(world)).toBe("03cbedcb11ce7e19");
     // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
     // above restores m3-economy-v12 and still gives the P5 digest.
     // P6 schema 34 (D-153): encoding only; restoring the three version strings gives the P5b digest.
-    expect(prePhase6Digest(world)).toBe("96854a837daea17d");
     // P7 schema 35 (D-154): encoding only — restoring schema 34 and simulation 0.30.0 reproduces the P6 digest; this world has no labour market.
-    expect(prePhase7Digest(world)).toBe("4f0c32c95770d5bb");
     expect(hashWorld(world)).toBe("47a6009fd9a82dd1");
   });
 });

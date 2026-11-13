@@ -39,11 +39,24 @@ function walk(directory: string, predicate: (path: string) => boolean): string[]
   return results;
 }
 
+/**
+ * Blank comments and string/template contents, keeping every other character and every
+ * newline in place (the output has the input's length). D-155: the characters are written
+ * to a code-unit buffer and decoded once; appending them one by one to a string built a
+ * rope of tens of millions of nodes for the generated bundles (over 1 GB of heap).
+ */
 function stripCommentsAndStrings(source: string): string {
-  let output = "";
+  const out = new Uint16Array(source.length);
+  let written = 0;
+  const SPACE = 32;
+  const NEWLINE = 10;
+  const put = (code: number): void => {
+    out[written] = code;
+    written += 1;
+  };
+  const blank = (char: string): number => (char === "\n" ? NEWLINE : SPACE);
   let state = "code";
   let index = 0;
-  const blank = (char: string): string => (char === "\n" ? "\n" : " ");
 
   while (index < source.length) {
     const char = source[index] ?? "";
@@ -52,22 +65,24 @@ function stripCommentsAndStrings(source: string): string {
     if (state === "code") {
       if (char === "/" && next === "/") {
         state = "line";
-        output += "  ";
+        put(SPACE);
+        put(SPACE);
         index += 2;
       } else if (char === "/" && next === "*") {
         state = "block";
-        output += "  ";
+        put(SPACE);
+        put(SPACE);
         index += 2;
       } else if (char === "'" || char === '"') {
         state = char;
-        output += " ";
+        put(SPACE);
         index += 1;
       } else if (char === "`") {
         state = "template";
-        output += " ";
+        put(SPACE);
         index += 1;
       } else {
-        output += char;
+        put(source.charCodeAt(index));
         index += 1;
       }
       continue;
@@ -76,9 +91,9 @@ function stripCommentsAndStrings(source: string): string {
     if (state === "line") {
       if (char === "\n") {
         state = "code";
-        output += "\n";
+        put(NEWLINE);
       } else {
-        output += " ";
+        put(SPACE);
       }
       index += 1;
       continue;
@@ -87,31 +102,37 @@ function stripCommentsAndStrings(source: string): string {
     if (state === "block") {
       if (char === "*" && next === "/") {
         state = "code";
-        output += "  ";
+        put(SPACE);
+        put(SPACE);
         index += 2;
       } else {
-        output += blank(char);
+        put(blank(char));
         index += 1;
       }
       continue;
     }
 
     if (char === "\\") {
-      output += blank(char);
-      if (next !== "") output += blank(next);
+      put(blank(char));
+      if (next !== "") put(blank(next));
       index += 2;
       continue;
     }
     if ((state === "template" && char === "`") || (state !== "template" && char === state)) {
       state = "code";
-      output += " ";
+      put(SPACE);
       index += 1;
       continue;
     }
-    output += blank(char);
+    put(blank(char));
     index += 1;
   }
 
+  let output = "";
+  const CHUNK = 0x8000;
+  for (let start = 0; start < written; start += CHUNK) {
+    output += String.fromCharCode(...out.subarray(start, Math.min(written, start + CHUNK)));
+  }
   return output;
 }
 

@@ -33,7 +33,7 @@ import {
   type WorkerEvent,
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
 import {
   M5_CLOTHING,
@@ -60,6 +60,9 @@ interface TradeFixtureOptions {
 }
 
 /** Build a two-market fixture where clothing is profitably scarcer in market 1. */
+/** D-155: the C1 workshop belongs to the C1 peasant block (block 5) in the M5 fixture. */
+const WORKSHOP_OWNER_BLOCK = 5;
+
 function tradeScenario(options: TradeFixtureOptions = {}): EconomyScenarioDef {
   const scenario = m5Scenario();
   const freight = options.freightPerUnit ?? 0.05;
@@ -120,7 +123,7 @@ function tradeScenario(options: TradeFixtureOptions = {}): EconomyScenarioDef {
         popBlocks: scenario.population.popBlocks.map((block) => ({
           ...block,
           initialSavingsRUSD:
-            options.ownerSavings !== undefined && block.id === 6
+            options.ownerSavings !== undefined && block.id === WORKSHOP_OWNER_BLOCK
               ? options.ownerSavings
               : block.initialSavingsRUSD,
         })),
@@ -362,14 +365,14 @@ describe("E6a dispatch, customs, and delivery", () => {
 
   test("freight and duty are funded by the owner when the enterprise cannot pay", () => {
     const { scenario, world } = build({ tariff: 0.1, workshopCash: 0, ownerSavings: 5_000 });
-    const ownerBefore = accountBalance(world, "popBlock", 6, "household-cash");
+    const ownerBefore = accountBalance(world, "popBlock", WORKSHOP_OWNER_BLOCK, "household-cash");
     const result = runTradeDispatchPhase(world, scenario.definitions, world.dayIndex);
     expect(result.shipments.length).toBeGreaterThan(0);
     expect(result.ownerFundedRUSD).toBeGreaterThan(0);
     expect(
       result.ownerFundedRUSD,
     ).toBeCloseTo(result.freightPaidRUSD + result.dutyPaidRUSD, 6);
-    expect(accountBalance(world, "popBlock", 6, "household-cash")).toBeCloseTo(
+    expect(accountBalance(world, "popBlock", WORKSHOP_OWNER_BLOCK, "household-cash")).toBeCloseTo(
       ownerBefore - result.ownerFundedRUSD,
       6,
     );
@@ -602,7 +605,7 @@ describe("E6a worker protocol and snapshot contract", () => {
     let snapshot: SimulationSnapshot | null = null;
     let actionResult: Extract<WorkerEvent, { type: "ACTION_RESULT" }> | null = null;
     const host = new SimulationHost({
-      scenario: loadM5EightPolities(),
+      scenario: loadM5Sample(),
       seed: SEED,
       emit: (event: WorkerEvent) => {
         if (event.type === "READY" || event.type === "SNAPSHOT") {

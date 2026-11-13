@@ -19,7 +19,7 @@ import {
   compressSaveForStorage,
   decompressSaveFromStorage,
 } from "@century/sim-worker/persistence";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
 const SEED = 20_261_023;
 
@@ -35,7 +35,7 @@ function createHarness(): {
   const events: WorkerEvent[] = [];
   let now = 1_000;
   const host = new SimulationHost({
-    scenario: loadM5EightPolities(),
+    scenario: loadM5Sample(),
     seed: SEED,
     emit: (event) => {
       events.push(event);
@@ -464,7 +464,7 @@ describe("M7 simulation worker host", () => {
   });
 
   test("STEP and START behave predictably at the terminal boundary", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const terminalScenario = {
       ...scenario,
       population: { ...scenario.population, startDayIndex: 36_524 },

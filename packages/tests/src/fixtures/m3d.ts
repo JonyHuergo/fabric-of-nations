@@ -18,6 +18,9 @@ import {
 export const CLOTHING_ID = 6;
 export const FOOD_ID = FOOD_PRODUCTS_ID;
 
+/** Clerks: the M3 fixture's block for them has no population after `productionScenario`. */
+const M3D_IDLE_PROFESSION_ID = 2;
+
 export interface MarketFixtureOptions {
   readonly lots?: readonly { goodId: number; ownerBuildingId: number; quantity: number }[];
   readonly produce?: boolean;
@@ -48,6 +51,15 @@ export function marketScenario(options: MarketFixtureOptions = {}): EconomyScena
         assignment.buildingInstanceId !== 4 &&
         assignment.buildingInstanceId !== 5,
     );
+    // D-155: the labour market staffs every job it can at creation and does not read the
+    // scenario's assignment list, so the producers' jobs go to the clerks, whom this
+    // fixture leaves without workers: staffing 0, capacity 0, the buildings still buyers.
+    for (const definitionId of [0, 4, 5]) {
+      const definition = scenario.definitions.buildings.find((candidate) => candidate.id === definitionId);
+      if (definition !== undefined) {
+        definition.jobs = definition.jobs.map((job) => ({ ...job, professionId: M3D_IDLE_PROFESSION_ID }));
+      }
+    }
   }
   return scenario;
 }

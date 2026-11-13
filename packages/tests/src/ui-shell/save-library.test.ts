@@ -1,16 +1,14 @@
 /**
  * The saved-game library behind Load Game: one replace-safe slot per campaign,
- * an index listing them by recency, adoption of the single save that predates
- * it, and deletion that cannot leave a listed slot without its save.
+ * an index listing them by recency, and deletion that cannot leave a listed slot
+ * without its save.
  */
 
 import { WORLD_SCHEMA_VERSION, createEconomyWorld, serializeWorld, tick } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import {
   SaveLibrary,
-  SaveStore,
   canonicalSaveOf,
-  compressSaveForStorage,
   type SaveStorageBackend,
   type SaveSlot,
 } from "@century/sim-worker/persistence";
@@ -18,7 +16,6 @@ import {
 import { saveEra, saveProblem } from "../../../app/src/screens/saveDisplay.js";
 
 const SEED = 20_261_102;
-const LEGACY = "century.m7.save.v1";
 const INDEX = "fon.saves.index.v1";
 
 class MemoryBackend implements SaveStorageBackend {
@@ -39,7 +36,7 @@ class MemoryBackend implements SaveStorageBackend {
   }
 }
 
-const scenario = loadM5EightPolities();
+const scenario = loadM5Sample();
 
 /** Canonical saves of one world after 0, 1 and 2 days. */
 function saves(): readonly string[] {
@@ -146,38 +143,6 @@ describe("save library", () => {
     expect((await saved.list()).map((slot) => slot.playerCountryId)).toEqual([3, 2, 1]);
   });
 
-  test("the single save from before the library is adopted in place", async () => {
-    const backend = new MemoryBackend();
-    await new SaveStore(backend, { expectedSchemaVersion: WORLD_SCHEMA_VERSION }).store(day1);
-    const saved = library(backend);
-    const [adopted] = await saved.list();
-    expect(adopted?.key).toBe(LEGACY);
-    expect(adopted?.playerCountryId).toBeNull();
-    expect(adopted?.metadata?.dayIndex).toBe(1);
-    expect(canonicalSaveOf((await saved.load(adopted?.id ?? ""))?.save ?? "")).toBe(day1);
-
-    // Its nation is recorded once known; a new campaign gets a new slot beside it.
-    expect((await saved.annotate(adopted?.id ?? "", 7))?.playerCountryId).toBe(7);
-    expect((await saved.annotate(adopted?.id ?? "", 9))?.playerCountryId).toBe(7);
-    const next = await saved.create(day0, { playerCountryId: 2, savedAtMs: null });
-    expect((await saved.list()).map((slot) => slot.id)).toEqual([next.slot.id, adopted?.id]);
-    expect(canonicalSaveOf((await saved.load(adopted?.id ?? ""))?.save ?? "")).toBe(day1);
-  });
-
-  test("an adopted save this build cannot read is listed, refuses to load, and can be deleted", async () => {
-    const backend = new MemoryBackend();
-    const parsed = JSON.parse(day0) as { schemaVersion: number };
-    parsed.schemaVersion = WORLD_SCHEMA_VERSION - 1;
-    backend.values.set(LEGACY, compressSaveForStorage(JSON.stringify(parsed)));
-    const saved = library(backend);
-    const [adopted] = await saved.list();
-    expect(adopted?.metadata?.schemaVersion).toBe(WORLD_SCHEMA_VERSION - 1);
-    await expect(saved.load(adopted?.id ?? "")).rejects.toThrow(/schema/u);
-    await saved.remove(adopted?.id ?? "");
-    expect(await saved.list()).toEqual([]);
-    expect(backend.values.get(LEGACY)).toBeUndefined();
-  });
-
   test("a damaged index is reported, not silently emptied", async () => {
     for (const raw of [
       "not json",
@@ -198,10 +163,10 @@ describe("save library", () => {
     }
   });
 
-  test("clearing removes every slot, the index and the old single save", async () => {
+  test("clearing removes every slot and the index", async () => {
     const backend = new MemoryBackend();
-    await new SaveStore(backend, { expectedSchemaVersion: WORLD_SCHEMA_VERSION }).store(day0);
     const saved = library(backend);
+    await saved.create(day0, { playerCountryId: 2, savedAtMs: null });
     await saved.create(day1, { playerCountryId: 1, savedAtMs: null });
     await saved.clear();
     expect(backend.values.size).toBe(0);

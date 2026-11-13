@@ -12,7 +12,7 @@
  * changing an outcome.
  */
 
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import {
   createEconomyWorld,
   createRollbackRunner,
@@ -40,7 +40,7 @@ function world(scenario: EconomyScenarioDef) {
 
 describe("D-137 performance hooks do not change outcomes", () => {
   test("phase observer sees phases and changes no world hash", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const plainWorld = world(scenario);
     const observedWorld = world(scenario);
     const plain = createRollbackRunner(plainWorld);
@@ -60,7 +60,7 @@ describe("D-137 performance hooks do not change outcomes", () => {
   });
 
   test("summary result detail leaves the world identical to full", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const fullWorld = world(scenario);
     const summaryWorld = world(scenario);
     runTicks(fullWorld, DAYS, contextFor(scenario));
@@ -71,7 +71,7 @@ describe("D-137 performance hooks do not change outcomes", () => {
   });
 
   test("a reused snapshot cache produces the same snapshot as a fresh one", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const simWorld = world(scenario);
     runTicks(simWorld, DAYS, contextFor(scenario));
 

@@ -1199,10 +1199,10 @@ export function refreshInstitution(
   const infrastructure = provinceCount > 0 ? infrastructureWeighted / provinceCount : DEFAULT_INFRASTRUCTURE;
   const clerkShare = population > 0 ? staff / population : 0;
   let staffingRatio = clamp(clerkShare / ADMIN_TARGET_CLERK_SHARE, 0, 1);
-  // P7 (D-154, plan Q4): in a labour-market world the administration's staff are the
-  // bureaucrats it employs; staffing is its filled share of the posts its budget funds
-  // (the funding ratio below still measures the budget against the benchmark).
-  if (world.labourMarket.enabled) {
+  // P7 (D-154, plan Q4): the administration's staff are the bureaucrats it employs;
+  // staffing is its filled share of the posts its budget funds (the funding ratio below
+  // still measures the budget against the benchmark).
+  {
     const employed = institutionStaff(world, country.id, "administration");
     const funded = administrationPostsFunded(world, definitions, country);
     staffingRatio = funded > 0 ? clamp(employed / funded, 0, 1) : 0;
@@ -1835,16 +1835,14 @@ export function runUnrestPhase(
       (employedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
     );
   }
-  // P7 (D-154, plan §13 item 13): a labour-market world counts institution staff as
-  // employed and measures unemployment against the eligible labour force.
-  const labour = world.labourMarket.enabled;
-  if (labour) {
-    for (const assignment of world.labourMarket.institutionEmployment) {
-      employedByBlock.set(
-        assignment.popBlockId,
-        (employedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
-      );
-    }
+  // P7 (D-154, plan §13 item 13): institution staff count as employed and unemployment
+  // is measured against the eligible labour force (D-155: the working-age measure of
+  // worlds without a labour market was removed).
+  for (const assignment of world.labourMarket.institutionEmployment) {
+    employedByBlock.set(
+      assignment.popBlockId,
+      (employedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
+    );
   }
   const professionById = new Map((definitions?.professions ?? []).map((profession) => [profession.id, profession]));
   // D-137: provinces and their blocks by id once; a province's blocks in ascending id
@@ -1859,7 +1857,6 @@ export function runUnrestPhase(
       let provincePopulation = 0;
       let weightedMilitancy = 0;
       let unmetPopulation = 0;
-      let workingAge = 0;
       let employed = 0;
       let eligibleLabour = 0;
       for (const block of lookups.blocksByProvince.get(provinceId) ?? []) {
@@ -1867,16 +1864,9 @@ export function runUnrestPhase(
         provincePopulation += count;
         weightedMilitancy += block.militancy * count;
         if (block.unmetSubsistenceDays >= 7) unmetPopulation += count;
-        let blockWorkingAge = 0;
-        for (let age = 15; age < 81; age += 1) {
-          blockWorkingAge += (block.maleByAge[age] ?? 0) + (block.femaleByAge[age] ?? 0);
-        }
-        workingAge += blockWorkingAge;
         employed += employedByBlock.get(block.id) ?? 0;
-        if (labour) {
-          const profession = professionById.get(block.professionId);
-          if (profession !== undefined) eligibleLabour += labourEligibleWorkforce(block, profession);
-        }
+        const profession = professionById.get(block.professionId);
+        if (profession !== undefined) eligibleLabour += labourEligibleWorkforce(block, profession);
       }
       if (!(provincePopulation > 0)) {
         province.unrest = roundTo(
@@ -1887,13 +1877,7 @@ export function runUnrestPhase(
       }
       const militancy = weightedMilitancy / provincePopulation;
       const unmet = unmetPopulation / provincePopulation;
-      const unemployment = labour
-        ? eligibleLabour > 0
-          ? clamp(1 - employed / eligibleLabour, 0, 1)
-          : 0
-        : workingAge > 0
-          ? clamp(1 - employed / workingAge, 0, 1)
-          : 0;
+      const unemployment = eligibleLabour > 0 ? clamp(1 - employed / eligibleLabour, 0, 1) : 0;
       const overload = Math.min(country.institutions.overload, 1);
       // P6 (D-153): housing worse than the province's 1900 level adds unrest.
       const crowding = provinceCrowding(

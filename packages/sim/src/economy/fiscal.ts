@@ -40,7 +40,7 @@ import {
   isTerminalDayIndex,
 } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
-import { buildLabourWageTable, institutionPayroll } from "./labourMarket.js";
+import { buildLabourWageTable, institutionPayroll, popBlocksById } from "./labourMarket.js";
 import { populationTotal } from "../population/state.js";
 import type { DayIndex, Id } from "../types.js";
 import {
@@ -280,15 +280,6 @@ function executeFiscalPhase(
   const owners = buildProvinceOwnerMap(world);
   const countries = inIdOrder(world.countries);
   const politics = options.economyDefinitions?.politics;
-  const administrationProfessionKeys = new Set(
-    politics?.administrationProfessionKeys ?? [],
-  );
-  const professionKeyById = new Map(
-    (options.economyDefinitions?.professions ?? []).map((profession) => [
-      profession.id,
-      profession.key,
-    ]),
-  );
 
   const groups: CountryBlockGroup[] = countries.map((country) => ({
     country,
@@ -520,11 +511,10 @@ function executeFiscalPhase(
     Id,
     { requested: number; paid: number; shortfall: number }
   >();
-  const labourWages =
-    world.labourMarket.enabled && options.economyDefinitions !== undefined
-      ? buildLabourWageTable(world, options.economyDefinitions)
-      : null;
-  if (politics !== undefined && world.politics.enabled) {
+  const payrollDefinitions = options.economyDefinitions;
+  const labourWages = payrollDefinitions !== undefined ? buildLabourWageTable(world, payrollDefinitions) : null;
+  const payrollBlocks = popBlocksById(world);
+  if (politics !== undefined && world.politics.enabled && payrollDefinitions !== undefined && labourWages !== null) {
     for (const plan of plans) {
       const country = plan.group.country;
       const requested = country.institutions.fundedAnnualRUSD / yearDays;
@@ -532,21 +522,10 @@ function executeFiscalPhase(
         throw new RangeError(`invalid administration funding for country ${String(country.id)}`);
       }
       if (!(requested > 0)) continue;
-      // P7 (D-154, plan Q3, Q4): in a labour-market world the administration and the
-      // health service pay their assigned staff the market wage; elsewhere the M8
-      // payroll is shared by the administration professions' population.
-      const owed =
-        labourWages !== null && options.economyDefinitions !== undefined
-          ? institutionPayroll(world, options.economyDefinitions, country.id, ["administration", "health"], yearDays, labourWages)
-          : null;
-      const eligible =
-        owed ??
-        plan.group.blocks.filter((block) => {
-          if (!(block.population > 0)) return false;
-          const key = professionKeyById.get(block.professionId) ?? "";
-          return administrationProfessionKeys.has(key);
-        });
-      const owedTotal = owed === null ? requested : owed.reduce((total, entry) => total + entry.population, 0);
+      // P7 (D-154, plan Q3, Q4): the administration and the health service pay their
+      // assigned staff the market wage (D-155: the M8 population-share payroll was removed).
+      const eligible = institutionPayroll(world, payrollDefinitions, country.id, ["administration", "health"], yearDays, labourWages, payrollBlocks);
+      const owedTotal = eligible.reduce((total, entry) => total + entry.population, 0);
       const available = index.get("country", country.id, "treasury-cash").balanceRUSD;
       const payableCeiling = Math.max(0, available - plan.reserveTargetRUSD);
       const payable = eligible.length > 0 ? Math.min(owedTotal, payableCeiling) : 0;

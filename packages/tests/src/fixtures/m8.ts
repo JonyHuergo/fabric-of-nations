@@ -11,7 +11,7 @@ import type {
   PoliticsDefinitions,
   TechnologyDefinitions,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "./smallWorlds.js";
 
 import {
   M5_COUNTRY_A,
@@ -21,6 +21,7 @@ import {
   m5AgeGroups,
   m5Scenario,
 } from "./m5.js";
+import { withCurrentModel } from "./currentModel.js";
 
 export const M8_COUNTRY_A = M5_COUNTRY_A;
 export const M8_COUNTRY_B = M5_COUNTRY_B;
@@ -30,7 +31,7 @@ export const M8_CLERKS_BLOCK = 7;
 export const M8_CLERKS_ACCOUNT = 500;
 
 export function m8PoliticsDefinitions(): PoliticsDefinitions {
-  const scenario = loadM5EightPolities();
+  const scenario = loadM5Sample();
   if (scenario.definitions.politics === undefined) {
     throw new Error("M5 historical scenario does not carry M8 politics definitions");
   }
@@ -43,7 +44,7 @@ export function m8PoliticsDefinitions(): PoliticsDefinitions {
  * academics population, so research and schooling are inert.
  */
 export function m8TechnologyDefinitions(): TechnologyDefinitions {
-  const scenario = loadM5EightPolities();
+  const scenario = loadM5Sample();
   if (scenario.definitions.technology === undefined) {
     throw new Error("M5 historical scenario does not carry M9 technology definitions");
   }
@@ -60,7 +61,12 @@ export interface M8FixtureOptions {
 }
 
 /** Build the M8 fixture scenario. Fresh objects on every call. */
+/** D-155: the fixture with the labour-market roles and demand system (`withCurrentModel`). */
 export function m8Scenario(options: M8FixtureOptions = {}): EconomyScenarioDef {
+  return withCurrentModel(m8ScenarioBase(options));
+}
+
+function m8ScenarioBase(options: M8FixtureOptions): EconomyScenarioDef {
   const scenario = m5Scenario();
   const clerks = {
     id: M8_CLERKS_ID,

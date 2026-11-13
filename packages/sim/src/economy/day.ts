@@ -86,7 +86,7 @@ import {
   type ConstructionPhaseResult,
 } from "./construction.js";
 import { runDebtPhase, type DebtPhaseResult } from "./debt.js";
-import { runMigrationPhase, type MigrationDayResult } from "./migration.js";
+import type { MigrationDayResult } from "./migrationResult.js";
 import { runLabourMonthPhase, type LabourMonthPhaseResult } from "./mobility.js";
 import {
   runTradeArrivals,
@@ -140,14 +140,7 @@ import type {
   BuildingDef,
   EconomyDefinitions,
   FinancialAccount,
-  Market,
 } from "./types.js";
-
-const M3_TIER_NEEDS: Readonly<Record<1 | 3 | 6, readonly NeedTier[]>> = {
-  1: ["subsistence"],
-  3: ["basic"],
-  6: ["comfort", "luxury"],
-};
 
 /**
  * One day's household demand in columns (D-139): one row per (block, market tier,
@@ -175,12 +168,6 @@ function marketByProvince(world: World): Map<Id, Id> {
     if (province.marketId !== null) map.set(province.id, province.marketId);
   }
   return map;
-}
-
-function marketPrices(world: World, marketId: Id): Market {
-  const market = world.markets.find((candidate) => candidate.id === marketId);
-  if (market === undefined) throw new RangeError(`missing market ${String(marketId)}`);
-  return market;
 }
 
 export interface EconomyDayResult {
@@ -233,18 +220,6 @@ export interface EconomyDayResult {
     /** P6 (D-153): planned household spending by country and the day's housing; null on the tier path. */
     readonly demand: EconomyDemandDayResult | null;
   };
-}
-
-/**
- * MONEY_TOLERANCE_RUSD scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
- * former rest parameter allocated an array on every call; a missing value is 0,
- * which never raises the scale above 1, so the result is unchanged.
- */
-function moneyTolerance(a: number, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0): number {
-  return (
-    MONEY_TOLERANCE_RUSD *
-    Math.max(1, Math.abs(a), Math.abs(b), Math.abs(c), Math.abs(d), Math.abs(e), Math.abs(f), Math.abs(g), Math.abs(h))
-  );
 }
 
 function quantityTolerance(...values: number[]): number {
@@ -387,18 +362,6 @@ function accountByOwner(
   return index.get(ownerKind, ownerId, ownerKind === "popBlock" ? "household-cash" : "operating-cash");
 }
 
-function needDefinitionsByTier(
-  definitions: PopulationDefinitions,
-): Map<
-  NeedTier,
-  {
-    activationWealthMin: number;
-    items: readonly { goodKey: string; quantityPerCapitaPerDay: number; requiredTechnologyKey?: string }[];
-  }
-> {
-  return new Map(definitions.needs.map((tier) => [tier.tier, tier]));
-}
-
 /**
  * P5b (D-146, C-21): whether a technology-gated need item is wanted in a province
  * today — its owner knows the technology, or its market holds stock of the good.
@@ -418,199 +381,6 @@ function needGate(world: World): (provinceId: Id, marketId: Id, technologyId: Id
     const owner = ownerId === undefined ? undefined : countryById.get(ownerId);
     return owner !== undefined && hasResearchedTechnology(owner, technologyId);
   };
-}
-
-function buildHouseholdDemand(
-  world: World,
-  economyDefinitions: EconomyDefinitions,
-  populationDefinitions: PopulationDefinitions,
-  index: FinanceIndex,
-  detail: DayResultDetail,
-  ownConsumption: OwnConsumptionPlan = EMPTY_OWN_CONSUMPTION,
-): HouseholdDemandBuild {
-  const provinceToMarket = marketByProvince(world);
-  const goodByKey = new Map(economyDefinitions.goods.map((good) => [good.key, good]));
-  const needByTier = needDefinitionsByTier(populationDefinitions);
-  const build: HouseholdDemandBuild = {
-    count: 0,
-    popBlockId: [],
-    marketId: [],
-    tier: [],
-    needTier: [],
-    goodId: [],
-    desired: [],
-    funded: [],
-    rowsOfBlock: new Map(),
-    records: [],
-  };
-  const rowsOfBlock = build.rowsOfBlock as Map<Id, { readonly start: number; readonly end: number }>;
-
-  // D-137: the need items of each market tier resolved once, and per-good scratch
-  // reused across blocks. Desired quantities are summed in need-item order and emitted
-  // in ascending good id; every cost is summed in the same order. D-139: each plan's
-  // goods in ascending id are listed once, so a block's present goods are visited in
-  // that order instead of being sorted per block.
-  const goodCount = economyDefinitions.goods.length;
-  // P5b (C-21): technology-gated need items.
-  const technologyByKey = new Map(
-    (economyDefinitions.technology?.technologies ?? []).map((technology) => [technology.key, technology.id]),
-  );
-  let gatedItems = false;
-  const tierPlans = ([1, 3, 6] as const).map((tier) => {
-    const needs = M3_TIER_NEEDS[tier].flatMap((needTier) => {
-      const need = needByTier.get(needTier);
-      if (need === undefined) return [];
-      return [
-        {
-          needTier,
-          activationWealthMin: need.activationWealthMin,
-          items: need.items.map((item) => {
-            const good = goodByKey.get(item.goodKey);
-            if (good === undefined) {
-              throw new RangeError(
-                `needs tier ${needTier} references unknown economy good ${JSON.stringify(item.goodKey)}`,
-              );
-            }
-            let requiredTechnologyId: number | null = null;
-            if (item.requiredTechnologyKey !== undefined) {
-              const technology = technologyByKey.get(item.requiredTechnologyKey);
-              if (technology === undefined) {
-                throw new RangeError(
-                  `needs tier ${needTier} references unknown technology ${JSON.stringify(item.requiredTechnologyKey)}`,
-                );
-              }
-              requiredTechnologyId = technology;
-              gatedItems = true;
-            }
-            return { goodId: good.id, quantityPerCapitaPerDay: item.quantityPerCapitaPerDay, requiredTechnologyId };
-          }),
-        },
-      ];
-    });
-    const goods = [...new Set(needs.flatMap((need) => need.items.map((item) => item.goodId)))].sort(
-      (left, right) => left - right,
-    );
-    return { tier, needs, goods };
-  });
-  const marketById = new Map(world.markets.map((market) => [market.id, market]));
-  const householdIds = index.ownerAccountIds("popBlock", "household-cash");
-  // P5b (C-21): a gated item is wanted where the block's country knows its technology
-  // or the market holds stock of the good this morning.
-  const gate = gatedItems ? needGate(world) : null;
-  const present = new Uint8Array(goodCount);
-  const desiredByGood = new Float64Array(goodCount);
-  const labelByGood: NeedTier[] = new Array<NeedTier>(goodCount);
-  const full = detail === "full";
-
-  for (const block of inIdOrder(world.popBlocks)) {
-    const population = populationTotal(block);
-    if (population <= 0) continue;
-    const marketId = provinceToMarket.get(block.provinceId);
-    if (marketId === undefined) {
-      throw new RangeError(`popBlock ${String(block.id)} is in a province with no market`);
-    }
-    const market = marketById.get(marketId) ?? marketPrices(world, marketId);
-    const accountId =
-      Number.isInteger(block.id) && block.id >= 0 && block.id < householdIds.length ? (householdIds[block.id] ?? -1) : -1;
-    const account = accountId >= 0 ? index.account(accountId) : undefined;
-    if (account === undefined) {
-      throw new RangeError(`missing household-cash account for popBlock ${String(block.id)}`);
-    }
-    let remainingCash = account.balanceRUSD;
-    const blockStart = build.popBlockId.length;
-    // P5 (D-143 §2): subsistence food the block kept from its own farms today.
-    const kept = ownConsumption.byBlock.get(block.id);
-
-    // Indexed loops (D-139): the same order, without iterator allocation.
-    for (let planIndex = 0; planIndex < tierPlans.length; planIndex += 1) {
-      const plan = tierPlans[planIndex] as (typeof tierPlans)[number];
-      const tier = plan.tier;
-      let presentCount = 0;
-      for (let needIndex = 0; needIndex < plan.needs.length; needIndex += 1) {
-        const need = plan.needs[needIndex] as (typeof plan.needs)[number];
-        if (block.wealthLevel < need.activationWealthMin) continue;
-        for (let itemIndex = 0; itemIndex < need.items.length; itemIndex += 1) {
-          const item = need.items[itemIndex] as (typeof need.items)[number];
-          if (gate !== null && item.requiredTechnologyId !== null && !gate(block.provinceId, marketId, item.requiredTechnologyId, item.goodId)) {
-            continue;
-          }
-          let desired = item.quantityPerCapitaPerDay * population;
-          if (kept !== undefined && need.needTier === "subsistence") {
-            const keptQuantity = kept[item.goodId] ?? 0;
-            if (keptQuantity > 0) {
-              desired -= keptQuantity;
-              if (desired <= quantityTolerance(keptQuantity)) continue;
-            }
-          }
-          if (desired <= 0) continue;
-          if (present[item.goodId] !== 1) {
-            present[item.goodId] = 1;
-            desiredByGood[item.goodId] = desired;
-            labelByGood[item.goodId] = need.needTier;
-            presentCount += 1;
-          } else {
-            // M3 needs data has no overlapping good/tier pairs, but keep the
-            // first tier label and combine physical demand defensively.
-            desiredByGood[item.goodId] = (desiredByGood[item.goodId] ?? 0) + desired;
-          }
-        }
-      }
-      if (presentCount === 0) continue;
-
-      let desiredCost = 0;
-      const planGoods = plan.goods;
-      for (let goodIndex = 0; goodIndex < planGoods.length; goodIndex += 1) {
-        const goodId = planGoods[goodIndex] as number;
-        if (present[goodId] !== 1) continue;
-        desiredCost += (desiredByGood[goodId] ?? 0) * (market.priceRUSD[goodId] ?? 0);
-      }
-      if (!(desiredCost > 0)) {
-        for (let goodIndex = 0; goodIndex < planGoods.length; goodIndex += 1) present[planGoods[goodIndex] as number] = 0;
-        continue;
-      }
-      const spendable = Math.max(0, remainingCash - MONEY_TOLERANCE_RUSD);
-      const ratio = spendable >= desiredCost ? 1 : spendable / desiredCost;
-      let fundedCost = 0;
-      for (let goodIndex = 0; goodIndex < planGoods.length; goodIndex += 1) {
-        const goodId = planGoods[goodIndex] as number;
-        if (present[goodId] !== 1) continue;
-        const desired = desiredByGood[goodId] ?? 0;
-        const funded = desired * ratio;
-        const price = market.priceRUSD[goodId] ?? 0;
-        fundedCost += funded * price;
-        build.popBlockId.push(block.id);
-        build.marketId.push(marketId);
-        build.tier.push(tier);
-        build.needTier.push(labelByGood[goodId] as NeedTier);
-        build.goodId.push(goodId);
-        build.desired.push(desired);
-        build.funded.push(funded);
-        if (full) {
-          build.records.push({
-            popBlockId: block.id,
-            tier,
-            goodId,
-            desiredQuantity: desired,
-            fundedQuantity: funded,
-          });
-        }
-        present[goodId] = 0;
-      }
-      if (fundedCost > remainingCash + moneyTolerance(fundedCost, remainingCash)) {
-        throw new RangeError(`household funding exceeds available cash for popBlock ${String(block.id)}`);
-      }
-      remainingCash = Math.max(0, remainingCash - fundedCost);
-      if (ratio < 1) break;
-    }
-    const blockEnd = build.popBlockId.length;
-    if (blockEnd > blockStart) rowsOfBlock.set(block.id, { start: blockStart, end: blockEnd });
-  }
-
-  // Blocks are walked in ascending id order, tiers in 1/3/6 order and each tier's
-  // goods in ascending good id, so the rows are already in the canonical
-  // (popBlock, tier, good) order the sorts produced.
-  (build as { count: number }).count = build.popBlockId.length;
-  return build;
 }
 
 function criticalGoodIds(
@@ -1099,8 +869,8 @@ interface MarketAttempt {
   readonly fulfilledByRecord: Float64Array;
   /** P5 (D-143 §2): the food owner households kept from their own farms today. */
   readonly ownConsumption: OwnConsumptionPlan;
-  /** P6 (D-153): the demand-system rows and plans, or null on the tier path. */
-  readonly les: LesHouseholdDemand | null;
+  /** P6 (D-153): the demand-system rows and plans. */
+  readonly les: LesHouseholdDemand;
 }
 
 /**
@@ -1159,32 +929,20 @@ function runMarketAttempt(
     ownConsumption.entries.length === 0
       ? baseLookups
       : { ...baseLookups, production: { ...baseLookups.production, ownConsumption } };
-  // P6 (D-153): a world with a demand system buys by it instead of the need tiers.
+  // P6 (D-153): households buy by the demand system (D-155: the need-tier path was removed).
   const demandSystem = demandSystemOf(populationDefinitions, definitions);
-  let les: LesHouseholdDemand | null = null;
-  if (demandSystem !== null) {
-    initialiseSmoothedPrices(world);
-    const gated = demandSystem.requiredTechnologyId.some((id) => id >= 0);
-    les = buildLesHouseholdDemand(
-      world,
-      definitions,
-      demandSystem,
-      index,
-      detail,
-      ownConsumption,
-      gated ? needGate(world) : null,
-    );
-  }
-  const household: HouseholdDemandBuild =
-    les ??
-    buildHouseholdDemand(
-      world,
-      definitions,
-      populationDefinitions,
-      index,
-      detail,
-      ownConsumption,
-    );
+  initialiseSmoothedPrices(world);
+  const gated = demandSystem.requiredTechnologyId.some((id) => id >= 0);
+  const les = buildLesHouseholdDemand(
+    world,
+    definitions,
+    demandSystem,
+    index,
+    detail,
+    ownConsumption,
+    gated ? needGate(world) : null,
+  );
+  const household: HouseholdDemandBuild = les;
   const cap = { cappedBuildings: 0 };
   observe?.("market-production-demand");
   const production = buildProductionDemands(
@@ -1445,20 +1203,13 @@ export function runEconomicDay(
     }
   }
   let employment = refreshEmploymentIfDue(world, economyDefinitions, dayIndex);
-  // M5 migration: monthly, after the initial labor allocation and before the
-  // day's market phase. The migration phase owns the post-flow employment repair
-  // when it moves people, so the integrated day does not repeat it.
   observe?.("migration");
-  // P7 (D-154): a labour-market world replaces M5 migration with the monthly labour
-  // phase (wages, ceilings, mobility, migration, retirement; plan §5.1). The staged
-  // day (or the rollback runner in phase mode) restores the world on failure.
-  const labourMonth = world.labourMarket.enabled ? runLabourMonthPhase(world, economyDefinitions, dayIndex) : null;
-  const migration = world.labourMarket.enabled
-    ? labourMigrationResult(dayIndex, labourMonth)
-    : runMigrationPhase(world, economyDefinitions, dayIndex, {
-        validateWorld: false,
-        restoreOnFailure: options.integrity !== "phase",
-      });
+  // P7 (D-154): the monthly labour phase (wages, ceilings, mobility, migration,
+  // retirement; plan §5.1), after the initial labour allocation and before the day's
+  // market phase. The staged day (or the rollback runner in phase mode) restores the
+  // world on failure. D-155: the M5 migration it replaced was removed.
+  const labourMonth = runLabourMonthPhase(world, economyDefinitions, dayIndex);
+  const migration = labourMigrationResult(dayIndex, labourMonth);
   if (migration.employmentRefresh !== null) {
     employment = migration.employmentRefresh;
   }
@@ -1484,13 +1235,10 @@ export function runEconomicDay(
   // P6 (D-153): household cash before the market, to measure the day's income.
   const demandSystem = demandSystemOf(populationDefinitions, economyDefinitions);
   const householdAccountIds = attemptIndex.ownerAccountIds("popBlock", "household-cash");
-  const cashBeforeMarket =
-    demandSystem === null
-      ? null
-      : world.popBlocks.map((block) => {
-          const accountId = householdAccountIds[block.id] ?? -1;
-          return accountId >= 0 ? (attemptIndex.account(accountId)?.balanceRUSD ?? 0) : 0;
-        });
+  const cashBeforeMarket = world.popBlocks.map((block) => {
+    const accountId = householdAccountIds[block.id] ?? -1;
+    return accountId >= 0 ? (attemptIndex.account(accountId)?.balanceRUSD ?? 0) : 0;
+  });
   const attempt = runMarketAttempt(
     world,
     economyDefinitions,
@@ -1502,11 +1250,8 @@ export function runEconomicDay(
     options.detail ?? "full",
   );
   // P6 (D-153): bought dwellings join the buyers' stock; households read smoothed prices.
-  const dwellingsBought =
-    demandSystem !== null && attempt.les !== null
-      ? applyDwellingPurchases(world, demandSystem, attempt.les, attempt.fulfilledByRecord)
-      : 0;
-  if (demandSystem !== null) updateSmoothedPrices(world);
+  const dwellingsBought = applyDwellingPurchases(world, demandSystem, attempt.les, attempt.fulfilledByRecord);
+  updateSmoothedPrices(world);
   const fallbackUsed = attempt.cappedBuildings > 0;
   const household = attempt.household;
   const productionRecords = attempt.production;
@@ -1639,10 +1384,15 @@ export function runEconomicDay(
       ? null
       : runProfitDistributionPhase(world, dayIndex, financeClose, { financeInPlace: true });
   // P6 (D-153): the day's income enters the smoothed income; dwellings depreciate.
-  const housing =
-    demandSystem !== null && cashBeforeMarket !== null
-      ? updateHouseholdIncomeAndHousing(world, dayIndex, cashBeforeMarket, attempt.settlement, attempt.ownConsumption, attempt.markets, dwellingsBought)
-      : null;
+  const housing = updateHouseholdIncomeAndHousing(
+    world,
+    dayIndex,
+    cashBeforeMarket,
+    attempt.settlement,
+    attempt.ownConsumption,
+    attempt.markets,
+    dwellingsBought,
+  );
 
   observe?.("day-result");
   let workingAge = 0;
@@ -1697,10 +1447,7 @@ export function runEconomicDay(
       profitDistribution,
       ownConsumption: attempt.ownConsumption.entries,
       discovery,
-      demand:
-        attempt.les === null || housing === null
-          ? null
-          : { categoryKeys: attempt.les.categoryKeys, byCountry: [...attempt.les.byCountry.values()], housing },
+      demand: { categoryKeys: attempt.les.categoryKeys, byCountry: [...attempt.les.byCountry.values()], housing },
     },
   };
 }

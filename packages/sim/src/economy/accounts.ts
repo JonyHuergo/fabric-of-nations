@@ -2623,13 +2623,11 @@ export function applyOpeningBalances(
     if (account === undefined) throw new RangeError(`unknown account ${String(entry.accountId)}`);
     account.balanceRUSD = entry.balanceRUSD;
   }
-  // M14 compatibility: the opening-balance checksum is a derived integrity
-  // value that predates the RUSD rename. Hash it with the former field spelling
-  // so unchanged balances produce the same historical checksum and world hash;
-  // the authoritative account field remains balanceRUSD.
+  // D-155: the checksum is over the authoritative field names (the pre-M14 spelling
+  // it used to keep was removed with the other legacy aliases).
   const openingChecksumEntries = normalized.map((entry) => ({
     accountId: entry.accountId,
-    balanceSUSD: entry.balanceRUSD,
+    balanceRUSD: entry.balanceRUSD,
   }));
   const opening: OpeningBalanceRecord = {
     dayIndex,

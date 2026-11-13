@@ -172,6 +172,10 @@ describe("E5 training and qualification", () => {
     });
     const index = buildFinanceIndex(world.finance);
     const treasury = index.get("country", country.id, "treasury-cash");
+    // D-155: the training payroll is the assigned instructors' market wage (P7 plan Q4),
+    // which the large budget does not raise, so the treasury itself is limited: the
+    // reserve target leaves 1 RUSD payable.
+    country.fiscal = { ...country.fiscal, reserveTargetRUSD: Math.max(0, treasury.balanceRUSD - 1) };
     const affordable = Math.max(
       0,
       treasury.balanceRUSD - country.fiscal.reserveTargetRUSD,
@@ -259,7 +263,10 @@ describe("E5 qualification and labor-law channels", () => {
   });
 
   test("public health uses existing administration staff and lowers the mortality factor", () => {
-    const healthScenario = e5Scenario({ healthStaffShareA: 0.2 });
+    // D-155: the health service's posts are its share of the administration budget at the
+    // clerks' market wage (P7 plan Q3); a share of 0.2 of this fixture's budget buys less
+    // than one post, so the share is 0.5.
+    const healthScenario = e5Scenario({ healthStaffShareA: 0.5 });
     const healthWorld = createEconomyWorld(healthScenario, { seed: SEED });
     const healthCountry = healthWorld.countries.find((entry) => entry.id === M5_COUNTRY_A);
     if (healthCountry === undefined) throw new Error("no country A");
@@ -275,10 +282,9 @@ describe("E5 qualification and labor-law channels", () => {
     if (neutralCountry === undefined) throw new Error("no country A");
     const withoutHealth = deriveHealth(neutralWorld, neutralCountry, neutralScenario.definitions);
     expect(withoutHealth.mortalityFactor).toBe(1);
-    refreshInstitution(neutralWorld, neutralCountry, neutralScenario.definitions, 0);
-    expect(healthCountry.institutions.quality).toBeLessThan(
-      neutralCountry.institutions.quality,
-    );
+    // D-155: the comparison of administration quality with and without the health share
+    // was removed with the shared clerk pool it measured: under P7 the administration's
+    // quality is its assigned staff over the posts its (reduced) budget funds (plan Q3, Q4).
   });
 
   test("an enacted health law enforces a minimum staff share", () => {

@@ -9,7 +9,6 @@
  * The legacy-save rejection both renames once pinned lives in
  * `serialization/save-compatibility.test.ts`.
  */
-import { prePhase7Digest } from "../fixtures/p7Encoding.js";
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -17,7 +16,6 @@ import { fileURLToPath } from "node:url";
 
 import { loadM11World } from "@century/data";
 import {
-  LEGACY_SUSD_CURRENCY_KEY,
   RUSD_CURRENCY_KEY,
   RUSD_UNIT_ABBREVIATION,
   RUSD_UNIT_NAME,
@@ -98,7 +96,6 @@ describe("M14 canonical RUSD identity", () => {
     expect(RUSD_CURRENCY_KEY).toBe("rusd");
     expect(RUSD_UNIT_ABBREVIATION).toBe("RUSD");
     expect(RUSD_UNIT_NAME).toBe("Reference US Dollars");
-    expect(LEGACY_SUSD_CURRENCY_KEY).toBe("susd");
   });
 
   test("RUSD is not USD and actual USD remains a national currency", () => {
@@ -113,7 +110,7 @@ describe("M14 canonical RUSD identity", () => {
   });
 
   test("RUSD cannot be adopted or issued as a national currency", () => {
-    for (const key of ["rusd", "RUSD", "Rusd", "susd", "SUSD", "Susd"]) {
+    for (const key of ["rusd", "RUSD", "Rusd"]) {
       const scenario = ownCurrencyScenario();
       scenario.currencies![0]!.key = key;
       expect(() => createEconomyWorld(scenario, { seed: 1 })).toThrow(/reserved for the RUSD/i);
@@ -192,8 +189,11 @@ describe("M14 monetary equivalence and determinism", () => {
   // no labour market until its data changes in P7 step 3, and restoring schema 34 and
   // simulation 0.30.0 reproduces the P6 digest. The new pin follows the designer's review
   // of the P7 before/after report.
+  // D-155: the pre-P7 encoding proof is removed (designer, 2026-11-11). The pin below is
+  // the last one the designer accepted; the world has changed since (P7 step 3 and the
+  // D-155 digest without the SUSD view), so this test fails until the designer re-pins it.
   test("the 1900 world hash is pinned", () => {
-    expect(prePhase7Digest(world)).toBe("bfd55c27e7ef866d");
+    expect(hashWorld(world)).toBe("bfd55c27e7ef866d");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {

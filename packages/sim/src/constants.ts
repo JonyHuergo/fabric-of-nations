@@ -201,13 +201,6 @@ export const RUSD_UNIT_NAME = "Reference US Dollars";
 /** Official abbreviation of the reference unit of account. */
 export const RUSD_UNIT_ABBREVIATION = "RUSD";
 
-/**
- * Legacy pre-M14 key for the reference unit. Retained only so old scenario or
- * save data that used the former vocabulary is rejected as a currency, never
- * accepted as a national currency.
- */
-export const LEGACY_SUSD_CURRENCY_KEY = "susd";
-
 /** Maximum accepted length of a registered currency key. */
 export const MAX_CURRENCY_KEY_LENGTH = 32;
 

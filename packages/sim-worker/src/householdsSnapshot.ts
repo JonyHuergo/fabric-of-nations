@@ -38,7 +38,6 @@ export function countryHouseholdsSnapshot(
 ): CountryHouseholdsSnapshot | null {
   if (populationDefinitions === undefined) return null;
   const system = demandSystemOf(populationDefinitions, definitions);
-  if (system === null) return null;
   const out = createDemandPlanOutput(system);
   const available = new Uint8Array(system.goodCount);
   const marketById = new Map(world.markets.map((market) => [market.id, market]));

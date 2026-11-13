@@ -32,7 +32,7 @@ import {
   type TickContext,
   type World,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
 const SEED = 20_261_023;
 const START_DAY = 28;
@@ -84,7 +84,7 @@ function uniqueIds(values: readonly number[]): boolean {
 
 describe("Batch 6 integrated multi-country economic run", () => {
   test("conserves population, cash, and accounting across closes, migration, and debt", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const context = contextFor(scenario);
     const world = createEconomyWorld(scenario, { seed: SEED });
     world.dayIndex = START_DAY;

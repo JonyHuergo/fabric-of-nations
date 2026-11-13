@@ -28,7 +28,7 @@ import {
   tickM5b as tick,
 } from "../fixtures/m5b.js";
 import { m5Scenario } from "../fixtures/m5.js";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
 function account(
   world: World,
@@ -471,7 +471,7 @@ describe("bounded debt contracts and financing semantics", () => {
   });
 
   test("the shipped USA policy is active and produces real borrowing", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const usa = scenario.countries?.find((country) => country.tag === "USA");
     expect(usa?.debt?.enabled).toBe(true);
     expect(usa?.debt?.creditorKind).toBe("country");

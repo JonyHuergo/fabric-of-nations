@@ -54,6 +54,97 @@ export function dualFnv1a32Hex(text: string): string {
   return `${toHex8(fnv1a32(text, FNV_OFFSET_BASIS))}${toHex8(fnv1a32(text, SECOND_LANE_BASIS))}`;
 }
 
+/**
+ * `dualFnv1a32Hex(stableStringify(value))` without building the canonical text.
+ *
+ * The digest of the 1900 world hashes about 100 MB of canonical JSON; building that
+ * string first held several hundred megabytes at once (D-155). This walks the value
+ * in the fast encoder's order and feeds each piece of text to both FNV-1a lanes as it
+ * is produced, so the digest is identical by construction: the pieces concatenate to
+ * exactly the fast encoder's text. Input the fast encoder does not accept falls back
+ * to `stableStringify`, which throws its exact error (or encodes it, if valid).
+ */
+export function dualFnv1a32HexOfCanonical(value: unknown): string {
+  const lanes: DualFnvLanes = { first: FNV_OFFSET_BASIS | 0, second: SECOND_LANE_BASIS | 0 };
+  if (!feedCanonical(value, 0, lanes)) return dualFnv1a32Hex(stableStringify(value));
+  return `${toHex8(lanes.first)}${toHex8(lanes.second)}`;
+}
+
+/** Two FNV-1a states (signed 32-bit) over the same text; a local accumulator (D-155). */
+interface DualFnvLanes {
+  first: number;
+  second: number;
+}
+
+function feedText(lanes: DualFnvLanes, text: string): void {
+  let first = lanes.first;
+  let second = lanes.second;
+  const length = text.length;
+  for (let index = 0; index < length; index += 1) {
+    const code = text.charCodeAt(index);
+    first = Math.imul(first ^ code, FNV_PRIME);
+    second = Math.imul(second ^ code, FNV_PRIME);
+  }
+  lanes.first = first;
+  lanes.second = second;
+}
+
+/**
+ * Feed the canonical encoding of `value` to `lanes`; false where `encodeFast` would
+ * return null. Mirrors `encodeFast` piece for piece. A numeric array is fed element by
+ * element, which is the same text as `JSON.stringify(array)`: finite numbers, written
+ * by `String`, with -0 written as 0.
+ */
+function feedCanonical(value: unknown, depth: number, lanes: DualFnvLanes): boolean {
+  if (value === null) {
+    feedText(lanes, "null");
+    return true;
+  }
+  switch (typeof value) {
+    case "string":
+      feedText(lanes, JSON.stringify(value));
+      return true;
+    case "number":
+      if (!Number.isFinite(value)) return false;
+      feedText(lanes, Object.is(value, -0) ? "0" : String(value));
+      return true;
+    case "boolean":
+      feedText(lanes, value ? "true" : "false");
+      return true;
+    case "object": {
+      if (depth >= FAST_ENCODE_MAX_DEPTH) return false;
+      if (Array.isArray(value)) {
+        const array = value as unknown[];
+        feedText(lanes, "[");
+        for (let index = 0; index < array.length; index += 1) {
+          if (!(index in array)) return false;
+          if (index > 0) feedText(lanes, ",");
+          if (!feedCanonical(array[index], depth + 1, lanes)) return false;
+        }
+        feedText(lanes, "]");
+        return true;
+      }
+      const record = value as Record<string, unknown>;
+      const prototype: unknown = Object.getPrototypeOf(record);
+      if (prototype !== Object.prototype && prototype !== null) return false;
+      if (Object.getOwnPropertySymbols(record).length > 0) return false;
+      const keys = Object.keys(record).sort();
+      feedText(lanes, "{");
+      for (let index = 0; index < keys.length; index += 1) {
+        const key = keys[index] as string;
+        const child = record[key];
+        if (child === undefined) return false;
+        feedText(lanes, `${index === 0 ? "" : ","}${JSON.stringify(key)}:`);
+        if (!feedCanonical(child, depth + 1, lanes)) return false;
+      }
+      feedText(lanes, "}");
+      return true;
+    }
+    default:
+      return false;
+  }
+}
+
 /** Canonical JSON encoding used by checksums, state hashes, and tests. */
 export function stableStringify(value: unknown): string {
   // D-137: a fast encoder produces the same text for every valid input; it builds no
@@ -201,5 +292,7 @@ function encodeValue(value: unknown, path: string, ancestors: Set<object>): stri
  * corruption and simple edits; it is not an authentication mechanism.
  */
 export function checksumOfJson(value: unknown): string {
-  return `${SAVE_CHECKSUM_PREFIX}${fnv1a32Hex(stableStringify(value))}`;
+  // D-155: hashed as the canonical text is produced. The first lane of the two-lane
+  // digest is FNV-1a with the standard offset basis, i.e. `fnv1a32Hex` of the same text.
+  return `${SAVE_CHECKSUM_PREFIX}${dualFnv1a32HexOfCanonical(value).slice(0, 8)}`;
 }

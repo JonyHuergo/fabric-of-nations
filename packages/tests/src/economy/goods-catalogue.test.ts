@@ -35,7 +35,7 @@ import {
   type EconomyScenarioDef,
   type World,
 } from "@century/sim";
-import { loadM3SmallEconomy } from "@century/data";
+import { loadM3SmallEconomy } from "../fixtures/smallWorlds.js";
 import { economyTickContext, totalCash } from "../fixtures/m3e.js";
 import {
   FOOD_PRODUCTS_ID,

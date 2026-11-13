@@ -17,6 +17,7 @@ import {
   validateCountryAction,
   type CountryAction,
   type EconomyScenarioDef,
+  type World,
   countryProvinceIds,
   hydroCapacityPerDay,
 } from "@century/sim";
@@ -170,7 +171,14 @@ describe("M11 historical catalog", () => {
 });
 
 describe("M11 world initialization", () => {
-  const scenario = loadM11World();
+  // D-155: loaded for this block's tests and released after them, not at collection.
+  let scenario: EconomyScenarioDef;
+  beforeAll(() => {
+    scenario = loadM11World();
+  });
+  afterAll(() => {
+    scenario = undefined as never;
+  });
 
   test("every selectable country exists as a playable simulation entity", () => {
     expect(scenario.countries?.length).toBe(67);
@@ -198,7 +206,7 @@ describe("M11 world initialization", () => {
   });
 
   test("every selectable country can initialize a campaign", () => {
-    const base = loadM11World();
+    const base = scenario;
     const selectable = (base.countryMeta ?? []).filter((meta) => meta.selectable);
     expect(selectable.length).toBe(66);
     for (const meta of selectable) {
@@ -246,9 +254,20 @@ describe("M11 world initialization", () => {
 });
 
 describe("P5b 1900 world: hydro stations and jewellery (C-12, D-152)", () => {
-  const scenario = loadM11World();
-  const definitionByKey = new Map(scenario.definitions.buildings.map((definition) => [definition.key, definition]));
-  const goodByKey = new Map(scenario.definitions.goods.map((good) => [good.key, good]));
+  // D-155: loaded for this block's tests and released after them, not at collection.
+  let scenario: EconomyScenarioDef;
+  let definitionByKey: Map<string, EconomyScenarioDef["definitions"]["buildings"][number]>;
+  let goodByKey: Map<string, EconomyScenarioDef["definitions"]["goods"][number]>;
+  beforeAll(() => {
+    scenario = loadM11World();
+    definitionByKey = new Map(scenario.definitions.buildings.map((definition) => [definition.key, definition]));
+    goodByKey = new Map(scenario.definitions.goods.map((good) => [good.key, good]));
+  });
+  afterAll(() => {
+    scenario = undefined as never;
+    definitionByKey = undefined as never;
+    goodByKey = undefined as never;
+  });
 
   test("hydro stations stand only where the rivers have potential, and the opening day stays under the cap", () => {
     const hydro = definitionByKey.get("hydro-station");
@@ -310,16 +329,29 @@ describe("P5b 1900 world: hydro stations and jewellery (C-12, D-152)", () => {
 
 describe("P5b 1900 world: A12 crops at their recorded 1900 producers (D-148 additions, item 9)", () => {
   const p5b = (file: string) => JSON.parse(readFileSync(join(DATA_ROOT, "historical/p5b", file), "utf8")) as unknown;
-  const sources = p5b("sources_1900.json") as {
+  // D-155: the tables are read for this block's tests and released after them.
+  let sources: {
     crops1900: { entries: { crop: string; territory: string; kind: string; kg: number; as: string; batch: number }[] };
     units: { id: string; value: number }[];
   };
-  const calibration = p5b("calibration_1900.json") as {
+  let calibration: {
     placement: { goods: Record<string, { a12?: { coverage: number; minCoverage: number; usesSourcedShares: boolean } }> };
   };
-  const provinces = p5b("provinces_1900.json") as { id: number; territoryKey: string }[];
-  const buildings = p5b("buildings_1900.json") as { provinceId: number; definitionKey: string; level: number; technique: number }[];
-  const territoryOf = new Map(provinces.map((province) => [province.id, province.territoryKey]));
+  let buildings: { provinceId: number; definitionKey: string; level: number; technique: number }[];
+  let territoryOf: Map<number, string>;
+  beforeAll(() => {
+    sources = p5b("sources_1900.json") as typeof sources;
+    calibration = p5b("calibration_1900.json") as typeof calibration;
+    const provinces = p5b("provinces_1900.json") as { id: number; territoryKey: string }[];
+    buildings = p5b("buildings_1900.json") as typeof buildings;
+    territoryOf = new Map(provinces.map((province) => [province.id, province.territoryKey]));
+  });
+  afterAll(() => {
+    sources = undefined as never;
+    calibration = undefined as never;
+    buildings = undefined as never;
+    territoryOf = undefined as never;
+  });
   const levelsIn = (definitionKey: string) => {
     const levels = new Map<string, number>();
     for (const building of buildings.filter((row) => row.definitionKey === definitionKey)) {
@@ -616,11 +648,21 @@ describe("M11 map data", () => {
 });
 
 describe("M11 slider ranges produce validated authoritative actions", () => {
-  const scenario = loadM11World();
-  const world = createEconomyWorld(scenario, { seed: 9 });
+  // D-155: built for this block's tests and released after them, not at collection.
+  let scenario: EconomyScenarioDef;
+  let world: World;
+  let countryId: number;
+  beforeAll(() => {
+    scenario = loadM11World();
+    world = createEconomyWorld(scenario, { seed: 9 });
+    countryId = tagId(scenario, "USA");
+  });
+  afterAll(() => {
+    scenario = undefined as never;
+    world = undefined as never;
+  });
   /** One value per good of the 1900 catalogue (the trade-policy arrays are per good). */
   const perGood = <T,>(value: T): T[] => scenario.definitions.goods.map(() => value);
-  const countryId = tagId(scenario, "USA");
 
   function validate(action: CountryAction): boolean {
     return validateCountryAction(world, action, scenario.definitions).valid;

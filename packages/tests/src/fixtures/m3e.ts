@@ -1,6 +1,7 @@
 import {
   createEconomyWorld,
   designatedCashTotal,
+  refreshEmployment,
   runMarketDay,
   settleMarketDay,
   type EconomyScenarioDef,
@@ -105,6 +106,15 @@ export function singleBuildingScenario(options: {
   scenario.employment = scenario.employment.filter((assignment) =>
     options.buildingIds.includes(assignment.buildingInstanceId),
   );
+  // D-155: the labour market staffs every job it can at creation and does not read the
+  // assignment list, so a producer outside `buildingIds` gives its jobs to the clerks,
+  // whose block is empty in this fixture: it has no workers, as it had no assignments.
+  for (const building of scenario.buildingInstances) {
+    if (options.buildingIds.includes(building.id)) continue;
+    const definition = scenario.definitions.buildings.find((candidate) => candidate.id === building.definitionId);
+    const first = definition?.jobs[0];
+    if (definition !== undefined && first !== undefined) definition.jobs = [{ ...first, professionId: 2 }];
+  }
   return scenario;
 }
 
@@ -122,6 +132,9 @@ export function createSettlementWorld(
     for (const building of world.buildings) {
       if (!active.has(building.id)) building.operational = false;
     }
+    // D-155: the labour market keeps no assignment at a closed building; a closure is
+    // followed by the forced refresh the game runs (`markEmploymentDirty`).
+    refreshEmployment(world, scenario.definitions, world.dayIndex, { force: true });
   }
   return { scenario, world };
 }

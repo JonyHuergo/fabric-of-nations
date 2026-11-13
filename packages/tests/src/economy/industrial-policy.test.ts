@@ -24,7 +24,7 @@ import {
   type TickContext,
   type World,
 } from "@century/sim";
-import { loadM3SmallEconomy } from "@century/data";
+import { loadM3SmallEconomy } from "../fixtures/smallWorlds.js";
 import {
   PROTOCOL_VERSION,
   parseWorkerEvent,

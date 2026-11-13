@@ -6,7 +6,6 @@ import {
   designatedCashTotal,
   hashWorld,
   populationTotal,
-  runMigrationPhase,
   runTicks,
   serializeWorld,
   deserializeWorld,
@@ -19,7 +18,6 @@ import {
   M5_COUNTRY_A,
   M5_COUNTRY_B,
   M5_COUNTRY_C,
-  M5_FARM,
   M5_REGION_A2,
   M5_REGION_B1,
   m5Scenario,
@@ -55,58 +53,6 @@ describe("M5 multi-province and multi-country world", () => {
     expect(world.countries.find((country) => country.id === M5_COUNTRY_B)?.immigrationOpen).toBe(
       false,
     );
-  });
-
-  test("assigns cross-province labor within a country and cross-border labor only into an open country", () => {
-    const { world } = m5World();
-    runTicks(world, 1, context(m5Scenario()));
-    expect(world.employment.length).toBeGreaterThan(0);
-    assertValidWorld(world);
-    const provinceByBuilding = new Map(world.buildings.map((building) => [building.id, building.provinceId]));
-    const countryOfProvince = new Map<number, number>();
-    for (const country of world.countries) {
-      for (const provinceId of countryProvinceIds(world, country.id)) countryOfProvince.set(provinceId, country.id);
-    }
-    let crossProvinceSameCountry = 0;
-    for (const assignment of world.employment) {
-      const block = world.popBlocks.find((candidate) => candidate.id === assignment.popBlockId);
-      expect(block).toBeDefined();
-      if (block === undefined) continue;
-      const buildingProvince = provinceByBuilding.get(assignment.buildingInstanceId);
-      if (buildingProvince === undefined) continue;
-      if (buildingProvince !== block.provinceId) {
-        const sourceCountry = countryOfProvince.get(block.provinceId);
-        const destinationCountry = countryOfProvince.get(buildingProvince);
-        if (sourceCountry === destinationCountry) crossProvinceSameCountry += 1;
-        else {
-          expect(destinationCountry).toBe(M5_COUNTRY_C);
-          expect(world.countries.find((country) => country.id === destinationCountry)?.immigrationOpen).toBe(true);
-        }
-      }
-    }
-    expect(crossProvinceSameCountry).toBeGreaterThan(0);
-  });
-
-  test("keeps a closed border closed even when vacancies exist", () => {
-    const scenario = m5Scenario();
-    const farm = scenario.buildingInstances.find(
-      (building) => building.id === 5 && building.provinceId === M5_REGION_B1,
-    );
-    expect(farm?.definitionId).toBe(M5_FARM);
-    // Enlarge B's farm far beyond its domestic workforce.
-    scenario.buildingInstances = scenario.buildingInstances.map((building) =>
-      building.id === 5 ? { ...building, level: 10 } : building,
-    );
-    const world = createEconomyWorld(scenario, { seed: 20_261_023 });
-    runTicks(world, 1, context(scenario));
-    const bBlocks = world.popBlocks.filter((block) => block.provinceId === M5_REGION_B1);
-    const bBuildingIds = new Set(
-      world.buildings.filter((building) => building.provinceId === M5_REGION_B1).map((building) => building.id),
-    );
-    for (const assignment of world.employment) {
-      if (!bBuildingIds.has(assignment.buildingInstanceId)) continue;
-      expect(bBlocks.some((block) => block.id === assignment.popBlockId)).toBe(true);
-    }
   });
 
   test("rejects invalid market and country membership", () => {
@@ -155,16 +101,6 @@ describe("M5 multi-province and multi-country world", () => {
     expect(world.dayIndex).toBe(32);
     expect(hashWorld(world)).not.toBe(start);
     assertValidWorld(world);
-  });
-
-  test("migration phase is a no-op outside the first day of a month", () => {
-    const scenario = m5Scenario();
-    const world = createEconomyWorld(scenario, { seed: 20_261_023 });
-    const before = hashWorld(world);
-    const result = runMigrationPhase(world, scenario.definitions, 0);
-    expect(result.ran).toBe(false);
-    expect(result.employmentRefresh).toBeNull();
-    expect(hashWorld(world)).toBe(before);
   });
 
   test("conserves population and cash across an actual migration tick", () => {

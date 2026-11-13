@@ -9,9 +9,8 @@ import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { loadM11World, loadM5EightPolities } from "@century/data";
+import { loadM11World } from "@century/data";
 import {
-  DEFAULT_MONEY_COEFFICIENTS,
   MONEY_COEFFICIENT_KEYS,
   WORLD_SCHEMA_VERSION,
   buildProvinceOwnerMap,
@@ -22,7 +21,6 @@ import {
   hashWorld,
   inheritedTechnique,
   localWageIndex,
-  provinceWageRUSDPerYear,
   serializeWorld,
   tick,
   type EconomyScenarioDef,
@@ -264,7 +262,8 @@ describe("P2b 1900 world", () => {
 
   it("pays each worker the wage of the province's table", () => {
     const probe = createEconomyWorld(scenario, { seed: 20_261_023 });
-    const result = tick(probe, { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions } });
+    // D-155: summary detail (D-137) keeps the wage settlements and gives the same world.
+    const result = tick(probe, { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions }, detail: "summary" });
     const professions = new Map(scenario.definitions.professions.map((profession) => [profession.id, profession]));
     const blocks = new Map(probe.popBlocks.map((block) => [block.id, block]));
     const provinces = new Map(probe.provinceEconomies.map((province) => [province.id, province]));
@@ -275,7 +274,9 @@ describe("P2b 1900 world", () => {
         const profession = professions.get(payment.professionId);
         if (block === undefined || profession === undefined || payment.workers <= 0) continue;
         if (block.qualification !== 0) continue;
-        const wage = provinceWageRUSDPerYear(provinces.get(block.provinceId)?.wageRUSDPerYearByProfession, profession);
+        // D-155: the province table's wage, or the profession's reference wage where the
+        // table has none (the rule of the removed provinceWageRUSDPerYear).
+        const wage = provinces.get(block.provinceId)?.wageRUSDPerYearByProfession[profession.id] ?? profession.baseWage1900RUSDPerYear;
         // P5 (D-143 §2): an owner block's wage at its own farm is partly paid in kind
         // (its kept food at opening prices); cash + in kind is the table wage.
         close((payment.obligationRUSD + (payment.paidInKindRUSD ?? 0)) / payment.workers, wage / 365, 6);
@@ -290,7 +291,8 @@ describe("P2b 1900 world", () => {
   // price fell 5% a day although supply and demand balanced.
   it("runs a week and balanced goods hold their price (D-136)", () => {
     const probe = createEconomyWorld(scenario, { seed: 20_261_023 });
-    const context = { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions } };
+    // D-155: summary detail (D-137): the same world without the per-record diagnostics.
+    const context = { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions }, detail: "summary" as const };
     const us = probe.markets.find((market) => market.customsCountryId === probe.countries.find((country) => country.tag === "USA")?.id);
     if (us === undefined) throw new Error("fixture");
     const livestock = scenario.definitions.goods.find((good) => good.key === "livestock")?.id ?? -1;
@@ -320,7 +322,7 @@ describe("P2b 1900 world", () => {
 
   it("scales a building's capacity with its technique", () => {
     const probe = createEconomyWorld(scenario, { seed: 20_261_023 });
-    tick(probe, { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions } });
+    tick(probe, { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions }, detail: "summary" });
     const building = probe.buildings.find((candidate) => computeBuildingCapacity(probe, scenario.definitions, candidate.id).capacityTU > 0);
     expect(building).toBeDefined();
     if (building === undefined) return;
@@ -344,7 +346,7 @@ describe("P2b 1900 world", () => {
     close(inheritedTechnique(world, usa.id, farm.id), sum / weight, 9);
   });
 
-  it("scales public-service benchmarks with local wages and leaves legacy worlds at 1", () => {
+  it("scales public-service benchmarks with local wages", () => {
     const keys = new Set(["academics"]);
     const gbr = world.countries.find((country) => country.tag === "GBR");
     const usa = world.countries.find((country) => country.tag === "USA");
@@ -355,20 +357,5 @@ describe("P2b 1900 world", () => {
     const american = localWageIndex(world, blocksOf(usa.id), scenario.definitions, keys);
     expect(british).toBeLessThan(american);
     expect(american).toBeLessThanOrEqual(1);
-    const legacyScenario = loadM5EightPolities();
-    const legacy = createEconomyWorld(legacyScenario, { seed: 1 });
-    expect(localWageIndex(legacy, legacy.popBlocks, legacyScenario.definitions, keys)).toBe(1);
-  });
-});
-
-describe("P2b leaves legacy fixtures on their own scale (A6)", () => {
-  it("keeps the M5 sample on the M11 definitions and the default money coefficients", () => {
-    const legacyScenario = loadM5EightPolities();
-    const legacy = createEconomyWorld(legacyScenario, { seed: 1 });
-    expect(legacy.moneyCoefficients).toEqual(DEFAULT_MONEY_COEFFICIENTS);
-    expect(legacy.provinceEconomies.every((province) => province.wageRUSDPerYearByProfession.length === 0)).toBe(true);
-    expect(legacy.buildings.every((building) => building.technique === 1)).toBe(true);
-    const goods = readJson<{ key: string; basePrice1900RUSD: number }[]>("historical_goods.json");
-    expect(legacyScenario.definitions.goods.map((good) => good.basePrice1900RUSD)).toEqual(goods.map((good) => good.basePrice1900RUSD));
   });
 });

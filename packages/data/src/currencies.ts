@@ -23,7 +23,6 @@ import { fileURLToPath } from "node:url";
 import {
   CURRENCY_RATE_MAX,
   CURRENCY_RATE_MIN,
-  LEGACY_SUSD_CURRENCY_KEY,
   MAX_CURRENCY_KEY_LENGTH,
   MAX_CURRENCY_NAME_LENGTH,
   RUSD_CURRENCY_KEY,
@@ -185,7 +184,7 @@ function readCurrency(
   if (key.length > MAX_CURRENCY_KEY_LENGTH) {
     errors.push(`${path}.key must be at most ${String(MAX_CURRENCY_KEY_LENGTH)} characters`);
   }
-  if (key === RUSD_CURRENCY_KEY || key === LEGACY_SUSD_CURRENCY_KEY) {
+  if (key === RUSD_CURRENCY_KEY) {
     errors.push(`${path}.key is reserved for RUSD`);
   }
   const name = text(raw, "name", path, errors);

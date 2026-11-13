@@ -1,4 +1,4 @@
-import { loadM2WorldAggregate } from "@century/data";
+import { loadM2WorldAggregate } from "../fixtures/smallWorlds.js";
 import {
   assertValidWorld,
   createEconomyWorld,
@@ -18,7 +18,9 @@ describe("M3a world state and relationships", () => {
     if (province === undefined || market === undefined) throw new Error("missing economy state");
 
     expect(world.buildings).toHaveLength(8);
-    expect(world.employment).toHaveLength(3);
+    // D-155: the labour market staffs the world at creation (8 assignments) instead of
+    // keeping the scenario's three.
+    expect(world.employment).toHaveLength(8);
     expect(world.markets).toHaveLength(1);
     expect(province.marketId).toBe(0);
     expect(province.buildingInstanceIds).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);

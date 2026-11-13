@@ -62,9 +62,13 @@ function goldInMarket(world: World, marketId: number): number {
 function goldInTransit(world: World): number {
   return world.trade.shipments.filter((shipment) => shipment.goodId === goldId).reduce((acc, shipment) => acc + shipment.quantity, 0);
 }
-/** One full-detail day; returns the gold produced, used, eaten and lost in every market. */
+/**
+ * One day; returns the gold produced, used, eaten and lost in every market. D-155: the
+ * market inventory flows are part of the summary detail (D-137), so the day no longer
+ * builds the full-detail record lists of the 1900 world.
+ */
 function dayWithGoldFlows(world: World): number {
-  const result = tick(world, { ...context, detail: "full" as const });
+  const result = tick(world, context);
   let net = 0;
   for (const market of result.economy!.markets) {
     const flow = market.inventory.find((entry) => entry.goodId === goldId);
@@ -138,18 +142,23 @@ describe("D-140 mint window (D-149)", () => {
   }, 300_000);
 
   test("at the export point it sells to the dealer; with no metal left it suspends", () => {
-    const world = fresh();
-    const usa = authority(world, "USA");
-    const marketId = issuerHomeMarketId(world, usa.issuerCountryId!)!;
-    const market = world.markets.find((entry) => entry.id === marketId)!;
-    market.priceRUSD[goldId] = mintPriceRUSDPerKg(usa) * (1 + MINT_EXPORT_POINT) * 1.2;
-    const goldBefore = worldGold(world);
-    const kgBefore = usa.metalReserveKg;
-    const net = dayWithGoldFlows(world);
-    const sold = kgBefore - authority(world, "USA").metalReserveKg;
-    expect(sold).toBeGreaterThan(0);
-    expect(goldInMarket(world, marketId)).toBeGreaterThan(0);
-    expect(worldGold(world)).toBeCloseTo(goldBefore + net, 6);
+    // D-155: the first world lives only inside this function, so it is released before the
+    // second (emptied) world is built.
+    const marketId = ((): number => {
+      const world = fresh();
+      const usa = authority(world, "USA");
+      const marketId = issuerHomeMarketId(world, usa.issuerCountryId!)!;
+      const market = world.markets.find((entry) => entry.id === marketId)!;
+      market.priceRUSD[goldId] = mintPriceRUSDPerKg(usa) * (1 + MINT_EXPORT_POINT) * 1.2;
+      const goldBefore = worldGold(world);
+      const kgBefore = usa.metalReserveKg;
+      const net = dayWithGoldFlows(world);
+      const sold = kgBefore - authority(world, "USA").metalReserveKg;
+      expect(sold).toBeGreaterThan(0);
+      expect(goldInMarket(world, marketId)).toBeGreaterThan(0);
+      expect(worldGold(world)).toBeCloseTo(goldBefore + net, 6);
+      return marketId;
+    })();
 
     // Empty the reserve (and its account) and ask again: convertibility is suspended.
     const empty = fresh();
@@ -179,15 +188,21 @@ describe("D-140 mint window (D-149)", () => {
   }, 300_000);
 
   test("saves round-trip the metal standard; two runs are identical", () => {
-    const runs = [0, 1].map(() => {
+    const run = (): World => {
       const runner = createRollbackRunner(fresh());
       runTicksWithRollback(runner, 2, context);
       return runner.world;
-    });
-    expect(hashWorld(runs[1]!)).toBe(hashWorld(runs[0]!));
-    const restored = deserializeWorld(serializeWorld(runs[0]!));
-    expect(hashWorld(restored)).toBe(hashWorld(runs[0]!));
-    expect(authority(restored, "USA").metalReserveKg).toBe(authority(runs[0]!, "USA").metalReserveKg);
+    };
+    // D-155: the first run is reduced to its hash, its save and its reserve before the
+    // second run is built, so two 1900 worlds and their checkpoints are never alive together.
+    const first = ((): { hash: string; save: string; reserveKg: number } => {
+      const world = run();
+      return { hash: hashWorld(world), save: serializeWorld(world), reserveKg: authority(world, "USA").metalReserveKg };
+    })();
+    expect(hashWorld(run())).toBe(first.hash);
+    const restored = deserializeWorld(first.save);
+    expect(hashWorld(restored)).toBe(first.hash);
+    expect(authority(restored, "USA").metalReserveKg).toBe(first.reserveKg);
   }, 600_000);
 });
 

@@ -15,6 +15,7 @@ import {
   lotQuantity,
   prices,
   productionScenario,
+  idleBuilding,
   productionWorld,
   reservation,
   setBuildingJobs,
@@ -92,6 +93,7 @@ describe("M3c production capacity and throughput", () => {
     noWorkers.employment = noWorkers.employment.filter(
       (assignment) => assignment.buildingInstanceId !== 4,
     );
+    idleBuilding(noWorkers, 4);
     const noWorkersWorld = createEconomyWorld(noWorkers, { seed: 1 });
     const noWorkersResult = runProductionPhase(noWorkersWorld, noWorkers.definitions, [
       reservation(4, GRAIN_ID, 0, 5),

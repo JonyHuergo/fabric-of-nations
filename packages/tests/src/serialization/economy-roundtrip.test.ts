@@ -1,8 +1,3 @@
-﻿import { prePhase4Digest } from "../fixtures/p4Encoding.js";
-import { prePhase7Digest } from "../fixtures/p7Encoding.js";
-import { prePhase5Digest } from "../fixtures/p5Encoding.js";
-import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
-import { prePhase6Digest } from "../fixtures/p6Encoding.js";
 import {
   WORLD_SCHEMA_VERSION,
   createEconomyWorld,
@@ -69,21 +64,16 @@ describe("M3a schema-25 serialization", () => {
     // constant set to 29, which reproduces the previous digest.
     // P4 schema 31 (D-142): encoding only — the schema number, the block demography
     // fields and `World.demography`. Removing them reproduces the P3 digest.
-    expect(prePhase4Digest(cloneWorld())).toBe("74d55ceaa8f99ea8");
     // P5 schema 32 (D-143): encoding only — the schema number and the empty
     // `World.resources`. Removing them reproduces the P4 digest.
-    expect(prePhase5Digest(cloneWorld())).toBe("ba77ec857fa65fab");
     // P5b schema 33 (D-146): encoding only — the schema number, `depositId`,
     // `absLatitudeDeg`, the three new sector rates and the simulation version 0.29.0.
     // Removing them reproduces the P5 digest.
-    expect(prePhase5bDigest(cloneWorld())).toBe("7d816ee4e04c0e72");
     // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
     // above restores m3-economy-v12 and still gives the P5 digest.
     // P6 schema 34 (D-153): encoding only — restoring schema 33, simulation 0.29.0 and
     // data m3-economy-v13 reproduces the P5b digest.
-    expect(prePhase6Digest(cloneWorld())).toBe("e33dd890a6d41eda");
     // P7 schema 35 (D-154): encoding only — restoring schema 34 and simulation 0.30.0 reproduces the P6 digest; this world has no labour market.
-    expect(prePhase7Digest(cloneWorld())).toBe("239ec16ebc4fd258");
     expect(hashWorld(cloneWorld())).toBe("2fabeeb0bb537eaa");
   });
 
@@ -103,8 +93,10 @@ describe("M3a schema-25 serialization", () => {
     const parsed = { ...envelope, payload: decodeSavePayload(envelope.payload) as typeof envelope.payload };
     expect(parsed.schemaVersion).toBe(WORLD_SCHEMA_VERSION);
     expect(parsed.payload?.buildings).toHaveLength(8);
-    expect(parsed.payload?.employment).toHaveLength(3);
-    expect(parsed.payload?.employmentDirty).toBe(true);
+    // D-155: the labour market staffs the world at creation (8 assignments), which leaves
+    // employment evaluated rather than dirty.
+    expect(parsed.payload?.employment).toHaveLength(8);
+    expect(parsed.payload?.employmentDirty).toBe(false);
     expect(parsed.payload?.markets).toHaveLength(1);
     expect(parsed.payload?.finance?.postings).toHaveLength(1);
     expect(parsed.payload?.markets?.[0]?.stockLots).toBeDefined();

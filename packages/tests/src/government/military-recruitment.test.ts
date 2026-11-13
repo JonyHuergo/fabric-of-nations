@@ -23,7 +23,7 @@ import {
   type PopBlock,
   type World,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import { occupierOf } from "../fixtures/provinces.js";
 
 const SEED = 20_261_109;
@@ -184,7 +184,7 @@ function shippedScenario(): {
   provinceId: Id;
   world: World;
 } {
-  const scenario = loadM5EightPolities();
+  const scenario = loadM5Sample();
   const country = scenario.countries?.[0];
   if (country === undefined) throw new Error("shipped scenario has no country");
   const provinceId = country.provinceIds[0];
@@ -195,7 +195,7 @@ function shippedScenario(): {
 
 describe("AUDIT-006 explicit military allocation", () => {
   test("scenario-provided initial armies use the same proportional removal", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const country = scenario.countries?.[0];
     if (country === undefined) throw new Error("shipped scenario has no country");
     const provinceId = country.provinceIds[0];
@@ -210,7 +210,7 @@ describe("AUDIT-006 explicit military allocation", () => {
         },
       ],
     };
-    const baselineScenario = loadM5EightPolities();
+    const baselineScenario = loadM5Sample();
     const baselineWorld = createEconomyWorld(baselineScenario, { seed: SEED });
     const baseline = snapshots(baselineWorld, provinceId);
     const world = createEconomyWorld(scenario, { seed: SEED });
@@ -315,7 +315,7 @@ describe("AUDIT-006 explicit military allocation", () => {
 
   test("reversing pop-block storage order leaves the semantic allocation unchanged", () => {
     const first = shippedScenario();
-    const secondScenario = loadM5EightPolities();
+    const secondScenario = loadM5Sample();
     const secondCountry = secondScenario.countries?.[0];
     if (secondCountry === undefined) throw new Error("shipped scenario has no country");
     const secondProvinceId = secondCountry.provinceIds[0];
@@ -361,7 +361,7 @@ describe("AUDIT-006 explicit military allocation", () => {
   });
 
   test("largest-remainder ties follow population, not ascending pop-block id", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const country = scenario.countries?.[0];
     if (country === undefined) throw new Error("shipped scenario has no country");
     const provinceId = country.provinceIds[0];
@@ -396,7 +396,7 @@ describe("AUDIT-006 explicit military allocation", () => {
     expect(removals.get(0)).toBe(0);
 
     // Repeating the same action on an identical world gives the same tie-break.
-    const repeatScenario = loadM5EightPolities();
+    const repeatScenario = loadM5Sample();
     const repeatCountry = repeatScenario.countries?.[0];
     if (repeatCountry === undefined) throw new Error("shipped scenario has no country");
     const repeatProvinceId = repeatCountry.provinceIds[0];
@@ -426,7 +426,7 @@ describe("AUDIT-006 explicit military allocation", () => {
     const build = (
       reverse: boolean,
     ): { world: World; removals: Map<Id, number> } => {
-      const scenario = loadM5EightPolities();
+      const scenario = loadM5Sample();
       const country = scenario.countries?.[0];
       if (country === undefined) throw new Error("shipped scenario has no country");
       const provinceId = country.provinceIds[0];
@@ -469,7 +469,7 @@ describe("AUDIT-006 explicit military allocation", () => {
   });
 
   test("males are removed before females and no block is over-drawn", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const country = scenario.countries?.[0];
     if (country === undefined) throw new Error("shipped scenario has no country");
     const provinceId = country.provinceIds[0];
@@ -512,7 +512,7 @@ describe("AUDIT-006 explicit military allocation", () => {
   });
 
   test("daily pay and garrison payments are distributed across the province's households", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const firstCountry = scenario.countries?.[0];
     const secondCountry = scenario.countries?.[1];
     if (firstCountry === undefined || secondCountry === undefined) {
@@ -594,7 +594,7 @@ describe("AUDIT-006 explicit military allocation", () => {
   });
 
   test("insufficient people or treasury rejects recruitment atomically", () => {
-    const populationScenario = loadM5EightPolities();
+    const populationScenario = loadM5Sample();
     const populationCountry = populationScenario.countries?.[0];
     if (populationCountry === undefined) throw new Error("shipped scenario has no country");
     const populationProvince = populationCountry.provinceIds[0];
@@ -610,7 +610,7 @@ describe("AUDIT-006 explicit military allocation", () => {
     expect(populationWorld.military.armies).toHaveLength(0);
     assertValidWorld(populationWorld);
 
-    const treasuryScenario = loadM5EightPolities();
+    const treasuryScenario = loadM5Sample();
     const treasuryCountry = treasuryScenario.countries?.[0];
     if (treasuryCountry === undefined) throw new Error("shipped scenario has no country");
     const treasuryProvince = treasuryCountry.provinceIds[0];

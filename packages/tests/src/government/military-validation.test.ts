@@ -167,11 +167,22 @@ function accountBalance(
 }
 
 function zeroProvincePopulation(world: World, provinceId: Id): void {
+  const emptied = new Set<Id>();
   for (const block of world.popBlocks) {
     if (block.provinceId !== provinceId) continue;
     block.maleByAge.fill(0);
     block.femaleByAge.fill(0);
+    emptied.add(block.id);
   }
+  // D-155: the labour market staffs the world at creation, so the emptied blocks'
+  // assignments go with their people.
+  world.employment = world.employment.filter((assignment) => !emptied.has(assignment.popBlockId));
+  world.labourMarket.institutionEmployment = world.labourMarket.institutionEmployment.filter(
+    (assignment) => !emptied.has(assignment.popBlockId),
+  );
+  world.labourMarket.householdEmployment = world.labourMarket.householdEmployment.filter(
+    (assignment) => !emptied.has(assignment.popBlockId),
+  );
 }
 
 function craftSave(world: World, mutate: (payload: LooseSave["payload"]) => void): string {

@@ -30,7 +30,7 @@ import {
   type TickContext,
   type World,
 } from "@century/sim";
-import { loadM3SmallEconomy } from "@century/data";
+import { loadM3SmallEconomy } from "../fixtures/smallWorlds.js";
 import {
   PROTOCOL_VERSION,
   parseWorkerEvent,
@@ -350,9 +350,12 @@ describe("E3 construction progress and completion", () => {
   test("a project can wait for labor and resume when a worker becomes idle", () => {
     const f = fixture();
     // Make every block ineligible for its profession and remove assignments, so
-    // there is no idle construction labor at all.
+    // there is no idle construction labor at all. D-155: the labour market keeps one
+    // block per profession and province and counts literacy only for professions with
+    // the literacy gate, so every profession takes that gate and every block loses its
+    // literacy (formerly: every block became an illiterate laborer block).
+    for (const profession of f.scenario.definitions.professions) profession.gates = ["literacy"];
     for (const block of f.world.popBlocks) {
-      block.professionId = 1; // laborers
       block.literacyByAge = initialLiteracyByAge(0);
       block.literacy = 0;
     }
@@ -371,10 +374,9 @@ describe("E3 construction progress and completion", () => {
     expect(project(f.world, projectId).blockedReason).toBe("labor");
     expect(project(f.world, projectId).spentRUSD).toBe(0);
 
-    // Restore a single block as a peasant; no monthly refresh occurs on day 2,
+    // Restore a single block's literacy; no monthly refresh occurs on day 2,
     // so the construction queue sees it as idle and resumes.
     const block = f.world.popBlocks[0]!;
-    block.professionId = 0;
     block.literacyByAge = initialLiteracyByAge(0.5);
     block.literacy = 0.5;
     assertValidWorld(f.world);

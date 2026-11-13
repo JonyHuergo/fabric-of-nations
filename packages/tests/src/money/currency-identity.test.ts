@@ -141,8 +141,8 @@ describe("M4a-2 country and currency identity", () => {
     expect(() => build(scenario)).toThrow(/foreign-issued currency.*adopted/i);
   });
 
-  test("rejects RUSD and the legacy SUSD spelling as currency keys regardless of casing", () => {
-    for (const key of ["rusd", "RUSD", "Rusd", "susd", "SUSD", "Susd"]) {
+  test("rejects RUSD as a currency key regardless of casing", () => {
+    for (const key of ["rusd", "RUSD", "Rusd"]) {
       const scenario = ownCurrencyScenario();
       scenario.currencies![0]!.key = key;
       expect(() => build(scenario)).toThrow(/reserved for the RUSD/i);

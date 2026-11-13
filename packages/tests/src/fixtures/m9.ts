@@ -12,10 +12,11 @@ import type {
   EconomyScenarioDef,
   TechnologyDefinitions,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "./smallWorlds.js";
 
 import { M5_REGION_A1, M5_COUNTRY_A, M5_PEASANTS, m5AgeGroups } from "./m5.js";
 import { M8_ACADEMICS_ID, m8Scenario, m8TechnologyDefinitions } from "./m8.js";
+import { withCurrentModel } from "./currentModel.js";
 
 export const M9_ACADEMICS_BLOCK = 8;
 export const M9_ACADEMICS_ACCOUNT = 501;
@@ -91,7 +92,12 @@ export interface M9FixtureOptions {
 }
 
 /** Build the M9 fixture scenario. Fresh objects on every call. */
+/** D-155: the fixture with the labour-market roles and demand system (`withCurrentModel`). */
 export function m9Scenario(options: M9FixtureOptions = {}): EconomyScenarioDef {
+  return withCurrentModel(m9ScenarioBase(options));
+}
+
+function m9ScenarioBase(options: M9FixtureOptions): EconomyScenarioDef {
   const scenario = m8Scenario();
   const technology = m9TechnologyDefinitions();
   const definitions: EconomyDefinitions = {
@@ -156,7 +162,7 @@ export function m9Scenario(options: M9FixtureOptions = {}): EconomyScenarioDef {
 
 /** The M5 historical scenario for tests that need the full technology catalog. */
 export function m9HistoricalTechnology(): TechnologyDefinitions {
-  const scenario = loadM5EightPolities();
+  const scenario = loadM5Sample();
   if (scenario.definitions.technology === undefined) {
     throw new Error("historical scenario has no technology definitions");
   }

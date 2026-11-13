@@ -22,19 +22,8 @@ import {
   runTicks,
   serializeWorld,
 } from "@century/sim";
-import {
-  HistoricalDataError,
-  buildM5HistoricalScenario,
-  loadM5HistoricalData,
-  validateM5HistoricalData,
-  type HistoricalData,
-  type HistoricalEmploymentInput,
-  DATA_PACKAGE_INFO,
-  DATA_PACKAGE_VERSION,
-  loadM2WorldAggregate,
-  loadM3SmallEconomy,
-  loadM5EightPolities,
-} from "@century/data";
+import { HistoricalDataError, validateM5HistoricalData, type HistoricalData, type HistoricalEmploymentInput, DATA_PACKAGE_INFO, DATA_PACKAGE_VERSION } from "@century/data";
+import { buildM5Sample, loadM2WorldAggregate, loadM3SmallEconomy, loadM5Sample, loadM5SampleData } from "../fixtures/smallWorlds.js";
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -76,52 +65,52 @@ function buildingFor(
 
 describe("historical loader validation consistency", () => {
   test("shipped historical data remains valid", () => {
-    const data = loadM5HistoricalData();
+    const data = loadM5SampleData();
     expect(validateM5HistoricalData(data).errors).toEqual([]);
-    expect(() => buildM5HistoricalScenario(data)).not.toThrow();
+    expect(() => buildM5Sample(data)).not.toThrow();
   });
 
   test("currency valuation, fiscal, and identifier bounds fail at the data stage", () => {
-    const rate = cloneData(loadM5HistoricalData());
+    const rate = cloneData(loadM5SampleData());
     rate.countries[0]!.currency.valuation = {
       status: "specified",
       rusdPerUnit: 1e13,
       sourceIds: ["owid-population"],
     };
     expect(errorsOf(rate).join("\n")).toMatch(/rusdPerUnit must be in/);
-    expect(() => buildM5HistoricalScenario(rate)).toThrow(HistoricalDataError);
+    expect(() => buildM5Sample(rate)).toThrow(HistoricalDataError);
 
-    const budget = cloneData(loadM5HistoricalData());
+    const budget = cloneData(loadM5SampleData());
     budget.countries[0]!.fiscal.welfareBudgetRUSDPerYear = 1e16;
     expect(errorsOf(budget).join("\n")).toMatch(/welfareBudgetRUSDPerYear must not exceed/);
 
-    const key = cloneData(loadM5HistoricalData());
+    const key = cloneData(loadM5SampleData());
     key.countries[0]!.currency.key = `a${"b".repeat(32)}`;
     expect(errorsOf(key).join("\n")).toMatch(/currency.key must be at most/);
 
-    const name = cloneData(loadM5HistoricalData());
+    const name = cloneData(loadM5SampleData());
     name.countries[0]!.name = "x".repeat(129);
     expect(errorsOf(name).join("\n")).toMatch(/name must be at most/);
 
-    const id = cloneData(loadM5HistoricalData());
+    const id = cloneData(loadM5SampleData());
     id.countries[0]!.id = 0x1_0000_0000;
     expect(errorsOf(id).join("\n")).toMatch(/id must be an unsigned 32-bit integer/);
 
-    const land = cloneData(loadM5HistoricalData());
+    const land = cloneData(loadM5SampleData());
     (land.provinces[0] as { arableLandHa?: number }).arableLandHa = -1;
     expect(errorsOf(land).join("\n")).toMatch(/arableLandHa must be non-negative/);
   });
 
   test("startDayIndex must be a processable campaign day", () => {
     for (const value of [-1, 1.5, 36_524, 99_999]) {
-      const data = cloneData(loadM5HistoricalData());
+      const data = cloneData(loadM5SampleData());
       data.meta.startDayIndex = value;
       expect(errorsOf(data).join("\n")).toMatch(/meta.startDayIndex must be an integer/);
     }
   });
 
   test("employment references, job slots, and qualified workforce are validated", () => {
-    const base = loadM5HistoricalData();
+    const base = loadM5SampleData();
     const farm = buildingFor(base, "subsistence-farm");
     const commercial = buildingFor(base, "commercial-farm");
 
@@ -161,25 +150,25 @@ describe("historical loader validation consistency", () => {
   });
 
   test("invalid stock lots and duplicate source/calibration keys are rejected", () => {
-    const lot = cloneData(loadM5HistoricalData());
+    const lot = cloneData(loadM5SampleData());
     lot.markets[0]!.stockLots = [
       { goodKey: "grain", ownerBuildingKey: "unknown-building", quantity: 1 },
     ];
     expect(errorsOf(lot).join("\n")).toMatch(/ownerBuildingKey references unknown building/);
 
-    const quantity = cloneData(loadM5HistoricalData());
+    const quantity = cloneData(loadM5SampleData());
     quantity.markets[0]!.stockLots = [
       { goodKey: "grain", ownerBuildingKey: quantity.buildings[0]!.key, quantity: 0 },
     ];
     expect(errorsOf(quantity).join("\n")).toMatch(/quantity must be a positive finite number/);
 
-    const source = cloneData(loadM5HistoricalData());
+    const source = cloneData(loadM5SampleData());
     source.meta.sources.push({ ...source.meta.sources[0]! });
     expect(errorsOf(source).join("\n")).toMatch(
       /meta.sources\[.*\]\.id .* duplicates meta.sources\[0\]\.id/,
     );
 
-    const calibration = cloneData(loadM5HistoricalData());
+    const calibration = cloneData(loadM5SampleData());
     calibration.calibration.push({
       ...calibration.calibration[0]!,
       id: "duplicate-target-id",
@@ -188,7 +177,7 @@ describe("historical loader validation consistency", () => {
       /duplicates calibration target .* first declared at calibration\[0\]/,
     );
 
-    const distinctSource = cloneData(loadM5HistoricalData());
+    const distinctSource = cloneData(loadM5SampleData());
     distinctSource.meta.sources.push({
       id: "additional-valid-source",
       title: "Additional fixture source",
@@ -201,7 +190,7 @@ describe("historical loader validation consistency", () => {
   });
 
   test("employment ids and canonical hash are independent of record order", () => {
-    const base = loadM5HistoricalData();
+    const base = loadM5SampleData();
     const farm = buildingFor(base, "subsistence-farm");
     const commercial = buildingFor(base, "commercial-farm");
     const first = employment(farm.key, farm.provinceId, "peasants", 100);
@@ -212,8 +201,8 @@ describe("historical loader validation consistency", () => {
     const reverse = cloneData(base);
     reverse.employment = [second, first];
 
-    const forwardScenario: EconomyScenarioDef = buildM5HistoricalScenario(forward);
-    const reverseScenario: EconomyScenarioDef = buildM5HistoricalScenario(reverse);
+    const forwardScenario: EconomyScenarioDef = buildM5Sample(forward);
+    const reverseScenario: EconomyScenarioDef = buildM5Sample(reverse);
     expect(forwardScenario.employment).toHaveLength(2);
     expect(reverseScenario.employment).toHaveLength(2);
     const normalize = (scenario: EconomyScenarioDef) =>
@@ -265,7 +254,7 @@ describe("data version consistency", () => {
     expect(loadM2WorldAggregate().dataVersion).toBe(DATA_PACKAGE_VERSION);
     expect(loadM3SmallEconomy().definitions.dataVersion).toBe(DATA_PACKAGE_VERSION);
     expect(loadM3SmallEconomy().population.dataVersion).toBe(DATA_PACKAGE_VERSION);
-    expect(loadM5HistoricalData().meta.dataVersion).toBe(DATA_PACKAGE_VERSION);
+    expect(loadM5SampleData().meta.dataVersion).toBe(DATA_PACKAGE_VERSION);
   });
 });
 
@@ -275,7 +264,7 @@ function cloneAuthoredData(data: HistoricalData): HistoricalData {
 
 describe("M5 historical data pipeline", () => {
   test("loads and validates the eight authored polities", () => {
-    const data = loadM5HistoricalData();
+    const data = loadM5SampleData();
     const validation = validateM5HistoricalData(data);
     expect(validation.errors).toEqual([]);
     expect(data.countries).toHaveLength(8);
@@ -291,7 +280,7 @@ describe("M5 historical data pipeline", () => {
   });
 
   test("builds, constructs, and ticks the eight polities together", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     expect(world.countries).toHaveLength(8);
     expect(world.provinceEconomies).toHaveLength(16);
@@ -319,7 +308,7 @@ describe("M5 historical data pipeline", () => {
   });
 
   test("population targets and provisional occupation targets are satisfied by authored data", () => {
-    const data = loadM5HistoricalData();
+    const data = loadM5SampleData();
     for (const country of data.countries) {
       const provinceIds = new Set(country.provinceIds);
       const blocks = data.populations.filter((block) => provinceIds.has(block.provinceId));
@@ -351,7 +340,7 @@ describe("M5 historical data pipeline", () => {
   });
 
   test("declaration order does not change the built scenario or world hash", () => {
-    const data = loadM5HistoricalData();
+    const data = loadM5SampleData();
     const reversed = cloneAuthoredData(data);
     const reversedData: HistoricalData = {
       ...reversed,
@@ -361,15 +350,15 @@ describe("M5 historical data pipeline", () => {
       populations: [...reversed.populations].reverse(),
       buildings: [...reversed.buildings].reverse(),
     };
-    const first = buildM5HistoricalScenario(data);
-    const second = buildM5HistoricalScenario(reversedData);
+    const first = buildM5Sample(data);
+    const second = buildM5Sample(reversedData);
     expect(hashWorld(createEconomyWorld(second, { seed: 7 }))).toBe(
       hashWorld(createEconomyWorld(first, { seed: 7 })),
     );
   });
 
   test("round-trips a multi-country save and resumes identically", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const context = {
       population: { definitions: scenario.population.definitions },
       economy: { definitions: scenario.definitions },
@@ -387,7 +376,7 @@ describe("M5 historical data pipeline", () => {
   });
 
   test("validator reports deterministic, actionable structural errors", () => {
-    const data = loadM5HistoricalData();
+    const data = loadM5SampleData();
     const broken = cloneAuthoredData(data) as unknown as {
       countries: { id: number; provinceIds: number[] }[];
       provinces: { id: number }[];
@@ -413,7 +402,7 @@ describe("M5 historical data pipeline", () => {
   });
 
   test("validates source metadata, currency, and fiscal inputs", () => {
-    const data = loadM5HistoricalData();
+    const data = loadM5SampleData();
     const broken = cloneAuthoredData(data) as unknown as {
       countries: {
         id: number;
@@ -439,7 +428,7 @@ describe("M5 historical data pipeline", () => {
   });
 
   test("rejects an authored population outside the source-backed target", () => {
-    const data = loadM5HistoricalData();
+    const data = loadM5SampleData();
     const broken = cloneAuthoredData(data) as unknown as {
       populations: { provinceId: number; population: number }[];
     };

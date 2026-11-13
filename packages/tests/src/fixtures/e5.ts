@@ -8,6 +8,7 @@ import type { EconomyScenarioDef } from "@century/sim";
 
 import { M5_COUNTRY_A } from "./m5.js";
 import { m9Scenario, type M9FixtureOptions } from "./m9.js";
+import { withCurrentModel } from "./currentModel.js";
 
 export const E5_TRAINING_BUDGET = 200_000;
 export const E5_TRAINING_STIPEND = 1;
@@ -22,7 +23,12 @@ export interface E5FixtureOptions extends M9FixtureOptions {
 }
 
 /** Build the E5 fixture scenario. Fresh objects on every call. */
+/** D-155: the fixture with the labour-market roles and demand system (`withCurrentModel`). */
 export function e5Scenario(options: E5FixtureOptions = {}): EconomyScenarioDef {
+  return withCurrentModel(e5ScenarioBase(options));
+}
+
+function e5ScenarioBase(options: E5FixtureOptions): EconomyScenarioDef {
   const scenario = m9Scenario(options);
   scenario.countries = (scenario.countries ?? []).map((country) => {
     if (country.id !== M5_COUNTRY_A) return country;

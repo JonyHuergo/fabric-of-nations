@@ -23,7 +23,7 @@ import {
   type TickContext,
   type World,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
 const SEED = 20_261_102;
 
@@ -38,6 +38,9 @@ function context(scenario: EconomyScenarioDef): TickContext {
  * One-shot failure injection: the economy definitions throw on the `armedAccess`-th
  * read of `buildings` after `arm()` is called, then disarm. Reads in the first phases
  * of a day succeed, so the day fails part-way after population state has changed.
+ * D-155: in the labour-market day the 3rd to 6th reads (0-based 2-5) fall inside the
+ * post-demography employment check (D-126), which answers any failure with a repair or a
+ * full refresh, so the injections use reads 6-9, which fail the day.
  */
 function failingDefinitions(definitions: EconomyDefinitions): {
   readonly definitions: EconomyDefinitions;
@@ -68,7 +71,7 @@ function failingDefinitions(definitions: EconomyDefinitions): {
   };
 }
 
-const SCENARIO = loadM5EightPolities();
+const SCENARIO = loadM5Sample();
 
 function stagedReference(days: number): string[] {
   const world = createEconomyWorld(SCENARIO, { seed: SEED });
@@ -131,7 +134,7 @@ describe("P1 rollback", () => {
     const before = hashWorld(world);
     expect(before).toBe(REFERENCE[12]);
 
-    injected.arm(3);
+    injected.arm(7);
     expect(() => runTicksWithRollback(runner, 1, ctx)).toThrow(DayRolledBackError);
     expect(injected.fired()).toBe(true);
     expect(runner.rollbacks).toBe(1);
@@ -151,7 +154,7 @@ describe("P1 rollback", () => {
     const world = createEconomyWorld(SCENARIO, { seed: SEED });
     const runner = createRollbackRunner(world);
     runTicksWithRollback(runner, 33, ctx);
-    injected.arm(5);
+    injected.arm(9);
     let caught: unknown;
     try {
       runTicksWithRollback(runner, 1, ctx);
@@ -173,7 +176,7 @@ describe("P1 rollback", () => {
     };
     const world = createEconomyWorld(SCENARIO, { seed: SEED });
     const runner = createRollbackRunner(world);
-    injected.arm(2);
+    injected.arm(6);
     expect(() => runTicksWithRollback(runner, 1, ctx)).toThrow(DayRolledBackError);
     expect(hashWorld(world)).toBe(REFERENCE[0]);
   });
@@ -193,7 +196,7 @@ describe("P1 rollback", () => {
     checkpointRollbackRunner(runner);
     runTicksWithRollback(runner, 3, ctx);
     const before = hashWorld(world);
-    injected.arm(4);
+    injected.arm(8);
     expect(() => runTicksWithRollback(runner, 1, ctx)).toThrow(DayRolledBackError);
     expect(hashWorld(world)).toBe(before);
   });
@@ -211,7 +214,7 @@ describe("P1 rollback", () => {
     if (market === undefined) throw new Error("fixture has no market");
     // Changed without a checkpoint: the replay cannot reproduce it.
     market.priceRUSD = market.priceRUSD.map((price) => price * 1.5);
-    injected.arm(4);
+    injected.arm(8);
     expect(() => runTicksWithRollback(runner, 1, ctx)).toThrow(IntegrityFailureError);
     // The live world is left at the last checkpoint, never at a partial day.
     expect(hashWorld(world)).toBe(REFERENCE[0]);

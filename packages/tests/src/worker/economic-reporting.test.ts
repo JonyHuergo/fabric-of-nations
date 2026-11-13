@@ -23,7 +23,7 @@ import {
   type Month,
   type World,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import {
   MAX_PLAYER_ACTION_HISTORY,
   PROTOCOL_VERSION,
@@ -56,7 +56,7 @@ function contextFor(scenario: EconomyScenarioDef): TickContext {
 }
 
 function snapshotAt(ticks: number): { readonly snapshot: SimulationSnapshot; readonly scenario: EconomyScenarioDef } {
-  const scenario = loadM5EightPolities();
+  const scenario = loadM5Sample();
   const world = createEconomyWorld(scenario, { seed: SEED });
   if (ticks > 0) runTicks(world, ticks, contextFor(scenario));
   const snapshot = buildSimulationSnapshot(
@@ -322,7 +322,7 @@ function monthlySummaries(): FinancePeriodSummary[] {
 }
 
 function worldWithReports(): World {
-  const scenario = loadM5EightPolities();
+  const scenario = loadM5Sample();
   const world = createEconomyWorld(scenario, { seed: FISCAL_REPORT_SEED });
   const periods = monthlySummaries();
   world.finance.periodSummaries = periods;
@@ -346,7 +346,7 @@ function worldWithReports(): World {
 }
 
 function snapshotFor(world: World) {
-  const scenario = loadM5EightPolities();
+  const scenario = loadM5Sample();
   return buildSimulationSnapshot(
     world,
     scenario.definitions,

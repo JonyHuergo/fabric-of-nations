@@ -108,9 +108,14 @@ describe("M8 political institutions", () => {
     for (const group of country.interestGroups) {
       expect(Object.keys(group.stanceByLaw)).toHaveLength(laws.length);
     }
-    expect(country.institutions.staffedByProfession[2]).toBeGreaterThan(0);
-    expect(country.institutions.quality).toBeGreaterThan(0);
-    expect(country.institutions.quality).toBeLessThanOrEqual(1);
+    // D-155: the administration's staff are the bureaucrats the labour market assigns,
+    // and the creation-time institution state precedes that first assignment, so the
+    // administration is read after its first daily refresh.
+    run(world, scenario, 1);
+    const staffed = world.countries.find((entry) => entry.id === M8_COUNTRY_A)!;
+    expect(staffed.institutions.staffedByProfession[2]).toBeGreaterThan(0);
+    expect(staffed.institutions.quality).toBeGreaterThan(0);
+    expect(staffed.institutions.quality).toBeLessThanOrEqual(1);
     expect(world.politics.eventLog.length).toBeLessThanOrEqual(64);
     expect(world.politics.eventQueue.length).toBeLessThanOrEqual(256);
     expect(country.lawTransitions.length).toBeLessThanOrEqual(4);
@@ -137,6 +142,9 @@ describe("M8 political institutions", () => {
     const low = m8Scenario({ fundingA: 0 });
     const highWorld = worldFor(high);
     const lowWorld = worldFor(low);
+    // D-155: institution quality follows the assigned staff, read after the first day.
+    run(highWorld, high, 1);
+    run(lowWorld, low, 1);
     const highCountry = highWorld.countries.find((entry) => entry.id === M8_COUNTRY_A)!;
     const lowCountry = lowWorld.countries.find((entry) => entry.id === M8_COUNTRY_A)!;
     expect(highCountry.institutions.quality).toBeGreaterThan(lowCountry.institutions.quality);

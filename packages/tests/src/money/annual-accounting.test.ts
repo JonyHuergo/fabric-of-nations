@@ -20,7 +20,7 @@ import {
   type World,
   countryProvinceIds,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import { PROTOCOL_VERSION } from "@century/sim-worker";
 import { buildSimulationSnapshot } from "@century/sim-worker/snapshot";
 import { marketScenario } from "../fixtures/m3d.js";
@@ -35,7 +35,7 @@ function contextFor(scenario: EconomyScenarioDef): TickContext {
 }
 
 function worldAt(startDayIndex: number): { readonly scenario: EconomyScenarioDef; readonly world: World } {
-  const scenario = loadM5EightPolities();
+  const scenario = loadM5Sample();
   return {
     scenario,
     world: createEconomyWorld(scenario, { seed: SEED, startDayIndex }),

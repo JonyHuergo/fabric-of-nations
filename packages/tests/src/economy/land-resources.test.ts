@@ -14,7 +14,8 @@
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadM11World, loadM3SmallEconomy, loadM5EightPolities } from "@century/data";
+import { loadM11World } from "@century/data";
+import { loadM3SmallEconomy, loadM5Sample } from "../fixtures/smallWorlds.js";
 import {
   applyOverflowToTable,
   assertValidWorld,
@@ -331,7 +332,9 @@ describe("P5 bad harvest in a low-access market (acceptance)", () => {
       const fairBlock = fair.world.popBlocks.find((block) => block.id === badBlock.id)!;
       expect(badBlock.adultMortalityResidual).toBe(fairBlock.adultMortalityResidual);
       expect(badBlock.childMortalityResidual).toBe(fairBlock.childMortalityResidual);
-      expect(badBlock.urbanShare).toBe(fairBlock.urbanShare);
+      // D-155: under the P7 labour market a harvest also moves people between town and
+      // country (urbanisation, D-154), so the urban share may differ; the ratios below
+      // hold every other cause at the hungry block's own values.
       if (badBlock.foodSufficiency < fairBlock.foodSufficiency - 0.05) hungry += 1;
       const asFair = { ...badBlock, foodSufficiency: fairBlock.foodSufficiency };
       expect(
@@ -355,7 +358,7 @@ describe("P5 bad harvest in a low-access market (acceptance)", () => {
 
 /** The M5 eight-polity sample with one deposit of each resource in every province. */
 function depositScenario(requiredTechnologyId: number | null = null): EconomyScenarioDef {
-  const scenario = JSON.parse(JSON.stringify(loadM5EightPolities())) as EconomyScenarioDef;
+  const scenario = JSON.parse(JSON.stringify(loadM5Sample())) as EconomyScenarioDef;
   const deposits: DepositInitialDef[] = [];
   let id = 1;
   for (const province of scenario.population.provinceEconomies) {

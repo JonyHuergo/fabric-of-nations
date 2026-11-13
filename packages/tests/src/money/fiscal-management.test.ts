@@ -29,7 +29,7 @@ import {
   type EconomyScenarioDef,
   type World,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import { economyTickContext } from "../fixtures/m3e.js";
 import { fiscalScenario } from "../fixtures/m4c.js";
 import {
@@ -755,7 +755,7 @@ describe("E2 reporting, ordering, and determinism", () => {
   });
 
   test("the player country boundary is enforced for every action kind", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const world = createEconomyWorld(scenario, { seed: SEED });
     const playerId = world.playerCountryId;
     expect(playerId).not.toBeNull();

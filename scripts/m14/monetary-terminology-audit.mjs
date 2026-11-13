@@ -7,9 +7,8 @@
  * distinguishes:
  *
  *   - current RUSD terminology (must be used);
- *   - deliberate legacy compatibility aliases in save decoding, the legacy
- *     currency-key rejection, the diagnostic hash view and the opening-balance
- *     checksum;
+ *   - the audits and tests that look for the former spelling (D-155 removed the
+ *     legacy aliases: the reserved key, the hash view and the opening checksum);
  *   - historical milestone documents, GDD versions, change reports and
  *     screenshots that keep their original wording;
  *   - actual USD references, which are distinct and must remain.
@@ -29,18 +28,13 @@ const errors = [];
 const checked = [];
 const allowed = { legacy: 0, historical: 0 };
 
-/** Narrow compatibility files. Each is documented in the M14 report. */
+/**
+ * Files that name the former spelling in order to look for it. D-155 removed every
+ * legacy alias (the reserved key, the hash view and the opening checksum), so no
+ * simulation, data or worker source may mention it.
+ */
 const LEGACY_COMPATIBILITY_FILES = new Set([
-  "packages/sim/src/serialization.ts",
-  "packages/sim/src/stateHash.ts",
-  "packages/sim/src/economy/accounts.ts",
-  "packages/sim/src/constants.ts",
-  "packages/sim/src/economy/country.ts",
-  "packages/data/src/historical.ts",
-  // P3 (D-141): the currency-table loader rejects the reserved legacy key too.
-  "packages/data/src/currencies.ts",
   "packages/tests/src/architecture/naming-audits.test.ts",
-  "packages/tests/src/money/currency-identity.test.ts",
   "scripts/m14/monetary-terminology-audit.mjs",
   "scripts/m14/playtest-rusd.mjs",
 ]);
@@ -169,7 +163,6 @@ const constants = readFileSync(join(ROOT, "packages/sim/src/constants.ts"), "utf
 requireIncludes("canonical RUSD key", constants, 'RUSD_CURRENCY_KEY = "rusd"');
 requireIncludes("canonical RUSD name", constants, 'RUSD_UNIT_NAME = "Reference US Dollars"');
 requireIncludes("canonical RUSD abbreviation", constants, 'RUSD_UNIT_ABBREVIATION = "RUSD"');
-requireIncludes("legacy reserved key", constants, 'LEGACY_SUSD_CURRENCY_KEY = "susd"');
 
 const gdd = readFileSync(join(ROOT, "Fabric_of_Nations_GDD.md"), "utf8");
 requireIncludes("current GDD unit definition", gdd, "RUSD` — **Reference US Dollars**");
@@ -194,7 +187,8 @@ requireIncludes("RUSD formatter canonical unit", formatter, "const unit = RUSD_U
 /* 3. Data and serialization vocabulary                                */
 /* ------------------------------------------------------------------ */
 
-const goods = JSON.parse(readFileSync(join(ROOT, "packages/data/data/goods.json"), "utf8"));
+// D-155: the 1900 world's goods catalogue (the M3 catalogue moved to the test fixtures).
+const goods = JSON.parse(readFileSync(join(ROOT, "packages/data/data/historical/p5b/goods_1900.json"), "utf8"));
 const goodsText = JSON.stringify(goods);
 requireIncludes("goods base price key", goodsText, "basePrice1900RUSD");
 if (/SUSD/.test(goodsText)) errors.push("goods data still contains SUSD keys");
@@ -209,17 +203,11 @@ if (/"key":\s*"(rusd|susd)"/.test(countriesText)) {
 }
 
 const serialization = readFileSync(join(ROOT, "packages/sim/src/serialization.ts"), "utf8");
-// D-137: save format 2 rejects every format-1 save (pre-M14 SUSD saves included) as
-// incompatible before decoding, so the format-1 SUSD key normalizer was removed; the
-// SUSD spelling survives only in the hash view and the opening checksum below.
+// D-137: save format 2 rejects every format-1 save as incompatible before decoding;
+// D-155 removed the last legacy spellings (hash view, opening checksum).
 requireIncludes("format-1 saves rejected as incompatible", serialization, "is incompatible with this build");
 requireIncludes("canonical RUSD save fields", serialization, "balanceRUSD");
 
-const stateHash = readFileSync(join(ROOT, "packages/sim/src/stateHash.ts"), "utf8");
-requireIncludes("legacy hash compatibility view", stateHash, "legacyMonetaryView");
-
-const accounts = readFileSync(join(ROOT, "packages/sim/src/economy/accounts.ts"), "utf8");
-requireIncludes("legacy opening checksum", accounts, "balanceSUSD: entry.balanceRUSD");
 
 /* ------------------------------------------------------------------ */
 /* 4. Save envelope and protocol status                                */

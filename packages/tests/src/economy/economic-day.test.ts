@@ -6,13 +6,14 @@ import {
   deserializeWorld,
   hashWorld,
   populationTotal,
+  refreshEmployment,
   serializeWorld,
   tick,
   type EconomyScenarioDef,
   type TickContext,
   type World,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import {
   accountBalance,
   buildingAccountId,
@@ -56,6 +57,9 @@ function worldFor(scenario: EconomyScenarioDef, active?: readonly number[]): Wor
     for (const building of world.buildings) {
       if (!activeIds.has(building.id)) building.operational = false;
     }
+    // D-155: the labour market keeps no assignment at a closed building; a closure is
+    // followed by the forced refresh the game runs.
+    refreshEmployment(world, scenario.definitions, world.dayIndex, { force: true });
   }
   return world;
 }
@@ -151,6 +155,12 @@ describe("M3f integrated economic day", () => {
     const block = scenario.population.popBlocks.find((candidate) => candidate.id === 1);
     if (block === undefined) throw new Error("missing household block");
     block.wealthLevel = 80;
+    // D-155: households buy by the demand system; textiles were a luxury-tier good, which
+    // the converted system does not commit, so the luxury tier's 0.002 per person a day is
+    // committed here to keep a buyer for the mill's stock (as the tier gave block 1).
+    for (const category of scenario.population.definitions.demandSystem?.categories ?? []) {
+      for (const good of category.goods) if (good.goodKey === "textiles") good.committedPerAdultEquivalentPerDay = 0.002;
+    }
     scenario.employment = scenario.employment.filter(
       (assignment) => assignment.buildingInstanceId !== 4,
     );
@@ -168,12 +178,12 @@ describe("M3f integrated economic day", () => {
         transaction.kind === "input-purchase" && transaction.buyerBuildingId === 5,
     );
     expect(millInput).toBeUndefined();
-    const millSale = result.economy?.settlement.transactions.find(
-      (transaction) =>
-        transaction.kind === "household-purchase" &&
-        transaction.sellerBuildingId === 5 &&
-        transaction.buyerPopBlockId === 1,
-    );
+    // D-155: households buy by the demand system, so the mill's textiles go to whichever
+    // household's plan includes them (block 1 bought them through the need tiers).
+    const millSales = result.economy?.settlement.transactions.filter(
+      (transaction) => transaction.kind === "household-purchase" && transaction.sellerBuildingId === 5,
+    ) ?? [];
+    const millSale = millSales.length === 0 ? undefined : { totalRUSD: millSales.reduce((sum, sale) => sum + sale.totalRUSD, 0) };
     const millProducer = result.economy?.settlement.producers.find(
       (producer) => producer.buildingId === 5,
     );
@@ -398,32 +408,6 @@ describe("M3f integrated economic day", () => {
     expect(result.population?.wealthUpdates).toEqual([]);
   });
 
-  test("monthly wealth changes next-day comfort demand activation", () => {
-    const scenario = fullScenario();
-    const world = worldFor(scenario);
-    const block = world.popBlocks.find((candidate) => candidate.id === 1);
-    if (block === undefined) throw new Error("missing block 1");
-    block.wealthLevel = 24;
-    world.dayIndex = 30;
-    const monthEnd = tick(world, contextFor(scenario));
-    const update = monthEnd.population?.wealthUpdates.find(
-      (entry) => entry.popBlockId === 1,
-    );
-    expect(update?.newWealthLevel).toBeGreaterThanOrEqual(25);
-    expect(
-      monthEnd.economy?.householdDemands.some(
-        (demand) => demand.popBlockId === 1 && demand.tier === 6,
-      ),
-    ).toBe(false);
-
-    const nextDay = tick(world, contextFor(scenario));
-    expect(
-      nextDay.economy?.householdDemands.some(
-        (demand) => demand.popBlockId === 1 && demand.tier === 6,
-      ),
-    ).toBe(true);
-  });
-
   test("updates wealth on 1900-12-31, then applies January 1 ageing across save/load", () => {
     const directScenario = fullScenario();
     const reloadScenario = fullScenario();
@@ -519,7 +503,7 @@ describe("M3f integrated economic day", () => {
   });
 
   test("staging isolates military and country trade subtrees", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const world = createEconomyWorld(scenario, { seed: 20_261_107 });
     applyMilitaryAction(
       world,
@@ -556,7 +540,7 @@ describe("M3f integrated economic day", () => {
   });
 
   test("a late-phase failure leaves the complete original world unchanged", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const world = createEconomyWorld(scenario, { seed: 20_261_107 });
     applyMilitaryAction(
       world,

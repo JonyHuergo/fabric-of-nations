@@ -1,4 +1,4 @@
-import { loadM3SmallEconomy } from "@century/data";
+import { loadM3SmallEconomy } from "./smallWorlds.js";
 import {
   createEconomyWorld,
   deriveStockByGood,
@@ -14,6 +14,9 @@ import {
 } from "./m3b.js";
 
 export { setBuildingJobs, workingAgeGroups };
+
+/** Clerks: `productionScenario` leaves their block without population. */
+const IDLE_PROFESSION_ID = 2;
 
 export const GRAIN_ID = 0;
 export const LIVESTOCK_ID = 1;
@@ -103,7 +106,27 @@ export function productionScenario(): EconomyScenarioDef {
     { id: 1, popBlockId: 1, buildingInstanceId: 4, professionId: 1, workers: 50 },
     { id: 2, popBlockId: 1, buildingInstanceId: 5, professionId: 1, workers: 50 },
   ];
+  // D-155: the labour market staffs every job it can at creation and does not read the
+  // assignment list above, so the buildings this fixture does not configure as producers
+  // (1, 2, 3, 6) give their jobs to the clerks, whose block is empty here: they stay idle,
+  // as they were without assignments.
+  for (const definition of scenario.definitions.buildings) {
+    if (definition.id === 0 || definition.id === 4 || definition.id === 5) continue;
+    idleBuilding(scenario, definition.id);
+  }
   return scenario;
+}
+
+/**
+ * D-155: leave a building of this fixture without workers. The labour market staffs every
+ * job it can at creation (it does not read the scenario's assignment list), so the
+ * building's jobs go to the clerks, whose block is empty here.
+ */
+export function idleBuilding(scenario: EconomyScenarioDef, definitionId: number): void {
+  const definition = scenario.definitions.buildings.find((candidate) => candidate.id === definitionId);
+  if (definition === undefined) throw new Error(`missing building definition ${String(definitionId)}`);
+  const first = definition.jobs[0];
+  definition.jobs = first === undefined ? [] : [{ ...first, professionId: IDLE_PROFESSION_ID }];
 }
 
 export function productionWorld(): {

@@ -11,7 +11,6 @@ import {
   buildLabourWageTable,
   createEconomyWorld,
   createRollbackRunner,
-  deserializeWorld,
   hashWorld,
   institutionFundingRUSDPerYear,
   institutionProfession,
@@ -23,7 +22,6 @@ import {
   refreshEmployment,
   runLabourMonthPhase,
   runTicksWithRollback,
-  serializeWorld,
   STAFFING_CEILING_RATE,
   tick,
   updateLabourMarketMonth,
@@ -320,12 +318,5 @@ describe("P7 replay and saves", () => {
     const runner = createRollbackRunner(createEconomyWorld(scenario), { worldJustValidated: true });
     runTicksWithRollback(runner, 70, context);
     expect(hashWorld(runner.world)).toBe(hashWorld(staged));
-  });
-
-  test("a schema-34 save is rejected as incompatible (plan Q20, D-120)", () => {
-    const save = serializeWorld(createEconomyWorld(p7Scenario()));
-    const envelope = JSON.parse(save) as Record<string, unknown>;
-    envelope.schemaVersion = 34;
-    expect(() => deserializeWorld(JSON.stringify(envelope))).toThrow(/Save world schema 34 is incompatible/);
   });
 });

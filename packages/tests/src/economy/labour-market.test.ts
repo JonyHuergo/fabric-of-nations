@@ -19,7 +19,6 @@ import {
   createEconomyWorld,
   createReclassifyContext,
   deserializeWorld,
-  encodeWorld,
   hashWorld,
   labourEligibleWorkforce,
   literateWorkingAge,
@@ -38,7 +37,7 @@ import {
 } from "@century/sim";
 
 import { economyTickContext, totalCash } from "../fixtures/m3e.js";
-import { M5_LABORERS, M5_PEASANTS, M5_REGION_A1, M5_REGION_A2, m5Scenario } from "../fixtures/m5.js";
+import { M5_LABORERS, M5_PEASANTS, M5_REGION_A1, M5_REGION_A2 } from "../fixtures/m5.js";
 import { P7_CLERKS, P7_CLERK_BLOCK, p7Scenario } from "../fixtures/p7.js";
 
 function worldPeople(world: World): number {
@@ -74,12 +73,6 @@ describe("P7 world creation", () => {
       expect(blockById.get(assignment.popBlockId)?.provinceId).toBe(buildingById.get(assignment.buildingInstanceId)?.provinceId);
     }
     expect(world.labourMarket.nextPopBlockId).toBe(P7_CLERK_BLOCK + 1);
-  });
-
-  test("a world without labour-market definitions keeps the legacy state (plan Q21)", () => {
-    const world = createEconomyWorld(m5Scenario());
-    expect(world.labourMarket.enabled).toBe(false);
-    expect("labourMarket" in (encodeWorld(world) as unknown as Record<string, unknown>)).toBe(false);
   });
 
   test("clerk eligibility counts literate working-age persons only (selective literacy)", () => {

@@ -1,4 +1,4 @@
-import { loadM2MultiBlock, loadM2WorldAggregate } from "@century/data";
+import { loadM2MultiBlock, loadM2WorldAggregate } from "./smallWorlds.js";
 import {
   createPopulationWorld,
   type PopulationInputs,

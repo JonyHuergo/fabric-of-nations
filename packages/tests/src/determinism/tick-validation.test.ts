@@ -34,7 +34,6 @@ import {
   resetValidationInstrumentation,
   runDebtPhase,
   runEconomicDay,
-  runMigrationPhase,
   runProductionPhase,
   runTicks,
   serializeWorld,
@@ -44,11 +43,8 @@ import {
   type EconomyScenarioDef,
   type TickContext,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import { GRAIN_ID, productionWorld, reservation } from "../fixtures/m3c.js";
-import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
-import { prePhase6Digest } from "../fixtures/p6Encoding.js";
-import { prePhase7Digest } from "../fixtures/p7Encoding.js";
 
 const SEED = 20_261_023;
 
@@ -82,15 +78,12 @@ const SEED = 20_261_023;
 // P5b re-pins it (D-147): encoding only — the legacy M5 definitions have no extraction,
 // non-storable good, optional or maintenance input or gated need item, so removing the
 // P5b fields and restoring schema 32 and simulation 0.28.0 gives the P5 hash (asserted).
-const PRE_P5B_HASH_AFTER_22_TICKS = "d1580017f60be441";
 // Data m3-economy-v13 (D-148) re-pins it again: the content version in the encoding
 // only; the proof restores m3-economy-v12 and still gives the P5 hash (asserted).
 // D-149 adds the (paper, empty) monetary-standard fields to every authority record;
 // the proof strips them and still gives the P5 hash.
-const PRE_P6_HASH_AFTER_22_TICKS = "1b0c4a1e37334b84";
 // P6 schema 34 (D-153) re-pins it: encoding only (schema, simulation and data version
 // strings); restoring them gives the P5b hash (asserted). The world has no demand system.
-const PRE_P7_HASH_AFTER_22_TICKS = "9b91fb62e7376098";
 // P7 schema 35 (D-154) re-pins it: encoding only (schema and simulation version strings);
 // restoring them gives the P6 hash (asserted). The world has no labour market.
 const PRE_BATCH5_HASH_AFTER_22_TICKS = "74795cbc041b566a";
@@ -103,7 +96,7 @@ function contextFor(scenario: EconomyScenarioDef): TickContext {
 }
 
 function eightPolities(): EconomyScenarioDef {
-  return loadM5EightPolities();
+  return loadM5Sample();
 }
 
 function requireEconomy(result: ReturnType<typeof tick>) {
@@ -123,9 +116,6 @@ describe("Batch 5 validation boundary and determinism", () => {
     const world = createEconomyWorld(scenario, { seed: SEED });
     runTicks(world, 22, contextFor(scenario));
     expect(world.dayIndex).toBe(22);
-    expect(prePhase5bDigest(world)).toBe(PRE_P5B_HASH_AFTER_22_TICKS);
-    expect(prePhase6Digest(world)).toBe(PRE_P6_HASH_AFTER_22_TICKS);
-    expect(prePhase7Digest(world)).toBe(PRE_P7_HASH_AFTER_22_TICKS);
     expect(hashWorld(world)).toBe(PRE_BATCH5_HASH_AFTER_22_TICKS);
   });
 
@@ -165,7 +155,9 @@ describe("Batch 5 validation boundary and determinism", () => {
     const scenario = eightPolities();
     const world = createEconomyWorld(scenario, { seed: SEED });
     const context = contextFor(scenario);
-    tick(world, context);
+    // D-155: in the labour-market M5 sample the AI first applies an action on day 36, so
+    // the instrumented 20 days are days 31-50 (formerly days 1-20).
+    for (let day = 0; day < 31; day += 1) tick(world, context);
 
     setValidationInstrumentationEnabled(true);
     try {
@@ -190,15 +182,9 @@ describe("Batch 5 validation boundary and determinism", () => {
     if (account === undefined) throw new Error("fixture has no accounts");
     account.balanceRUSD = Number.NaN;
 
-    expect(() => runMigrationPhase(world, scenario.definitions, 5)).toThrow(
-      /balance/i,
-    );
-    // The staged-day caller may opt out only explicitly; the day boundary then
-    // owns validation. This non-month-start day returns without mutation.
-    expect(runMigrationPhase(world, scenario.definitions, 5, { validateWorld: false })).toMatchObject({
-      ran: false,
-      dayIndex: 5,
-    });
+    // D-155: the M5 migration phase this used was removed; the debt phase is a public
+    // phase entry point with the same default.
+    expect(() => runDebtPhase(world, 5)).toThrow(/balance/i);
   });
 
   test("phase-scoped reservation validation remains active in staged mode", () => {

@@ -9459,3 +9459,180 @@ the before/after.
   education (no 1900 series); Mexico's agrarian status (no peón or holdings table in the 1900
   summary: the fit stands in) and any Chinese occupation or tenure source (none found for
   1900-1910); the UK coverage (P5b/P6).
+
+## D-155 (maintenance) — Test-suite memory, and the removal of the legacy worlds, paths and old saves
+
+**Status:** designer's instruction of 2026-11-11 (branch `maint/test-memory`, from `main`
+at `24a8db7`): the full `pnpm test` must finish with a peak memory at least three times lower
+than the baseline, and the legacy worlds, the code paths that existed only for them and
+old-save support are removed. This reverses P7 plan Q21(a). On 2026-11-11 the designer chose
+to convert the small fixtures rather than delete their suites ("convert, then delete": keep
+small fixtures only as unit scaffolding with the labour-market and demand configuration, and
+delete the suites whose whole point is a legacy world) and to remove the SUSD hash view now.
+**Amends:** D-013 and D-120 (old saves), D-137 (stored save form, test runner), D-145 (test
+layout), D-153 and D-154 (the Q21(a) legacy paths), the M14 hash compatibility view.
+
+### 1. Memory
+
+Measured on this machine (Windows 11, Ryzen 5 2600, 6 cores / 12 threads, 7.9 GB RAM, Node
+24.22.1): peak RSS from `process.resourceUsage().maxRSS` of each jest process, and a 3-5 s
+working-set sampler summing every jest process.
+
+- **Baseline** (`main`, unchanged command: one process, `--runInBand`, 4 GB heap): heap out of
+  memory after 5,393 s with 109 of 112 suites done; peak RSS 4,113 MB measured before the crash
+  (the heap was at 4,049 of 4,096 MB). The three suites that never ran, measured the same way in
+  a second process: 1,125 s, peak 2,876 MB. All 112 suites took 6,518 s in two processes. The
+  baseline peak is a lower bound: the run needed more than its 4 GB heap.
+- **What held the memory**, largest first: (1) every suite's leftovers in the one process:
+  3.05 GB of retained heap by suite 109 (`world-1900` alone left 629 MB, `provinces-oceania` 439,
+  `money-calibration` 198, `naming-audits` 169, `demography-causes` 161); (2) ts-jest's
+  type-checking language service of the whole program, 240 MB in even a trivial suite and growing
+  across files; (3) garbage that V8 lets pile up under a 4 GB ceiling: one 1900-world suite reached
+  2.9 GB in a fresh process with about 0.6 GB live; (4) the 1900 world held several times at once:
+  scenarios and worlds built at collection time and kept for the whole file, two or three worlds
+  compared side by side, rollback checkpoints beside probes; (5) full-detail day results of the
+  1900 world (about 3.4 million objects, 470-570 MB) in tests that read only world state; (6) the
+  world digest: the SUSD view rewrote the encoded world and the 100 MB canonical text was built
+  before hashing (+1.1 GB RSS, about 10 s a hash); (7) the isolation audit's comment stripper,
+  which appended the 37 MB worker bundle one character at a time (1.45 GB).
+- **What fixed it.** Jest runs one worker, replaced after every suite
+  (`workerIdleMemoryLimit: "1MB"`; about 2 s a suite; a 512 MB limit let a heavy suite start on
+  a worker still holding up to 512 MB and run out of heap), under a 900 MB heap ceiling
+  (`--max-old-space-size=900`; the ceiling, not the recycling, bounds a heavy suite), and ts-jest transpiles each file on its own
+  (`isolatedModules`; `pnpm typecheck` type-checks the tests package, so Jest no longer repeats
+  it). The digest hashes the canonical text as it is produced (`dualFnv1a32HexOfCanonical`,
+  identical to `dualFnv1a32Hex(stableStringify(x))` by construction and by test; the save
+  checksum uses its first lane) and has no SUSD view. The heavy 1900-world suites load their data
+  per describe block, keep one 1900 world at a time, and tick with summary detail where they read
+  only world state, demand totals, wages or inventory flows (D-137: the same world). The isolation
+  audit writes its output to a buffer (the same output on all 329 package sources).
+- **Result:** the full `pnpm test` finishes: 108 suites in 6,074 s (101 min; the
+  baseline needed 6,518 s for its 112 suites in two processes). Peak memory 1,274 MB (summed
+  working set of the jest processes, sampled every 3 s); the largest single process peaked at
+  1,248 MB (`demography-causes`; then `money-calibration` 1,174, `world-1900` 1,135,
+  `naming-audits` 1,122, `p6-world` 1,114) and the main process at 70 MB, so the run never held
+  more than 1,318 MB. Against the baseline's 4,113 MB (a lower bound) that is 3.2 times lower
+  sampled and at least 3.1 times lower by the per-process bound. Tests: 1,454 (1,443 passed,
+  11 failed, all of them known on `main`), against 1,503 (12 failed) at the baseline; 52 tests
+  were removed with the legacy worlds and paths and 3 added (the canonical digest).
+
+### 2. Legacy worlds
+
+- Removed from the data package: the loaders `loadM5EightPolities`, `loadM5HistoricalData`,
+  `loadM3SmallEconomy`, `loadM2MultiBlock`, `loadM2Wpp1950Validation`,
+  `loadM2PopulationCalibration` and the `HISTORICAL_SCENARIO_FILE` default; the M2 population
+  target series (`calibration/m2_population_targets.json`) with the M2 calibration test that
+  documented the gap to it.
+- Moved to `packages/tests/src/fixtures/data` as unit scaffolding, read only by the tests through
+  `fixtures/smallWorlds.ts`: `m2_multi_block.json`, `m2_wpp_1950_validation.json`,
+  `m3_small_economy.json` and the M3 catalogue (`goods.json`, `professions.json`, `buildings.json`,
+  `m3_needs.json`).
+- Kept in the data package because the current world or its generators read them:
+  `m11_world_1900.json`; `m5_eight_polities.json` and its tables (`scripts/m11/build-world-data.mjs`
+  reads its age structure; the tests build the M5 sample from them); the `historical_*.json` and
+  `historical_1900_*.json` catalogues (`scripts/m11`, `p2`, `p2b`, `p5b`); `demography.json`,
+  `politics.json`, `technology.json`; `m2_world_aggregate.json` and `needs.json` (the 1900 world
+  cites the aggregate as the source of its age structure, and the M1/M2 benchmark runs it); the
+  WPP reference and validation tables.
+- Every economy fixture runs the current model: `fixtures/currentModel.ts` gives a scenario the
+  labour-market configuration, profession roles by key (the 1900 world's roles without entry
+  gates) and a demand system derived from its need tiers. The M5 sample is built with test-only
+  profession roles and labour configuration (`fixtures/data/m5_sample_*.json`), because the
+  generators read the original catalogue files.
+- Deleted, because their subject was a legacy world or a removed path: the M5 migration suite,
+  the M3b allocator suite, the M5 cross-border labour-mobility suite, the M5-sample feasibility
+  suite, the save-compatibility suite and the Century-era save; the encoding proofs
+  (`p4Encoding` to `p7Encoding` and their assertions in five suites); and single tests of the tier
+  path, the static-wage path, the M5 sample's own scale, the schema-34 rejection, tier activation
+  by wealth and cross-border hiring. The completion report lists every one.
+
+### 3. Code paths
+
+- `EconomyDefinitions.labourMarket` is required (also checked at run time); every economy world
+  runs the labour market and buys by its demand system (resolved when the scenario is validated).
+  Removed: the need-tier household demand builder, the M5 migration module (its day-result type
+  moved to `migrationResult.ts`), the M3b employment allocator and repair, the static-wage
+  settlement (P2b table wage with the E5 floor), and the non-labour branches of construction
+  labour, the fiscal and education payrolls, health and training staffing, administration
+  staffing, unemployment and the local wage index. `World.labourMarket.enabled` stays in the
+  encoding (empty and population-only worlds have no economy; removing the flag would be a schema
+  change).
+- Bug found and fixed: an institution budget that bought more posts than the country has people
+  made the province apportionment throw (`planInstitutionSlots`); posts are now capped at the
+  population. The 1900 world never reached it; the education shortfall test is its regression test.
+- The SUSD aliases are gone: the hash view, the reserved `susd` currency key and the
+  opening-balance checksum spelling. Every world digest changed once; the opening checksum is
+  over `balanceRUSD`.
+
+### 4. Old saves
+
+Removed: the pre-D-137 gzip stored form (`COMPRESSED_SAVE_PREFIX`, `legacyCompressSaveForStorage`),
+the adoption of the pre-library single save (`century.m7.save.v1`) and the default legacy store
+keys (`SaveStore` now needs its keys), the save-compatibility listings of earlier schemas and the
+Century-era save fixture. A save of another schema is still rejected by the current check
+(envelope test), and the save list shows one message for it ("This version of the game cannot
+load this save."); a save from a newer version still asks the player to update.
+
+### 5. Speed of the day (optional item)
+
+`institutionPayroll` built a map of all 20,739 blocks for every country in each of three
+daily phases (fiscal, training, education); the phases now build it once and pass it. One-off
+desktop measurement of the 1900 world (Ryzen 5 2600, Node 24.22.1, 3 warm-up days, 20 timed
+days, two alternating runs each): mean 5,437 ms a day before, 5,076 ms after (-6.6 %); median
+5,456 ms before, 5,049 ms after (-7.5 %); the world hash after 23 days is the same
+(`5976aa354a47d263`). Not a device measurement; `pnpm bench`, perfPhases and perfBench were not
+run.
+
+### Consequences
+
+- Known answers moved by the conversion are restated in their tests with a D-155 note; each keeps
+  the behaviour it checks. The digest pins that already failed on `main` (waiting for the
+  designer's re-pin) still fail, with new values: D-155 changes the digest algorithm, and for the
+  empty world the removed view reproduces `main`'s value exactly.
+- `pnpm bench` keeps only its M1/M2 cases; `bench:campaign` and the M3-M10, E5 and E6 bench
+  modules were removed with the worlds they ran. `pnpm bench`, perfPhases and perfBench stay on
+  hold.
+- Jest no longer reports TypeScript errors; `pnpm typecheck` does.
+- This entry is headed like D-154 (`(step 3)`), which the index generator does not list; indexing
+  this entry alone would make the index check report D-154 as missing.
+
+### Ambiguities left to the designer
+
+- **The M5 sample stays in the data package** (`scenarios/m5_eight_polities.json` and its
+  `historical/*_1900.json` tables): `scripts/m11/build-world-data.mjs` reads its age structure,
+  and 21 converted suites run on it; only its loaders were removed. Moving its tables into the
+  test fixtures, or porting those suites to the M5 fixture, is the designer's call.
+- **`m2_world_aggregate.json` and `needs.json` stay**: the 1900 world's source list cites the
+  aggregate (`internal:packages/data/data/scenarios/m2_world_aggregate.json`) for its provisional
+  age structure, and the M1/M2 benchmark runs it.
+- **The need tiers stay in the definitions**: the wealth indicator still prices its basket by
+  the subsistence tier (P6), and the fixtures' demand systems are derived from their tiers.
+- **`World.labourMarket.enabled` stays** (always true in an economy world): removing it is a
+  schema change and would make every save incompatible.
+- **Saves of earlier schemas are still listed** as unloadable, with a plain message; D-120 says a
+  save is never deleted without the player, so they are neither hidden nor deleted.
+- **Save-index records with `savedAtMs: null`** (adopted pre-library saves on a device) are still
+  read and labelled "Saved before the save list existed"; nothing creates them any more.
+- **`scripts/m11d/playtest.mjs`** (a historical M11d playtest tool) still contains its legacy-save
+  steps (`century.m7.save.v1`); `scripts/m13/playtest-rebrand.mjs` lost its legacy-save section
+  because it read the deleted Century-era save.
+- **AGENTS.md** still says that "historical reports and legacy save aliases retain" the SUSD
+  spelling; the aliases no longer exist (AGENTS.md is the designer's file, not changed).
+- **D-154's heading** (`## D-154 (step 3) — …`) is not listed by the decision index; D-155 uses the
+  same style so the index check passes. Indexing both is a one-line change to D-154's heading.
+- **Day-0 institution state** in a labour-market world (the 1900 world included) is derived
+  before the labour market's first assignment, so administration staff and quality read zero
+  until the first day; two M8 tests now read them after one day. Reordering creation would
+  change the 1900 world's day-0 state, so it was left.
+- **Education and training memos** (P7 behaviour, unchanged): the month-to-date "requested" is the
+  budget's daily share, while "shortfall" is measured against the staff payroll owed; the old
+  identity requested = paid + shortfall no longer holds, and two tests were restated around it.
+- **The post-demography employment check** (D-126) answers any error, not only an invalid
+  state, with a repair or a full refresh; the rollback tests now inject failures outside it.
+- **The M5 fixture's plant and workshop** now belong to their province's peasant block (they
+  belonged to the laborers who staff them, who under P7 R2 would take the residual, not a wage).
+- **ts-jest no longer type-checks** in Jest; type errors in tests surface only in `pnpm typecheck`.
+- **The empty M1 world and the population-only M2 worlds** are kept: they have no economy, so
+  neither the labour market nor the demand system applies.
+- **The bench package** keeps only its M1/M2 harness; whether `pnpm bench` should run the 1900
+  world (perfBench) instead is open.

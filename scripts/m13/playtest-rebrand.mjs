@@ -11,7 +11,6 @@
  * save injected into the same AsyncStorage-backed browser keys. It writes
  * screenshots and a JSON evidence report under docs/images/m13/.
  */
-import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -51,10 +50,6 @@ async function shot(app, name) {
   await app.screenshot(name);
   evidence.screenshots.push(`docs/images/m13/${name}.png`);
 }
-
-const legacy = JSON.parse(
-  readFileSync(join(ROOT, "packages/tests/src/fixtures/century-era-save.json"), "utf8"),
-);
 
 const app = await boot({ fresh: true, port: 8881, cdpPort: 9481, windowSize: "1440,1000" });
 
@@ -157,27 +152,6 @@ try {
   check("manual load succeeds", loaded.includes("Saved game loaded"));
   check("loaded campaign has no old wordmark", !/\bCENTURY\b/.test(loaded));
   await shot(app, "m13-campaign-loaded");
-
-  /* ---------------------------------------------------------------- */
-  /* Pre-rebrand save compatibility                                   */
-  /* ---------------------------------------------------------------- */
-  await app.step("pre-rebrand save compatibility");
-  await app.evaluate(
-    `localStorage.setItem("century.m7.save.v1", ${JSON.stringify(legacy.stored)}); localStorage.removeItem("century.m7.save.v1.previous"); localStorage.removeItem("century.m7.save.v1.staging"); true`,
-  );
-  await app.navigate(URL);
-  const legacyMenu = await waitForText(app, "Continue campaign", 60_000);
-  check("pre-rebrand save is recognized on the menu", legacyMenu.includes("Continue campaign"));
-  check("legacy save date is shown", legacyMenu.includes("1900-01-01"));
-  check("legacy save menu has no old wordmark", !/\bCENTURY\b/.test(legacyMenu));
-  await shot(app, "m13-legacy-save-menu");
-  await app.clickAria("Continue campaign");
-  await waitForText(app, "World map", 240_000);
-  await sleep(3000);
-  const legacyCampaign = await app.text();
-  check("pre-rebrand save loads into a campaign", legacyCampaign.includes("World map"));
-  check("pre-rebrand campaign has no old wordmark", !/\bCENTURY\b/.test(legacyCampaign));
-  await shot(app, "m13-legacy-save-loaded");
 
   /* ---------------------------------------------------------------- */
   /* Narrow layout                                                    */

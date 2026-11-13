@@ -2,35 +2,25 @@
 
 Canonical static definitions for Fabric of Nations, stored as JSON under `data/`.
 
-M3a includes all M2.1 population content plus:
+The package loads the 1900 world (`loadM11World`, from `data/scenarios/m11_world_1900.json`
+and the tables it names under `data/historical/` and `data/map/`) and the reference tables
+it and its generators read:
 
-- `data/goods.json` — eight M3 goods.
-- `data/professions.json` — four provisional M3 profession definitions.
-- `data/buildings.json` — eight M3 building definitions.
-- `data/m3_needs.json` — M3 needs; services are deferred.
-- `data/scenarios/m3_small_economy.json` — synthetic single-region,
-  single-market structural fixture.
+- `data/demography.json`, `data/politics.json`, `data/technology.json` — definitions the
+  1900 world and `scripts/p5b/build-goods-1900.mjs` read.
+- `data/historical_*.json`, `data/historical_1900_*.json` — catalogues the 1900 generators
+  (`scripts/m11`, `scripts/p2`, `scripts/p2b`, `scripts/p5b`) read.
+- `data/calibration/wpp_age_sex_reference.json`, `data/validation/` — WPP 2024 references
+  (the 1900 demography definitions and the P4 validation).
+- `data/scenarios/m2_world_aggregate.json` and `data/needs.json` — the M2 world-aggregate
+  population scenario, which the 1900 world cites as the source of its provisional age
+  structure and the M1/M2 benchmark runs (`loadM2WorldAggregate`).
+- `data/scenarios/m5_eight_polities.json` and `data/historical/*_1900.json` — the M5
+  sample, read by `scripts/m11/build-world-data.mjs` (its age structure) and by the test
+  fixtures; the package no longer exports a loader for it.
+- `data/source_notes.md` — provenance, source conventions, calibration status, and
+  missing inputs.
 
-The M3a loader validates the economy definitions and returns an explicit
-`EconomyScenarioDef`. It does not simulate production, employment matching,
-market clearing, wages, or prices. M3 recipe, population, and price values are
-provisional synthetic inputs, not historical calibration.
-
-M2.1 content remains under `data/`:
-
-- `data/needs.json` — M2 four-tier needs fixture.
-- `data/demography.json` — age-specific fertility and sex-specific mortality
-  anchors; WPP 2024 for 1950/1975/2000 and provisional pre-1950 schedules.
-- `data/scenarios/m2_*.json` — population-only scenarios.
-- `data/calibration/m2_population_targets.json` — OWID world population series
-  1899–2000.
-- `data/calibration/wpp_age_sex_reference.json` — WPP 2024 world age/sex, ASFR,
-  and mortality references for 1950/1975/2000.
-- `data/source_notes.md` — provenance, source conventions, calibration status,
-  and missing inputs.
-
-M5 adds the source-annotated eight-polity 1900 sample under `data/historical/`
-and `data/scenarios/m5_eight_polities.json`. The scenario enables the provisional
-M5a profit-allocation policy and the M6 country-AI policy; the AI rules live in
-`@century/sim`, not in this data package, and the sample does not claim historical
-government behavior. See `data/historical/source_notes.md`.
+D-155 (2026-11-11): the M2 multi-block and WPP-1950 scenarios, the M3 catalogue and
+`m3_small_economy.json` moved to `packages/tests/src/fixtures/data` as unit-test
+scaffolding, with their loaders; the M2 population-target series was removed.

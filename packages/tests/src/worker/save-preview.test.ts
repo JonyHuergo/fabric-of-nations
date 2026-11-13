@@ -14,7 +14,7 @@ import {
   type WorkerEvent,
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
 const SEED = 20_261_023;
 
@@ -25,7 +25,7 @@ function command(type: WorkerCommand["type"], id: string, extra: Partial<WorkerC
 function harness(): { host: SimulationHost; events: WorkerEvent[] } {
   const events: WorkerEvent[] = [];
   const host = new SimulationHost({
-    scenario: loadM5EightPolities(),
+    scenario: loadM5Sample(),
     seed: SEED,
     emit: (event) => {
       events.push(event);

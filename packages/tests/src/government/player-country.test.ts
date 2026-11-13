@@ -8,9 +8,9 @@ import {
   type CountryAction,
   type TickContext,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
-function contextFor(scenario: ReturnType<typeof loadM5EightPolities>): TickContext {
+function contextFor(scenario: ReturnType<typeof loadM5Sample>): TickContext {
   return {
     population: { definitions: scenario.population.definitions },
     economy: { definitions: scenario.definitions },
@@ -19,7 +19,7 @@ function contextFor(scenario: ReturnType<typeof loadM5EightPolities>): TickConte
 
 describe("M6 designated player country", () => {
   test("identifies the player country and preserves its fiscal policy across AI evaluations", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     expect(world.playerCountryId).not.toBeNull();
     const player = world.countries.find((country) => country.id === world.playerCountryId);
@@ -69,7 +69,7 @@ describe("M6 designated player country", () => {
   });
 
   test("save/load and deterministic replay preserve the player-country configuration", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const context = contextFor(scenario);
     const first = createEconomyWorld(scenario, { seed: 20_261_023 });
     const second = createEconomyWorld(scenario, { seed: 20_261_023 });

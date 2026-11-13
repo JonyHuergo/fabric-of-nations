@@ -77,23 +77,7 @@ export const M3_PRICE_EPSILON = 1e-9;
 export const M3_PRICE_MIN_RATIO = 0.25;
 export const M3_PRICE_MAX_RATIO = 4;
 
-/**
- * M5 migration pressure coefficients. PROVISIONAL, not calibrated.
- *
- * Monthly pressure for one source->destination pair is
- * `vacancyWeight * vacancyRate + wealthWeight * wealthGap`, where vacancyRate is
- * unfilled job slots divided by eligible provincial workforce (0..1) and
- * wealthGap is (destination wealth - source wealth) / 100. The weights sum to 1.
- * The monthly migrant fraction of the source population is
- * `clamp(pressure * ratePerPressure, 0, maxFraction)`.
- */
-export const MIGRATION_VACANCY_WEIGHT = 0.7;
-export const MIGRATION_WEALTH_WEIGHT = 0.3;
-
-/** Fraction of source population that moves per month at pressure 1. PROVISIONAL. */
-export const MIGRATION_RATE_PER_PRESSURE = 0.01;
-
-/** Hard monthly cap on the fraction of a source block that may migrate. PROVISIONAL. */
+/** Hard monthly cap on the fraction of a source block that may migrate (P7 labour migration). PROVISIONAL. */
 export const MIGRATION_MONTHLY_MAX_FRACTION = 0.01;
 
 /**

@@ -14,7 +14,7 @@
  * plain data and is recomputed into derived values on demand.
  */
 
-import { buildLabourWageTable, institutionPayroll, institutionStaff } from "./labourMarket.js";
+import { buildLabourWageTable, institutionPayroll, institutionStaff, popBlocksById } from "./labourMarket.js";
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
 import { CONTRACEPTION_MAX_REDUCTION, RATE_DECIMAL_PLACES } from "../population/constants.js";
 import { populationTotal, syncBlockLiteracy, workingAgePopulation } from "../population/state.js";
@@ -706,10 +706,6 @@ function countryBlocks(
   return countryPopBlocks(world, country.id, index);
 }
 
-function professionKeyById(definitions: EconomyDefinitions): Map<Id, string> {
-  return new Map(definitions.professions.map((profession) => [profession.id, profession.key]));
-}
-
 /** Attendance and quality policy contributed by the enacted education law. */
 export function educationLawPolicy(
   country: Country,
@@ -831,10 +827,9 @@ export function deriveEducation(
     0,
     availableAcademicWorkers - researchStaff - trainingStaff,
   );
-  // P7 (D-154, plan §3.4, Q4): in a labour-market world teachers, researchers and
-  // instructors are the workers the schools, research and training institutions
-  // employ (assignments), not shares of an academic pool.
-  if (world.labourMarket.enabled) {
+  // P7 (D-154, plan §3.4, Q4): teachers, researchers and instructors are the workers
+  // the schools, research and training institutions employ (assignments).
+  {
     teacherStaff = institutionStaff(world, country.id, "education");
     researchStaff = institutionStaff(world, country.id, "research");
     trainingStaff = institutionStaff(world, country.id, "training");
@@ -879,7 +874,6 @@ export function deriveEducation(
       blocks,
       definitions,
       new Set(content.academicProfessionKeys),
-      populationIndex?.wagesByProvince,
     );
   const fundingAdequacy =
     fundingBenchmark > 0
@@ -1031,34 +1025,21 @@ export function runEducationPhase(
     blocks: { id: Id; population: number }[];
   }[] = [];
   const entries: JournalEntryInput[] = [];
-  const academicKeys = new Set(content.academicProfessionKeys);
-  const professionKey = professionKeyById(definitions);
-  const labourWages = world.labourMarket.enabled ? buildLabourWageTable(world, definitions) : null;
+  const labourWages = buildLabourWageTable(world, definitions);
+  const payrollBlocks = popBlocksById(world);
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     const requested = country.education.fundedAnnualRUSD / yearDays;
     if (!Number.isFinite(requested) || requested < 0) {
       throw new RangeError(`invalid education funding for country ${String(country.id)}`);
     }
     if (!(requested > 0)) continue;
-    // P7 (D-154, plan Q4): a labour-market world pays the schools' and research
-    // institutions' assigned staff the market wage; elsewhere the academic population.
-    const owed =
-      labourWages !== null
-        ? institutionPayroll(world, definitions, country.id, ["education", "research"], yearDays, labourWages).map((entry) => ({
-            id: entry.popBlockId,
-            population: entry.population,
-          }))
-        : null;
-    const eligible =
-      owed ??
-      countryBlocks(world, country, populationIndex)
-        .filter(
-          (block) =>
-            populationTotal(block) > 0 &&
-            academicKeys.has(professionKey.get(block.professionId) ?? ""),
-        )
-        .map((block) => ({ id: block.id, population: populationTotal(block) }));
-    const owedTotal = owed === null ? requested : owed.reduce((total, entry) => total + entry.population, 0);
+    // P7 (D-154, plan Q4): the schools and research institutions pay their assigned
+    // staff the market wage (D-155: the academic-population path was removed).
+    const eligible = institutionPayroll(world, definitions, country.id, ["education", "research"], yearDays, labourWages, payrollBlocks).map((entry) => ({
+      id: entry.popBlockId,
+      population: entry.population,
+    }));
+    const owedTotal = eligible.reduce((total, entry) => total + entry.population, 0);
     const treasury = index.get("country", country.id, "treasury-cash");
     const payableCeiling = Math.max(0, treasury.balanceRUSD - country.fiscal.reserveTargetRUSD);
     const payable = eligible.length > 0 ? Math.min(owedTotal, payableCeiling) : 0;

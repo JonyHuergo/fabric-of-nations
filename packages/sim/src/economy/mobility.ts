@@ -480,7 +480,6 @@ export function runLabourMonthPhase(world: World, definitions: EconomyDefinition
     employmentRefresh: null,
   };
   if (!labourMonthIsDue(world, dayIndex)) return none;
-  if (definitions.labourMarket === undefined) throw new RangeError("labour-market world needs labour-market definitions");
   updateLabourMarketMonth(world, definitions, dayIndex);
   const index = buildPhaseIndex(world, definitions, dayIndex);
   const context = createReclassifyContext(world, definitions, dayIndex);

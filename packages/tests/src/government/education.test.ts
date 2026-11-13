@@ -105,8 +105,13 @@ describe("M9 education payroll accounting", () => {
     const treasury = after.get("country", M5_COUNTRY_A, "treasury-cash");
     const expense = after.get("country", M5_COUNTRY_A, "education-expense").balanceRUSD;
     const income = after.get("popBlock", M9_ACADEMICS_BLOCK, "education-income").balanceRUSD;
-    const expectedDaily = M9_EDUCATION_FUNDING / 365;
-    expect(expense).toBeCloseTo(expectedDaily, 6);
+    // D-155: the schools pay their assigned teachers and researchers the market wage
+    // (P7 plan Q4); the funding sets how many posts there are, so the day's payroll is
+    // positive and at most the budget's daily share (formerly exactly that share, paid
+    // to the academics' population).
+    const expectedDaily = expense;
+    expect(expense).toBeGreaterThan(0);
+    expect(expense).toBeLessThanOrEqual(M9_EDUCATION_FUNDING / 365 + 1e-9);
     expect(income).toBeCloseTo(expense, 6);
     // The payroll's treasury credit equals the education expense.
     const payroll = world.finance.postings.find(
@@ -122,12 +127,19 @@ describe("M9 education payroll accounting", () => {
     expect(
       world.finance.postings.some((posting) => posting.transactionKind === "education-payroll"),
     ).toBe(true);
-    expect(country.education.fundingRequestedMonthToDateRUSD).toBeCloseTo(expectedDaily, 6);
+    // The memo's request is the budget's daily share; nothing owed went unpaid.
+    expect(country.education.fundingRequestedMonthToDateRUSD).toBeCloseTo(M9_EDUCATION_FUNDING / 365, 6);
+    expect(country.education.fundingRequestedMonthToDateRUSD).toBeGreaterThanOrEqual(expectedDaily - 1e-9);
     expect(country.education.fundingShortfallMonthToDateRUSD).toBe(0);
   });
 
   test("treasury cash limits the payroll and records an explicit shortfall, not debt", () => {
+    // D-155: the payroll is the assigned staff's wages (P7 plan Q4), which a large budget
+    // does not raise past the posts the population can fill, so the treasury itself is
+    // limited: the reserve target leaves 1 RUSD payable.
     const { scenario, world, country } = fixture({ fundingA: 1_000_000_000 });
+    const treasuryCash = buildFinanceIndex(world.finance).get("country", M5_COUNTRY_A, "treasury-cash").balanceRUSD;
+    country.fiscal = { ...country.fiscal, reserveTargetRUSD: Math.max(0, treasuryCash - 1) };
     runEconomicDay(
       world,
       scenario.population.definitions,
@@ -135,11 +147,11 @@ describe("M9 education payroll accounting", () => {
       world.dayIndex,
     );
     expect(country.education.fundingShortfallMonthToDateRUSD).toBeGreaterThan(0);
-    expect(country.education.fundingRequestedMonthToDateRUSD).toBeCloseTo(
+    // The unpaid part is recorded; the request (the budget's share) covers it and the paid part.
+    expect(country.education.fundingRequestedMonthToDateRUSD).toBeGreaterThanOrEqual(
       country.education.fundingShortfallMonthToDateRUSD +
-        (buildFinanceIndex(world.finance).get("country", M5_COUNTRY_A, "education-expense")
-          .balanceRUSD),
-      6,
+        buildFinanceIndex(world.finance).get("country", M5_COUNTRY_A, "education-expense").balanceRUSD -
+        1e-6,
     );
     // No debt or payable account is created for the unpaid request.
     const liabilities = world.finance.accounts.filter(
@@ -295,8 +307,12 @@ describe("M9 age-specific literacy", () => {
 
 describe("M9 education law integration", () => {
   test("a technology-gated education law becomes effective on its effective day and raises attendance", () => {
+    // D-155: teachers are the posts the budget funds at the market wage (P7 plan Q4), so
+    // the budget is large enough for school places not to bind and the law's attendance
+    // floor to show (the fixture budget pays only a few teachers).
     const { scenario, world, country } = fixture({
       researchedA: ["primary-schooling", "compulsory-education-systems"],
+      fundingA: 10_000_000,
     });
     const definitions = scenario.definitions;
     const politics = definitions.politics;

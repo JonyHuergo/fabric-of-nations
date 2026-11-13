@@ -1,0 +1,87 @@
+[
+  {
+    "id": 0,
+    "key": "peasants",
+    "name": "Peasants",
+    "stratum": "lower",
+    "participationRate": 0.6,
+    "qualificationLiteracy": 0,
+    "qualificationWealthLevel": 0,
+    "baseWage1900RUSDPerYear": 60,
+    "trainingCostRUSD": 0,
+    "laborProductivityModifier": 1,
+    "roles": [
+      "subsistence"
+    ],
+    "settlement": "rural"
+  },
+  {
+    "id": 1,
+    "key": "laborers",
+    "name": "Laborers",
+    "stratum": "lower",
+    "participationRate": 0.4,
+    "qualificationLiteracy": 0.1,
+    "qualificationWealthLevel": 0,
+    "baseWage1900RUSDPerYear": 130,
+    "trainingCostRUSD": 0,
+    "laborProductivityModifier": 1,
+    "roles": [
+      "wage-labour"
+    ],
+    "settlement": "by-job"
+  },
+  {
+    "id": 2,
+    "key": "clerks",
+    "name": "Clerks",
+    "stratum": "middle",
+    "participationRate": 0.55,
+    "qualificationLiteracy": 0.7,
+    "qualificationWealthLevel": 20,
+    "baseWage1900RUSDPerYear": 250,
+    "trainingCostRUSD": 0,
+    "laborProductivityModifier": 1.1,
+    "roles": [
+      "wage-labour",
+      "administration",
+      "health"
+    ],
+    "settlement": "urban"
+  },
+  {
+    "id": 3,
+    "key": "capitalists",
+    "name": "Capitalists",
+    "stratum": "upper",
+    "participationRate": 0.4,
+    "qualificationLiteracy": 0.8,
+    "qualificationWealthLevel": 50,
+    "baseWage1900RUSDPerYear": 600,
+    "trainingCostRUSD": 0,
+    "laborProductivityModifier": 1,
+    "roles": [
+      "owns-capital",
+      "management"
+    ],
+    "settlement": "urban"
+  },
+  {
+    "id": 4,
+    "key": "academics",
+    "name": "Academics",
+    "stratum": "middle",
+    "participationRate": 0.6,
+    "qualificationLiteracy": 0.85,
+    "qualificationWealthLevel": 40,
+    "baseWage1900RUSDPerYear": 320,
+    "trainingCostRUSD": 0,
+    "laborProductivityModifier": 1.15,
+    "roles": [
+      "education",
+      "research",
+      "training"
+    ],
+    "settlement": "urban"
+  }
+]

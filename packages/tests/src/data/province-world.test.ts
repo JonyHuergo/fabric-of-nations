@@ -8,7 +8,8 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { loadM11World, loadM5EightPolities } from "@century/data";
+import { loadM11World } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import {
   assertValidWorld,
   cloneWorld,
@@ -95,7 +96,7 @@ describe("P2 conserving province transfer (D-118 §4)", () => {
   const RUSSIA = 4;
 
   test("population, cash and goods are conserved; the province joins the new owner's market", () => {
-    const world = createEconomyWorld(loadM5EightPolities(), { seed: 20_261_102 });
+    const world = createEconomyWorld(loadM5Sample(), { seed: 20_261_102 });
     const before = {
       population: population(world),
       cash: cashTotal(world),
@@ -142,7 +143,7 @@ describe("P2 conserving province transfer (D-118 §4)", () => {
 
   test("the transfer is deterministic and survives a save round trip", () => {
     const run = (): World => {
-      const world = createEconomyWorld(loadM5EightPolities(), { seed: 7 });
+      const world = createEconomyWorld(loadM5Sample(), { seed: 7 });
       transferProvincesToCountry(world, { provinceIds: [PRUSSIA], toCountryId: RUSSIA, kind: "cession", day: world.dayIndex, note: "x" });
       return world;
     };
@@ -153,7 +154,7 @@ describe("P2 conserving province transfer (D-118 §4)", () => {
   });
 
   test("a transfer to a polity that is not a simulation country is rejected and changes nothing", () => {
-    const world = createEconomyWorld(loadM5EightPolities(), { seed: 3 });
+    const world = createEconomyWorld(loadM5Sample(), { seed: 3 });
     const before = hashWorld(world);
     expect(() =>
       transferProvincesToCountry(world, { provinceIds: [PRUSSIA], toCountryId: 9_999, kind: "cession", day: world.dayIndex, note: "x" }),
@@ -162,7 +163,7 @@ describe("P2 conserving province transfer (D-118 §4)", () => {
   });
 
   test("cloneWorld isolates province ownership", () => {
-    const world = createEconomyWorld(loadM5EightPolities(), { seed: 5 });
+    const world = createEconomyWorld(loadM5Sample(), { seed: 5 });
     const clone = cloneWorld(world);
     clone.provinces.ownership[0]!.claimantPolityIds.push(99);
     expect(world.provinces.ownership[0]?.claimantPolityIds).toEqual([]);

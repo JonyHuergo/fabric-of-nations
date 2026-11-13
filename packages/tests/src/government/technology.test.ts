@@ -20,7 +20,7 @@ import {
   type World,
 } from "@century/sim";
 import { parseWorkerCommand } from "@century/sim-worker";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
 import {
   M9_BASIC_SANITATION,
@@ -279,7 +279,10 @@ describe("M9 research actions and progress", () => {
   });
 
   test("completes on the day the required work is reached and records the completion day", () => {
-    const { scenario, world, context, country } = fixture();
+    // D-155: researchers are the posts the budget funds at the market wage (P7 plan Q4);
+    // the budget is raised so the research finishes within the loop's 20 days (the
+    // fixture budget funds only a few researchers).
+    const { scenario, world, context, country } = fixture({ fundingA: 10_000_000 });
     applyCountryAction(
       world,
       researchAction(M5_COUNTRY_A, M9_STEAM_POWER, world.dayIndex),
@@ -364,7 +367,7 @@ describe("M9 technology effects", () => {
   test("mortality reduction lowers deaths from the same starting population", () => {
     // The small M5 fixture can produce zero whole-day deaths, so this channel is
     // exercised on the eight-polity historical world where daily deaths are large.
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const baseline = createEconomyWorld(scenario, { seed: SEED });
     const researched = createEconomyWorld(scenario, { seed: SEED });
     const baselineCountry = baseline.countries.find((entry) => entry.id === 0);

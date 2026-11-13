@@ -1,4 +1,4 @@
-import { loadM3SmallEconomy } from "@century/data";
+import { loadM3SmallEconomy } from "./smallWorlds.js";
 import {
   createEconomyWorld,
   refreshEmployment,

@@ -14,7 +14,7 @@ import {
   hashWorld,
   serializeWorld,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import {
   PROTOCOL_VERSION,
   type WorkerEvent,
@@ -36,14 +36,13 @@ import {
 } from "../fixtures/asyncStorageMock.js";
 
 const SEED = 20_261_107;
-const PRIMARY_SAVE_KEY = "century.m7.save.v1";
 
 describe("app storage adapter save path", () => {
   test("accepts the current schema and round-trips through the worker", async () => {
     resetAsyncStorageMock();
     expect(SUPPORTED_SAVE_SCHEMA_VERSION).toBe(WORLD_SCHEMA_VERSION);
 
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const world = createEconomyWorld(scenario, { seed: SEED });
     const save = serializeWorld(world);
 
@@ -89,12 +88,15 @@ describe("app storage adapter save path", () => {
 
   test("an incompatible stored schema is rejected with an actionable error", async () => {
     resetAsyncStorageMock();
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const world = createEconomyWorld(scenario, { seed: SEED });
-    const parsed = JSON.parse(serializeWorld(world)) as { schemaVersion: number };
+    const save = serializeWorld(world);
+    const parsed = JSON.parse(save) as { schemaVersion: number };
     const oldSchema = WORLD_SCHEMA_VERSION - 1;
     parsed.schemaVersion = oldSchema;
-    writeStoredValue(PRIMARY_SAVE_KEY, compressSaveForStorage(JSON.stringify(parsed)));
+    // A listed slot whose stored save no longer matches this build's schema.
+    const { slot } = await storeSave(save);
+    writeStoredValue(slot.key, compressSaveForStorage(JSON.stringify(parsed)));
 
     await expect(readSave()).rejects.toThrow(new RegExp(`schema ${String(oldSchema)}`));
     await expect(readStoredCampaign()).rejects.toThrow(

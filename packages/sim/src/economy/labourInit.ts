@@ -13,7 +13,6 @@
 import { populationTotal } from "../population/state.js";
 import type { Id } from "../types.js";
 import type { World } from "../world.js";
-import { emptyLabourMarketState } from "./labourState.js";
 import {
   PROFESSION_GATES,
   PROFESSION_ROLES,
@@ -30,10 +29,6 @@ function professionIndexSize(definitions: EconomyDefinitions): number {
 }
 
 export function initialiseLabourMarket(world: World, definitions: EconomyDefinitions): void {
-  if (definitions.labourMarket === undefined) {
-    world.labourMarket = emptyLabourMarketState();
-    return;
-  }
   const size = professionIndexSize(definitions);
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
   const populationByProvince = new Map<Id, number>();
@@ -110,11 +105,20 @@ export function initialiseLabourMarket(world: World, definitions: EconomyDefinit
 
 /**
  * Validate the P7 definition fields: roles, gates, settlement, entry, course lengths
- * and entry capital. In a labour-market world every profession needs roles, trained
- * professions a course length and capital-gated professions an entry capital.
+ * and entry capital. Every profession needs roles, trained professions a course length
+ * and capital-gated professions an entry capital.
  */
 export function assertValidLabourDefinitions(definitions: EconomyDefinitions): void {
-  const shares = definitions.labourMarket?.domesticServiceShares ?? [];
+  // D-155: the configuration is required (the static-wage path was removed); checked at
+  // run time because definitions arrive from data files.
+  const raw: unknown = (definitions as { readonly labourMarket?: unknown }).labourMarket;
+  if (raw === null || typeof raw !== "object" || Array.isArray(raw)) {
+    throw new RangeError("economyDefinitions.labourMarket is required (D-155)");
+  }
+  if (!Array.isArray(definitions.labourMarket.domesticServiceBuildingKeys)) {
+    throw new RangeError("economyDefinitions.labourMarket.domesticServiceBuildingKeys must be an array");
+  }
+  const shares = definitions.labourMarket.domesticServiceShares ?? [];
   let previousProvince = -1;
   for (const [index, entry] of shares.entries()) {
     const path = `definitions.labourMarket.domesticServiceShares[${String(index)}]`;
@@ -150,22 +154,18 @@ export function assertValidLabourDefinitions(definitions: EconomyDefinitions): v
     if (profession.entryCapitalRUSD !== undefined && (!Number.isFinite(profession.entryCapitalRUSD) || profession.entryCapitalRUSD < 0)) {
       throw new RangeError(`${path}.entryCapitalRUSD must be finite and non-negative`);
     }
-    if (labour !== undefined) {
-      if (profession.roles === undefined || profession.roles.length === 0) throw new RangeError(`${path} needs roles in a labour-market world`);
-      if (professionHasGate(profession, "training") && profession.courseLengthYears === undefined) {
-        throw new RangeError(`${path} has the training gate but no course length`);
-      }
-      if (professionHasGate(profession, "capital") && profession.entryCapitalRUSD === undefined) {
-        throw new RangeError(`${path} has the capital gate but no entry capital`);
-      }
+    if (profession.roles === undefined || profession.roles.length === 0) throw new RangeError(`${path} needs roles`);
+    if (professionHasGate(profession, "training") && profession.courseLengthYears === undefined) {
+      throw new RangeError(`${path} has the training gate but no course length`);
+    }
+    if (professionHasGate(profession, "capital") && profession.entryCapitalRUSD === undefined) {
+      throw new RangeError(`${path} has the capital gate but no entry capital`);
     }
   }
-  if (labour !== undefined) {
-    const keys = new Set(definitions.buildings.map((building) => building.key));
-    for (const key of labour.domesticServiceBuildingKeys) {
-      if (!keys.has(key)) {
-        throw new RangeError(`economyDefinitions.labourMarket.domesticServiceBuildingKeys references unknown building ${JSON.stringify(key)}`);
-      }
+  const keys = new Set(definitions.buildings.map((building) => building.key));
+  for (const key of labour.domesticServiceBuildingKeys) {
+    if (!keys.has(key)) {
+      throw new RangeError(`economyDefinitions.labourMarket.domesticServiceBuildingKeys references unknown building ${JSON.stringify(key)}`);
     }
   }
 }

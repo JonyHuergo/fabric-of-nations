@@ -621,17 +621,30 @@ describe("P3 month-end closing valuations", () => {
 describe("P3 currency data and simulation behaviour", () => {
   test("valuations and adopted arrangements change no simulated quantity (one day; the 35-day run is `node packages/bench/dist/p3Equivalence.js 35`)", () => {
     const { withParities, withoutValuations, preP3 } = p3EquivalenceScenarios();
+    // D-155: summary detail (D-137) gives the same worlds; only their states are compared.
     const context = {
       population: { definitions: withParities.population.definitions },
       economy: { definitions: withParities.definitions },
+      detail: "summary" as const,
     };
-    const worlds = [withParities, withoutValuations, preP3].map((scenario) => createEconomyWorld(scenario, { seed: P3_PROBE_SEED }));
-    const [a, b, c] = worlds as [World, World, World];
-    const runners = worlds.map((world) => createRollbackRunner(world));
-    for (let day = 0; day < 1; day += 1) {
-      for (const runner of runners) runTicksWithRollback(runner, 1, context);
-      expect(hashWorld(withValuationsOf(a, b))).toBe(hashWorld(a));
-      expect(simulatedQuantitiesDigest(c)).toBe(simulatedQuantitiesDigest(a));
-    }
+    // D-155: the three worlds run one after another, so only one 1900 world is alive at a
+    // time; the comparison keeps of the first world its digests and the valuation fields
+    // `withValuationsOf` reads.
+    const run = (scenario: typeof withParities): World => {
+      const runner = createRollbackRunner(createEconomyWorld(scenario, { seed: P3_PROBE_SEED }));
+      runTicksWithRollback(runner, 1, context);
+      return runner.world;
+    };
+    let a: World | null = run(withParities);
+    const hashA = hashWorld(a);
+    const quantitiesA = simulatedQuantitiesDigest(a);
+    const valuationsA = {
+      currencyValuations: a.currencyValuations,
+      monetary: { currencies: a.monetary.currencies },
+      finance: { periodSummaries: a.finance.periodSummaries },
+    } as unknown as World;
+    a = null;
+    expect(hashWorld(withValuationsOf(valuationsA, run(withoutValuations)))).toBe(hashA);
+    expect(simulatedQuantitiesDigest(run(preP3))).toBe(quantitiesA);
   }, 300_000);
 });

@@ -40,7 +40,7 @@ import {
   type WorkerEvent,
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
 import {
   M5_CLOTHING,
@@ -486,7 +486,7 @@ describe("E6b monetary authority accounting", () => {
     ).toThrow(/requires an enacted currency law/);
 
     // Full sample: activate the USA currency, enact the managed-currency law.
-    const sample = loadM5EightPolities();
+    const sample = loadM5Sample();
     const managedLaw = sample.definitions.politics?.laws.find(
       (law) => law.slot === "currency" && law.currencyRegime === "managed",
     );
@@ -665,7 +665,7 @@ describe("E6b determinism, persistence, and worker contract", () => {
     let snapshot: SimulationSnapshot | null = null;
     let actionResult: Extract<WorkerEvent, { type: "ACTION_RESULT" }> | null = null;
     const host = new SimulationHost({
-      scenario: loadM5EightPolities(),
+      scenario: loadM5Sample(),
       seed: SEED,
       emit: (event: WorkerEvent) => {
         if (event.type === "READY" || event.type === "SNAPSHOT") snapshot = event.snapshot;

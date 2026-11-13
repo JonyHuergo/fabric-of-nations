@@ -17,6 +17,8 @@ import {
   type World,
 } from "@century/sim";
 
+import { withCurrentModel } from "./currentModel.js";
+
 export const M5_GRAIN = 0;
 export const M5_FOOD = 1;
 export const M5_CLOTHING = 2;
@@ -94,6 +96,8 @@ export function m5EconomyDefinitions(): EconomyDefinitions {
         baseWage1900RUSDPerYear: 180,
         trainingCostRUSD: 0,
         laborProductivityModifier: 1,
+        roles: ["subsistence"],
+        settlement: "rural",
       },
       {
         id: M5_LABORERS,
@@ -106,6 +110,8 @@ export function m5EconomyDefinitions(): EconomyDefinitions {
         baseWage1900RUSDPerYear: 250,
         trainingCostRUSD: 0,
         laborProductivityModifier: 1,
+        roles: ["wage-labour"],
+        settlement: "by-job",
       },
     ],
     buildings: [
@@ -193,6 +199,7 @@ export function m5EconomyDefinitions(): EconomyDefinitions {
         isEssentialInfrastructure: true,
       },
     ],
+    labourMarket: { domesticServiceBuildingKeys: [] },
   };
 }
 
@@ -337,19 +344,31 @@ function defaultBuildings(): EconomyScenarioDef["buildingInstances"] {
     nextId += 1;
   };
   add(M5_FARM, M5_REGION_A1, 100, 200);
-  add(M5_FOOD_PLANT, M5_REGION_A1, 101, 201);
+  // D-155: the plant and the workshop belong to their province's peasant block, so the
+  // laborers who staff them are wage workers (P7 R2: a block working in a building it owns
+  // takes its residual, not a wage; they belonged to the laborers' own blocks).
+  add(M5_FOOD_PLANT, M5_REGION_A1, 100, 201);
   add(M5_WAREHOUSE, M5_REGION_A1, 100, 202);
   add(M5_FARM, M5_REGION_A2, 102, 203);
   add(M5_WAREHOUSE, M5_REGION_A2, 102, 204);
   add(M5_FARM, M5_REGION_B1, 104, 205);
   add(M5_WAREHOUSE, M5_REGION_B1, 104, 206);
   add(M5_FARM, M5_REGION_C1, 105, 207);
-  add(M5_WORKSHOP, M5_REGION_C1, 106, 208);
+  add(M5_WORKSHOP, M5_REGION_C1, 105, 208);
   add(M5_WAREHOUSE, M5_REGION_C1, 105, 209);
   return instances;
 }
 
+/**
+ * The M5 fixture world. D-155: it runs the labour market (peasants subsistence,
+ * laborers wage labour) and buys by the demand system its need tiers imply
+ * (`withCurrentModel`).
+ */
 export function m5Scenario(options: M5FixtureOptions = {}): EconomyScenarioDef {
+  return withCurrentModel(m5BaseScenario(options));
+}
+
+function m5BaseScenario(options: M5FixtureOptions): EconomyScenarioDef {
   const blocks = defaultBlocks();
   const open = new Set(options.openBorders ?? [M5_COUNTRY_C]);
   const fiscal = options.fiscal ?? {};

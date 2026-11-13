@@ -152,10 +152,7 @@ export type ProfessionSettlement = (typeof PROFESSION_SETTLEMENTS)[number];
 export const INSTITUTION_KINDS = ["administration", "health", "education", "research", "training"] as const;
 export type InstitutionKind = (typeof INSTITUTION_KINDS)[number];
 
-/**
- * P7 (D-154): the labour-market configuration. Its presence in the definitions turns
- * the labour market on (plan Q21); legacy definitions omit it and keep static wages.
- */
+/** P7 (D-154): the labour-market configuration (required since D-155). */
 export interface LabourMarketDefinitions {
   /**
    * Building definition keys whose jobs are domestic service (minimum-wage coverage,
@@ -313,8 +310,11 @@ export interface EconomyDefinitions {
    * `World.politics.enabled = false` and no M8 effects (D-076).
    */
   politics?: PoliticsDefinitions;
-  /** P7 (D-154): present in labour-market worlds only (plan Q21). */
-  labourMarket?: LabourMarketDefinitions;
+  /**
+   * P7 (D-154): the labour-market configuration. D-155: required; every economy world
+   * runs the labour market (the static-wage path of plan Q21(a) was removed).
+   */
+  labourMarket: LabourMarketDefinitions;
   /**
    * M9 validated technology content. Omitted for legacy fixtures, which then have
    * `World.technology.enabled = false` and no M9 effects (D-077).
@@ -2418,7 +2418,7 @@ export interface LabourMonthReport {
   netByProfession: number[];
 }
 
-/** P7 (D-154): the labour market. Disabled and empty in legacy worlds (plan Q21). */
+/** P7 (D-154): the labour market. Disabled and empty only in worlds without an economy. */
 export interface LabourMarketState {
   enabled: boolean;
   /** One per market, ascending market id. */

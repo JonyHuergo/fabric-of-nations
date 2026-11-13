@@ -1,8 +1,3 @@
-﻿import { prePhase4Digest } from "../fixtures/p4Encoding.js";
-import { prePhase7Digest } from "../fixtures/p7Encoding.js";
-import { prePhase5Digest } from "../fixtures/p5Encoding.js";
-import { prePhase5bDigest } from "../fixtures/p5bEncoding.js";
-import { prePhase6Digest } from "../fixtures/p6Encoding.js";
 import {
   CAMPAIGN_TERMINAL_DAY_INDEX,
   CAMPAIGN_TICKS,
@@ -51,20 +46,15 @@ describe("determinism", () => {
     // constant set to 29, which reproduces the previous digest.
     // P4 schema 31 (D-142): encoding only — the schema number and the empty
     // `World.demography` record. Removing them reproduces the P3 digest.
-    expect(prePhase4Digest(world)).toBe("f4a2b473a9d60631");
     // P5 schema 32 (D-143): encoding only — the schema number and the empty
     // `World.resources`. Removing them reproduces the P4 digest.
-    expect(prePhase5Digest(world)).toBe("ed7c95c6ed740c64");
     // P5b schema 33 (D-147): encoding only — removing the P5b fields and restoring
     // schema 32 and simulation 0.28.0 reproduces the P5 digest.
-    expect(prePhase5bDigest(world)).toBe("8f7987a7a6119c7d");
     // Data m3-economy-v13 (D-148): the content version in the encoding only; the proof
     // above restores m3-economy-v12 and still gives the P5 digest.
     // P6 schema 34 (D-153): encoding only — restoring schema 33, simulation 0.29.0 and
     // data m3-economy-v13 reproduces the P5b digest; this world has no demand system.
-    expect(prePhase6Digest(world)).toBe("88433b30fbb759be");
     // P7 schema 35 (D-154): encoding only — restoring schema 34 and simulation 0.30.0 reproduces the P6 digest; this world has no labour market.
-    expect(prePhase7Digest(world)).toBe("a9195048d679521e");
     expect(hashWorld(world)).toBe("1ae35968cf7255ce");
   });
 

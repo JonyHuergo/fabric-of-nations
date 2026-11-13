@@ -35,12 +35,17 @@ export interface HousingDayResult {
 
 const cache = new WeakMap<PopulationDefinitions, { readonly economy: EconomyDefinitions; readonly system: ResolvedDemandSystem }>();
 
-/** The resolved demand system of the definitions, or null on the tier path (cached). */
+/**
+ * The resolved demand system of the definitions (cached). D-155: every economy world
+ * buys by its demand system; the need-tier path was removed.
+ */
 export function demandSystemOf(
   population: PopulationDefinitions,
   economy: EconomyDefinitions,
-): ResolvedDemandSystem | null {
-  if (population.demandSystem === undefined) return null;
+): ResolvedDemandSystem {
+  if (population.demandSystem === undefined) {
+    throw new RangeError("an economy world needs a demand system (population.definitions.demandSystem, D-155)");
+  }
   const hit = cache.get(population);
   if (hit !== undefined && hit.economy === economy) return hit.system;
   const technologyIdByKey = new Map(

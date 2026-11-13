@@ -288,7 +288,7 @@ export function buildLabourWageTable(
       const owner = ownerOf(provinceId);
       return owner === undefined ? FULL_COVERAGE : (coverageByCountry.get(owner) ?? FULL_COVERAGE);
     },
-    domesticServiceKeys: new Set(definitions.labourMarket?.domesticServiceBuildingKeys ?? []),
+    domesticServiceKeys: new Set(definitions.labourMarket.domesticServiceBuildingKeys),
   };
 }
 
@@ -380,7 +380,10 @@ export function planInstitutionSlots(
       });
       const wage = weightedWage / totalWeight;
       if (!(wage > 0)) return;
-      const slots = Math.floor(funding / wage);
+      // D-155: never more posts than the country has people. A budget that buys more made
+      // the province apportionment below throw (total above the sum of its weights); the
+      // cap changes nothing while the posts are fewer than the people.
+      const slots = Math.min(Math.floor(funding / wage), totalWeight);
       if (slots <= 0) return;
       countryPlan.set(institution, { slots, professionId: profession.id, wageRUSDPerYear: wage });
       const shares = apportionLargestRemainder(
@@ -584,7 +587,7 @@ function hireHouseholdServants(
   eligibleByBlock: ReadonlyMap<Id, number>,
 ): { assignments: HouseholdAssignment[]; nextId: Id; hired: number } {
   let nextId = world.labourMarket.nextHouseholdAssignmentId;
-  const shares = definitions.labourMarket?.domesticServiceShares ?? [];
+  const shares = definitions.labourMarket.domesticServiceShares ?? [];
   if (shares.length === 0) return { assignments: [], nextId, hired: 0 };
   const shareOf = new Map(shares.map((entry) => [entry.provinceId, entry.share]));
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
@@ -1352,11 +1355,19 @@ function updateStaffingCeilings(
 // Institution payroll (plan Q4: paid per assigned worker at the market wage)
 // ---------------------------------------------------------------------------
 
+/** The world's blocks by id (a derived lookup, never stored). */
+export function popBlocksById(world: World): Map<Id, World["popBlocks"][number]> {
+  return new Map(world.popBlocks.map((block) => [block.id, block]));
+}
+
 /**
  * Daily payroll owed by a country's institutions of the given kinds: per block, its
  * assigned workers × the covered paid wage of its province and profession × the labour
  * law's hours factor ÷ days in the year. RUSD a day; ascending block id. The field is
  * named `population` so the fiscal allocators can use it as a weight.
+ *
+ * D-155: a phase that pays every country passes `blockById` (`popBlocksById(world)`,
+ * built once); the payroll is the same, without one block map per country.
  */
 export function institutionPayroll(
   world: World,
@@ -1365,11 +1376,11 @@ export function institutionPayroll(
   kinds: readonly InstitutionKind[],
   yearDays: number,
   wages: LabourWageTable,
+  blockById: ReadonlyMap<Id, World["popBlocks"][number]> = popBlocksById(world),
 ): { popBlockId: Id; population: number }[] {
   const country = world.countries.find((entry) => entry.id === countryId);
   if (country === undefined) return [];
   const hours = laborHoursFactor(country, definitions);
-  const blockById = new Map(world.popBlocks.map((block) => [block.id, block]));
   const owed = new Map<Id, number>();
   for (const assignment of world.labourMarket.institutionEmployment) {
     if (assignment.countryId !== countryId || !kinds.includes(assignment.institution)) continue;

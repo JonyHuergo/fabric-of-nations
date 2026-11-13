@@ -58,13 +58,12 @@ export function saveNation(
 /** Why this build cannot load a save, or null when it can try. */
 export function saveProblem(slot: SaveSlot): string | null {
   if (slot.metadata === null) return "The save could not be read.";
-  // D-120: an older save is never migrated, deleted or overwritten; the player decides.
-  if (slot.metadata.schemaVersion < SUPPORTED_SAVE_SCHEMA_VERSION) {
-    return "Made by an earlier version of the game, whose world format this version cannot read. It is kept until you delete it.";
-  }
   if (slot.metadata.schemaVersion > SUPPORTED_SAVE_SCHEMA_VERSION) {
     return "Made by a newer version of the game; update the game to load it.";
   }
+  // D-155: earlier world formats have no special listing; such a save is never loaded,
+  // and never deleted or overwritten without the player (D-120).
+  if (slot.metadata.schemaVersion !== SUPPORTED_SAVE_SCHEMA_VERSION) return "This version of the game cannot load this save.";
   return null;
 }
 

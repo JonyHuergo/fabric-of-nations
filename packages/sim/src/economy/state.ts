@@ -7,6 +7,7 @@
  */
 
 import { assertValidJobMix, buildingJobs } from "./buildingJobs.js";
+import { demandSystemOf } from "./demandDay.js";
 import { initialiseLabourMarket } from "./labourInit.js";
 import { refreshLabourEmployment } from "./labourMarket.js";
 import { normaliseFarmTechniques } from "./agriculture.js";
@@ -850,6 +851,9 @@ function pathForBlock(blockId: Id): string {
 /** Validate an M3 scenario before constructing authoritative state. */
 export function assertValidEconomyScenario(scenario: EconomyScenarioDef): void {
   assertValidEconomyDefinitions(scenario.definitions);
+  // D-155: households buy by the demand system in every economy world; resolving it
+  // here rejects a missing or inconsistent one before any state is built.
+  demandSystemOf(scenario.population.definitions, scenario.definitions);
   if (scenario.profitDistribution !== undefined) {
     assertValidProfitDistributionPolicy(
       scenario.profitDistribution,
@@ -1510,7 +1514,7 @@ export function createEconomyWorld(
   // first refresh employs the institutions' staff (medics among them), so the P4
   // calibration below sees the health service the first day will have.
   initialiseLabourMarket(world, scenario.definitions);
-  if (world.labourMarket.enabled) refreshLabourEmployment(world, scenario.definitions, world.startDayIndex);
+  refreshLabourEmployment(world, scenario.definitions, world.startDayIndex);
   // P4 (D-142): the blocks were calibrated with neutral factors; fix their residuals
   // under the countries' start-of-game health, sanitation and contraception.
   calibrateDemographyForCountries(world, scenario.definitions);

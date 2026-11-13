@@ -201,7 +201,9 @@ function e5HostFixture(): {
 } {
   const events: WorkerEvent[] = [];
   const host = new SimulationHost({
-    scenario: e5Scenario(),
+    // D-155: the health service's posts are its share of the administration budget at the
+    // clerks' wage (P7 plan Q3); the E5 default share of 0.2 buys no post, so 0.5.
+    scenario: e5Scenario({ healthStaffShareA: 0.5 }),
     seed: 20_261_102,
     emit: (event) => events.push(event),
     autoPump: false,

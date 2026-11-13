@@ -18,7 +18,7 @@ export * from "./resourceState.js";
 export * from "./resources.js";
 export * from "./market.js";
 export * from "./settlement.js";
-export * from "./migration.js";
+export * from "./migrationResult.js";
 export * from "./aiState.js";
 export * from "./ai.js";
 export * from "./day.js";

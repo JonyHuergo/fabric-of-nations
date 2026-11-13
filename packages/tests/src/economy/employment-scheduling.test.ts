@@ -19,9 +19,10 @@ import {
 } from "../fixtures/m3b.js";
 
 function employmentScenario(): EconomyScenarioDef {
+  // D-155: the labour market keeps one block per profession and province, so the 180
+  // workers of profession 0 are one block (formerly two blocks of 100 and 80).
   const scenario = controlledScenario();
-  setBlockWorkforce(scenario, 0, 100, 0);
-  setBlockWorkforce(scenario, 1, 80, 0);
+  setBlockWorkforce(scenario, 0, 180, 0);
   setBuildingJobs(scenario, 0, [{ professionId: 0, workersPerThroughputUnit: 10 }]);
   setBuildingJobs(scenario, 1, [{ professionId: 0, workersPerThroughputUnit: 8 }]);
   return scenario;
@@ -31,7 +32,10 @@ describe("M3b employment scheduling", () => {
   test("initial evaluation is due and clears the dirty flag", () => {
     const scenario = employmentScenario();
     const world = m3bWorld(scenario);
-    expect(world.employmentDirty).toBe(true);
+    // D-155: the labour market evaluates employment when the world is created, so the new
+    // world is staffed and clean; day 0 (1 January) is still a calendar refresh day.
+    expect(world.employmentDirty).toBe(false);
+    expect(world.employment.length).toBeGreaterThan(0);
     expect(isEmploymentRefreshDue(world, 0)).toBe(true);
 
     const result = refreshEmploymentIfDue(world, scenario.definitions, 0);
@@ -136,6 +140,8 @@ describe("M3b employment scheduling", () => {
     const scenario = employmentScenario();
     const original = m3bWorld(scenario);
     original.dayIndex = 5;
+    // D-155: a new labour-market world is already evaluated; mark the boundary dirty.
+    markEmploymentDirty(original);
     const restored = deserializeWorld(serializeWorld(original));
 
     expect(restored.employmentDirty).toBe(true);

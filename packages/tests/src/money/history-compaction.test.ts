@@ -17,7 +17,7 @@ import {
   type Month,
   type World,
 } from "@century/sim";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import { SimulationHost } from "@century/sim-worker/host";
 import {
   PROTOCOL_VERSION,
@@ -75,7 +75,7 @@ function worldWithRepresentativeHistory(): {
   baseSummary: FinancePeriodSummary;
 } {
   if (cachedFixture === null) {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const context = {
       population: { definitions: scenario.population.definitions },
       economy: { definitions: scenario.definitions },
@@ -156,7 +156,7 @@ describe("monthly finance history compaction (D-065)", () => {
   });
 
   test("compaction preserves military expense and the stored net reconciles", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const context = {
       population: { definitions: scenario.population.definitions },
       economy: { definitions: scenario.definitions },
@@ -224,7 +224,7 @@ describe("monthly finance history compaction (D-065)", () => {
   });
 
   test("the real 13th monthly close succeeds with military expense in the compacted month", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const context = {
       population: { definitions: scenario.population.definitions },
       economy: { definitions: scenario.definitions },
@@ -264,7 +264,7 @@ describe("monthly finance history compaction (D-065)", () => {
   });
 
   test("the real close path compacts only after the detailed window", () => {
-    const scenario = loadM5EightPolities();
+    const scenario = loadM5Sample();
     const world = createEconomyWorld(scenario, { seed: SEED });
     for (let index = 0; index < 13; index += 1) {
       const year = 1900 + Math.floor(index / 12);
@@ -292,7 +292,7 @@ describe("monthly finance history compaction (D-065)", () => {
     const save = serializeWorld(world);
     const events: WorkerEvent[] = [];
     const host = new SimulationHost({
-      scenario: loadM5EightPolities(),
+      scenario: loadM5Sample(),
       seed: SEED,
       emit: (event) => events.push(event),
       autoPump: false,

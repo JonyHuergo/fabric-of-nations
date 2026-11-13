@@ -7,13 +7,10 @@
  * key/value store can hold it. The worker produces it when saving (so compression
  * runs off the app thread) and accepts it when loading; the app stores and lists it
  * without decompressing, reading only the metadata line. The canonical save inside
- * is unchanged and carries its own checksum.
- *
- * Saves stored before D-137 (`COMPRESSED_SAVE_PREFIX`, gzip of the whole save) are
- * still decoded so they can be listed with the reason they cannot be loaded (D-120).
+ * is unchanged and carries its own checksum. Older stored forms are not read (D-155).
  */
 
-import { deflateSync, gunzipSync, gzipSync, inflateSync, strFromU8, strToU8 } from "fflate";
+import { deflateSync, inflateSync, strFromU8, strToU8 } from "fflate";
 
 export const STORED_SAVE_PREFIX = "fon-save-deflate2:";
 /**
@@ -22,7 +19,6 @@ export const STORED_SAVE_PREFIX = "fon-save-deflate2:";
  * the worker test checks they agree).
  */
 export const SAVE_FORMAT_VERSION = 2;
-export const COMPRESSED_SAVE_PREFIX = "century-save-gzip1:";
 export const MAX_STORED_SAVE_LENGTH = 64 * 1024 * 1024;
 
 const BASE64_ALPHABET =
@@ -164,29 +160,12 @@ export function decompressSaveFromStorage(stored: string): string {
     if (restored.length === 0) throw new RangeError("stored save is empty after decompression");
     return restored;
   }
-  if (!stored.startsWith(COMPRESSED_SAVE_PREFIX)) {
-    throw new RangeError(
-      `stored save must start with ${JSON.stringify(STORED_SAVE_PREFIX)} or ${JSON.stringify(COMPRESSED_SAVE_PREFIX)}`,
-    );
-  }
-  const payload = stored.slice(COMPRESSED_SAVE_PREFIX.length);
-  if (payload.length === 0) throw new RangeError("stored save payload is empty");
-  const compressed = base64ToBytes(payload);
-  const restored = strFromU8(gunzipSync(compressed));
-  if (restored.length === 0) throw new RangeError("stored save is empty after decompression");
-  return restored;
+  throw new RangeError(`stored save must start with ${JSON.stringify(STORED_SAVE_PREFIX)}`);
 }
 
 /** Saves the worker can load: the stored form, or a canonical save. */
 export function canonicalSaveOf(save: string): string {
-  return save.startsWith(STORED_SAVE_PREFIX) || save.startsWith(COMPRESSED_SAVE_PREFIX)
-    ? decompressSaveFromStorage(save)
-    : save;
-}
-
-/** Legacy gzip stored form (tests of pre-D-137 storage); not written by the app. */
-export function legacyCompressSaveForStorage(save: string): string {
-  return `${COMPRESSED_SAVE_PREFIX}${bytesToBase64(gzipSync(strToU8(save), { level: 9 }))}`;
+  return save.startsWith(STORED_SAVE_PREFIX) ? decompressSaveFromStorage(save) : save;
 }
 
 /** User-visible metadata parsed from the canonical envelope without loading a world. */
@@ -254,14 +233,12 @@ export function readSaveMetadata(save: string): SaveMetadata {
     throw new RangeError("save must be a non-empty string");
   }
   // D-137: the stored form carries the metadata on its first line; a canonical save
-  // yields it without parsing the payload; a legacy stored save is decompressed.
+  // yields it without parsing the payload.
   let metadataText: string;
   if (save.startsWith(STORED_SAVE_PREFIX)) {
     const newline = save.indexOf("\n", STORED_SAVE_PREFIX.length);
     if (newline < 0) throw new RangeError("stored save has no metadata line");
     metadataText = save.slice(STORED_SAVE_PREFIX.length, newline);
-  } else if (save.startsWith(COMPRESSED_SAVE_PREFIX)) {
-    metadataText = envelopeMetadataText(decompressSaveFromStorage(save));
   } else {
     metadataText = envelopeMetadataText(save);
   }
@@ -351,10 +328,11 @@ export interface SaveStoreOptions {
   /** Expected schema; incompatible candidates are rejected before load. */
   readonly expectedSchemaVersion: number;
   readonly expectedFormatVersion?: number;
-  readonly keys?: {
-    readonly primary?: string;
-    readonly previous?: string;
-    readonly staging?: string;
+  /** The backend keys of the save, its previous copy and its staging copy. */
+  readonly keys: {
+    readonly primary: string;
+    readonly previous: string;
+    readonly staging: string;
   };
 }
 
@@ -380,9 +358,9 @@ export class SaveStore {
     this.backend = backend;
     this.expectedSchemaVersion = options.expectedSchemaVersion;
     this.expectedFormatVersion = options.expectedFormatVersion ?? SAVE_FORMAT_VERSION;
-    this.primaryKey = options.keys?.primary ?? "century.m7.save.v1";
-    this.previousKey = options.keys?.previous ?? "century.m7.save.v1.previous";
-    this.stagingKey = options.keys?.staging ?? "century.m7.save.v1.staging";
+    this.primaryKey = options.keys.primary;
+    this.previousKey = options.keys.previous;
+    this.stagingKey = options.keys.staging;
   }
 
   public async store(save: string): Promise<StoredSaveInfo> {
@@ -541,8 +519,6 @@ export interface SaveLibraryOptions {
   readonly indexKey?: string;
   /** Prefix of the keys of new slots. */
   readonly slotKeyPrefix?: string;
-  /** Key of the single-campaign store that predates the library; adopted as a slot. */
-  readonly legacyKey?: string;
 }
 
 interface SaveLibraryIndex {
@@ -553,7 +529,6 @@ interface SaveLibraryIndex {
 }
 
 const SAVE_LIBRARY_INDEX_VERSION = 1;
-const LEGACY_SLOT_ID = "legacy";
 
 function isRecordValue(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -635,9 +610,6 @@ function parseLibraryIndex(raw: string): SaveLibraryIndex {
  * interrupted index write can at worst leave an unlisted slot behind, never a
  * listed slot without its save. Operations are serialized, because the index is
  * read, changed and written back.
- *
- * The single store used before the library existed is adopted in place as the
- * first slot the first time the index is read; its keys are not moved.
  */
 export class SaveLibrary {
   private readonly backend: SaveStorageBackend;
@@ -645,7 +617,6 @@ export class SaveLibrary {
   private readonly expectedFormatVersion: number;
   private readonly indexKey: string;
   private readonly slotKeyPrefix: string;
-  private readonly legacyKey: string;
   private queue: Promise<unknown> = Promise.resolve();
 
   public constructor(backend: SaveStorageBackend, options: SaveLibraryOptions) {
@@ -654,7 +625,6 @@ export class SaveLibrary {
     this.expectedFormatVersion = options.expectedFormatVersion ?? SAVE_FORMAT_VERSION;
     this.indexKey = options.indexKey ?? "fon.saves.index.v1";
     this.slotKeyPrefix = options.slotKeyPrefix ?? "fon.saves.slot.";
-    this.legacyKey = options.legacyKey ?? "century.m7.save.v1";
   }
 
   /** Every slot, most recently saved first. */
@@ -748,7 +718,6 @@ export class SaveLibrary {
       const index = await this.readIndex();
       await this.backend.removeItem(this.indexKey);
       for (const slot of index.slots) await this.storeFor(slot.key).clear();
-      await this.storeFor(this.legacyKey).clear();
     });
   }
 
@@ -787,39 +756,7 @@ export class SaveLibrary {
   private async readIndex(): Promise<SaveLibraryIndex> {
     const raw = await this.backend.getItem(this.indexKey);
     if (raw !== null) return parseLibraryIndex(raw);
-    const adopted = await this.adoptLegacy();
-    const index: SaveLibraryIndex = {
-      version: SAVE_LIBRARY_INDEX_VERSION,
-      nextSlot: 1,
-      nextOrder: adopted === null ? 1 : adopted.order + 1,
-      slots: adopted === null ? [] : [adopted],
-    };
-    if (adopted !== null) await this.writeIndex(index);
-    return index;
-  }
-
-  /** The pre-library single store as a slot, or null when it holds nothing. */
-  private async adoptLegacy(): Promise<SaveSlot | null> {
-    for (const key of [this.legacyKey, `${this.legacyKey}.staging`, `${this.legacyKey}.previous`]) {
-      const stored = await this.backend.getItem(key);
-      if (stored === null) continue;
-      let metadata: SaveMetadata | null = null;
-      try {
-        metadata = readSaveMetadata(decompressSaveFromStorage(stored));
-      } catch {
-        // Still listed, so it can be deleted; loading it reports why it cannot be read.
-      }
-      return {
-        id: LEGACY_SLOT_ID,
-        key: this.legacyKey,
-        order: 0,
-        savedAtMs: null,
-        playerCountryId: null,
-        metadata,
-        storedBytes: stored.length,
-      };
-    }
-    return null;
+    return { version: SAVE_LIBRARY_INDEX_VERSION, nextSlot: 1, nextOrder: 1, slots: [] };
   }
 
   private async writeIndex(index: SaveLibraryIndex): Promise<void> {

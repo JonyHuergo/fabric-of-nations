@@ -266,12 +266,17 @@ describe("M11b catalog coverage — dependencies, flags and saves", () => {
     const oldPlayer = byTag.get("USA")?.id ?? 0;
     const newPlayer = byTag.get("AUT")?.id ?? 60;
     for (const playerCountryId of [oldPlayer, newPlayer]) {
-      const custom = { ...scenario, playerCountryId };
-      const world = createEconomyWorld(custom, { seed: 11 });
-      expect(world.countries).toHaveLength(67);
-      expect(world.provinceEconomies).toHaveLength(1687); // P2: one record per province (D-118)
-      expect(world.playerCountryId).toBe(playerCountryId);
-      const restored = deserializeWorld(serializeWorld(world));
+      // D-155: the world lives only inside this function, so it is released before the
+      // save is loaded and two 1900 worlds are never held at once.
+      const save = ((): string => {
+        const custom = { ...scenario, playerCountryId };
+        const world = createEconomyWorld(custom, { seed: 11 });
+        expect(world.countries).toHaveLength(67);
+        expect(world.provinceEconomies).toHaveLength(1687); // P2: one record per province (D-118)
+        expect(world.playerCountryId).toBe(playerCountryId);
+        return serializeWorld(world);
+      })();
+      const restored = deserializeWorld(save);
       expect(restored.playerCountryId).toBe(playerCountryId);
       expect(restored.countries).toHaveLength(67);
       expect(restored.provinceEconomies).toHaveLength(1687);

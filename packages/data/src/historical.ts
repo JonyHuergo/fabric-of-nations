@@ -80,7 +80,6 @@ import { DATA_PACKAGE_VERSION } from "./version.js";
 
 const DATA_ROOT = fileURLToPath(new URL("../data/", import.meta.url));
 
-export const HISTORICAL_SCENARIO_FILE = "scenarios/m5_eight_polities.json";
 /** M11 world scenario: all selectable 1900 polities and their territories. */
 export const WORLD_SCENARIO_FILE = "scenarios/m11_world_1900.json";
 
@@ -813,9 +812,7 @@ function readMoneyCoefficients(value: unknown, errors: string[]): MoneyCoefficie
 }
 
 /** Load the raw historical tables for one scenario file from the data package. */
-export function loadHistoricalData(
-  scenarioFile: string = HISTORICAL_SCENARIO_FILE,
-): HistoricalData {
+export function loadHistoricalData(scenarioFile: string): HistoricalData {
   const rawScenario = readJson<unknown>(scenarioFile);
   const errors: string[] = [];
   const metaRecord = assertRecord(rawScenario, "scenario", errors);
@@ -878,11 +875,6 @@ export function loadHistoricalData(
       ? {}
       : { demography1900: loadDemography1900(meta.files.demography) }),
   };
-}
-
-/** Load the original eight-polity M5 sample (test fixture and compatibility). */
-export function loadM5HistoricalData(): HistoricalData {
-  return loadHistoricalData(HISTORICAL_SCENARIO_FILE);
 }
 
 interface RawTables {
@@ -1557,10 +1549,7 @@ export function validateM5HistoricalData(
         `${path}.currency.name must be at most ${String(MAX_CURRENCY_NAME_LENGTH)} characters`,
       );
     }
-    if (
-      country.currency.key === "rusd" ||
-      country.currency.key === "susd"
-    ) {
+    if (country.currency.key === "rusd") {
       errors.push(`${path}.currency.key is reserved for RUSD`);
     }
     if (currencyKeys.has(country.currency.key)) {
@@ -2370,6 +2359,14 @@ function tableCurrencies(data: HistoricalData, table: CurrencyTable1900): Scenar
   return { currencies, currencyValuations: valuations, arrangementByCountry };
 }
 
+/** D-155: every economy world runs the labour market; a scenario must name its configuration. */
+function requiredLabourMarketFile(file: string | undefined): string {
+  if (file === undefined) {
+    throw new HistoricalDataError(["meta.definitions.labourMarket is required: every economy world runs the labour market (D-155)"]);
+  }
+  return file;
+}
+
 export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenarioDef {
   assertValidM5HistoricalData(data);
   const goods = readJson<GoodDef[]>(data.meta.definitions.goods);
@@ -2395,10 +2392,8 @@ export function buildM5HistoricalScenario(data: HistoricalData): EconomyScenario
     buildings,
     politics,
     technology,
-    // P7 (D-154): the labour market runs only where the scenario names its configuration.
-    ...(data.meta.definitions.labourMarket === undefined
-      ? {}
-      : { labourMarket: readJson<LabourMarketDefinitions>(data.meta.definitions.labourMarket) }),
+    // P7 (D-154): the labour-market configuration (required since D-155).
+    labourMarket: readJson<LabourMarketDefinitions>(requiredLabourMarketFile(data.meta.definitions.labourMarket)),
   };
   assertValidEconomyDefinitions(economyDefinitions);
 
@@ -2853,11 +2848,6 @@ function readDeposits(file: string, definitions: EconomyDefinitions): DepositIni
   });
   if (errors.length > 0) throw new HistoricalDataError(errors.sort());
   return deposits;
-}
-
-/** Load and build the eight-polity M5 scenario. */
-export function loadM5EightPolities(): EconomyScenarioDef {
-  return buildM5HistoricalScenario(loadM5HistoricalData());
 }
 
 /** Load and build the M11 1900 world used by the playable game. */

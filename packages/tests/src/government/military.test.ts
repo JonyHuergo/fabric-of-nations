@@ -42,7 +42,7 @@ import {
 } from "@century/sim-worker";
 import { SimulationHost } from "@century/sim-worker/host";
 import { buildSimulationSnapshot } from "@century/sim-worker/snapshot";
-import { loadM5EightPolities } from "@century/data";
+import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import {
   M5_COUNTRY_A,
   M5_COUNTRY_B,
@@ -138,7 +138,7 @@ function accountBalance(
 
 describe("M10 sovereignty and military control", () => {
   test("the sample enables the military system with no initial wars or armies", () => {
-    const sample = loadM5EightPolities();
+    const sample = loadM5Sample();
     const world = createEconomyWorld(sample, { seed: SEED });
     expect(world.military.enabled).toBe(true);
     expect(world.military.armies).toHaveLength(0);
@@ -620,7 +620,7 @@ describe("M10 determinism, persistence, and worker contract", () => {
     let snapshot: SimulationSnapshot | null = null;
     let actionResult: Extract<WorkerEvent, { type: "ACTION_RESULT" }> | null = null;
     const host = new SimulationHost({
-      scenario: loadM5EightPolities(),
+      scenario: loadM5Sample(),
       seed: SEED,
       emit: (event: WorkerEvent) => {
         if (event.type === "READY" || event.type === "SNAPSHOT") snapshot = event.snapshot;

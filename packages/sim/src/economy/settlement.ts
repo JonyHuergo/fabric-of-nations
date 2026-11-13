@@ -51,7 +51,6 @@ import { assertValidEconomyDefinitions } from "./definitions.js";
 import { assertValidEmploymentState } from "./employment.js";
 import {
   laborHoursFactor,
-  laborMinimumWageRUSDPerYear,
   qualificationWageFactor,
 } from "./labor.js";
 import type {
@@ -945,21 +944,6 @@ interface WageLookup {
   readonly assignmentsByBuilding: ReadonlyMap<Id, readonly EmploymentAssignment[]>;
   readonly blockById: ReadonlyMap<Id, World["popBlocks"][number]>;
   readonly ownerByProvince: ReadonlyMap<Id, World["countries"][number]>;
-  /** P2b province wage tables by profession id; absent or empty means profession wages. */
-  readonly wagesByProvince: ReadonlyMap<Id, readonly number[]>;
-}
-
-/**
- * P2b (D-135): the annual wage of one worker of a profession in a province. The
- * province's sourced wage table applies when it has an entry for the profession;
- * otherwise the profession's world reference wage (legacy fixtures).
- */
-export function provinceWageRUSDPerYear(
-  wages: readonly number[] | undefined,
-  profession: ProfessionDef,
-): number {
-  const wage = wages?.[profession.id];
-  return wage === undefined ? profession.baseWage1900RUSDPerYear : wage;
 }
 
 function buildWageLookup(world: World): WageLookup {
@@ -979,13 +963,7 @@ function buildWageLookup(world: World): WageLookup {
     const country = countryById.get(countryId);
     if (country !== undefined) ownerByProvince.set(provinceId, country);
   }
-  const wagesByProvince = new Map<Id, readonly number[]>();
-  for (const province of world.provinceEconomies) {
-    if (province.wageRUSDPerYearByProfession.length > 0) {
-      wagesByProvince.set(province.id, province.wageRUSDPerYearByProfession);
-    }
-  }
-  return { assignmentsByBuilding, blockById, ownerByProvince, wagesByProvince };
+  return { assignmentsByBuilding, blockById, ownerByProvince };
 }
 
 function buildWageGroups(
@@ -995,20 +973,19 @@ function buildWageGroups(
   index: FinanceIndex,
   yearDays: number,
   laborStandards: {
-    readonly minimumWageRUSDPerYear: number;
     readonly hoursFactor: number;
   },
   /**
-   * P7 (D-154): in a labour-market world, the building's own-province effective wage
-   * with the minimum wage's coverage and compliance (plan §4.1, §4.5); absent: the P2b
-   * table and the E5 floor.
+   * P7 (D-154): the building's own-province effective wage with the minimum wage's
+   * coverage and compliance (plan §4.1, §4.5). D-155: the P2b-table wage with the E5
+   * floor, used by worlds without a labour market, was removed.
    */
-  labour?: { readonly wages: LabourWageTable; readonly definition: BuildingDef },
+  labour: { readonly wages: LabourWageTable; readonly definition: BuildingDef },
 ): WageGroup[] {
   const groups = new Map<Id, WageGroup>();
-  // P7 (D-154, R2): in a labour-market world a block working in a building it owns is paid
-  // the building's residual (profit), not a wage; the owner's account is the block's own.
-  const ownerAccount = labour === undefined ? undefined : index.account(building.ownerAccountId);
+  // P7 (D-154, R2): a block working in a building it owns is paid the building's residual
+  // (profit), not a wage; the owner's account is the block's own.
+  const ownerAccount = index.account(building.ownerAccountId);
   const ownerBlockId = ownerAccount !== undefined && ownerAccount.ownerKind === "popBlock" ? ownerAccount.ownerId : null;
   for (const assignment of lookup.assignmentsByBuilding.get(building.id) ?? []) {
     const block = lookup.blockById.get(assignment.popBlockId);
@@ -1020,17 +997,11 @@ function buildWageGroups(
     // E5: statutory floor and hours standard scale the wage obligation; the block's
     // vocational qualification adds a premium. All three are real labor-market
     // channels, not display modifiers.
-    const annualBase =
-      labour === undefined
-        ? Math.max(
-            provinceWageRUSDPerYear(lookup.wagesByProvince.get(block.provinceId), profession),
-            laborStandards.minimumWageRUSDPerYear,
-          )
-        : labour.wages.paid(
-            building.provinceId,
-            profession.id,
-            jobIsCovered(labour.definition, profession, labour.wages.coverage(building.provinceId), labour.wages.domesticServiceKeys),
-          );
+    const annualBase = labour.wages.paid(
+      building.provinceId,
+      profession.id,
+      jobIsCovered(labour.definition, profession, labour.wages.coverage(building.provinceId), labour.wages.domesticServiceKeys),
+    );
     const dailyWage =
       (annualBase * laborStandards.hoursFactor * qualificationWageFactor(block)) /
       yearDays;
@@ -1254,7 +1225,7 @@ function settleMarketDaysInternal(
     const yearDays = daysInYear(dayIndexToCivilDate(dayIndex).year);
     const wageSettlements: WageSettlement[] = [];
     const wageLookup = buildWageLookup(world);
-    const labourWages = world.labourMarket.enabled ? buildLabourWageTable(world, definitions) : undefined;
+    const labourWages = buildLabourWageTable(world, definitions);
     const wageEntries: JournalEntryInput[] = [];
     for (const building of inIdOrder(world.buildings)) {
       if (!building.operational) continue;
@@ -1271,13 +1242,10 @@ function settleMarketDaysInternal(
         (() => {
           const owner = wageLookup.ownerByProvince.get(building.provinceId);
           return owner === undefined
-            ? { minimumWageRUSDPerYear: 0, hoursFactor: 1 }
-            : {
-                minimumWageRUSDPerYear: laborMinimumWageRUSDPerYear(owner, definitions),
-                hoursFactor: laborHoursFactor(owner, definitions),
-              };
+            ? { hoursFactor: 1 }
+            : { hoursFactor: laborHoursFactor(owner, definitions) };
         })(),
-        labourWages === undefined ? undefined : { wages: labourWages, definition },
+        { wages: labourWages, definition },
       );
       if (grossGroups.length === 0) continue;
       // P5 (D-143 §2): the owner block's kept food is a wage in kind, up to its cash

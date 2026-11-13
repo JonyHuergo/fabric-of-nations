@@ -16,7 +16,7 @@
  * new profession, payment, or duplicate people.
  */
 
-import { buildLabourWageTable, institutionPayroll, institutionStaff } from "./labourMarket.js";
+import { buildLabourWageTable, institutionPayroll, institutionStaff, popBlocksById } from "./labourMarket.js";
 import { healthStaffFloor, laborHoursFactor } from "./labourLaws.js";
 export { healthStaffFloor, laborHoursFactor, laborMinimumWageRUSDPerYear } from "./labourLaws.js";
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
@@ -276,13 +276,11 @@ export function deriveHealth(
   }
   let healthStaff = clerkPopulation * share;
   let administrationStaff = clerkPopulation - healthStaff;
-  // P7 (D-154, plan Q3): in a labour-market world the health service's staff are the
-  // medics it employs and the administration's the bureaucrats it employs.
-  if (world.labourMarket.enabled) {
-    healthStaff = institutionStaff(world, country.id, "health");
-    administrationStaff = institutionStaff(world, country.id, "administration");
-    clerkPopulation = healthStaff + administrationStaff;
-  }
+  // P7 (D-154, plan Q3): the health service's staff are the medics it employs and the
+  // administration's the bureaucrats it employs.
+  healthStaff = institutionStaff(world, country.id, "health");
+  administrationStaff = institutionStaff(world, country.id, "administration");
+  clerkPopulation = healthStaff + administrationStaff;
   const staffingRatio =
     population > 0
       ? clamp(healthStaff / population / HEALTH_TARGET_STAFF_PER_CAPITA, 0, 1)
@@ -291,7 +289,7 @@ export function deriveHealth(
   const fundingBenchmark =
     population *
     world.moneyCoefficients.adminFundingPerCapitaPerYearRUSD *
-    localWageIndex(world, blocks, definitions, keys, populationIndex?.wagesByProvince);
+    localWageIndex(world, blocks, definitions, keys);
   const fundingRatio =
     fundingBenchmark > 0
       ? clamp(country.institutions.fundedAnnualRUSD / fundingBenchmark, 0, 1)
@@ -500,10 +498,8 @@ export function runTrainingPhase(
   const academicProfessionKeys = new Set(
     definitions.technology?.academicProfessionKeys ?? [],
   );
-  const professionById = new Map(
-    definitions.professions.map((profession) => [profession.id, profession]),
-  );
-  const labourWages = world.labourMarket.enabled ? buildLabourWageTable(world, definitions) : null;
+  const labourWages = buildLabourWageTable(world, definitions);
+  const payrollBlocks = popBlocksById(world);
 
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     const derived = derivedByCountry.get(country.id);
@@ -511,19 +507,13 @@ export function runTrainingPhase(
     if (!(derived.participation > 0)) continue;
     const labor = country.labor ?? neutralLaborPolicyState();
     const eligible = trainingEligibleBlocks(world, country, populationIndex);
-    // P7 (D-154, plan Q4): a labour-market world pays the training institution's
-    // assigned instructors the market wage; elsewhere the budget goes to the academics.
-    const owedInstructors =
-      labourWages !== null
-        ? institutionPayroll(world, definitions, country.id, ["training"], yearDays, labourWages).map((entry) => ({
-            id: entry.popBlockId,
-            weight: entry.population,
-          }))
-        : null;
-    const requestedPayroll =
-      owedInstructors === null
-        ? labor.trainingBudgetRUSDPerYear / yearDays
-        : owedInstructors.reduce((total, entry) => total + entry.weight, 0);
+    // P7 (D-154, plan Q4): the training institution pays its assigned instructors the
+    // market wage (D-155: the budget-to-academics path was removed).
+    const owedInstructors = institutionPayroll(world, definitions, country.id, ["training"], yearDays, labourWages, payrollBlocks).map((entry) => ({
+      id: entry.popBlockId,
+      weight: entry.population,
+    }));
+    const requestedPayroll = owedInstructors.reduce((total, entry) => total + entry.weight, 0);
     const requestedStipend =
       (labor.trainingStipendPerTraineeRUSDPerYear * derived.trainees) / yearDays;
     const requested = requestedPayroll + requestedStipend;
@@ -536,15 +526,7 @@ export function runTrainingPhase(
     const stipendPaid = requestedStipend * scale;
 
     if (payrollPaid > 0) {
-      const academicBlocks =
-        owedInstructors ??
-        countryBlocks(world, country, populationIndex)
-          .filter(
-            (block) =>
-              populationTotal(block) > 0 &&
-              academicProfessionKeys.has(professionById.get(block.professionId)?.key ?? ""),
-          )
-          .map((block) => ({ id: block.id, weight: populationTotal(block) }));
+      const academicBlocks = owedInstructors;
       const allocations = allocateExact(payrollPaid, academicBlocks);
       const lines: JournalLine[] = [];
       for (const block of academicBlocks) {
@@ -634,7 +616,6 @@ export function runTrainingPhase(
         countryBlocks(world, country, populationIndex),
         definitions,
         academicProfessionKeys,
-        populationIndex.wagesByProvince,
       );
     const instructorBenchmark = derived.instructors * instructorCost;
     const fundingAdequacy =

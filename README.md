@@ -70,11 +70,10 @@ sends commands through the worker protocol.
 | `pnpm run typecheck` | Build the workspace libraries, then typecheck every package in strict mode. |
 | `pnpm test` | Run the Jest suite (about 30 minutes in band on a desktop). |
 | `pnpm run bench` | Build and run the bounded Node benchmark cases with timings, hashes and invariant gates. |
-| `pnpm run bench:campaign` | Opt-in full 36,524-tick campaign benchmark. Long-running. |
 | `pnpm -F @century/bench perf` | Performance-stage benchmark on the 1900 world (Node diagnostic; device performance is measured by the designer). |
 | `pnpm run check:worker` | Verify the committed worker scenario and app worker bundle without overwriting them. |
 | `pnpm run audit:branding` / `audit:branding:dist` | Verify the official name in source, metadata and current documents (or in the web export). |
-| `pnpm run audit:monetary` | Verify current RUSD terminology and the documented legacy save aliases. |
+| `pnpm run audit:monetary` | Verify current RUSD terminology (D-155 removed the legacy aliases). |
 | `node scripts/docs/decisions-index.mjs` | Regenerate the `DECISIONS.md` index (`--check` verifies it; the test suite runs the check). |
 | `pnpm map:atlas` / `map:atlas:check` | Build or verify the one-page map runtime every platform runs. Run after changing design tokens or `packages/app/src/map`. |
 | `pnpm map:verify` / `map:verify:file` / `map:audit:sheets` | Browser checks of the map, touch, sheets and the page from a file origin. They need a GPU and `export:web`. |
@@ -91,14 +90,17 @@ separate job that depends on it, with a frozen lockfile.
 
 `packages/tests/src` is organised by subsystem; shared fixture worlds are in
 `fixtures/` and keep the names the decision register uses for them ("the M5 sample",
-"the M3 fixture").
+"the M3 fixture"). Since D-155 every fixture economy runs the current model (labour
+market and demand system, `fixtures/currentModel.ts`), and the small worlds are loaded by
+the tests themselves (`fixtures/smallWorlds.ts`, data in `fixtures/data/`). Jest runs one
+worker that is recycled after a suite leaves more than its idle-memory limit behind.
 
 | Folder | Protects |
 |---|---|
 | `architecture/` | Simulation isolation (ES2022 only, no DOM/React Native/Node/`Date`/`Math.random`), the No-Mana Doctrine, dependency cycles, generated-artifact drift, naming audits, the decision index |
 | `determinism/` | Keyed RNG known answers, replay digests, the tick driver and calendar, rollback, per-tick validation |
-| `serialization/` | Save envelope, typed-array encoding, round trips, and rejection of every earlier save version |
-| `population/` | Population state, ageing, births and deaths, death allocation, calibration, needs, wealth, P4 demography, migration |
+| `serialization/` | Save envelope, typed-array encoding, round trips, and rejection of saves from another version |
+| `population/` | Population state, ageing, births and deaths, death allocation, calibration, needs, wealth, P4 demography |
 | `economy/` | Definitions, employment, production, inventory, market clearing, the economic day, multi-country markets and labour, land and resources, construction, industrial policy |
 | `money/` | Ledger and accounts, settlement, period close, fiscal loop, debt, profit distribution, annual accounting, currencies, the monetary authority, money calibration, local-currency display |
 | `trade/` | Routes, customs, quotas and trade conservation |

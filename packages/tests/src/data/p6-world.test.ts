@@ -108,7 +108,8 @@ describe("P6 in the 1900 world", () => {
 
   test("two days: demand result, dwelling conservation and save round trip", () => {
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
-    const context = { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions } };
+    // D-155: summary detail (D-137) keeps the demand result and gives the same world.
+    const context = { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions }, detail: "summary" as const };
     const start = world.popBlocks.reduce((sum, block) => sum + block.dwellings, 0);
     let bought = 0;
     let depreciated = 0;

@@ -1,4 +1,4 @@
-import { loadM2WorldAggregate } from "@century/data";
+import { loadM2WorldAggregate } from "../fixtures/smallWorlds.js";
 import {
   assertValidWorld,
   cloneWorld,
