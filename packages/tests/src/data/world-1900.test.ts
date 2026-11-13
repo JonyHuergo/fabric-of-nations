@@ -577,6 +577,14 @@ describe("M11 country selection and persistence", () => {
       };
     }).snapshot;
     expect(JSON.stringify(snapshot).length).toBeLessThan(700_000);
+    // P7 (D-156): protocol 24's labour fields are inside the bound: the player's labour
+    // market with rows, and a province unemployment rate wherever people work.
+    const full = snapshot as unknown as SimulationSnapshot;
+    const labour = full.countries.find((country) => country.id === tagId(scenario, "DEU"))?.labourMarket;
+    expect(labour?.territories.some((territory) => territory.rows.length > 0)).toBe(true);
+    expect(labour?.minimumWage.length).toBeGreaterThan(0);
+    const rates = provinceEconomyRows(full).filter((province) => province.unemploymentRate !== null);
+    expect(rates.length).toBeGreaterThan(provinceEconomyRows(full).length / 2);
     for (const market of snapshot.markets) {
       expect(market.label).not.toMatch(/^Market \d+$/);
       expect(market.name).toBe(market.label);

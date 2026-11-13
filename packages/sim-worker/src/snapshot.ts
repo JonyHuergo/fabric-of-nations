@@ -8,6 +8,16 @@
 
 import { provinceHarvestFactor, provinceLandSnapshot } from "./landSnapshot.js";
 import { countryHouseholdsSnapshot } from "./householdsSnapshot.js";
+import {
+  countryLabourMarketSnapshot,
+  labourMobilitySnapshot,
+  labourSnapshotContext,
+  professionEarns,
+  professionGroup,
+  provinceLabourSnapshot,
+  provinceUnemploymentRate,
+  type LabourSnapshotContext,
+} from "./labourSnapshot.js";
 import { provinceCrowding, type PopBlock } from "@century/sim";
 import {
   countryDemographySnapshot,
@@ -182,6 +192,8 @@ interface SnapshotBuild {
   readonly demography: DemographySnapshotContext | null;
   /** P6 (D-153): the population definitions (demand system), when given. */
   readonly populationDefinitions?: PopulationDefinitions;
+  /** P7 (D-156): the labour market measured once per snapshot; null without one. */
+  readonly labour: LabourSnapshotContext | null;
 }
 
 export interface SnapshotRuntimeState {
@@ -1412,6 +1424,7 @@ function countrySnapshot(
     blocksWithUnmetSubsistence: unmetSubsistenceBlocks,
     blocksWithUnmetBasic: unmetBasicBlocks,
     households: countryHouseholdsSnapshot(world, country, new Set(provinceIds), definitions, build?.populationDefinitions),
+    labourMarket: countryLabourMarketSnapshot(world, country, new Set(provinceIds), definitions, build?.labour ?? null),
     buildingCount,
     productionCapacityByGood: productionCapacitySnapshots(definitions, capacity),
     latestFiscal,
@@ -1914,6 +1927,7 @@ function militarySnapshot(world: World): SimulationSnapshot["military"] {
 function provinceEconomySnapshots(
   world: World,
   territoryMeta: readonly TerritoryMetaDef[],
+  labour: LabourSnapshotContext | null,
 ): readonly ProvinceEconomySnapshot[] {
   const urbanPeople = new Map<number, number>();
   const ownerByProvince = buildProvinceOwnerMap(world);
@@ -1990,6 +2004,8 @@ function provinceEconomySnapshots(
         harvestFactor: provinceHarvestFactor(world, province),
         // P6 (D-153): housing (null where the province has no 1900 housing reference).
         ...provinceHousing(blocksByProvince.get(province.id) ?? [], province),
+        // P7 (D-156): the labour-market unemployment rate (the Unemployment lens).
+        unemploymentRate: provinceUnemploymentRate(labour, province.id),
       };
     });
 }
@@ -2006,15 +2022,20 @@ function provinceHousing(
   return { dwellings: roundDisplay(dwellings, 1), crowding: crowding === null ? null : roundDisplay(crowding, 3) };
 }
 
-/** P5 (D-143): attach the focused province's land section. */
+/** P5 (D-143): attach the focused province's land section; P7 (D-156) its labour rows. */
 function withLand(
-  focus: Omit<FocusProvinceSnapshot, "land"> | null,
+  focus: Omit<FocusProvinceSnapshot, "land" | "labour"> | null,
   world: World,
   definitions: EconomyDefinitions,
   populationDefinitions: PopulationDefinitions | undefined,
+  labour: LabourSnapshotContext | null,
 ): FocusProvinceSnapshot | null {
   if (focus === null) return null;
-  return { ...focus, land: provinceLandSnapshot(world, definitions, populationDefinitions, focus.provinceId) };
+  return {
+    ...focus,
+    land: provinceLandSnapshot(world, definitions, populationDefinitions, focus.provinceId),
+    labour: provinceLabourSnapshot(labour, world, focus.provinceId),
+  };
 }
 
 
@@ -2442,6 +2463,7 @@ export function buildSimulationSnapshot(
     priceIndexes: derivePriceIndexes(world),
     demography: demographySnapshotContext(world, definitions, populationDefinitions),
     ...(populationDefinitions === undefined ? {} : { populationDefinitions }),
+    labour: labourSnapshotContext(world, definitions),
   };
   const territoryMeta = runtime.territoryMeta ?? [];
   if (
@@ -2458,7 +2480,13 @@ export function buildSimulationSnapshot(
         goods: goodsSnapshots(definitions),
         professions: [...definitions.professions]
           .sort((left, right) => left.id - right.id)
-          .map((profession) => ({ id: profession.id, key: profession.key, name: profession.name })),
+          .map((profession) => ({
+            id: profession.id,
+            key: profession.key,
+            name: profession.name,
+            group: professionGroup(profession),
+            earns: professionEarns(profession),
+          })),
         needTiers: needTierSnapshots(populationDefinitions, definitions),
         projectTypes: projectTypeSnapshots(definitions),
         technologyEraNames: [...(definitions.technology?.eraNames ?? [])],
@@ -2568,12 +2596,13 @@ export function buildSimulationSnapshot(
       world,
       definitions,
       populationDefinitions,
+      build.labour,
     ),
     constructionEnabled: world.profitDistribution.enabled,
     countries,
     countrySummaries,
     provinceTable: encodeProvinceEconomyTable(
-      provinceEconomySnapshots(world, runtime.territoryMeta ?? []),
+      provinceEconomySnapshots(world, runtime.territoryMeta ?? [], build.labour),
       [...definitions.professions].sort((left, right) => left.id - right.id),
     ),
     territories: staticSections.territories,
@@ -2581,6 +2610,7 @@ export function buildSimulationSnapshot(
     markets: marketSnapshots(world, definitions, capacities.byMarket, marketMetaById, fullMarketIds),
     goods: staticSections.goods,
     professions: staticSections.professions,
+    labourMobility: labourMobilitySnapshot(world),
     needTiers: staticSections.needTiers,
     projectTypes: staticSections.projectTypes,
     technologyEraNames: staticSections.technologyEraNames,

@@ -34,6 +34,8 @@ const LENS_RULES: Readonly<Record<MapModeId, (data: LensData | null) => boolean>
   harvest: (data) => data !== null && provinceEconomyRows(data).some((province) => province.harvestFactor !== null),
   // P6 (D-153): the crowding lens needs a campaign with a dwelling stock.
   crowding: (data) => data !== null && provinceEconomyRows(data).some((province) => province.crowding !== null),
+  // P7 (D-156): the unemployment lens needs a campaign with a labour market.
+  unemployment: (data) => data !== null && provinceEconomyRows(data).some((province) => province.unemploymentRate !== null),
 };
 
 function populated(data: LensData | null): boolean {
@@ -50,6 +52,7 @@ export const LENS_ORDER: readonly MapModeId[] = [
   "unrest",
   "harvest",
   "crowding",
+  "unemployment",
 ];
 
 /** The lenses that have real data right now, in display order. */

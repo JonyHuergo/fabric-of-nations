@@ -182,6 +182,13 @@ describe("lenses", () => {
     } as unknown as LensData;
     expect(availableLenses(farmed).map((lens) => lens.id)).toContain("harvest");
     expect(availableLenses(populated).map((lens) => lens.id)).not.toContain("harvest");
+    // P7 (D-156): the unemployment lens needs a province with a labour force.
+    const working = {
+      ...live,
+      provinceTable: table([{ id: 1, marketId: 0, population: 10, unemploymentRate: 0.04 }]),
+    } as unknown as LensData;
+    expect(availableLenses(working).map((lens) => lens.id)).toContain("unemployment");
+    expect(availableLenses(populated).map((lens) => lens.id)).not.toContain("unemployment");
   });
 
   test("no lens is offered that the snapshot cannot back", () => {
@@ -192,6 +199,8 @@ describe("lenses", () => {
     }
     // P5 (D-143): harvests are modelled; the snapshot carries this year's factor.
     expect(protocol).toMatch(/readonly harvestFactor: number \| null;/u);
+    // P7 (D-156): the labour market's unemployment rate per province.
+    expect(protocol).toMatch(/readonly unemploymentRate: number \| null;/u);
     // Nothing the simulation does not model yet may appear as a lens.
     expect(read("src/map/lenses.ts")).not.toMatch(/gdp|wealth|deposit|infrastructure/iu);
   });
@@ -418,8 +427,8 @@ describe("the bridge", () => {
     {
       type: "set-states",
       changes: [
-        [4, "FRA", "DEU", "FRA", 2, 61.5, 0.3, 0.8, 0.02, 1.07, 1.12],
-        [5, "DEU", "DEU", "DEU", null, null, null, null, null, null, null],
+        [4, "FRA", "DEU", "FRA", 2, 61.5, 0.3, 0.8, 0.02, 1.07, 1.12, 0.04],
+        [5, "DEU", "DEU", "DEU", null, null, null, null, null, null, null, null],
       ],
     },
     { type: "set-selection", selectedTag: "GBR", playerTag: null, selectedProvinceIndex: 12 },
@@ -517,6 +526,7 @@ describe("the bridge", () => {
       first.unrest,
       first.harvest,
       first.crowding,
+      first.unemployment,
     ];
     expect(diffProvinceStates(base, next)).toEqual([change]);
     expect(planMapCommands(inputs(), inputs({ states: next }), base)).toEqual([

@@ -9636,3 +9636,138 @@ run.
   neither the labour market nor the demand system applies.
 - **The bench package** keeps only its M1/M2 harness; whether `pnpm bench` should run the 1900
   world (perfBench) instead is open.
+
+## D-156 (step 4) — P7: the labour market on the phone (worker protocol 24, map bridge 5)
+
+**Status:** P7 plan §15 step 4 (plan §11.1 and D-154 "Not done"), designer's task of
+2026-11-12, branch `prosperity/p7-ui` from `main` at `3b88ccd`. Presentation only: no
+simulation state, schema, data version or hash changes. The step-3 review of the
+before/after is not finished, so no digest or 1900-world hash pin was re-pinned; those tests
+keep failing as on `main`.
+**Amends:** D-153 (protocol 23, map bridge 4), D-154 "Not done" (the phone UI for owners and
+servants).
+
+### Decision
+
+1. **Worker protocol 23 → 24.** New snapshot fields, all built from the simulation's own
+   measurement (`measureLabourMarket` over `planInstitutionSlots` and `buildLabourWageTable`,
+   measured once per snapshot and shared by every section; `minimumWagePreview`; the labour
+   history):
+   - `CountrySnapshot.labourMarket` (player and focus countries; null without a labour
+     market): labour force, employed, unemployment rate, unfilled posts; the agricultural
+     employment share; the urban share; household service (servants, the employer blocks,
+     the wage bill owed); `territories[]`, per territory (market) the country has provinces
+     in, one row per profession with a labour force (labour force, employed, unemployment
+     rate, unfilled posts, the market wage and its change at the last monthly update,
+     servants among the employed); `professions[]`, every profession with persons (persons,
+     income a head a year, servants employed, members in household service);
+     `minimumWage[]`, the plan §4.5 preview of every minimum-wage law of the catalogue at its
+     floor.
+   - `ProvinceEconomyTable.unemploymentRate` (and `ProvinceEconomySnapshot.unemploymentRate`):
+     unemployed ÷ labour force per province, null where nobody is in the labour force. The
+     urban-share column already existed (P4) and is block state, so it already moves with
+     mobility, migration, births and deaths; it is unchanged.
+   - `FocusProvinceSnapshot.labour`: the focused province's rows, wage index and servants.
+   - `ProfessionSnapshot.group` and `.earns` (static).
+   - `SimulationSnapshot.labourMobility`: the world's last monthly mobility report (people who
+     changed profession, who moved province, blocks created and retired, net by profession,
+     live blocks); null before the first month.
+   The validator checks every new field (finite, non-negative, shares in [0, 1]); the m14
+   audit and `naming-audits` pin 24.
+2. **Definitions of the derived figures (presentation).**
+   - *Unemployment rate*: Σ max(0, eligible − employed) ÷ Σ eligible over provinces, as the
+     simulation measures them (owners outside the labour force; the self-employed of a
+     work-sharing profession count as employed, D-154 R1/R2).
+   - *Unfilled posts*: Σ over provinces of max(0, offered − employed): a post in one province
+     does not employ an unemployed person in another (own-province work, plan Q5).
+   - *Wage*: the market wage W × d (with the peasant alternative where it applies) before any
+     statutory floor, weighted by the labour force over the provinces; its change is the
+     territory reference wage against the previous one.
+   - *Agricultural employment share*: (workers assigned to agriculture-sector buildings + the
+     work-sharing excess, employed − assigned, of rural-settlement professions) ÷ employed.
+   - *Income a head*: the blocks' smoothed household income per person × days in the year
+     (all sources: wages, residuals, servants' pay); for owners it is the residual of what
+     they own.
+   - *Servants' wage bill*: servants × the province's market wage × `DOMESTIC_WAGE_RATIO`
+     (owed; an employer short of cash pays less, D-154 item 5).
+   - *Province wage index*: the labour-force weighted mean of the province's differentials d.
+3. **Profession groups from roles, not keys** (plan §3.1 item 2): owns-capital or owns-land →
+   owners; military-* → military; administration or clergy → state and church; research,
+   training, education, health or technical → professional; subsistence → rural;
+   owner-operator → rural if its settlement is rural, else office and commerce; wage-labour →
+   office and commerce with the literacy gate, else manual and service. The 1900 professions
+   fall into the plan §11.1 groups exactly (peasants, farmers; laborers, attendants;
+   servicemen, officers; clerks, shopkeepers; academics, teachers, medics, engineers;
+   bureaucrats, clergy; capitalists, aristocrats).
+4. **The minimum-wage preview** is computed for the catalogue's minimum-wage laws at their
+   data floors, because a floor is a law option, not a player number (no floor slider
+   exists). It is labelled a short-run estimate and states what is not modelled (plan §4.5).
+5. **Map bridge 4 → 5:** the province state tuple gains the unemployment value (12 entries);
+   the Unemployment lens is a sequential province lens through the existing path, bands
+   2 / 5 / 10 / 20 % (provisional presentation), offered when any province has a rate.
+   `pnpm map:atlas` regenerated the atlas, which was already stale on `main`.
+6. **Screens** (one code path; tokens only; 44-point controls; nothing on hover): the Labor
+   screen's Unemployment headline and "Labour market" section (farm and urban shares, the
+   profession rows in a `Disclosure`, per territory when there is more than one, owners'
+   residual income, household service) and the minimum-wage preview under Labor standards;
+   the Population screen's Professions section (seven groups in `Disclosure`s, all sixteen
+   professions with persons and income, servants) and "Mobility this month"; the province
+   panel's labour row (unemployment, wage index, servants) and "Employment by profession".
+   Two statements made false by P7 were corrected: the Population screen no longer says the
+   model has no unemployment rate, and the Labor screen no longer calls enforcement deferred.
+
+### Snapshot bound
+
+The bound is the 1900-world test's 700,000 characters of JSON (`world-1900.test.ts`).
+Germany on 1 January 1900 with its most populous province focused: 607,917 characters, of
+which the protocol-24 fields are 16,882 (591,035 without them; the province unemployment
+column is 10,568, Germany's labour section 3,818, the focused province's rows and the
+profession groups the rest); headroom 92,083 (13 %). Without a focused province: 604,821.
+
+### Measurements (desktop, one-off; not a device measurement)
+
+Ryzen 5 2600, Node 24.22.1, the 1900 world on day 0: the shared labour measurement takes
+about 120 ms (156 ms on the first call) of a snapshot build of about 580 ms; Germany's section
+about 20 ms. Not optimised (designer's performance hold); `pnpm bench`, perfPhases and
+perfBench were not run. The app worker bundle grows from 37,034,028 to 37,052,224 bytes.
+
+### Observed in the playtest (simulation, not changed here)
+
+- The first monthly mobility (1 February 1900) moves 7.58 M people between professions and
+  2.64 M between provinces, creates 13 blocks and retires none; peasants −3.44 M, laborers
+  −0.71 M, clerks +0.88 M (world).
+- On day 0, 428 of the 1,626 provinces with a labour force are at 20 % unemployment or more,
+  but they hold 1.8 % of the population (79.0 % of people live in provinces below 2 %); the
+  lens, which colours provinces by rate, therefore shows large thinly peopled areas in the
+  top band. Some small provinces show a work-sharing profession 100 % unemployed because the
+  province has no farm or shop of theirs (D-154 R2 counts sharing only where one exists).
+- Web autosave fails with a storage-quota error in the playtest browser (the 1900-world save
+  is larger than the page's local storage); the P5 playtest recorded the same failure. Saves
+  are not touched by this entry.
+
+### Consequences
+
+- The app reads only snapshot and protocol types; the labour context lives in the worker
+  (`sim-worker/src/labourSnapshot.ts`, not exported to the app).
+- Tests: `worker/labour-snapshot.test.ts` (validator, purity, rows against the measurement,
+  province column, focus rows, preview against the simulation, groups, mobility report);
+  the 1900-world bound test asserts the new fields inside the bound; lens, bridge tuple and
+  hand-built snapshots updated. Playtest: `scripts/p7/playtest-labour.mjs`, evidence in
+  `docs/images/p7/`.
+
+### Ambiguities and open items
+
+- **Mobility is world-wide.** `World.labourMarket.history` keeps world totals, so the
+  Population screen's "Mobility this month" says it covers the world. A per-country report
+  needs a schema change (a country dimension in the monthly report); proposed for later.
+- **The preview sits on the Labor screen**, where the plan puts it; the law is still enacted
+  on the Politics screen, which does not show the estimate.
+- **Wages are market wages before the floor**; where a floor binds, covered employees are
+  paid more (compliance × the gap).
+- **Professions with no persons** in a country (Germany's servicemen, officers and clergy in
+  1900) are listed as "None" so all sixteen appear.
+- **"Labour market" spelling**: the section uses the plan's name inside the screen titled
+  "Labor & health".
+- **Index headings.** This entry is headed like D-154 and D-155 so the index check passes;
+  indexing all three is a change of their three headings to `## D-15N — …` and a rerun of
+  `scripts/docs/decisions-index.mjs`.

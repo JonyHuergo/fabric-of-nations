@@ -4,14 +4,37 @@ import {
   countryById,
   formatCount,
   formatRate,
+  PROFESSION_GROUPS,
+  type CountryLabourMarketSnapshot,
+  type ProfessionGroupDto,
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
-import { Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
+import { DataRow, Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
+import type { MoneyFormat } from "../format/money";
 import { DemographyRows, DemographyTrend, PopulationPyramid, percent } from "../components/Demography";
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { provinceEconomyRows } from "@century/sim-worker";
 import { useMoney } from "../format/useMoney";
+
+/** P7 (D-156): headings of the profession groups (presentation). */
+const GROUP_NAMES: Readonly<Record<ProfessionGroupDto, string>> = {
+  rural: "Rural",
+  "manual-service": "Manual and service",
+  military: "Military",
+  "office-commerce": "Office and commerce",
+  professional: "Professional",
+  "state-church": "State and church",
+  owners: "Owners",
+  other: "Other",
+};
+
+/** P7 (D-156): how a profession's people earn, as the rows say it. */
+const EARNS_TEXT = {
+  wage: "wages",
+  "own-work": "their own farm or shop",
+  residual: "the residual of the buildings and land they own",
+} as const;
 
 /** P6 (D-153): names of the demand system's categories (presentation). */
 const CATEGORY_NAMES: Readonly<Record<string, string>> = {
@@ -105,7 +128,7 @@ export function PopulationScreen({
             value={formatCount(
               Math.max(0, country.workingAgePopulation - country.employedWorkers),
             )}
-            detail="Residual, not an unemployment rate: the model does not measure job search or labor-force participation separately."
+            detail="Residual, not an unemployment rate: it includes people outside the labour force. The labour market's unemployment rate is on the Labor screen."
           />
           <StatRow
             label="Household cash"
@@ -134,11 +157,15 @@ export function PopulationScreen({
           />
           <Notice title="What these figures mean">
             Population, worker, and cash values are stocks. The wage base is a current
-            employment estimate. The model does not calculate an unemployment rate, labor-force
-            participation rate, or per-capita income; no such figure is shown.
+            employment estimate. Unemployment and wages by profession are measured in the
+            labour market (Labor screen); income per head by profession is under Professions.
           </Notice>
         </Section>
       )}
+      {country === null || country.labourMarket === null ? null : (
+        <ProfessionsSection market={country.labourMarket} snapshot={snapshot} money={money} />
+      )}
+      {country === null ? null : <MobilitySection snapshot={snapshot} />}
       {country === undefined || country === null || country.households === null ? null : (
         <Section title="Households" subtitle="Planned spending at this month's prices; dwellings owned by households.">
           <StatRow
@@ -194,6 +221,89 @@ export function PopulationScreen({
       </Section>
 
     </View>
+  );
+}
+
+/** P7 (D-156): the sixteen professions in their groups, with persons, income and servants. */
+function ProfessionsSection({
+  market,
+  snapshot,
+  money,
+}: {
+  readonly market: CountryLabourMarketSnapshot;
+  readonly snapshot: SimulationSnapshot;
+  readonly money: MoneyFormat;
+}) {
+  const rowOf = new Map(market.professions.map((row) => [row.professionId, row]));
+  return (
+    <Section title="Professions" subtitle="Persons of every age by occupation; income per head over the last weeks.">
+      {PROFESSION_GROUPS.map((group) => {
+        const members = snapshot.professions.filter((profession) => profession.group === group);
+        if (members.length === 0) return null;
+        const persons = members.reduce((sum, profession) => sum + (rowOf.get(profession.id)?.persons ?? 0), 0);
+        return (
+          <Disclosure key={group} title={`${GROUP_NAMES[group]} · ${persons > 0 ? formatCount(persons) : "none"}`}>
+            {members.map((profession) => {
+              const row = rowOf.get(profession.id);
+              if (row === undefined) {
+                return <DataRow key={profession.id} title={profession.name} value="None" valueTone="muted" />;
+              }
+              const servants = [
+                row.servantsEmployed > 0 ? `employ ${formatCount(row.servantsEmployed)} servants` : null,
+                row.inHouseholdService > 0 ? `${formatCount(row.inHouseholdService)} work as servants` : null,
+              ].filter((part): part is string => part !== null);
+              return (
+                <DataRow
+                  key={profession.id}
+                  title={profession.name}
+                  value={formatCount(row.persons)}
+                  note={[`${money.format(row.incomeRUSDPerHeadYear)}/yr a head from ${EARNS_TEXT[profession.earns]}`, ...servants].join(" · ")}
+                />
+              );
+            })}
+          </Disclosure>
+        );
+      })}
+    </Section>
+  );
+}
+
+/** P7 (D-156): the last month's social mobility (a world-wide report). */
+function MobilitySection({ snapshot }: { readonly snapshot: SimulationSnapshot }) {
+  const report = snapshot.labourMobility;
+  const nameOf = new Map(snapshot.professions.map((profession) => [profession.id, profession.name]));
+  return (
+    <Section title="Mobility" subtitle="People change profession and province on the first day of each month.">
+      <Disclosure title={report === null ? "Mobility this month · none yet" : "Mobility this month · world"}>
+        {report === null ? (
+          <Notice title="No month has closed yet">
+            The first month's mobility runs on the first day of the next month: people move
+            toward professions and provinces that pay more and have work.
+          </Notice>
+        ) : (
+          <>
+            <StatRow label="Changed profession" value={formatCount(report.mobilityPeople)} detail="Inside their province" />
+            <StatRow label="Moved province" value={formatCount(report.migrationPeople)} detail="Toward work, wages and housing" />
+            <StatRow
+              label="Population blocks"
+              value={`${String(report.blocksCreated)} created · ${String(report.blocksRetired)} retired`}
+              detail={`${formatCount(report.liveBlocks)} blocks now`}
+            />
+            {report.net.map((entry) => (
+              <DataRow
+                key={entry.professionId}
+                title={nameOf.get(entry.professionId) ?? `Profession ${String(entry.professionId)}`}
+                value={`${entry.net > 0 ? "+" : "−"}${formatCount(Math.abs(entry.net))}`}
+                valueTone={entry.net > 0 ? "accent" : "muted"}
+              />
+            ))}
+            <Text style={styles.headerText}>
+              The monthly report covers the whole world; the simulation does not yet keep one per country.
+            </Text>
+          </>
+        )}
+      </Disclosure>
+    </Section>
   );
 }
 

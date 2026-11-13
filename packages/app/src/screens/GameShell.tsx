@@ -26,7 +26,8 @@ import {
 import { CountryFlag } from "../components/CountryFlag";
 import { Icon, type IconName } from "../components/icons";
 import { statusLabel } from "../components/WorldMap";
-import { Badge, Button, Chip, Divider, Metric, Panel, StatRow } from "../components/ui";
+import { Badge, Button, Chip, Disclosure, Divider, Metric, Panel, StatRow } from "../components/ui";
+import { LabourRows } from "../components/Labour";
 import { shellMetrics, type ShellMetrics } from "../design/tokens";
 import { PROVINCE_CATALOG } from "../generated/provinceCatalog";
 import { WORLD_CATALOG } from "../generated/worldCatalog";
@@ -1227,6 +1228,7 @@ function LandRows({ land }: { readonly land: ProvinceLandSnapshot }) {
 /** P2 live population and economy of one province (D-118). */
 function ProvinceEconomySection({ economy }: { readonly economy: ProvinceEconomySnapshot }) {
   const { snapshot, setProvinceFocus } = useSimulation();
+  const money = useMoney();
   // P4: the worker sends one province's pyramid, the one this panel shows.
   useEffect(() => {
     setProvinceFocus(economy.id);
@@ -1250,7 +1252,7 @@ function ProvinceEconomySection({ economy }: { readonly economy: ProvinceEconomy
       <StatRow
         label="Towns and literacy"
         value={`${percentText(economy.urbanShare)} urban`}
-        detail={`Adult literacy ${percentText(economy.literacy)} · 1900 urban share from HYDE 3.3`}
+        detail={`Adult literacy ${percentText(economy.literacy)} · towns grow and shrink as people move to work, migrate, are born and die (HYDE 3.3 in 1900)`}
       />
       {economy.dwellings === null || economy.crowding === null ? null : (
         <StatRow
@@ -1283,6 +1285,19 @@ function ProvinceEconomySection({ economy }: { readonly economy: ProvinceEconomy
         value={`${formatPeople(economy.employedWorkers)} employed here`}
         detail={`${String(economy.buildingCount)} building${economy.buildingCount === 1 ? "" : "s"}, ${String(economy.buildingLevels)} capacity level${economy.buildingLevels === 1 ? "" : "s"}`}
       />
+      {focus === null || focus.labour === null || snapshot === null ? null : (
+        <>
+          <StatRow
+            label="Labour market"
+            value={focus.labour.unemploymentRate === null ? "No labour force" : `${(focus.labour.unemploymentRate * 100).toFixed(1)}% out of work`}
+            detail={`Wage index ${focus.labour.wageIndex.toFixed(2)} of its territory's level · ${formatPeople(focus.labour.servantsEmployed)} servants in households here`}
+            tone={focus.labour.unemploymentRate !== null && focus.labour.unemploymentRate >= 0.1 ? "negative" : "default"}
+          />
+          <Disclosure title={`Employment by profession · ${String(focus.labour.rows.length)}`}>
+            <LabourRows rows={focus.labour.rows} professions={snapshot.professions} money={money} />
+          </Disclosure>
+        </>
+      )}
       <StatRow
         label="Unrest"
         value={percentText(economy.unrest)}

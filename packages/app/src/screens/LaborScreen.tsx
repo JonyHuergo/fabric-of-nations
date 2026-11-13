@@ -3,13 +3,18 @@ import { Text, View } from "react-native";
 
 import {
   countryById,
+  formatCount,
+  formatRate,
   previewHealthPolicy,
   previewTrainingPolicy,
+  type CountryLabourMarketSnapshot,
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
+import { LabourRows, mergeTerritoryRows } from "../components/Labour";
 import { SliderField, useDeferredCommit } from "../components/Slider";
-import { ActionButton, Headline, Notice, Section, StatRow } from "../components/ui";
+import { ActionButton, DataRow, Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
+import type { MoneyFormat } from "../format/money";
 import { colors, fonts, spacing, themedSheet } from "../theme";
 import { useSimulation } from "../worker/SimulationProvider";
 import { useMoney } from "../format/useMoney";
@@ -180,6 +185,10 @@ export function LaborScreen({
           {localError}
         </Notice>
       ) : null}
+
+      {country.labourMarket === null ? null : (
+        <LabourMarketSection market={country.labourMarket} snapshot={snapshot} money={money} />
+      )}
 
       <Headline
         label="Qualification"
@@ -406,6 +415,40 @@ export function LaborScreen({
             : "No floor enacted"
         }
       />
+      {country.labourMarket === null
+        ? null
+        : country.labourMarket.minimumWage.map((preview) => (
+            <View key={preview.lawId} style={styles.estimate}>
+              <Text style={styles.estimateTitle}>
+                {`${preview.lawName} at ${money.format(preview.floorRUSDPerYear)}/year${preview.enacted ? " (in force)" : ""} · short-run estimate`}
+              </Text>
+              <StatRow
+                label="Covered workers"
+                value={formatCount(preview.coveredWorkers)}
+                detail="Employees of firms and public institutions; never the self-employed, peasants or owners."
+              />
+              <StatRow
+                label="Paid below the floor today"
+                value={formatCount(preview.workersBelowFloor)}
+              />
+              <StatRow
+                label="Jobs at risk"
+                value={formatCount(preview.jobsAtRisk)}
+                detail="Filled jobs in covered buildings that could not pay their staff at this floor."
+                tone={preview.jobsAtRisk > 0 ? "negative" : "default"}
+              />
+              <StatRow
+                label="Compliance"
+                value={formatRate(preview.compliance)}
+                detail="Share of the gap employers pay; it rises with administration quality."
+              />
+              <Text style={styles.help}>
+                Prices and people are held at today's levels; in time shed output raises prices
+                and people move toward work. Monopsony, efficiency wages and pay rises spreading
+                up the wage scale are not modelled.
+              </Text>
+            </View>
+          ))}
       <StatRow
         label="Statutory working week"
         value={
@@ -420,12 +463,81 @@ export function LaborScreen({
       />
       <Text style={styles.help}>
         Labor and health laws are proposed in the Politics screen. A minimum wage raises
-        the actual wage obligation; a shorter week scales output and wages and modestly
+        the wage owed in covered jobs as far as employers comply; buildings that cannot
+        pay it take on fewer workers. A shorter week scales output and wages and modestly
         improves mortality. Public health lowers mortality through the population stock.
-        Pensions, collective bargaining, and labor-market enforcement are deliberately
-        deferred.
+        Pensions and collective bargaining are deliberately deferred.
       </Text>
     </Section>
+  );
+}
+
+/** P7 (D-156): the country's labour market, one row per profession with a labour force. */
+function LabourMarketSection({
+  market,
+  snapshot,
+  money,
+}: {
+  readonly market: CountryLabourMarketSnapshot;
+  readonly snapshot: SimulationSnapshot;
+  readonly money: MoneyFormat;
+}) {
+  const rows = mergeTerritoryRows(market.territories);
+  const nameOf = new Map(snapshot.professions.map((profession) => [profession.id, profession]));
+  const owners = market.professions.filter((row) => nameOf.get(row.professionId)?.earns === "residual");
+  const marketName = new Map(snapshot.markets.map((entry) => [entry.id, entry.name]));
+  return (
+    <>
+      <Headline
+        label="Unemployment"
+        value={formatRate(market.unemploymentRate)}
+        tone={market.unemploymentRate >= 0.08 ? "negative" : "default"}
+        detail={`${formatCount(market.employed)} of ${formatCount(market.labourForce)} in the labour force working · ${formatCount(market.vacancies)} posts unfilled`}
+      />
+      <Section title="Labour market" subtitle={snapshot.date.label}>
+        <StatRow
+          label="Work on farms"
+          value={formatRate(market.agriculturalEmploymentShare)}
+          detail="Share of the employed working on farms: farm jobs, and peasants and farmers on their own land."
+        />
+        <StatRow
+          label="Towns"
+          value={`${formatRate(market.urbanShare)} urban`}
+          detail="Changes as people move to work, migrate, are born and die."
+        />
+        <Disclosure title={`Professions · ${String(rows.length)}`}>
+          <LabourRows rows={rows} professions={snapshot.professions} money={money} />
+          {market.territories.length > 1
+            ? market.territories.map((territory) => (
+                <Disclosure
+                  key={territory.marketId}
+                  title={`${marketName.get(territory.marketId) ?? `Territory ${String(territory.marketId)}`} · ${String(territory.rows.length)}`}
+                >
+                  <LabourRows rows={territory.rows} professions={snapshot.professions} money={money} />
+                </Disclosure>
+              ))
+            : null}
+        </Disclosure>
+        {owners.map((row) => (
+          <DataRow
+            key={row.professionId}
+            title={nameOf.get(row.professionId)?.name ?? `Profession ${String(row.professionId)}`}
+            value={`${money.format(row.incomeRUSDPerHeadYear)}/yr a head`}
+            note={`${formatCount(row.persons)} persons outside the labour force: they earn the residual of the buildings and land they own${row.servantsEmployed > 0 ? ` · employ ${formatCount(row.servantsEmployed)} servants` : ""}`}
+          />
+        ))}
+        <StatRow
+          label="Household service"
+          value={`${formatCount(market.servants.workers)} servants`}
+          detail={`Employed by ${String(market.servants.employerBlocks)} groups of middle and upper households · ${money.format(market.servants.wageBillRUSDPerYear)}/yr in wages owed`}
+        />
+        <Text style={styles.help}>
+          Unemployment counts the labour force without work in its own province; a post
+          unfilled elsewhere does not employ anyone. Wages are this month's market wage
+          before any statutory floor.
+        </Text>
+      </Section>
+    </>
   );
 }
 

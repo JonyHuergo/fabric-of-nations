@@ -14,7 +14,13 @@
  * 21 (D-143): province ownership as columns (`provinceOwnership`), the harvest column
  * and the focused province's land section.
  */
-export const PROTOCOL_VERSION = 23 as const;
+/**
+ * 24 (D-156, P7): the labour market — the country's labour-market section (rows per
+ * territory and profession, owners' and servants' incomes, the minimum-wage preview),
+ * profession groups, the province unemployment column, the focused province's labour rows
+ * and the world's last monthly mobility report.
+ */
+export const PROTOCOL_VERSION = 24 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -1102,6 +1108,8 @@ export interface ProvinceEconomyTable {
   /** P6 (D-153): dwellings and crowding (null without housing). */
   readonly dwellings: readonly (number | null)[];
   readonly crowding: readonly (number | null)[];
+  /** P7 (D-156): labour-market unemployment rate, 0..1 (null where nobody is in the labour force). */
+  readonly unemploymentRate: readonly (number | null)[];
 }
 
 /** Encode province rows as a column table (rows ascending by id). */
@@ -1132,6 +1140,7 @@ export function encodeProvinceEconomyTable(
     harvestFactor: rows.map((row) => row.harvestFactor),
     dwellings: rows.map((row) => row.dwellings),
     crowding: rows.map((row) => row.crowding),
+    unemploymentRate: rows.map((row) => row.unemploymentRate),
   };
 }
 
@@ -1178,6 +1187,7 @@ export function provinceEconomyRows(
       harvestFactor: table.harvestFactor[index] ?? null,
       dwellings: table.dwellings[index] ?? null,
       crowding: table.crowding[index] ?? null,
+      unemploymentRate: table.unemploymentRate[index] ?? null,
     });
   });
   provinceRowsCache.set(table, rows);
@@ -1279,6 +1289,8 @@ export interface CountrySnapshot {
   readonly blocksWithUnmetBasic: number;
   /** P6 (D-153): planned household spending, saving and housing; null on the tier path. */
   readonly households: CountryHouseholdsSnapshot | null;
+  /** P7 (D-156): the labour market; null in a world without one. */
+  readonly labourMarket: CountryLabourMarketSnapshot | null;
   readonly buildingCount: number;
   /** Estimated capacity for every good in the catalog; zero means no capacity. */
   readonly productionCapacityByGood: readonly SnapshotProductionCapacity[];
@@ -1459,6 +1471,8 @@ export interface FocusProvinceSnapshot {
   readonly pyramid: PopulationPyramidSnapshot;
   /** P5 (D-143): land, today's harvest and own consumption, and known deposits. */
   readonly land: ProvinceLandSnapshot | null;
+  /** P7 (D-156): employment and unemployment by profession; null without a labour market. */
+  readonly labour: ProvinceLabourSnapshot | null;
 }
 
 /** P5: one good's quantity today, physical units of the good. */
@@ -1570,6 +1584,12 @@ export interface ProvinceEconomySnapshot {
   readonly dwellings: number | null;
   /** P6: persons per dwelling ÷ the province's 1900 persons per dwelling; null without housing. */
   readonly crowding: number | null;
+  /**
+   * P7 (D-156): unemployed ÷ labour force over the province's professions (owners are
+   * outside the labour force; the self-employed share work on their own land and shops);
+   * null where nobody is in the labour force.
+   */
+  readonly unemploymentRate: number | null;
 }
 
 /**
@@ -1650,6 +1670,129 @@ export interface ProfessionSnapshot {
   readonly id: number;
   readonly key: string;
   readonly name: string;
+  /** P7 (D-156): presentation group, derived from the profession's roles, gates and settlement. */
+  readonly group: ProfessionGroupDto;
+  /**
+   * P7 (D-156): how its people earn: a wage; their own work on their own farm or shop
+   * (peasants, farmers, shopkeepers); or the residual of the buildings and land they own
+   * (capitalists, aristocrats: outside the labour force).
+   */
+  readonly earns: "wage" | "own-work" | "residual";
+}
+
+/** P7 (D-156): the profession groups of the Population screen, in display order. */
+export const PROFESSION_GROUPS = [
+  "rural",
+  "manual-service",
+  "military",
+  "office-commerce",
+  "professional",
+  "state-church",
+  "owners",
+  "other",
+] as const;
+export type ProfessionGroupDto = (typeof PROFESSION_GROUPS)[number];
+
+/** P7 (D-156): one profession of a territory or province in the labour market. */
+export interface LabourProfessionRowSnapshot {
+  readonly professionId: number;
+  /** Eligible working-age persons (participation, literacy where the profession needs it). */
+  readonly labourForce: number;
+  /** Holding a job or a post, or sharing the work of their own farm or shop. */
+  readonly employed: number;
+  /** Unemployed ÷ labour force, 0..1. */
+  readonly unemploymentRate: number;
+  /** Posts offered and not filled, summed over provinces (a vacancy elsewhere does not employ). */
+  readonly vacancies: number;
+  /** Market wage (before any statutory floor), RUSD a year, labour-force weighted. */
+  readonly wageRUSDPerYear: number;
+  /** The territory reference wage's change at the last monthly update (0.02 = +2 %). */
+  readonly wageChange: number;
+  /** Of the employed, those working as servants for households. */
+  readonly inHouseholdService: number;
+}
+
+/** P7 (D-156): a country's provinces in one territory (market). */
+export interface LabourTerritorySnapshot {
+  readonly marketId: number;
+  /** Professions with a labour force, ascending id. */
+  readonly rows: readonly LabourProfessionRowSnapshot[];
+}
+
+/** P7 (D-156): persons and income of one profession of a country (every populated profession). */
+export interface CountryProfessionSnapshot {
+  readonly professionId: number;
+  readonly persons: number;
+  /** Smoothed household income per person, RUSD a year (wages, residuals, servants' pay). */
+  readonly incomeRUSDPerHeadYear: number;
+  /** Servants this profession's households employ. */
+  readonly servantsEmployed: number;
+  /** Members working as servants for other households. */
+  readonly inHouseholdService: number;
+}
+
+/** P7 (D-156, plan §4.5): the short-run estimate of a minimum-wage law at its floor. */
+export interface MinimumWagePreviewSnapshot {
+  readonly lawId: number;
+  readonly lawName: string;
+  readonly enacted: boolean;
+  readonly floorRUSDPerYear: number;
+  /** Workers in covered jobs of buildings and institutions. */
+  readonly coveredWorkers: number;
+  /** Covered workers whose paid wage today is below the floor. */
+  readonly workersBelowFloor: number;
+  /** Filled jobs of covered buildings that could not pay their staff at the floor (R < 1). */
+  readonly jobsAtRisk: number;
+  /** Share of the gap employers pay: administration quality ^ γ, 0..1. */
+  readonly compliance: number;
+}
+
+/** P7 (D-156): a country's labour market. */
+export interface CountryLabourMarketSnapshot {
+  readonly labourForce: number;
+  readonly employed: number;
+  readonly unemploymentRate: number;
+  readonly vacancies: number;
+  /** Employed on farms (jobs on agricultural buildings and the self-employed of rural professions) ÷ employed. */
+  readonly agriculturalEmploymentShare: number;
+  /** Urban persons ÷ persons. */
+  readonly urbanShare: number;
+  readonly servants: {
+    readonly workers: number;
+    /** Population blocks (households of one profession in one province) employing them. */
+    readonly employerBlocks: number;
+    /** Annual wage owed to the servants at today's province wages, RUSD. */
+    readonly wageBillRUSDPerYear: number;
+  };
+  /** One entry per territory the country has provinces in, ascending market id. */
+  readonly territories: readonly LabourTerritorySnapshot[];
+  /** Every profession with persons, ascending id. */
+  readonly professions: readonly CountryProfessionSnapshot[];
+  /** One estimate per minimum-wage law of the catalogue. */
+  readonly minimumWage: readonly MinimumWagePreviewSnapshot[];
+}
+
+/** P7 (D-156): the focused province's labour market. */
+export interface ProvinceLabourSnapshot {
+  /** Labour-force weighted mean of the province's wage differentials (1 = its territory's level). */
+  readonly wageIndex: number;
+  readonly unemploymentRate: number | null;
+  readonly rows: readonly LabourProfessionRowSnapshot[];
+  /** Servants the province's households employ. */
+  readonly servantsEmployed: number;
+}
+
+/** P7 (D-156): the world's last monthly mobility report (the history is world-wide). */
+export interface LabourMobilitySnapshot {
+  /** Day the month's mobility ran (the first civil day of the month). */
+  readonly dayIndex: number;
+  readonly mobilityPeople: number;
+  readonly migrationPeople: number;
+  readonly blocksCreated: number;
+  readonly blocksRetired: number;
+  /** Net people gained (positive) or lost per profession; professions without a change are left out. */
+  readonly net: readonly { readonly professionId: number; readonly net: number }[];
+  readonly liveBlocks: number;
 }
 
 export interface GoodSnapshot {
@@ -1753,6 +1896,8 @@ export interface SimulationSnapshot {
   readonly goods: readonly GoodSnapshot[];
   /** P2 profession names, for per-province population (static). */
   readonly professions: readonly ProfessionSnapshot[];
+  /** P7 (D-156): the world's last monthly mobility report; null before the first month. */
+  readonly labourMobility: LabourMobilitySnapshot | null;
   /** Static authored need tiers, used for evidence-based diagnosis. */
   readonly needTiers: readonly SnapshotNeedTier[];
   /** Validated buildable public-construction project types. */
@@ -3074,6 +3219,7 @@ function isCountrySnapshot(value: unknown): value is CountrySnapshot {
   if (!isIntegerIn(value.blocksWithUnmetSubsistence, 0, 1_000_000)) return false;
   if (!isIntegerIn(value.blocksWithUnmetBasic, 0, 1_000_000)) return false;
   if (value.households !== null && !isCountryHouseholds(value.households)) return false;
+  if (value.labourMarket !== null && !isCountryLabourMarket(value.labourMarket)) return false;
   if (!isIntegerIn(value.buildingCount, 0, 1_000_000)) return false;
   if (!Array.isArray(value.productionCapacityByGood)) return false;
   if (!value.productionCapacityByGood.every(isProductionCapacity)) return false;
@@ -3141,6 +3287,75 @@ function isNullableFiniteArray(value: unknown, length: number): boolean {
   return Array.isArray(value) && value.length === length && value.every((entry) => entry === null || isFiniteNumber(entry));
 }
 
+function isNonNegativeFinite(value: unknown): boolean {
+  return isFiniteNumber(value) && value >= 0;
+}
+
+function isUnitShare(value: unknown): boolean {
+  return isFiniteNumber(value) && value >= 0 && value <= 1;
+}
+
+/** P7 (D-156): one labour-market row. */
+function isLabourRow(value: unknown): value is LabourProfessionRowSnapshot {
+  if (!isRecord(value) || !isIntegerIn(value.professionId, 0, 0xffff)) return false;
+  for (const key of ["labourForce", "employed", "vacancies", "wageRUSDPerYear", "inHouseholdService"] as const) {
+    if (!isNonNegativeFinite(value[key])) return false;
+  }
+  return isUnitShare(value.unemploymentRate) && isFiniteNumber(value.wageChange);
+}
+
+/** P7 (D-156): the country's labour-market section. */
+function isCountryLabourMarket(value: unknown): value is CountryLabourMarketSnapshot {
+  if (!isRecord(value)) return false;
+  for (const key of ["labourForce", "employed", "vacancies"] as const) {
+    if (!isNonNegativeFinite(value[key])) return false;
+  }
+  if (!isUnitShare(value.unemploymentRate) || !isUnitShare(value.agriculturalEmploymentShare) || !isUnitShare(value.urbanShare)) return false;
+  const servants = value.servants;
+  if (!isRecord(servants) || !isNonNegativeFinite(servants.workers) || !isNonNegativeFinite(servants.employerBlocks) || !isNonNegativeFinite(servants.wageBillRUSDPerYear)) return false;
+  if (!Array.isArray(value.territories)) return false;
+  for (const territory of value.territories) {
+    if (!isRecord(territory) || !isIntegerIn(territory.marketId, 0, 0xffff_ffff)) return false;
+    if (!Array.isArray(territory.rows) || !territory.rows.every(isLabourRow)) return false;
+  }
+  if (!Array.isArray(value.professions)) return false;
+  for (const row of value.professions) {
+    if (!isRecord(row) || !isIntegerIn(row.professionId, 0, 0xffff)) return false;
+    for (const key of ["persons", "incomeRUSDPerHeadYear", "servantsEmployed", "inHouseholdService"] as const) {
+      if (!isNonNegativeFinite(row[key])) return false;
+    }
+  }
+  if (!Array.isArray(value.minimumWage)) return false;
+  for (const preview of value.minimumWage) {
+    if (!isRecord(preview) || !isIntegerIn(preview.lawId, 0, 0xffff_ffff) || !isString(preview.lawName, 128)) return false;
+    if (typeof preview.enacted !== "boolean") return false;
+    for (const key of ["floorRUSDPerYear", "coveredWorkers", "workersBelowFloor", "jobsAtRisk"] as const) {
+      if (!isNonNegativeFinite(preview[key])) return false;
+    }
+    if (!isUnitShare(preview.compliance)) return false;
+  }
+  return true;
+}
+
+/** P7 (D-156): the focused province's labour rows. */
+function isProvinceLabour(value: unknown): value is ProvinceLabourSnapshot {
+  if (!isRecord(value) || !isNonNegativeFinite(value.wageIndex) || !isNonNegativeFinite(value.servantsEmployed)) return false;
+  if (value.unemploymentRate !== null && !isUnitShare(value.unemploymentRate)) return false;
+  return Array.isArray(value.rows) && value.rows.every(isLabourRow);
+}
+
+/** P7 (D-156): the world's last monthly mobility report. */
+function isLabourMobility(value: unknown): value is LabourMobilitySnapshot {
+  if (!isRecord(value) || !isIntegerIn(value.dayIndex, 0, 36_524)) return false;
+  for (const key of ["mobilityPeople", "migrationPeople", "blocksCreated", "blocksRetired", "liveBlocks"] as const) {
+    if (!isIntegerIn(value[key], 0, Number.MAX_SAFE_INTEGER)) return false;
+  }
+  return (
+    Array.isArray(value.net) &&
+    value.net.every((entry) => isRecord(entry) && isIntegerIn(entry.professionId, 0, 0xffff) && Number.isInteger(entry.net))
+  );
+}
+
 /** P6 (D-153): the households section. */
 function isCountryHouseholds(value: unknown): value is CountryHouseholdsSnapshot {
   if (!isRecord(value) || !Array.isArray(value.categoryShares)) return false;
@@ -3180,6 +3395,7 @@ function isProvinceEconomyTable(value: unknown): value is ProvinceEconomyTable {
     if (!Array.isArray(entries) || entries.length !== length || !entries.every(isNullableId)) return false;
   }
   if (!isNullableFiniteArray(value.dwellings, length) || !isNullableFiniteArray(value.crowding, length)) return false;
+  if (!isNullableFiniteArray(value.unemploymentRate, length)) return false;
   const harvest = value.harvestFactor;
   if (
     !Array.isArray(harvest) ||
@@ -3388,6 +3604,7 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
     if (!isFiniteNumberArray(focusPyramid.male) || focusPyramid.male.length !== 17) return false;
     if (!isFiniteNumberArray(focusPyramid.female) || focusPyramid.female.length !== 17) return false;
     if (value.focusProvince.land !== null && !isProvinceLandSnapshot(value.focusProvince.land)) return false;
+    if (value.focusProvince.labour !== null && !isProvinceLabour(value.focusProvince.labour)) return false;
   }
   if (typeof value.constructionEnabled !== "boolean") return false;
   if (!Array.isArray(value.countries) || !value.countries.every(isCountrySnapshot)) return false;
@@ -3418,6 +3635,17 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
   if (!isProvinceEconomyTable(value.provinceTable)) return false;
   if (!Array.isArray(value.territories) || !value.territories.every(isTerritorySnapshot)) return false;
   if (!Array.isArray(value.professions)) return false;
+  if (
+    !value.professions.every(
+      (profession) =>
+        isRecord(profession) &&
+        (PROFESSION_GROUPS as readonly unknown[]).includes(profession.group) &&
+        (profession.earns === "wage" || profession.earns === "own-work" || profession.earns === "residual"),
+    )
+  ) {
+    return false;
+  }
+  if (value.labourMobility !== null && !isLabourMobility(value.labourMobility)) return false;
   const ownership = value.provinceOwnership as Partial<ProvinceOwnershipTable> | undefined;
   if (
     ownership === undefined ||

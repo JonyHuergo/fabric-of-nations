@@ -1,0 +1,262 @@
+{
+  "startedAt": "2026-11-13T01:39:13.642Z",
+  "viewport": "844,390",
+  "checks": [
+    {
+      "name": "phone landscape viewport",
+      "passed": true,
+      "detail": "{\"width\":844,\"height\":390}"
+    },
+    {
+      "name": "Labour market headline shows the unemployment rate",
+      "passed": true,
+      "detail": "Unemployment counts the labour force without work in its own province; a post unfilled elsewhere does not employ anyone. Wages are this month's market wage befo"
+    },
+    {
+      "name": "farm share shown",
+      "passed": true,
+      "detail": "Work on farms 45.3% Share of the employed working on farms: "
+    },
+    {
+      "name": "urban share shown",
+      "passed": true,
+      "detail": "Towns 21.1% urban Changes as people move"
+    },
+    {
+      "name": "one row per populated profession, each with its unemployment",
+      "passed": true,
+      "detail": "11"
+    },
+    {
+      "name": "rows show workers, unfilled posts and the wage with last month's change",
+      "passed": true,
+      "detail": "Laborers 3.6% out of work 6.29M of 6.52M working · 299.4k posts unfilled · 630.80 DEM/yr, −1.5% last month · 590.1k in household service Clerks 24.6% out of work 536.6k of 711.5k working · 311 posts u"
+    },
+    {
+      "name": "owners' residual income shown",
+      "passed": true,
+      "detail": "Capitalists 2.5k DEM/yr a head 655.8k persons outside the labour force: they earn the residual of the buildings and land they own · employ 251.6k servants Aristocrats 1.6k DEM/yr a"
+    },
+    {
+      "name": "household service shown",
+      "passed": true,
+      "detail": "Household service 773.3k servants Employed by 587 groups of middle and upper households · 343.94M DEM/yr in wages owed Unemployment counts t"
+    },
+    {
+      "name": "Professions disclosure is at least 44 pt",
+      "passed": true,
+      "detail": "44"
+    },
+    {
+      "name": "every visible button on the Labor screen is at least 44 pt",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "minimum-wage preview labelled a short-run estimate",
+      "passed": true,
+      "detail": "Minimum wage at 80.27 DEM/year · short-run estimate Covered workers 7.81M Employees of fir"
+    },
+    {
+      "name": "preview shows covered workers, workers below the floor, jobs at risk and compliance",
+      "passed": true,
+      "detail": "Covered workers 7.81M Employees of firms and public institutions; never the self-employed, peasants or owners. Paid below the floor today 733.1k Jobs at risk 2.00M Filled jobs in covered buildings that could not pay their staff at this floor. Compliance 70.0% "
+    },
+    {
+      "name": "the seven profession groups are listed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all sixteen professions shown with persons",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "owners earn the residual, servants shown",
+      "passed": true,
+      "detail": "Capitalists 655.8k 2.5k DEM/yr a head from the residual of the buildings and land they own · employ 251.6k servants Aristocrats 82.2k 1.6k DEM/yr a head from th"
+    },
+    {
+      "name": "mobility this month shows people moved and blocks",
+      "passed": true,
+      "detail": "Changed profession 7.58M Inside their province Moved province 2.64M Toward work, wages and housing Population blocks 13 created · 0 retired 20.8k blocks now Peasants −3.44M Laborers −709.0k Clerks +87"
+    },
+    {
+      "name": "every visible button on the Population screen is at least 44 pt",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "SVG fallback map: a German province pressed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "province panel shows its unemployment and wage index",
+      "passed": true,
+      "detail": "Labour market 2.3% out of work Wage index 1.17 of its territory's level · 20 k servants in households here Employment by profession · 11 + Unrest 10% Infrastruc"
+    },
+    {
+      "name": "province panel shows the urban share",
+      "passed": true,
+      "detail": "Towns and literacy 28% urban Adult literacy 86% · towns grow and shrink as peopl"
+    },
+    {
+      "name": "province panel lists employment and unemployment by profession",
+      "passed": true,
+      "detail": "11"
+    },
+    {
+      "name": "lens switch is at least 44 pt",
+      "passed": true,
+      "detail": "{\"height\":44}"
+    },
+    {
+      "name": "Unemployment lens offered, at least 44 pt",
+      "passed": true,
+      "detail": "{\"height\":44,\"width\":98.625}"
+    },
+    {
+      "name": "unemployment legend shows the bands",
+      "passed": true,
+      "detail": "Below 2% 2% to 5% 5% to 10% 10% to 20% 20% and above No data Unemployment 30× Au"
+    },
+    {
+      "name": "the Unemployment lens colours the map (distinct province fills)",
+      "passed": true,
+      "detail": "{\"rgb(95, 148, 144)\":1,\"rgb(156, 90, 94)\":1,\"rgb(109, 112, 117)\":1,\"rgb(74, 108, 156)\":1,\"rgb(86, 119, 95)\":1,\"rgb(163, 88, 119)\":1,\"rgb(75, 138, 118)\":1,\"rgb(168, 138, 72)\":1,\"rgb(111, 143, 92)\":1,\"rgb(176, 119, 74)\":1,\"rgb(127, 103, 150)\":1,\"rgb(162, 89, 90)\":1,\"rgb(95, 134, 171)\":1,\"rgb(111, 106, 160)\":1,\"rgb(168, 116, 95)\":1,\"rgb(90, 144, 184)\":1,\"rgb(140, 98, 130)\":1,\"rgb(106, 149, 121)\":1,\"rgb(94, 143, 152)\":1,\"rgb(127, 156, 102)\":1,\"rgb(154, 117, 80)\":1,\"rgb(102, 160, 163)\":1,\"rgb(160, 88, 87)\":1,\"rgb(89, 134, 162)\":1,\"rgb(159, 125, 61)\":1,\"rgb(100, 117, 164)\":1,\"rgb(163, 140, 78)\":1,\"rgb(111, 144, 161)\":1,\"rgb(143, 150, 88)\":1,\"rgb(131, 116, 150)\":1,\"rgb(158, 97, 88)\":1,\"rgb(126, 151, 98)\":1,\"rgb(147, 126, 157)\":1,\"rgb(121, 141, 85)\":1,\"rgb(125, 142, 81)\":1,\"rgb(157, 104, 80)\":1,\"rgb(145, 129, 85)\":1,\"rgb(104, 163, 148)\":1,\"rgb(71, 121, 101)\":1,\"rgb(133, 104, 64)\":1,\"rgb(103, 138, 155)\":1,\"rgb(156, 139, 83)\":1,\"rgb(130, 118, 157)\":1,\"rgb(111, 149, 107)\":1,\"rgb(164, 139, 73)\":1,\"rgb(124, 37, 41)\":1,\"rgb(137, 158, 108)\":1,\"rgb(161, 110, 100)\":1,\"rgb(128, 161, 138)\":1,\"rgb(154, 133, 175)\":1,\"rgb(66, 126, 138)\":1,\"rgb(159, 137, 94)\":1,\"rgb(142, 110, 98)\":1,\"rgb(89, 133, 71)\":1,\"rgb(157, 113, 134)\":1,\"rgb(107, 132, 163)\":1,\"rgb(175, 131, 127)\":1,\"rgb(165, 106, 104)\":1,\"rgb(173, 116, 112)\":1,\"rgb(165, 131, 95)\":1,\"rgb(211, 220, 240)\":1,\"rgb(146, 118, 149)\":1,\"rgb(156, 126, 76)\":1,\"rgb(130, 96, 127)\":1,\"rgb(100, 138, 127)\":1,\"rgb(160, 133, 96)\":1,\"rgb(128, 130, 165)\":1,\"rgb(168, 110, 110)\":13,\"rgb(183, 135, 131)\":9,\"rgb(166, 107, 108)\":1,\"rgb(97, 125, 164)\":8,\"rgb(127, 147, 173)\":1,\"rgb(127, 129, 130)\":7,\"rgb(143, 121, 158)\":1,\"rgb(129, 155, 109)\":5,\"rgb(98, 151, 131)\":2,\"rgb(185, 135, 93)\":3,\"rgb(178, 151, 91)\":2,\"rgb(115, 159, 153)\":4,\"rgb(186, 146, 125)\":3,\"rgb(178, 132, 111)\":1,\"rgb(171, 140, 106)\":1,\"rgb(117, 141, 118)\":1,\"rgb(174, 108, 132)\":1,\"rgb(178, 158, 104)\":1,\"rgb(135, 155, 132)\":2,\"rgb(217, 180, 106)\":459,\"rgb(179, 163, 90)\":219,\"rgb(63, 107, 106)\":182,\"rgb(109, 143, 98)\":172,\"rgb(47, 74, 87)\":594,\"rgb(84, 90, 94)\":61}"
+    },
+    {
+      "name": "home market counts the goods traded of 60",
+      "passed": true,
+      "detail": "45 of 60 goods traded"
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no uncaught exceptions",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no failed resource loads",
+      "passed": true,
+      "detail": "[]"
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "docs/images/p7/p7-844x390-labour-market.png",
+    "docs/images/p7/p7-844x390-labour-rows.png",
+    "docs/images/p7/p7-844x390-minimum-wage.png",
+    "docs/images/p7/p7-844x390-population-professions.png",
+    "docs/images/p7/p7-844x390-mobility.png",
+    "docs/images/p7/p7-844x390-province-labour.png",
+    "docs/images/p7/p7-844x390-unemployment-lens.png"
+  ],
+  "figures": {
+    "secondsToFebruary": 79,
+    "unemployment": "3.9%",
+    "labourRows": 11,
+    "mobility": "Changed profession 7.58M Inside their province Moved province 2.64M Toward work, wages and housing Population blocks 13 created · 0 retired 20.8k blocks now Peasants −3.44M Laborers −709.0k Clerks +87",
+    "lensFills": {
+      "rgb(95, 148, 144)": 1,
+      "rgb(156, 90, 94)": 1,
+      "rgb(109, 112, 117)": 1,
+      "rgb(74, 108, 156)": 1,
+      "rgb(86, 119, 95)": 1,
+      "rgb(163, 88, 119)": 1,
+      "rgb(75, 138, 118)": 1,
+      "rgb(168, 138, 72)": 1,
+      "rgb(111, 143, 92)": 1,
+      "rgb(176, 119, 74)": 1,
+      "rgb(127, 103, 150)": 1,
+      "rgb(162, 89, 90)": 1,
+      "rgb(95, 134, 171)": 1,
+      "rgb(111, 106, 160)": 1,
+      "rgb(168, 116, 95)": 1,
+      "rgb(90, 144, 184)": 1,
+      "rgb(140, 98, 130)": 1,
+      "rgb(106, 149, 121)": 1,
+      "rgb(94, 143, 152)": 1,
+      "rgb(127, 156, 102)": 1,
+      "rgb(154, 117, 80)": 1,
+      "rgb(102, 160, 163)": 1,
+      "rgb(160, 88, 87)": 1,
+      "rgb(89, 134, 162)": 1,
+      "rgb(159, 125, 61)": 1,
+      "rgb(100, 117, 164)": 1,
+      "rgb(163, 140, 78)": 1,
+      "rgb(111, 144, 161)": 1,
+      "rgb(143, 150, 88)": 1,
+      "rgb(131, 116, 150)": 1,
+      "rgb(158, 97, 88)": 1,
+      "rgb(126, 151, 98)": 1,
+      "rgb(147, 126, 157)": 1,
+      "rgb(121, 141, 85)": 1,
+      "rgb(125, 142, 81)": 1,
+      "rgb(157, 104, 80)": 1,
+      "rgb(145, 129, 85)": 1,
+      "rgb(104, 163, 148)": 1,
+      "rgb(71, 121, 101)": 1,
+      "rgb(133, 104, 64)": 1,
+      "rgb(103, 138, 155)": 1,
+      "rgb(156, 139, 83)": 1,
+      "rgb(130, 118, 157)": 1,
+      "rgb(111, 149, 107)": 1,
+      "rgb(164, 139, 73)": 1,
+      "rgb(124, 37, 41)": 1,
+      "rgb(137, 158, 108)": 1,
+      "rgb(161, 110, 100)": 1,
+      "rgb(128, 161, 138)": 1,
+      "rgb(154, 133, 175)": 1,
+      "rgb(66, 126, 138)": 1,
+      "rgb(159, 137, 94)": 1,
+      "rgb(142, 110, 98)": 1,
+      "rgb(89, 133, 71)": 1,
+      "rgb(157, 113, 134)": 1,
+      "rgb(107, 132, 163)": 1,
+      "rgb(175, 131, 127)": 1,
+      "rgb(165, 106, 104)": 1,
+      "rgb(173, 116, 112)": 1,
+      "rgb(165, 131, 95)": 1,
+      "rgb(211, 220, 240)": 1,
+      "rgb(146, 118, 149)": 1,
+      "rgb(156, 126, 76)": 1,
+      "rgb(130, 96, 127)": 1,
+      "rgb(100, 138, 127)": 1,
+      "rgb(160, 133, 96)": 1,
+      "rgb(128, 130, 165)": 1,
+      "rgb(168, 110, 110)": 13,
+      "rgb(183, 135, 131)": 9,
+      "rgb(166, 107, 108)": 1,
+      "rgb(97, 125, 164)": 8,
+      "rgb(127, 147, 173)": 1,
+      "rgb(127, 129, 130)": 7,
+      "rgb(143, 121, 158)": 1,
+      "rgb(129, 155, 109)": 5,
+      "rgb(98, 151, 131)": 2,
+      "rgb(185, 135, 93)": 3,
+      "rgb(178, 151, 91)": 2,
+      "rgb(115, 159, 153)": 4,
+      "rgb(186, 146, 125)": 3,
+      "rgb(178, 132, 111)": 1,
+      "rgb(171, 140, 106)": 1,
+      "rgb(117, 141, 118)": 1,
+      "rgb(174, 108, 132)": 1,
+      "rgb(178, 158, 104)": 1,
+      "rgb(135, 155, 132)": 2,
+      "rgb(217, 180, 106)": 459,
+      "rgb(179, 163, 90)": 219,
+      "rgb(63, 107, 106)": 182,
+      "rgb(109, 143, 98)": 172,
+      "rgb(47, 74, 87)": 594,
+      "rgb(84, 90, 94)": 61
+    }
+  },
+  "finishedAt": "2026-11-13T01:41:12.706Z"
+}

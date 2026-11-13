@@ -234,7 +234,9 @@ describe("M14 current documentation and protocol", () => {
     // 22: sparse market prices, compact price rows, goods groups, SET_MARKET_FOCUS,
     //     metal-standard and currency actions, country resources (P5b, D-151).
     // 23: households section, province dwellings and crowding columns (P6, D-153).
-    expect(PROTOCOL_VERSION).toBe(23);
+    // 24: labour-market section, profession groups, province unemployment column, focused
+    //     province labour rows and the monthly mobility report (P7, D-156).
+    expect(PROTOCOL_VERSION).toBe(24);
   });
 
   test("the monetary terminology audit passes", () => {

@@ -210,7 +210,8 @@ describe("map modes", () => {
   const context = contextFor(null);
 
   test("every mode is registered with the same interface", () => {
-    // P2 adds the four province data lenses; P5 (D-143) the harvest lens; P6 (D-153) the crowding lens.
+    // P2 adds the four province data lenses; P5 (D-143) the harvest lens; P6 (D-153) the crowding
+    // lens; P7 (D-156) the unemployment lens.
     expect(Object.keys(MAP_MODES).sort()).toEqual([
       "control",
       "crowding",
@@ -219,6 +220,7 @@ describe("map modes", () => {
       "literacy",
       "markets",
       "political",
+      "unemployment",
       "unrest",
       "urban",
     ]);
