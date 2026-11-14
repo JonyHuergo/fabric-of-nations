@@ -10052,3 +10052,303 @@ day to 2.4 s at `4bec918`. That figure is no longer a working budget. Proposed, 
   integrity failure) unchanged; D-155 made the same adjustment for the same reason. The suite
   passes (11 of 11) after the change; the full run above had these 3 failures besides the
   eleven known ones.
+
+## D-158 (performance) — The 1900-world day, second stage: a columnar account table, per-day measures, typed results; the 5× target and threads
+
+**Status:** designer's task of 2026-11-13 (continued), branch `perf/day-5x`, after D-157. The designer's
+permissions for this stage: change anything needed for 5× (save schema, serialization, summation order,
+pinned hashes, worker threads), with the AGENTS.md hard rules, mobile-first delivery, pnpm and LF still
+binding. **The 5× target is not met** (see "Target"); the threads step needs the designer's decision
+(see "Threads").
+**Amends:** D-133, D-137, D-139, D-157 (finance index); P5b A11 (budget, below); D-155 (test helpers).
+
+### Decision
+
+1. **Columnar account table (`economy/accountTable.ts`).** `FinanceState.accounts` is an `AccountTable`:
+   typed columns (`id`, `ownerKind`, `ownerId`, `subtype`, `balance`) indexed by position, a `count`,
+   capacity for appends. Positions follow ascending id (`appendAccount` rejects an id that does not
+   ascend; `accountTableFromRecords` sorts and rejects duplicates), so an id lookup is a dense position
+   table or a binary search. The category is derived from the subtype (`CATEGORY_OF_SUBTYPE`, filled from
+   the subtype rule of `accounts.ts`), so an account can no longer carry a contradicting category.
+   `FinancialAccount` remains as a thin view: `accountView`/`index.get`/`find`/`account` return a
+   prototype-accessor view (cheap, no state of its own; `toJSON` gives the record); `listAccounts` gives
+   own-property views (a spread or `toEqual` sees the fields) for tests and diagnostics;
+   `readAccountRow` reads a position into one reused row for whole-table scans. A truncation
+   (`truncateAccounts`, a failed currency action's staged appends) bumps a per-table generation so a
+   cached index cannot outlive it.
+2. **Finance index over typed tables (`accounts.ts`).** Position by id (Int32Array), owner tables per
+   (owner kind, subtype) (Int32Array, the D-080 external-counterparty duplicates excepted, owners
+   without a dense id in a small map), cash positions, subtype positions on demand. The former id and
+   owner maps of every account (two 481k-entry maps, retained between phases) are gone. Appends extend
+   the cached index (block creation during migration); every lookup of an index is bounded by its own
+   count, so an index handed out earlier answers as it did (D-157's rule, kept).
+3. **Hot paths read the columns.** `postJournalColumns` checks lines from the codes (category, cash,
+   semantic matrix as a per-kind mask by subtype; the view and message are built only for a failing
+   line); batch affordability and application write `balance` directly; settlement reads balances by
+   position (opening cash, wages, upkeep, producers, households) and posts domestic service and upkeep
+   as journal columns (the same lines, order, batches and checks; `domestic-service` has no structure
+   check); the month-end close builds its closing entries from positions; validation checks rows from
+   their codes (the full check runs only for a row that fails); the worker's household and ledger
+   snapshots read the table instead of building a map of every account.
+4. **Per-day block totals (`population/blockTotals.ts`, plan step 3).** `runEconomicDay` measures each
+   block's persons and working-age persons after the day's demography (again after the monthly labour
+   phase and after a military phase that returned people) and passes them explicitly to household
+   demand, needs, housing, fiscal, training, education, monetary, unrest, the employment check and the
+   day result. Sums of integer cells are exact in any order. The record is derived, never stored.
+5. **Typed needs result (plan step 2).** The needs result has `columns` (per block and tier: active, met,
+   costs, spending, calories) in every detail; the per-block objects are built in full detail only.
+   `needsReader` serves the counters, militancy and wealth from either form.
+6. **Month start (plan step 6).** Largest-remainder apportionment reads tie keys only for the run of
+   equal remainders at the cut and finds the cut with a numeric sort (same allocation for a pure tie
+   function; regression test against the full ordering); migration filters candidate provinces once per
+   (profession, owner), keeps expected incomes in a typed memo and destination persons between moves;
+   the employment refresh uses numeric employer keys.
+7. **Smaller exact changes.** `tierMet` flags per block computed at each totals refresh (market); typed
+   eligibility slots by block id (market); production demands from per-definition purchase specs; the
+   training phase shares its wage table with the education derivation (it was rebuilt per country);
+   trade dispatch builds a lot list only after the margin allows a shipment; settlement wage lookups in
+   id-indexed tables.
+8. **Earlier commits of this stage (9dd9803, 207d1c3).** Market settlement posts each market's
+   money flows (one journal entry per market and kind, amounts summed per account over goods, in
+   flow order) instead of entries built from the canonical transaction list; wages in columns; a
+   single-pass employment check; typed demand rows; needs and education allocations in typed
+   arrays; production sorts. These change the summation order (see "Equivalence"). A market-day
+   result without its flow columns (a copy: the flows are a non-enumerable companion) is settled
+   from its own transaction list, validated first, so hand-built or altered results are still
+   checked (the M3e duplicate and invalid-buyer tests).
+
+### Save schema and migration
+
+**No save change, no migration.** The save already stored accounts as columns without a category
+(schema 35); the account table encodes to exactly that form (`accountRecords` → the same
+columns) and decodes from it (`decodeAccountTable`: ascending ids, duplicates rejected, category
+derived). `WORLD_SCHEMA_VERSION` stays 35, and saves written by `4bec918` or `8e26f4a` load
+unchanged. This deviates from the plan's "new save schema with a version bump": the columnar
+account table did not need one, and the population cells, lots and employment (which would) were
+not made columnar in this stage (see "Consequences"). `SIM_VERSION` stays 0.31.0 (see open items).
+
+### Equivalence
+
+Harness `packages/bench/scratch/equiv.mjs` (not committed): load a save, run one phase-mode day
+with the frozen reference build and with this build, compare every population cell, block scalar,
+account balance, lot, employment entry, market price and stock, country and fiscal field, the
+calendar and the ledger. Metric: |x − y| / max(1, |x|, |y|) (an absolute difference below 1).
+Saves of days 2, 30 (the first month end) and 31 (the first month start), regenerated from
+`8e26f4a` (start hashes `ace825f288e7d104`, `7aa3a9fa23552fc4`, `ac6eb8ef4931a5a1`).
+
+- **Against `8e26f4a`** (D-157's head, rebuilt from its sources): every compared quantity within
+  1e-9 on all three days. Largest differences: account balances 7.4e-16 (day 2), 4.6e-13 (day 30,
+  an owner-equity account of 0.61 RUSD), 1.5e-11 (day 31, a household-cash account of 1e-6 RUSD);
+  smoothed block income 2.1e-16; everything else identical. The ledger differs in shape, not in
+  balances: the posting count (161,243 → 161,320 on day 2) and the posting rows, because market
+  settlement aggregates its postings differently (item 8); the harness reports ledger rows for
+  information against this reference.
+- **Against `207d1c3`** (this stage's WIP head before this session's changes), strict (ledger
+  rows included): identical on all three days (every field, 10,148 audited postings on day 2).
+- **Hashes.** `pinhashes` (perf-hash-equality's procedure) gives the same hashes at 0, 1, 31, 52
+  and 53 ticks and the same day-53 failure for this build and `207d1c3`; day 0 equals `4bec918`.
+
+### Measurements (desktop; not a device measurement)
+
+Environment: AMD Ryzen 5 2600 (6 cores, 12 threads), 7.9 GB RAM, Windows 11 Pro 10.0.26200,
+Node v24.22.1, `--max-old-space-size=4096`; nothing else running. Each figure is the median of
+3 runs. Baseline = `4bec918`, D-157's figures on this desktop with the same procedures (D-157's
+"Baseline" columns); after = this branch at the commit of this entry.
+
+**Ordinary days 2–11 (perfPhases `2 12`, ms per day)**
+
+| Phase | Baseline | After | Ratio |
+|---|---:|---:|---:|
+| settlement | 561.4 | 238.3 | 2.36× |
+| market-clearing | 506.3 | 403.8 | 1.25× |
+| market-household-demand | 306.7 | 160.7 | 1.91× |
+| employment | 147.5 | 45.4 | 3.25× |
+| demography | 146.2 | 123.9 | 1.18× |
+| training | 98.6 | 28.9 | 3.41× |
+| needs | 92.2 | 48.4 | 1.90× |
+| education | 86.3 | 51.0 | 1.69× |
+| trade-dispatch | 72.8 | 93.1 | 0.78× |
+| fiscal | 69.6 | 58.3 | 1.19× |
+| market-production-demand | 64.3 | 42.1 | 1.53× |
+| migration (post-labour check) | 64.3 | 0.0 | – |
+| unrest | 30.8 | 23.3 | 1.32× |
+| politics | 25.4 | 24.2 | 1.05× |
+| finance-close | 21.0 | 13.6 | 1.54× |
+| invariants-end | 20.3 | 9.0 | 2.26× |
+| ai | 17.9 | 5.3 | 3.38× |
+| invariants-start | 15.5 | 5.2 | 2.98× |
+| monetary | 14.9 | 6.3 | 2.37× |
+| fingerprint | 14.4 | 11.5 | 1.25× |
+| debt | 13.0 | 7.0 | 1.86× |
+| others (each < 5) | 15.3 | 11.0 | – |
+| **Mean day** | **2,405.6** | **1,402.3** | **1.72×** |
+
+Runs after: 1,397.0 / 1,463.6 / 1,402.3; worst day of the window 1,557 ms (median). Trade
+dispatch is slower than at `4bec918` (93 against 73 ms; D-157 measured 70); not investigated.
+
+**Whole month, days 0–31 (perfPhases `0 32`, ms per day; baseline: D-157's JSON probe, the same
+loop)**
+
+| Phase | Baseline | After | Ratio |
+|---|---:|---:|---:|
+| market-clearing | 538.4 | 422.4 | 1.27× |
+| migration (the monthly labour phase) | 524.9 | 76.5 | 6.86× |
+| settlement | 521.9 | 234.6 | 2.22× |
+| market-household-demand | 304.2 | 159.3 | 1.91× |
+| employment | 168.9 | 58.1 | 2.91× |
+| demography | 153.3 | 126.2 | 1.21× |
+| training | 98.7 | 29.5 | 3.35× |
+| needs | 91.1 | 49.1 | 1.86× |
+| trade-dispatch | 88.8 | 94.7 | 0.94× |
+| education | 80.4 | 45.4 | 1.77× |
+| fiscal | 67.8 | 57.5 | 1.18× |
+| market-production-demand | 64.4 | 40.1 | 1.61× |
+| finance-close | 48.6 | 29.0 | 1.68× |
+| politics | 37.0 | 36.6 | 1.01× |
+| unrest | 31.6 | 20.8 | 1.52× |
+| validate-month-end | 29.9 | 12.9 | 2.32× |
+| ai | 23.8 | 7.1 | 3.35× |
+| wealth | 15.6 | 1.5 | 10.4× |
+| others (each < 12) | 103.7 | 55.9 | – |
+| **Mean day** | **3,027.2** | **1,562.6** | **1.94×** |
+
+Runs after: 1,565.8 / 1,549.1 / 1,562.6. Worst day (day 31, 1 February 1900, the first monthly
+labour phase): 18,654 → 4,687 ms (runs 4,687 / 4,710 / 4,669), 3.98×. Day 30 (the first month
+end, perfBench host day): 5,426 → 2,819 ms, 1.92×.
+
+**perfBench** (`node --max-old-space-size=4096 dist/perfBench.js 52`, medians of 3; baseline →
+after): host STEP day (tick + snapshot + JSON) mean 3,268 → 1,892 ms (1.73×); its tick 2,744 →
+1,581 ms (1.74×); snapshot build 517 → 303 ms (1.71×); ordinary host days 2,878 → 1,781 ms
+(1.62×); day 31 18,733 → 5,134 ms (3.65×); day 30 5,426 → 2,819 ms (1.92×); staged-mode tick
+5,848 → 2,811 ms (2.08×); new game (create + first checkpoint) 3,592 → 1,895 ms (1.90×); SAVE
+3,856 → 2,948 ms (1.31×); LOAD 4,083 → 2,538 ms (1.61×); heap used p50 360 MiB, max 504 MiB.
+Every run: hashes at days 1, 31, 32, 52 `4d77f5a066875b02`, `c9d106dbe6dbed6d`,
+`0828e7ffda61a1b5`, `5b100c8146d94453`; "two independent runs identical", "staged mode equals
+phase mode" and the save round trip PASS. Its throughput stage then stops on the day-53 failure,
+as at `4bec918` (no `--out` file).
+
+**Host throughput at the fastest speed** (perfBench's throughput loop from a new game, 30 days/s
+requested, days 0–32; `scratch/throughput.mjs`, not committed): 0.345 → 0.650 days/s (runs 0.651 /
+0.648 / 0.650), 1.88×.
+
+**Web app at its top speed (30×)** — `scripts/p7/playtest-labour.mjs` at 844 × 390, the web
+export, seconds from 1 January to February 1900: 82 s → 37 / 37 / 37 s (0.38 → 0.84 days/s),
+2.2×. 29/29 checks in each run; the in-game figures are unchanged (unemployment 3.9 %, 7.58 M
+changed profession, 2.64 M moved province, 13 blocks created). The evidence under
+`docs/images/p7` was restored afterwards. Not a device measurement.
+
+**Snapshot build** (Germany, first call and the median of 7 repeats, 3 runs): day 0 first call
+665 → 478 ms, repeat 491 → 291 ms (1.69×); day 33 first call 824 → 486 ms, repeat 503 → 286 ms.
+The worker's household and ledger sections read the account table instead of building a map of
+every account.
+
+**`pnpm bench`** (M1/M2 harness, 3 invocations, all PASS, p95 in ms of each invocation's first
+run, median; baseline → after): M1 empty world 0.008 → 0.010; M2 aggregate 0.070 → 0.069; stress
+200 blocks 2.98 → 2.62, 1,000 blocks 14.3 → 12.7, 3,000 blocks 49.8 → 39.3, 6,000 blocks 105.5 →
+82.0. The stress worlds have one household account per block, so the account table and the
+measured block totals reach them; the M1 and M2 aggregate differences are noise.
+
+**Where the savings came from (ordinary day, phase medians, after D-157 → after D-158).**
+Settlement 528 → 238 (column postings, balances by position, market flows); household demand
+242 → 161 and needs 95 → 48 (typed rows, measured totals, typed needs result); employment 104 →
+45 (single-pass check, numeric keys, measured totals); training 79 → 29 and education 63 → 51
+(shared wage table, measured totals); production demands 70 → 42 (purchase specs); invariants,
+AI, monetary and debt together 77 → 33 (no account maps). Garbage collection fell from about
+410 to about 210 ms per day and the live heap after a day from about 330 to about 176 MB
+(`scratch/gcdays.mjs`, `livesave.mjs`, single runs, under other load: indicative only).
+
+### Target
+
+**Not met.** Targets: ordinary day ≤ 481 ms, month mean ≤ 605 ms, app ≥ 1.9 days/s. After:
+1,402 ms (1.72×), 1,563 ms (1.94×), 0.84 days/s (2.2×). The month start is 3.98× faster. On the
+ordinary day the largest phases are now market clearing (404 ms, 29 %), settlement (238 ms),
+household demand (161 ms), demography (124 ms) and trade dispatch (93 ms); together they are 73 %
+of the day and each is a pass over hundreds of thousands of rows (lots, demand rows, settled
+flows, age cells) that is already columnar or nearly so. A single thread can still gain from
+columnar population cells and lots (demography, market clearing, the checkpoint, validation),
+perhaps another 1.3–1.6×; 5× needs the phases to run in parallel (see "Threads"). Work stopped
+here instead of cutting model detail.
+
+### Threads (plan step 5): not built; designer's decision needed
+
+The plan asked to check the phone's WebView path before relying on `SharedArrayBuffer`. It does
+not support it as built:
+
+- The phone runs the simulation in a hidden `react-native-webview` loaded with
+  `source={{ html: SIM_WORKER_HTML }}` (`packages/app/src/worker/NativeWorkerHost.tsx`). An inline
+  HTML document has no HTTP response, so it cannot carry `Cross-Origin-Opener-Policy` and
+  `Cross-Origin-Embedder-Policy`; the page is not cross-origin isolated, and browsers expose
+  `SharedArrayBuffer` only to isolated pages (Chrome's announcement of the requirement:
+  https://developer.chrome.com/blog/enabling-shared-array-buffer). Android WebView has
+  historically not offered it at all (Blink intent thread:
+  https://groups.google.com/a/chromium.org/g/blink-dev/c/xtyi6D52DkM). Not checked on a device.
+- A worker pool on web only would break the rule that whatever ships reaches iOS and Android
+  through the same code path, so none was built.
+
+Alternatives, for the designer:
+
+- **A. Workers with transferable buffers (no shared memory).** Each phase that splits (market
+  clearing by market, household demand and demography by block range, the month-start pressure
+  search by source) sends its typed input slices to dedicated workers, which return typed results;
+  `postMessage` with transfer lists moves `ArrayBuffer`s without copying and works in WKWebView
+  and Android WebView today. Needs the remaining state columnar (population cells, lots) so a
+  phase's input is a few buffers, not object graphs, and a deterministic merge in a fixed order
+  (results stay bit-identical to the single-threaded run when each summation keeps its order).
+  Same code path on web and phone. Largest change; recommended.
+- **B. Native threads.** A second JS runtime (JSI/worklets) or native code for the kernels;
+  different code per platform, breaks "same code path".
+- **C. Cross-origin isolation in the WebView.** Serve the worker page from a local origin with
+  COOP/COEP headers (a `WKURLSchemeHandler` on iOS, `WebViewAssetLoader` on Android), then use
+  `SharedArrayBuffer`. Depends on WebView versions that honour the headers; must be verified on
+  devices by the designer before anything relies on it.
+
+### A11 budget
+
+D-157's A11a guard (ordinary day ≤ 2,500 ms, month mean ≤ 2,700 ms, worst day ≤ 10,000 ms) is
+replaced, for the designer's acceptance, by about 1.15× this entry's figures:
+
+- **A11a, regression guard (reference desktop, Node, perfPhases, median of 3):** ordinary day
+  (days 2–11) ≤ 1,600 ms; whole first month (days 0–31) mean ≤ 1,800 ms; worst day of that month
+  ≤ 5,500 ms; a change that exceeds one of these reports why.
+- **A11b:** unchanged (phases that grow with the goods ≤ 2× their time), with this entry's
+  per-phase table as the reference.
+- **A11c, the 5× aim:** unchanged (ordinary day ≤ 481 ms, month mean ≤ 605 ms, app ≥ 1.9 days/s
+  on this desktop), scheduled with the threads route the designer chooses.
+
+### Consequences and open items
+
+- **Day 53 still fails** (23 February 1900, fiscal phase, a debit of -1.7014044923219608e-15
+  RUSD from an empty household-cash account). At `4bec918` the first failing account was 1368
+  (block 368); with the new summation order it is 1303 (block 303). Not fixed (designer's call);
+  the pin test records the new message.
+- **`SIM_VERSION` stays 0.31.0** although the results differ from `4bec918` in the last bits. The
+  determinism rule ties identical results to the simulation version; a bump to 0.32.0 would
+  reject saves of earlier builds and, because `hashWorld` encodes the version, move every pinned
+  world digest in the tests. Left for the designer to decide.
+- **Hash pins.** `determinism/perf-hash-equality.test.ts` now pins this branch's hashes at 0, 1,
+  31, 52 and 53 ticks (`685bf3c4ccf4f842`, `4d77f5a066875b02`, `c9d106dbe6dbed6d`,
+  `5b100c8146d94453`, `2fa36b1df11debff`) and the day-53 message, explaining the change.
+- **Tests changed** (none weakened): 51 test files read the account table through `listAccounts`,
+  `accountRecords` or `count`; fixtures build tables (`fixtures/accounts.ts`); "rejects an account
+  whose category does not match its subtype" checks the record boundary (`accountTableFromRecords`,
+  `appendAccount`), the only place a category can now arrive; the fiscal owner test corrupts the
+  owner column directly; the finance-index test compares the found account by id (lookups return
+  views). Rollback injections (`determinism/rollback.test.ts`): the employment check reads
+  `definitions.buildings` once (9dd9803), so on an ordinary day the reads after it moved down by
+  one; traced read by read, the injections 7, 5, 4, 4 became 6, 4, 3, 3 and fail at the same place
+  (settlement, production demands, capacity index), with their assertions unchanged. New tests:
+  `economy/apportion.test.ts` (20,000 cases against the full ordering), `money/account-table.test.ts`.
+- **Full `pnpm test`** (this commit's code, 6,371 s; 112 suites, 1,470 tests): 1,459 pass; the 11
+  failures are the eleven known failures of `main`, with the received values D-157 recorded
+  except one: tick-validation's 22-tick hash is now `9dfd323500a31f87` (D-157: `b37dad865f6ff868`;
+  the summation order, as above). Unchanged: replay empty-world digest `6aef674f9648abdd`; WPP 1950
+  `9aaedfa0cfabe4f6`; economy-roundtrip M3a `c7f29aa27a231428`; naming-audits 1900-world hash
+  `685bf3c4ccf4f842` (day 0); the four P2b money-calibration tests (`historical/p7/employment_1900.json`,
+  0, 0, 0.06354578421472346); demography-causes urban rows 5,687 of 20,739; world-1900 cotton
+  1.3558462628762207. No known-failure digest was re-pinned. `typecheck`, `lint`, both audits,
+  `check:worker`, `check:sim-deps`, `pnpm bench` and `pnpm app:export` (web, iOS, Android) pass.
+- **Plan steps not done:** population cells and block scalars, lots and employment are not
+  columnar (so no save schema change); the rollback checkpoint is not cheaper beyond what the
+  account table gives it (it is taken monthly; 1.9 ms per day over the month); no threads.
+- **`pnpm map:atlas:check`** still fails on `main` for its own reason; not run or changed here.
+- **Index heading:** headed like D-154 to D-157 so the index check passes.
