@@ -21,7 +21,6 @@ import { checksumOfJson } from "../hash.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { Day, Id, MoneyRUSD } from "../types.js";
 import {
-  requireArray,
   requireFiniteNumber,
   requireInteger,
   requireRecord,
@@ -43,6 +42,19 @@ import {
   type PublicTransactionKind,
   type TransactionKind,
 } from "./types.js";
+import {
+  ACCOUNT_OWNER_KINDS,
+  CATEGORY_OF_SUBTYPE,
+  NO_ACCOUNT_OWNER,
+  accountById,
+  accountPosition,
+  accountTableGeneration,
+  accountView,
+  cloneAccountTable,
+  isAccountTable,
+  registerSubtypeCategories,
+  type AccountTable,
+} from "./accountTable.js";
 
 /**
  * The explicit designated-cash set for I-2. Never substitute "every asset
@@ -392,7 +404,7 @@ export const FLOW_EXPENSE_SUBTYPE: Readonly<Record<FlowTransactionKind, AccountS
 export function assertFiscalPostingStructure(
   kind: "income-tax" | "welfare-transfer",
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   if (lines.length === 0) {
@@ -576,7 +588,7 @@ export function assertFiscalPostingStructure(
  */
 function assertPayrollPostingStructure(
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   expenseSubtype: AccountSubtype,
   incomeSubtype: AccountSubtype,
   label: string,
@@ -678,7 +690,7 @@ function assertPayrollPostingStructure(
 /** Enforce the M8 administration-payroll structure. */
 export function assertAdministrationPostingStructure(
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   assertPayrollPostingStructure(
@@ -694,7 +706,7 @@ export function assertAdministrationPostingStructure(
 /** Enforce the M9 education-payroll structure. */
 export function assertEducationPostingStructure(
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   assertPayrollPostingStructure(
@@ -710,7 +722,7 @@ export function assertEducationPostingStructure(
 /** Enforce the E5 training payroll/stipend structure. */
 export function assertTrainingPostingStructure(
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   assertPayrollPostingStructure(
@@ -737,7 +749,7 @@ export function assertTrainingPostingStructure(
  */
 export function assertBusinessTaxPostingStructure(
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   if (lines.length === 0) {
@@ -837,7 +849,7 @@ export function assertConstructionPostingStructure(
     | "construction-writeoff"
     | "construction-working-capital",
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   if (lines.length === 0) throw new RangeError(`${path} must contain construction lines`);
@@ -965,7 +977,7 @@ export function assertIndustrialPostingStructure(
     | "production-subsidy"
     | "public-enterprise-capital-contribution",
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   if (lines.length === 0) throw new RangeError(`${path} must contain industrial lines`);
@@ -1074,7 +1086,7 @@ export function assertMonetaryPostingStructure(
     | "fx-redemption"
     | "fx-revaluation",
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   const patterns: Readonly<Record<string, readonly (readonly string[])[]>> = {
@@ -1172,7 +1184,7 @@ export function assertMonetaryPostingStructure(
 export function assertMintPostingStructure(
   kind: "mint-purchase" | "mint-sale" | "metal-revaluation",
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   const patterns: Readonly<Record<string, readonly (readonly string[])[]>> = {
@@ -1237,7 +1249,7 @@ export function assertMintPostingStructure(
  */
 export function assertOwnerCapitalInjectionStructure(
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   if (lines.length !== 2 && lines.length !== 4) {
@@ -1332,7 +1344,7 @@ export function assertOwnerCapitalInjectionStructure(
 export function assertTradePostingStructure(
   kind: "trade-freight" | "customs-duty",
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   if (lines.length !== 4) {
@@ -1404,7 +1416,7 @@ export function assertTradePostingStructure(
 export function assertMilitaryPostingStructure(
   kind: "military-pay" | "military-procurement",
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   if (lines.length !== 4) {
@@ -1488,7 +1500,7 @@ export function assertMilitaryPostingStructure(
 export function assertProfitAllocationStructure(
   kind: ProfitAllocationKind,
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   if (lines.length === 0) throw new RangeError(`${path} must contain profit-allocation lines`);
@@ -1652,7 +1664,7 @@ export function isDebtPostingKind(value: string): value is DebtPostingKind {
 export function assertDebtPostingStructure(
   kind: DebtPostingKind,
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<Id, FinancialAccount>,
+  accounts: AccountsById,
   path = "journal posting",
 ): void {
   if (lines.length === 0) throw new RangeError(`${path} must contain debt lines`);
@@ -1878,6 +1890,11 @@ function semanticRuleAllows(kind: TransactionKind, subtype: AccountSubtype, side
   return (mask & (side === "debit" ? 1 : 2)) !== 0;
 }
 
+/** `semanticRuleAllows` by subtype code (D-158 column posting path). */
+export function semanticRuleAllowsCode(kind: TransactionKind, subtypeCodeValue: number, side: JournalSide): boolean {
+  return semanticRuleAllows(kind, ACCOUNT_SUBTYPES[subtypeCodeValue] as AccountSubtype, side);
+}
+
 /**
  * The D-047 semantic-matrix violation of one line, or null when the line is allowed.
  * Separate from `assertSemanticJournalLine` so the posting hot path builds the line
@@ -1922,7 +1939,7 @@ export function cloneFinanceState(
   options: { readonly shareImmutableSummaries?: boolean } = {},
 ): FinanceState {
   return {
-    accounts: finance.accounts.map((account) => ({ ...account })),
+    accounts: cloneAccountTable(finance.accounts),
     postings: finance.postings.map((posting) => ({
       ...posting,
       lines: posting.lines.map((line) => ({ ...line })),
@@ -2092,10 +2109,49 @@ export function assertOwnerEquityTallies(tallies: Iterable<OwnerEquityTally>): v
  */
 export function assertOwnerEquityInvariant(finance: FinanceState): void {
   const tallies = new Map<number | string, OwnerEquityTally>();
-  for (const value of requireArray(finance.accounts, "finance.accounts")) {
-    tallyOwnerEquity(tallies, value as FinancialAccount);
+  const table = requireAccountTable(finance.accounts);
+  for (let position = 0; position < table.count; position += 1) {
+    tallyOwnerEquityAt(tallies, table, position);
   }
   assertOwnerEquityTallies(tallies.values());
+}
+
+/** The account table of a finance state, or a TypeError (validation boundary, D-158). */
+export function requireAccountTable(value: unknown): AccountTable {
+  if (!isAccountTable(value)) throw new TypeError("finance.accounts must be an account table");
+  if (!Number.isInteger(value.count) || value.count < 0 || value.count > value.id.length) {
+    throw new RangeError("finance.accounts.count is invalid");
+  }
+  return value;
+}
+
+const EQUITY_CATEGORY_CODES = {
+  revenue: ACCOUNT_CATEGORIES.indexOf("revenue"),
+  expense: ACCOUNT_CATEGORIES.indexOf("expense"),
+};
+const OWNER_EQUITY_SUBTYPE_CODE = ACCOUNT_SUBTYPES.indexOf("owner-equity");
+
+/** `tallyOwnerEquity` for the account at a table position (D-158). */
+export function tallyOwnerEquityAt(
+  tallies: Map<number | string, OwnerEquityTally>,
+  table: AccountTable,
+  position: number,
+): void {
+  const kind = ACCOUNT_OWNER_KINDS[table.ownerKind[position] ?? 0] as FinancialAccountOwnerKind;
+  const rawOwner = table.ownerId[position] ?? NO_ACCOUNT_OWNER;
+  const ownerId = rawOwner === NO_ACCOUNT_OWNER ? null : rawOwner;
+  const key = ownerEquityKey(kind, ownerId);
+  let tally = tallies.get(key);
+  if (tally === undefined) {
+    tally = { ownerKind: kind, ownerId, requiresEquity: false, equityAccountCount: 0 };
+    tallies.set(key, tally);
+  }
+  const subtype = table.subtype[position] ?? 0;
+  const category = CATEGORY_OF_SUBTYPE[subtype] ?? 0;
+  if (category === EQUITY_CATEGORY_CODES.revenue || category === EQUITY_CATEGORY_CODES.expense) {
+    tally.requiresEquity = true;
+  }
+  if (subtype === OWNER_EQUITY_SUBTYPE_CODE) tally.equityAccountCount += 1;
 }
 
 /**
@@ -2123,37 +2179,20 @@ export interface AccountingTotals {
 
 /** Sum authoritative balances by category. Never clamps or repairs. */
 export function accountingTotals(finance: FinanceState): AccountingTotals {
-  const accounts = requireArray(finance.accounts, "finance.accounts");
-  let assets = 0;
-  let liabilities = 0;
-  let equity = 0;
-  let revenues = 0;
-  let expenses = 0;
-  for (let index = 0; index < accounts.length; index += 1) {
-    const account = accounts[index] as FinancialAccount;
-    const balance = account.balanceRUSD;
-    // `requireFiniteNumber`'s check and message, built only on failure (D-137).
-    if (typeof balance !== "number" || !Number.isFinite(balance)) {
-      throw new TypeError(`account ${String(account.id)}.balanceRUSD must be a finite number`);
+  const table = requireAccountTable(finance.accounts);
+  // Category sums in position order (= id order, the former array order).
+  const sums = [0, 0, 0, 0, 0];
+  const balances = table.balance;
+  const subtypes = table.subtype;
+  for (let position = 0; position < table.count; position += 1) {
+    const balance = balances[position] ?? 0;
+    if (!Number.isFinite(balance)) {
+      throw new TypeError(`account ${String(table.id[position])}.balanceRUSD must be a finite number`);
     }
-    switch (account.category) {
-      case "asset":
-        assets += balance;
-        break;
-      case "liability":
-        liabilities += balance;
-        break;
-      case "equity":
-        equity += balance;
-        break;
-      case "revenue":
-        revenues += balance;
-        break;
-      case "expense":
-        expenses += balance;
-        break;
-    }
+    const category = CATEGORY_OF_SUBTYPE[subtypes[position] ?? 0] ?? 0;
+    sums[category] = (sums[category] ?? 0) + balance;
   }
+  const [assets = 0, liabilities = 0, equity = 0, revenues = 0, expenses = 0] = sums;
   return { assets, liabilities, equity, revenues, expenses, netWorth: assets - liabilities };
 }
 
@@ -2179,17 +2218,16 @@ export function assertAccountingIdentity(finance: FinanceState): AccountingTotal
  * implemented in M4a-1.
  */
 export function designatedCashTotal(finance: FinanceState): MoneyRUSD {
-  const accounts = requireArray(finance.accounts, "finance.accounts") as FinancialAccount[];
+  const table = requireAccountTable(finance.accounts);
   let total = 0;
-  // D-137: the cached designated-cash accounts, in array order (the order the scan
-  // of every account summed them in).
-  const cash = accountLookup(accounts).cash;
+  // D-137: the cached designated-cash positions, in id order (the order the scan of every
+  // account summed them in).
+  const cash = financeIndexOfTable(table).cashPositions();
   for (let index = 0; index < cash.length; index += 1) {
-    const account = cash[index] as FinancialAccount;
-    const balance = account.balanceRUSD;
-    // `requireFiniteNumber`'s check and message, built only on failure (D-137).
-    if (typeof balance !== "number" || !Number.isFinite(balance)) {
-      throw new TypeError(`account ${String(account.id)}.balanceRUSD must be a finite number`);
+    const position = cash[index] ?? 0;
+    const balance = table.balance[position] ?? 0;
+    if (!Number.isFinite(balance)) {
+      throw new TypeError(`account ${String(table.id[position])}.balanceRUSD must be a finite number`);
     }
     total += balance;
   }
@@ -2198,9 +2236,13 @@ export function designatedCashTotal(finance: FinanceState): MoneyRUSD {
 
 /** Transient owner/subtype lookup. Never serialized, never authoritative. */
 export interface FinanceIndex {
-  readonly accounts: readonly FinancialAccount[];
-  readonly byId: ReadonlyMap<Id, FinancialAccount>;
-  /** The account with this id (`byId.get`), through a dense id table when ids are dense (D-137). */
+  /** The account table this index answers for (D-158). */
+  readonly accounts: AccountTable;
+  /** Number of accounts the index was built with; later appends are not part of it. */
+  readonly count: number;
+  /** Accounts by id, as live views (D-158: no map of every account). */
+  readonly byId: AccountsById;
+  /** The account with this id as a live view (`byId.get`). */
   account(id: Id): FinancialAccount | undefined;
   /** Look up exactly one account for an owner and subtype, or throw. */
   get(ownerKind: FinancialAccountOwnerKind, ownerId: Id | null, subtype: AccountSubtype): FinancialAccount;
@@ -2210,19 +2252,31 @@ export interface FinanceIndex {
     ownerId: Id | null,
     subtype: AccountSubtype,
   ): FinancialAccount | undefined;
+  /** Position of the owner's account of this subtype, or -1 (D-158). */
+  ownerPosition(ownerKind: FinancialAccountOwnerKind, ownerId: Id | null, subtype: AccountSubtype): number;
   /** Designated-cash accounts in stable id order. */
   cash(): readonly FinancialAccount[];
+  /** Positions of the designated-cash accounts in id order (D-158). */
+  cashPositions(): Int32Array;
+  /** Positions of the accounts of one subtype in id order (D-158; built on first use). */
+  subtypePositions(subtype: AccountSubtype): Int32Array;
   /**
-   * Position of the account with this id in `accounts`, or -1 (D-139). Typed-array
+   * Position of the account with this id in the table, or -1 (D-139). Typed-array
    * scratch over account positions replaces per-batch maps on the hot path.
    */
   position(id: Id): number;
   /**
    * Account id of `(ownerKind, ownerId, subtype)` for every owner id, -1 where the
-   * owner has no such account (D-139). Built once per index and subtype; ids, owners
-   * and subtypes never change after creation, so the table equals `find(...)?.id`.
+   * owner has no such account (D-139). Built once per index; ids, owners and subtypes
+   * never change after creation, so the table equals `find(...)?.id`.
    */
   ownerAccountIds(ownerKind: FinancialAccountOwnerKind, subtype: AccountSubtype): Int32Array;
+}
+
+/** Read access to accounts by id (a `Map` of accounts, or a finance index's `byId`). */
+export interface AccountsById {
+  get(id: Id): FinancialAccount | undefined;
+  has(id: Id): boolean;
 }
 
 const OWNER_KIND_CODES: Readonly<Record<FinancialAccountOwnerKind, number>> = {
@@ -2247,142 +2301,41 @@ export function accountOwnerKey(
   ownerId: Id | null,
   subtype: AccountSubtype,
 ): number | string {
-  return ownerKey(ownerKind, ownerId, subtype);
-}
-
-function ownerKey(
-  ownerKind: FinancialAccountOwnerKind,
-  ownerId: Id | null,
-  subtype: AccountSubtype,
-): number | string {
-  const subtypeCode = SUBTYPE_CODES.get(subtype);
+  const subtypeCodeValue = SUBTYPE_CODES.get(subtype);
   const ownerCode = ownerId === null ? 0 : ownerId + 1;
   if (
-    subtypeCode !== undefined &&
-    subtypeCode < 64 &&
+    subtypeCodeValue !== undefined &&
+    subtypeCodeValue < 64 &&
     Number.isInteger(ownerCode) &&
     ownerCode >= 0 &&
     ownerCode < NUMERIC_OWNER_KEY_LIMIT
   ) {
-    return (ownerCode * 64 + subtypeCode) * 4 + OWNER_KIND_CODES[ownerKind];
+    return (ownerCode * 64 + subtypeCodeValue) * 4 + OWNER_KIND_CODES[ownerKind];
   }
   return `${ownerKind}:${ownerId === null ? "-" : String(ownerId)}:${subtype}`;
 }
 
-/** Build the transient account index for one phase. O(accounts). */
-interface AccountLookupCache {
-  readonly length: number;
-  readonly byId: Map<Id, FinancialAccount>;
-  readonly byOwner: Map<number | string, FinancialAccount>;
-  readonly bySubtype: Map<AccountSubtype, FinancialAccount[]>;
-  /** Designated-cash accounts in array order (D-137; subtypes never change). */
-  readonly cash: FinancialAccount[];
+/** The account with this id, as a live view. */
+export function findAccountById(accounts: AccountTable, accountId: Id): FinancialAccount | undefined {
+  return accountById(accounts, accountId);
 }
 
-/**
- * P2 derived lookup over an accounts array (D-133). Account ids, owners and
- * subtypes never change after creation and accounts are never removed, so a map
- * built for an array stays valid until accounts are appended; the cache is keyed by
- * the array object and rebuilt when its length changes. It returns the live account
- * objects, holds no authoritative state and cannot change any result: every caller
- * gets exactly the account a linear scan would find.
- */
-const accountLookupCache = new WeakMap<readonly FinancialAccount[], AccountLookupCache>();
-
-function accountLookup(accounts: readonly FinancialAccount[]): AccountLookupCache {
-  const cached = accountLookupCache.get(accounts);
-  if (cached !== undefined && cached.length === accounts.length) return cached;
-  const byId = new Map<Id, FinancialAccount>();
-  const byOwner = new Map<number | string, FinancialAccount>();
-  const bySubtype = new Map<AccountSubtype, FinancialAccount[]>();
-  const cash: FinancialAccount[] = [];
-  for (const account of accounts) {
-    if (!byId.has(account.id)) byId.set(account.id, account);
-    const key = ownerKey(account.ownerKind, account.ownerId, account.subtype);
-    if (!byOwner.has(key)) byOwner.set(key, account);
-    const list = bySubtype.get(account.subtype);
-    if (list === undefined) bySubtype.set(account.subtype, [account]);
-    else list.push(account);
-    if (isCashAccount(account)) cash.push(account);
-  }
-  const entry = { length: accounts.length, byId, byOwner, bySubtype, cash };
-  accountLookupCache.set(accounts, entry);
-  return entry;
-}
-
-/** The first account with this id, as `accounts.find` would return it. */
-export function findAccountById(
-  accounts: readonly FinancialAccount[],
-  accountId: Id,
-): FinancialAccount | undefined {
-  return accountLookup(accounts).byId.get(accountId);
-}
-
-/** The first account with this owner and subtype, as a linear `find` would return it. */
+/** The account with this owner and subtype, as a live view. */
 export function findAccountByOwner(
-  accounts: readonly FinancialAccount[],
+  accounts: AccountTable,
   ownerKind: FinancialAccountOwnerKind,
   ownerId: Id | null,
   subtype: AccountSubtype,
 ): FinancialAccount | undefined {
-  return accountLookup(accounts).byOwner.get(ownerKey(ownerKind, ownerId, subtype));
+  return financeIndexOfTable(accounts).find(ownerKind, ownerId, subtype);
 }
 
-/** All accounts of one subtype, in array order. */
-export function findAccountsBySubtype(
-  accounts: readonly FinancialAccount[],
-  subtype: AccountSubtype,
-): readonly FinancialAccount[] {
-  return accountLookup(accounts).bySubtype.get(subtype) ?? [];
-}
-
-/**
- * Built indexes per accounts array (D-133). An index is a read-only view whose
- * duplicate checks passed when it was built. Ids, owners and subtypes are immutable,
- * so a cached index always equals a fresh build.
- *
- * D-157: accounts are only ever appended, each creator taking `finance.nextAccountId`, so
- * new accounts have ids above every existing id. When the cached array has grown that
- * way, the cached index is extended instead of rebuilt (a month-start migration creates
- * blocks between its postings, and every rebuild of the 481k-account index, with its
- * cache entry, cost about a quarter of a second): the id map, the owner map and the dense
- * id table are shared and grow, the new accounts pass the duplicate checks a fresh build
- * applies (otherwise the fresh build runs and reports them), and a new index object
- * answers for the longer array. An index object handed out earlier answers exactly as it
- * did: its lookups are bounded by the largest id it was built with, its `byId` becomes a
- * view of its own entries, and it keeps its own cash list and lazily built tables. Any
- * other growth (an id that does not increase, a sparse id range) rebuilds as before.
- */
-interface FinanceIndexCore {
-  readonly accounts: readonly FinancialAccount[];
-  readonly byId: Map<Id, FinancialAccount>;
-  readonly byOwner: Map<number | string, FinancialAccount>;
-  /** Id-indexed table (shared; grows with the extension), or null for sparse ids. */
-  readonly dense: (FinancialAccount | undefined)[] | null;
-  maxId: number;
-}
-
-interface FinanceIndexCacheEntry {
-  length: number;
-  index: FinanceIndex;
-  /** Freezes `index` at its own accounts before the shared tables grow. */
-  retire: () => void;
-  cash: readonly FinancialAccount[];
-  readonly core: FinanceIndexCore;
-}
-
-const financeIndexCache = new WeakMap<readonly FinancialAccount[], FinanceIndexCacheEntry>();
-
-export function buildFinanceIndex(finance: FinanceState): FinanceIndex {
-  const cached = financeIndexCache.get(finance.accounts);
-  if (cached !== undefined && cached.length === finance.accounts.length) return cached.index;
-  if (cached !== undefined && cached.length < finance.accounts.length && extendFinanceIndex(cached)) {
-    return cached.index;
-  }
-  const accounts = requireArray(finance.accounts, "finance.accounts") as FinancialAccount[];
-  const entry = buildFinanceIndexEntry(accounts);
-  financeIndexCache.set(finance.accounts, entry);
-  return entry.index;
+/** All accounts of one subtype, in id order, as live views (positions cached per index). */
+export function findAccountsBySubtype(accounts: AccountTable, subtype: AccountSubtype): readonly FinancialAccount[] {
+  const positions = financeIndexOfTable(accounts).subtypePositions(subtype);
+  const found: FinancialAccount[] = new Array<FinancialAccount>(positions.length);
+  for (let item = 0; item < positions.length; item += 1) found[item] = accountView(accounts, positions[item] ?? 0);
+  return found;
 }
 
 /**
@@ -2390,276 +2343,229 @@ export function buildFinanceIndex(finance: FinanceState): FinanceIndex {
  * explicit monetary-state ids; they are the documented duplicate exception (D-080). They
  * are never looked up by owner/subtype.
  */
-function isPerCountryExternalAccount(account: FinancialAccount): boolean {
-  return (
-    account.ownerKind === "system" &&
-    (account.subtype === "external-cash" ||
-      account.subtype === "external-currency-holding" ||
-      account.subtype === "external-equity")
-  );
+const EXTERNAL_SUBTYPE_CODES: ReadonlySet<number> = new Set(
+  (["external-cash", "external-currency-holding", "external-equity"] as const).map(
+    (subtype) => SUBTYPE_CODES.get(subtype) as number,
+  ),
+);
+const CASH_SUBTYPE_CODES: ReadonlySet<number> = new Set(CASH_SUBTYPES.map((subtype) => SUBTYPE_CODES.get(subtype) as number));
+const SYSTEM_KIND_CODE = OWNER_KIND_CODES.system;
+
+/** True when the subtype code is a designated-cash subtype (D-158 hot paths). */
+export function isCashSubtypeCode(code: number): boolean {
+  return CASH_SUBTYPE_CODES.has(code);
 }
 
-function buildFinanceIndexEntry(accounts: readonly FinancialAccount[]): FinanceIndexCacheEntry {
-  const byId = new Map<Id, FinancialAccount>();
-  const byOwner = new Map<number | string, FinancialAccount>();
-  const cash: FinancialAccount[] = [];
-  for (const account of accounts) {
-    if (byId.has(account.id)) {
-      throw new RangeError(`duplicate finance account id ${String(account.id)}`);
-    }
-    byId.set(account.id, account);
-    const key = ownerKey(account.ownerKind, account.ownerId, account.subtype);
-    const perCountryExternalAccount = isPerCountryExternalAccount(account);
-    if (byOwner.has(key) && !perCountryExternalAccount) {
-      throw new RangeError(
-        `duplicate ${account.subtype} account for ${account.ownerKind} ${String(account.ownerId)}`,
-      );
-    }
-    if (!perCountryExternalAccount) byOwner.set(key, account);
-    if (isCashAccount(account)) cash.push(account);
-  }
-  cash.sort((left, right) => left.id - right.id);
-  // Account ids are allocated sequentially, so an id-indexed table is small; fall back
-  // to the map for sparse ids.
-  let maxId = 0;
-  for (const account of accounts) if (account.id > maxId) maxId = account.id;
-  const dense: (FinancialAccount | undefined)[] | null =
-    Number.isSafeInteger(maxId) && maxId <= accounts.length * 4 + 1024
-      ? new Array<FinancialAccount | undefined>(maxId + 1).fill(undefined)
-      : null;
-  if (dense !== null) for (const account of accounts) dense[account.id] = account;
-  const core: FinanceIndexCore = { accounts, byId, byOwner, dense, maxId };
-  const view = financeIndexView(core, maxId, cash);
-  return { length: accounts.length, index: view.index, retire: view.retire, cash, core };
-}
-
-/** D-157: extend the cached index by the appended accounts; false when a fresh build must run. */
-function extendFinanceIndex(entry: FinanceIndexCacheEntry): boolean {
-  const core = entry.core;
-  const accounts = core.accounts;
-  const dense = core.dense;
-  if (dense === null) return false;
-  const from = entry.length;
-  const to = accounts.length;
-  // Every check runs before a shared table changes.
-  let maxId = core.maxId;
-  const keys: (number | string)[] = [];
-  const newKeys = new Set<number | string>();
-  for (let position = from; position < to; position += 1) {
-    const account = accounts[position];
-    if (account === undefined || !Number.isSafeInteger(account.id) || !(account.id > maxId)) return false;
-    maxId = account.id;
-    const key = ownerKey(account.ownerKind, account.ownerId, account.subtype);
-    if (!isPerCountryExternalAccount(account)) {
-      if (core.byOwner.has(key) || newKeys.has(key)) return false;
-      newKeys.add(key);
-    }
-    keys.push(key);
-  }
-  if (!(maxId <= to * 4 + 1024)) return false;
-  entry.retire();
-  const added: FinancialAccount[] = [];
-  for (let position = from; position < to; position += 1) {
-    const account = accounts[position] as FinancialAccount;
-    core.byId.set(account.id, account);
-    if (!isPerCountryExternalAccount(account)) core.byOwner.set(keys[position - from] as number | string, account);
-    if (isCashAccount(account)) added.push(account);
-    while (dense.length < account.id) dense.push(undefined);
-    dense[account.id] = account;
-  }
-  core.maxId = maxId;
-  const cash = [...entry.cash, ...added];
-  cash.sort((left, right) => left.id - right.id);
-  const view = financeIndexView(core, maxId, cash);
-  entry.length = to;
-  entry.cash = cash;
-  entry.index = view.index;
-  entry.retire = view.retire;
-  return true;
-}
-
-/** The first `size` entries of a map whose later entries all have keys above `limitId`. */
-function boundedIdMap(
-  map: ReadonlyMap<Id, FinancialAccount>,
-  limitId: number,
-  size: number,
-): ReadonlyMap<Id, FinancialAccount> {
-  function* entries(): Generator<[Id, FinancialAccount]> {
-    let count = 0;
-    for (const entry of map) {
-      if (count >= size) return;
-      count += 1;
-      yield entry;
-    }
-  }
-  const view = {
-    get size(): number {
-      return size;
-    },
-    get(id: Id): FinancialAccount | undefined {
-      return id <= limitId ? map.get(id) : undefined;
-    },
-    has(id: Id): boolean {
-      return id <= limitId && map.has(id);
-    },
-    forEach(
-      callback: (value: FinancialAccount, key: Id, owner: ReadonlyMap<Id, FinancialAccount>) => void,
-      thisArg?: unknown,
-    ): void {
-      for (const [key, value] of entries()) {
-        callback.call(thisArg, value, key, view as unknown as ReadonlyMap<Id, FinancialAccount>);
-      }
-    },
-    entries,
-    *keys(): Generator<Id> {
-      for (const [key] of entries()) yield key;
-    },
-    *values(): Generator<FinancialAccount> {
-      for (const [, value] of entries()) yield value;
-    },
-    [Symbol.iterator]: entries,
-  };
-  return view as unknown as ReadonlyMap<Id, FinancialAccount>;
+/** Owner tables: one per (owner kind, subtype) code, owner id → position, or a map for unusual ids. */
+interface OwnerTables {
+  readonly dense: (Int32Array | undefined)[];
+  /** Positions of accounts whose owner id is null or not table-addressable, by owner key. */
+  readonly sparse: Map<number | string, number>;
 }
 
 /**
- * The index object over `core` as built for accounts with ids up to `limitId`. `retire`
- * freezes its `byId` at its own entries before the shared map grows (D-157).
+ * D-158 index core over a table at one count: the dense position of every id, the owner
+ * tables and the cash positions, all typed arrays (the former id and owner maps of every
+ * account are gone). Built once per table and count; a table that grew or was truncated
+ * gets a new core, and an index handed out earlier keeps answering for its own count.
  */
-function financeIndexView(
-  core: FinanceIndexCore,
-  limitId: number,
-  cash: readonly FinancialAccount[],
-): { readonly index: FinanceIndex; readonly retire: () => void } {
-  const { accounts, byOwner, dense } = core;
-  let byId: ReadonlyMap<Id, FinancialAccount> = core.byId;
-  const byIdSize = core.byId.size;
-  const retire = (): void => {
-    byId = boundedIdMap(core.byId, limitId, byIdSize);
-  };
-  // Positions by account id, built on first use (D-139): an index rebuilt after every
-  // account creation (migration) must not pay for tables nobody reads.
-  let positions: Map<Id, number> | null = null;
-  let densePositions: Int32Array | null = null;
-  const buildPositions = (): void => {
-    positions = new Map<Id, number>();
-    if (dense !== null) densePositions = new Int32Array(limitId + 1).fill(-1);
-    for (let position = 0; position < accounts.length; position += 1) {
-      const account = accounts[position] as FinancialAccount;
-      if (densePositions !== null) {
-        if (densePositions[account.id] === -1) densePositions[account.id] = position;
-      } else if (!positions.has(account.id)) {
-        positions.set(account.id, position);
-      }
-    }
-  };
-  // D-139: account id by owner id for every (owner kind, subtype), built together in
-  // one pass on first use. Equal to `byOwner` for non-negative integer owner ids
-  // (the external-counterparty duplicates are excluded from both).
-  let ownerTables: (Int32Array | undefined)[] | null = null;
-  const tableCode = (ownerKind: FinancialAccountOwnerKind, subtype: AccountSubtype): number =>
-    OWNER_KIND_CODES[ownerKind] * (SUBTYPE_CODES.size + 1) + (SUBTYPE_CODES.get(subtype) ?? SUBTYPE_CODES.size);
-  const buildOwnerTables = (): (Int32Array | undefined)[] => {
-    const codeCount = 4 * (SUBTYPE_CODES.size + 1);
-    const maxOwner = new Float64Array(codeCount).fill(-1);
-    // An account is its owner key's `byOwner` entry unless it is one of the
-    // per-country external-counterparty duplicates (keys are otherwise unique: the
-    // index build rejects duplicates), so membership needs no map lookup.
-    const included = (account: FinancialAccount): boolean =>
-      account.ownerId !== null &&
-      Number.isInteger(account.ownerId) &&
-      account.ownerId >= 0 &&
-      account.ownerId < 2 ** 31 &&
-      !(
-        account.ownerKind === "system" &&
-        (account.subtype === "external-cash" ||
-          account.subtype === "external-currency-holding" ||
-          account.subtype === "external-equity")
+interface FinanceIndexCore {
+  readonly count: number;
+  readonly generation: number;
+  /** Position by id (-1 = none), length max id + 1; null when ids are too sparse. */
+  readonly positionById: Int32Array | null;
+  readonly owners: OwnerTables;
+  readonly cash: Int32Array;
+  /** Account id by owner id per (owner kind, subtype), built on first use (D-139). */
+  ownerIdTables: (Int32Array | undefined)[] | null;
+  cashViews: readonly FinancialAccount[] | null;
+  /** Positions by subtype code, built on first use. */
+  bySubtype: (Int32Array | undefined)[] | null;
+  index: FinanceIndex | null;
+}
+
+const financeIndexCache = new WeakMap<AccountTable, FinanceIndexCore>();
+
+export function buildFinanceIndex(finance: FinanceState): FinanceIndex {
+  return financeIndexOfTable(finance.accounts);
+}
+
+/** The cached index of a table (rebuilt when the table's accounts changed in number). */
+export function financeIndexOfTable(table: AccountTable): FinanceIndex {
+  if (!isAccountTable(table)) throw new TypeError("finance.accounts must be an account table");
+  const generation = accountTableGeneration(table);
+  let core = financeIndexCache.get(table);
+  if (core === undefined || core.count !== table.count || core.generation !== generation) {
+    core = buildFinanceIndexCore(table, generation);
+    financeIndexCache.set(table, core);
+  }
+  core.index ??= financeIndexView(table, core);
+  return core.index;
+}
+
+const TABLE_CODE_COUNT = 4 * ACCOUNT_SUBTYPES.length;
+function tableCodeOf(kindCode: number, subtypeCodeValue: number): number {
+  return kindCode * ACCOUNT_SUBTYPES.length + subtypeCodeValue;
+}
+/** Owner ids below this bound are addressed densely. */
+const DENSE_OWNER_LIMIT = 2 ** 31;
+
+function buildFinanceIndexCore(table: AccountTable, generation: number): FinanceIndexCore {
+  const count = table.count;
+  const ids = table.id;
+  // Ids strictly ascend over positions (D-158), which also rules out duplicate ids.
+  for (let position = 1; position < count; position += 1) {
+    if (!((ids[position] ?? 0) > (ids[position - 1] ?? 0))) {
+      throw new RangeError(
+        (ids[position] ?? 0) === (ids[position - 1] ?? 0)
+          ? `duplicate finance account id ${String(ids[position])}`
+          : `finance account ids must ascend: ${String(ids[position - 1])} then ${String(ids[position])}`,
       );
-    for (const account of accounts) {
-      if (!included(account)) continue;
-      const code = tableCode(account.ownerKind, account.subtype);
-      if ((account.ownerId as number) > (maxOwner[code] ?? -1)) maxOwner[code] = account.ownerId as number;
     }
-    const tables: (Int32Array | undefined)[] = new Array<Int32Array | undefined>(codeCount);
-    for (let code = 0; code < tables.length; code += 1) {
-      const max = maxOwner[code] ?? -1;
-      tables[code] = max >= 0 ? new Int32Array(max + 1).fill(-1) : undefined;
+  }
+  const maxId = count > 0 ? (ids[count - 1] ?? 0) : 0;
+  const positionById = maxId <= count * 4 + 1024 ? new Int32Array(maxId + 1).fill(-1) : null;
+  if (positionById !== null) for (let position = 0; position < count; position += 1) positionById[ids[position] ?? 0] = position;
+  // Owner tables, with the duplicate check of the former owner map (first duplicate in
+  // position order; the external counterparty accounts are excepted).
+  const maxOwner = new Float64Array(TABLE_CODE_COUNT).fill(-1);
+  for (let position = 0; position < count; position += 1) {
+    const owner = table.ownerId[position] ?? -1;
+    if (owner < 0 || owner >= DENSE_OWNER_LIMIT) continue;
+    const code = tableCodeOf(table.ownerKind[position] ?? 0, table.subtype[position] ?? 0);
+    if (owner > (maxOwner[code] ?? -1)) maxOwner[code] = owner;
+  }
+  const dense: (Int32Array | undefined)[] = new Array<Int32Array | undefined>(TABLE_CODE_COUNT);
+  for (let code = 0; code < TABLE_CODE_COUNT; code += 1) {
+    const max = maxOwner[code] ?? -1;
+    dense[code] = max >= 0 ? new Int32Array(max + 1).fill(-1) : undefined;
+  }
+  const sparse = new Map<number | string, number>();
+  const cashList: number[] = [];
+  for (let position = 0; position < count; position += 1) {
+    const kind = table.ownerKind[position] ?? 0;
+    const subtype = table.subtype[position] ?? 0;
+    if (CASH_SUBTYPE_CODES.has(subtype)) cashList.push(position);
+    if (kind === SYSTEM_KIND_CODE && EXTERNAL_SUBTYPE_CODES.has(subtype)) continue;
+    const owner = table.ownerId[position] ?? -1;
+    let duplicate: boolean;
+    if (owner >= 0 && owner < DENSE_OWNER_LIMIT) {
+      const slots = dense[tableCodeOf(kind, subtype)] as Int32Array;
+      duplicate = (slots[owner] ?? -1) >= 0;
+      if (!duplicate) slots[owner] = position;
+    } else {
+      const key = accountOwnerKey(
+        ACCOUNT_OWNER_KINDS[kind] as FinancialAccountOwnerKind,
+        owner === NO_ACCOUNT_OWNER ? null : owner,
+        ACCOUNT_SUBTYPES[subtype] as AccountSubtype,
+      );
+      duplicate = sparse.has(key);
+      if (!duplicate) sparse.set(key, position);
     }
-    for (const account of accounts) {
-      if (!included(account)) continue;
-      const table = tables[tableCode(account.ownerKind, account.subtype)];
-      if (table !== undefined) table[account.ownerId as number] = account.id;
+    if (duplicate) {
+      throw new RangeError(
+        `duplicate ${String(ACCOUNT_SUBTYPES[subtype])} account for ${String(ACCOUNT_OWNER_KINDS[kind])} ${owner === NO_ACCOUNT_OWNER ? "null" : String(owner)}`,
+      );
     }
-    return tables;
+  }
+  return {
+    count,
+    generation,
+    positionById,
+    owners: { dense, sparse },
+    cash: Int32Array.from(cashList),
+    ownerIdTables: null,
+    cashViews: null,
+    bySubtype: null,
+    index: null,
+  };
+}
+
+function financeIndexView(table: AccountTable, core: FinanceIndexCore): FinanceIndex {
+  const count = core.count;
+  const position = (id: Id): number => {
+    if (!Number.isInteger(id) || id < 0) return -1;
+    const positions = core.positionById;
+    if (positions !== null) return id < positions.length ? (positions[id] ?? -1) : -1;
+    const found = accountPosition(table, id);
+    return found < count ? found : -1;
+  };
+  const ownerPosition = (ownerKind: FinancialAccountOwnerKind, ownerId: Id | null, subtype: AccountSubtype): number => {
+    const kind = OWNER_KIND_CODES[ownerKind];
+    const code = SUBTYPE_CODES.get(subtype);
+    if (kind === undefined || code === undefined) return -1;
+    if (ownerId !== null && Number.isInteger(ownerId) && ownerId >= 0 && ownerId < DENSE_OWNER_LIMIT) {
+      const slots = core.owners.dense[tableCodeOf(kind, code)];
+      return slots === undefined || ownerId >= slots.length ? -1 : (slots[ownerId] ?? -1);
+    }
+    return core.owners.sparse.get(accountOwnerKey(ownerKind, ownerId, subtype)) ?? -1;
+  };
+  const account = (id: Id): FinancialAccount | undefined => {
+    const found = position(id);
+    return found < 0 ? undefined : accountView(table, found);
+  };
+  const byId: AccountsById = {
+    get: account,
+    has: (id) => position(id) >= 0,
   };
   const emptyTable = new Int32Array(0);
-  const tableFor = (ownerKind: FinancialAccountOwnerKind, subtype: AccountSubtype): Int32Array => {
-    ownerTables ??= buildOwnerTables();
-    return ownerTables[tableCode(ownerKind, subtype)] ?? emptyTable;
-  };
-  const lookupOwner = (
-    ownerKind: FinancialAccountOwnerKind,
-    ownerId: Id | null,
-    subtype: AccountSubtype,
-  ): FinancialAccount | undefined => {
-    // Owner tables once built (by a bulk reader); otherwise the owner-key map, so a
-    // freshly rebuilt index answers single lookups without building every table.
-    if (
-      ownerTables !== null &&
-      dense !== null &&
-      ownerId !== null &&
-      Number.isInteger(ownerId) &&
-      ownerId >= 0 &&
-      SUBTYPE_CODES.has(subtype)
-    ) {
-      const table = tableFor(ownerKind, subtype);
-      if (ownerId >= table.length) return undefined;
-      const id = table[ownerId] ?? -1;
-      // D-157: accounts appended after this index was built are not part of it.
-      return id < 0 || id > limitId ? undefined : dense[id];
-    }
-    const found = byOwner.get(ownerKey(ownerKind, ownerId, subtype));
-    return found !== undefined && found.id > limitId ? undefined : found;
-  };
   const index: FinanceIndex = {
-    accounts,
-    get byId(): ReadonlyMap<Id, FinancialAccount> {
-      return byId;
-    },
-    position(id) {
-      if (positions === null) buildPositions();
-      if (densePositions !== null) {
-        return Number.isInteger(id) && id >= 0 && id < densePositions.length ? (densePositions[id] ?? -1) : -1;
-      }
-      return positions?.get(id) ?? -1;
-    },
-    ownerAccountIds(ownerKind, subtype) {
-      if (!SUBTYPE_CODES.has(subtype)) return emptyTable;
-      return tableFor(ownerKind, subtype);
-    },
-    account(id) {
-      if (id > limitId) return undefined;
-      if (dense !== null && Number.isInteger(id) && id >= 0 && id < dense.length) return dense[id];
-      return byId.get(id);
-    },
+    accounts: table,
+    count,
+    byId,
+    account,
+    position,
+    ownerPosition,
     get(ownerKind, ownerId, subtype) {
-      const account = lookupOwner(ownerKind, ownerId, subtype);
-      if (account === undefined) {
-        throw new RangeError(
-          `missing ${subtype} account for ${ownerKind} ${String(ownerId)}`,
-        );
+      const found = ownerPosition(ownerKind, ownerId, subtype);
+      if (found < 0) {
+        throw new RangeError(`missing ${subtype} account for ${ownerKind} ${String(ownerId)}`);
       }
-      return account;
+      return accountView(table, found);
     },
     find(ownerKind, ownerId, subtype) {
-      return lookupOwner(ownerKind, ownerId, subtype);
+      const found = ownerPosition(ownerKind, ownerId, subtype);
+      return found < 0 ? undefined : accountView(table, found);
     },
     cash() {
-      return cash;
+      core.cashViews ??= Array.from(core.cash, (cashPosition) => accountView(table, cashPosition));
+      return core.cashViews;
+    },
+    cashPositions() {
+      return core.cash;
+    },
+    subtypePositions(subtype) {
+      const code = SUBTYPE_CODES.get(subtype);
+      if (code === undefined) return emptyTable;
+      if (core.bySubtype === null) {
+        const lists: number[][] = ACCOUNT_SUBTYPES.map(() => []);
+        for (let at = 0; at < count; at += 1) lists[table.subtype[at] ?? 0]?.push(at);
+        core.bySubtype = lists.map((list) => Int32Array.from(list));
+      }
+      return core.bySubtype[code] ?? emptyTable;
+    },
+    ownerAccountIds(ownerKind, subtype) {
+      const kind = OWNER_KIND_CODES[ownerKind];
+      const code = SUBTYPE_CODES.get(subtype);
+      if (kind === undefined || code === undefined) return emptyTable;
+      core.ownerIdTables ??= new Array<Int32Array | undefined>(TABLE_CODE_COUNT);
+      const tableCode = tableCodeOf(kind, code);
+      let ids = core.ownerIdTables[tableCode];
+      if (ids === undefined) {
+        const slots = core.owners.dense[tableCode];
+        ids = slots === undefined ? emptyTable : new Int32Array(slots.length);
+        if (slots !== undefined) {
+          for (let owner = 0; owner < slots.length; owner += 1) {
+            const at = slots[owner] ?? -1;
+            ids[owner] = at < 0 ? -1 : (table.id[at] ?? -1);
+          }
+        }
+        core.ownerIdTables[tableCode] = ids;
+      }
+      return ids;
     },
   };
-  return { index, retire };
+  return index;
 }
 
 /** One opening balance to apply. */
@@ -2694,16 +2600,12 @@ export function applyOpeningBalances(
   if (finance.opening !== null) {
     throw new RangeError("opening balances have already been applied");
   }
-  const accounts = requireArray(finance.accounts, "finance.accounts") as FinancialAccount[];
-  const byId = new Map<Id, FinancialAccount>();
-  for (const account of accounts) {
-    if (byId.has(account.id)) {
-      throw new RangeError(`duplicate finance account id ${String(account.id)}`);
-    }
-    byId.set(account.id, account);
-    if (account.balanceRUSD !== 0) {
+  const table = requireAccountTable(finance.accounts);
+  const byId = financeIndexOfTable(table).byId;
+  for (let position = 0; position < table.count; position += 1) {
+    if ((table.balance[position] ?? 0) !== 0) {
       throw new RangeError(
-        `opening balances require zeroed account ${String(account.id)}; found ${String(account.balanceRUSD)}`,
+        `opening balances require zeroed account ${String(table.id[position])}; found ${String(table.balance[position])}`,
       );
     }
   }
@@ -2785,7 +2687,7 @@ export function applyOpeningBalances(
   }));
   const opening: OpeningBalanceRecord = {
     dayIndex,
-    accountCount: accounts.length,
+    accountCount: table.count,
     checksum: checksumOfJson(openingChecksumEntries),
   };
   finance.opening = opening;
@@ -2810,3 +2712,6 @@ export function assertValidOpeningRecord(record: OpeningBalanceRecord): void {
 export function accountSubtypeCategory(): Readonly<Record<AccountSubtype, AccountCategory>> {
   return SUBTYPE_CATEGORY;
 }
+
+// D-158: the account table derives each category from its subtype through this rule.
+registerSubtypeCategories(categoryForSubtype);

@@ -93,6 +93,7 @@ import type {
 } from "./types.js";
 import { MONETARY_STANDARDS } from "./types.js";
 
+import { accountRecords, accountTableFromRecords, type AccountRecord } from "./accountTable.js";
 function professionIds(scenario: EconomyScenarioDef): Map<number, ProfessionDef> {
   return new Map(scenario.definitions.professions.map((profession) => [profession.id, profession]));
 }
@@ -1057,6 +1058,10 @@ export function createEconomyWorld(
     .sort((left, right) => left.currencyId - right.currencyId);
 
   let nextAccountId = world.finance.nextAccountId;
+  // D-158: the economy's accounts are collected here (scenario-declared ids interleave
+  // with allocated ones) and become the account table, sorted by id, before the opening
+  // balances are applied.
+  const createdAccounts: AccountRecord[] = accountRecords(world.finance.accounts);
   const allocate = (
     ownerKind: "popBlock" | "building" | "country" | "system",
     ownerId: Id | null,
@@ -1064,7 +1069,7 @@ export function createEconomyWorld(
   ): Id => {
     const id = nextAccountId;
     nextAccountId += 1;
-    world.finance.accounts.push({
+    createdAccounts.push({
       id,
       ownerKind,
       ownerId,
@@ -1080,7 +1085,7 @@ export function createEconomyWorld(
     scenario.population.popBlocks.map((block) => [block.id, block.initialSavingsRUSD]),
   );
   const equityByBlock = new Map<Id, Id>();
-  for (const account of world.finance.accounts) {
+  for (const account of createdAccounts) {
     if (
       account.ownerKind === "popBlock" &&
       account.ownerId !== null &&
@@ -1103,7 +1108,7 @@ export function createEconomyWorld(
   }
 
   for (const account of scenario.systemAccounts) {
-    world.finance.accounts.push({
+    createdAccounts.push({
       id: account.id,
       ownerKind: "system",
       ownerId: null,
@@ -1133,7 +1138,7 @@ export function createEconomyWorld(
     if (initial === undefined) {
       throw new RangeError(`missing initial definition for country ${String(country.id)}`);
     }
-    world.finance.accounts.push({
+    createdAccounts.push({
       id: country.treasuryAccountId,
       ownerKind: "country",
       ownerId: country.id,
@@ -1394,7 +1399,8 @@ export function createEconomyWorld(
     };
   }
 
-  for (const instance of [...scenario.buildingInstances].sort((left, right) => left.id - right.id)) {    world.finance.accounts.push({
+  for (const instance of [...scenario.buildingInstances].sort((left, right) => left.id - right.id)) {
+    createdAccounts.push({
       id: instance.operatingCashAccountId,
       ownerKind: "building",
       ownerId: instance.id,
@@ -1445,8 +1451,8 @@ export function createEconomyWorld(
   }
   world.finance.nextAccountId = nextAccountId;
   world.buildings.sort((left, right) => left.id - right.id);
+  world.finance.accounts = accountTableFromRecords(createdAccounts);
   applyOpeningBalances(world.finance, world.startDayIndex, opening);
-  world.finance.accounts.sort((left, right) => left.id - right.id);
 
   for (const market of scenario.markets) {
     const built: Market = {

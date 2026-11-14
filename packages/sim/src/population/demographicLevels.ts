@@ -215,25 +215,25 @@ export function fertilityLevel(block: PopBlock, factors: DemographyCountryFactor
   );
 }
 
-/** Effective child (0–4) death-rate multiplier of a block today. */
-export function effectiveChildMortality(block: PopBlock, factors: DemographyCountryFactors): number {
+/** Effective child (0–4) death-rate multiplier of a block today (`persons`: measured, D-158). */
+export function effectiveChildMortality(block: PopBlock, factors: DemographyCountryFactors, persons?: number): number {
   return (
     block.childMortalityResidual *
     urbanMortalityFactor(block.urbanShare, factors.sanitationCoverage, URBAN_MORTALITY_PENALTY_CHILD) *
     Math.pow(factors.healthFactor, MORTALITY_CHILD_HEALTH_ELASTICITY) *
     foodMortalityFactor(block.foodSufficiency, FOOD_MORTALITY_WEIGHT_CHILD) *
-    crowdingMortalityFactor(blockCrowding(block), CROWDING_MORTALITY_WEIGHT_CHILD)
+    crowdingMortalityFactor(blockCrowding(block, persons), CROWDING_MORTALITY_WEIGHT_CHILD)
   );
 }
 
-/** Effective adult (5+) death-rate multiplier of a block today. */
-export function effectiveAdultMortality(block: PopBlock, factors: DemographyCountryFactors): number {
+/** Effective adult (5+) death-rate multiplier of a block today (`persons`: measured, D-158). */
+export function effectiveAdultMortality(block: PopBlock, factors: DemographyCountryFactors, persons?: number): number {
   return (
     block.adultMortalityResidual *
     urbanMortalityFactor(block.urbanShare, factors.sanitationCoverage, URBAN_MORTALITY_PENALTY_ADULT) *
     factors.healthFactor *
     foodMortalityFactor(block.foodSufficiency, FOOD_MORTALITY_WEIGHT_ADULT) *
-    crowdingMortalityFactor(blockCrowding(block), CROWDING_MORTALITY_WEIGHT_ADULT)
+    crowdingMortalityFactor(blockCrowding(block, persons), CROWDING_MORTALITY_WEIGHT_ADULT)
   );
 }
 

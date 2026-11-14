@@ -21,7 +21,7 @@
 import { assertValidDayIndex } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { Day, Id } from "../types.js";
-import { isRecord, requireArray, requireInteger } from "../validation.js";
+import { isRecord, requireInteger } from "../validation.js";
 import {
   accountNormalSide,
   assertBusinessTaxPostingStructure,
@@ -45,7 +45,12 @@ import {
   isProfitAllocationKind,
   transactionKindChangesCash,
   buildFinanceIndex,
+  isCashSubtypeCode,
+  requireAccountTable,
+  semanticRuleAllowsCode,
+  type AccountsById,
 } from "./accounts.js";
+import { CATEGORY_OF_SUBTYPE, accountCategoryAt, type AccountTable } from "./accountTable.js";
 import { MAX_AUDIT_POSTINGS } from "./constants.js";
 import {
   TRANSACTION_KINDS,
@@ -149,10 +154,25 @@ function toleranceMoney(a: number, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h =
 }
 
 /** Accounts by id with the duplicate-id check, from the cached finance index (D-133). */
-function accountMap(finance: FinanceState): ReadonlyMap<number, FinancialAccount> {
-  requireArray(finance.accounts, "finance.accounts");
+function accountMap(finance: FinanceState): AccountsById {
+  requireAccountTable(finance.accounts);
   return buildFinanceIndex(finance).byId;
 }
+
+/** 1 for a debit-normal category code (asset, expense), 0 for credit-normal (D-158). */
+const DEBIT_NORMAL_CATEGORY = Uint8Array.from(
+  (["asset", "liability", "equity", "revenue", "expense"] as const).map((category) =>
+    accountNormalSide(category) === "debit" ? 1 : 0,
+  ),
+);
+/** 1 for a category code whose balance may be negative (equity). */
+const NEGATIVE_ALLOWED_CATEGORY = Uint8Array.from(
+  (["asset", "liability", "equity", "revenue", "expense"] as const).map((category) =>
+    categoryAllowsNegativeBalance(category) ? 1 : 0,
+  ),
+);
+const REVENUE_CATEGORY_CODE = 3;
+const EXPENSE_CATEGORY_CODE = 4;
 
 function assertTransactionKind(value: unknown): asserts value is TransactionKind {
   if (!(TRANSACTION_KINDS as readonly string[]).includes(value as string)) {
@@ -178,7 +198,7 @@ function assertPublicTransactionKind(value: unknown): asserts value is PublicTra
 
 function validatePostingLines(
   lines: readonly JournalLine[],
-  accounts: ReadonlyMap<number, FinancialAccount>,
+  accounts: AccountsById,
   transactionKind: TransactionKind,
   /** `accounts.get` through the finance index's dense id table (D-137). */
   accountOf: (id: number) => FinancialAccount | undefined = (id) => accounts.get(id),
@@ -306,7 +326,7 @@ function validatePostingLines(
 }
 
 function assertBalanceConstraints(
-  accounts: ReadonlyMap<number, FinancialAccount>,
+  accounts: AccountsById,
   deltas: Map<number, number>,
 ): void {
   for (const [accountId, delta] of deltas) {
@@ -340,6 +360,29 @@ function assertCashConservation(kind: TransactionKind, cashDelta: number, grossR
     throw new RangeError(
       `cash-neutral posting ${JSON.stringify(kind)} would change aggregate designated cash by ${String(cashDelta)}`,
     );
+  }
+}
+
+/** `assertBalanceConstraints` over a batch, in first-touch order (D-139; D-158 table). */
+function assertBatchAffordable(table: AccountTable, batch: BatchDeltas): void {
+  for (const position of batch.touched) {
+    const balance = table.balance[position] ?? 0;
+    const delta = batchDelta(batch, position);
+    const next = balance + delta;
+    if (!Number.isFinite(next)) {
+      throw new RangeError(`posting would make account ${String(table.id[position])} non-finite`);
+    }
+    if (NEGATIVE_ALLOWED_CATEGORY[CATEGORY_OF_SUBTYPE[table.subtype[position] ?? 0] ?? 0] !== 1 && next < 0) {
+      throw new RangeError(
+        `insufficient funds; posting would make ${accountCategoryAt(table, position)} account ${String(table.id[position])} negative: ${String(balance)} + ${String(delta)} < 0`,
+      );
+    }
+  }
+}
+
+function applyBatch(table: AccountTable, batch: BatchDeltas): void {
+  for (const position of batch.touched) {
+    table.balance[position] = (table.balance[position] ?? 0) + batchDelta(batch, position);
   }
 }
 
@@ -473,10 +516,10 @@ export function postJournalBatch(
   // (D-137): a settlement batch creates thousands of wage/upkeep entries per day and
   // the buffer keeps 256.
   const retainedStart = Math.max(0, entries.length - MAX_AUDIT_POSTINGS);
-  const accountList = finance.accounts;
+  const table = finance.accounts;
   let lineCount = 0;
   for (const entry of entries) lineCount += entry?.lines.length ?? 0;
-  const batch = createBatchDeltas((id) => financeIndex.position(id), accountList.length, lineCount);
+  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lineCount);
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
@@ -492,24 +535,9 @@ export function postJournalBatch(
     assertCashConservation(entry.transactionKind, validated.cashDelta, validated.debits);
   }
   // `assertBalanceConstraints` over the batch, in first-touch order (D-139).
-  for (const position of batch.touched) {
-    const account = accountList[position] as FinancialAccount;
-    const delta = batchDelta(batch, position);
-    const next = account.balanceRUSD + delta;
-    if (!Number.isFinite(next)) {
-      throw new RangeError(`posting would make account ${String(account.id)} non-finite`);
-    }
-    if (!categoryAllowsNegativeBalance(account.category) && next < 0) {
-      throw new RangeError(
-        `insufficient funds; posting would make ${account.category} account ${String(account.id)} negative: ${String(account.balanceRUSD)} + ${String(delta)} < 0`,
-      );
-    }
-  }
+  assertBatchAffordable(table, batch);
 
-  for (const position of batch.touched) {
-    const account = accountList[position] as FinancialAccount;
-    account.balanceRUSD += batchDelta(batch, position);
-  }
+  applyBatch(table, batch);
 
   // Materialise postings only after every entry is validated and affordable, so a
   // rejected batch leaves the audit buffer and posting id untouched (as before).
@@ -561,8 +589,9 @@ export function postCashTransfer(
   if (options.fromAccountId === options.toAccountId) {
     throw new RangeError("cash transfer payer and receiver must be different accounts");
   }
+  const byId = accountMap(finance);
   for (const accountId of [options.fromAccountId, options.toAccountId]) {
-    const account = finance.accounts.find((candidate) => candidate.id === accountId);
+    const account = byId.get(accountId);
     if (account !== undefined && !isCashAccount(account)) {
       throw new RangeError(
         `cash transfer requires designated cash accounts; account ${String(accountId)} is ${account.subtype}`,
@@ -608,9 +637,19 @@ export interface DeferredPostings {
   materialize(from: number): JournalPosting[];
 }
 
-/** Kinds whose structure checks read whole line objects; none is a market kind. */
+/**
+ * Kinds whose structure checks read whole line objects; none is a market kind. D-158:
+ * `domestic-service` has no structure check either (only the semantic matrix, which the
+ * column path applies line by line), so it takes the column path too.
+ */
 function needsLineObjects(kind: TransactionKind): boolean {
-  return !(kind === "goods-purchase" || kind === "input-purchase" || kind === "wages" || kind === "upkeep");
+  return !(
+    kind === "goods-purchase" ||
+    kind === "input-purchase" ||
+    kind === "wages" ||
+    kind === "upkeep" ||
+    kind === "domestic-service"
+  );
 }
 
 /**
@@ -671,8 +710,8 @@ export function postJournalColumns(
   if (nextId + entries.length > Number.MAX_SAFE_INTEGER) {
     throw new RangeError("finance posting id overflow");
   }
-  const accountList = finance.accounts;
-  const batch = createBatchDeltas((id) => financeIndex.position(id), accountList.length, lines.accountId.length);
+  const table = finance.accounts;
+  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lines.accountId.length);
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
@@ -704,8 +743,8 @@ export function postJournalColumns(
           `journal line ${String(index_)}.accountId must be in 0..${String(0xffff_ffff)}, received ${String(accountId)}`,
         );
       }
-      const account = accountOf(accountId);
-      if (account === undefined) {
+      const position = financeIndex.position(accountId);
+      if (position < 0) {
         throw new RangeError(`journal line ${String(index_)} references unknown account ${String(accountId)}`);
       }
       const debit = lines.debit[line];
@@ -720,13 +759,22 @@ export function postJournalColumns(
       if (!(amount > 0)) {
         throw new RangeError(`journal line ${String(index_)}.amountRUSD must be strictly positive`);
       }
-      const violation = semanticJournalLineViolation(entry.transactionKind, account, side);
-      if (violation !== null) throw new RangeError(`journal line ${String(index_)}: ${violation}`);
-      const signed = side === accountNormalSide(account.category) ? amount : -amount;
+      const subtypeCode = table.subtype[position] ?? 0;
+      const categoryCode = CATEGORY_OF_SUBTYPE[subtypeCode] ?? 0;
+      // D-158: the semantic matrix constrains only revenue and expense lines, so a view is
+      // built only for those (the same rule and message as before).
+      if (
+        (categoryCode === REVENUE_CATEGORY_CODE || categoryCode === EXPENSE_CATEGORY_CODE) &&
+        !semanticRuleAllowsCode(entry.transactionKind, subtypeCode, side)
+      ) {
+        const violation = semanticJournalLineViolation(entry.transactionKind, accountOf(accountId) as FinancialAccount, side);
+        if (violation !== null) throw new RangeError(`journal line ${String(index_)}: ${violation}`);
+      }
+      const signed = (debit === 1) === (DEBIT_NORMAL_CATEGORY[categoryCode] === 1) ? amount : -amount;
       if (debit === 1) debits += amount;
       else credits += amount;
-      addBatchDelta(batch, batch.positionOf(accountId), signed);
-      if (isCashAccount(account)) cashDelta += signed;
+      addBatchDelta(batch, position, signed);
+      if (isCashSubtypeCode(subtypeCode)) cashDelta += signed;
     }
     if (Math.abs(debits - credits) > MONEY_TOLERANCE_RUSD) {
       throw new RangeError(
@@ -735,23 +783,8 @@ export function postJournalColumns(
     }
     assertCashConservation(entry.transactionKind, cashDelta, debits);
   }
-  for (const position of batch.touched) {
-    const account = accountList[position] as FinancialAccount;
-    const delta = batchDelta(batch, position);
-    const next = account.balanceRUSD + delta;
-    if (!Number.isFinite(next)) {
-      throw new RangeError(`posting would make account ${String(account.id)} non-finite`);
-    }
-    if (!categoryAllowsNegativeBalance(account.category) && next < 0) {
-      throw new RangeError(
-        `insufficient funds; posting would make ${account.category} account ${String(account.id)} negative: ${String(account.balanceRUSD)} + ${String(delta)} < 0`,
-      );
-    }
-  }
-  for (const position of batch.touched) {
-    const account = accountList[position] as FinancialAccount;
-    account.balanceRUSD += batchDelta(batch, position);
-  }
+  assertBatchAffordable(table, batch);
+  applyBatch(table, batch);
   finance.nextPostingId = nextId + entries.length;
   return deferred(entries.length);
 }

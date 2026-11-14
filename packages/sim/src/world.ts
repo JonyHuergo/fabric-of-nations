@@ -31,6 +31,7 @@ import {
   SIM_VERSION,
   WORLD_SCHEMA_VERSION,
 } from "./constants.js";
+import { createAccountTable } from "./economy/accountTable.js";
 import { assertValidEconomyState } from "./economy/validation.js";
 import { DEFAULT_MONEY_COEFFICIENTS, MONEY_COEFFICIENT_KEYS } from "./economy/constants.js";
 import type { MoneyCoefficients } from "./economy/types.js";
@@ -248,7 +249,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     employmentDirty: false,
     markets: [],
     finance: {
-      accounts: [],
+      accounts: createAccountTable(),
       postings: [],
       nextPostingId: 1,
       nextAccountId: 1,

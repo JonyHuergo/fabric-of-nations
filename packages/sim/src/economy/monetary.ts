@@ -15,7 +15,7 @@
 
 import { dayIndexToCivilDate, daysInMonth } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
-import { populationTotal } from "../population/state.js";
+import { } from "../population/state.js";
 import type { PopulationDefinitions } from "../population/types.js";
 import type { DayIndex, Id } from "../types.js";
 import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
@@ -51,9 +51,14 @@ import type {
   PriceIndexState,
   RusdPerCurrencyUnit,
 } from "./types.js";
-import { MONETARY_REGIMES } from "./types.js";
+import {
+  MONETARY_REGIMES,
+  type AccountSubtype,
+} from "./types.js";
 import { runMintWindow, type MintFlow } from "./mint.js";
 import { runDemonetisation } from "./currencyActions.js";
+import { findAccountByOwner } from "./accounts.js";
+import { personsOfBlock, type BlockTotals } from "../population/blockTotals.js";
 export {
   assertValidMonetaryState,
   assertValidPriceIndexState,
@@ -145,7 +150,7 @@ export interface DerivedPriceIndexes {
  * the caller. A country index is the population-weighted mean of the indices of the
  * markets containing its provinces.
  */
-export function derivePriceIndexes(world: World): DerivedPriceIndexes {
+export function derivePriceIndexes(world: World, totals?: BlockTotals): DerivedPriceIndexes {
   const basket = world.priceIndex.basket;
   const baseByMarket = new Map(
     world.priceIndex.basePrices.map((base) => [base.marketId, base.prices]),
@@ -169,7 +174,7 @@ export function derivePriceIndexes(world: World): DerivedPriceIndexes {
   for (const block of world.popBlocks) {
     populationByProvince.set(
       block.provinceId,
-      (populationByProvince.get(block.provinceId) ?? 0) + populationTotal(block),
+      (populationByProvince.get(block.provinceId) ?? 0) + personsOfBlock(totals, block),
     );
   }
   // D-137: provinces by id, each market's provinces (ascending, `marketProvinceIds`)
@@ -464,7 +469,7 @@ export function runMonetaryPhase(
   world: World,
   economyDefinitions: EconomyDefinitions,
   dayIndex: DayIndex,
-  options: PhaseValidationOptions = {},
+  options: PhaseValidationOptions & { readonly blockTotals?: BlockTotals } = {},
 ): MonetaryPhaseResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
   // Staged mode: the integrated day validated the definitions once at its start.
@@ -481,7 +486,7 @@ export function runMonetaryPhase(
   if (world.monetary.lastUpdateDay === dayIndex) return empty;
 
   const monthEnd = isMonthEnd(dayIndex);
-  const values = derivePriceIndexes(world);
+  const values = derivePriceIndexes(world, options.blockTotals);
   const managed: Id[] = [];
   const entries: JournalEntryInput[] = [];
   let revaluationRUSD = 0;
@@ -884,10 +889,9 @@ export function applyMonetaryPolicy(
 
   const openingMonetary = cloneMonetaryState(world.monetary);
   const openingValuations = cloneValuations(world.currencyValuations);
-  const openingBalances = new Map<Id, number>();
-  for (const account of world.finance.accounts) {
-    openingBalances.set(account.id, account.balanceRUSD);
-  }
+  // D-158: the balance column, restored as a whole on failure (accounts are not appended here).
+  const openingAccountCount = world.finance.accounts.count;
+  const openingBalances = world.finance.accounts.balance.slice(0, openingAccountCount);
   const openingPostings = [...world.finance.postings];
   const openingNextPostingId = world.finance.nextPostingId;
 
@@ -1035,13 +1039,10 @@ export function applyMonetaryPolicy(
   } catch (error) {
     world.monetary = openingMonetary;
     world.currencyValuations = openingValuations;
-    for (const account of world.finance.accounts) {
-      const balance = openingBalances.get(account.id);
-      if (balance === undefined) {
-        throw new RangeError(`monetary rollback lost account ${String(account.id)}`);
-      }
-      account.balanceRUSD = balance;
+    if (world.finance.accounts.count !== openingAccountCount) {
+      throw new RangeError("monetary rollback lost accounts");
     }
+    world.finance.accounts.balance.set(openingBalances);
     world.finance.postings = openingPostings;
     world.finance.nextPostingId = openingNextPostingId;
     throw error;
@@ -1054,12 +1055,7 @@ function accountIdFor(
   ownerId: Id | null,
   subtype: string,
 ): Id {
-  const account = world.finance.accounts.find(
-    (candidate) =>
-      candidate.ownerKind === ownerKind &&
-      candidate.ownerId === ownerId &&
-      candidate.subtype === subtype,
-  );
+  const account = findAccountByOwner(world.finance.accounts, ownerKind, ownerId, subtype as AccountSubtype);
   if (account === undefined) {
     throw new RangeError(`missing ${ownerKind} ${subtype} account for monetary policy`);
   }

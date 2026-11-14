@@ -79,7 +79,15 @@ import {
   type LabourMeasurement,
   type LabourWageTable,
 } from "./labourMarket.js";
-import { blockKey, createReclassifyContext, movablePeople, moveBlockPeople, retireEmptyBlocks, type ReclassifyContext } from "./reclassify.js";
+import {
+  blockKey,
+  createReclassifyContext,
+  movablePeople,
+  moveBlockPeople,
+  retireEmptyBlocks,
+  type ReclassifyContext,
+  householdCashPosition,
+} from "./reclassify.js";
 import type { EconomyDefinitions, ProfessionDef } from "./types.js";
 
 export interface LabourMonthPhaseResult {
@@ -340,7 +348,8 @@ function trainingPlaces(world: World, definitions: EconomyDefinitions): Map<Id, 
 }
 
 function householdCashBalance(context: ReclassifyContext, blockId: Id): number {
-  return context.accountsByBlock.get(blockId)?.find((account) => account.subtype === "household-cash")?.balanceRUSD ?? 0;
+  const position = householdCashPosition(context, blockId);
+  return position < 0 ? 0 : (context.world.finance.accounts.balance[position] ?? 0);
 }
 
 interface FlowTally {

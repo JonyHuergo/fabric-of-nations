@@ -452,6 +452,8 @@ export interface NeedGoodResult {
   unmetFunded: number;
 }
 
+import type { NeedsColumns } from "./needsColumns.js";
+
 export interface NeedTierSummary {
   tier: NeedTier;
   active: boolean;
@@ -480,7 +482,13 @@ export interface PopBlockNeedsResult {
 }
 
 export interface PopulationNeedsDayResult {
+  /**
+   * Per-block results. D-158: the integrated day builds them in full detail only (empty in
+   * `summary`); `columns` holds the same values in every detail.
+   */
   blocks: readonly PopBlockNeedsResult[];
+  /** D-158: the per-block, per-tier values in typed columns (`needsColumns.ts`). */
+  readonly columns?: NeedsColumns;
   initialSupplyByGood: Readonly<Record<string, number>>;
   remainingSupplyByGood: Readonly<Record<string, number>>;
   consumedSupplyByGood: Readonly<Record<string, number>>;

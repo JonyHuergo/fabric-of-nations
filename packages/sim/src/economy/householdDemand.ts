@@ -32,7 +32,6 @@ import {
   type RetailPowers,
 } from "../population/demandSystem.js";
 import { adultEquivalents, blockHasHousing, desiredDwellings } from "../population/housing.js";
-import { populationTotal } from "../population/state.js";
 import type { NeedTier } from "../population/constants.js";
 import type { DayResultDetail } from "../population/types.js";
 import type { Id } from "../types.js";
@@ -44,6 +43,7 @@ import { buildProvinceOwnerMap } from "./country.js";
 import type { HouseholdDemandRecord, HouseholdTier } from "./market.js";
 import type { EconomyDefinitions } from "./types.js";
 
+import { personsOfBlock, type BlockTotals } from "../population/blockTotals.js";
 /** Planned household spending of one country today (snapshot and report; RUSD). */
 export interface HouseholdCountryDemand {
   readonly countryId: Id;
@@ -110,6 +110,8 @@ export function buildLesHouseholdDemand(
   detail: DayResultDetail,
   ownConsumption: OwnConsumptionPlan,
   gate: NeedGate | null,
+  /** D-158: the day's measured block totals (the cells summed when absent). */
+  totals?: BlockTotals,
 ): LesHouseholdDemand {
   const year = daysInYear(dayIndexToCivilDate(world.dayIndex).year);
   const goodCount = system.goodCount;
@@ -188,7 +190,7 @@ export function buildLesHouseholdDemand(
   };
 
   for (const block of inIdOrder(world.popBlocks)) {
-    const persons = populationTotal(block);
+    const persons = personsOfBlock(totals, block);
     if (persons <= 0) continue;
     const marketId = marketOfProvince.get(block.provinceId) ?? null;
     if (marketId === null) throw new RangeError(`popBlock ${String(block.id)} is in a province with no market`);
@@ -319,7 +321,7 @@ export function buildLesHouseholdDemand(
         // Replacement of today's depreciation plus a share of the gap (plan §4.3).
         dwellingDesired =
           (block.dwellings * DWELLING_DEPRECIATION_RATE_PER_YEAR) / year +
-          Math.max(0, desiredDwellings(block) - block.dwellings) / HOUSING_ADJUSTMENT_DAYS;
+          Math.max(0, desiredDwellings(block, persons) - block.dwellings) / HOUSING_ADJUSTMENT_DAYS;
         if (owner !== undefined && dwellingDesired > 0) {
           const entry = byCountry.get(owner.id);
           if (entry !== undefined) entry.dwellingsDesired += dwellingDesired;

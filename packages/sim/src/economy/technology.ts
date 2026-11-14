@@ -17,7 +17,7 @@
 import { buildLabourWageTable, institutionPayroll, popBlocksById, type LabourWageTable } from "./labourMarket.js";
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
 import { CONTRACEPTION_MAX_REDUCTION, RATE_DECIMAL_PLACES } from "../population/constants.js";
-import { populationTotal, syncBlockLiteracy, workingAgePopulation } from "../population/state.js";
+import { syncBlockLiteracy, } from "../population/state.js";
 import { localWageIndex } from "./localWages.js";
 import type { Day, Id, Rate } from "../types.js";
 import {
@@ -71,6 +71,7 @@ import {
   type CountryPopulationIndex,
 } from "./country.js";
 
+import { personsOfBlock, workingAgeOfBlock, type BlockTotals } from "../population/blockTotals.js";
 const MAX_TECHNOLOGY_DESCRIPTION_LENGTH = 500;
 const MAX_TECHNOLOGY_KEY_LENGTH = 64;
 const MAX_TECHNOLOGY_NAME_LENGTH = 128;
@@ -804,7 +805,7 @@ export function deriveEducation(
   const blockSchoolAge = new Float64Array(blocks.length);
   for (let position = 0; position < blocks.length; position += 1) {
     const block = blocks[position] as World["popBlocks"][number];
-    const population = populationTotal(block);
+    const population = personsOfBlock(populationIndex?.totals, block);
     const schoolAge = schoolAgeOf(block);
     blockSchoolAge[position] = schoolAge;
     schoolAgePopulation += schoolAge;
@@ -812,7 +813,7 @@ export function deriveEducation(
     const profession = professionById.get(block.professionId);
     if (profession === undefined) continue;
     if (!academicKeys.has(profession.key)) continue;
-    const workingAge = workingAgePopulation(block);
+    const workingAge = workingAgeOfBlock(populationIndex?.totals, block);
     const available = Math.max(
       0,
       workingAge * profession.participationRate - (assignedByBlock.get(block.id) ?? 0),
@@ -1009,7 +1010,7 @@ export function runEducationPhase(
   world: World,
   definitions: EconomyDefinitions | undefined,
   day: Day,
-  options: { readonly validateWorld?: boolean; readonly financeInPlace?: boolean } = {},
+  options: { readonly validateWorld?: boolean; readonly financeInPlace?: boolean; readonly blockTotals?: BlockTotals } = {},
 ): EducationPhaseResult {
   if (definitions?.technology === undefined || !world.technology.enabled) {
     return {
@@ -1024,7 +1025,7 @@ export function runEducationPhase(
   const yearDays = daysInYear(dayIndexToCivilDate(day).year);
   // D-137: one set of country lookups for the whole phase; the payroll below changes
   // only balances, never the blocks, assignments or wage tables it reads.
-  const populationIndex = buildCountryPopulationIndex(world);
+  const populationIndex = buildCountryPopulationIndex(world, options.blockTotals);
   // D-157: the phase's one wage table, for the derivations and the payroll below (built
   // here instead of after the derivations, which change nothing).
   const labourWages = buildLabourWageTable(world, definitions);

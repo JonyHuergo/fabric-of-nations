@@ -59,6 +59,7 @@ import {
   type ProfessionRole,
 } from "./types.js";
 
+import { ownerKindCode, subtypeCode, NO_ACCOUNT_OWNER } from "./accountTable.js";
 /** Relative tolerance of the differentials' weighted mean of 1 (validation). */
 export const DIFFERENTIAL_MEAN_TOLERANCE = 1e-6;
 
@@ -556,8 +557,14 @@ export function measureLabourMarket(
  */
 export function ownerProfessionByBuilding(world: World): Map<Id, Id> {
   const accountOwner = new Map<Id, Id>();
-  for (const account of world.finance.accounts) {
-    if (account.ownerKind === "popBlock" && account.subtype === "household-cash" && account.ownerId !== null) accountOwner.set(account.id, account.ownerId);
+  const table = world.finance.accounts;
+  const popBlockKind = ownerKindCode("popBlock");
+  const householdCashCode = subtypeCode("household-cash");
+  for (let position = 0; position < table.count; position += 1) {
+    const owner = table.ownerId[position] ?? NO_ACCOUNT_OWNER;
+    if (table.ownerKind[position] === popBlockKind && table.subtype[position] === householdCashCode && owner !== NO_ACCOUNT_OWNER) {
+      accountOwner.set(table.id[position] ?? 0, owner);
+    }
   }
   const professionOfBlock = new Map(world.popBlocks.map((block) => [block.id, block.professionId]));
   const out = new Map<Id, Id>();

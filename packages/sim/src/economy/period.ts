@@ -40,9 +40,33 @@ import {
   assertAccountingIdentity,
   assertOwnerEquityInvariant,
   categoryAllowsNegativeBalance,
+  financeIndexOfTable,
+  ownerEquityKey,
   phaseFinance,
   FLOW_EXPENSE_SUBTYPE,
 } from "./accounts.js";
+import { accountRowScratch, readAccountRow, type AccountRow, type AccountTable } from "./accountTable.js";
+
+/**
+ * D-158: accounts by id through the finance index, each read into one reused row. The
+ * returned row is overwritten by the next `get`, so callers use it before the next lookup.
+ */
+function rowLookup(table: AccountTable): { get(id: Id): AccountRow | undefined } {
+  const index = financeIndexOfTable(table);
+  const row = accountRowScratch();
+  return {
+    get(id) {
+      const position = index.position(id);
+      return position < 0 ? undefined : readAccountRow(table, position, row);
+    },
+  };
+}
+
+/** Every account, read into one reused row (D-158). */
+function* accountRows(table: AccountTable): Generator<AccountRow> {
+  const row = accountRowScratch();
+  for (let position = 0; position < table.count; position += 1) yield readAccountRow(table, position, row);
+}
 import {
   MAX_ANNUAL_SUMMARIES,
   MAX_AUDIT_POSTINGS,
@@ -64,7 +88,6 @@ import {
   type ClosingCurrencyValuation,
   type FinancePeriodSummary,
   type FinanceState,
-  type FinancialAccount,
   type FinancialAccountOwnerKind,
   type FlowTransactionKind,
   type JournalLine,
@@ -144,8 +167,7 @@ export function governmentPeriodTotals(
       })
       .sort((left, right) => left.countryId - right.countryId);
   }
-  const accounts = new Map<Id, FinancialAccount>();
-  for (const account of finance.accounts) accounts.set(account.id, account);
+  const accounts = rowLookup(finance.accounts);
   const totals = new Map<
     Id,
     {
@@ -161,7 +183,7 @@ export function governmentPeriodTotals(
       customs: number;
     }
   >();
-  for (const account of finance.accounts) {
+  for (const account of accountRows(finance.accounts)) {
     if (account.ownerKind === "country" && account.ownerId !== null) {
       totals.set(
         account.ownerId,
@@ -408,7 +430,7 @@ function resolveClosePeriod(world: World): ClosePeriodBounds {
  */
 function captureBudgetTotals(finance: FinanceState): Record<Id, FinancePeriodBudgetTotals> {
   const countryIds = new Set<Id>();
-  for (const account of finance.accounts) {
+  for (const account of accountRows(finance.accounts)) {
     if (account.ownerKind === "country" && account.ownerId !== null) {
       countryIds.add(account.ownerId);
     }
@@ -436,7 +458,8 @@ function capturePeriodSummary(
   finance: FinanceState,
   bounds: ClosePeriodBounds,
 ): FinancePeriodSummary {
-  const accounts = [...finance.accounts].sort((left, right) => left.id - right.id);
+  // Positions follow ascending id (D-158), the order the sorted copy gave.
+  const accounts = accountRows(finance.accounts);
   const accountTotals: Record<Id, MoneyRUSD> = {};
   const flowTotalsByKind: Record<FlowTransactionKind, MoneyRUSD> = {
     "goods-purchase": 0,
@@ -471,8 +494,7 @@ function assertSummaryTrialBalance(
   finance: FinanceState,
   summary: FinancePeriodSummary,
 ): void {
-  const byId = new Map<number, FinancialAccount>();
-  for (const account of finance.accounts) byId.set(account.id, account);
+  const byId = rowLookup(finance.accounts);
   let assets = 0;
   let liabilities = 0;
   let equity = 0;
@@ -540,9 +562,11 @@ const OWNER_KIND_ORDER: Readonly<Record<FinancialAccountOwnerKind, number>> = {
 interface OwnerBooks {
   readonly ownerKind: FinancialAccountOwnerKind;
   readonly ownerId: Id | null;
-  readonly revenue: FinancialAccount[];
-  readonly expense: FinancialAccount[];
-  equity: FinancialAccount | undefined;
+  /** D-158: account-table positions, ascending (= id order). */
+  readonly revenue: number[];
+  readonly expense: number[];
+  /** Position of the owner-equity account, or -1. */
+  equity: number;
 }
 
 interface ClosingEntry {
@@ -551,10 +575,6 @@ interface ClosingEntry {
   readonly ownerLabel: string;
   /** Revenue/expense accounts zeroed by this entry, in line order. */
   readonly closedAccountIds: readonly Id[];
-}
-
-function ownerBooksKey(ownerKind: FinancialAccountOwnerKind, ownerId: Id | null): string {
-  return `${ownerKind}:${ownerId === null ? "-" : String(ownerId)}`;
 }
 
 function compareOwnerBooks(left: OwnerBooks, right: OwnerBooks): number {
@@ -576,8 +596,13 @@ function ownerLabel(ownerKind: FinancialAccountOwnerKind, ownerId: Id | null): s
  * needs no equity line. Equity may become negative. No cash account is touched.
  */
 function buildClosingEntries(finance: FinanceState): ClosingEntry[] {
-  const books = new Map<string, OwnerBooks>();
-  for (const account of finance.accounts) {
+  // D-158: owners keyed by the collision-free owner key (no string per account); the
+  // owners are sorted below, so the map's order does not matter.
+  const books = new Map<number | string, OwnerBooks>();
+  const table = finance.accounts;
+  let position = -1;
+  for (const account of accountRows(table)) {
+    position += 1;
     if (account.category === "equity" && account.subtype !== "owner-equity") continue;
     if (
       account.category !== "revenue" &&
@@ -586,7 +611,7 @@ function buildClosingEntries(finance: FinanceState): ClosingEntry[] {
     ) {
       continue;
     }
-    const key = ownerBooksKey(account.ownerKind, account.ownerId);
+    const key = ownerEquityKey(account.ownerKind, account.ownerId);
     let owner = books.get(key);
     if (owner === undefined) {
       owner = {
@@ -594,52 +619,56 @@ function buildClosingEntries(finance: FinanceState): ClosingEntry[] {
         ownerId: account.ownerId,
         revenue: [],
         expense: [],
-        equity: undefined,
+        equity: -1,
       };
       books.set(key, owner);
     }
-    if (account.category === "revenue") owner.revenue.push(account);
-    else if (account.category === "expense") owner.expense.push(account);
-    else owner.equity = account;
+    if (account.category === "revenue") owner.revenue.push(position);
+    else if (account.category === "expense") owner.expense.push(position);
+    else owner.equity = position;
   }
+  const balances = table.balance;
+  const ids = table.id;
 
   const owners = [...books.values()]
     .filter((owner) => owner.revenue.length > 0 || owner.expense.length > 0)
     .sort(compareOwnerBooks);
   const entries: ClosingEntry[] = [];
   for (const owner of owners) {
-    const revenue = [...owner.revenue].sort((left, right) => left.id - right.id);
-    const expense = [...owner.expense].sort((left, right) => left.id - right.id);
+    const revenue = owner.revenue;
+    const expense = owner.expense;
     let revenueTotal = 0;
-    for (const account of revenue) revenueTotal += account.balanceRUSD;
+    for (const at of revenue) revenueTotal += balances[at] ?? 0;
     let expenseTotal = 0;
-    for (const account of expense) expenseTotal += account.balanceRUSD;
+    for (const at of expense) expenseTotal += balances[at] ?? 0;
     if (revenueTotal === 0 && expenseTotal === 0) continue;
     const net = revenueTotal - expenseTotal;
     const label = ownerLabel(owner.ownerKind, owner.ownerId);
-    if (net !== 0 && owner.equity === undefined) {
+    if (net !== 0 && owner.equity < 0) {
       throw new RangeError(
         `${label} has a nonzero period result but no owner-equity account to close into`,
       );
     }
     const lines: JournalLine[] = [];
     const closedAccountIds: Id[] = [];
-    for (const account of revenue) {
-      if (!(account.balanceRUSD > 0)) continue;
-      lines.push({ accountId: account.id, side: "debit", amountRUSD: account.balanceRUSD });
-      closedAccountIds.push(account.id);
+    for (const at of revenue) {
+      const balance = balances[at] ?? 0;
+      if (!(balance > 0)) continue;
+      lines.push({ accountId: ids[at] ?? 0, side: "debit", amountRUSD: balance });
+      closedAccountIds.push(ids[at] ?? 0);
     }
-    for (const account of expense) {
-      if (!(account.balanceRUSD > 0)) continue;
-      lines.push({ accountId: account.id, side: "credit", amountRUSD: account.balanceRUSD });
-      closedAccountIds.push(account.id);
+    for (const at of expense) {
+      const balance = balances[at] ?? 0;
+      if (!(balance > 0)) continue;
+      lines.push({ accountId: ids[at] ?? 0, side: "credit", amountRUSD: balance });
+      closedAccountIds.push(ids[at] ?? 0);
     }
     if (net > 0) {
-      if (owner.equity === undefined) throw new RangeError(`${label} has no owner-equity account`);
-      lines.push({ accountId: owner.equity.id, side: "credit", amountRUSD: net });
+      if (owner.equity < 0) throw new RangeError(`${label} has no owner-equity account`);
+      lines.push({ accountId: ids[owner.equity] ?? 0, side: "credit", amountRUSD: net });
     } else if (net < 0) {
-      if (owner.equity === undefined) throw new RangeError(`${label} has no owner-equity account`);
-      lines.push({ accountId: owner.equity.id, side: "debit", amountRUSD: -net });
+      if (owner.equity < 0) throw new RangeError(`${label} has no owner-equity account`);
+      lines.push({ accountId: ids[owner.equity] ?? 0, side: "debit", amountRUSD: -net });
     }
     entries.push({
       lines,
@@ -672,8 +701,9 @@ function postPeriodCloseEntries(
 ): JournalPosting[] {
   assertValidDayIndex(dayIndex);
   if (entries.length === 0) return [];
-  const accounts = new Map<number, FinancialAccount>();
-  for (const account of finance.accounts) accounts.set(account.id, account);
+  const accounts = rowLookup(finance.accounts);
+  const balances = finance.accounts.balance;
+  const positionOf = financeIndexOfTable(finance.accounts).position;
   const nextPostingId = requireInteger(
     finance.nextPostingId,
     "finance.nextPostingId",
@@ -735,9 +765,9 @@ function postPeriodCloseEntries(
   }
 
   for (const [accountId, delta] of aggregate) {
-    const account = accounts.get(accountId);
-    if (account === undefined) throw new RangeError(`unknown account ${String(accountId)}`);
-    account.balanceRUSD += delta;
+    const position = positionOf(accountId);
+    if (position < 0) throw new RangeError(`unknown account ${String(accountId)}`);
+    balances[position] = (balances[position] ?? 0) + delta;
   }
 
   const postings: JournalPosting[] = [];
@@ -799,7 +829,7 @@ function buildAnnualSummary(
   }
   // The December monthly close is the year-end closing entry. It must have
   // zeroed every revenue/expense account before an annual summary can exist.
-  for (const account of finance.accounts) {
+  for (const account of accountRows(finance.accounts)) {
     if (account.category !== "revenue" && account.category !== "expense") continue;
     if (Math.abs(account.balanceRUSD) > toleranceMoney(account.balanceRUSD)) {
       throw new RangeError(
@@ -915,7 +945,7 @@ function buildAnnualSummary(
       interestPayableRUSD: 0,
     };
   }
-  for (const account of finance.accounts) {
+  for (const account of accountRows(finance.accounts)) {
     if (account.ownerKind !== "country" || account.ownerId === null) continue;
     const balances = closingBalances[account.ownerId];
     if (balances === undefined) continue;
@@ -986,7 +1016,7 @@ function countryClosingBalancesOf(world: World, finance: FinanceState): ClosingC
     const owner = ownerOfProvince.get(block.provinceId);
     if (owner !== undefined && household.has(owner)) countryOfBlock.set(block.id, owner);
   }
-  for (const account of finance.accounts) {
+  for (const account of accountRows(finance.accounts)) {
     if (account.ownerId === null) continue;
     if (account.ownerKind === "country") {
       if (account.subtype === "treasury-cash" && treasury.has(account.ownerId)) {

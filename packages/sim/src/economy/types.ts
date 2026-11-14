@@ -12,6 +12,7 @@
  * they are not serialized into `World`.
  */
 
+import type { AccountTable } from "./accountTable.js";
 import type { DepositInitialDef, ResourceKind } from "./resourceState.js";
 import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
 import type { PopulationScenarioDef } from "../population/types.js";
@@ -876,7 +877,8 @@ export interface FinanceCorrection {
 }
 
 export interface FinanceState {
-  accounts: FinancialAccount[];
+  /** D-158: the columnar account table (`accountTable.ts`); accounts as views via `listAccounts`. */
+  accounts: AccountTable;
   /** Bounded recent audit buffer; never an unbounded transaction log. */
   postings: JournalPosting[];
   nextPostingId: number;

@@ -116,6 +116,7 @@ import {
 } from "./types.js";
 import { countryProvinceIds } from "./country.js";
 
+import { personsOfBlock, type BlockTotals } from "../population/blockTotals.js";
 const DEFAULT_INFRASTRUCTURE = 0.5;
 const DEFAULT_ADULT_AGE = SUFFRAGE_MIN_AGE;
 
@@ -1822,6 +1823,8 @@ export function runUnrestPhase(
   world: World,
   definitions: EconomyDefinitions | undefined,
   day: Day,
+  /** D-158: the day's measured block totals (cells summed when absent). */
+  totals?: BlockTotals,
 ): void {
   void day;
   if (definitions?.politics === undefined || !world.politics.enabled) return;
@@ -1860,7 +1863,7 @@ export function runUnrestPhase(
       let employed = 0;
       let eligibleLabour = 0;
       for (const block of lookups.blocksByProvince.get(provinceId) ?? []) {
-        const count = populationTotal(block);
+        const count = personsOfBlock(totals, block);
         provincePopulation += count;
         weightedMilitancy += block.militancy * count;
         if (block.unmetSubsistenceDays >= 7) unmetPopulation += count;

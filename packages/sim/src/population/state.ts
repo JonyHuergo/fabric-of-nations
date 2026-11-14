@@ -17,7 +17,12 @@ import {
 } from "./demographicLevels.js";
 import { assertValidDayIndex } from "../calendar.js";
 import { DEFAULT_DATA_VERSION, MAX_SCENARIO_ID_LENGTH, SIM_VERSION, WORLD_SCHEMA_VERSION } from "../constants.js";
-import { applyOpeningBalances, categoryForSubtype } from "../economy/accounts.js";
+import { applyOpeningBalances, categoryForSubtype, financeIndexOfTable } from "../economy/accounts.js";
+import {
+  accountTableFromRecords,
+  NO_ACCOUNT_OWNER,
+  ownerKindCode,
+} from "../economy/accountTable.js";
 import type { OpeningBalanceEntry } from "../economy/accounts.js";
 import type { AccountSubtype } from "../economy/types.js";
 import type { Day, Id, Rate, Seed } from "../types.js";
@@ -248,13 +253,9 @@ export function assertValidPopulationState(world: World): void {
   assertUnique(blocks as PopBlock[], (block) => block.id, "world.popBlocks");
   const blockIds = new Set<number>((blocks as PopBlock[]).map((block) => block.id));
 
-  const accountById = new Map<number, FinancialAccount>();
-  for (const account of world.finance.accounts) {
-    if (accountById.has(account.id)) {
-      throw new RangeError(`duplicate finance account id ${String(account.id)}`);
-    }
-    accountById.set(account.id, account);
-  }
+  // D-158: the index's id lookup (it rejects duplicate ids when built).
+  const accountTable = world.finance.accounts;
+  const accountById = financeIndexOfTable(accountTable).byId;
   const accountOwners = new Set<number>();
   for (const block of blocks as PopBlock[]) {
     if (!provinceIds.has(block.provinceId)) {
@@ -282,11 +283,14 @@ export function assertValidPopulationState(world: World): void {
     accountOwners.add(account.id);
   }
   const retiredBlockIds = new Set<number>(world.labourMarket.retiredPopBlockIds);
-  for (const account of world.finance.accounts) {
-    if (account.ownerKind === "popBlock" && account.ownerId !== null && retiredBlockIds.has(account.ownerId)) continue;
-    if (account.ownerKind === "popBlock" && (account.ownerId === null || !blockIds.has(account.ownerId))) {
+  const popBlockKind = ownerKindCode("popBlock");
+  for (let position = 0; position < accountTable.count; position += 1) {
+    if (accountTable.ownerKind[position] !== popBlockKind) continue;
+    const owner = accountTable.ownerId[position] ?? NO_ACCOUNT_OWNER;
+    if (owner !== NO_ACCOUNT_OWNER && retiredBlockIds.has(owner)) continue;
+    if (owner === NO_ACCOUNT_OWNER || !blockIds.has(owner)) {
       throw new RangeError(
-        `popBlock financial account ${String(account.id)} references unknown popBlock`,
+        `popBlock financial account ${String(accountTable.id[position])} references unknown popBlock`,
       );
     }
   }
@@ -722,7 +726,7 @@ export function createPopulationWorld(
     employmentDirty: false,
     markets: [],
     finance: {
-      accounts,
+      accounts: accountTableFromRecords(accounts),
       postings: [],
       nextPostingId: 1,
       nextAccountId,

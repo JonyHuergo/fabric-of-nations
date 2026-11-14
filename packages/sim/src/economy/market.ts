@@ -819,6 +819,12 @@ export function runMarketDay(
   const fulfilled1 = new Float64Array(blockSlot.size);
   const desired3 = new Float64Array(blockSlot.size);
   const fulfilled3 = new Float64Array(blockSlot.size);
+  /**
+   * D-158: `tierMet` of each slot's tier-1 and tier-3 totals, computed when the totals are
+   * refreshed (its only inputs), instead of once per demand row that asks.
+   */
+  const met1 = new Uint8Array(blockSlot.size);
+  const met3 = new Uint8Array(blockSlot.size);
   const slotOfDemand = new Int32Array(householdCount).fill(-1);
   for (let index = 0; index < householdCount; index += 1) slotOfDemand[index] = blockSlot.get(buyer[index] ?? 0) ?? -1;
   // `householdTierTotals` over the current fulfilment, summed in demand order.
@@ -843,15 +849,19 @@ export function runMarketDay(
       if (tierOf[index] === 1) fulfilled1[slot] = (fulfilled1[slot] ?? 0) + (fulfilled[index] ?? 0);
       else fulfilled3[slot] = (fulfilled3[slot] ?? 0) + (fulfilled[index] ?? 0);
     }
+    for (let slot = 0; slot < met1.length; slot += 1) {
+      met1[slot] = tierMet(desired1[slot] ?? 0, fulfilled1[slot] ?? 0) ? 1 : 0;
+      met3[slot] = tierMet(desired3[slot] ?? 0, fulfilled3[slot] ?? 0) ? 1 : 0;
+    }
   };
   const isEligible = (index: number): boolean => {
     if (kind[index] !== 0) return true;
     const tier = tierOf[index];
     if (tier === 1) return true;
     const slot = slotOfDemand[index] ?? -1;
-    if (slot >= 0 && !tierMet(desired1[slot] ?? 0, fulfilled1[slot] ?? 0)) return false;
+    if (slot >= 0 && met1[slot] !== 1) return false;
     if (tier === 3) return true;
-    return slot < 0 || tierMet(desired3[slot] ?? 0, fulfilled3[slot] ?? 0);
+    return slot < 0 || met3[slot] === 1;
   };
 
   // Reservations in columns, in creation order. D-158: household pieces are kept only in full

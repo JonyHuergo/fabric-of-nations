@@ -21,7 +21,7 @@ import { healthStaffFloor, laborHoursFactor } from "./labourLaws.js";
 export { healthStaffFloor, laborHoursFactor, laborMinimumWageRUSDPerYear } from "./labourLaws.js";
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD, RATE_DECIMAL_PLACES } from "../population/constants.js";
-import { populationTotal, workingAgePopulation } from "../population/state.js";
+import { } from "../population/state.js";
 import { localWageIndex } from "./localWages.js";
 import type { Day, Id, Rate } from "../types.js";
 import {
@@ -69,6 +69,7 @@ import {
   type CountryPopulationIndex,
 } from "./country.js";
 
+import { personsOfBlock, workingAgeOfBlock, type BlockTotals } from "../population/blockTotals.js";
 function clamp(value: number, minimum: number, maximum: number): number {
   if (value < minimum) return minimum;
   if (value > maximum) return maximum;
@@ -270,7 +271,7 @@ export function deriveHealth(
   let literacyWeighted = 0;
   const blocks = countryBlocks(world, country, populationIndex);
   for (const block of blocks) {
-    const count = populationTotal(block);
+    const count = personsOfBlock(populationIndex?.totals, block);
     population += count;
     literacyWeighted += block.literacy * count;
     const profession = professionById.get(block.professionId);
@@ -337,7 +338,7 @@ function trainingEligibleBlocks(
 ): TrainingEligibleBlock[] {
   const result: TrainingEligibleBlock[] = [];
   for (const block of countryBlocks(world, country, index)) {
-    const workingAge = workingAgePopulation(block);
+    const workingAge = workingAgeOfBlock(index?.totals, block);
     if (workingAge <= 0) continue;
     if (block.literacy < TRAINING_MIN_LITERACY) continue;
     result.push({ block, workingAge });
@@ -470,7 +471,7 @@ export function runTrainingPhase(
   world: World,
   definitions: EconomyDefinitions | undefined,
   day: Day,
-  options: { readonly financeInPlace?: boolean } = {},
+  options: { readonly financeInPlace?: boolean; readonly blockTotals?: BlockTotals } = {},
 ): TrainingPhaseResult {
   if (definitions === undefined) {
     return { dayIndex: day, countries: [], totalPaidRUSD: 0, totalRequestedRUSD: 0 };
@@ -478,7 +479,7 @@ export function runTrainingPhase(
   const yearDays = daysInYear(dayIndexToCivilDate(day).year);
   // D-137: one set of country lookups for the phase; the payroll changes balances and
   // the qualification gains below change `qualification`, neither of which they read.
-  const populationIndex = buildCountryPopulationIndex(world);
+  const populationIndex = buildCountryPopulationIndex(world, options.blockTotals);
   const derivedByCountry = new Map<Id, TrainingDerived>();
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
     derivedByCountry.set(country.id, deriveTraining(world, country, definitions, populationIndex));

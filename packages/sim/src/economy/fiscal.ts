@@ -41,7 +41,7 @@ import {
 } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import { buildLabourWageTable, institutionPayroll, popBlocksById } from "./labourMarket.js";
-import { populationTotal } from "../population/state.js";
+import { } from "../population/state.js";
 import type { DayIndex, Id } from "../types.js";
 import {
   assertValidWorldForTick,
@@ -57,6 +57,7 @@ import type { MarketSettlementResult } from "./settlement.js";
 import type { Country, EconomyDefinitions, FinanceState, JournalLine } from "./types.js";
 import { taxCollectionEfficiency } from "./politics.js";
 
+import { personsOfBlock, type BlockTotals } from "../population/blockTotals.js";
 /** Per-block fiscal result for one processed day. */
 export interface FiscalBlockResult {
   readonly popBlockId: Id;
@@ -125,6 +126,8 @@ export interface FiscalPhaseTestHooks {
 /** M8-aware fiscal phase options. `economyDefinitions` is needed for payroll. */
 export interface FiscalPhaseOptions extends PhaseValidationOptions {
   readonly economyDefinitions?: EconomyDefinitions;
+  /** D-158: the day's measured block totals (cells summed when absent). */
+  readonly blockTotals?: BlockTotals;
 }
 
 /**
@@ -299,7 +302,7 @@ function executeFiscalPhase(
     }
     group.blocks.push({
       popBlockId: block.id,
-      population: populationTotal(block),
+      population: personsOfBlock(options.blockTotals, block),
       wealthLevel: block.wealthLevel,
       professionId: block.professionId,
     });

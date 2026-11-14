@@ -38,7 +38,6 @@ import {
   saturate,
 } from "./definitions.js";
 import type {
-  NeedTierSummary,
   PopBlockNeedsResult,
   PopulationDefinitions,
   PopulationInputs,
@@ -46,13 +45,7 @@ import type {
   WealthUpdate,
 } from "./types.js";
 
-function tierSummary(
-  blockNeeds: PopBlockNeedsResult | undefined,
-  tier: "subsistence" | "basic" | "comfort" | "luxury",
-): NeedTierSummary | undefined {
-  return blockNeeds?.tierSummaries.find((summary) => summary.tier === tier);
-}
-
+import { needsReader, type NeedsReader } from "./needsColumns.js";
 /**
  * D-158: the needs result of each block of `blocks` by position. The integrated day lists
  * results in block order, so the result at the same position is the block's; otherwise
@@ -72,10 +65,11 @@ export function needsByPosition(
   return (position) => byId.get(blocks[position]?.id ?? -1);
 }
 
-function luxuryFulfillmentRatio(blockNeeds: PopBlockNeedsResult | undefined): number {
-  const summary = tierSummary(blockNeeds, "luxury");
-  if (summary === undefined || !summary.active || summary.desiredCostRUSD <= 0) return 0;
-  return clamp(summary.spentRUSD / summary.desiredCostRUSD, 0, 1);
+function luxuryFulfillmentRatio(reader: NeedsReader, position: number): number {
+  if (!reader.hasTier(position, "luxury") || !reader.active(position, "luxury")) return 0;
+  const desired = reader.desiredCostRUSD(position, "luxury");
+  if (desired <= 0) return 0;
+  return clamp(reader.spentRUSD(position, "luxury") / desired, 0, 1);
 }
 
 /**
@@ -97,8 +91,8 @@ export function updateMonthlyWealth(
       "annual subsistence basket cost must be positive for the wealth formula",
     );
   }
-  const needsByBlock = new Map<number, PopBlockNeedsResult>();
-  for (const blockNeeds of needs.blocks) needsByBlock.set(blockNeeds.popBlockId, blockNeeds);
+  // D-158: the result's columns (or objects) by block position.
+  const reader = needsReader(world.popBlocks, needs);
   const incomeById = new Map<
     number,
     { annualSettledIncomePerCapitaRUSD: number; annualMandatoryPaymentsPerCapitaRUSD: number }
@@ -106,7 +100,8 @@ export function updateMonthlyWealth(
   for (const income of inputs.income) incomeById.set(income.popBlockId, income);
 
   const updates: WealthUpdate[] = [];
-  for (const block of world.popBlocks) {
+  for (let position = 0; position < world.popBlocks.length; position += 1) {
+    const block = world.popBlocks[position] as World["popBlocks"][number];
     const income = incomeById.get(block.id);
     if (income === undefined) {
       throw new RangeError(`missing income fixture for popBlock ${String(block.id)}`);
@@ -138,7 +133,7 @@ export function updateMonthlyWealth(
     const comfortGain =
       COMFORT_WEALTH_GAIN_MAX * saturate(block.comfortFulfilledDays, COMFORT_WEALTH_SCALE_DAYS);
     const luxuryGain =
-      LUXURY_WEALTH_GAIN_MAX * luxuryFulfillmentRatio(needsByBlock.get(block.id));
+      LUXURY_WEALTH_GAIN_MAX * luxuryFulfillmentRatio(reader, position);
     const newWealth = roundTo(
       clamp(smoothed - basicLoss + comfortGain + luxuryGain, WEALTH_MIN, WEALTH_MAX),
       WEALTH_DECIMAL_PLACES,
@@ -161,10 +156,17 @@ export function updateDailyMilitancy(
   world: World,
   needs: PopulationNeedsDayResult,
 ): void {
-  const needsAt = needsByPosition(world.popBlocks, needs.blocks);
+  const reader = needsReader(world.popBlocks, needs);
   for (let position = 0; position < world.popBlocks.length; position += 1) {
     const block = world.popBlocks[position] as World["popBlocks"][number];
-    const luxury = tierSummary(needsAt(position), "luxury");
+    const luxury =
+      reader.hasTier(position, "luxury")
+        ? {
+            active: reader.active(position, "luxury"),
+            spentRUSD: reader.spentRUSD(position, "luxury"),
+            desiredCostRUSD: reader.desiredCostRUSD(position, "luxury"),
+          }
+        : undefined;
     const subsistencePressure = saturate(block.unmetSubsistenceDays, MILITANCY_SCALE_DAYS);
     const basicPressure = saturate(block.unmetBasicDays, MILITANCY_SCALE_DAYS);
     const comfortRelief = saturate(block.comfortFulfilledDays, MILITANCY_SCALE_DAYS);

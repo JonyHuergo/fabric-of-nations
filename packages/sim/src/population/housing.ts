@@ -54,10 +54,13 @@ export function blockHasHousing(block: PopBlock): boolean {
   return block.housingReferencePersonsPerDwelling > 0;
 }
 
-/** Crowding of a block: persons per dwelling ÷ its 1900 persons per dwelling. */
-export function blockCrowding(block: PopBlock): number {
+/**
+ * Crowding of a block: persons per dwelling ÷ its 1900 persons per dwelling. `measured` is
+ * the block's persons when the caller has them (D-158; the same integer sum).
+ */
+export function blockCrowding(block: PopBlock, measured?: number): number {
   if (!blockHasHousing(block)) return 1;
-  const persons = personsOf(block);
+  const persons = measured ?? personsOf(block);
   if (persons <= 0) return 1;
   if (!(block.dwellings > 0)) return CROWDING_MAX;
   const crowding = persons / block.dwellings / block.housingReferencePersonsPerDwelling;
@@ -72,12 +75,14 @@ export function blockCrowding(block: PopBlock): number {
 export function provinceCrowding(
   blocks: readonly PopBlock[],
   referencePersonsPerDwelling: number | null,
+  /** D-158: the blocks' persons when the caller has measured them. */
+  personsOfMeasured?: (block: PopBlock) => number,
 ): number | null {
   if (referencePersonsPerDwelling === null) return null;
   let persons = 0;
   let dwellings = 0;
   for (const block of blocks) {
-    persons += personsOf(block);
+    persons += personsOfMeasured === undefined ? personsOf(block) : personsOfMeasured(block);
     dwellings += block.dwellings;
   }
   if (persons <= 0) return 1;
@@ -92,10 +97,10 @@ export function crowdingMortalityFactor(crowding: number, weight: number): numbe
   return 1 + weight * Math.max(0, crowding - 1);
 }
 
-/** Dwellings the block wants at its smoothed income (plan §4.3). */
-export function desiredDwellings(block: PopBlock): number {
+/** Dwellings the block wants at its smoothed income (plan §4.3); `measured` as in `blockCrowding`. */
+export function desiredDwellings(block: PopBlock, measured?: number): number {
   if (!blockHasHousing(block)) return 0;
-  const persons = personsOf(block);
+  const persons = measured ?? personsOf(block);
   const base = persons / block.housingReferencePersonsPerDwelling;
   const reference = block.housingReferenceIncomeRUSDPerCapitaDay;
   const income = block.incomeSmoothedRUSDPerCapitaDay;

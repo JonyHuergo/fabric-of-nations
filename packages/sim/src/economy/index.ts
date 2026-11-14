@@ -3,6 +3,7 @@
 export * from "./types.js";
 export * from "./constants.js";
 export * from "./accounts.js";
+export * from "./accountTable.js";
 export * from "./currency.js";
 export * from "./country.js";
 export * from "./definitions.js";

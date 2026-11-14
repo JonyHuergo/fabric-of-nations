@@ -251,8 +251,9 @@ export function applyDailyDemography(
     const male = block.maleByAge;
     const female = block.femaleByAge;
     const factors = options.factorsOf?.(block) ?? NEUTRAL_DEMOGRAPHY_FACTORS;
-    const childMultiplier = effectiveChildMortality(block, factors);
-    const adultMultiplier = effectiveAdultMortality(block, factors);
+    // D-158: the block's persons (`start`, the cells unchanged since) for its crowding.
+    const childMultiplier = effectiveChildMortality(block, factors, start);
+    const adultMultiplier = effectiveAdultMortality(block, factors, start);
     // The effective rate is a function of the band only, so it is formed once per band.
     for (let band = 0; band < 17; band += 1) {
       const multiplier = band === CHILD_MORTALITY_BAND ? childMultiplier : adultMultiplier;

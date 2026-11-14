@@ -20,6 +20,7 @@ import { CASUS_BELLI, PEACE_TERMS } from "./types.js";
 import type { MilitaryState, WarState } from "./types.js";
 import { requireInteger } from "../validation.js";
 
+import { accountRowScratch, readAccountRow } from "./accountTable.js";
 export function emptyMilitaryState(): MilitaryState {
   return {
     enabled: false,
@@ -116,7 +117,10 @@ function assertMilitaryAccounts(world: World, path: string): void {
   const blockIds = new Set<Id>(world.popBlocks.map((block) => block.id));
   const expenseCounts = new Map<Id, number>();
   const incomeCounts = new Map<Id, number>();
-  for (const account of world.finance.accounts) {
+  const table = world.finance.accounts;
+  const row = accountRowScratch();
+  for (let position = 0; position < table.count; position += 1) {
+    const account = readAccountRow(table, position, row);
     if (account.subtype === "military-expense") {
       if (account.ownerKind !== "country" || account.ownerId === null) {
         throw new RangeError(`${path} military-expense account must be owned by a country`);

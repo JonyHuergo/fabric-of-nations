@@ -23,7 +23,10 @@ import { QUANTITY_TOLERANCE } from "../population/constants.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { DayIndex, Id } from "../types.js";
 import type { World } from "../world.js";
-import { buildFinanceIndex, categoryForSubtype } from "./accounts.js";
+import {
+  buildFinanceIndex,
+  findAccountById,
+} from "./accounts.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import { MINT_MAX_DAILY_SALE_SHARE } from "./constants.js";
 import { asRusdPerCurrencyUnit } from "./currency.js";
@@ -39,6 +42,7 @@ import type {
 } from "./types.js";
 import { MONETARY_STANDARDS } from "./types.js";
 
+import { appendAccount, accountView, truncateAccounts } from "./accountTable.js";
 export interface AdoptCurrencyInput {
   readonly countryId: Id;
   readonly currencyId: Id;
@@ -163,7 +167,7 @@ export function validateEstablishCurrency(world: World, definitions: EconomyDefi
   }
   if (!Number.isFinite(input.reserveFundingRUSD) || input.reserveFundingRUSD < 0) errors.push("the reserve funding must be finite and non-negative");
   else {
-    const treasury = world.finance.accounts.find((account) => account.id === country.treasuryAccountId)?.balanceRUSD ?? 0;
+    const treasury = findAccountById(world.finance.accounts, country.treasuryAccountId)?.balanceRUSD ?? 0;
     if (input.reserveFundingRUSD > treasury + MONEY_TOLERANCE_RUSD) errors.push("the reserve funding exceeds the treasury's cash");
   }
   if (country.monetary.kind === "adopted" && currencyValuationOf(world, country.monetary.currencyId) === null) {
@@ -196,7 +200,7 @@ export function applyEstablishCurrency(
     currencies: world.currencies.map((currency) => ({ ...currency })),
     valuations: world.currencyValuations.map((valuation) => ({ ...valuation })),
     records: world.monetary.currencies.map((record) => ({ ...record })),
-    accounts: world.finance.accounts.length,
+    accounts: world.finance.accounts.count,
     nextAccountId: world.finance.nextAccountId,
     arrangement: country.monetary,
   };
@@ -284,7 +288,7 @@ export function applyEstablishCurrency(
     world.currencies = before.currencies;
     world.currencyValuations = before.valuations;
     world.monetary.currencies = before.records;
-    world.finance.accounts.length = before.accounts;
+    truncateAccounts(world.finance.accounts, before.accounts);
     world.finance.nextAccountId = before.nextAccountId;
     country.monetary = before.arrangement;
     throw error;
@@ -411,7 +415,6 @@ function homePrice(world: World, definitions: EconomyDefinitions, countryId: Id,
 function allocate(world: World, ownerKind: "country" | "system", ownerId: Id | null, subtype: AccountSubtype): FinancialAccount {
   const id = world.finance.nextAccountId;
   world.finance.nextAccountId = id + 1;
-  const account: FinancialAccount = { id, ownerKind, ownerId, category: categoryForSubtype(subtype), subtype, balanceRUSD: 0 };
-  world.finance.accounts.push(account);
-  return account;
+  const position = appendAccount(world.finance.accounts, { id, ownerKind, ownerId, subtype, balanceRUSD: 0 });
+  return accountView(world.finance.accounts, position);
 }

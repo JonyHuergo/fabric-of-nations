@@ -31,12 +31,13 @@ import { drawUint32 } from "../rng.js";
 import type { DayIndex, Id } from "../types.js";
 import type { World } from "../world.js";
 import { postJournalBatch } from "./accounting.js";
-import { categoryForSubtype } from "./accounts.js";
+import { } from "./accounts.js";
 import { MOBILITY_AGE_REMAINDER_PURPOSE } from "./constants.js";
 import { apportionLargestRemainderBy } from "./apportion.js";
 import type { AccountSubtype, EconomyDefinitions, FinancialAccount } from "./types.js";
 import { WORKING_AGE_END, WORKING_AGE_START } from "../population/constants.js";
 
+import { ownerKindCode, NO_ACCOUNT_OWNER, subtypeCode, accountView, accountSubtypeAt, appendAccount, accountCategoryAt } from "./accountTable.js";
 export interface MoveOptions {
   /** Movers are literate working-age persons (a literacy-gated destination, plan §5.3). */
   readonly selectiveLiterate: boolean;
@@ -60,7 +61,8 @@ export interface ReclassifyContext {
   readonly definitions: EconomyDefinitions;
   readonly dayIndex: DayIndex;
   /** Owner block id → its accounts (built once per phase, extended on creation). */
-  readonly accountsByBlock: Map<Id, FinancialAccount[]>;
+  /** D-158: account-table positions of each block's accounts, in id order. */
+  readonly accountsByBlock: Map<Id, number[]>;
   /** (province, profession) → block. */
   readonly blockByKey: Map<string, PopBlock>;
   /** Source block id → destination block id → people received this month. */
@@ -73,22 +75,33 @@ export function blockKey(provinceId: Id, professionId: Id): string {
 }
 
 export function createReclassifyContext(world: World, definitions: EconomyDefinitions, dayIndex: DayIndex): ReclassifyContext {
-  const accountsByBlock = new Map<Id, FinancialAccount[]>();
-  for (const account of world.finance.accounts) {
-    if (account.ownerKind !== "popBlock" || account.ownerId === null) continue;
-    const list = accountsByBlock.get(account.ownerId);
-    if (list === undefined) accountsByBlock.set(account.ownerId, [account]);
-    else list.push(account);
+  const accountsByBlock = new Map<Id, number[]>();
+  const table = world.finance.accounts;
+  const popBlockKind = ownerKindCode("popBlock");
+  for (let position = 0; position < table.count; position += 1) {
+    const owner = table.ownerId[position] ?? NO_ACCOUNT_OWNER;
+    if (table.ownerKind[position] !== popBlockKind || owner === NO_ACCOUNT_OWNER) continue;
+    const list = accountsByBlock.get(owner);
+    if (list === undefined) accountsByBlock.set(owner, [position]);
+    else list.push(position);
   }
   const blockByKey = new Map<string, PopBlock>();
   for (const block of world.popBlocks) blockByKey.set(blockKey(block.provinceId, block.professionId), block);
   return { world, definitions, dayIndex, accountsByBlock, blockByKey, received: new Map(), blocksCreated: 0 };
 }
 
+const HOUSEHOLD_CASH_CODE = subtypeCode("household-cash");
+
+/** Position of a block's household cash account, or -1. */
+export function householdCashPosition(context: ReclassifyContext, blockId: Id): number {
+  const table = context.world.finance.accounts;
+  return context.accountsByBlock.get(blockId)?.find((position) => table.subtype[position] === HOUSEHOLD_CASH_CODE) ?? -1;
+}
+
 function householdCash(context: ReclassifyContext, blockId: Id): FinancialAccount {
-  const account = context.accountsByBlock.get(blockId)?.find((entry) => entry.subtype === "household-cash");
-  if (account === undefined) throw new RangeError(`popBlock ${String(blockId)} has no household cash account`);
-  return account;
+  const position = householdCashPosition(context, blockId);
+  if (position < 0) throw new RangeError(`popBlock ${String(blockId)} has no household cash account`);
+  return accountView(context.world.finance.accounts, position);
 }
 
 /** Split `count` movers over a block's sex and age cells (largest remainder, keyed ties). */
@@ -150,25 +163,18 @@ function createBlock(context: ReclassifyContext, source: PopBlock, provinceId: I
   // has the same set), through the ledger's id allocator; balances start at zero.
   const sourceAccounts = context.accountsByBlock.get(source.id) ?? [];
   if (sourceAccounts.length === 0) throw new RangeError(`popBlock ${String(source.id)} has no accounts`);
-  const subtypes: AccountSubtype[] = [...new Set(sourceAccounts.map((account) => account.subtype))];
-  const created: FinancialAccount[] = [];
+  const table = world.finance.accounts;
+  const subtypes: AccountSubtype[] = [...new Set(sourceAccounts.map((position) => accountSubtypeAt(table, position)))];
+  const created: number[] = [];
   for (const subtype of subtypes) {
     const accountId = world.finance.nextAccountId;
     world.finance.nextAccountId += 1;
-    const account: FinancialAccount = {
-      id: accountId,
-      ownerKind: "popBlock",
-      ownerId: id,
-      category: categoryForSubtype(subtype),
-      subtype,
-      balanceRUSD: 0,
-    };
-    world.finance.accounts.push(account);
-    created.push(account);
+    created.push(appendAccount(table, { id: accountId, ownerKind: "popBlock", ownerId: id, subtype, balanceRUSD: 0 }));
   }
   context.accountsByBlock.set(id, created);
-  const cash = created.find((account) => account.subtype === "household-cash");
-  if (cash === undefined) throw new RangeError("new popBlock has no household cash account");
+  const cashPosition = created.find((position) => table.subtype[position] === HOUSEHOLD_CASH_CODE);
+  if (cashPosition === undefined) throw new RangeError("new popBlock has no household cash account");
+  const cash = { id: table.id[cashPosition] ?? 0 };
   const block: PopBlock = {
     id,
     provinceId,
@@ -342,7 +348,15 @@ export function retireEmptyBlocks(context: ReclassifyContext): number {
   const retired = new Set<Id>();
   for (const block of candidates) {
     const accounts = context.accountsByBlock.get(block.id) ?? [];
-    if (accounts.some((account) => account.category === "asset" && account.subtype !== "household-cash" && Math.abs(account.balanceRUSD) > 0)) continue;
+    const table = world.finance.accounts;
+    if (
+      accounts.some(
+        (position) =>
+          accountCategoryAt(table, position) === "asset" &&
+          table.subtype[position] !== HOUSEHOLD_CASH_CODE &&
+          Math.abs(table.balance[position] ?? 0) > 0,
+      )
+    ) continue;
     // Recipient: the block that received most of its people this month, else the
     // province's most populous block of the same stratum, else its most populous block.
     let recipient: PopBlock | undefined;

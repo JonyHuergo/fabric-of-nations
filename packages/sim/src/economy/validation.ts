@@ -43,10 +43,19 @@ import {
   isCashAccount,
   subtypeAllowsOwnerKind,
   tallyOwnerEquity,
-  accountOwnerKey,
   transactionKindChangesCash,
+  financeIndexOfTable,
+  requireAccountTable,
+  type AccountsById,
   type OwnerEquityTally,
 } from "./accounts.js";
+import {
+  NO_ACCOUNT_OWNER,
+  accountRowScratch,
+  ownerKindCode,
+  readAccountRow,
+  type AccountTable,
+} from "./accountTable.js";
 import {
   assertValidCountryCurrencyState,
   buildProvinceOwnerMap,
@@ -209,7 +218,7 @@ interface PostingLineDelta {
 function assertPostingLine(
   value: unknown,
   path: string,
-  accounts: ReadonlyMap<number, FinancialAccount>,
+  accounts: AccountsById,
   transactionKind: TransactionKind,
 ): PostingLineDelta {
   const record = requireRecord(value, path);
@@ -247,7 +256,7 @@ function assertPostingLine(
  */
 function assertValidPeriodClosePosting(
   lines: readonly unknown[],
-  accounts: ReadonlyMap<number, FinancialAccount>,
+  accounts: AccountsById,
   path: string,
 ): void {
   let debits = 0;
@@ -316,7 +325,7 @@ function assertValidPeriodClosePosting(
 
 export function assertValidJournalPosting(
   posting: JournalPosting,
-  accounts: ReadonlyMap<number, FinancialAccount>,
+  accounts: AccountsById,
   path = "finance.postings[]",
 ): void {
   const record = requireRecord(posting, path);
@@ -572,7 +581,7 @@ const customs = valueOf("customsDutyRevenueRUSD");
 
 function assertValidFinanceCorrection(
   correction: FinanceCorrection,
-  accounts: ReadonlyMap<number, FinancialAccount>,
+  accounts: AccountsById,
   path: string,
 ): void {
   const record = requireRecord(correction, path);
@@ -615,7 +624,7 @@ function assertValidFinanceCorrection(
 
 function assertValidAnnualState(
   finance: FinanceState,
-  accounts: ReadonlyMap<number, FinancialAccount>,
+  accounts: AccountsById,
 ): void {
   if (finance.annualSummaries.length > MAX_ANNUAL_SUMMARIES) {
     throw new RangeError(
@@ -679,36 +688,16 @@ function assertValidAnnualState(
 
 export function assertValidFinanceState(finance: FinanceState): void {
   const record = requireRecord(finance, "world.finance");
-  const rawAccounts = requireArray(record.accounts, "world.finance.accounts");
-  const accounts = new Map<number, FinancialAccount>();
-  const ownerKeys = new Set<number | string>();
-  let maxAccountId = 0;
-  for (const value of rawAccounts) {
-    const account = value as FinancialAccount;
-    assertValidFinancialAccount(account);
-    if (accounts.has(account.id)) {
-      throw new RangeError(`duplicate finance account id ${String(account.id)}`);
-    }
-    accounts.set(account.id, account);
-    maxAccountId = Math.max(maxAccountId, account.id);
-    // D-137: the collision-free numeric owner key of the finance index (no string per
-    // account); unusual owner ids fall back to the string form.
-    const key = accountOwnerKey(account.ownerKind, account.ownerId, account.subtype);
-    // E6b external-counterparty accounts are per-country system accounts identified by
-    // explicit ids in `World.monetary`; they are the one documented exception to the
-    // one-account-per-owner/subtype rule (D-080).
-    const perCountryExternalAccount =
-      account.ownerKind === "system" &&
-      (account.subtype === "external-cash" ||
-        account.subtype === "external-currency-holding" ||
-        account.subtype === "external-equity");
-    if (ownerKeys.has(key) && !perCountryExternalAccount) {
-      throw new RangeError(
-        `duplicate ${account.subtype} account for ${account.ownerKind} ${String(account.ownerId)}`,
-      );
-    }
-    ownerKeys.add(key);
+  // D-158: every row of the account table, then the index build's checks (ids strictly
+  // ascending, so no duplicate id; one account per owner and subtype, the E6b external
+  // counterparty accounts excepted, D-080).
+  const table = requireAccountTable(record.accounts);
+  const row = accountRowScratch();
+  for (let position = 0; position < table.count; position += 1) {
+    assertValidFinancialAccount(readAccountRow(table, position, row));
   }
+  const accounts: AccountsById = financeIndexOfTable(table).byId;
+  const maxAccountId = table.count > 0 ? (table.id[table.count - 1] ?? 0) : 0;
 
   const rawPostings = requireArray(record.postings, "world.finance.postings");
   if (rawPostings.length > MAX_AUDIT_POSTINGS) {
@@ -844,10 +833,10 @@ export function assertValidFinanceState(finance: FinanceState): void {
 
   const opening = record.opening as FinanceState["opening"];
   if (opening === null || opening === undefined) {
-    for (const account of accounts.values()) {
-      if (account.balanceRUSD !== 0) {
+    for (let position = 0; position < table.count; position += 1) {
+      if ((table.balance[position] ?? 0) !== 0) {
         throw new RangeError(
-          `world.finance.opening is required when account ${String(account.id)} has a non-zero balance`,
+          `world.finance.opening is required when account ${String(table.id[position])} has a non-zero balance`,
         );
       }
     }
@@ -922,8 +911,9 @@ export function assertValidCountryClosingBalances(value: unknown, path: string):
 
 export function assertValidFinancePeriodSummary(
   summary: FinancePeriodSummary,
-  accounts: ReadonlyMap<number, FinancialAccount>,
+  accounts: AccountsById,
   path: string,
+  table: AccountTable,
 ): void {
   const record = requireRecord(summary, path);
   const start = requireInteger(
@@ -956,10 +946,10 @@ export function assertValidFinancePeriodSummary(
   const compacted = record.countryFiscalTotals !== undefined;
   const totalsByAccount = new Map<number, number>();
   const countryIds = new Set<number>();
-  for (const account of accounts.values()) {
-    if (account.ownerKind === "country" && account.ownerId !== null) {
-      countryIds.add(account.ownerId);
-    }
+  const countryKind = ownerKindCode("country");
+  for (let position = 0; position < table.count; position += 1) {
+    const owner = table.ownerId[position] ?? NO_ACCOUNT_OWNER;
+    if (table.ownerKind[position] === countryKind && owner !== NO_ACCOUNT_OWNER) countryIds.add(owner);
   }
   if (compacted) {
     if (Object.keys(totals).length !== 0) {
@@ -1229,11 +1219,8 @@ export function assertValidPeriodSummaries(
   // its first month-end): no per-account work is needed on the hot tick path.
   if (rawSummaries.length === 0) return;
 
-  const accounts = new Map<number, FinancialAccount>();
-  for (const value of requireArray(record.accounts, "world.finance.accounts")) {
-    const account = value as FinancialAccount;
-    accounts.set(account.id, account);
-  }
+  const accountTable = requireAccountTable(record.accounts);
+  const accounts: AccountsById = financeIndexOfTable(accountTable).byId;
 
   const firstIndex = mode === "latest" ? rawSummaries.length - 1 : 0;
   let previousEnd: Day | null =
@@ -1244,7 +1231,7 @@ export function assertValidPeriodSummaries(
   for (let index = firstIndex; index < rawSummaries.length; index += 1) {
     const summary = rawSummaries[index] as FinancePeriodSummary;
     const path = `world.finance.periodSummaries[${String(index)}]`;
-    assertValidFinancePeriodSummary(summary, accounts, path);
+    assertValidFinancePeriodSummary(summary, accounts, path, accountTable);
     const start = summary.periodStartDay;
     const end = summary.periodEndDay;
     if (index === 0) {
@@ -1535,7 +1522,10 @@ function assertOwnerAccountSets(world: World, index: ReturnType<typeof buildFina
       }
     }
   }
-  for (const account of world.finance.accounts) {
+  const accountTable = world.finance.accounts;
+  const systemRow = accountRowScratch();
+  for (let position = 0; position < accountTable.count; position += 1) {
+    const account = readAccountRow(accountTable, position, systemRow);
     if (account.ownerKind !== "system" || account.subtype !== "system-reserve-cash") continue;
     for (const subtype of ["owner-equity", "system-income"] as const) {
       index.get("system", null, subtype);
@@ -1604,7 +1594,10 @@ export function assertValidEconomyState(
   // The same pass collects the D-047 owner-equity tallies, so the invariant adds
   // no extra per-account scan. Reference errors are reported first.
   const ownerEquityTallies = new Map<number | string, OwnerEquityTally>();
-  for (const account of world.finance.accounts) {
+  const ownedTable = world.finance.accounts;
+  const ownedRow = accountRowScratch();
+  for (let position = 0; position < ownedTable.count; position += 1) {
+    const account = readAccountRow(ownedTable, position, ownedRow);
     if (account.ownerKind === "building") {
       if (account.ownerId === null || !buildingById.has(account.ownerId)) {
         throw new RangeError(

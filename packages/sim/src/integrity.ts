@@ -23,10 +23,9 @@ export function assertDailyWorldInvariants(world: World): void {
   }
   // Indexed loops (D-139): the same order, without iterator allocation.
   const accounts = world.finance.accounts;
-  for (let index = 0; index < accounts.length; index += 1) {
-    const account = accounts[index] as World["finance"]["accounts"][number];
-    if (!Number.isFinite(account.balanceRUSD)) {
-      throw new RangeError(`account ${String(account.id)} has a non-finite balance`);
+  for (let index = 0; index < accounts.count; index += 1) {
+    if (!Number.isFinite(accounts.balance[index] ?? 0)) {
+      throw new RangeError(`account ${String(accounts.id[index])} has a non-finite balance`);
     }
   }
   assertAccountingIdentity(world.finance);
@@ -75,9 +74,7 @@ export function worldDayFingerprint(world: World): string {
   }
   let balances = 0;
   const accounts = world.finance.accounts;
-  for (let index = 0; index < accounts.length; index += 1) {
-    balances += (accounts[index] as World["finance"]["accounts"][number]).balanceRUSD;
-  }
+  for (let index = 0; index < accounts.count; index += 1) balances += accounts.balance[index] ?? 0;
   let stock = 0;
   let prices = 0;
   for (const market of world.markets) {
@@ -92,7 +89,7 @@ export function worldDayFingerprint(world: World): string {
     population,
     world.buildings.length,
     world.employment.length,
-    world.finance.accounts.length,
+    world.finance.accounts.count,
     world.finance.nextPostingId,
     world.finance.nextAccountId,
     world.finance.periodSummaries.length,

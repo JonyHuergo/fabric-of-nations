@@ -60,6 +60,7 @@ import type {
 } from "./types.js";
 import { BUILDING_SECTORS } from "./types.js";
 
+import { type BlockTotals } from "../population/blockTotals.js";
 const CURRENCY_KEY_PATTERN = /^[a-z][a-z0-9-]*$/;
 
 /** Structural country identity shared by runtime state and scenario input. */
@@ -166,9 +167,11 @@ export interface CountryPopulationIndex {
   readonly assignedByBlock: ReadonlyMap<Id, number>;
   /** D-158: each country's institution assignments, in `institutionEmployment` order. */
   readonly institutionsByCountry?: ReadonlyMap<Id, readonly World["labourMarket"]["institutionEmployment"][number][]>;
+  /** D-158: the day's measured block totals, when the caller has them (cells summed otherwise). */
+  readonly totals?: BlockTotals;
 }
 
-export function buildCountryPopulationIndex(world: World): CountryPopulationIndex {
+export function buildCountryPopulationIndex(world: World, totals?: BlockTotals): CountryPopulationIndex {
   const ownersByProvince = new Map<Id, Id[]>();
   if (world.provinces.enabled) {
     for (const record of world.provinces.ownership) {
@@ -198,7 +201,9 @@ export function buildCountryPopulationIndex(world: World): CountryPopulationInde
     if (list === undefined) institutionsByCountry.set(assignment.countryId, [assignment]);
     else list.push(assignment);
   }
-  return { blocksByCountry, assignedByBlock, institutionsByCountry };
+  return totals === undefined
+    ? { blocksByCountry, assignedByBlock, institutionsByCountry }
+    : { blocksByCountry, assignedByBlock, institutionsByCountry, totals };
 }
 
 /** A country's blocks in `world.popBlocks` order, from the index when one is supplied. */

@@ -19,7 +19,10 @@ import type {
   PriceIndexState,
   RusdPerCurrencyUnit,
 } from "./types.js";
-import { findAccountById } from "./accounts.js";
+import {
+  findAccountById,
+  financeIndexOfTable,
+} from "./accounts.js";
 
 /** Empty price-index state for population-only worlds. */
 export function emptyPriceIndexState(): PriceIndexState {
@@ -189,7 +192,7 @@ export function assertValidMonetaryState(world: World, path = "world.monetary"):
   if (!Array.isArray(state.currencies)) {
     throw new TypeError(`${path}.currencies must be an array`);
   }
-  const accountsById = new Map(world.finance.accounts.map((account) => [account.id, account]));
+  const accountsById = financeIndexOfTable(world.finance.accounts).byId;
   const currenciesById = new Map(world.currencies.map((currency) => [currency.id, currency]));
   const countryIds = new Set(world.countries.map((country) => country.id));
   const seenCurrencies = new Set<Id>();

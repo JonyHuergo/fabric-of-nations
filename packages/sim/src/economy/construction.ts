@@ -44,7 +44,6 @@ import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
 import {
   assertAccountingIdentity,
   buildFinanceIndex,
-  categoryForSubtype,
   cloneFinanceState,
   phaseFinance,
   designatedCashTotal,
@@ -85,6 +84,7 @@ import type {
 } from "./types.js";
 import { buildProvinceOwnerMap, countryProvinceIds } from "./country.js";
 
+import { appendAccount, accountView } from "./accountTable.js";
 /**
  * MONEY_TOLERANCE_RUSD scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
  * former rest parameter allocated an array on every call; a missing value is 0,
@@ -158,16 +158,9 @@ function allocateAccount(
     throw new RangeError("finance.nextAccountId is invalid");
   }
   finance.nextAccountId = id + 1;
-  const account: FinancialAccount = {
-    id,
-    ownerKind,
-    ownerId,
-    category: categoryForSubtype(subtype),
-    subtype,
-    balanceRUSD: 0,
-  };
-  finance.accounts.push(account);
-  return account;
+  // D-158: appended to the account table (ids ascend); the caller gets a live view.
+  const position = appendAccount(finance.accounts, { id, ownerKind, ownerId, subtype, balanceRUSD: 0 });
+  return accountView(finance.accounts, position);
 }
 
 function provinceOwner(world: World, provinceId: Id): Id | null {
@@ -380,7 +373,6 @@ function createCompletedBuilding(
   province.buildingInstanceIds.sort((left, right) => left - right);
   world.construction.nextBuildingId = buildingId + 1;
   world.employmentDirty = true;
-  finance.accounts.sort((left, right) => left.id - right.id);
   return { building, operatingCashAccountId: operatingCash.id, equityAccountId: equity.id };
 }
 

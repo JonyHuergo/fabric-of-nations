@@ -132,6 +132,7 @@ import type {
   PeaceTermKind,
 } from "./types.js";
 
+import { findAccountByOwner } from "./accounts.js";
 /**
  * Set the complete E2 fiscal policy. Schedule, eligibility, business-tax, and
  * reserve fields are part of the same validated action so a policy change can
@@ -650,12 +651,7 @@ function toleranceFor(...values: readonly number[]): number {
 }
 
 function treasuryAccountOf(world: World, countryId: Id): FinancialAccount {
-  const account = world.finance.accounts.find(
-    (candidate) =>
-      candidate.ownerKind === "country" &&
-      candidate.ownerId === countryId &&
-      candidate.subtype === "treasury-cash",
-  );
+  const account = findAccountByOwner(world.finance.accounts, "country", countryId, "treasury-cash");
   if (account === undefined) {
     throw new RangeError(`country ${String(countryId)} has no treasury-cash account`);
   }

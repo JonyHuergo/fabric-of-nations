@@ -150,6 +150,7 @@ import {
   requireUint32,
 } from "./validation.js";
 
+import { accountRecords, accountTableFromRecords, type AccountTable } from "./economy/accountTable.js";
 /** Maximum accepted length of one encoded typed array. */
 export const MAX_TYPED_ARRAY_LENGTH = 10_000_000;
 
@@ -1629,16 +1630,9 @@ export function encodeWorld(world: World): SerializedWorld {
         ...(encodeDemand ? { priceSmoothedRUSD: [...market.priceSmoothedRUSD] } : {}),
       })),
     finance: {
-      accounts: [...world.finance.accounts]
-        .sort((left, right) => left.id - right.id)
-        .map((account) => ({
-          id: account.id,
-          ownerKind: account.ownerKind,
-          ownerId: account.ownerId,
-          category: account.category,
-          subtype: account.subtype,
-          balanceRUSD: account.balanceRUSD,
-        })),
+      // D-158: the account table in position order, which is ascending id (the former
+      // sorted order), as the same plain records.
+      accounts: accountRecords(world.finance.accounts),
       postings: [...world.finance.postings]
         .sort((left, right) => left.id - right.id)
         .map((posting) => ({
@@ -3412,6 +3406,18 @@ function decodeFinancialAccount(value: unknown, path: string): FinancialAccount 
   };
 }
 
+/** D-158: the decoded accounts as the account table (ascending id, duplicates rejected). */
+function decodeAccountTable(accounts: readonly unknown[]): AccountTable {
+  const records = accounts.map((account, index) =>
+    decodeFinancialAccount(account, `save payload.finance.accounts[${String(index)}]`),
+  );
+  try {
+    return accountTableFromRecords(records);
+  } catch (error) {
+    throw new SaveFormatError(`save payload.finance.accounts: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 function decodeJournalLine(value: unknown, path: string): JournalLine {
   const record = requireRecord(value, path);
   if (record.side !== "debit" && record.side !== "credit") {
@@ -3733,9 +3739,7 @@ function decodeFinanceState(value: unknown): FinanceState {
     );
   }
   return {
-    accounts: accounts.map((account, index) =>
-      decodeFinancialAccount(account, `save payload.finance.accounts[${String(index)}]`),
-    ),
+    accounts: decodeAccountTable(accounts),
     postings: postings.map((posting, index) =>
       decodeJournalPosting(posting, `save payload.finance.postings[${String(index)}]`),
     ),

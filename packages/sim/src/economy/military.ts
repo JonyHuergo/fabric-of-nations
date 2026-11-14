@@ -42,6 +42,7 @@ import {
   type PeaceOffer,
   type PeaceTermKind,
   type WarState,
+  type AccountSubtype,
 } from "./types.js";
 import {
   M10_AI_PEACE_MIN_WAR_DAYS,
@@ -69,7 +70,11 @@ import {
   MAX_WARS,
 } from "./constants.js";
 import { postJournalBatch, type JournalEntryInput } from "./accounting.js";
-import { cloneFinanceState } from "./accounts.js";
+import {
+  cloneFinanceState,
+  findAccountByOwner,
+  findAccountById,
+} from "./accounts.js";
 import { drawUint32 } from "../rng.js";
 import { assertValidDayIndex, isTerminalDayIndex } from "../calendar.js";
 import {
@@ -697,12 +702,7 @@ function accountId(
   ownerId: Id | null,
   subtype: string,
 ): Id {
-  const account = world.finance.accounts.find(
-    (candidate) =>
-      candidate.ownerKind === ownerKind &&
-      candidate.ownerId === ownerId &&
-      candidate.subtype === subtype,
-  );
+  const account = findAccountByOwner(world.finance.accounts, ownerKind, ownerId, subtype as AccountSubtype);
   if (account === undefined) {
     throw new RangeError(`missing ${ownerKind} ${String(ownerId)} ${subtype} account`);
   }
@@ -712,10 +712,7 @@ function accountId(
 function treasuryCash(world: World, countryId: Id): number {
   const country = countryById(world, countryId);
   if (country === undefined) return 0;
-  const account = world.finance.accounts.find(
-    (candidate) => candidate.id === country.treasuryAccountId,
-  );
-  return account?.balanceRUSD ?? 0;
+  return findAccountById(world.finance.accounts, country.treasuryAccountId)?.balanceRUSD ?? 0;
 }
 
 /**

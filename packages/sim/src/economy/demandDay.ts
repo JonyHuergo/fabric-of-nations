@@ -16,7 +16,7 @@ import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
 import { DEMAND_PRICE_SMOOTHING_DAYS, INCOME_SMOOTHING_DAYS } from "../population/constants.js";
 import { resolveDemandSystem, type ResolvedDemandSystem } from "../population/demandSystem.js";
 import { depreciateDwellings } from "../population/housing.js";
-import { populationTotal } from "../population/state.js";
+import { } from "../population/state.js";
 import type { PopulationDefinitions } from "../population/types.js";
 import type { DayIndex } from "../types.js";
 import type { World } from "../world.js";
@@ -26,6 +26,7 @@ import type { MarketDayResult } from "./market.js";
 import type { MarketSettlementResult } from "./settlement.js";
 import type { EconomyDefinitions } from "./types.js";
 
+import { personsOfBlock, type BlockTotals } from "../population/blockTotals.js";
 /** Housing figures of one day (world totals). */
 export interface HousingDayResult {
   readonly dwellingsBought: number;
@@ -81,6 +82,8 @@ export function updateHouseholdIncomeAndHousing(
   ownConsumption: OwnConsumptionPlan,
   markets: readonly MarketDayResult[],
   dwellingsBought: number,
+  /** D-158: the day's measured block totals (cells summed when absent). */
+  totals?: BlockTotals,
 ): HousingDayResult {
   const year = daysInYear(dayIndexToCivilDate(dayIndex).year);
   const index = buildFinanceIndex(world.finance);
@@ -103,7 +106,7 @@ export function updateHouseholdIncomeAndHousing(
   let depreciated = 0;
   let dwellingsEnd = 0;
   world.popBlocks.forEach((block, position) => {
-    const persons = populationTotal(block);
+    const persons = personsOfBlock(totals, block);
     if (persons > 0) {
       const accountId = householdIds[block.id] ?? -1;
       const cashAfter = accountId >= 0 ? (index.account(accountId)?.balanceRUSD ?? 0) : 0;

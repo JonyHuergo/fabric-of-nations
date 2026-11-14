@@ -33,12 +33,10 @@ import { drawUint32 } from "../rng.js";
 import type { DayIndex, Id, Seed } from "../types.js";
 import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
 import {
-  postJournalBatch,
   postJournalColumns,
   retainDeferredPostings,
   type DeferredPostings,
   type JournalColumnEntry,
-  type JournalEntryInput,
   type JournalLineColumns,
 } from "./accounting.js";
 import {
@@ -61,6 +59,7 @@ import type {
   MarketFlowColumns,
 } from "./market.js";
 import type {
+  AccountSubtype,
   EconomyDefinitions,
   EmploymentAssignment,
   FinancialAccount,
@@ -69,6 +68,7 @@ import type {
 import { buildProvinceOwnerMap } from "./country.js";
 import { inIdOrder } from "../ordering.js";
 
+import { ownerKindCode, accountOwnerIdAt } from "./accountTable.js";
 export const M3E_WAGE_RESIDUAL_PURPOSE = "settlement.wage-residual";
 
 export interface SettledMarketTransaction {
@@ -206,6 +206,29 @@ function toleranceMoney(a: number, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h =
     MONEY_TOLERANCE_RUSD *
     Math.max(1, Math.abs(a), Math.abs(b), Math.abs(c), Math.abs(d), Math.abs(e), Math.abs(f), Math.abs(g), Math.abs(h))
   );
+}
+
+const POP_BLOCK_KIND = ownerKindCode("popBlock");
+
+/** An owner's account id from an owner table, or the lookup's error (D-158). */
+function ownerAccountOrThrow(table: Int32Array, ownerId: number, subtype: AccountSubtype, ownerKind: "popBlock" | "building"): number {
+  const id = tableAccount(table, ownerId);
+  if (id < 0) throw new RangeError(`missing ${subtype} account for ${ownerKind} ${String(ownerId)}`);
+  return id;
+}
+
+/** `householdCash(...).id` through the owner table (D-158). */
+function householdCashId(index: FinanceIndex, table: Int32Array, popBlockId: Id): number {
+  const id = tableAccount(table, popBlockId);
+  if (id < 0) return householdCash(index, popBlockId).id;
+  return id;
+}
+
+/** `operatingCash(...).id` through the owner table (D-158). */
+function operatingCashId(index: FinanceIndex, table: Int32Array, buildingId: Id): number {
+  const id = tableAccount(table, buildingId);
+  if (id < 0) return operatingCash(index, buildingId).id;
+  return id;
 }
 
 function householdCash(index: FinanceIndex, popBlockId: Id): FinancialAccount {
@@ -1000,24 +1023,19 @@ function settleMarketDaysInternal(
   // atomicity, so the 100k-account copy is skipped. The opening cash of each
   // producer and household is read before any posting either way.
   const accounts = world.finance.accounts;
-  let openingBalanceArray: Float64Array | null = null;
-  if (atomic) {
-    openingBalanceArray = new Float64Array(accounts.length);
-    for (let position = 0; position < accounts.length; position += 1) {
-      openingBalanceArray[position] = (accounts[position] as FinancialAccount).balanceRUSD;
-    }
-  }
+  const openingBalanceArray: Float64Array | null = atomic ? accounts.balance.slice(0, accounts.count) : null;
   const openingCashByAccount = new Map<Id, number>();
+  const balanceOfId = (accountId: Id): number => {
+    const position = index.position(accountId);
+    return position < 0 ? 0 : (accounts.balance[position] ?? 0);
+  };
   for (const building of world.buildings) {
-    openingCashByAccount.set(
-      building.operatingCashAccountId,
-      index.account(building.operatingCashAccountId)?.balanceRUSD ?? 0,
-    );
+    openingCashByAccount.set(building.operatingCashAccountId, balanceOfId(building.operatingCashAccountId));
   }
   const householdCashIds = index.ownerAccountIds("popBlock", "household-cash");
   for (const block of world.popBlocks) {
     const accountId = tableAccount(householdCashIds, block.id);
-    if (accountId >= 0) openingCashByAccount.set(accountId, index.account(accountId)?.balanceRUSD ?? 0);
+    if (accountId >= 0) openingCashByAccount.set(accountId, balanceOfId(accountId));
   }
   const initialCash = designatedCashTotal(world.finance);
   const openingPostings = [...world.finance.postings];
@@ -1115,8 +1133,11 @@ function settleMarketDaysInternal(
       gObligation.length = 0;
       gInKind.length = 0;
       // P7 (D-154, R2): a block working in a building it owns is paid the building's residual.
-      const ownerAccount = index.account(building.ownerAccountId);
-      const ownerBlockId = ownerAccount !== undefined && ownerAccount.ownerKind === "popBlock" ? ownerAccount.ownerId : null;
+      const ownerPosition = index.position(building.ownerAccountId);
+      const ownerBlockId =
+        ownerPosition >= 0 && accounts.ownerKind[ownerPosition] === POP_BLOCK_KIND
+          ? accountOwnerIdAt(accounts, ownerPosition)
+          : null;
       const coverage = labourWages.coverage(building.provinceId);
       for (const assignment of wageLookup.assignmentsByBuilding.get(building.id) ?? []) {
         const block = wageLookup.blockById.get(assignment.popBlockId);
@@ -1193,7 +1214,8 @@ function settleMarketDaysInternal(
       let obligation = 0;
       for (let item = 0; item < groupCount; item += 1) obligation += gObligation[item] ?? 0;
       const employerId = accountIn(operatingTable, building.id, "operating-cash");
-      const employer = index.account(employerId) as FinancialAccount;
+      // D-158: the employer's balance, read once (nothing posts until the loop has run).
+      const employer = { id: employerId, balanceRUSD: balanceOfId(employerId) };
       const paid = Math.min(employer.balanceRUSD, obligation);
       // Proportional allocation with the keyed residual (allocateMoney).
       gPaid.length = groupCount;
@@ -1339,7 +1361,11 @@ function settleMarketDaysInternal(
     // pays from the cash it held before today's wages: today's wages stay in its account for
     // the fiscal phase, whose income tax is a share of them. An employer without such cash
     // leaves the day unpaid; the next refresh rehires by income.
-    const householdEntries: JournalEntryInput[] = [];
+    // D-158: the domestic-service entries in journal columns (the same lines, in the same
+    // order, posted as one batch with the same checks as the former entry objects).
+    const householdEntries: JournalColumnEntry[] = [];
+    const householdLines: JournalLineColumns = { accountId: [], debit: [], amount: [] };
+    const consumptionTable = index.ownerAccountIds("popBlock", "consumption-expense");
     const spent = new Map<Id, number>();
     const domesticReceived = new Map<Id, number>();
     if (labourWages !== undefined && world.labourMarket.householdEmployment.length > 0) {
@@ -1350,7 +1376,8 @@ function settleMarketDaysInternal(
         const covered = labourWages.coverage(servant.provinceId).domesticService;
         const annual = labourWages.paid(servant.provinceId, servant.professionId, covered) * DOMESTIC_WAGE_RATIO;
         const obligation = (annual * assignment.workers) / yearDays;
-        const employerCash = householdCash(index, employer.id);
+        const employerCashId = householdCashId(index, householdCashTable, employer.id);
+        const employerCash = { id: employerCashId, balanceRUSD: balanceOfId(employerCashId) };
         const prior = spent.get(employer.id) ?? 0;
         const limit = Math.max(0, employerCash.balanceRUSD - (wagePaidByBlock[employer.id] ?? 0));
         let paid = Math.min(obligation, Math.max(0, limit - prior));
@@ -1366,25 +1393,34 @@ function settleMarketDaysInternal(
         if (!Number.isFinite(paid) || !(paid > 0) || prior + paid > limit) continue;
         spent.set(employer.id, prior + paid);
         domesticReceived.set(servant.id, (domesticReceived.get(servant.id) ?? 0) + paid);
+        const start = householdLines.accountId.length;
+        householdLines.accountId.push(
+          ownerAccountOrThrow(consumptionTable, employer.id, "consumption-expense", "popBlock"),
+          employerCash.id,
+          householdCashId(index, householdCashTable, servant.id),
+          ownerAccountOrThrow(wageIncomeTable, servant.id, "wage-income", "popBlock"),
+        );
+        householdLines.debit.push(1, 0, 1, 0);
+        householdLines.amount.push(paid, paid, paid, paid);
         householdEntries.push({
           transactionKind: "domestic-service",
-          lines: [
-            { accountId: index.get("popBlock", employer.id, "consumption-expense").id, side: "debit", amountRUSD: paid },
-            { accountId: employerCash.id, side: "credit", amountRUSD: paid },
-            { accountId: householdCash(index, servant.id).id, side: "debit", amountRUSD: paid },
-            { accountId: index.get("popBlock", servant.id, "wage-income").id, side: "credit", amountRUSD: paid },
-          ],
+          start,
+          end: householdLines.accountId.length,
           sourceEntityId: employer.id,
           targetEntityId: servant.id,
         });
       }
-      if (householdEntries.length > 0) {
-        postings.push(...postJournalBatch(world.finance, dayIndex, householdEntries, { adoptLines: true }));
-      }
+    }
+    let householdPostings: DeferredPostings | null = null;
+    if (householdEntries.length > 0) {
+      householdPostings = postJournalColumns(world.finance, dayIndex, householdEntries, householdLines);
     }
 
     const upkeepSettlements: UpkeepSettlement[] = [];
-    const upkeepEntries: JournalEntryInput[] = [];
+    // D-158: upkeep entries in journal columns (same lines and order, one batch as before).
+    const upkeepEntries: JournalColumnEntry[] = [];
+    const upkeepLines: JournalLineColumns = { accountId: [], debit: [], amount: [] };
+    const upkeepExpenseTable = index.ownerAccountIds("building", "upkeep-expense");
     const upkeepPaidByBuilding = new Map<Id, number>();
     const upkeepObligationByBuilding = new Map<Id, number>();
     const unpaidUpkeepByBuilding = new Map<Id, number>();
@@ -1412,19 +1448,24 @@ function settleMarketDaysInternal(
         }
         systemIncome = index.get("system", null, "system-income");
       }
-      const employer = operatingCash(index, building.id);
+      const employerId = operatingCashId(index, operatingTable, building.id);
+      const employer = { id: employerId, balanceRUSD: balanceOfId(employerId) };
       const paid = Math.min(employer.balanceRUSD, obligation);
       const unpaid = Math.max(0, obligation - paid);
       if (paid > 0) {
-        const upkeepExpense = index.get("building", building.id, "upkeep-expense");
+        const start = upkeepLines.accountId.length;
+        upkeepLines.accountId.push(
+          systemAccount.id,
+          ownerAccountOrThrow(upkeepExpenseTable, building.id, "upkeep-expense", "building"),
+          employer.id,
+          systemIncome!.id,
+        );
+        upkeepLines.debit.push(1, 1, 0, 0);
+        upkeepLines.amount.push(paid, paid, paid, paid);
         upkeepEntries.push({
           transactionKind: "upkeep",
-          lines: [
-            { accountId: systemAccount.id, side: "debit", amountRUSD: paid },
-            { accountId: upkeepExpense.id, side: "debit", amountRUSD: paid },
-            { accountId: employer.id, side: "credit", amountRUSD: paid },
-            { accountId: systemIncome!.id, side: "credit", amountRUSD: paid },
-          ],
+          start,
+          end: upkeepLines.accountId.length,
           sourceEntityId: building.id,
           targetEntityId: systemAccount.id,
         });
@@ -1441,8 +1482,9 @@ function settleMarketDaysInternal(
       upkeepObligationByBuilding.set(building.id, obligation);
       unpaidUpkeepByBuilding.set(building.id, unpaid);
     }
+    let upkeepPostings: DeferredPostings | null = null;
     if (upkeepEntries.length > 0) {
-      postings.push(...postJournalBatch(world.finance, dayIndex, upkeepEntries, { adoptLines: true }));
+      upkeepPostings = postJournalColumns(world.finance, dayIndex, upkeepEntries, upkeepLines);
     }
     if (marketPostings !== null) {
       retainDeferredPostings(world.finance, marketPostings, wageEntries.length + householdEntries.length + upkeepEntries.length);
@@ -1450,6 +1492,10 @@ function settleMarketDaysInternal(
     if (wagePostings !== null) {
       retainDeferredPostings(world.finance, wagePostings, householdEntries.length + upkeepEntries.length);
     }
+    if (householdPostings !== null) {
+      retainDeferredPostings(world.finance, householdPostings, upkeepEntries.length);
+    }
+    if (upkeepPostings !== null) retainDeferredPostings(world.finance, upkeepPostings, 0);
 
     // D-139: per-owner sums in canonical transaction order, in id-indexed tables. A
     // table entry starts at 0 and adds each amount, as the former `get ?? 0` maps did.
@@ -1490,7 +1536,8 @@ function settleMarketDaysInternal(
       .map((building) => {
         const initialCash =
           openingCashByAccount.get(building.operatingCashAccountId) ?? 0;
-        const current = operatingCash(index, building.id);
+        const currentId = operatingCashId(index, operatingTable, building.id);
+        const current = { balanceRUSD: balanceOfId(currentId) };
         const revenue = revenueByBuilding[building.id] ?? 0;
         const inputCosts = inputCostsByBuilding[building.id] ?? 0;
         const wagesPaid = wagePaidByBuilding[building.id] ?? 0;
@@ -1522,7 +1569,8 @@ function settleMarketDaysInternal(
 
     const households: HouseholdSettlement[] = inIdOrder(world.popBlocks)
       .map((block) => {
-        const account = householdCash(index, block.id);
+        const accountId = householdCashId(index, householdCashTable, block.id);
+        const account = { id: accountId, balanceRUSD: balanceOfId(accountId) };
         const initialCash =
           openingCashByAccount.get(account.id) ?? 0;
         const purchases = purchasesByBlock[block.id] ?? 0;
@@ -1593,17 +1641,21 @@ function settleMarketDaysInternal(
         ...(wagePostings === null
           ? []
           : Array.from({ length: wagePostings.count }, (_, offset) => wagePostings.firstId + offset)),
+        ...(householdPostings === null
+          ? []
+          : Array.from({ length: householdPostings.count }, (_, offset) => householdPostings.firstId + offset)),
+        ...(upkeepPostings === null
+          ? []
+          : Array.from({ length: upkeepPostings.count }, (_, offset) => upkeepPostings.firstId + offset)),
         ...postings.map((posting) => posting.id),
       ],
     };
   } catch (error) {
     if (openingBalanceArray === null) throw error;
-    if (accounts.length !== openingBalanceArray.length) {
+    if (accounts.count !== openingBalanceArray.length) {
       throw new RangeError("settlement rollback found accounts created during settlement");
     }
-    for (let position = 0; position < accounts.length; position += 1) {
-      (accounts[position] as FinancialAccount).balanceRUSD = openingBalanceArray[position] ?? 0;
-    }
+    accounts.balance.set(openingBalanceArray);
     world.finance.postings = openingPostings;
     world.finance.nextPostingId = openingNextPostingId;
     throw error;

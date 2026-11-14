@@ -32,11 +32,10 @@ import {
 } from "../population/demographicLevels.js";
 import { demographyFactorsByCountry, demographyFactorsOfBlock } from "./demographyFactors.js";
 import { assertValidPopulationDefinitions } from "../population/definitions.js";
-import { populationTotal, workingAgePopulation } from "../population/state.js";
+import { populationTotal, } from "../population/state.js";
 import type {
   NeedGoodResult,
   NeedTierResult,
-  NeedTierSummary,
   PopBlockNeedsResult,
   PopulationDefinitions,
   PopulationInputs,
@@ -44,7 +43,7 @@ import type {
   PopulationTickResult,
   WealthUpdate,
 } from "../population/types.js";
-import { needsByPosition, updateDailyMilitancy, updateMonthlyWealth } from "../population/wealth.js";
+import { updateDailyMilitancy, updateMonthlyWealth } from "../population/wealth.js";
 import { dayIndexToCivilDate, daysInMonth, daysInYear } from "../calendar.js";
 import { inIdOrder } from "../ordering.js";
 import { assertValidWorld, assertValidWorldForTick, type World } from "../world.js";
@@ -144,6 +143,8 @@ import type {
   FinancialAccount,
 } from "./types.js";
 
+import { measureBlockTotals, personsOfBlock, workingAgeOfBlock, type BlockTotals } from "../population/blockTotals.js";
+import { createNeedsColumns, needsReader, NEED_TIER_COUNT } from "../population/needsColumns.js";
 /**
  * One day's household demand in columns (D-139): one row per (block, market tier,
  * good), in canonical (block, tier, good) order, so a block's rows are contiguous.
@@ -554,25 +555,39 @@ function buildNeedsResult(
   kcalByGoodId: Float64Array,
   /** P5 (D-143 §2): food kept from own farms; it counts toward calories eaten. */
   ownConsumption: OwnConsumptionPlan = EMPTY_OWN_CONSUMPTION,
+  /** D-158: the day's measured block totals (cells summed when absent). */
+  totals?: BlockTotals,
 ): PopulationNeedsDayResult {
-  const householdByName = new Map(
-    settlement.households.map((entry) => [entry.popBlockId, entry]),
-  );
-  const pricesByMarket = new Map(markets.map((market) => [market.marketId, market.openingPrices]));
+  const full = detail === "full";
+  // Settlement lists households in ascending block id, the order of this loop (D-158: read by
+  // position, with the former map as the fallback for another order).
+  const settledHouseholds = settlement.households;
+  let householdByName: Map<number, MarketSettlementResult["households"][number]> | null = null;
+  const settledFor = (position: number, blockId: number): MarketSettlementResult["households"][number] | undefined => {
+    const atPosition = settledHouseholds[position];
+    if (atPosition !== undefined && atPosition.popBlockId === blockId) return atPosition;
+    householdByName ??= new Map(settledHouseholds.map((entry) => [entry.popBlockId, entry]));
+    return householdByName.get(blockId);
+  };
+  // D-158: opening prices by market id in one table (no map lookup per row).
+  let maxMarketId = 0;
+  for (const market of markets) if (market.marketId > maxMarketId) maxMarketId = market.marketId;
+  const pricesByMarketId: (readonly number[] | undefined)[] = new Array<readonly number[] | undefined>(maxMarketId + 1);
+  for (const market of markets) pricesByMarketId[market.marketId] = market.openingPrices;
+  const ordered = inIdOrder(world.popBlocks);
+  const columns = createNeedsColumns(ordered.length);
   const blocks: PopBlockNeedsResult[] = [];
-  // D-139: a block's rows are contiguous; each need tier takes them in row order (the
-  // order the former per-tier grouping produced).
-  const tierRows: number[] = [];
 
-  for (const block of inIdOrder(world.popBlocks)) {
-    const population = populationTotal(block);
+  for (let position = 0; position < ordered.length; position += 1) {
+    const block = ordered[position] as World["popBlocks"][number];
+    const population = personsOfBlock(totals, block);
     const rangeStart = block.id < household.rowStart.length ? (household.rowStart[block.id] ?? -1) : -1;
-    const range = rangeStart < 0 ? undefined : { start: rangeStart, end: household.rowEnd[block.id] ?? rangeStart };
-    const householdSettlement = householdByName.get(block.id);
+    const start = rangeStart < 0 ? 0 : rangeStart;
+    const end = rangeStart < 0 ? 0 : (household.rowEnd[block.id] ?? rangeStart);
+    const householdSettlement = settledFor(position, block.id);
     if (householdSettlement === undefined) {
       throw new RangeError(`missing household settlement for popBlock ${String(block.id)}`);
     }
-    const summaries: NeedTierSummary[] = [];
     const tierResults: NeedTierResult[] = [];
     let lowerMet = true;
     let kcalConsumed = 0;
@@ -590,79 +605,91 @@ function buildNeedsResult(
       }
     }
 
-    for (const tier of NEED_TIER_ORDER) {
-      tierRows.length = 0;
-      if (range !== undefined) {
-        for (let row = range.start; row < range.end; row += 1) {
-          if (household.needTierCode[row] === NEED_TIER_CODE[tier]) tierRows.push(row);
-        }
-      }
-      const active =
-        population > 0 && lowerMet && (tierRows.length > 0 || (tier === "subsistence" && keptAny));
+    for (let tierIndex = 0; tierIndex < NEED_TIER_ORDER.length; tierIndex += 1) {
+      const tier = NEED_TIER_ORDER[tierIndex] as NeedTier;
+      const code = NEED_TIER_CODE[tier];
+      // D-139: a block's rows are contiguous; each need tier takes them in row order.
+      let rowCount = 0;
+      for (let row = start; row < end; row += 1) if (household.needTierCode[row] === code) rowCount += 1;
+      const active = population > 0 && lowerMet && (rowCount > 0 || (tier === "subsistence" && keptAny));
       let desiredCost = 0;
       let fundedCost = 0;
       let spent = 0;
       let allMet = true;
       // D-158: per-good results are built in full detail only.
-      const goods: NeedGoodResult[] = detail === "full" ? [] : NO_NEED_GOODS;
-      for (const row of tierRows) {
-        const fulfilledQuantity = fulfilledByRecord[row] ?? Number.NaN;
-        if (Number.isNaN(fulfilledQuantity)) throw new RangeError("missing market household demand result");
-        const marketId = household.marketId[row] ?? 0;
-        const marketOpeningPrices = pricesByMarket.get(marketId);
-        if (marketOpeningPrices === undefined) {
-          throw new RangeError(`missing market ${String(marketId)} for household demand`);
-        }
-        const goodId = household.goodId[row] ?? 0;
-        const desired = household.desired[row] ?? 0;
-        const funded = household.funded[row] ?? 0;
-        const price = marketOpeningPrices[goodId] ?? 0;
-        desiredCost += desired * price;
-        fundedCost += funded * price;
-        spent += fulfilledQuantity * price;
-        kcalConsumed += fulfilledQuantity * (kcalByGoodId[goodId] ?? 0);
-        if (!active || fulfilledQuantity + quantityTolerance(desired, fulfilledQuantity) < desired) {
-          allMet = false;
-        }
-        // Per-good detail is diagnostic only (`summary` omits it, D-137).
-        if (population > 0 && detail === "full") {
-          goods.push({
-            goodKey: definitions.goods[goodId]?.key ?? String(goodId),
-            desired,
-            funded,
-            fulfilled: fulfilledQuantity,
-            unmetDesired: Math.max(0, desired - fulfilledQuantity),
-            unmetFunded: Math.max(0, funded - fulfilledQuantity),
-          });
+      const goods: NeedGoodResult[] = full ? [] : NO_NEED_GOODS;
+      if (rowCount > 0) {
+        for (let row = start; row < end; row += 1) {
+          if (household.needTierCode[row] !== code) continue;
+          const fulfilledQuantity = fulfilledByRecord[row] ?? Number.NaN;
+          if (Number.isNaN(fulfilledQuantity)) throw new RangeError("missing market household demand result");
+          const marketId = household.marketId[row] ?? 0;
+          const marketOpeningPrices = marketId >= 0 && marketId <= maxMarketId ? pricesByMarketId[marketId] : undefined;
+          if (marketOpeningPrices === undefined) {
+            throw new RangeError(`missing market ${String(marketId)} for household demand`);
+          }
+          const goodId = household.goodId[row] ?? 0;
+          const desired = household.desired[row] ?? 0;
+          const funded = household.funded[row] ?? 0;
+          const price = marketOpeningPrices[goodId] ?? 0;
+          desiredCost += desired * price;
+          fundedCost += funded * price;
+          spent += fulfilledQuantity * price;
+          kcalConsumed += fulfilledQuantity * (kcalByGoodId[goodId] ?? 0);
+          if (!active || fulfilledQuantity + quantityTolerance(desired, fulfilledQuantity) < desired) {
+            allMet = false;
+          }
+          // Per-good detail is diagnostic only (`summary` omits it, D-137).
+          if (population > 0 && full) {
+            goods.push({
+              goodKey: definitions.goods[goodId]?.key ?? String(goodId),
+              desired,
+              funded,
+              fulfilled: fulfilledQuantity,
+              unmetDesired: Math.max(0, desired - fulfilledQuantity),
+              unmetFunded: Math.max(0, funded - fulfilledQuantity),
+            });
+          }
         }
       }
       const fullyMet = active && allMet;
-      // D-158: one object per tier serves as its summary and its result.
-      const summary: NeedTierResult = {
-        tier,
-        active,
-        fullyMet,
-        desiredCostRUSD: active ? desiredCost : 0,
-        fundedCostRUSD: active ? fundedCost : 0,
-        spentRUSD: active ? spent : 0,
-        goods: active ? goods : NO_NEED_GOODS,
-      };
-      summaries.push(summary);
-      tierResults.push(summary);
+      const cell = position * NEED_TIER_COUNT + tierIndex;
+      columns.active[cell] = active ? 1 : 0;
+      columns.fullyMet[cell] = fullyMet ? 1 : 0;
+      columns.desiredCostRUSD[cell] = active ? desiredCost : 0;
+      columns.fundedCostRUSD[cell] = active ? fundedCost : 0;
+      columns.spentRUSD[cell] = active ? spent : 0;
+      if (full) {
+        // D-158: one object per tier serves as its summary and its result.
+        tierResults.push({
+          tier,
+          active,
+          fullyMet,
+          desiredCostRUSD: active ? desiredCost : 0,
+          fundedCostRUSD: active ? fundedCost : 0,
+          spentRUSD: active ? spent : 0,
+          goods: active ? goods : NO_NEED_GOODS,
+        });
+      }
       if (active && !fullyMet) lowerMet = false;
     }
 
-    const spent = householdSettlement.marketPurchasesRUSD;
-    blocks.push({
-      popBlockId: block.id,
-      population,
-      budgetStartBeforeNeedsRUSD: householdSettlement.initialCashRUSD,
-      budgetEndAfterNeedsRUSD: householdSettlement.initialCashRUSD - spent,
-      spentRUSD: spent,
-      kcalConsumed,
-      tiers: tierResults,
-      tierSummaries: summaries,
-    });
+    columns.blockId[position] = block.id;
+    columns.population[position] = population;
+    columns.kcalConsumed[position] = kcalConsumed;
+    if (full) {
+      const spent = householdSettlement.marketPurchasesRUSD;
+      blocks.push({
+        popBlockId: block.id,
+        population,
+        budgetStartBeforeNeedsRUSD: householdSettlement.initialCashRUSD,
+        budgetEndAfterNeedsRUSD: householdSettlement.initialCashRUSD - spent,
+        spentRUSD: spent,
+        kcalConsumed,
+        tiers: tierResults,
+        tierSummaries: tierResults,
+      });
+    }
   }
 
   const initialSupplyByGood: Record<string, number> = {};
@@ -673,7 +700,7 @@ function buildNeedsResult(
     let closing = 0;
     let consumed = 0;
     for (const market of markets) {
-      const flow = market.inventory.find((item) => item.goodId === good.id);
+      const flow = market.inventory[good.id]?.goodId === good.id ? market.inventory[good.id] : market.inventory.find((item) => item.goodId === good.id);
       initial += flow?.openingStock ?? 0;
       closing += flow?.closingStock ?? 0;
       consumed += flow?.householdConsumption ?? 0;
@@ -682,46 +709,44 @@ function buildNeedsResult(
     remainingSupplyByGood[good.key] = closing;
     consumedSupplyByGood[good.key] = consumed;
   }
-  return { blocks, initialSupplyByGood, remainingSupplyByGood, consumedSupplyByGood };
+  // D-158: the per-block objects exist in full detail only; the columns always.
+  return { blocks, columns, initialSupplyByGood, remainingSupplyByGood, consumedSupplyByGood };
 }
 
 /** D-158: the shared empty per-good list (never written). */
 const NO_NEED_GOODS: NeedGoodResult[] = [];
 
 function updateNeedsCounters(world: World, needs: PopulationNeedsDayResult): void {
-  const needsAt = needsByPosition(world.popBlocks, needs.blocks);
+  // D-158: the result's columns (or, from other callers, its objects) by block position.
+  const reader = needsReader(world.popBlocks, needs);
   for (let position = 0; position < world.popBlocks.length; position += 1) {
     const block = world.popBlocks[position] as World["popBlocks"][number];
-    const result = needsAt(position);
-    if (result === undefined) throw new RangeError(`missing needs result for popBlock ${String(block.id)}`);
-    if (result.population === 0) {
+    if (!reader.has(position)) throw new RangeError(`missing needs result for popBlock ${String(block.id)}`);
+    const population = reader.population(position);
+    if (population === 0) {
       block.unmetSubsistenceDays = 0;
       block.unmetBasicDays = 0;
       block.comfortFulfilledDays = 0;
       continue;
     }
-    const summary = (tier: NeedTier): NeedTierSummary | undefined =>
-      result.tierSummaries.find((entry) => entry.tier === tier);
-    const subsistence = summary("subsistence");
-    const basic = summary("basic");
-    const comfort = summary("comfort");
-    if (subsistence !== undefined && subsistence.active && subsistence.fullyMet) {
+    const met = (tier: NeedTier): boolean => reader.active(position, tier) && reader.fullyMet(position, tier);
+    if (met("subsistence")) {
       block.unmetSubsistenceDays = 0;
     } else {
       block.unmetSubsistenceDays += 1;
     }
-    if (basic !== undefined && basic.active && basic.fullyMet) {
+    if (met("basic")) {
       block.unmetBasicDays = 0;
     } else {
       block.unmetBasicDays += 1;
     }
-    if (comfort !== undefined && comfort.active && comfort.fullyMet) {
+    if (met("comfort")) {
       block.comfortFulfilledDays += 1;
     } else {
       block.comfortFulfilledDays = 0;
     }
     // P4 (D-142): food sufficiency from the calories actually bought today.
-    updateBlockFoodSufficiency(block, result.population, result.kcalConsumed);
+    updateBlockFoodSufficiency(block, population, reader.kcalConsumed(position));
   }
 }
 
@@ -923,6 +948,7 @@ function runMarketAttempt(
   mode: "full" | "cash",
   observe?: DayPhaseObserver,
   detail: DayResultDetail = "full",
+  totals?: BlockTotals,
 ): MarketAttempt {
   observe?.("market-household-demand");
   // D-137: one set of day-level lookups (capacity index and per-building capacity)
@@ -954,6 +980,7 @@ function runMarketAttempt(
     detail,
     ownConsumption,
     gated ? needGate(world) : null,
+    totals,
   );
   const household: HouseholdDemandBuild = les;
   const cap = { cappedBuildings: 0 };
@@ -1204,6 +1231,9 @@ export function runEconomicDay(
     { factorsOf: blockFactors },
   );
   accumulateDemography(world, calendarDate.year, populationsAtStart, demography);
+  // D-158: the day's block totals, measured once the day's demography has changed the cells
+  // (again below if the monthly labour phase moves people); read by the later phases.
+  let blockTotals = measureBlockTotals(world.popBlocks);
   // Population decline can invalidate assignments before the next monthly
   // refresh. D-126: trim the over-assigned blocks first; only a state that the
   // trim cannot make valid falls back to the dirty full refresh.
@@ -1231,6 +1261,7 @@ export function runEconomicDay(
   // market phase. The staged day (or the rollback runner in phase mode) restores the
   // world on failure. D-155: the M5 migration it replaced was removed.
   const labourMonth = runLabourMonthPhase(world, economyDefinitions, dayIndex);
+  if (labourMonth.ran) blockTotals = measureBlockTotals(world.popBlocks);
   const migration = labourMigrationResult(dayIndex, labourMonth);
   if (migration.employmentRefresh !== null) {
     employment = migration.employmentRefresh;
@@ -1273,6 +1304,7 @@ export function runEconomicDay(
     "cash",
     observe,
     options.detail ?? "full",
+    blockTotals,
   );
   // P6 (D-153): bought dwellings join the buyers' stock; households read smoothed prices.
   const dwellingsBought = applyDwellingPurchases(world, demandSystem, attempt.les, attempt.fulfilledByRecord);
@@ -1291,6 +1323,7 @@ export function runEconomicDay(
     validateWorld: false,
     financeInPlace: true,
     economyDefinitions,
+    blockTotals,
   });
 
   // E6a pipeline step 12b: after settlement and fiscal (the fiscal phase requires the
@@ -1310,20 +1343,25 @@ export function runEconomicDay(
   observe?.("monetary");
   const monetary = runMonetaryPhase(world, economyDefinitions, dayIndex, {
     validateWorld: false,
+    blockTotals,
   });
 
   // M10 military phase: movement arrivals, battles, occupation/liberation, garrison and
   // upkeep payments, wounded recovery, and the bounded AI peace rule. It follows fiscal
   // so pay uses post-tax treasury cash and precedes the close so outlays are in-period.
   observe?.("military");
+  const armiesBeforeMilitary = world.military.armies.length;
   const military = runMilitaryPhase(world, dayIndex, { validateWorld: false });
+  // D-158: a destroyed formation returns its wounded to the blocks' cells, so the totals
+  // are measured again for the phases after this one.
+  if (armiesBeforeMilitary > 0) blockTotals = measureBlockTotals(world.popBlocks);
 
   // E5 training: treasury-limited provider payroll and trainee stipend, then
   // qualification gains for participating blocks. It runs after fiscal (so it sees
   // the same post-fiscal treasury cash as the other service payrolls) and before the
   // education phase.
   observe?.("training");
-  const training = runTrainingPhase(world, economyDefinitions, dayIndex, { financeInPlace: true });
+  const training = runTrainingPhase(world, economyDefinitions, dayIndex, { financeInPlace: true, blockTotals });
 
   // M9 education and research: the payroll is paid from actual post-fiscal treasury
   // cash, age-specific literacy rises for the school-age cohort, and the active
@@ -1332,6 +1370,7 @@ export function runEconomicDay(
   const education = runEducationPhase(world, economyDefinitions, dayIndex, {
     validateWorld: false,
     financeInPlace: true,
+    blockTotals,
   });
 
   // E4 sectoral production subsidy: verified physical output is valued at the
@@ -1384,13 +1423,14 @@ export function runEconomicDay(
     attempt.fulfilledByRecord,
     kcalByGoodIdOf(economyDefinitions, populationDefinitions),
     attempt.ownConsumption,
+    blockTotals,
   );
   updateNeedsCounters(world, needs);
   updateDailyMilitancy(world, needs);
   // M8: provincial unrest is updated after the day's needs/militancy and before
   // the close. Its tax/construction effects are read on the next civil day.
   observe?.("unrest");
-  runUnrestPhase(world, economyDefinitions, dayIndex);
+  runUnrestPhase(world, economyDefinitions, dayIndex, blockTotals);
   observe?.("wealth");
   const wealthUpdates = updateEconomicWealth(
     world,
@@ -1417,11 +1457,12 @@ export function runEconomicDay(
     attempt.ownConsumption,
     attempt.markets,
     dwellingsBought,
+    blockTotals,
   );
 
   observe?.("day-result");
   let workingAge = 0;
-  for (const block of world.popBlocks) workingAge += workingAgePopulation(block);
+  for (const block of world.popBlocks) workingAge += workingAgeOfBlock(blockTotals, block);
   const population: PopulationTickResult = {
     aged,
     populationStart,
