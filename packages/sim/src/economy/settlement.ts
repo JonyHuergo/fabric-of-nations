@@ -729,22 +729,56 @@ function settledTransactions(prepared: PreparedColumns): SettledMarketTransactio
  * matching the linear scans they replace.
  */
 interface WageLookup {
-  readonly assignmentsByBuilding: ReadonlyMap<Id, readonly EmploymentAssignment[]>;
-  readonly blockById: ReadonlyMap<Id, World["popBlocks"][number]>;
+  readonly assignmentsByBuilding: { get(id: Id): readonly EmploymentAssignment[] | undefined };
+  readonly blockById: { get(id: Id): World["popBlocks"][number] | undefined };
   readonly ownerByProvince: ReadonlyMap<Id, World["countries"][number]>;
 }
 
+/**
+ * D-158: an id-indexed table (the first entry per id, as the former maps kept), or a map when
+ * the ids are too sparse for a table.
+ */
+function idTable<T>(entries: readonly T[], idOf: (entry: T) => Id, keepFirst: boolean, group: false): { get(id: Id): T | undefined };
+function idTable<T>(entries: readonly T[], idOf: (entry: T) => Id, keepFirst: boolean, group: true): { get(id: Id): T[] | undefined };
+function idTable<T>(entries: readonly T[], idOf: (entry: T) => Id, keepFirst: boolean, group: boolean): { get(id: Id): unknown } {
+  let maxId = -1;
+  let dense = true;
+  for (const entry of entries) {
+    const id = idOf(entry);
+    if (!(Number.isInteger(id) && id >= 0)) dense = false;
+    else if (id > maxId) maxId = id;
+  }
+  if (dense && maxId <= entries.length * 4 + 1024) {
+    const table: unknown[] = new Array<unknown>(maxId + 1);
+    for (const entry of entries) {
+      const id = idOf(entry);
+      if (group) {
+        const list = table[id] as T[] | undefined;
+        if (list === undefined) table[id] = [entry];
+        else list.push(entry);
+      } else if (!keepFirst || table[id] === undefined) {
+        table[id] = entry;
+      }
+    }
+    return { get: (id) => (Number.isInteger(id) && id >= 0 && id <= maxId ? table[id] : undefined) };
+  }
+  const map = new Map<Id, unknown>();
+  for (const entry of entries) {
+    const id = idOf(entry);
+    if (group) {
+      const list = map.get(id) as T[] | undefined;
+      if (list === undefined) map.set(id, [entry]);
+      else list.push(entry);
+    } else if (!keepFirst || !map.has(id)) {
+      map.set(id, entry);
+    }
+  }
+  return { get: (id) => map.get(id) };
+}
+
 function buildWageLookup(world: World): WageLookup {
-  const assignmentsByBuilding = new Map<Id, EmploymentAssignment[]>();
-  for (const assignment of world.employment) {
-    const list = assignmentsByBuilding.get(assignment.buildingInstanceId);
-    if (list === undefined) assignmentsByBuilding.set(assignment.buildingInstanceId, [assignment]);
-    else list.push(assignment);
-  }
-  const blockById = new Map<Id, World["popBlocks"][number]>();
-  for (const block of world.popBlocks) {
-    if (!blockById.has(block.id)) blockById.set(block.id, block);
-  }
+  const assignmentsByBuilding = idTable(world.employment, (assignment) => assignment.buildingInstanceId, false, true);
+  const blockById = idTable(world.popBlocks, (block) => block.id, true, false);
   const ownerByProvince = new Map<Id, World["countries"][number]>();
   const countryById = new Map(world.countries.map((country) => [country.id, country]));
   for (const [provinceId, countryId] of buildProvinceOwnerMap(world)) {
