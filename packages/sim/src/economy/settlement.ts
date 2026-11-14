@@ -21,7 +21,7 @@
  */
 
 import { DOMESTIC_WAGE_RATIO } from "./constants.js";
-import { buildLabourWageTable, jobIsCovered, type LabourWageTable } from "./labourMarket.js";
+import { buildLabourWageTable, jobIsCovered, type MinimumWageCoverage } from "./labourMarket.js";
 import {
   assertValidDayIndex,
   dayIndexToCivilDate,
@@ -58,16 +58,13 @@ import type {
   MarketTier,
   PendingColumns,
   PendingTransaction,
+  MarketFlowColumns,
 } from "./market.js";
 import type {
-  BuildingDef,
-  BuildingInstance,
   EconomyDefinitions,
   EmploymentAssignment,
   FinancialAccount,
-  JournalLine,
   JournalPosting,
-  ProfessionDef,
 } from "./types.js";
 import { buildProvinceOwnerMap } from "./country.js";
 import { inIdOrder } from "../ordering.js";
@@ -197,17 +194,6 @@ export interface MarketSettlementResult {
   readonly households: readonly HouseholdSettlement[];
   readonly totals: SettlementTotals;
   readonly postingIds: readonly number[];
-}
-
-interface WageGroup {
-  readonly popBlockId: Id;
-  readonly professionId: Id;
-  readonly workers: number;
-  readonly accountId: Id;
-  /** Cash wage owed today (after any wage in kind, P5). */
-  readonly obligationRUSD: number;
-  /** P5 (D-143 §2): wage paid in kind (kept food at opening prices); absent when none. */
-  readonly paidInKindRUSD?: number;
 }
 
 /**
@@ -715,227 +701,6 @@ function settledTransactions(prepared: PreparedColumns): SettledMarketTransactio
 }
 
 /**
- * D-125 aggregated market postings: one balanced entry per (transaction kind, good)
- * instead of one per buyer × seller lot × tier × phase.
- *
- * Each buyer account gets one debit-expense/credit-cash pair and each seller account
- * one debit-cash/credit-revenue pair, with amounts summed over the prepared
- * transactions in their canonical key order. Pairs keep debits and credits summing
- * the same sequence of amounts, so every entry balances exactly. Quantities,
- * allocations and each account's net cash change are those of the individual
- * transactions; only the posting count and floating summation order differ.
- *
- * D-139: built from the columns. A buyer's transactions are contiguous in canonical
- * order (buyer is the second key), so per-good sums need only a per-good scratch;
- * sellers use a slot map. Each sum adds the same amounts in the same order as the
- * former per-group maps, and lines follow ascending account id as before.
- */
-function aggregatedMarketEntries(
-  prepared: PreparedColumns,
-  goodCount: number,
-): { readonly entries: JournalColumnEntry[]; readonly lines: JournalLineColumns } {
-  const { count, order, kind, good, total } = prepared;
-  const groupCount = 2 * goodCount;
-  interface GroupLists {
-    readonly buyerAccount: number[];
-    readonly buyerExpense: number[];
-    readonly buyerAmount: number[];
-    readonly sellerAccount: number[];
-    readonly sellerRevenue: number[];
-    readonly sellerAmount: number[];
-  }
-  const groups: (GroupLists | undefined)[] = new Array<GroupLists | undefined>(groupCount);
-  const listOf = (group: number): GroupLists => {
-    let lists = groups[group];
-    if (lists === undefined) {
-      lists = {
-        buyerAccount: [],
-        buyerExpense: [],
-        buyerAmount: [],
-        sellerAccount: [],
-        sellerRevenue: [],
-        sellerAmount: [],
-      };
-      groups[group] = lists;
-    }
-    return lists;
-  };
-  // Buyer runs: per good, the first amount is taken as is and later amounts added,
-  // exactly as the per-group buyer map did.
-  const runAmount = new Float64Array(goodCount);
-  const runTouched = new Int32Array(goodCount);
-  const runSeen = new Uint8Array(goodCount);
-  let runLength = 0;
-  let runKind = -1;
-  let runBuyer = -1;
-  let runCash = -1;
-  let runExpense = -1;
-  const flushRun = (): void => {
-    for (let item = 0; item < runLength; item += 1) {
-      const goodId = runTouched[item] ?? 0;
-      const lists = listOf(runKind * goodCount + goodId);
-      lists.buyerAccount.push(runCash);
-      lists.buyerExpense.push(runExpense);
-      lists.buyerAmount.push(runAmount[goodId] ?? 0);
-      runSeen[goodId] = 0;
-    }
-    runLength = 0;
-  };
-  // Seller slot per (group, seller building): a seller building has one cash account.
-  let maxSeller = 0;
-  for (let index = 0; index < count; index += 1) {
-    const sellerId = prepared.seller[index] ?? 0;
-    if (sellerId > maxSeller) maxSeller = sellerId;
-  }
-  const sellerStride = maxSeller + 1;
-  const sellerSlot =
-    groupCount * sellerStride <= 8_000_000 ? new Int32Array(groupCount * sellerStride).fill(-1) : null;
-  const sellerSlotMap = sellerSlot === null ? new Map<number, number>() : null;
-  for (let index = 0; index < count; index += 1) {
-    const position = order[index] ?? 0;
-    const transactionKind = kind[position] ?? 0;
-    const buyerId = prepared.buyer[position] ?? 0;
-    if (transactionKind !== runKind || buyerId !== runBuyer) {
-      flushRun();
-      runKind = transactionKind;
-      runBuyer = buyerId;
-      runCash = prepared.buyerCash[position] ?? 0;
-      runExpense = prepared.buyerExpense[position] ?? 0;
-    }
-    const goodId = good[position] ?? 0;
-    const amount = total[position] ?? 0;
-    if (runSeen[goodId] === 0) {
-      runSeen[goodId] = 1;
-      runTouched[runLength] = goodId;
-      runLength += 1;
-      runAmount[goodId] = amount;
-    } else {
-      runAmount[goodId] = (runAmount[goodId] ?? 0) + amount;
-    }
-    const group = transactionKind * goodCount + goodId;
-    const sellerAccountId = prepared.sellerCash[position] ?? 0;
-    const slotKey = group * sellerStride + (prepared.seller[position] ?? 0);
-    const found = sellerSlot !== null ? (sellerSlot[slotKey] ?? -1) : (sellerSlotMap?.get(slotKey) ?? -1);
-    const slot = found < 0 ? undefined : found;
-    const lists = listOf(group);
-    if (slot === undefined) {
-      if (sellerSlot !== null) sellerSlot[slotKey] = lists.sellerAccount.length;
-      else sellerSlotMap?.set(slotKey, lists.sellerAccount.length);
-      lists.sellerAccount.push(sellerAccountId);
-      lists.sellerRevenue.push(prepared.sellerRevenue[position] ?? 0);
-      lists.sellerAmount.push(amount);
-    } else {
-      lists.sellerAmount[slot] = (lists.sellerAmount[slot] ?? 0) + amount;
-    }
-  }
-  flushRun();
-
-  // Items of one group in ascending account id (account ids are unique per group).
-  const byAccount = (accounts: readonly number[]): Int32Array => {
-    const keys = new Float64Array(accounts.length);
-    for (let item = 0; item < accounts.length; item += 1) keys[item] = (accounts[item] ?? 0) * 2 ** 20 + item;
-    keys.sort();
-    const sorted = new Int32Array(accounts.length);
-    for (let item = 0; item < accounts.length; item += 1) sorted[item] = (keys[item] ?? 0) % 2 ** 20;
-    return sorted;
-  };
-  const entries: JournalColumnEntry[] = [];
-  const lines: JournalLineColumns = { accountId: [], debit: [], amount: [] };
-  const pushLine = (accountId: number, debit: number, amount: number): void => {
-    lines.accountId.push(accountId);
-    lines.debit.push(debit);
-    lines.amount.push(amount);
-  };
-  for (let transactionKind = 0; transactionKind < 2; transactionKind += 1) {
-    for (let goodId = 0; goodId < goodCount; goodId += 1) {
-      const lists = groups[transactionKind * goodCount + goodId];
-      if (lists === undefined) continue;
-      if (lists.buyerAccount.length >= 2 ** 20 || lists.sellerAccount.length >= 2 ** 20) {
-        throw new RangeError("market posting group is too large");
-      }
-      const start = lines.accountId.length;
-      for (const item of byAccount(lists.buyerAccount)) {
-        const amount = lists.buyerAmount[item] ?? 0;
-        if (!(amount > 0)) continue;
-        pushLine(lists.buyerExpense[item] ?? 0, 1, amount);
-        pushLine(lists.buyerAccount[item] ?? 0, 0, amount);
-      }
-      for (const item of byAccount(lists.sellerAccount)) {
-        const amount = lists.sellerAmount[item] ?? 0;
-        if (!(amount > 0)) continue;
-        pushLine(lists.sellerAccount[item] ?? 0, 1, amount);
-        pushLine(lists.sellerRevenue[item] ?? 0, 0, amount);
-      }
-      const end = lines.accountId.length;
-      if (end > start) {
-        entries.push({
-          transactionKind: transactionKind === 0 ? "goods-purchase" : "input-purchase",
-          start,
-          end,
-          sourceEntityId: null,
-          targetEntityId: null,
-        });
-      }
-    }
-  }
-  return { entries, lines };
-}
-
-function allocateMoney(
-  world: World,
-  dayIndex: DayIndex,
-  total: number,
-  groups: readonly WageGroup[],
-): Map<Id, number> {
-  const allocations = new Map<Id, number>();
-  if (!(total > 0) || groups.length === 0) return allocations;
-  let totalWeight = 0;
-  for (const group of groups) totalWeight += group.obligationRUSD;
-  if (!(totalWeight > 0)) return allocations;
-  let allocated = 0;
-  for (const group of groups) {
-    const quantity = (total * group.obligationRUSD) / totalWeight;
-    allocations.set(group.popBlockId, quantity);
-    allocated += quantity;
-  }
-  let residual = total - allocated;
-  // The keyed order is read only when a residual beyond tolerance remains; each
-  // group's draw is computed once rather than twice per comparison (D-137).
-  const order =
-    Math.abs(residual) > toleranceMoney(residual)
-      ? groups
-          .map((group) => ({
-            group,
-            key: drawUint32({
-              seed: world.seed,
-              day: dayIndex,
-              entityId: group.popBlockId,
-              purpose: M3E_WAGE_RESIDUAL_PURPOSE,
-              drawIndex: 0,
-            }),
-          }))
-          .sort((left, right) => left.key - right.key || left.group.popBlockId - right.group.popBlockId)
-          .map((entry) => entry.group)
-      : [];
-  for (let attempt = 0; attempt < order.length && Math.abs(residual) > toleranceMoney(residual); attempt += 1) {
-    const group = order[attempt];
-    if (group === undefined) break;
-    const current = allocations.get(group.popBlockId) ?? 0;
-    if (residual > 0) {
-      allocations.set(group.popBlockId, current + residual);
-      residual = 0;
-    } else if (current >= -residual) {
-      allocations.set(group.popBlockId, current + residual);
-      residual = 0;
-    }
-  }
-  if (Math.abs(residual) > toleranceMoney(residual)) {
-    throw new RangeError("wage residual allocation failed");
-  }
-  return allocations;
-}
-
-/**
  * P1 lookup tables for daily wage settlement. Assignments keep `world.employment`
  * order per building and the owner is the first country in `world.countries` order,
  * matching the linear scans they replace.
@@ -964,69 +729,6 @@ function buildWageLookup(world: World): WageLookup {
     if (country !== undefined) ownerByProvince.set(provinceId, country);
   }
   return { assignmentsByBuilding, blockById, ownerByProvince };
-}
-
-function buildWageGroups(
-  lookup: WageLookup,
-  building: BuildingInstance,
-  professions: ReadonlyMap<Id, ProfessionDef>,
-  index: FinanceIndex,
-  yearDays: number,
-  laborStandards: {
-    readonly hoursFactor: number;
-  },
-  /**
-   * P7 (D-154): the building's own-province effective wage with the minimum wage's
-   * coverage and compliance (plan §4.1, §4.5). D-155: the P2b-table wage with the E5
-   * floor, used by worlds without a labour market, was removed.
-   */
-  labour: { readonly wages: LabourWageTable; readonly definition: BuildingDef },
-): WageGroup[] {
-  const groups = new Map<Id, WageGroup>();
-  // P7 (D-154, R2): a block working in a building it owns is paid the building's residual
-  // (profit), not a wage; the owner's account is the block's own.
-  const ownerAccount = index.account(building.ownerAccountId);
-  const ownerBlockId = ownerAccount !== undefined && ownerAccount.ownerKind === "popBlock" ? ownerAccount.ownerId : null;
-  for (const assignment of lookup.assignmentsByBuilding.get(building.id) ?? []) {
-    const block = lookup.blockById.get(assignment.popBlockId);
-    if (block === undefined) throw new RangeError("employment assignment references an unknown block");
-    if (ownerBlockId !== null && ownerBlockId === block.id) continue;
-    const profession = professions.get(assignment.professionId);
-    if (profession === undefined) throw new RangeError("employment assignment references an unknown profession");
-    const account = householdCash(index, block.id);
-    // E5: statutory floor and hours standard scale the wage obligation; the block's
-    // vocational qualification adds a premium. All three are real labor-market
-    // channels, not display modifiers.
-    const annualBase = labour.wages.paid(
-      building.provinceId,
-      profession.id,
-      jobIsCovered(labour.definition, profession, labour.wages.coverage(building.provinceId), labour.wages.domesticServiceKeys),
-    );
-    const dailyWage =
-      (annualBase * laborStandards.hoursFactor * qualificationWageFactor(block)) /
-      yearDays;
-    if (!Number.isFinite(dailyWage) || !(dailyWage > 0)) {
-      throw new RangeError(`invalid daily wage for profession ${String(profession.id)}`);
-    }
-    const current = groups.get(block.id);
-    const obligation = dailyWage * assignment.workers;
-    if (current === undefined) {
-      groups.set(block.id, {
-        popBlockId: block.id,
-        professionId: profession.id,
-        workers: assignment.workers,
-        accountId: account.id,
-        obligationRUSD: obligation,
-      });
-    } else {
-      groups.set(block.id, {
-        ...current,
-        workers: current.workers + assignment.workers,
-        obligationRUSD: current.obligationRUSD + obligation,
-      });
-    }
-  }
-  return [...groups.values()].sort((left, right) => left.popBlockId - right.popBlockId);
 }
 
 function producerProfit(
@@ -1156,6 +858,118 @@ export function settleMarketDay(
   return settleMarketDays(world, definitions, [marketDay], options);
 }
 
+/**
+ * D-158: the market postings of the day from the markets' money flows. One entry per market
+ * and kind: households' purchases (each block's consumption expense and cash, then each
+ * seller's cash and sales revenue) and producers' input purchases (each buyer's input expense
+ * and cash, then each seller's), every amount summed over goods. Buyers are listed in flow
+ * order and sellers in first-receipt order; both are aggregated per account.
+ */
+function marketFlowEntries(
+  world: World,
+  index: FinanceIndex,
+  marketDays: readonly MarketDayResult[],
+  flows: readonly MarketFlowColumns[],
+): { readonly entries: JournalColumnEntry[]; readonly lines: JournalLineColumns } {
+  const householdIds = index.ownerAccountIds("popBlock", "household-cash");
+  const consumptionIds = index.ownerAccountIds("popBlock", "consumption-expense");
+  const operatingIds = index.ownerAccountIds("building", "operating-cash");
+  const revenueIds = index.ownerAccountIds("building", "sales-revenue");
+  const inputExpenseIds = index.ownerAccountIds("building", "input-expense");
+  const accountOf = (table: Int32Array, ownerId: number, what: string): number => {
+    const id = tableAccount(table, ownerId);
+    if (id < 0) throw new RangeError(`missing ${what} account for ${String(ownerId)}`);
+    return id;
+  };
+  let maxBuilding = 0;
+  for (const building of world.buildings) if (building.id > maxBuilding) maxBuilding = building.id;
+  const sellerAmount = new Float64Array(maxBuilding + 1);
+  const buyerAmount = new Float64Array(maxBuilding + 1);
+  const entries: JournalColumnEntry[] = [];
+  const lines: JournalLineColumns = { accountId: [], debit: [], amount: [] };
+  const push = (accountId: number, debit: number, amount: number): void => {
+    lines.accountId.push(accountId);
+    lines.debit.push(debit);
+    lines.amount.push(amount);
+  };
+  const close = (kind: "goods-purchase" | "input-purchase", start: number): void => {
+    if (lines.accountId.length > start) {
+      entries.push({ transactionKind: kind, start, end: lines.accountId.length, sourceEntityId: null, targetEntityId: null });
+    }
+  };
+  const sellerList: number[] = [];
+  const addSeller = (sellerId: number, amount: number): void => {
+    if (!(amount > 0)) return;
+    if (!(Number.isInteger(sellerId) && sellerId >= 0 && sellerId <= maxBuilding)) {
+      throw new RangeError(`market receipt for unknown building ${String(sellerId)}`);
+    }
+    if (sellerAmount[sellerId] === 0) sellerList.push(sellerId);
+    sellerAmount[sellerId] = (sellerAmount[sellerId] ?? 0) + amount;
+  };
+  const flushSellers = (): void => {
+    for (const sellerId of sellerList) {
+      const amount = sellerAmount[sellerId] ?? 0;
+      push(accountOf(operatingIds, sellerId, "operating-cash"), 1, amount);
+      push(accountOf(revenueIds, sellerId, "sales-revenue"), 0, amount);
+      sellerAmount[sellerId] = 0;
+    }
+    sellerList.length = 0;
+  };
+  for (let market = 0; market < marketDays.length; market += 1) {
+    const flow = flows[market] as MarketFlowColumns;
+    // Households: rows of a block are contiguous.
+    let start = lines.accountId.length;
+    let runBlock = -1;
+    let runAmount = 0;
+    const flushBlock = (): void => {
+      if (runBlock >= 0 && runAmount > 0) {
+        push(accountOf(consumptionIds, runBlock, "consumption-expense"), 1, runAmount);
+        push(accountOf(householdIds, runBlock, "household-cash"), 0, runAmount);
+      }
+    };
+    for (let row = 0; row < flow.householdSpend.length; row += 1) {
+      const blockId = flow.householdBuyer[row] ?? 0;
+      if (blockId !== runBlock) {
+        flushBlock();
+        runBlock = blockId;
+        runAmount = 0;
+      }
+      runAmount += flow.householdSpend[row] ?? 0;
+    }
+    flushBlock();
+    for (let item = 0; item < flow.householdSellerId.length; item += 1) {
+      addSeller(flow.householdSellerId[item] ?? 0, flow.householdSellerAmount[item] ?? 0);
+    }
+    flushSellers();
+    close("goods-purchase", start);
+    // Producers' inputs.
+    start = lines.accountId.length;
+    const buyerList: number[] = [];
+    for (let item = 0; item < flow.inputBuyer.length; item += 1) {
+      const amount = flow.inputAmount[item] ?? 0;
+      if (!(amount > 0)) continue;
+      const buyerId = flow.inputBuyer[item] ?? 0;
+      if (!(Number.isInteger(buyerId) && buyerId >= 0 && buyerId <= maxBuilding)) {
+        throw new RangeError(`input purchase by unknown building ${String(buyerId)}`);
+      }
+      if (buyerAmount[buyerId] === 0) buyerList.push(buyerId);
+      buyerAmount[buyerId] = (buyerAmount[buyerId] ?? 0) + amount;
+    }
+    for (const buyerId of buyerList) {
+      const amount = buyerAmount[buyerId] ?? 0;
+      push(accountOf(inputExpenseIds, buyerId, "input-expense"), 1, amount);
+      push(accountOf(operatingIds, buyerId, "operating-cash"), 0, amount);
+      buyerAmount[buyerId] = 0;
+    }
+    for (let item = 0; item < flow.inputBuyer.length; item += 1) {
+      addSeller(flow.inputSeller[item] ?? 0, flow.inputAmount[item] ?? 0);
+    }
+    flushSellers();
+    close("input-purchase", start);
+  }
+  return { entries, lines };
+}
+
 function settleMarketDaysInternal(
   world: World,
   definitions: EconomyDefinitions,
@@ -1170,7 +984,15 @@ function settleMarketDaysInternal(
   const marketId = marketIds[0];
   if (marketId === undefined) throw new RangeError("settlement requires a market-day result");
   const index = buildFinanceIndex(world.finance);
-  const transactions = prepareTransactions(world, definitions, index, marketDays.map(transactionChunk));
+  // D-158: settlement posts the markets' money flows; the validated transaction list is built
+  // only for full detail, where it is reported.
+  const flows = marketDays.map((marketDay) => {
+    const columns = marketDay.columns?.flows;
+    if (columns === undefined) throw new RangeError(`market ${String(marketDay.marketId)} returned no money flows`);
+    return columns;
+  });
+  const transactions =
+    detail === "full" ? prepareTransactions(world, definitions, index, marketDays.map(transactionChunk)) : null;
 
   // Opening balances in account order, restored on failure when the call owns its
   // atomicity (no account is created during settlement). D-139: the integrated day
@@ -1213,8 +1035,9 @@ function settleMarketDaysInternal(
     // D-139: market postings with column lines; their audit copies are materialised
     // below only if they can still be among the newest postings.
     let marketPostings: DeferredPostings | null = null;
-    if (transactions.count > 0) {
-      const market = aggregatedMarketEntries(transactions, goodCount);
+    void goodCount;
+    const market = marketFlowEntries(world, index, marketDays, flows);
+    if (market.entries.length > 0) {
       marketPostings = postJournalColumns(world.finance, dayIndex, market.entries, market.lines);
     }
 
@@ -1226,149 +1049,275 @@ function settleMarketDaysInternal(
     const wageSettlements: WageSettlement[] = [];
     const wageLookup = buildWageLookup(world);
     const labourWages = buildLabourWageTable(world, definitions);
-    const wageEntries: JournalEntryInput[] = [];
+    // D-158: wages in columns. Per building, the groups (one per worker block, merged and in
+    // block-id order), the in-kind deduction, the proportional allocation of what the
+    // employer can pay with its keyed residual and ulp guards, and one "wages" entry in
+    // journal columns: the same rules as the former object path. Per-building and per-block
+    // totals go into id-indexed tables; the per-building objects are built in full detail only.
+    let maxWageBuilding = 0;
+    for (const building of world.buildings) if (building.id > maxWageBuilding) maxWageBuilding = building.id;
+    let maxWageBlock = 0;
+    for (const block of world.popBlocks) if (block.id > maxWageBlock) maxWageBlock = block.id;
+    const wagePaidByBuilding = new Float64Array(maxWageBuilding + 1);
+    const wageObligationOfBuilding = new Float64Array(maxWageBuilding + 1);
+    const wageUnpaidByBuilding = new Float64Array(maxWageBuilding + 1);
+    const wagePaidByBlock = new Float64Array(maxWageBlock + 1);
+    let wageObligationTotal = 0;
+    let wagePaidTotal = 0;
+    let wageUnpaidTotal = 0;
+    const householdCashTable = index.ownerAccountIds("popBlock", "household-cash");
+    const wageIncomeTable = index.ownerAccountIds("popBlock", "wage-income");
+    const operatingTable = index.ownerAccountIds("building", "operating-cash");
+    const wageExpenseTable = index.ownerAccountIds("building", "wage-expense");
+    const hoursByCountry = new Map<Id, number>();
+    // D-158: the paid wage of a (province, profession, covered) job and whether a building
+    // definition's job is covered under a coverage rule, each derived once per settlement.
+    let stride = 1;
+    for (const profession of definitions.professions) if (profession.id + 1 > stride) stride = profession.id + 1;
+    const paidWage = new Map<number, number>();
+    const coveredJob = new Map<MinimumWageCoverage, Map<number, boolean>>();
+    const wageEntries: JournalColumnEntry[] = [];
+    const wageLines: JournalLineColumns = { accountId: [], debit: [], amount: [] };
+    // Groups of the current building (scratch).
+    const gBlock: number[] = [];
+    const gProfession: number[] = [];
+    const gWorkers: number[] = [];
+    const gAccount: number[] = [];
+    const gObligation: number[] = [];
+    const gInKind: number[] = [];
+    const gPaid: number[] = [];
+    const accountIn = (table: Int32Array, ownerId: number, what: string): number => {
+      const id = tableAccount(table, ownerId);
+      if (id < 0) throw new RangeError(`missing ${what} account for ${String(ownerId)}`);
+      return id;
+    };
     for (const building of inIdOrder(world.buildings)) {
       if (!building.operational) continue;
       const definition = buildingDefinitions.get(building.definitionId);
       if (definition === undefined) {
         throw new RangeError(`building ${String(building.id)} has no definition`);
       }
-      const grossGroups = buildWageGroups(
-        wageLookup,
-        building,
-        professions,
-        index,
-        yearDays,
-        (() => {
-          const owner = wageLookup.ownerByProvince.get(building.provinceId);
-          return owner === undefined
-            ? { hoursFactor: 1 }
-            : { hoursFactor: laborHoursFactor(owner, definitions) };
-        })(),
-        { wages: labourWages, definition },
-      );
-      if (grossGroups.length === 0) continue;
-      // P5 (D-143 §2): the owner block's kept food is a wage in kind, up to its cash
-      // wage here; no money moves for it.
+      const owner = wageLookup.ownerByProvince.get(building.provinceId);
+      let hoursFactor = 1;
+      if (owner !== undefined) {
+        const known = hoursByCountry.get(owner.id);
+        if (known === undefined) {
+          hoursFactor = laborHoursFactor(owner, definitions);
+          hoursByCountry.set(owner.id, hoursFactor);
+        } else {
+          hoursFactor = known;
+        }
+      }
+      gBlock.length = 0;
+      gProfession.length = 0;
+      gWorkers.length = 0;
+      gAccount.length = 0;
+      gObligation.length = 0;
+      gInKind.length = 0;
+      // P7 (D-154, R2): a block working in a building it owns is paid the building's residual.
+      const ownerAccount = index.account(building.ownerAccountId);
+      const ownerBlockId = ownerAccount !== undefined && ownerAccount.ownerKind === "popBlock" ? ownerAccount.ownerId : null;
+      const coverage = labourWages.coverage(building.provinceId);
+      for (const assignment of wageLookup.assignmentsByBuilding.get(building.id) ?? []) {
+        const block = wageLookup.blockById.get(assignment.popBlockId);
+        if (block === undefined) throw new RangeError("employment assignment references an unknown block");
+        if (ownerBlockId !== null && ownerBlockId === block.id) continue;
+        const profession = professions.get(assignment.professionId);
+        if (profession === undefined) throw new RangeError("employment assignment references an unknown profession");
+        let coveredBy = coveredJob.get(coverage);
+        if (coveredBy === undefined) {
+          coveredBy = new Map();
+          coveredJob.set(coverage, coveredBy);
+        }
+        const jobKey = definition.id * stride + profession.id;
+        let covered = coveredBy.get(jobKey);
+        if (covered === undefined) {
+          covered = jobIsCovered(definition, profession, coverage, labourWages.domesticServiceKeys);
+          coveredBy.set(jobKey, covered);
+        }
+        const wageKey = (building.provinceId * stride + profession.id) * 2 + (covered ? 1 : 0);
+        let annualBase = paidWage.get(wageKey);
+        if (annualBase === undefined) {
+          annualBase = labourWages.paid(building.provinceId, profession.id, covered);
+          paidWage.set(wageKey, annualBase);
+        }
+        const dailyWage = (annualBase * hoursFactor * qualificationWageFactor(block)) / yearDays;
+        if (!Number.isFinite(dailyWage) || !(dailyWage > 0)) {
+          throw new RangeError(`invalid daily wage for profession ${String(profession.id)}`);
+        }
+        const obligation = dailyWage * assignment.workers;
+        let group = -1;
+        for (let item = 0; item < gBlock.length; item += 1) if (gBlock[item] === block.id) group = item;
+        if (group < 0) {
+          // Insert in block-id order.
+          let at = gBlock.length;
+          while (at > 0 && (gBlock[at - 1] ?? 0) > block.id) at -= 1;
+          gBlock.splice(at, 0, block.id);
+          gProfession.splice(at, 0, profession.id);
+          gWorkers.splice(at, 0, assignment.workers);
+          gAccount.splice(at, 0, accountIn(householdCashTable, block.id, "household-cash"));
+          gObligation.splice(at, 0, obligation);
+          gInKind.splice(at, 0, 0);
+        } else {
+          gWorkers[group] = (gWorkers[group] ?? 0) + assignment.workers;
+          gObligation[group] = (gObligation[group] ?? 0) + obligation;
+        }
+      }
+      const groupCount = gBlock.length;
+      if (groupCount === 0) continue;
+      // P5 (D-143 §2): the owner block's kept food is a wage in kind, up to its cash wage here.
       const inKind = inKindWages?.get(building.id);
-      const groups =
-        inKind === undefined || !(inKind.valueRUSD > 0)
-          ? grossGroups
-          : grossGroups.map((group) => {
-              if (group.popBlockId !== inKind.popBlockId) return group;
-              const applied = Math.min(group.obligationRUSD, inKind.valueRUSD);
-              if (!(applied > 0)) return group;
-              return { ...group, obligationRUSD: group.obligationRUSD - applied, paidInKindRUSD: applied };
-            });
-      const obligation = groups.reduce((total, group) => total + group.obligationRUSD, 0);
-      const employer = operatingCash(index, building.id);
+      if (inKind !== undefined && inKind.valueRUSD > 0) {
+        for (let item = 0; item < groupCount; item += 1) {
+          if (gBlock[item] !== inKind.popBlockId) continue;
+          const applied = Math.min(gObligation[item] ?? 0, inKind.valueRUSD);
+          if (!(applied > 0)) continue;
+          gObligation[item] = (gObligation[item] ?? 0) - applied;
+          gInKind[item] = applied;
+        }
+      }
+      let obligation = 0;
+      for (let item = 0; item < groupCount; item += 1) obligation += gObligation[item] ?? 0;
+      const employerId = accountIn(operatingTable, building.id, "operating-cash");
+      const employer = index.account(employerId) as FinancialAccount;
       const paid = Math.min(employer.balanceRUSD, obligation);
-      const allocations = allocateMoney(world, dayIndex, paid, groups);
-      const payments: WagePayment[] = groups.map((group) => {
-        const paidRUSD = allocations.get(group.popBlockId) ?? 0;
-        return {
-          ...group,
-          paidRUSD,
-          unpaidRUSD: Math.max(0, group.obligationRUSD - paidRUSD),
-        };
-      });
-      let paidTotal = payments.reduce((total, payment) => total + payment.paidRUSD, 0);
+      // Proportional allocation with the keyed residual (allocateMoney).
+      gPaid.length = groupCount;
+      for (let item = 0; item < groupCount; item += 1) gPaid[item] = 0;
+      if (paid > 0 && obligation > 0) {
+        let allocated = 0;
+        for (let item = 0; item < groupCount; item += 1) {
+          const quantity = (paid * (gObligation[item] ?? 0)) / obligation;
+          gPaid[item] = quantity;
+          allocated += quantity;
+        }
+        let residual = paid - allocated;
+        if (Math.abs(residual) > toleranceMoney(residual)) {
+          const order = gBlock
+            .map((blockId, item) => ({
+              item,
+              blockId,
+              key: drawUint32({ seed: world.seed, day: dayIndex, entityId: blockId, purpose: M3E_WAGE_RESIDUAL_PURPOSE, drawIndex: 0 }),
+            }))
+            .sort((left, right) => left.key - right.key || left.blockId - right.blockId);
+          for (let attempt = 0; attempt < order.length && Math.abs(residual) > toleranceMoney(residual); attempt += 1) {
+            const item = (order[attempt] as { item: number }).item;
+            const current = gPaid[item] ?? 0;
+            if (residual > 0) {
+              gPaid[item] = current + residual;
+              residual = 0;
+            } else if (current >= -residual) {
+              gPaid[item] = current + residual;
+              residual = 0;
+            }
+          }
+          if (Math.abs(residual) > toleranceMoney(residual)) throw new RangeError("wage residual allocation failed");
+        }
+      }
+      let paidTotal = 0;
+      for (let item = 0; item < groupCount; item += 1) paidTotal += gPaid[item] ?? 0;
       if (paidTotal > employer.balanceRUSD) {
         let excess = paidTotal - employer.balanceRUSD;
-        for (let index = payments.length - 1; index >= 0 && excess > 0; index -= 1) {
-          const payment = payments[index];
-          if (payment === undefined) continue;
-          const reduction = Math.min(payment.paidRUSD, excess);
+        for (let item = groupCount - 1; item >= 0 && excess > 0; item -= 1) {
+          const reduction = Math.min(gPaid[item] ?? 0, excess);
           if (reduction <= 0) continue;
-          payments[index] = {
-            ...payment,
-            paidRUSD: payment.paidRUSD - reduction,
-            unpaidRUSD: payment.unpaidRUSD + reduction,
-          };
+          gPaid[item] = (gPaid[item] ?? 0) - reduction;
           excess -= reduction;
         }
-        paidTotal = payments.reduce((total, payment) => total + payment.paidRUSD, 0);
+        paidTotal = 0;
+        for (let item = 0; item < groupCount; item += 1) paidTotal += gPaid[item] ?? 0;
       }
-      // Proportional allocation can exceed the employer balance by one or two
-      // binary64 ulps even though every amount is finite. A reduction smaller
-      // than an ulp would be a no-op, so step by at least one representable ulp
-      // until the paid total is genuinely affordable. The difference is paid as
-      // reported shortfall, never as debt or negative cash.
+      // Proportional allocation can exceed the employer balance by an ulp or two; step down by at
+      // least one representable ulp until the total is affordable (the rest stays unpaid).
       let roundingGuard = 0;
       while (paidTotal > employer.balanceRUSD && roundingGuard < 32) {
         let reduced = false;
-        for (let index = payments.length - 1; index >= 0 && !reduced; index -= 1) {
-          const payment = payments[index];
-          if (payment === undefined || payment.paidRUSD <= 0) continue;
-          const step = Math.max(
-            paidTotal - employer.balanceRUSD,
-            Math.abs(payment.paidRUSD) * Number.EPSILON * 2,
-          );
-          const reduction = Math.min(payment.paidRUSD, step);
-          const nextPaid = payment.paidRUSD - reduction;
-          if (!(nextPaid < payment.paidRUSD)) continue;
-          payments[index] = {
-            ...payment,
-            paidRUSD: nextPaid,
-            unpaidRUSD: payment.unpaidRUSD + (payment.paidRUSD - nextPaid),
-          };
+        for (let item = groupCount - 1; item >= 0 && !reduced; item -= 1) {
+          const current = gPaid[item] ?? 0;
+          if (current <= 0) continue;
+          const step = Math.max(paidTotal - employer.balanceRUSD, Math.abs(current) * Number.EPSILON * 2);
+          const nextPaid = current - Math.min(current, step);
+          if (!(nextPaid < current)) continue;
+          gPaid[item] = nextPaid;
           reduced = true;
         }
         if (!reduced) break;
-        paidTotal = payments.reduce((total, payment) => total + payment.paidRUSD, 0);
+        paidTotal = 0;
+        for (let item = 0; item < groupCount; item += 1) paidTotal += gPaid[item] ?? 0;
         roundingGuard += 1;
       }
       if (paidTotal > employer.balanceRUSD + toleranceMoney(paidTotal, employer.balanceRUSD)) {
         throw new RangeError(`wage payment exceeds employer cash for building ${String(building.id)}`);
       }
       if (paidTotal > 0) {
-        const wageExpense = index.get("building", building.id, "wage-expense");
-        const lines: JournalLine[] = [];
-        for (const payment of payments) {
-          if (payment.paidRUSD <= 0) continue;
-          lines.push({
-            accountId: payment.accountId,
-            side: "debit",
-            amountRUSD: payment.paidRUSD,
-          });
+        const start = wageLines.accountId.length;
+        for (let item = 0; item < groupCount; item += 1) {
+          const amount = gPaid[item] ?? 0;
+          if (amount <= 0) continue;
+          wageLines.accountId.push(gAccount[item] ?? 0);
+          wageLines.debit.push(1);
+          wageLines.amount.push(amount);
         }
-        lines.push({
-          accountId: wageExpense.id,
-          side: "debit",
-          amountRUSD: paidTotal,
-        });
-        lines.push({
-          accountId: employer.id,
-          side: "credit",
-          amountRUSD: paidTotal,
-        });
-        for (const payment of payments) {
-          if (payment.paidRUSD <= 0) continue;
-          const income = index.get("popBlock", payment.popBlockId, "wage-income");
-          lines.push({
-            accountId: income.id,
-            side: "credit",
-            amountRUSD: payment.paidRUSD,
-          });
+        wageLines.accountId.push(accountIn(wageExpenseTable, building.id, "wage-expense"));
+        wageLines.debit.push(1);
+        wageLines.amount.push(paidTotal);
+        wageLines.accountId.push(employer.id);
+        wageLines.debit.push(0);
+        wageLines.amount.push(paidTotal);
+        for (let item = 0; item < groupCount; item += 1) {
+          const amount = gPaid[item] ?? 0;
+          if (amount <= 0) continue;
+          wageLines.accountId.push(accountIn(wageIncomeTable, gBlock[item] ?? 0, "wage-income"));
+          wageLines.debit.push(0);
+          wageLines.amount.push(amount);
         }
         wageEntries.push({
           transactionKind: "wages",
-          lines,
+          start,
+          end: wageLines.accountId.length,
           sourceEntityId: building.id,
           targetEntityId: null,
         });
       }
-      wageSettlements.push({
-        buildingId: building.id,
-        operatingAccountId: employer.id,
-        obligationRUSD: obligation,
-        paidRUSD: paidTotal,
-        unpaidRUSD: Math.max(0, obligation - paidTotal),
-        payments,
-      });
+      for (let item = 0; item < groupCount; item += 1) {
+        const blockId = gBlock[item] ?? 0;
+        wagePaidByBlock[blockId] = (wagePaidByBlock[blockId] ?? 0) + (gPaid[item] ?? 0);
+      }
+      wagePaidByBuilding[building.id] = paidTotal;
+      wageObligationOfBuilding[building.id] = obligation;
+      wageUnpaidByBuilding[building.id] = Math.max(0, obligation - paidTotal);
+      wageObligationTotal += obligation;
+      wagePaidTotal += paidTotal;
+      wageUnpaidTotal += Math.max(0, obligation - paidTotal);
+      if (detail === "full") {
+        const payments: WagePayment[] = [];
+        for (let item = 0; item < groupCount; item += 1) {
+          const paidRUSD = gPaid[item] ?? 0;
+          const obligationRUSD = gObligation[item] ?? 0;
+          payments.push({
+            popBlockId: gBlock[item] ?? 0,
+            professionId: gProfession[item] ?? 0,
+            workers: gWorkers[item] ?? 0,
+            accountId: gAccount[item] ?? 0,
+            obligationRUSD,
+            ...((gInKind[item] ?? 0) > 0 ? { paidInKindRUSD: gInKind[item] ?? 0 } : {}),
+            paidRUSD,
+            unpaidRUSD: Math.max(0, obligationRUSD - paidRUSD),
+          });
+        }
+        wageSettlements.push({
+          buildingId: building.id,
+          operatingAccountId: employer.id,
+          obligationRUSD: obligation,
+          paidRUSD: paidTotal,
+          unpaidRUSD: Math.max(0, obligation - paidTotal),
+          payments,
+        });
+      }
     }
+    let wagePostings: DeferredPostings | null = null;
     if (wageEntries.length > 0) {
-      postings.push(...postJournalBatch(world.finance, dayIndex, wageEntries, { adoptLines: true }));
+      wagePostings = postJournalColumns(world.finance, dayIndex, wageEntries, wageLines);
     }
     // P7 (D-154, docs/P7_EMPLOYERS_PROPOSAL.md §4.1): households pay their domestic servants the
     // province's paid wage of the servant's profession × DOMESTIC_WAGE_RATIO, from the employer's
@@ -1380,12 +1329,6 @@ function settleMarketDaysInternal(
     const spent = new Map<Id, number>();
     const domesticReceived = new Map<Id, number>();
     if (labourWages !== undefined && world.labourMarket.householdEmployment.length > 0) {
-      const wagesToday = new Map<Id, number>();
-      for (const settlement of wageSettlements) {
-        for (const payment of settlement.payments) {
-          wagesToday.set(payment.popBlockId, (wagesToday.get(payment.popBlockId) ?? 0) + payment.paidRUSD);
-        }
-      }
       for (const assignment of world.labourMarket.householdEmployment) {
         const servant = wageLookup.blockById.get(assignment.popBlockId);
         const employer = wageLookup.blockById.get(assignment.employerBlockId);
@@ -1395,7 +1338,7 @@ function settleMarketDaysInternal(
         const obligation = (annual * assignment.workers) / yearDays;
         const employerCash = householdCash(index, employer.id);
         const prior = spent.get(employer.id) ?? 0;
-        const limit = Math.max(0, employerCash.balanceRUSD - (wagesToday.get(employer.id) ?? 0));
+        const limit = Math.max(0, employerCash.balanceRUSD - (wagePaidByBlock[employer.id] ?? 0));
         let paid = Math.min(obligation, Math.max(0, limit - prior));
         // The batch debits the employer's cash by the running sum of its payments; when the
         // employer pays out its last spendable cash, `prior + paid` can exceed the limit by an
@@ -1490,6 +1433,9 @@ function settleMarketDaysInternal(
     if (marketPostings !== null) {
       retainDeferredPostings(world.finance, marketPostings, wageEntries.length + householdEntries.length + upkeepEntries.length);
     }
+    if (wagePostings !== null) {
+      retainDeferredPostings(world.finance, wagePostings, householdEntries.length + upkeepEntries.length);
+    }
 
     // D-139: per-owner sums in canonical transaction order, in id-indexed tables. A
     // table entry starts at 0 and adds each amount, as the former `get ?? 0` maps did.
@@ -1497,42 +1443,34 @@ function settleMarketDaysInternal(
     for (const building of world.buildings) if (building.id > maxBuildingId) maxBuildingId = building.id;
     let maxBlockId = 0;
     for (const block of world.popBlocks) if (block.id > maxBlockId) maxBlockId = block.id;
+    // D-158: the same per-owner sums from the markets' flows, in market and flow order.
     const revenueByBuilding = new Float64Array(maxBuildingId + 1);
     const inputCostsByBuilding = new Float64Array(maxBuildingId + 1);
     const purchasesByBlock = new Float64Array(maxBlockId + 1);
-    let marketPurchasesTotal = 0;
     let householdPurchasesTotal = 0;
     let inputPurchasesTotal = 0;
-    for (let item = 0; item < transactions.count; item += 1) {
-      const position = transactions.order[item] ?? 0;
-      const amount = transactions.total[position] ?? 0;
-      const sellerId = transactions.seller[position] ?? 0;
-      revenueByBuilding[sellerId] = (revenueByBuilding[sellerId] ?? 0) + amount;
-      marketPurchasesTotal += amount;
-      const buyerId = transactions.buyer[position] ?? 0;
-      if (transactions.kind[position] === 1) {
-        inputCostsByBuilding[buyerId] = (inputCostsByBuilding[buyerId] ?? 0) + amount;
-        inputPurchasesTotal += amount;
-      } else {
-        purchasesByBlock[buyerId] = (purchasesByBlock[buyerId] ?? 0) + amount;
+    for (const flow of flows) {
+      for (let row = 0; row < flow.householdSpend.length; row += 1) {
+        const amount = flow.householdSpend[row] ?? 0;
+        if (!(amount > 0)) continue;
+        const blockId = flow.householdBuyer[row] ?? 0;
+        purchasesByBlock[blockId] = (purchasesByBlock[blockId] ?? 0) + amount;
         householdPurchasesTotal += amount;
       }
-    }
-    const wagesByBuilding = new Map<Id, number>();
-    const wageObligationByBuilding = new Map<Id, number>();
-    const unpaidWagesByBuilding = new Map<Id, number>();
-    const wagesByBlock = new Map<Id, number>();
-    for (const settlement of wageSettlements) {
-      wagesByBuilding.set(settlement.buildingId, settlement.paidRUSD);
-      wageObligationByBuilding.set(settlement.buildingId, settlement.obligationRUSD);
-      unpaidWagesByBuilding.set(settlement.buildingId, settlement.unpaidRUSD);
-      for (const payment of settlement.payments) {
-        wagesByBlock.set(
-          payment.popBlockId,
-          (wagesByBlock.get(payment.popBlockId) ?? 0) + payment.paidRUSD,
-        );
+      for (let item = 0; item < flow.householdSellerId.length; item += 1) {
+        const sellerId = flow.householdSellerId[item] ?? 0;
+        revenueByBuilding[sellerId] = (revenueByBuilding[sellerId] ?? 0) + (flow.householdSellerAmount[item] ?? 0);
+      }
+      for (let item = 0; item < flow.inputBuyer.length; item += 1) {
+        const amount = flow.inputAmount[item] ?? 0;
+        const buyerId = flow.inputBuyer[item] ?? 0;
+        const sellerId = flow.inputSeller[item] ?? 0;
+        inputCostsByBuilding[buyerId] = (inputCostsByBuilding[buyerId] ?? 0) + amount;
+        revenueByBuilding[sellerId] = (revenueByBuilding[sellerId] ?? 0) + amount;
+        inputPurchasesTotal += amount;
       }
     }
+    const marketPurchasesTotal = householdPurchasesTotal + inputPurchasesTotal;
 
     const producers: ProducerSettlement[] = inIdOrder(world.buildings)
       .map((building) => {
@@ -1541,7 +1479,7 @@ function settleMarketDaysInternal(
         const current = operatingCash(index, building.id);
         const revenue = revenueByBuilding[building.id] ?? 0;
         const inputCosts = inputCostsByBuilding[building.id] ?? 0;
-        const wagesPaid = wagesByBuilding.get(building.id) ?? 0;
+        const wagesPaid = wagePaidByBuilding[building.id] ?? 0;
         const upkeepPaid = upkeepPaidByBuilding.get(building.id) ?? 0;
         return {
           buildingId: building.id,
@@ -1551,8 +1489,8 @@ function settleMarketDaysInternal(
           revenueRUSD: revenue,
           inputCostsRUSD: inputCosts,
           wagesPaidRUSD: wagesPaid,
-          wageObligationRUSD: wageObligationByBuilding.get(building.id) ?? 0,
-          unpaidWagesRUSD: unpaidWagesByBuilding.get(building.id) ?? 0,
+          wageObligationRUSD: wageObligationOfBuilding[building.id] ?? 0,
+          unpaidWagesRUSD: wageUnpaidByBuilding[building.id] ?? 0,
           upkeepPaidRUSD: upkeepPaid,
           upkeepObligationRUSD: upkeepObligationByBuilding.get(building.id) ?? 0,
           unpaidUpkeepRUSD: unpaidUpkeepByBuilding.get(building.id) ?? 0,
@@ -1575,7 +1513,7 @@ function settleMarketDaysInternal(
           openingCashByAccount.get(account.id) ?? 0;
         const purchases = purchasesByBlock[block.id] ?? 0;
         // §4.1: a servant's pay is wage income; an employer's is household spending outside the market.
-        const wages = (wagesByBlock.get(block.id) ?? 0) + (domesticReceived.get(block.id) ?? 0);
+        const wages = (wagePaidByBlock[block.id] ?? 0) + (domesticReceived.get(block.id) ?? 0);
         const expected = initialCash - purchases - (spent.get(block.id) ?? 0) + wages;
         if (Math.abs(expected - account.balanceRUSD) > toleranceMoney(expected, account.balanceRUSD)) {
           throw new RangeError(`household cash does not reconcile for popBlock ${String(block.id)}`);
@@ -1599,9 +1537,9 @@ function settleMarketDaysInternal(
       marketPurchasesRUSD: marketPurchasesTotal,
       householdPurchasesRUSD: householdPurchasesTotal,
       inputPurchasesRUSD: inputPurchasesTotal,
-      wageObligationRUSD: wageSettlements.reduce((total, settlement) => total + settlement.obligationRUSD, 0),
-      wagesPaidRUSD: wageSettlements.reduce((total, settlement) => total + settlement.paidRUSD, 0),
-      unpaidWagesRUSD: wageSettlements.reduce((total, settlement) => total + settlement.unpaidRUSD, 0),
+      wageObligationRUSD: wageObligationTotal,
+      wagesPaidRUSD: wagePaidTotal,
+      unpaidWagesRUSD: wageUnpaidTotal,
       upkeepObligationRUSD: upkeepSettlements.reduce(
         (total, settlement) => total + settlement.obligationRUSD,
         0,
@@ -1628,7 +1566,7 @@ function settleMarketDaysInternal(
       startDayIndex: world.startDayIndex,
       settlementNextPostingId: world.finance.nextPostingId,
       fiscalApplied: false,
-      transactions: detail === "summary" ? [] : settledTransactions(transactions),
+      transactions: transactions === null ? [] : settledTransactions(transactions),
       wages: wageSettlements,
       upkeep: upkeepSettlements,
       producers,
@@ -1638,6 +1576,9 @@ function settleMarketDaysInternal(
         ...(marketPostings === null
           ? []
           : Array.from({ length: marketPostings.count }, (_, offset) => marketPostings.firstId + offset)),
+        ...(wagePostings === null
+          ? []
+          : Array.from({ length: wagePostings.count }, (_, offset) => wagePostings.firstId + offset)),
         ...postings.map((posting) => posting.id),
       ],
     };

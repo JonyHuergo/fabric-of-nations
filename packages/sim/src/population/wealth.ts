@@ -53,6 +53,25 @@ function tierSummary(
   return blockNeeds?.tierSummaries.find((summary) => summary.tier === tier);
 }
 
+/**
+ * D-158: the needs result of each block of `blocks` by position. The integrated day lists
+ * results in block order, so the result at the same position is the block's; otherwise
+ * (another caller's order) the lookup falls back to a map by block id.
+ */
+export function needsByPosition(
+  blocks: readonly { readonly id: number }[],
+  results: readonly PopBlockNeedsResult[],
+): (position: number) => PopBlockNeedsResult | undefined {
+  let aligned = results.length === blocks.length;
+  for (let index = 0; aligned && index < blocks.length; index += 1) {
+    if (results[index]?.popBlockId !== blocks[index]?.id) aligned = false;
+  }
+  if (aligned) return (position) => results[position];
+  const byId = new Map<number, PopBlockNeedsResult>();
+  for (const result of results) byId.set(result.popBlockId, result);
+  return (position) => byId.get(blocks[position]?.id ?? -1);
+}
+
 function luxuryFulfillmentRatio(blockNeeds: PopBlockNeedsResult | undefined): number {
   const summary = tierSummary(blockNeeds, "luxury");
   if (summary === undefined || !summary.active || summary.desiredCostRUSD <= 0) return 0;
@@ -142,10 +161,10 @@ export function updateDailyMilitancy(
   world: World,
   needs: PopulationNeedsDayResult,
 ): void {
-  const needsByBlock = new Map<number, PopBlockNeedsResult>();
-  for (const blockNeeds of needs.blocks) needsByBlock.set(blockNeeds.popBlockId, blockNeeds);
-  for (const block of world.popBlocks) {
-    const luxury = tierSummary(needsByBlock.get(block.id), "luxury");
+  const needsAt = needsByPosition(world.popBlocks, needs.blocks);
+  for (let position = 0; position < world.popBlocks.length; position += 1) {
+    const block = world.popBlocks[position] as World["popBlocks"][number];
+    const luxury = tierSummary(needsAt(position), "luxury");
     const subsistencePressure = saturate(block.unmetSubsistenceDays, MILITANCY_SCALE_DAYS);
     const basicPressure = saturate(block.unmetBasicDays, MILITANCY_SCALE_DAYS);
     const comfortRelief = saturate(block.comfortFulfilledDays, MILITANCY_SCALE_DAYS);

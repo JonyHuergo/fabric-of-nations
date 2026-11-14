@@ -99,11 +99,11 @@ export interface MarketDayInput {
 
 /** Household demand records in columns, row `i` being record `i` (D-139). */
 export interface HouseholdDemandColumns {
-  readonly popBlockId: readonly number[];
-  readonly tier: readonly HouseholdTier[];
-  readonly goodId: readonly number[];
-  readonly desired: readonly number[];
-  readonly funded: readonly number[];
+  readonly popBlockId: ArrayLike<number>;
+  readonly tier: ArrayLike<number>;
+  readonly goodId: ArrayLike<number>;
+  readonly desired: ArrayLike<number>;
+  readonly funded: ArrayLike<number>;
 }
 
 export interface HouseholdDemandResult {
@@ -303,6 +303,13 @@ export interface MarketDayOptions extends PhaseValidationOptions {
    * transactions by their full canonical key). Defaults to `full`.
    */
   readonly detail?: "full" | "summary";
+  /**
+   * D-158: the integrated day built the demand rows itself (household demand from the
+   * demand system, producers' from their recipes and cash), so the per-row checks of
+   * `validateMarketDayInput` and the per-reservation checks of production are skipped.
+   * Direct callers keep every check.
+   */
+  readonly trustedInput?: boolean;
 }
 
 /**
@@ -408,7 +415,8 @@ function validateMarketDayInput(
   if (columns !== undefined && input.householdDemands.length > 0) {
     throw new RangeError("market-day input must not carry both household records and columns");
   }
-  const householdRows = columns !== undefined ? columns.popBlockId.length : input.householdDemands.length;
+  const householdRows =
+    options.trustedInput === true ? 0 : columns !== undefined ? columns.popBlockId.length : input.householdDemands.length;
   for (let index = 0; index < householdRows; index += 1) {
     let popBlockId: number;
     let tier: number;
@@ -459,7 +467,8 @@ function validateMarketDayInput(
   }
 
   const productionKeys = duplicateKeys();
-  for (let index = 0; index < input.productionDemands.length; index += 1) {
+  const productionRows = options.trustedInput === true ? 0 : input.productionDemands.length;
+  for (let index = 0; index < productionRows; index += 1) {
     const demand = input.productionDemands[index];
     if (demand === undefined) throw new RangeError("missing production demand");
     const path = `productionDemands[${String(index)}]`;
@@ -582,11 +591,33 @@ export interface PendingColumns {
   readonly total: number[];
 }
 
+/**
+ * D-158: the money of one market day, as settlement posts it. Household spend is the sum of
+ * each demand row's pieces at the opening price; sellers' household receipts the same pieces
+ * by seller; input purchases one entry per used reservation (quantity used × opening price).
+ */
+export interface MarketFlowColumns {
+  /** Buyer block of each household demand row (input order). */
+  readonly householdBuyer: Float64Array;
+  /** Spend of each household demand row, RUSD. */
+  readonly householdSpend: Float64Array;
+  /** Household-purchase receipts by seller building, in lot-slot order. */
+  readonly householdSellerId: number[];
+  readonly householdSellerAmount: number[];
+  /** Input purchases (buyer building, seller building, RUSD), in use order. */
+  readonly inputBuyer: number[];
+  readonly inputSeller: number[];
+  readonly inputAmount: number[];
+}
+
 /** Transient columnar companions of a market-day result (D-139). */
 export interface MarketDayColumns {
+  /** Full detail only (D-158): the transactions behind `pendingTransactions`. */
   readonly transactions: PendingColumns;
   /** Fulfilled quantity of each `input.householdDemands` record, in input order. */
   readonly householdFulfilled: Float64Array;
+  /** D-158: the day's money flows of this market. */
+  readonly flows: MarketFlowColumns;
 }
 
 /** Ascending (household before building, buyer id, tier), the allocation order (D-133). */
@@ -699,6 +730,7 @@ export function runMarketDay(
   const lookups = options.lookups ?? buildMarketDayLookups(world, definitions);
   const goodCount = definitions.goods.length;
   const detail = options.detail ?? "full";
+  const trusted = options.trustedInput === true;
 
   // Demand columns: household records first, then production records (input order).
   const householdColumns = input.householdColumns;
@@ -716,13 +748,12 @@ export function runMarketDay(
   const passB = new Float64Array(demandCount);
   const fulfilled = new Float64Array(demandCount);
   if (householdColumns !== undefined) {
-    for (let index = 0; index < householdCount; index += 1) {
-      buyer[index] = householdColumns.popBlockId[index] ?? 0;
-      tierOf[index] = householdColumns.tier[index] ?? 0;
-      goodOf[index] = householdColumns.goodId[index] ?? 0;
-      desired[index] = householdColumns.desired[index] ?? 0;
-      funded[index] = householdColumns.funded[index] ?? 0;
-    }
+    // D-158: typed columns are copied in bulk.
+    buyer.set(householdColumns.popBlockId);
+    tierOf.set(householdColumns.tier);
+    goodOf.set(householdColumns.goodId);
+    desired.set(householdColumns.desired);
+    funded.set(householdColumns.funded);
   } else {
     for (let index = 0; index < householdCount; index += 1) {
       const demand = input.householdDemands[index] as HouseholdDemandRecord;
@@ -742,10 +773,39 @@ export function runMarketDay(
     desired[index] = demand.desiredQuantity;
     funded[index] = demand.fundedQuantity;
   }
-  // Demand indices per tier, then per (tier, good), each in demand order.
-  const tierList = new Map<number, number[]>();
-  for (const tier of M3_MARKET_TIERS) tierList.set(tier, []);
-  for (let index = 0; index < demandCount; index += 1) tierList.get(tierOf[index] ?? 0)?.push(index);
+  // D-158: demand indices grouped by (tier, good), each group in demand order, by one stable
+  // counting sort; group = tier position (M3_MARKET_TIERS order) × goods + good. A tier's
+  // groups are contiguous, so a tier is one range too.
+  const tierPosition = new Int8Array(8).fill(-1);
+  M3_MARKET_TIERS.forEach((tier, position) => {
+    tierPosition[tier] = position;
+  });
+  const groupCount = M3_MARKET_TIERS.length * goodCount;
+  const groupStart = new Int32Array(groupCount + 1);
+  const groupOfDemand = new Int32Array(demandCount);
+  for (let index = 0; index < demandCount; index += 1) {
+    const position = tierPosition[tierOf[index] ?? 0] ?? -1;
+    const goodId = goodOf[index] ?? 0;
+    const group = position < 0 || goodId < 0 || goodId >= goodCount ? -1 : position * goodCount + goodId;
+    groupOfDemand[index] = group;
+    if (group >= 0) groupStart[group + 1] = (groupStart[group + 1] ?? 0) + 1;
+  }
+  for (let group = 0; group < groupCount; group += 1) groupStart[group + 1] = (groupStart[group + 1] ?? 0) + (groupStart[group] ?? 0);
+  const groupOrder = new Int32Array(groupStart[groupCount] ?? 0);
+  {
+    const fill = groupStart.slice(0, groupCount);
+    for (let index = 0; index < demandCount; index += 1) {
+      const group = groupOfDemand[index] ?? -1;
+      if (group < 0) continue;
+      groupOrder[fill[group] ?? 0] = index;
+      fill[group] = (fill[group] ?? 0) + 1;
+    }
+  }
+  const tierRangeStart = (tier: number): number => groupStart[(tierPosition[tier] ?? 0) * goodCount] ?? 0;
+  const tierRangeEnd = (tier: number): number => groupStart[((tierPosition[tier] ?? 0) + 1) * goodCount] ?? 0;
+  const groupOf = (tier: number, goodId: number): number => (tierPosition[tier] ?? 0) * goodCount + goodId;
+  /** Candidate scratch for one (tier, good) allocation. */
+  const candidates = new Int32Array(demandCount);
   // Household blocks with tier 1/3 demands get a slot for the eligibility totals.
   const blockSlot = new Map<number, number>();
   const tierOneThree: number[] = [];
@@ -793,14 +853,10 @@ export function runMarketDay(
     if (tier === 3) return true;
     return slot < 0 || tierMet(desired3[slot] ?? 0, fulfilled3[slot] ?? 0);
   };
-  const byGood = (indices: readonly number[]): number[][] => {
-    const groups: number[][] = [];
-    for (let goodId = 0; goodId < goodCount; goodId += 1) groups.push([]);
-    for (const index of indices) groups[goodOf[index] ?? 0]?.push(index);
-    return groups;
-  };
 
-  // Reservations in columns, in creation order.
+  // Reservations in columns, in creation order. D-158: household pieces are kept only in full
+  // detail; their quantities and money go straight into the totals declared with the lots.
+  const storeHouseholdPieces = detail === "full";
   const resKind: number[] = [];
   const resBuyer: number[] = [];
   const resTier: number[] = [];
@@ -817,15 +873,24 @@ export function runMarketDay(
   const buyerEnd: number[] = [];
   const lotSlots: number[] = [];
   const lotEnd: number[] = [];
+  // D-158: the amount a candidate is allocated: funded (Pass A), funded less Pass A (Pass B),
+  // or funded less fulfilled (Pass A2).
+  const fundedFor = (index: number, mode: 0 | 1 | 2): number =>
+    mode === 0
+      ? (funded[index] ?? 0)
+      : mode === 1
+        ? (funded[index] ?? 0) - (passA[index] ?? 0)
+        : (funded[index] ?? 0) - (fulfilled[index] ?? 0);
   const allocate = (
-    candidates: readonly number[],
-    fundedOf: (index: number) => number,
+    count: number,
+    mode: 0 | 1 | 2,
     goodId: number,
     lots: LotTable,
     phase: 0 | 1,
   ): { readonly totalFunded: number; readonly fulfilled: number } => {
+    const fundedOf = (index: number): number => fundedFor(index, mode);
     relevant.length = 0;
-    for (let item = 0; item < candidates.length; item += 1) {
+    for (let item = 0; item < count; item += 1) {
       const index = candidates[item] as number;
       if (fundedOf(index) > 0) relevant.push(index);
     }
@@ -893,14 +958,25 @@ export function runMarketDay(
           if (kind[demand] === 0 && (tierOf[demand] === 1 || tierOf[demand] === 3)) totalsStale = true;
           if (phase === 0) passA[demand] = (passA[demand] ?? 0) + quantity;
           else passB[demand] = (passB[demand] ?? 0) + quantity;
-          resKind.push(kind[demand] ?? 0);
-          resBuyer.push(buyer[demand] ?? 0);
-          resTier.push(tierOf[demand] ?? 0);
-          resGood.push(goodId);
-          resSeller.push(sellerId);
-          resSellerSlot.push(lotSlots[lotIndex] ?? 0);
-          resQuantity.push(quantity);
-          resPhase.push(phase);
+          const household = kind[demand] === 0;
+          if (household) {
+            const cell = base + (lotSlots[lotIndex] ?? 0);
+            const amount = quantity * (openingPrices[goodId] ?? 0);
+            householdTakenByCell[cell] = (householdTakenByCell[cell] ?? 0) + quantity;
+            householdTakenByGood[goodId] = (householdTakenByGood[goodId] ?? 0) + quantity;
+            householdReceiptByCell[cell] = (householdReceiptByCell[cell] ?? 0) + amount;
+            householdSpend[demand] = (householdSpend[demand] ?? 0) + amount;
+          }
+          if (!household || storeHouseholdPieces) {
+            resKind.push(kind[demand] ?? 0);
+            resBuyer.push(buyer[demand] ?? 0);
+            resTier.push(tierOf[demand] ?? 0);
+            resGood.push(goodId);
+            resSeller.push(sellerId);
+            resSellerSlot.push(lotSlots[lotIndex] ?? 0);
+            resQuantity.push(quantity);
+            resPhase.push(phase);
+          }
           reservedByLot[lotIndex] = (reservedByLot[lotIndex] ?? 0) + quantity;
         }
         if (buyerStop <= lotStop) buyerIndex += 1;
@@ -940,15 +1016,22 @@ export function runMarketDay(
   const buildingIds = lookups.production.buildingIdsByMarket.get(market.id) ?? [];
   const opening = lotTableFromLots(market.stockLots, buildingIds, goodCount);
   const ownerCount = opening.owners.length;
+  /** D-158: household takings by lot cell (good × owner slot) and by good, in piece order. */
+  const householdTakenByCell = new Float64Array(goodCount * ownerCount);
+  const householdTakenByGood = new Float64Array(goodCount);
+  /** D-158: household receipts by lot cell and spend by demand row, RUSD at opening prices. */
+  const householdReceiptByCell = new Float64Array(goodCount * ownerCount);
+  const householdSpend = new Float64Array(householdCount);
 
   try {
     // Pass A: opening stock, tiers 1, 2, 3, 5, 6.
     const remaining = copyLotTable(opening);
     const blockedGoods = new Uint8Array(goodCount);
     for (const tier of M3_MARKET_TIERS) {
-      const tierDemands = tierList.get(tier) ?? [];
       refreshTotals();
-      for (const index of tierDemands) {
+      // Every good of a tier is classified before the tier allocates (as before).
+      for (let item = tierRangeStart(tier); item < tierRangeEnd(tier); item += 1) {
+        const index = groupOrder[item] ?? 0;
         const isNow = isEligible(index);
         eligible[index] = isNow ? 1 : 0;
         if (isNow) {
@@ -956,14 +1039,19 @@ export function runMarketDay(
           priceFundedByGood[goodId] = (priceFundedByGood[goodId] ?? 0) + (funded[index] ?? 0);
         }
       }
-      const tierByGood = byGood(tierDemands);
       for (let goodId = 0; goodId < goodCount; goodId += 1) {
         if (blockedGoods[goodId] === 1) continue;
-        const candidates = (tierByGood[goodId] ?? []).filter(
-          (index) => eligible[index] === 1 && (funded[index] ?? 0) > 0,
-        );
-        if (candidates.length === 0) continue;
-        const allocation = allocate(candidates, (index) => funded[index] ?? 0, goodId, remaining, 0);
+        const group = groupOf(tier, goodId);
+        let count = 0;
+        for (let item = groupStart[group] ?? 0; item < (groupStart[group + 1] ?? 0); item += 1) {
+          const index = groupOrder[item] ?? 0;
+          if (eligible[index] === 1 && (funded[index] ?? 0) > 0) {
+            candidates[count] = index;
+            count += 1;
+          }
+        }
+        if (count === 0) continue;
+        const allocation = allocate(count, 0, goodId, remaining, 0);
         if (
           allocation.totalFunded - allocation.fulfilled >
           tolerance(allocation.totalFunded, allocation.fulfilled)
@@ -973,6 +1061,8 @@ export function runMarketDay(
       }
     }
     const primaryCount = resKind.length;
+    const householdPassATakenByCell = householdTakenByCell.slice();
+    const householdPassATakenByGood = householdTakenByGood.slice();
 
     // M3c production from the building reservations of Pass A.
     const inputColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
@@ -997,7 +1087,7 @@ export function runMarketDay(
     const waves = productionWaves(definitions, market.id, lookups, kind, goodOf, funded, householdCount, demandCount);
     let productionCore: ReturnType<typeof runProductionCore>;
     if (waves === null) {
-      productionCore = runProductionCore(world, definitions, market, lookups.production, opening, inputColumns, false);
+      productionCore = runProductionCore(world, definitions, market, lookups.production, opening, inputColumns, false, undefined, trusted);
     } else {
       const firstColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
       const secondColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
@@ -1008,19 +1098,24 @@ export function runMarketDay(
         (target.seller as number[]).push(inputColumns.seller[index] ?? 0);
         (target.quantity as number[]).push(inputColumns.quantity[index] ?? 0);
       }
-      const first = runProductionCore(world, definitions, market, lookups.production, opening, firstColumns, false, waves.first);
+      const first = runProductionCore(world, definitions, market, lookups.production, opening, firstColumns, false, waves.first, trusted);
       // Pass A2: same-day output of non-storable goods to producers, tiers 2 then 5.
       const sameDay = copyLotTable(first.lots);
       const beforeA2 = resKind.length;
       for (const tier of [2, 5] as const) {
         for (const goodId of waves.goods) {
-          const candidates: number[] = [];
-          for (let index = householdCount; index < demandCount; index += 1) {
-            if (tierOf[index] !== tier || goodOf[index] !== goodId) continue;
-            if ((funded[index] ?? 0) - (fulfilled[index] ?? 0) > tolerance(funded[index] ?? 0)) candidates.push(index);
+          const group = groupOf(tier, goodId);
+          let count = 0;
+          for (let item = groupStart[group] ?? 0; item < (groupStart[group + 1] ?? 0); item += 1) {
+            const index = groupOrder[item] ?? 0;
+            if (index < householdCount) continue;
+            if ((funded[index] ?? 0) - (fulfilled[index] ?? 0) > tolerance(funded[index] ?? 0)) {
+              candidates[count] = index;
+              count += 1;
+            }
           }
-          if (candidates.length === 0) continue;
-          allocate(candidates, (index) => (funded[index] ?? 0) - (fulfilled[index] ?? 0), goodId, sameDay, 0);
+          if (count === 0) continue;
+          allocate(count, 2, goodId, sameDay, 0);
         }
       }
       for (let index = beforeA2; index < resKind.length; index += 1) {
@@ -1029,7 +1124,7 @@ export function runMarketDay(
         (secondColumns.seller as number[]).push(resSeller[index] ?? 0);
         (secondColumns.quantity as number[]).push(resQuantity[index] ?? 0);
       }
-      const second = runProductionCore(world, definitions, market, lookups.production, first.lots, secondColumns, false, waves.second);
+      const second = runProductionCore(world, definitions, market, lookups.production, first.lots, secondColumns, false, waves.second, trusted);
       productionCore = {
         buildings: [...first.buildings, ...second.buildings].sort((left, right) => left.buildingId - right.buildingId),
         uses: {
@@ -1066,15 +1161,10 @@ export function runMarketDay(
     }
 
     // Pass B lots: the produced lots less outstanding household Pass-A reservations.
-    const householdReservedByLot = new Float64Array(goodCount * ownerCount);
-    const householdPassAByGood = new Float64Array(goodCount);
-    for (let index = 0; index < primaryCount; index += 1) {
-      if (resKind[index] !== 0) continue;
-      const goodId = resGood[index] ?? 0;
-      const cell = goodId * ownerCount + (resSellerSlot[index] ?? 0);
-      householdReservedByLot[cell] = (householdReservedByLot[cell] ?? 0) + (resQuantity[index] ?? 0);
-      householdPassAByGood[goodId] = (householdPassAByGood[goodId] ?? 0) + (resQuantity[index] ?? 0);
-    }
+    // D-158: the totals were summed piece by piece in creation order, as the former loop over
+    // the stored pieces summed them; Pass A2 takes no household pieces.
+    const householdReservedByLot = householdPassATakenByCell;
+    const householdPassAByGood = householdPassATakenByGood;
     const passBLots: LotTable = {
       goodCount,
       owners: opening.owners,
@@ -1118,8 +1208,8 @@ export function runMarketDay(
       // completed tier and include newly unlocked funded demand in the price
       // signal (it was excluded from the Pass-A signal).
       refreshTotals();
-      const tierDemands = tierList.get(tier) ?? [];
-      for (const index of tierDemands) {
+      for (let item = tierRangeStart(tier); item < tierRangeEnd(tier); item += 1) {
+        const index = groupOrder[item] ?? 0;
         if (kind[index] !== 0) continue;
         const wasEligible = eligible[index] === 1;
         const isNow = isEligible(index);
@@ -1129,26 +1219,27 @@ export function runMarketDay(
           priceFundedByGood[goodId] = (priceFundedByGood[goodId] ?? 0) + (funded[index] ?? 0);
         }
       }
-      const open = tierDemands.filter(
-        (index) =>
-          kind[index] === 0 &&
-          eligible[index] === 1 &&
-          (funded[index] ?? 0) - (passA[index] ?? 0) > tolerance(funded[index] ?? 0, passA[index] ?? 0),
-      );
-      const tierByGood = byGood(open);
       for (let goodId = 0; goodId < goodCount; goodId += 1) {
         if (passBBlocked[goodId] === 1) continue;
         if (tier === 3 && inputCriticalUnmet[goodId] === 1) continue;
         if (tier === 6 && (inputCriticalUnmet[goodId] === 1 || inputRemainingUnmet[goodId] === 1)) continue;
-        const candidates = tierByGood[goodId] ?? [];
-        if (candidates.length === 0) continue;
-        const allocation = allocate(
-          candidates,
-          (index) => (funded[index] ?? 0) - (passA[index] ?? 0),
-          goodId,
-          passBLots,
-          1,
-        );
+        // The open demands of the tier and good, in demand order (Pass A amounts and the
+        // eligibility above do not change while Pass B allocates).
+        const group = groupOf(tier, goodId);
+        let count = 0;
+        for (let item = groupStart[group] ?? 0; item < (groupStart[group + 1] ?? 0); item += 1) {
+          const index = groupOrder[item] ?? 0;
+          if (
+            kind[index] === 0 &&
+            eligible[index] === 1 &&
+            (funded[index] ?? 0) - (passA[index] ?? 0) > tolerance(funded[index] ?? 0, passA[index] ?? 0)
+          ) {
+            candidates[count] = index;
+            count += 1;
+          }
+        }
+        if (count === 0) continue;
+        const allocation = allocate(count, 1, goodId, passBLots, 1);
         if (
           allocation.totalFunded - allocation.fulfilled >
           tolerance(allocation.totalFunded, allocation.fulfilled)
@@ -1159,15 +1250,8 @@ export function runMarketDay(
     }
 
     // Final lots: the produced lots less every household reservation (A then B).
-    const householdByLot = new Float64Array(goodCount * ownerCount);
-    const householdByGood = new Float64Array(goodCount);
-    for (let index = 0; index < resKind.length; index += 1) {
-      if (resKind[index] !== 0) continue;
-      const goodId = resGood[index] ?? 0;
-      const cell = goodId * ownerCount + (resSellerSlot[index] ?? 0);
-      householdByLot[cell] = (householdByLot[cell] ?? 0) + (resQuantity[index] ?? 0);
-      householdByGood[goodId] = (householdByGood[goodId] ?? 0) + (resQuantity[index] ?? 0);
-    }
+    const householdByLot = householdTakenByCell;
+    const householdByGood = householdTakenByGood;
     const finalLots: LotTable = {
       goodCount,
       owners: opening.owners,
@@ -1249,7 +1333,7 @@ export function runMarketDay(
       transactions.total.push(quantity * unitPrice);
     };
     for (let index = 0; index < resKind.length; index += 1) {
-      if (resKind[index] !== 0) continue;
+      if (resKind[index] !== 0 || !storeHouseholdPieces) continue;
       pushTransaction(
         0,
         resBuyer[index] ?? 0,
@@ -1261,6 +1345,9 @@ export function runMarketDay(
       );
     }
     const uses = productionCore.uses;
+    const inputBuyer: number[] = [];
+    const inputSeller: number[] = [];
+    const inputAmount: number[] = [];
     for (let index = 0; index < uses.buyer.length; index += 1) {
       const used = uses.used[index] ?? 0;
       if (!(used > 0)) continue;
@@ -1268,7 +1355,11 @@ export function runMarketDay(
       const goodId = uses.good[index] ?? 0;
       const tier = inputTier.get(buyerId * goodCount + goodId);
       if (tier === undefined) throw new RangeError("production input use has no matching reservation");
-      pushTransaction(1, buyerId, uses.seller[index] ?? 0, goodId, tier, 0, used);
+      const sellerId = uses.seller[index] ?? 0;
+      inputBuyer.push(buyerId);
+      inputSeller.push(sellerId);
+      inputAmount.push(used * (openingPrices[goodId] ?? 0));
+      if (storeHouseholdPieces) pushTransaction(1, buyerId, sellerId, goodId, tier, 0, used);
     }
 
     // D-136 (amends D-040): sellable supply is the opening stock plus same-day output,
@@ -1319,12 +1410,7 @@ export function runMarketDay(
       sellableSupplyByGood,
     );
 
-    const householdConsumptionByGood = new Array<number>(goodCount).fill(0);
-    for (let index = 0; index < resKind.length; index += 1) {
-      if (resKind[index] !== 0) continue;
-      const goodId = resGood[index] ?? 0;
-      householdConsumptionByGood[goodId] = (householdConsumptionByGood[goodId] ?? 0) + (resQuantity[index] ?? 0);
-    }
+    const householdConsumptionByGood = householdTakenByGood;
     const lossByGood = new Array<number>(goodCount).fill(0);
     for (const loss of overflowLosses) {
       lossByGood[loss.goodId] = (lossByGood[loss.goodId] ?? 0) + loss.quantity;
@@ -1389,8 +1475,27 @@ export function runMarketDay(
     // Transient companions (D-139), non-enumerable: they are a cache of this result,
     // not part of its public shape, so equality checks and copies (`{ ...result }`)
     // see the same result as before and a copied result settles from its objects.
+    const householdSellerId: number[] = [];
+    const householdSellerAmount: number[] = [];
+    for (let slot = 0; slot < ownerCount; slot += 1) {
+      let amount = 0;
+      for (let goodId = 0; goodId < goodCount; goodId += 1) amount += householdReceiptByCell[goodId * ownerCount + slot] ?? 0;
+      if (amount > 0) {
+        householdSellerId.push(opening.owners[slot] ?? 0);
+        householdSellerAmount.push(amount);
+      }
+    }
+    const flows: MarketFlowColumns = {
+      householdBuyer: buyer.slice(0, householdCount),
+      householdSpend,
+      householdSellerId,
+      householdSellerAmount,
+      inputBuyer,
+      inputSeller,
+      inputAmount,
+    };
     Object.defineProperty(result, "columns", {
-      value: { transactions, householdFulfilled } satisfies MarketDayColumns,
+      value: { transactions, householdFulfilled, flows } satisfies MarketDayColumns,
       enumerable: false,
       writable: false,
     });

@@ -283,6 +283,34 @@ export interface DemandPlanInput {
   readonly wealthConsumptionRatePerYear: number;
   readonly cashReserveDays: number;
   readonly daysInYear: number;
+  /**
+   * D-158: `retailPowers(system, prices, urbanShare)` of this block's prices and urban
+   * share, shared by every block of the same market and urban share (the same values).
+   */
+  readonly powers?: RetailPowers;
+}
+
+/** D-158: retail prices and their price terms (retail ÷ reference)^(1 − σ) by good. */
+export interface RetailPowers {
+  readonly retail: Float64Array;
+  /** NaN where the retail price is not positive (the good takes no share). */
+  readonly power: Float64Array;
+}
+
+/** D-158: the retail prices and price terms a block with this urban share reads. */
+export function retailPowers(system: ResolvedDemandSystem, prices: ArrayLike<number>, urbanShare: number): RetailPowers {
+  const retail = new Float64Array(system.goodCount);
+  const power = new Float64Array(system.goodCount).fill(Number.NaN);
+  for (let goodId = 0; goodId < system.goodCount; goodId += 1) {
+    const category = system.categoryOfGood[goodId] ?? -1;
+    if (category < 0) continue;
+    const price = retailPrice(system, prices, goodId, urbanShare);
+    retail[goodId] = price;
+    if (!(price > 0)) continue;
+    const sigma = system.categorySigma[category] ?? 1;
+    power[goodId] = Math.pow(price / (system.referencePrice[goodId] ?? 1), 1 - sigma);
+  }
+  return { retail, power };
 }
 
 /** Caller-owned outputs (reused across blocks). */
@@ -343,13 +371,14 @@ export function planHouseholdDemand(system: ResolvedDemandSystem, input: DemandP
   categorySpend.fill(0);
   const ae = input.adultEquivalents;
   // Retail prices and the committed cost.
+  const powers = input.powers;
   let committedPerAe = 0;
   for (let goodId = 0; goodId < system.goodCount; goodId += 1) {
     if ((system.categoryOfGood[goodId] ?? -1) < 0) {
       retail[goodId] = 0;
       continue;
     }
-    const price = retailPrice(system, input.prices, goodId, input.urbanShare);
+    const price = powers !== undefined ? (powers.retail[goodId] ?? 0) : retailPrice(system, input.prices, goodId, input.urbanShare);
     retail[goodId] = price;
     const gamma = system.committed[goodId] ?? 0;
     if (gamma > 0) {
@@ -398,7 +427,11 @@ export function planHouseholdDemand(system: ResolvedDemandSystem, input: DemandP
       if (input.available[goodId] !== 1 || !((retail[goodId] ?? 0) > 0)) continue;
       const weight = goodWeightInSegment(system, goodId, x, segment) * (input.taste?.[goodId] ?? 1);
       if (!(weight > 0)) continue;
-      const term = weight * Math.pow((retail[goodId] ?? 0) / (system.referencePrice[goodId] ?? 1), 1 - sigma);
+      const term =
+        weight *
+        (powers !== undefined
+          ? (powers.power[goodId] ?? Number.NaN)
+          : Math.pow((retail[goodId] ?? 0) / (system.referencePrice[goodId] ?? 1), 1 - sigma));
       goodWeight[goodId] = term;
       sum += term;
     }

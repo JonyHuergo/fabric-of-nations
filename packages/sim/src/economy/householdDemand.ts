@@ -24,7 +24,13 @@ import {
   MARGINAL_PROPENSITY_TO_CONSUME,
   WEALTH_CONSUMPTION_RATE_PER_YEAR,
 } from "../population/constants.js";
-import { createDemandPlanOutput, planHouseholdDemand, type ResolvedDemandSystem } from "../population/demandSystem.js";
+import {
+  createDemandPlanOutput,
+  planHouseholdDemand,
+  retailPowers,
+  type ResolvedDemandSystem,
+  type RetailPowers,
+} from "../population/demandSystem.js";
 import { adultEquivalents, blockHasHousing, desiredDwellings } from "../population/housing.js";
 import { populationTotal } from "../population/state.js";
 import type { NeedTier } from "../population/constants.js";
@@ -98,7 +104,7 @@ export function buildLesHouseholdDemand(
   const year = daysInYear(dayIndexToCivilDate(world.dayIndex).year);
   const goodCount = system.goodCount;
   const out = createDemandPlanOutput(system);
-  const available = new Uint8Array(goodCount);
+  const availabilityByMarket = new Map<Id, Map<number, Uint8Array>>();
   // Desired quantity per tier (0: tier 1, 1: tier 3, 2: tier 6) by good id.
   const desiredByTier = [new Float64Array(goodCount), new Float64Array(goodCount), new Float64Array(goodCount)];
   const tiers: readonly HouseholdTier[] = [1, 3, 6];
@@ -127,6 +133,21 @@ export function buildLesHouseholdDemand(
   const rowsOfBlock = build.rowsOfBlock as Map<Id, { readonly start: number; readonly end: number }>;
   const byCountry = build.byCountry as Map<Id, HouseholdCountryDemand>;
   const dwellingGoodId = system.dwellingGoodId;
+  // D-158: retail prices and price terms per (market, urban share), computed once each.
+  const powersByMarket = new Map<Id, Map<number, RetailPowers>>();
+  const powersOf = (marketId: Id, prices: ArrayLike<number>, urbanShare: number): RetailPowers => {
+    let byUrban = powersByMarket.get(marketId);
+    if (byUrban === undefined) {
+      byUrban = new Map();
+      powersByMarket.set(marketId, byUrban);
+    }
+    let powers = byUrban.get(urbanShare);
+    if (powers === undefined) {
+      powers = retailPowers(system, prices, urbanShare);
+      byUrban.set(urbanShare, powers);
+    }
+    return powers;
+  };
 
   const push = (blockId: Id, marketId: Id, tier: HouseholdTier, label: NeedTier, goodId: number, desired: number, funded: number): void => {
     build.popBlockId.push(blockId);
@@ -157,12 +178,25 @@ export function buildLesHouseholdDemand(
     if (profession === undefined) throw new RangeError(`popBlock ${String(block.id)} has an unknown profession`);
     const ownerId = owners.get(block.provinceId);
     const owner = ownerId === undefined ? undefined : countryById.get(ownerId);
-    for (let goodId = 0; goodId < goodCount; goodId += 1) {
-      const technology = system.requiredTechnologyId[goodId] ?? -1;
-      available[goodId] =
-        (market.priceSmoothedRUSD[goodId] ?? 0) > 0 && (technology < 0 || gate === null || gate(block.provinceId, marketId, technology, goodId))
-          ? 1
-          : 0;
+    // D-158: what a block can buy depends on its market (prices, stock) and its province's
+    // owner (the technology gate) only, so it is derived once per (market, owner).
+    const availabilityKey = (ownerId ?? -1) + 1;
+    let byOwner = availabilityByMarket.get(marketId);
+    if (byOwner === undefined) {
+      byOwner = new Map();
+      availabilityByMarket.set(marketId, byOwner);
+    }
+    let available = byOwner.get(availabilityKey);
+    if (available === undefined) {
+      available = new Uint8Array(goodCount);
+      for (let goodId = 0; goodId < goodCount; goodId += 1) {
+        const technology = system.requiredTechnologyId[goodId] ?? -1;
+        available[goodId] =
+          (market.priceSmoothedRUSD[goodId] ?? 0) > 0 && (technology < 0 || gate === null || gate(block.provinceId, marketId, technology, goodId))
+            ? 1
+            : 0;
+      }
+      byOwner.set(availabilityKey, available);
     }
     planHouseholdDemand(
       system,
@@ -179,6 +213,7 @@ export function buildLesHouseholdDemand(
         wealthConsumptionRatePerYear: WEALTH_CONSUMPTION_RATE_PER_YEAR,
         cashReserveDays: CASH_RESERVE_DAYS,
         daysInYear: year,
+        powers: powersOf(marketId, market.priceSmoothedRUSD, block.urbanShare),
       },
       out,
     );

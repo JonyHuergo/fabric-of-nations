@@ -985,6 +985,22 @@ function lookupById<T extends { readonly id: Id }>(items: readonly T[]): (id: Id
 }
 
 export function assertValidLabourEmployment(world: World, definitions: EconomyDefinitions): void {
+  checkLabourEmployment(world, definitions, null);
+}
+
+/**
+ * D-158: `assertValidLabourEmployment` that collects, instead of throwing, the blocks whose
+ * assigned workers exceed their eligible workforce (block id → excess, in check order);
+ * every other violation throws as before. Deaths cause only that one violation, which the
+ * D-126 trim repairs, so the day checks once and trims (`trimLabourExcess`).
+ */
+export function labourEmploymentExcess(world: World, definitions: EconomyDefinitions): Map<Id, number> {
+  const excess = new Map<Id, number>();
+  checkLabourEmployment(world, definitions, excess);
+  return excess;
+}
+
+function checkLabourEmployment(world: World, definitions: EconomyDefinitions, excess: Map<Id, number> | null): void {
   const professionIdSet = new Set(definitions.professions.map((profession) => profession.id));
   // D-157: one definition lookup (the former `definitionOf` and `definitionById` were the same map).
   const definitionById = lookupById(definitions.buildings);
@@ -1069,8 +1085,10 @@ export function assertValidLabourEmployment(world: World, definitions: EconomyDe
     const block = blockById.get(blockId);
     const profession = block === undefined ? undefined : professionById.get(block.professionId);
     if (block === undefined || profession === undefined) throw new RangeError(`unknown block ${String(blockId)}`);
-    if (assigned > labourEligibleWorkforce(block, profession)) {
-      throw new RangeError(`popBlock ${String(blockId)} exceeds its eligible workforce`);
+    const eligible = labourEligibleWorkforce(block, profession);
+    if (assigned > eligible) {
+      if (excess === null) throw new RangeError(`popBlock ${String(blockId)} exceeds its eligible workforce`);
+      excess.set(blockId, assigned - eligible);
     }
   }
 }
@@ -1182,6 +1200,58 @@ export function repairLabourEmploymentWithOutcome(
     world.labourMarket.householdEmployment = originalHousehold;
     return { repaired: false, validated: false };
   }
+}
+
+/**
+ * D-158: the D-126 trim of `repairLabourEmploymentWithOutcome` for blocks whose excess is
+ * already known (`labourEmploymentExcess` passed every other check): each block's servants,
+ * building and institution assignments are cut by its excess, proportionally with largest
+ * remainder (servants first, then by kind and id). The result passes the check: only the
+ * excess was violated, and cutting workers relaxes every other rule.
+ */
+export function trimLabourExcess(world: World, excessOf: ReadonlyMap<Id, number>): void {
+  if (excessOf.size === 0) return;
+  type Entry = { readonly kind: 0 | 1 | 2; readonly id: Id; readonly workers: number };
+  const byBlock = new Map<Id, Entry[]>();
+  const push = (blockId: Id, entry: Entry): void => {
+    if (!excessOf.has(blockId)) return;
+    const list = byBlock.get(blockId);
+    if (list === undefined) byBlock.set(blockId, [entry]);
+    else list.push(entry);
+  };
+  for (const assignment of world.labourMarket.householdEmployment) push(assignment.popBlockId, { kind: 2, id: assignment.id, workers: assignment.workers });
+  for (const assignment of world.employment) push(assignment.popBlockId, { kind: 0, id: assignment.id, workers: assignment.workers });
+  for (const assignment of world.labourMarket.institutionEmployment) push(assignment.popBlockId, { kind: 1, id: assignment.id, workers: assignment.workers });
+  const reductionBuilding = new Map<Id, number>();
+  const reductionInstitution = new Map<Id, number>();
+  const reductionHousehold = new Map<Id, number>();
+  for (const [blockId, entries] of [...byBlock].sort((left, right) => left[0] - right[0])) {
+    const excess = excessOf.get(blockId) ?? 0;
+    if (excess <= 0) continue;
+    const ordered = [...entries].sort((left, right) => (left.kind === 2 ? -1 : left.kind) - (right.kind === 2 ? -1 : right.kind) || left.id - right.id);
+    const cuts = apportionLargestRemainder(
+      excess,
+      ordered.map((entry) => entry.workers),
+      ordered.map((_, index) => index),
+    );
+    ordered.forEach((entry, index) => {
+      const cut = cuts[index] ?? 0;
+      if (cut <= 0) return;
+      if (entry.kind === 0) reductionBuilding.set(entry.id, cut);
+      else if (entry.kind === 1) reductionInstitution.set(entry.id, cut);
+      else reductionHousehold.set(entry.id, cut);
+    });
+  }
+  const cut = <T extends { readonly id: Id; readonly workers: number }>(list: readonly T[], reductions: ReadonlyMap<Id, number>): T[] =>
+    list
+      .map((assignment) => {
+        const reduction = reductions.get(assignment.id) ?? 0;
+        return reduction === 0 ? assignment : { ...assignment, workers: assignment.workers - reduction };
+      })
+      .filter((assignment) => assignment.workers > 0);
+  if (reductionHousehold.size > 0) world.labourMarket.householdEmployment = cut(world.labourMarket.householdEmployment, reductionHousehold);
+  if (reductionBuilding.size > 0) world.employment = cut(world.employment, reductionBuilding);
+  if (reductionInstitution.size > 0) world.labourMarket.institutionEmployment = cut(world.labourMarket.institutionEmployment, reductionInstitution);
 }
 
 // ---------------------------------------------------------------------------

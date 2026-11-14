@@ -21,6 +21,8 @@ import {
   refreshLabourEmployment,
   repairLabourEmploymentAfterDemography,
   repairLabourEmploymentWithOutcome,
+  labourEmploymentExcess,
+  trimLabourExcess,
 } from "./labourMarket.js";
 import type {
   BuildingDef,
@@ -199,6 +201,16 @@ export function repairEmploymentAfterDemography(
 ): boolean {
   requireLabourMarket(world);
   return repairLabourEmploymentAfterDemography(world, definitions);
+}
+
+/**
+ * D-158: the day's employment check after demography: validates the labour employment
+ * state and trims blocks whose assignments exceed their eligible workforce (deaths); any
+ * other violation throws, as `assertValidEmploymentState` does.
+ */
+export function checkAndTrimEmploymentAfterDemography(world: World, definitions: EconomyDefinitions): void {
+  requireLabourMarket(world);
+  trimLabourExcess(world, labourEmploymentExcess(world, definitions));
 }
 
 /** D-157: `repairEmploymentAfterDemography`, also saying whether the repaired state was validated. */
