@@ -807,14 +807,33 @@ export function runMarketDay(
   /** Candidate scratch for one (tier, good) allocation. */
   const candidates = new Int32Array(demandCount);
   // Household blocks with tier 1/3 demands get a slot for the eligibility totals.
-  const blockSlot = new Map<number, number>();
+  // D-158: slots by block id in a typed table (first-use order, as the former map); a buyer id
+  // the table cannot address (not a small non-negative integer) falls back to the map.
+  let maxBuyerId = -1;
+  let denseBuyers = true;
+  for (let index = 0; index < householdCount; index += 1) {
+    const id = buyer[index] ?? 0;
+    if (!(Number.isInteger(id) && id >= 0 && id < 2 ** 24)) denseBuyers = false;
+    else if (id > maxBuyerId) maxBuyerId = id;
+  }
+  const slotById = denseBuyers ? new Int32Array(maxBuyerId + 1).fill(-1) : null;
+  const slotMap = denseBuyers ? null : new Map<number, number>();
+  let slotCount = 0;
+  const slotOfBlock = (id: number): number =>
+    slotById !== null ? (slotById[id] ?? -1) : ((slotMap as Map<number, number>).get(id) ?? -1);
   const tierOneThree: number[] = [];
   for (let index = 0; index < householdCount; index += 1) {
     const tier = tierOf[index];
     if (tier !== 1 && tier !== 3) continue;
     tierOneThree.push(index);
-    if (!blockSlot.has(buyer[index] ?? 0)) blockSlot.set(buyer[index] ?? 0, blockSlot.size);
+    const id = buyer[index] ?? 0;
+    if (slotOfBlock(id) < 0) {
+      if (slotById !== null) slotById[id] = slotCount;
+      else (slotMap as Map<number, number>).set(id, slotCount);
+      slotCount += 1;
+    }
   }
+  const blockSlot = { size: slotCount };
   const desired1 = new Float64Array(blockSlot.size);
   const fulfilled1 = new Float64Array(blockSlot.size);
   const desired3 = new Float64Array(blockSlot.size);
@@ -826,7 +845,7 @@ export function runMarketDay(
   const met1 = new Uint8Array(blockSlot.size);
   const met3 = new Uint8Array(blockSlot.size);
   const slotOfDemand = new Int32Array(householdCount).fill(-1);
-  for (let index = 0; index < householdCount; index += 1) slotOfDemand[index] = blockSlot.get(buyer[index] ?? 0) ?? -1;
+  for (let index = 0; index < householdCount; index += 1) slotOfDemand[index] = slotOfBlock(buyer[index] ?? 0);
   // `householdTierTotals` over the current fulfilment, summed in demand order.
   // D-139: desired totals never change; fulfilled totals are re-summed (in the same
   // demand order, from zero) only after an allocation changed a tier-1/3 household
