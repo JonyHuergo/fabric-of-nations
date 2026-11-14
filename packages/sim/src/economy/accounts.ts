@@ -1895,6 +1895,22 @@ export function semanticRuleAllowsCode(kind: TransactionKind, subtypeCodeValue: 
   return semanticRuleAllows(kind, ACCOUNT_SUBTYPES[subtypeCodeValue] as AccountSubtype, side);
 }
 
+const SEMANTIC_MASKS = new Map<string, Uint8Array>();
+
+/**
+ * D-158: the semantic matrix of one kind as a mask by subtype code (bit 1 = may debit,
+ * bit 2 = may credit), the same values `semanticRuleAllows` reads; derived once per kind.
+ */
+export function semanticMaskOf(kind: TransactionKind): Uint8Array {
+  let mask = SEMANTIC_MASKS.get(kind);
+  if (mask === undefined) {
+    const bySubtype = SEMANTIC_SIDES.get(kind);
+    mask = Uint8Array.from(ACCOUNT_SUBTYPES, (subtype) => bySubtype?.get(subtype) ?? 0);
+    SEMANTIC_MASKS.set(kind, mask);
+  }
+  return mask;
+}
+
 /**
  * The D-047 semantic-matrix violation of one line, or null when the line is allowed.
  * Separate from `assertSemanticJournalLine` so the posting hot path builds the line
@@ -2352,8 +2368,10 @@ const CASH_SUBTYPE_CODES: ReadonlySet<number> = new Set(CASH_SUBTYPES.map((subty
 const SYSTEM_KIND_CODE = OWNER_KIND_CODES.system;
 
 /** True when the subtype code is a designated-cash subtype (D-158 hot paths). */
+const CASH_BY_SUBTYPE_CODE = Uint8Array.from(ACCOUNT_SUBTYPES, (_, code) => (CASH_SUBTYPE_CODES.has(code) ? 1 : 0));
+
 export function isCashSubtypeCode(code: number): boolean {
-  return CASH_SUBTYPE_CODES.has(code);
+  return CASH_BY_SUBTYPE_CODE[code] === 1;
 }
 
 /** Owner tables: one per (owner kind, subtype) code, owner id → position, or a map for unusual ids. */

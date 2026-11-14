@@ -47,7 +47,7 @@ import {
   buildFinanceIndex,
   isCashSubtypeCode,
   requireAccountTable,
-  semanticRuleAllowsCode,
+  semanticMaskOf,
   type AccountsById,
 } from "./accounts.js";
 import { CATEGORY_OF_SUBTYPE, accountCategoryAt, type AccountTable } from "./accountTable.js";
@@ -732,6 +732,7 @@ export function postJournalColumns(
     let debits = 0;
     let credits = 0;
     let cashDelta = 0;
+    const semanticMask = semanticMaskOf(entry.transactionKind);
     for (let line = entry.start; line < entry.end; line += 1) {
       const index_ = line - entry.start;
       const accountId = lines.accountId[line];
@@ -765,7 +766,7 @@ export function postJournalColumns(
       // built only for those (the same rule and message as before).
       if (
         (categoryCode === REVENUE_CATEGORY_CODE || categoryCode === EXPENSE_CATEGORY_CODE) &&
-        !semanticRuleAllowsCode(entry.transactionKind, subtypeCode, side)
+        ((semanticMask[subtypeCode] ?? 0) & (debit === 1 ? 1 : 2)) === 0
       ) {
         const violation = semanticJournalLineViolation(entry.transactionKind, accountOf(accountId) as FinancialAccount, side);
         if (violation !== null) throw new RangeError(`journal line ${String(index_)}: ${violation}`);
