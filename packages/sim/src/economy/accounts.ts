@@ -2396,7 +2396,12 @@ export function financeIndexOfTable(table: AccountTable): FinanceIndex {
   const generation = accountTableGeneration(table);
   let core = financeIndexCache.get(table);
   if (core === undefined || core.count !== table.count || core.generation !== generation) {
-    core = buildFinanceIndexCore(table, generation);
+    // D-158 (as D-157 for the former maps): accounts appended since the cached core (a
+    // migration creates blocks between postings) extend it; anything else rebuilds.
+    core =
+      core !== undefined && core.generation === generation && core.count < table.count
+        ? (extendFinanceIndexCore(table, core) ?? buildFinanceIndexCore(table, generation))
+        : buildFinanceIndexCore(table, generation);
     financeIndexCache.set(table, core);
   }
   core.index ??= financeIndexView(table, core);
@@ -2481,12 +2486,91 @@ function buildFinanceIndexCore(table: AccountTable, generation: number): Finance
   };
 }
 
+/**
+ * Extend `core` by the accounts appended after it, or null when a fresh build must run
+ * (ids not above the last indexed id, a sparse id range). The extended core shares and
+ * grows the typed tables; every lookup of an index bounds its answer by its own count, so
+ * an index handed out before the extension answers exactly as it did.
+ */
+function extendFinanceIndexCore(table: AccountTable, core: FinanceIndexCore): FinanceIndexCore | null {
+  const from = core.count;
+  const to = table.count;
+  const ids = table.id;
+  let lastId = from > 0 ? (ids[from - 1] ?? 0) : -1;
+  for (let position = from; position < to; position += 1) {
+    const id = ids[position] ?? 0;
+    if (!(id > lastId)) return null;
+    lastId = id;
+  }
+  let positionById = core.positionById;
+  if (positionById !== null) {
+    if (!(lastId <= to * 4 + 1024)) return null;
+    if (lastId >= positionById.length) {
+      const grown = new Int32Array(Math.max(lastId + 1, Math.ceil(positionById.length * 1.25))).fill(-1);
+      grown.set(positionById);
+      positionById = grown;
+    }
+    for (let position = from; position < to; position += 1) positionById[ids[position] ?? 0] = position;
+  }
+  const dense = core.owners.dense.slice();
+  const sparse = core.owners.sparse;
+  const appendedCash: number[] = [];
+  for (let position = from; position < to; position += 1) {
+    const kind = table.ownerKind[position] ?? 0;
+    const subtype = table.subtype[position] ?? 0;
+    if (CASH_SUBTYPE_CODES.has(subtype)) appendedCash.push(position);
+    if (kind === SYSTEM_KIND_CODE && EXTERNAL_SUBTYPE_CODES.has(subtype)) continue;
+    const owner = table.ownerId[position] ?? -1;
+    let duplicate: boolean;
+    if (owner >= 0 && owner < DENSE_OWNER_LIMIT) {
+      const code = tableCodeOf(kind, subtype);
+      let slots = dense[code];
+      if (slots === undefined || owner >= slots.length) {
+        const grown = new Int32Array(Math.max(owner + 1, Math.ceil((slots?.length ?? 0) * 1.25))).fill(-1);
+        if (slots !== undefined) grown.set(slots);
+        slots = grown;
+        dense[code] = slots;
+      }
+      duplicate = (slots[owner] ?? -1) >= 0;
+      if (!duplicate) slots[owner] = position;
+    } else {
+      const key = accountOwnerKey(
+        ACCOUNT_OWNER_KINDS[kind] as FinancialAccountOwnerKind,
+        owner === NO_ACCOUNT_OWNER ? null : owner,
+        ACCOUNT_SUBTYPES[subtype] as AccountSubtype,
+      );
+      const existing = sparse.get(key);
+      duplicate = existing !== undefined && existing < to;
+      if (!duplicate) sparse.set(key, position);
+    }
+    if (duplicate) return null;
+  }
+  const cash = new Int32Array(core.cash.length + appendedCash.length);
+  cash.set(core.cash);
+  cash.set(appendedCash, core.cash.length);
+  return {
+    count: to,
+    generation: core.generation,
+    positionById,
+    owners: { dense, sparse },
+    cash,
+    ownerIdTables: null,
+    cashViews: null,
+    bySubtype: null,
+    index: null,
+  };
+}
+
 function financeIndexView(table: AccountTable, core: FinanceIndexCore): FinanceIndex {
   const count = core.count;
   const position = (id: Id): number => {
     if (!Number.isInteger(id) || id < 0) return -1;
     const positions = core.positionById;
-    if (positions !== null) return id < positions.length ? (positions[id] ?? -1) : -1;
+    if (positions !== null) {
+      const found = id < positions.length ? (positions[id] ?? -1) : -1;
+      // D-158: an index answers for its own accounts (tables are shared with extensions).
+      return found < count ? found : -1;
+    }
     const found = accountPosition(table, id);
     return found < count ? found : -1;
   };
@@ -2494,11 +2578,14 @@ function financeIndexView(table: AccountTable, core: FinanceIndexCore): FinanceI
     const kind = OWNER_KIND_CODES[ownerKind];
     const code = SUBTYPE_CODES.get(subtype);
     if (kind === undefined || code === undefined) return -1;
+    let found: number;
     if (ownerId !== null && Number.isInteger(ownerId) && ownerId >= 0 && ownerId < DENSE_OWNER_LIMIT) {
       const slots = core.owners.dense[tableCodeOf(kind, code)];
-      return slots === undefined || ownerId >= slots.length ? -1 : (slots[ownerId] ?? -1);
+      found = slots === undefined || ownerId >= slots.length ? -1 : (slots[ownerId] ?? -1);
+    } else {
+      found = core.owners.sparse.get(accountOwnerKey(ownerKind, ownerId, subtype)) ?? -1;
     }
-    return core.owners.sparse.get(accountOwnerKey(ownerKind, ownerId, subtype)) ?? -1;
+    return found < count ? found : -1;
   };
   const account = (id: Id): FinancialAccount | undefined => {
     const found = position(id);
@@ -2557,7 +2644,7 @@ function financeIndexView(table: AccountTable, core: FinanceIndexCore): FinanceI
         if (slots !== undefined) {
           for (let owner = 0; owner < slots.length; owner += 1) {
             const at = slots[owner] ?? -1;
-            ids[owner] = at < 0 ? -1 : (table.id[at] ?? -1);
+            ids[owner] = at < 0 || at >= count ? -1 : (table.id[at] ?? -1);
           }
         }
         core.ownerIdTables[tableCode] = ids;

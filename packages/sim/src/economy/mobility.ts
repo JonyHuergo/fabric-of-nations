@@ -150,7 +150,11 @@ interface PhaseIndex {
    * (`forgetMovedIncomes`); a move changes no other block and no other pair's block.
    */
   readonly incomeByBlock: Map<Id, number>;
-  readonly incomeByPair: Map<number, number>;
+  /**
+   * D-158: expected income by numeric (province, profession) key; NaN = not computed.
+   * Grown on demand (a key beyond it is computed without the memo).
+   */
+  incomeByPair: Float64Array;
 }
 
 function countsOf(index: PhaseIndex, provinceId: Id): LabourCounts | undefined {
@@ -180,12 +184,19 @@ function sourceExpectedIncome(index: PhaseIndex, profession: ProfessionDef, bloc
  */
 function destinationExpectedIncome(index: PhaseIndex, context: ReclassifyContext, provinceId: Id, profession: ProfessionDef): number {
   const key = pairKey(index, provinceId, profession.id);
-  if (key >= 0) {
-    const known = index.incomeByPair.get(key);
-    if (known !== undefined) return known;
+  if (key >= 0 && key < index.incomeByPair.length) {
+    const known = index.incomeByPair[key] ?? Number.NaN;
+    if (!Number.isNaN(known)) return known;
   }
   const value = expectedIncome(index, provinceId, profession, context.blockByKey.get(blockKey(provinceId, profession.id)));
-  if (key >= 0) index.incomeByPair.set(key, value);
+  if (key >= 0) {
+    if (key >= index.incomeByPair.length) {
+      const grown = new Float64Array(Math.max(key + 1, index.incomeByPair.length * 2)).fill(Number.NaN);
+      grown.set(index.incomeByPair);
+      index.incomeByPair = grown;
+    }
+    index.incomeByPair[key] = value;
+  }
   return value;
 }
 
@@ -193,8 +204,12 @@ function destinationExpectedIncome(index: PhaseIndex, context: ReclassifyContext
 function forgetMovedIncomes(index: PhaseIndex, source: PopBlock, destination: PopBlock): void {
   index.incomeByBlock.delete(source.id);
   index.incomeByBlock.delete(destination.id);
-  index.incomeByPair.delete(pairKey(index, source.provinceId, source.professionId));
-  index.incomeByPair.delete(pairKey(index, destination.provinceId, destination.professionId));
+  forgetPair(index, pairKey(index, source.provinceId, source.professionId));
+  forgetPair(index, pairKey(index, destination.provinceId, destination.professionId));
+}
+
+function forgetPair(index: PhaseIndex, key: number): void {
+  if (key >= 0 && key < index.incomeByPair.length) index.incomeByPair[key] = Number.NaN;
 }
 
 function expectedIncome(index: PhaseIndex, provinceId: Id, profession: ProfessionDef, block: PopBlock | undefined): number {
@@ -319,7 +334,7 @@ function buildPhaseIndex(world: World, definitions: EconomyDefinitions, dayIndex
     provinceUrban,
     settlementSlots,
     incomeByBlock: new Map(),
-    incomeByPair: new Map(),
+    incomeByPair: new Float64Array(0),
   };
 }
 
@@ -461,8 +476,20 @@ function runLabourMigration(index: PhaseIndex, context: ReclassifyContext, dayIn
   const sources = [...world.popBlocks]
     .map((block) => ({ block, draw: drawUint32({ seed: world.seed, day: dayIndex, entityId: block.id, purpose: LABOUR_MIGRATION_ORDER_PURPOSE, drawIndex: 0 }) }))
     .sort((left, right) => left.draw - right.draw || left.block.id - right.block.id);
+  const openProvinces = new Map<string, readonly Id[]>();
+  // D-158: persons of each block, summed once and summed again only for the two blocks a
+  // move changes (no other block's cells change during the migration).
+  const personsCache = new Map<PopBlock, number>();
+  const personsNow = (block: PopBlock): number => {
+    let persons = personsCache.get(block);
+    if (persons === undefined) {
+      persons = populationTotal(block);
+      personsCache.set(block, persons);
+    }
+    return persons;
+  };
   for (const { block: source } of sources) {
-    const persons = populationTotal(source);
+    const persons = personsNow(source);
     if (persons <= 0) continue;
     const profession = index.professionById.get(source.professionId);
     if (profession === undefined) continue;
@@ -471,20 +498,30 @@ function runLabourMigration(index: PhaseIndex, context: ReclassifyContext, dayIn
     const eligible = labourEligibleWorkforce(source, profession);
     const workerPerMover = eligible > 0 ? eligible / persons : profession.participationRate;
     let best: { provinceId: Id; pressure: number; draw: number; people: number } | null = null;
-    for (const provinceId of candidateProvinces.get(profession.id) ?? []) {
+    // D-158: the profession's candidate provinces open to the source's owner, filtered once
+    // per (profession, owner); owners and immigration rules do not change in the phase.
+    const openKey = `${String(profession.id)}:${sourceOwner === null ? "-" : String(sourceOwner)}`;
+    let open = openProvinces.get(openKey);
+    if (open === undefined) {
+      open = (candidateProvinces.get(profession.id) ?? []).filter((provinceId) => {
+        const destinationOwner = owners.get(provinceId) ?? null;
+        return destinationOwner === sourceOwner || (destinationOwner !== null && countryById.get(destinationOwner)?.immigrationOpen === true);
+      });
+      openProvinces.set(openKey, open);
+    }
+    for (const provinceId of open) {
       if (provinceId === source.provinceId) continue;
-      const destinationOwner = owners.get(provinceId) ?? null;
-      if (destinationOwner !== sourceOwner) {
-        if (destinationOwner === null || countryById.get(destinationOwner)?.immigrationOpen !== true) continue;
-      }
       const pressure = Math.log(destinationExpectedIncome(index, context, provinceId, profession) / income) - LABOUR_MIGRATION_THRESHOLD;
       if (!(pressure > 0)) continue;
       if (best !== null && pressure < best.pressure) continue;
       let people = Math.floor(persons * Math.min(MIGRATION_MONTHLY_MAX_FRACTION, LABOUR_MIGRATION_RATE_PER_PRESSURE * pressure));
       const cap = Math.floor((standing.get(provinceId) ?? 0) * MIGRATION_MONTHLY_INFLOW_CAP_FRACTION) - (inflow.get(provinceId) ?? 0);
       people = Math.min(people, cap);
+      // D-158: the room limit below only lowers `people`, so a province already below one
+      // mover is skipped before its destination block is looked up (the same outcome).
+      if (people < 1) continue;
       const destination = context.blockByKey.get(blockKey(provinceId, profession.id));
-      if (destination === undefined || populationTotal(destination) <= 0) {
+      if (destination === undefined || personsNow(destination) <= 0) {
         // Toward jobs only where the profession has no people yet.
         const room = roomOf(index, provinceId, profession.id) - (roomUsed.get(blockKey(provinceId, profession.id)) ?? 0);
         people = Math.min(people, workerPerMover > 0 ? Math.floor(room / workerPerMover) : 0);
@@ -497,13 +534,15 @@ function runLabourMigration(index: PhaseIndex, context: ReclassifyContext, dayIn
     }
     if (best === null) continue;
     const destination = context.blockByKey.get(blockKey(best.provinceId, profession.id));
-    const fraction = destination !== undefined && populationTotal(destination) > 0 ? destination.urbanShare : urbanFraction(index, best.provinceId, profession);
+    const fraction = destination !== undefined && personsNow(destination) > 0 ? destination.urbanShare : urbanFraction(index, best.provinceId, profession);
     const moved = moveBlockPeople(context, source, best.provinceId, profession.id, best.people, {
       selectiveLiterate: false,
       destinationUrbanFraction: fraction,
       carriedDwellingShare: 0,
     });
     forgetMovedIncomes(index, source, moved.destination);
+    personsCache.delete(source);
+    personsCache.delete(moved.destination);
     inflow.set(best.provinceId, (inflow.get(best.provinceId) ?? 0) + best.people);
     const key = blockKey(best.provinceId, profession.id);
     roomUsed.set(key, (roomUsed.get(key) ?? 0) + best.people * workerPerMover);
