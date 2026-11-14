@@ -145,6 +145,7 @@ import type {
 
 import { measureBlockTotals, personsOfBlock, workingAgeOfBlock, type BlockTotals } from "../population/blockTotals.js";
 import { createNeedsColumns, needsReader, NEED_TIER_COUNT } from "../population/needsColumns.js";
+import { populationFields, clonePopulationTable } from "../population/blockTable.js";
 /**
  * One day's household demand in columns (D-139): one row per (block, market tier,
  * good), in canonical (block, tier, good) order, so a block's rows are contiguous.
@@ -253,12 +254,8 @@ export function cloneWorld(
     countries: source.countries.map(copyCountry),
     currencies: source.currencies.map(copyCurrency),
     currencyValuations: source.currencyValuations.map(copyCurrencyValuation),
-    popBlocks: source.popBlocks.map((block) => ({
-      ...block,
-      maleByAge: block.maleByAge.slice(),
-      femaleByAge: block.femaleByAge.slice(),
-      literacyByAge: [...block.literacyByAge],
-    })),
+    // D-159: the population table is copied as its arrays.
+    ...populationFields(clonePopulationTable(source.population)),
     buildings: source.buildings.map((building) => ({ ...building })),
     employment: source.employment.map((assignment) => ({ ...assignment })),
     markets: source.markets.map((market) => ({

@@ -65,6 +65,7 @@ import {
 } from "./economy/monetaryState.js";
 import { assertValidMilitaryState } from "./economy/militaryState.js";
 import type { PopBlock, ProvinceEconomy } from "./population/types.js";
+import { createPopulationTable, populationFields, type PopulationTable } from "./population/blockTable.js";
 import type { ProvinceState } from "./provinces/types.js";
 import { assertValidProvinceState, emptyProvinceState } from "./provinces/state.js";
 import { emptyMilitaryState } from "./economy/militaryState.js";
@@ -112,7 +113,17 @@ export interface World {
   currencies: Currency[];
   /** M4a-2 RUSD-relative valuations, one per registered currency. */
   currencyValuations: CurrencyValuation[];
-  popBlocks: PopBlock[];
+  /**
+   * D-159: the authoritative population blocks, as a columnar table
+   * (`population/blockTable.ts`).
+   */
+  population: PopulationTable;
+  /**
+   * D-159: the views of `population`'s blocks in position order (`popBlockViews`), derived
+   * and never serialised; always the same array as `popBlockViews(population)`. Blocks are
+   * added, removed and reordered only through the table's functions.
+   */
+  readonly popBlocks: readonly PopBlock[];
   /** M3 building instances. Empty for population-only M2 worlds. */
   buildings: BuildingInstance[];
   /** M3 explicit employment assignments, maintained by the M3b refresh routine. */
@@ -243,7 +254,7 @@ export function createInitialWorld(options: CreateWorldOptions = {}): World {
     countries: [],
     currencies: [],
     currencyValuations: [],
-    popBlocks: [],
+    ...populationFields(createPopulationTable()),
     buildings: [],
     employment: [],
     employmentDirty: false,

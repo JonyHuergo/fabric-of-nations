@@ -139,7 +139,7 @@ import {
 import { assertValidFiscalPolicy, assertValidIndustrialPolicy } from "./economy/country.js";
 import { assertValidDebtPolicy } from "./economy/debtPolicy.js";
 import { SINGLE_AGE_COUNT } from "./population/constants.js";
-import type { PopBlock, ProvinceEconomy } from "./population/types.js";
+import type { ProvinceEconomy } from "./population/types.js";
 import { assertValidWorld, type World } from "./world.js";
 import {
   requireArray,
@@ -151,6 +151,7 @@ import {
 } from "./validation.js";
 
 import { accountRecords, accountTableFromRecords, type AccountTable } from "./economy/accountTable.js";
+import { populationFields, populationTableFromRecords, type PopBlockRecord } from "./population/blockTable.js";
 /** Maximum accepted length of one encoded typed array. */
 export const MAX_TYPED_ARRAY_LENGTH = 10_000_000;
 
@@ -3897,7 +3898,7 @@ function decodeEmployment(value: unknown, path: string): EmploymentAssignment {
   };
 }
 
-function decodePopBlock(value: unknown, path: string): PopBlock {
+function decodePopBlock(value: unknown, path: string): PopBlockRecord {
   const record = requireRecord(value, path);
   const maleByAge = decodeTypedArray(record.maleByAge);
   if (!(maleByAge instanceof Uint32Array)) {
@@ -4463,7 +4464,7 @@ function decodeWorldPayload(value: unknown): World {
     countries,
     currencies,
     currencyValuations,
-    popBlocks,
+    ...populationFields(populationTableFromRecords(popBlocks)),
     buildings,
     employment,
     employmentDirty,

@@ -23,6 +23,7 @@ import {
   type PopBlock,
   type World,
   listAccounts,
+  reorderPopBlocks,
 } from "@century/sim";
 import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import { occupierOf } from "../fixtures/provinces.js";
@@ -322,7 +323,7 @@ describe("AUDIT-006 explicit military allocation", () => {
     const secondProvinceId = secondCountry.provinceIds[0];
     if (secondProvinceId === undefined) throw new Error("shipped country has no province");
     const secondWorld = createEconomyWorld(secondScenario, { seed: SEED });
-    secondWorld.popBlocks = [...secondWorld.popBlocks].reverse();
+    reorderPopBlocks(secondWorld.population, [...secondWorld.popBlocks.keys()].reverse());
 
     const firstBefore = snapshots(first.world, first.provinceId);
     const secondBefore = snapshots(secondWorld, secondProvinceId);
@@ -439,7 +440,7 @@ describe("AUDIT-006 explicit military allocation", () => {
       setProvincePools(scenario, provinceId, pools);
       country.initialTreasuryCashRUSD = 1_000_000;
       const world = createEconomyWorld(scenario, { seed: SEED });
-      if (reverse) world.popBlocks = [...world.popBlocks].reverse();
+      if (reverse) reorderPopBlocks(world.population, [...world.popBlocks.keys()].reverse());
       const before = snapshots(world, provinceId);
       recruit(world, country.id, provinceId, 2);
       const after = snapshots(world, provinceId);

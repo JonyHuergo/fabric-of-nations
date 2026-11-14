@@ -38,6 +38,7 @@ import type { AccountSubtype, EconomyDefinitions, FinancialAccount } from "./typ
 import { WORKING_AGE_END, WORKING_AGE_START } from "../population/constants.js";
 
 import { ownerKindCode, NO_ACCOUNT_OWNER, subtypeCode, accountView, accountSubtypeAt, appendAccount, accountCategoryAt } from "./accountTable.js";
+import { appendPopBlock, removePopBlocks } from "../population/blockTable.js";
 export interface MoveOptions {
   /** Movers are literate working-age persons (a literacy-gated destination, plan §5.3). */
   readonly selectiveLiterate: boolean;
@@ -175,14 +176,14 @@ function createBlock(context: ReclassifyContext, source: PopBlock, provinceId: I
   const cashPosition = created.find((position) => table.subtype[position] === HOUSEHOLD_CASH_CODE);
   if (cashPosition === undefined) throw new RangeError("new popBlock has no household cash account");
   const cash = { id: table.id[cashPosition] ?? 0 };
-  const block: PopBlock = {
+  const block = appendPopBlock(world.population, {
     id,
     provinceId,
     professionId,
     maleByAge: new Uint32Array(source.maleByAge.length),
     femaleByAge: new Uint32Array(source.femaleByAge.length),
     literacy: 0,
-    literacyByAge: new Array<number>(source.literacyByAge.length).fill(0),
+    literacyByAge: new Float64Array(source.literacyByAge.length),
     qualification: source.qualification,
     wealthLevel: source.wealthLevel,
     financialAccountId: cash.id,
@@ -203,9 +204,8 @@ function createBlock(context: ReclassifyContext, source: PopBlock, provinceId: I
     dwellings: 0,
     housingReferencePersonsPerDwelling: source.housingReferencePersonsPerDwelling,
     housingReferenceIncomeRUSDPerCapitaDay: source.housingReferenceIncomeRUSDPerCapitaDay,
-  };
+  });
   world.labourMarket.nextPopBlockId = id + 1;
-  world.popBlocks.push(block);
   province.popBlockIds.push(id);
   province.popBlockIds.sort((left, right) => left - right);
   context.blockByKey.set(blockKey(provinceId, professionId), block);
@@ -407,7 +407,7 @@ export function retireEmptyBlocks(context: ReclassifyContext): number {
     retired.add(block.id);
   }
   if (retired.size === 0) return 0;
-  world.popBlocks = world.popBlocks.filter((block) => !retired.has(block.id));
+  removePopBlocks(world.population, retired);
   for (const province of world.provinceEconomies) {
     if (province.popBlockIds.some((id) => retired.has(id))) province.popBlockIds = province.popBlockIds.filter((id) => !retired.has(id));
   }

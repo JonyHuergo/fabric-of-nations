@@ -122,7 +122,7 @@ describe("M2.1 population state and validation", () => {
     expect(() => assertValidWorld(world)).toThrow(/literacy/);
     // M9: literacy is derived from the authoritative age-specific array, so both
     // the scalar and the array must be consistent.
-    block.literacyByAge = initialLiteracyByAge(0.5);
+    block.literacyByAge.set(initialLiteracyByAge(0.5));
     block.literacy = 0.5;
 
     block.wealthLevel = -1;
@@ -137,8 +137,10 @@ describe("M2.1 population state and validation", () => {
     expect(() => assertValidWorld(world)).toThrow(/fractionalMaleBirthRemainder/);
     block.fractionalMaleBirthRemainder = 0;
 
+    // D-159: a block's cells live in the population table; replacing the array detaches
+    // the view from them, which validation rejects.
     (world.popBlocks[0] as unknown as { maleByAge: number[] }).maleByAge = [1, 2, 3];
-    expect(() => assertValidWorld(world)).toThrow(/Uint32Array/);
+    expect(() => assertValidWorld(world)).toThrow(/view of its position/);
   });
 
   test("rejects invalid definitions and fixture inputs", () => {

@@ -83,6 +83,7 @@ import {
   WORKING_AGE_START,
 } from "../population/constants.js";
 
+import { clonePopulationTable, restorePopulationTable } from "../population/blockTable.js";
 /** Minimum working age for recruitment. */
 const RECRUIT_MIN_AGE = 18;
 /** Maximum working age for recruitment. */
@@ -1341,7 +1342,7 @@ function snapshotForAction(world: World): {
   markets: World["markets"];
   construction: World["construction"];
   finance: World["finance"];
-  popBlocks: PopBlock[];
+  population: World["population"];
   employment: World["employment"];
   employmentDirty: boolean;
 } {
@@ -1376,11 +1377,7 @@ function snapshotForAction(world: World): {
     })),
     construction: world.construction,
     finance: cloneFinanceState(world.finance),
-    popBlocks: world.popBlocks.map((block) => ({
-      ...block,
-      maleByAge: block.maleByAge.slice(),
-      femaleByAge: block.femaleByAge.slice(),
-    })),
+    population: clonePopulationTable(world.population),
     employment: world.employment.map((assignment) => ({ ...assignment })),
     employmentDirty: world.employmentDirty,
   };
@@ -1396,7 +1393,8 @@ function restoreActionSnapshot(
   world.markets = snapshot.markets;
   world.construction = snapshot.construction;
   world.finance = snapshot.finance;
-  world.popBlocks = snapshot.popBlocks;
+  // D-159: restored in place, so the world's block views keep working.
+  restorePopulationTable(world.population, snapshot.population);
   world.employment = snapshot.employment;
   world.employmentDirty = snapshot.employmentDirty;
 }

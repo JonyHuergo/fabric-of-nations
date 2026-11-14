@@ -94,6 +94,7 @@ import type {
 import { MONETARY_STANDARDS } from "./types.js";
 
 import { accountRecords, accountTableFromRecords, type AccountRecord } from "./accountTable.js";
+import { sortPopBlocksById } from "../population/blockTable.js";
 function professionIds(scenario: EconomyScenarioDef): Map<number, ProfessionDef> {
   return new Map(scenario.definitions.professions.map((profession) => [profession.id, profession]));
 }
@@ -1511,7 +1512,7 @@ export function createEconomyWorld(
     world.employment.push(built);
   }
   world.employment.sort((left, right) => left.id - right.id);
-  world.popBlocks.sort((left, right) => left.id - right.id);
+  sortPopBlocksById(world.population);
   world.employmentDirty = true;
   world.construction.nextBuildingId =
     world.buildings.reduce((max, building) => Math.max(max, building.id), 0) + 1;

@@ -416,11 +416,12 @@ describe("P4 conservation, determinism and validation (D-142)", () => {
       ["urbanShare", 2],
       ["childMortalityLagged", Number.POSITIVE_INFINITY],
     ] as const) {
-      const copy = { ...block, [field]: value };
-      world.popBlocks[0] = copy;
+      // D-159: blocks are table views; corrupt the field, then restore it.
+      const original = block[field];
+      block[field] = value;
       expect(() => assertValidWorld(world)).toThrow();
+      block[field] = original;
     }
-    world.popBlocks[0] = block;
     expect(() => assertValidWorld(world)).not.toThrow();
     expect(() =>
       calibrateBlockDemography(block, { fertilityLevel: 1, childMortality: -1, adultMortality: 1 }, NEUTRAL_DEMOGRAPHY_FACTORS, "test"),

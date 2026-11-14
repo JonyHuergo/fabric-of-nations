@@ -59,7 +59,7 @@ export function countryHouseholdsSnapshot(
   let dwellings = 0;
   let crowdingWeighted = 0;
   let crowdingPersons = 0;
-  const blocksByProvince = new Map<number, World["popBlocks"]>();
+  const blocksByProvince = new Map<number, World["popBlocks"][number][]>();
   for (const block of world.popBlocks) {
     if (!provinceIds.has(block.provinceId)) continue;
     const list = blocksByProvince.get(block.provinceId);

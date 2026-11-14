@@ -357,7 +357,7 @@ describe("E3 construction progress and completion", () => {
     // literacy (formerly: every block became an illiterate laborer block).
     for (const profession of f.scenario.definitions.professions) profession.gates = ["literacy"];
     for (const block of f.world.popBlocks) {
-      block.literacyByAge = initialLiteracyByAge(0);
+      block.literacyByAge.set(initialLiteracyByAge(0));
       block.literacy = 0;
     }
     f.world.employment = [];
@@ -378,7 +378,7 @@ describe("E3 construction progress and completion", () => {
     // Restore a single block's literacy; no monthly refresh occurs on day 2,
     // so the construction queue sees it as idle and resumes.
     const block = f.world.popBlocks[0]!;
-    block.literacyByAge = initialLiteracyByAge(0.5);
+    block.literacyByAge.set(initialLiteracyByAge(0.5));
     block.literacy = 0.5;
     assertValidWorld(f.world);
     run(f, 1);

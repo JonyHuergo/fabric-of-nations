@@ -32,6 +32,7 @@ import {
   countryProvinceIds,
   listAccounts,
   accountPosition,
+  reorderPopBlocks,
 } from "@century/sim";
 import {
   __runFiscalPhaseWithHooks,
@@ -1361,7 +1362,7 @@ describe("M4c integration, wealth effect, and determinism", () => {
     const scenario = fiscalScenario({ rate: 0.13, budget: 50_000, treasuryCash: 1_000 });
     const first = buildWorld(scenario);
     const second = buildWorld(scenario);
-    second.popBlocks = [...second.popBlocks].reverse();
+    reorderPopBlocks(second.population, [...second.popBlocks.keys()].reverse());
     const settlementFirst = runSettlement(scenario, first).settlement;
     const settlementSecond = runSettlement(scenario, second).settlement;
     const fiscalFirst = runFiscalPhase(first, settlementFirst, first.dayIndex);

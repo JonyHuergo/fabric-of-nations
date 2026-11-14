@@ -58,6 +58,16 @@ import type {
   ProvinceEconomy,
 } from "./types.js";
 
+import {
+  appendPopBlock,
+  createPopulationTable,
+  popBlockViews,
+  populationFields,
+  isPopulationTable,
+  populationCapacity,
+  POP_BLOCK_SCALAR_FIELDS,
+  PopBlockView,
+} from "./blockTable.js";
 function assertId(value: unknown, path: string): asserts value is Id {
   requireUint32(value, path);
 }
@@ -187,7 +197,12 @@ export function assertValidPopBlock(block: PopBlock): void {
   }
 
   assertRate(record.literacy, "popBlock.literacy");
-  const literacyByAge = requireArray(record.literacyByAge, "popBlock.literacyByAge");
+  // D-159: a table block's literacy is a Float64Array; a plain block may carry an array.
+  const rawLiteracy: unknown = record.literacyByAge;
+  if (!(rawLiteracy instanceof Float64Array) && !Array.isArray(rawLiteracy)) {
+    throw new TypeError("popBlock.literacyByAge must be an array");
+  }
+  const literacyByAge = rawLiteracy as ArrayLike<unknown>;
   if (literacyByAge.length !== SINGLE_AGE_COUNT) {
     throw new RangeError(
       `popBlock.literacyByAge must have length ${String(SINGLE_AGE_COUNT)}`,
@@ -231,11 +246,41 @@ function assertUnique<T>(values: readonly T[], key: (value: T) => string | numbe
 }
 
 /**
+ * D-159: the population table's shape, and `world.popBlocks` being its view list. The
+ * blocks' values are checked by `assertValidPopBlock`.
+ */
+function assertValidPopulationTable(world: World): void {
+  const table: unknown = world.population;
+  if (!isPopulationTable(table)) throw new TypeError("world.population must be a population table");
+  const capacity = populationCapacity(table);
+  if (!Number.isInteger(table.count) || table.count < 0 || table.count > capacity) {
+    throw new RangeError("world.population.count is outside its capacity");
+  }
+  const cells = capacity * SINGLE_AGE_COUNT;
+  if (table.male.length !== cells || table.female.length !== cells || table.literacyByAge.length !== cells) {
+    throw new RangeError("world.population age arrays do not match its capacity");
+  }
+  for (const field of POP_BLOCK_SCALAR_FIELDS) {
+    if (table[field].length !== capacity) throw new RangeError(`world.population.${field} does not match its capacity`);
+  }
+  const views = popBlockViews(table);
+  if (world.popBlocks !== views) throw new RangeError("world.popBlocks is not the population table's view list");
+  if (views.length !== table.count) throw new RangeError("world.popBlocks does not match world.population.count");
+  for (let position = 0; position < views.length; position += 1) {
+    const view = views[position];
+    if (!(view instanceof PopBlockView) || view.table !== table || view.position !== position || !view.bound()) {
+      throw new RangeError(`world.popBlocks[${String(position)}] is not the view of its position`);
+    }
+  }
+}
+
+/**
  * Validate population/finance state and all cross-references. Empty provinces,
  * pop blocks, and accounts are valid for M1-style empty worlds.
  */
 export function assertValidPopulationState(world: World): void {
   const provinces = requireArray(world.provinceEconomies, "world.provinceEconomies");
+  assertValidPopulationTable(world);
   const blocks = requireArray(world.popBlocks, "world.popBlocks");
   // M2 construction still creates exactly one province, but M5 economic worlds may
   // author several. ProvinceEconomy/market relationships are validated by the economy
@@ -537,7 +582,9 @@ export function createPopulationWorld(
   let nextAccountId = Math.max(floor, maxDeclared + 1);
 
   const accounts: FinancialAccount[] = [];
-  const blocks: PopBlock[] = [];
+  // D-159: blocks are appended to the population table; `blocks` are their views.
+  const populationTable = createPopulationTable(scenario.popBlocks.length);
+  const blocks = popBlockViews(populationTable);
   const openingEntries: OpeningBalanceEntry[] = [];
   const sortedPopBlocks = [...scenario.popBlocks].sort((left, right) => left.id - right.id);
   for (const initial of sortedPopBlocks) {
@@ -582,7 +629,7 @@ export function createPopulationWorld(
     const initialIncome = initial.incomeRUSDPerCapitaDay ?? 0;
     assertNonNegative(initialIncome, `popBlock ${String(initial.id)} incomeRUSDPerCapitaDay`);
 
-    const block: PopBlock = {
+    const block = appendPopBlock(populationTable, {
       id: initial.id,
       provinceId: initial.provinceId,
       professionId: initial.professionId,
@@ -613,7 +660,7 @@ export function createPopulationWorld(
       dwellings: 0,
       housingReferencePersonsPerDwelling: 0,
       housingReferenceIncomeRUSDPerCapitaDay: 0,
-    };
+    });
     const sourced = sourcedLevelsOf(initial.demography);
     assertRate(sourced.urbanShare, `popBlock ${String(initial.id)} demography.urbanShare`);
     block.urbanShare = sourced.urbanShare;
@@ -625,7 +672,6 @@ export function createPopulationWorld(
       NEUTRAL_DEMOGRAPHY_FACTORS,
       `popBlock ${String(initial.id)}`,
     );
-    blocks.push(block);
 
     // The cash account id is scenario-declared; the rest are deterministically
     // allocated. M4c fiscal accounts are conditional: they are created only when
@@ -720,7 +766,7 @@ export function createPopulationWorld(
     countries: [],
     currencies: [],
     currencyValuations: [],
-    popBlocks: blocks,
+    ...populationFields(populationTable),
     buildings: [],
     employment: [],
     employmentDirty: false,

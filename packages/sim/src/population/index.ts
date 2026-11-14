@@ -6,6 +6,7 @@ export * from "./types.js";
 export * from "./constants.js";
 export * from "./definitions.js";
 export * from "./state.js";
+export * from "./blockTable.js";
 export * from "./ageing.js";
 export * from "./demography.js";
 export * from "./needs.js";

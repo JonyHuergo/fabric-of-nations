@@ -96,7 +96,7 @@ export interface PopBlock {
    * is the derived population-weighted rate of ages 15+ and must equal the
    * aggregate of this array (D-077).
    */
-  literacyByAge: number[];
+  literacyByAge: Float64Array;
   /**
    * E5 authoritative vocational qualification rate, 0..1, over the block's
    * working-age people. It is built only by the funded training service and drives
