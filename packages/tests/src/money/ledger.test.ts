@@ -5,6 +5,7 @@ import {
   type FinanceState,
   type JournalLine,
   type PublicTransactionKind,
+  listAccounts,
 } from "@century/sim";
 import {
   M3_BUILDING_ACCOUNT_FIRST_ID,
@@ -143,7 +144,7 @@ describe("M3a minimal cash ledger", () => {
 
   test("rejects unbalanced, invalid, unknown-account, and overdraft postings atomically", () => {
     const finance = financeOf();
-    const before = finance.accounts.map((account) => account.balanceRUSD);
+    const before = listAccounts(finance.accounts).map((account) => account.balanceRUSD);
     const postingCount = finance.postings.length;
     const baselineBuilding = balanceOf(finance, SELLER_BUILDING);
 
@@ -178,7 +179,7 @@ describe("M3a minimal cash ledger", () => {
       }),
     ).toThrow(/overdraft|balance|insufficient/i);
 
-    expect(finance.accounts.map((account) => account.balanceRUSD)).toEqual(before);
+    expect(listAccounts(finance.accounts).map((account) => account.balanceRUSD)).toEqual(before);
     expect(finance.postings).toHaveLength(postingCount);
   });
 
@@ -204,7 +205,7 @@ describe("M3a minimal cash ledger", () => {
 });
 
 function balanceOf(finance: FinanceState, accountId: number): number {
-  const account = finance.accounts.find((candidate) => candidate.id === accountId);
+  const account = listAccounts(finance.accounts).find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
   return account.balanceRUSD;
 }

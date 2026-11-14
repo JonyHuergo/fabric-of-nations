@@ -355,7 +355,7 @@ describe("M6 country AI and action validation", () => {
     const world = aiWorld(scenario);
     const context = contextFor(scenario);
     tick(world, context);
-    const accountsAfterOne = world.finance.accounts.length;
+    const accountsAfterOne = world.finance.accounts.count;
     const countryKeysAfterOne = world.countries.map((country) => Object.keys(country).sort());
     for (let day = 1; day < 120; day += 1) tick(world, context);
     expect(world.finance.accounts).toHaveLength(accountsAfterOne);

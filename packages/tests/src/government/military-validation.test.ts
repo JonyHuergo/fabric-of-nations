@@ -33,6 +33,7 @@ import {
   type MilitaryActionInput,
   type World,
   countryProvinceIds,
+  listAccounts,
 } from "@century/sim";
 
 import {
@@ -156,7 +157,7 @@ function accountBalance(
   ownerId: Id | null,
   subtype: string,
 ): number {
-  const account = world.finance.accounts.find(
+  const account = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&

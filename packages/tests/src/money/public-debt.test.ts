@@ -18,6 +18,7 @@ import {
   MAX_RETAINED_TERMINATED_DEBT_CONTRACTS,
   assertValidFinanceState,
   type DebtContract,
+  listAccounts,
 } from "@century/sim";
 import {
   M5B_COUNTRY_A,
@@ -29,6 +30,7 @@ import {
 } from "../fixtures/m5b.js";
 import { m5Scenario } from "../fixtures/m5.js";
 import { loadM5Sample } from "../fixtures/smallWorlds.js";
+import { accountsTable } from "../fixtures/accounts.js";
 
 function account(
   world: World,
@@ -36,7 +38,7 @@ function account(
   ownerId: number,
   subtype: FinancialAccount["subtype"],
 ): FinancialAccount {
-  const found = world.finance.accounts.find(
+  const found = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&
@@ -72,8 +74,8 @@ describe("M5b public debt and deficit financing", () => {
     const world = createEconomyWorld(m5Scenario(), { seed: 1 });
     expect(world.countries.every((country) => country.debt.enabled === false)).toBe(true);
     expect(world.finance.debtContracts).toHaveLength(0);
-    expect(world.finance.accounts.some((entry) => entry.subtype === "debt-liability")).toBe(false);
-    expect(world.finance.accounts.some((entry) => entry.subtype === "bond-asset")).toBe(false);
+    expect(listAccounts(world.finance.accounts).some((entry) => entry.subtype === "debt-liability")).toBe(false);
+    expect(listAccounts(world.finance.accounts).some((entry) => entry.subtype === "bond-asset")).toBe(false);
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 
@@ -339,7 +341,7 @@ describe("M5b public debt and deficit financing", () => {
   test("failure to find a debt account rolls back issuance", () => {
     const world = createM5bWorld(m5bScenario());
     const bond = account(world, "country", M5B_COUNTRY_B, "bond-asset");
-    world.finance.accounts = world.finance.accounts.filter((entry) => entry.id !== bond.id);
+    world.finance.accounts = accountsTable(listAccounts(world.finance.accounts).filter((entry) => entry.id !== bond.id));
     const beforeContracts = world.finance.debtContracts.length;
     const beforeId = world.finance.nextContractId;
     expect(() => issue(world)).toThrow();
@@ -349,7 +351,7 @@ describe("M5b public debt and deficit financing", () => {
 });
 
 function treasuryCash(world: ReturnType<typeof createM5bWorld>, countryId: number): number {
-  const account = world.finance.accounts.find(
+  const account = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === "country" &&
       candidate.ownerId === countryId &&
@@ -419,7 +421,7 @@ describe("bounded debt contracts and financing semantics", () => {
     // Borrowing adds cash but does not retroactively post welfare expense.
     expect(treasuryCash(world, M5B_COUNTRY_A)).toBeCloseTo(3_100, 6);
     expect(
-      world.finance.accounts.some(
+      listAccounts(world.finance.accounts).some(
         (account) =>
           account.ownerKind === "country" &&
           account.ownerId === M5B_COUNTRY_A &&
@@ -486,7 +488,7 @@ describe("bounded debt contracts and financing semantics", () => {
     expect(last.economy!.debt.debtIssuedForDeficitRUSD).toBeGreaterThan(0);
     expect(world.finance.debtContracts.length).toBeGreaterThan(0);
     expect(world.finance.debtHistory.length).toBe(0);
-    const liability = world.finance.accounts.find(
+    const liability = listAccounts(world.finance.accounts).find(
       (account) =>
         account.ownerKind === "country" &&
         account.ownerId === usa?.id &&
@@ -497,7 +499,7 @@ describe("bounded debt contracts and financing semantics", () => {
       .filter((contract) => contract.status === "active" || contract.status === "arrears")
       .reduce((total, contract) => total + contract.outstandingPrincipalRUSD, 0);
     expect(liability?.balanceRUSD ?? 0).toBeCloseTo(activePrincipal, 6);
-    const bondAsset = world.finance.accounts.find(
+    const bondAsset = listAccounts(world.finance.accounts).find(
       (account) =>
         account.ownerKind === "country" &&
         account.ownerId === 1 &&

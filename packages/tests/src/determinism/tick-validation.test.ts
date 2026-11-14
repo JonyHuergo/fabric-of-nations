@@ -42,6 +42,7 @@ import {
   tick,
   type EconomyScenarioDef,
   type TickContext,
+  listAccounts,
 } from "@century/sim";
 import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import { GRAIN_ID, productionWorld, reservation } from "../fixtures/m3c.js";
@@ -178,7 +179,7 @@ describe("Batch 5 validation boundary and determinism", () => {
     const scenario = eightPolities();
     const world = createEconomyWorld(scenario, { seed: SEED });
     world.dayIndex = 5;
-    const account = world.finance.accounts[0];
+    const account = listAccounts(world.finance.accounts)[0];
     if (account === undefined) throw new Error("fixture has no accounts");
     account.balanceRUSD = Number.NaN;
 

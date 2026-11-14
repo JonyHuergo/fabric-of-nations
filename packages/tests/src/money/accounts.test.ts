@@ -25,6 +25,7 @@ import {
   type FinancialAccount,
   type PublicTransactionKind,
   type World,
+  listAccounts,
 } from "@century/sim";
 import {
   M3_BUILDING_ACCOUNT_FIRST_ID,
@@ -44,6 +45,7 @@ import {
   runSettlement,
   totalCash,
 } from "../fixtures/m3e.js";
+import { accountsTable, insertAccount } from "../fixtures/accounts.js";
 
 function accountOf(
   world: World,
@@ -51,7 +53,7 @@ function accountOf(
   ownerId: number | null,
   subtype: FinancialAccount["subtype"],
 ): FinancialAccount {
-  const account = world.finance.accounts.find(
+  const account = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&
@@ -64,7 +66,7 @@ function accountOf(
 }
 
 function balanceOf(finance: FinanceState, accountId: number): number {
-  const account = finance.accounts.find((candidate) => candidate.id === accountId);
+  const account = listAccounts(finance.accounts).find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
   return account.balanceRUSD;
 }
@@ -88,7 +90,7 @@ function manualFinance(
     balanceRUSD: entry.balanceRUSD ?? 0,
   }));
   return {
-    accounts,
+    accounts: accountsTable(accounts),
     postings: [],
     nextPostingId: 1,
     nextAccountId: entries.reduce((max, entry) => Math.max(max, entry.id), 0) + 1,
@@ -227,7 +229,7 @@ describe("M4a-1 account semantics", () => {
   test("rejects a posting that would make a designated cash account negative and leaves state unchanged", () => {
     const world = m3World().world;
     const householdId = M3_HOUSEHOLD_ACCOUNT_IDS[0];
-    const before = world.finance.accounts.map((account) => ({ ...account }));
+    const before = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     const postingCount = world.finance.postings.length;
     expect(() =>
       postCashTransfer(world.finance, 0, "goods-purchase", {
@@ -313,7 +315,7 @@ describe("M4a-1 invariants", () => {
       "external-cash",
     ]);
     const world = m3World().world;
-    const cashAccounts = world.finance.accounts.filter((account) =>
+    const cashAccounts = listAccounts(world.finance.accounts).filter((account) =>
       (CASH_SUBTYPES as readonly string[]).includes(account.subtype),
     );
     expect(cashAccounts.length).toBeGreaterThan(0);
@@ -391,7 +393,7 @@ describe("M4a-1 invariants", () => {
 
   test("derived account ids are unique and nextAccountId stays above every id", () => {
     const world = m3World().world;
-    const ids = world.finance.accounts.map((account) => account.id);
+    const ids = listAccounts(world.finance.accounts).map((account) => account.id);
     expect(new Set(ids).size).toBe(ids.length);
     expect(world.finance.nextAccountId).toBe(Math.max(...ids) + 1);
     const before = world.finance.nextAccountId;
@@ -403,7 +405,7 @@ describe("M4a-1 invariants", () => {
     const world = m3World().world;
     const household = M3_HOUSEHOLD_ACCOUNT_IDS[0];
     const building = M3_BUILDING_ACCOUNT_FIRST_ID;
-    const before = world.finance.accounts.map((account) => ({ ...account }));
+    const before = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     const postingCount = world.finance.postings.length;
     const nextPostingId = world.finance.nextPostingId;
 
@@ -447,9 +449,9 @@ describe("M4a-1 owner-reference validation", () => {
     for (const subtype of buildingOwnedSubtypes) {
       const world = m3World().world;
       const freeId = 4;
-      expect(world.finance.accounts.some((account) => account.id === freeId)).toBe(false);
+      expect(listAccounts(world.finance.accounts).some((account) => account.id === freeId)).toBe(false);
       expect(freeId).toBeLessThan(world.finance.nextAccountId);
-      world.finance.accounts.push({
+      insertAccount(world.finance, {
         id: freeId,
         ownerKind: "building",
         ownerId: 999,
@@ -559,11 +561,11 @@ describe("M4a-1 persistence and compatibility", () => {
     const clone = cloneWorld(world);
     expect(serializeWorld(clone)).toBe(serializeWorld(world));
     const original = serializeWorld(world);
-    clone.finance.accounts[0]!.balanceRUSD += 1;
+    listAccounts(clone.finance.accounts)[0]!.balanceRUSD += 1;
     if (clone.finance.opening === null) throw new Error("missing clone opening record");
     clone.finance.opening.checksum = "tampered";
     expect(serializeWorld(world)).toBe(original);
-    expect(clone.finance.accounts[0]).not.toBe(world.finance.accounts[0]);
+    expect(listAccounts(clone.finance.accounts)[0]).not.toBe(listAccounts(world.finance.accounts)[0]);
     expect(clone.finance.opening).not.toBe(world.finance.opening);
   });
 
@@ -597,7 +599,7 @@ describe("M4a-1 persistence and compatibility", () => {
 
   test("rejects an account whose category does not match its subtype", () => {
     const world = m3World().world;
-    const account = world.finance.accounts[0];
+    const account = listAccounts(world.finance.accounts)[0];
     if (account === undefined) throw new Error("missing account");
     (account as unknown as { category: string }).category = "revenue";
     expect(() => assertValidWorld(world)).toThrow(/category|subtype/i);

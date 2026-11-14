@@ -7,6 +7,7 @@ import {
   runTicks,
   type TickContext,
   countryProvinceIds,
+  listAccounts,
 } from "@century/sim";
 import {
   M5_COUNTRY_A,
@@ -35,13 +36,13 @@ describe("M5 multi-country finance and fiscal integrity", () => {
       for (const provinceId of countryProvinceIds(world, country.id)) provinceOwners.set(provinceId, country.id);
     }
     for (const country of world.countries) {
-      const treasury = world.finance.accounts.find(
+      const treasury = listAccounts(world.finance.accounts).find(
         (account) =>
           account.ownerKind === "country" &&
           account.ownerId === country.id &&
           account.subtype === "treasury-cash",
       );
-      const taxRevenue = world.finance.accounts.find(
+      const taxRevenue = listAccounts(world.finance.accounts).find(
         (account) =>
           account.ownerKind === "country" &&
           account.ownerId === country.id &&
@@ -53,7 +54,7 @@ describe("M5 multi-country finance and fiscal integrity", () => {
       const residentTax = world.popBlocks
         .filter((block) => provinceOwners.get(block.provinceId) === country.id)
         .reduce((total, block) => {
-          const expense = world.finance.accounts.find(
+          const expense = listAccounts(world.finance.accounts).find(
             (account) =>
               account.ownerKind === "popBlock" &&
               account.ownerId === block.id &&
@@ -108,8 +109,8 @@ describe("M5 multi-country finance and fiscal integrity", () => {
     expect(JSON.stringify(first.finance.periodSummaries)).toBe(
       JSON.stringify(second.finance.periodSummaries),
     );
-    expect(first.finance.accounts.map((account) => account.balanceRUSD)).toEqual(
-      second.finance.accounts.map((account) => account.balanceRUSD),
+    expect(listAccounts(first.finance.accounts).map((account) => account.balanceRUSD)).toEqual(
+      listAccounts(second.finance.accounts).map((account) => account.balanceRUSD),
     );
   });
 
@@ -118,7 +119,7 @@ describe("M5 multi-country finance and fiscal integrity", () => {
     const world = createEconomyWorld(scenario, { seed: 20_261_023 });
     runTicks(world, 5, context(scenario));
     const treasury = (countryId: number): number =>
-      world.finance.accounts.find(
+      listAccounts(world.finance.accounts).find(
         (account) =>
           account.ownerKind === "country" &&
           account.ownerId === countryId &&

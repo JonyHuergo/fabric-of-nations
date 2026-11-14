@@ -4,6 +4,7 @@ import {
   populationTotal,
   tick,
   worldPopulation,
+  listAccounts,
 } from "@century/sim";
 import {
   contextFor,
@@ -189,11 +190,11 @@ describe("M2 needs, budgets, and shared supply", () => {
 
   test("does not finance daily needs from savings account balances", () => {
     const { scenario, world } = multiBlockWorld();
-    for (const account of world.finance.accounts) {
+    for (const account of listAccounts(world.finance.accounts)) {
       if (account.subtype !== "household-cash" && account.subtype !== "owner-equity") continue;
       account.balanceRUSD = 1_000_000_000;
     }
-    const before = world.finance.accounts.map((account) => account.balanceRUSD);
+    const before = listAccounts(world.finance.accounts).map((account) => account.balanceRUSD);
     const inputs = makeInputs([0, 1, 2], {
       annualIncomePerCapita: 0,
       annualMandatoryPerCapita: 0,
@@ -206,12 +207,12 @@ describe("M2 needs, budgets, and shared supply", () => {
       expect(block.spentRUSD).toBe(0);
       expect(block.budgetEndAfterNeedsRUSD).toBe(0);
     }
-    expect(world.finance.accounts.map((account) => account.balanceRUSD)).toEqual(before);
+    expect(listAccounts(world.finance.accounts).map((account) => account.balanceRUSD)).toEqual(before);
   });
 
   test("handles a non-positive disposable budget without creating money", () => {
     const { scenario, world } = multiBlockWorld();
-    const before = world.finance.accounts.map((account) => account.balanceRUSD);
+    const before = listAccounts(world.finance.accounts).map((account) => account.balanceRUSD);
     const inputs = makeInputs([0, 1, 2], {
       annualIncomePerCapita: 10,
       annualMandatoryPerCapita: 100,
@@ -224,7 +225,7 @@ describe("M2 needs, budgets, and shared supply", () => {
       expect(block.spentRUSD).toBe(0);
       expect(block.budgetEndAfterNeedsRUSD).toBe(0);
     }
-    expect(world.finance.accounts.map((account) => account.balanceRUSD)).toEqual(before);
+    expect(listAccounts(world.finance.accounts).map((account) => account.balanceRUSD)).toEqual(before);
   });
 
   test("zero-population blocks produce zero needs without NaN", () => {

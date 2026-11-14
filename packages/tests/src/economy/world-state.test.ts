@@ -7,8 +7,10 @@ import {
   populationTotal,
   type Market,
   type World,
+  listAccounts,
 } from "@century/sim";
 import { cloneM3Scenario, m3World } from "../fixtures/m3a.js";
+import { insertAccount, pushAccountUnchecked } from "../fixtures/accounts.js";
 
 describe("M3a world state and relationships", () => {
   test("creates the small M3 economy with buildings, assignments, lots, and accounts", () => {
@@ -93,9 +95,9 @@ describe("M3a world state and relationships", () => {
 
   test("rejects duplicate account and building ids", () => {
     const duplicateAccount = m3World().world;
-    const firstAccount = duplicateAccount.finance.accounts[0];
+    const firstAccount = listAccounts(duplicateAccount.finance.accounts)[0];
     if (firstAccount === undefined) throw new Error("missing account");
-    duplicateAccount.finance.accounts.push({ ...firstAccount });
+    pushAccountUnchecked(duplicateAccount.finance.accounts, { ...firstAccount });
     expect(() => assertValidWorld(duplicateAccount)).toThrow(/duplicate|account/i);
 
     const duplicateBuilding = cloneM3Scenario();
@@ -110,9 +112,9 @@ describe("M3a world state and relationships", () => {
     // Use a free id below nextAccountId so the account-id guard cannot mask the
     // owner-reference check this test is meant to exercise.
     const freeId = 4;
-    expect(world.finance.accounts.some((account) => account.id === freeId)).toBe(false);
+    expect(listAccounts(world.finance.accounts).some((account) => account.id === freeId)).toBe(false);
     expect(freeId).toBeLessThan(world.finance.nextAccountId);
-    world.finance.accounts.push({
+    insertAccount(world.finance, {
       id: freeId,
       ownerKind: "building",
       ownerId: 999,

@@ -22,6 +22,7 @@ import {
   type Id,
   type PopBlock,
   type World,
+  listAccounts,
 } from "@century/sim";
 import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import { occupierOf } from "../fixtures/provinces.js";
@@ -74,7 +75,7 @@ function accountBalance(
   ownerId: Id | null,
   subtype: string,
 ): number {
-  const account = world.finance.accounts.find(
+  const account = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&
@@ -151,7 +152,7 @@ function setProvincePools(
 /** Sum `military-pay` amounts on one day by recipient block. */
 function militaryPayByBlock(world: World, dayIndex: number): Map<Id, number> {
   const accountById = new Map(
-    world.finance.accounts.map((account) => [account.id, account] as const),
+    listAccounts(world.finance.accounts).map((account) => [account.id, account] as const),
   );
   const byBlock = new Map<Id, number>();
   for (const posting of world.finance.postings) {
@@ -629,7 +630,7 @@ describe("AUDIT-006 explicit military allocation", () => {
     recruit(world, countryId, provinceId, 2_000);
     runMilitaryPhase(world, world.dayIndex, { validateWorld: false });
     const accountById = new Map(
-      world.finance.accounts.map((account) => [account.id, account] as const),
+      listAccounts(world.finance.accounts).map((account) => [account.id, account] as const),
     );
     for (const posting of world.finance.postings) {
       let debits = 0;

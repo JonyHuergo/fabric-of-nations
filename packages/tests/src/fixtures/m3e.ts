@@ -9,6 +9,7 @@ import {
   type MarketSettlementResult,
   type TickContext,
   type World,
+  listAccounts,
 } from "@century/sim";
 import {
   marketInput,
@@ -18,7 +19,7 @@ import {
 } from "./m3d.js";
 
 export function accountBalance(world: World, accountId: number): number {
-  const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
+  const account = listAccounts(world.finance.accounts).find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
   return account.balanceRUSD;
 }
@@ -51,7 +52,7 @@ export function totalCash(world: World): number {
  * the same delta so the accounting identity stays valid. Test-only helper.
  */
 export function setCashBalance(world: World, accountId: number, balanceRUSD: number): void {
-  const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
+  const account = listAccounts(world.finance.accounts).find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
   if (
     account.subtype !== "household-cash" &&
@@ -60,7 +61,7 @@ export function setCashBalance(world: World, accountId: number, balanceRUSD: num
   ) {
     throw new Error(`account ${String(accountId)} is not a designated cash account`);
   }
-  const equity = world.finance.accounts.find(
+  const equity = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.subtype === "owner-equity" &&
       candidate.ownerKind === account.ownerKind &&

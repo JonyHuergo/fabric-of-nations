@@ -32,6 +32,7 @@ import {
   type World,
   countryProvinceIds,
   daysInYear,
+  listAccounts,
 } from "@century/sim";
 import {
   PROTOCOL_VERSION,
@@ -126,7 +127,7 @@ function accountBalance(
   ownerId: number | null,
   subtype: string,
 ): number {
-  const account = world.finance.accounts.find(
+  const account = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&
@@ -791,7 +792,7 @@ const PAYROLL_SEED = 20_261_111;
 
 function militaryPayForBlockOnDay(world: World, dayIndex: number, blockId: number): number {
   const accountById = new Map(
-    world.finance.accounts.map((account) => [account.id, account] as const),
+    listAccounts(world.finance.accounts).map((account) => [account.id, account] as const),
   );
   let total = 0;
   for (const posting of world.finance.postings) {

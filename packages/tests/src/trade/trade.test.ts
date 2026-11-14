@@ -25,6 +25,7 @@ import {
   type EconomyScenarioDef,
   type TradeRoute,
   type World,
+  listAccounts,
 } from "@century/sim";
 import {
   PROTOCOL_VERSION,
@@ -188,7 +189,7 @@ function accountBalance(
   ownerId: number | null,
   subtype: string,
 ): number {
-  const account = world.finance.accounts.find(
+  const account = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&
@@ -708,16 +709,16 @@ describe("E6a construction procurement cannot bypass trade rules", () => {
   test("a duty posting requires a shipping building and a destination country", () => {
     const { scenario, world } = build({ tariff: 0.1 });
     runDay(world, scenario);
-    const systemAccount = world.finance.accounts.find(
+    const systemAccount = listAccounts(world.finance.accounts).find(
       (account) => account.subtype === "system-reserve-cash",
     )!;
     const building = world.buildings.find((candidate) => candidate.id === 8)!;
-    const customsRevenue = world.finance.accounts.find(
+    const customsRevenue = listAccounts(world.finance.accounts).find(
       (account) => account.subtype === "customs-duty-revenue" && account.ownerId === M5_COUNTRY_B,
     )!;
     const treasury = world.countries.find((country) => country.id === M5_COUNTRY_B)!
       .treasuryAccountId;
-    const dutyExpense = world.finance.accounts.find(
+    const dutyExpense = listAccounts(world.finance.accounts).find(
       (account) => account.subtype === "customs-duty-expense" && account.ownerId === building.id,
     )!;
 

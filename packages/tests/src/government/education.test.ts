@@ -17,6 +17,7 @@ import {
   type TickContext,
   type World,
   countryProvinceIds,
+  listAccounts,
 } from "@century/sim";
 
 import {
@@ -154,7 +155,7 @@ describe("M9 education payroll accounting", () => {
         1e-6,
     );
     // No debt or payable account is created for the unpaid request.
-    const liabilities = world.finance.accounts.filter(
+    const liabilities = listAccounts(world.finance.accounts).filter(
       (account) => account.ownerKind === "country" && account.category === "liability",
     );
     expect(liabilities).toHaveLength(0);

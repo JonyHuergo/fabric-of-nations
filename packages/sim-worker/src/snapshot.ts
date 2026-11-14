@@ -18,7 +18,14 @@ import {
   provinceUnemploymentRate,
   type LabourSnapshotContext,
 } from "./labourSnapshot.js";
-import { provinceCrowding, type PopBlock } from "@century/sim";
+import {
+  provinceCrowding,
+  type PopBlock,
+  ownerKindCode,
+  subtypeCode,
+  NO_ACCOUNT_OWNER,
+  findAccountById,
+} from "@century/sim";
 import {
   countryDemographySnapshot,
   demographySnapshotContext,
@@ -653,7 +660,7 @@ function financeHistory(
   const cached = cache?.financeHistory.get(country.id);
   if (
     cached !== undefined &&
-    cached.accountCount === index.accounts.length &&
+    cached.accountCount === index.accounts.count &&
     cached.blockKey === blockKey &&
     cached.summaries.length === summaries.length &&
     cached.summaries.every((summary, position) => summary === summaries[position])
@@ -663,7 +670,7 @@ function financeHistory(
   const history = buildFinanceHistory(world, country, index, blockIds, summaries, cache);
   cache?.financeHistory.set(country.id, {
     summaries,
-    accountCount: index.accounts.length,
+    accountCount: index.accounts.count,
     blockKey,
     history,
   });
@@ -679,27 +686,23 @@ function buildFinanceHistory(
   cache: SnapshotCache | undefined,
 ): readonly SnapshotFinancePeriod[] {
   const treasuryId = index.find("country", country.id, "treasury-cash")?.id;
-  const debtAccountIds = new Set(
-    index.accounts
-      .filter(
-        (account) =>
-          account.ownerKind === "country" &&
-          account.ownerId === country.id &&
-          account.subtype === "debt-liability",
-      )
-      .map((account) => account.id),
-  );
-  const householdAccountIds = new Set(
-    index.accounts
-      .filter(
-        (account) =>
-          account.ownerKind === "popBlock" &&
-          account.ownerId !== null &&
-          blockIds.has(account.ownerId) &&
-          account.subtype === "household-cash",
-      )
-      .map((account) => account.id),
-  );
+  // D-158: the account table's columns, in id order (the former filters' order).
+  const table = index.accounts;
+  const countryKind = ownerKindCode("country");
+  const popBlockKind = ownerKindCode("popBlock");
+  const debtCode = subtypeCode("debt-liability");
+  const householdCode = subtypeCode("household-cash");
+  const debtAccountIds = new Set<number>();
+  const householdAccountIds = new Set<number>();
+  for (let position = 0; position < table.count; position += 1) {
+    const kind = table.ownerKind[position];
+    const subtype = table.subtype[position];
+    const owner = table.ownerId[position] ?? NO_ACCOUNT_OWNER;
+    if (kind === countryKind && owner === country.id && subtype === debtCode) debtAccountIds.add(table.id[position] ?? 0);
+    if (kind === popBlockKind && owner !== NO_ACCOUNT_OWNER && blockIds.has(owner) && subtype === householdCode) {
+      householdAccountIds.add(table.id[position] ?? 0);
+    }
+  }
   const history: SnapshotFinancePeriod[] = [];
   for (const summary of summaries) {
     const periodFiscal = fiscalTotals(summary, country.id, world, cache);
@@ -1805,7 +1808,7 @@ function monetarySnapshot(
     fineGramsPerUnit: roundDisplay(record.fineGramsPerUnit, 6),
     metalReserveKg: roundDisplay(record.metalReserveKg, 3),
     metalReserveValueRUSD: roundDisplay(
-      world.finance.accounts.find((account) => account.id === record.metalReserveAccountId)?.balanceRUSD ?? 0,
+      (record.metalReserveAccountId === null ? undefined : findAccountById(world.finance.accounts, record.metalReserveAccountId))?.balanceRUSD ?? 0,
       2,
     ),
     mintPriceRUSDPerKg: record.standard === "paper" ? null : roundDisplay(mintPriceRUSDPerKg(record), 2),

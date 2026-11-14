@@ -32,6 +32,7 @@ import {
   type EconomyScenarioDef,
   type Month,
   type World,
+  listAccounts,
 } from "@century/sim";
 import {
   PROTOCOL_VERSION,
@@ -110,7 +111,7 @@ function authority(world: World) {
 }
 
 function balance(world: World, ownerKind: string, ownerId: number | null, subtype: string): number {
-  const account = world.finance.accounts.find(
+  const account = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&
@@ -121,7 +122,7 @@ function balance(world: World, ownerKind: string, ownerId: number | null, subtyp
 }
 
 function designatedCash(world: World): number {
-  return world.finance.accounts
+  return listAccounts(world.finance.accounts)
     .filter((account) =>
       ["household-cash", "operating-cash", "system-reserve-cash", "treasury-cash", "monetary-reserve-cash", "external-cash"].includes(
         account.subtype,

@@ -14,6 +14,7 @@ import {
   type MarketDayResult,
   type TickContext,
   countryProvinceIds,
+  listAccounts,
 } from "@century/sim";
 import {
   M5_REGION_A1,
@@ -22,6 +23,7 @@ import {
   M5_REGION_C1,
   m5Scenario,
 } from "../fixtures/m5.js";
+import { accountsTable } from "../fixtures/accounts.js";
 
 function context(scenario: ReturnType<typeof m5Scenario>): TickContext {
   return {
@@ -280,9 +282,9 @@ describe("M5 multi-market clearing and conservation", () => {
     // posting references it. Settlement then fails inside the upkeep phase after
     // market and wage work has already been staged.
     const results = emptyMarketDays(scenario, world);
-    world.finance.accounts = world.finance.accounts.filter(
+    world.finance.accounts = accountsTable(listAccounts(world.finance.accounts).filter(
       (account) => account.subtype !== "system-reserve-cash",
-    );
+    ));
     const before = JSON.stringify(world.finance);
     const cashBefore = designatedCashTotal(world.finance);
     expect(() => settleMarketDays(world, scenario.definitions, results)).toThrow(

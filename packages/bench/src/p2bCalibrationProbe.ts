@@ -18,6 +18,7 @@ import {
   tick,
   type EconomyScenarioDef,
   type TickContext,
+  accountRecords,
 } from "@century/sim";
 
 const SEED = 20_261_023;
@@ -112,7 +113,7 @@ function main(): void {
   }
 
   const cashOf = (field: "Start" | "End"): void => {
-    for (const account of world.finance.accounts) {
+    for (const account of accountRecords(world.finance.accounts)) {
       if (!isCashAccount(account) || account.ownerId === null) continue;
       if (account.ownerKind === "country") {
         const acc = countries.get(account.ownerId);

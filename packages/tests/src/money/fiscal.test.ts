@@ -30,6 +30,7 @@ import {
   type TickResult,
   type World,
   countryProvinceIds,
+  listAccounts,
 } from "@century/sim";
 import {
   __runFiscalPhaseWithHooks,
@@ -47,6 +48,7 @@ import {
   zeroFiscalPolicy,
 } from "../fixtures/m4c.js";
 import * as simApi from "@century/sim";
+import { accountsTable } from "../fixtures/accounts.js";
 
 const SEED = 20_261_023;
 
@@ -56,7 +58,7 @@ function accountOf(
   ownerId: number | null,
   subtype: AccountSubtype,
 ): FinancialAccount {
-  const match = world.finance.accounts.find(
+  const match = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&
@@ -186,7 +188,7 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     const countryless = createEconomyWorld(marketScenario(), { seed: SEED });
     for (const block of countryless.popBlocks) {
       expect(
-        countryless.finance.accounts.some(
+        listAccounts(countryless.finance.accounts).some(
           (candidate) =>
             candidate.ownerKind === "popBlock" &&
             candidate.ownerId === block.id &&
@@ -195,7 +197,7 @@ describe("M4c fiscal accounts, construction, and validation", () => {
       ).toBe(false);
     }
     expect(
-      countryless.finance.accounts.some((candidate) => candidate.ownerKind === "country"),
+      listAccounts(countryless.finance.accounts).some((candidate) => candidate.ownerKind === "country"),
     ).toBe(false);
 
     const fiscal = buildWorld(fiscalScenario({ rate: 0, budget: 0 }));
@@ -203,7 +205,7 @@ describe("M4c fiscal accounts, construction, and validation", () => {
       expect(account(fiscal, "popBlock", block.id, "income-tax-expense").balanceRUSD).toBe(0);
       expect(account(fiscal, "popBlock", block.id, "welfare-income").balanceRUSD).toBe(0);
     }
-    expect(fiscal.finance.accounts.some((candidate) => candidate.ownerKind === "country")).toBe(
+    expect(listAccounts(fiscal.finance.accounts).some((candidate) => candidate.ownerKind === "country")).toBe(
       true,
     );
   });
@@ -266,9 +268,9 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     const world = buildWorld(scenario);
 
     const missingTreasury = cloneWorld(world);
-    missingTreasury.finance.accounts = missingTreasury.finance.accounts.filter(
+    missingTreasury.finance.accounts = accountsTable(listAccounts(missingTreasury.finance.accounts).filter(
       (candidate) => candidate.id !== FISCAL_TREASURY_ACCOUNT_ID,
-    );
+    ));
     expect(() => assertValidWorld(missingTreasury)).toThrow(/treasury-cash/i);
 
     const mismatch = cloneWorld(world);
@@ -276,28 +278,28 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     expect(() => assertValidWorld(mismatch)).toThrow(/does not reference its own treasury-cash/i);
 
     const wrongOwner = cloneWorld(world);
-    const treasury = wrongOwner.finance.accounts.find(
+    const treasury = listAccounts(wrongOwner.finance.accounts).find(
       (candidate) => candidate.id === FISCAL_TREASURY_ACCOUNT_ID,
     )!;
     treasury.ownerId = 999;
     expect(() => assertValidWorld(wrongOwner)).toThrow(/unknown country owner/i);
 
     const missingTaxRevenue = cloneWorld(world);
-    missingTaxRevenue.finance.accounts = missingTaxRevenue.finance.accounts.filter(
+    missingTaxRevenue.finance.accounts = accountsTable(listAccounts(missingTaxRevenue.finance.accounts).filter(
       (candidate) => candidate.subtype !== "income-tax-revenue",
-    );
+    ));
     expect(() => assertValidWorld(missingTaxRevenue)).toThrow(/missing income-tax-revenue/i);
 
     const missingWelfareIncome = cloneWorld(world);
-    missingWelfareIncome.finance.accounts = missingWelfareIncome.finance.accounts.filter(
+    missingWelfareIncome.finance.accounts = accountsTable(listAccounts(missingWelfareIncome.finance.accounts).filter(
       (candidate) => candidate.subtype !== "welfare-income",
-    );
+    ));
     expect(() => assertValidWorld(missingWelfareIncome)).toThrow(/missing welfare-income/i);
 
     const missingTaxExpense = cloneWorld(world);
-    missingTaxExpense.finance.accounts = missingTaxExpense.finance.accounts.filter(
+    missingTaxExpense.finance.accounts = accountsTable(listAccounts(missingTaxExpense.finance.accounts).filter(
       (candidate) => candidate.subtype !== "income-tax-expense",
-    );
+    ));
     expect(() => assertValidWorld(missingTaxExpense)).toThrow(/missing income-tax-expense/i);
   });
 
@@ -651,7 +653,7 @@ describe("M4c budgeted welfare transfers", () => {
       9,
     );
     // No debt, arrears, or negative cash is created.
-    for (const candidate of world.finance.accounts) {
+    for (const candidate of listAccounts(world.finance.accounts)) {
       if (candidate.category !== "equity") {
         expect(candidate.balanceRUSD).toBeGreaterThanOrEqual(0);
       }
@@ -1089,10 +1091,10 @@ describe("M4c execution guards, atomicity, and calendar boundaries", () => {
     const treasury = account(world, "country", 0, "treasury-cash");
     const beforePostings = world.finance.postings.length;
     treasury.balanceRUSD = Number.NaN;
-    const beforeAccounts = world.finance.accounts.map((candidate) => ({ ...candidate }));
+    const beforeAccounts = listAccounts(world.finance.accounts).map((candidate) => ({ ...candidate }));
     expect(() => runFiscalPhase(world, settlement, world.dayIndex)).toThrow(/finite/i);
     expect(world.finance.postings).toHaveLength(beforePostings);
-    expect(world.finance.accounts.map((candidate) => candidate.balanceRUSD)).toEqual(
+    expect(listAccounts(world.finance.accounts).map((candidate) => candidate.balanceRUSD)).toEqual(
       beforeAccounts.map((candidate) => candidate.balanceRUSD),
     );
   });
@@ -1113,7 +1115,7 @@ describe("M4c execution guards, atomicity, and calendar boundaries", () => {
       __runFiscalPhaseWithHooks(world, settlement, world.dayIndex, {
         afterStagedPostings: (staged) => {
           stagedPostings = staged.postings.length;
-          const treasury = staged.accounts.find(
+          const treasury = listAccounts(staged.accounts).find(
             (candidate) => candidate.ownerKind === "country" && candidate.subtype === "treasury-cash",
           );
           if (treasury === undefined) throw new Error("missing staged treasury");
@@ -1239,7 +1241,7 @@ describe("M4c integration, wealth effect, and determinism", () => {
           6,
         );
       }
-      for (const candidate of world.finance.accounts) {
+      for (const candidate of listAccounts(world.finance.accounts)) {
         if (candidate.category !== "equity") {
           expect(candidate.balanceRUSD).toBeGreaterThanOrEqual(0);
         }
@@ -1391,7 +1393,7 @@ describe("M4c integration, wealth effect, and determinism", () => {
     expect(world.finance.postings).toHaveLength(0);
     expect(world.countries).toHaveLength(0);
     expect(
-      world.finance.accounts.some((candidate) => candidate.ownerKind === "country"),
+      listAccounts(world.finance.accounts).some((candidate) => candidate.ownerKind === "country"),
     ).toBe(false);
   });
 });

@@ -22,6 +22,7 @@ import {
   type EconomyScenarioDef,
   type TickContext,
   type World,
+  listAccounts,
 } from "@century/sim";
 import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
@@ -229,7 +230,7 @@ describe("P1 rollback", () => {
     const world = createEconomyWorld(SCENARIO, { seed: SEED });
     const first = worldDayFingerprint(world);
     expect(worldDayFingerprint(world)).toBe(first);
-    const account = world.finance.accounts.find((candidate) => candidate.balanceRUSD > 0);
+    const account = listAccounts(world.finance.accounts).find((candidate) => candidate.balanceRUSD > 0);
     if (account === undefined) throw new Error("fixture has no funded account");
     account.balanceRUSD += 1;
     expect(worldDayFingerprint(world)).not.toBe(first);
@@ -261,7 +262,7 @@ describe("P1 hot-path indexes", () => {
     const world = advancedWorld();
     const index = buildFinanceIndex(world.finance);
     let looked = 0;
-    for (const account of world.finance.accounts) {
+    for (const account of listAccounts(world.finance.accounts)) {
       const external =
         account.ownerKind === "system" &&
         (account.subtype === "external-cash" ||

@@ -8,7 +8,17 @@
  *   the employer, wage income of the servant); money is conserved.
  * - Determinism and save round trip with household assignments.
  */
-import { createEconomyWorld, deserializeWorld, encodeWorld, labourEligibleWorkforce, refreshEmployment, serializeWorld, tick, type World } from "@century/sim";
+import {
+  createEconomyWorld,
+  deserializeWorld,
+  encodeWorld,
+  labourEligibleWorkforce,
+  refreshEmployment,
+  serializeWorld,
+  tick,
+  type World,
+  listAccounts,
+} from "@century/sim";
 
 import { economyTickContext, totalCash } from "../fixtures/m3e.js";
 import { M5_LABORERS, M5_REGION_A1 } from "../fixtures/m5.js";
@@ -82,7 +92,7 @@ describe("P7 households as employers (§4.1)", () => {
     const { world, scenario } = worldWithServants();
     const context = economyTickContext(scenario);
     const employerCash = (w: World): number =>
-      w.finance.accounts.find((account) => account.ownerKind === "popBlock" && account.ownerId === P7_CLERK_BLOCK && account.subtype === "household-cash")?.balanceRUSD ?? 0;
+      listAccounts(w.finance.accounts).find((account) => account.ownerKind === "popBlock" && account.ownerId === P7_CLERK_BLOCK && account.subtype === "household-cash")?.balanceRUSD ?? 0;
     expect(world.labourMarket.householdEmployment.length).toBeGreaterThan(0);
     expect(employerCash(world)).toBeGreaterThan(0);
     const cashBefore = totalCash(world);

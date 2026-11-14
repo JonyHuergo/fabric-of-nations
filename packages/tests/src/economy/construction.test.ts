@@ -29,6 +29,7 @@ import {
   type EconomyScenarioDef,
   type TickContext,
   type World,
+  listAccounts,
 } from "@century/sim";
 import { loadM3SmallEconomy } from "../fixtures/smallWorlds.js";
 import {
@@ -147,7 +148,7 @@ function accountBalance(
   ownerId: number,
   subtype: string,
 ): number {
-  const account = world.finance.accounts.find(
+  const account = listAccounts(world.finance.accounts).find(
     (entry) =>
       entry.ownerKind === ownerKind && entry.ownerId === ownerId && entry.subtype === subtype,
   );
@@ -226,10 +227,10 @@ describe("E3 construction selection and authorization", () => {
     // Insufficient treasury is rejected without mutation.
     const poor = fixture();
     poor.world.countries[COUNTRY]!.treasuryAccountId = 1000;
-    const treasury = poor.world.finance.accounts.find(
+    const treasury = listAccounts(poor.world.finance.accounts).find(
       (entry) => entry.id === poor.world.countries[COUNTRY]!.treasuryAccountId,
     )!;
-    const equity = poor.world.finance.accounts.find(
+    const equity = listAccounts(poor.world.finance.accounts).find(
       (entry) =>
         entry.ownerKind === "country" &&
         entry.ownerId === COUNTRY &&
@@ -337,7 +338,7 @@ describe("E3 construction progress and completion", () => {
     );
     expect(assignments.length).toBeGreaterThan(0);
     expect(
-      f.world.finance.accounts.find(
+      listAccounts(f.world.finance.accounts).find(
         (entry) =>
           entry.ownerKind === "building" &&
           entry.ownerId === building.id &&
@@ -405,13 +406,13 @@ describe("E3 construction progress and completion", () => {
     f.world.countries.find((entry) => entry.id === COUNTRY)!.fiscal.welfareBudgetRUSDPerYear = 0;
     // Fixture recapitalization: restore treasury liquidity and matching country
     // equity after the deliberately exhaustive welfare draw.
-    const treasury = f.world.finance.accounts.find(
+    const treasury = listAccounts(f.world.finance.accounts).find(
       (entry) =>
         entry.ownerKind === "country" &&
         entry.ownerId === COUNTRY &&
         entry.subtype === "treasury-cash",
     )!;
-    const equity = f.world.finance.accounts.find(
+    const equity = listAccounts(f.world.finance.accounts).find(
       (entry) =>
         entry.ownerKind === "country" &&
         entry.ownerId === COUNTRY &&

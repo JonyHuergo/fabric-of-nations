@@ -18,9 +18,11 @@ import {
   type Id,
   type MilitaryActionInput,
   type World,
+  listAccounts,
 } from "@century/sim";
 
 import { m5Scenario } from "../fixtures/m5.js";
+import { accountsTable } from "../fixtures/accounts.js";
 
 const SEED = 20_261_112;
 
@@ -136,9 +138,9 @@ describe("AUDIT-022 recruitment and civilian employment", () => {
     const before = world.employment.map((assignment) => ({ ...assignment }));
     const dirtyBefore = world.employmentDirty;
     // Force a failure after people have been removed and employment reconciled.
-    world.finance.accounts = world.finance.accounts.filter(
+    world.finance.accounts = accountsTable(listAccounts(world.finance.accounts).filter(
       (account) => account.subtype !== "military-income",
-    );
+    ));
     expect(() =>
       applyMilitaryAction(
         world,

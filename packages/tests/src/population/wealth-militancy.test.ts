@@ -12,6 +12,7 @@ import {
   tick,
   updateDailyMilitancy,
   updateMonthlyWealth,
+  listAccounts,
 } from "@century/sim";
 import {
   aggregateWorld,
@@ -205,11 +206,11 @@ describe("M2 wealth and militancy", () => {
 
   test("budget quantities use RUSD without mutating account balances", () => {
     const { scenario, world } = multiBlockWorld();
-    const before = world.finance.accounts.map((account) => account.balanceRUSD);
+    const before = listAccounts(world.finance.accounts).map((account) => account.balanceRUSD);
     const inputs = makeInputs([0, 1, 2]);
     const result = tick(world, contextFor(scenario, inputs));
     expect(result.population?.needs.blocks.every((block) => block.spentRUSD >= 0)).toBe(true);
-    expect(world.finance.accounts.map((account) => account.balanceRUSD)).toEqual(before);
+    expect(listAccounts(world.finance.accounts).map((account) => account.balanceRUSD)).toEqual(before);
     expect(populationTotal(world.popBlocks[0]!)).toBeGreaterThan(0);
     expect(MONEY_TOLERANCE_RUSD).toBeGreaterThan(0);
   });

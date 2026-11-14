@@ -20,6 +20,7 @@ import {
   serializeWorld,
   type EconomyScenarioDef,
   type TickContext,
+  accountRecords,
 } from "@century/sim";
 // Internal canonical-JSON helpers are not part of the package root; the profile reads them
 // from the built module so it measures exactly the code hashWorld runs.
@@ -57,11 +58,11 @@ function main(): void {
 
   console.log(
     `world: ${String(world.popBlocks.length)} blocks, ${String(world.buildings.length)} buildings, ` +
-      `${String(world.employment.length)} employment rows, ${String(world.finance.accounts.length)} accounts, ` +
+      `${String(world.employment.length)} employment rows, ${String(world.finance.accounts.count)} accounts, ` +
       `${String(world.finance.postings?.length ?? 0)} retained postings`,
   );
   const accountsByOwner = new Map<string, number>();
-  for (const account of world.finance.accounts) {
+  for (const account of accountRecords(world.finance.accounts)) {
     accountsByOwner.set(account.ownerKind, (accountsByOwner.get(account.ownerKind) ?? 0) + 1);
   }
   console.log(`accounts by owner kind: ${JSON.stringify(Object.fromEntries(accountsByOwner))}`);

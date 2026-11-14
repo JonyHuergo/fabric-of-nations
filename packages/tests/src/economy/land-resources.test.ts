@@ -50,6 +50,7 @@ import {
   type EconomyScenarioDef,
   type Month,
   type World,
+  listAccounts,
 } from "@century/sim";
 
 const GRAIN = 0;
@@ -269,7 +270,7 @@ describe("P5 own consumption (D-143 §2)", () => {
     const scenario = landScenario(3);
     const world = createEconomyWorld(scenario, { seed: 5 });
     const assets = (): number =>
-      world.finance.accounts.reduce((sum, account) => sum + (account.category === "asset" ? account.balanceRUSD : 0), 0);
+      listAccounts(world.finance.accounts).reduce((sum, account) => sum + (account.category === "asset" ? account.balanceRUSD : 0), 0);
     const cashBefore = assets();
     const result = tick(world, contextOf(scenario, "full"));
     const economy = result.economy!;

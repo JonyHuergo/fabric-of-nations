@@ -5,6 +5,7 @@ import {
   serializeWorld,
   settleMarketDay,
   type MarketDayResult,
+  listAccounts,
 } from "@century/sim";
 import {
   accountBalance,
@@ -21,6 +22,7 @@ import {
   marketInput,
   productionDemand,
 } from "../fixtures/m3d.js";
+import { accountsTable } from "../fixtures/accounts.js";
 
 const DAILY_PEASANT_WAGE = 180 / 365;
 const DAILY_LABORER_WAGE = 250 / 365;
@@ -464,7 +466,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
     );
     const householdId = householdAccountId(world, 0);
     setCashBalance(world, householdId, 0.1);
-    const before = world.finance.accounts.map((account) => ({ ...account }));
+    const before = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     const postings = [...world.finance.postings];
     const nextPostingId = world.finance.nextPostingId;
 
@@ -490,7 +492,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
       scenario.definitions,
       marketInput(scenario, world, [household(0, 1, GRAIN_ID, 10)]),
     );
-    const balances = world.finance.accounts.map((account) => ({ ...account }));
+    const balances = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     expect(() => settleMarketDay(world, scenario.definitions, marketDay)).toThrow(
       /insufficient|overdraw/i,
     );
@@ -509,15 +511,15 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
     // revenue account without an equity account (D-047), and the identity stays
     // balanced because every system balance is zero. Upkeep routing then fails
     // because no system-reserve account exists.
-    world.finance.accounts = world.finance.accounts.filter(
+    world.finance.accounts = accountsTable(listAccounts(world.finance.accounts).filter(
       (account) => account.ownerKind !== "system",
-    );
+    ));
     const marketDay = runMarketDay(
       world,
       scenario.definitions,
       marketInput(scenario, world, [household(0, 1, GRAIN_ID, 5)]),
     );
-    const balances = world.finance.accounts.map((account) => ({ ...account }));
+    const balances = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     const postings = [...world.finance.postings];
     const nextPostingId = world.finance.nextPostingId;
 
@@ -542,7 +544,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
       marketInput(scenario, world, [household(0, 1, GRAIN_ID, 5)]),
     );
     settleMarketDay(world, scenario.definitions, marketDay);
-    const balances = world.finance.accounts.map((account) => ({ ...account }));
+    const balances = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     const postingCount = world.finance.postings.length;
     expect(() => settleMarketDay(world, scenario.definitions, marketDay)).toThrow(/already been settled/i);
     expect(world.finance.accounts).toEqual(balances);
@@ -568,7 +570,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
         ...marketDay.pendingTransactions,
       ],
     };
-    const balances = world.finance.accounts.map((account) => ({ ...account }));
+    const balances = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     expect(() => settleMarketDay(world, scenario.definitions, duplicate)).toThrow(/duplicate pending/i);
     expect(world.finance.accounts).toEqual(balances);
   });
@@ -584,7 +586,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
       scenario.definitions,
       marketInput(scenario, world, [household(0, 1, GRAIN_ID, 5)]),
     );
-    const balances = world.finance.accounts.map((account) => ({ ...account }));
+    const balances = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     const original = marketDay.pendingTransactions[0]!;
 
     const invalidBuyer: MarketDayResult = {

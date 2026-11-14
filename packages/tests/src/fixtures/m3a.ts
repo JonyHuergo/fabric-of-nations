@@ -4,6 +4,7 @@ import {
   designatedCashTotal,
   type EconomyScenarioDef,
   type World,
+  listAccounts,
 } from "@century/sim";
 
 export const M3A_SEED = 20_261_023;
@@ -29,7 +30,7 @@ export function m3World(seed = M3A_SEED): {
 }
 
 export function accountBalance(world: World, accountId: number): number {
-  const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
+  const account = listAccounts(world.finance.accounts).find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
   return account.balanceRUSD;
 }

@@ -23,6 +23,7 @@ import {
   type EconomyScenarioDef,
   type TickContext,
   type World,
+  listAccounts,
 } from "@century/sim";
 import { loadM3SmallEconomy } from "../fixtures/smallWorlds.js";
 import {
@@ -108,7 +109,7 @@ function accountBalance(
   ownerId: number,
   subtype: string,
 ): number {
-  const account = world.finance.accounts.find(
+  const account = listAccounts(world.finance.accounts).find(
     (entry) =>
       entry.ownerKind === ownerKind && entry.ownerId === ownerId && entry.subtype === subtype,
   );
@@ -239,7 +240,7 @@ describe("E4 sector classification and construction materials", () => {
     const grainBefore = f.world.markets[0]!.stockLots
       .filter((lot) => lot.goodId === 0)
       .reduce((total, lot) => total + lot.quantity, 0);
-    const sellerRevenueBefore = f.world.finance.accounts
+    const sellerRevenueBefore = listAccounts(f.world.finance.accounts)
       .filter(
         (account) =>
           account.ownerKind === "building" && account.subtype === "sales-revenue",
@@ -260,7 +261,7 @@ describe("E4 sector classification and construction materials", () => {
       first.materials.find((material) => material.goodId === 0)!.deliveredQuantity,
       6,
     );
-    const sellerRevenueAfter = f.world.finance.accounts
+    const sellerRevenueAfter = listAccounts(f.world.finance.accounts)
       .filter(
         (account) =>
           account.ownerKind === "building" && account.subtype === "sales-revenue",
@@ -342,7 +343,7 @@ describe("E4 sectoral production subsidy", () => {
       6,
     );
     expect(
-      f.world.finance.accounts.some(
+      listAccounts(f.world.finance.accounts).some(
         (account) =>
           account.ownerKind === "building" &&
           account.subtype === "subsidy-revenue" &&
@@ -356,13 +357,13 @@ describe("E4 sectoral production subsidy", () => {
     const f = fixture();
     run(f, 2);
     // Drain treasury to a token amount while preserving the accounting identity.
-    const treasury = f.world.finance.accounts.find(
+    const treasury = listAccounts(f.world.finance.accounts).find(
       (account) =>
         account.ownerKind === "country" &&
         account.ownerId === COUNTRY &&
         account.subtype === "treasury-cash",
     )!;
-    const equity = f.world.finance.accounts.find(
+    const equity = listAccounts(f.world.finance.accounts).find(
       (account) =>
         account.ownerKind === "country" &&
         account.ownerId === COUNTRY &&

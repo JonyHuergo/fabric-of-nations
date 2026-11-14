@@ -30,6 +30,7 @@ import {
   type EconomyScenarioDef,
   type MonetaryCurrencyState,
   type World,
+  listAccounts,
 } from "@century/sim";
 
 const SEED = 20_261_023;
@@ -49,7 +50,7 @@ function authority(world: World, tag: string): MonetaryCurrencyState {
   return world.monetary.currencies.find((record) => record.issuerCountryId === country.id)!;
 }
 function balance(world: World, accountId: number | null): number {
-  return world.finance.accounts.find((account) => account.id === accountId)?.balanceRUSD ?? 0;
+  return listAccounts(world.finance.accounts).find((account) => account.id === accountId)?.balanceRUSD ?? 0;
 }
 function valuation(world: World, currencyId: number): number {
   const entry = world.currencyValuations.find((value) => value.currencyId === currencyId);
@@ -163,8 +164,8 @@ describe("D-140 mint window (D-149)", () => {
     // Empty the reserve (and its account) and ask again: convertibility is suspended.
     const empty = fresh();
     const record = authority(empty, "USA");
-    const metalAccount = empty.finance.accounts.find((account) => account.id === record.metalReserveAccountId)!;
-    const equityAccount = empty.finance.accounts.find((account) => account.id === record.equityAccountId)!;
+    const metalAccount = listAccounts(empty.finance.accounts).find((account) => account.id === record.metalReserveAccountId)!;
+    const equityAccount = listAccounts(empty.finance.accounts).find((account) => account.id === record.equityAccountId)!;
     equityAccount.balanceRUSD -= metalAccount.balanceRUSD;
     metalAccount.balanceRUSD = 0;
     record.metalReserveKg = 0;

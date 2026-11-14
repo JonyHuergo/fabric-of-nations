@@ -482,7 +482,7 @@ async function main(): Promise<void> {
   console.log(
     `world: ${String(probe.popBlocks.length)} blocks, ${String(probe.buildings.length)} buildings, ` +
       `${String(probe.provinceEconomies.length)} provinces, ${String(probe.markets.length)} markets, ` +
-      `${String(probe.countries.length)} countries, ${String(probe.finance.accounts.length)} accounts, ` +
+      `${String(probe.countries.length)} countries, ${String(probe.finance.accounts.count)} accounts, ` +
       `${String(probe.trade.routes.length)} routes; window ${String(days)} days`,
   );
   console.log(`scenario load (data package, Node only): ${fmt(scenarioLoadMs)} ms`);

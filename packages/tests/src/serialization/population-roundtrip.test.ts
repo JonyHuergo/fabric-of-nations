@@ -7,6 +7,7 @@ import {
   serializeWorld,
   tick,
   type World,
+  listAccounts,
 } from "@century/sim";
 import {
   aggregateWorld,
@@ -35,8 +36,8 @@ describe("M2.1 serialization and restoration", () => {
     expect(parsed.payload.popBlocks.ageCount).toBe(SINGLE_AGE_COUNT);
     expect(parsed.payload.popBlocks.maleByAge).toHaveLength(world.popBlocks.length * SINGLE_AGE_COUNT);
     expect(parsed.payload.popBlocks.femaleByAge).toHaveLength(world.popBlocks.length * SINGLE_AGE_COUNT);
-    expect(parsed.payload.finance.accounts.id).toHaveLength(world.finance.accounts.length);
-    expect(parsed.payload.finance.accounts.balanceRUSD).toHaveLength(world.finance.accounts.length);
+    expect(parsed.payload.finance.accounts.id).toHaveLength(world.finance.accounts.count);
+    expect(parsed.payload.finance.accounts.balanceRUSD).toHaveLength(world.finance.accounts.count);
 
     const restored = deserializeWorld(serialized);
     expect(restored.popBlocks[0]?.maleByAge).toBeInstanceOf(Uint32Array);
@@ -67,7 +68,7 @@ describe("M2.1 serialization and restoration", () => {
     expect(restored.finance.accounts).toHaveLength(12);
     for (const block of restored.popBlocks) {
       expect(
-        restored.finance.accounts.some((account) => account.id === block.financialAccountId),
+        listAccounts(restored.finance.accounts).some((account) => account.id === block.financialAccountId),
       ).toBe(true);
     }
     expect(hashWorld(restored)).toBe(hashWorld(world));

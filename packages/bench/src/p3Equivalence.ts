@@ -27,6 +27,7 @@ import {
   type EconomyScenarioDef,
   type TickContext,
   type World,
+  accountRecords,
 } from "@century/sim";
 
 export const P3_PROBE_SEED = 20_261_023;
@@ -112,7 +113,7 @@ function stripAccountIds(value: unknown): unknown {
  * politics, technology, military and the per-country finance summaries.
  */
 export function simulatedQuantitiesDigest(world: World): string {
-  const balances = world.finance.accounts
+  const balances = accountRecords(world.finance.accounts)
     .filter((account) => !MONETARY_SUBTYPES.has(account.subtype))
     .map((account) => [account.ownerKind, account.ownerId, account.subtype, account.balanceRUSD] as const)
     .sort((left, right) =>

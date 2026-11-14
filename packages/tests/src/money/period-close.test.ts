@@ -32,6 +32,7 @@ import {
   type JournalPosting,
   type PublicTransactionKind,
   type World,
+  listAccounts,
 } from "@century/sim";
 import {
   economyTickContext,
@@ -40,6 +41,7 @@ import {
 } from "../fixtures/m3e.js";
 import { marketScenario } from "../fixtures/m3d.js";
 import { aggregateWorld, contextFor, makeInputs } from "../fixtures/m2.js";
+import { accountsTable } from "../fixtures/accounts.js";
 
 const SEED = 20_261_023;
 const FIRST_MONTH_END = civilDateToDayIndex(1900, 1, 31);
@@ -51,7 +53,7 @@ function accountOf(
   ownerId: number | null,
   subtype: AccountSubtype,
 ): FinancialAccount {
-  const account = world.finance.accounts.find(
+  const account = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&
@@ -64,14 +66,14 @@ function accountOf(
 }
 
 function accountById(world: World, accountId: number): FinancialAccount {
-  const account = world.finance.accounts.find((candidate) => candidate.id === accountId);
+  const account = listAccounts(world.finance.accounts).find((candidate) => candidate.id === accountId);
   if (account === undefined) throw new Error(`missing account ${String(accountId)}`);
   return account;
 }
 
 function financeSnapshot(world: World): string {
   return JSON.stringify({
-    accounts: world.finance.accounts,
+    accounts: listAccounts(world.finance.accounts),
     postings: world.finance.postings,
     nextPostingId: world.finance.nextPostingId,
     nextAccountId: world.finance.nextAccountId,
@@ -91,14 +93,14 @@ function manualFinance(
   }[],
 ): FinanceState {
   return {
-    accounts: entries.map((entry) => ({
+    accounts: accountsTable(entries.map((entry) => ({
       id: entry.id,
       ownerKind: entry.ownerKind ?? "popBlock",
       ownerId: entry.ownerId === undefined ? 0 : entry.ownerId,
       category: categoryForSubtype(entry.subtype),
       subtype: entry.subtype,
       balanceRUSD: entry.balanceRUSD ?? 0,
-    })),
+    }))),
     postings: [],
     nextPostingId: 1,
     nextAccountId: entries.reduce((max, entry) => Math.max(max, entry.id), 0) + 1,
@@ -171,7 +173,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
       { id: 2, subtype: "owner-equity" },
       { id: 3, subtype: "wage-income" },
     ]);
-    const revenueBefore = revenueFinance.accounts.map((account) => ({ ...account }));
+    const revenueBefore = listAccounts(revenueFinance.accounts).map((account) => ({ ...account }));
     expect(() =>
       applyOpeningBalances(revenueFinance, 0, [
         { accountId: 1, balanceRUSD: 50 },
@@ -187,7 +189,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
       { id: 2, subtype: "owner-equity" },
       { id: 3, subtype: "consumption-expense" },
     ]);
-    const expenseBefore = expenseFinance.accounts.map((account) => ({ ...account }));
+    const expenseBefore = listAccounts(expenseFinance.accounts).map((account) => ({ ...account }));
     expect(() =>
       applyOpeningBalances(expenseFinance, 0, [
         { accountId: 1, balanceRUSD: 8 },
@@ -213,7 +215,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
       { accountId: 4, balanceRUSD: 0 },
     ]);
     expect(finance.opening).not.toBeNull();
-    expect(finance.accounts.find((account) => account.id === 3)?.balanceRUSD).toBe(0);
+    expect(listAccounts(finance.accounts).find((account) => account.id === 3)?.balanceRUSD).toBe(0);
   });
 
   test("rejects invalid kind/subtype/side combinations for individual postings", () => {
@@ -225,7 +227,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
     const sales = accountOf(world, "building", 0, "sales-revenue");
     const wageIncome = accountOf(world, "popBlock", 0, "wage-income");
     const equity = accountOf(world, "popBlock", 0, "owner-equity");
-    const before = world.finance.accounts.map((account) => ({ ...account }));
+    const before = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     const postingCount = world.finance.postings.length;
     const nextPostingId = world.finance.nextPostingId;
 
@@ -289,7 +291,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
     const sales = accountOf(world, "building", 0, "sales-revenue");
     const wageIncome = accountOf(world, "popBlock", 0, "wage-income");
     const equity = accountOf(world, "popBlock", 0, "owner-equity");
-    const before = world.finance.accounts.map((account) => ({ ...account }));
+    const before = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     const postingCount = world.finance.postings.length;
     const nextPostingId = world.finance.nextPostingId;
 
@@ -343,7 +345,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
     const world = createEconomyWorld(marketScenario(), { seed: SEED });
     const householdCash = accountOf(world, "popBlock", 0, "household-cash");
     const buildingCash = accountOf(world, "building", 0, "operating-cash");
-    const before = world.finance.accounts.map((account) => ({ ...account }));
+    const before = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     const postingCount = world.finance.postings.length;
     const internalKind = "period-close" as unknown as PublicTransactionKind;
     const lines = [
@@ -470,7 +472,7 @@ describe("M4b monthly periodic close", () => {
 
     // Opening balance-sheet balances remain in the pre-close trial balance. Cash
     // is not changed by a close, so its presence must match the live balance.
-    for (const account of world.finance.accounts) {
+    for (const account of listAccounts(world.finance.accounts)) {
       if (account.category !== "asset") continue;
       const total = summary.accountTotals[account.id];
       if (total === undefined) {
@@ -514,7 +516,7 @@ describe("M4b monthly periodic close", () => {
     }
 
     // Closing entries zero revenue and expense exactly and never touch cash.
-    for (const account of world.finance.accounts) {
+    for (const account of listAccounts(world.finance.accounts)) {
       if (account.category === "revenue" || account.category === "expense") {
         expect(account.balanceRUSD).toBe(0);
       }
@@ -685,15 +687,15 @@ describe("M4b monthly periodic close", () => {
     const scenario = marketScenario();
     const world = createEconomyWorld(scenario, { seed: SEED });
     world.dayIndex = FIRST_MONTH_END;
-    world.finance.accounts = world.finance.accounts.filter(
+    world.finance.accounts = accountsTable(listAccounts(world.finance.accounts).filter(
       (account) =>
         !(
           account.ownerKind === "system" &&
           (account.subtype === "system-reserve-cash" || account.subtype === "owner-equity")
         ),
-    );
+    ));
     expect(
-      world.finance.accounts.some(
+      listAccounts(world.finance.accounts).some(
         (account) => account.ownerKind === "system" && account.subtype === "system-income",
       ),
     ).toBe(true);
@@ -711,10 +713,10 @@ describe("M4b monthly periodic close", () => {
     const world = createEconomyWorld(scenario, { seed: SEED });
     world.dayIndex = FIRST_MONTH_END;
     setCashBalance(world, householdAccountId(world, 0), 0);
-    world.finance.accounts = world.finance.accounts.filter(
+    world.finance.accounts = accountsTable(listAccounts(world.finance.accounts).filter(
       (account) =>
         !(account.ownerKind === "popBlock" && account.ownerId === 0 && account.subtype === "owner-equity"),
-    );
+    ));
     const snapshot = financeSnapshot(world);
     expect(() => closeFinancePeriod(world)).toThrow(/popBlock owner 0 .* no owner-equity/i);
     expect(financeSnapshot(world)).toBe(snapshot);
@@ -977,7 +979,7 @@ describe("M4b finance summary persistence and validation", () => {
     const world = closedWorld();
     const postings = periodClosePostings(world);
     expect(postings.length).toBeGreaterThan(0);
-    const accounts = new Map(world.finance.accounts.map((account) => [account.id, account]));
+    const accounts = new Map(listAccounts(world.finance.accounts).map((account) => [account.id, account]));
     for (const posting of postings) {
       expect(() => assertValidJournalPosting(posting, accounts)).not.toThrow();
     }

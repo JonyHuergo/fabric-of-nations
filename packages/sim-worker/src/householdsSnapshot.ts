@@ -24,6 +24,7 @@ import {
   type EconomyDefinitions,
   type PopulationDefinitions,
   type World,
+  buildFinanceIndex,
 } from "@century/sim";
 import type { CountryHouseholdsSnapshot } from "./protocol.js";
 
@@ -42,7 +43,12 @@ export function countryHouseholdsSnapshot(
   const available = new Uint8Array(system.goodCount);
   const marketById = new Map(world.markets.map((market) => [market.id, market]));
   const provinceById = new Map(world.provinceEconomies.map((province) => [province.id, province]));
-  const cashByAccount = new Map(world.finance.accounts.map((account) => [account.id, account.balanceRUSD]));
+  // D-158: balances read from the account table by position (no map of every account).
+  const accountIndex = buildFinanceIndex(world.finance);
+  const cashOf = (accountId: number): number => {
+    const position = accountIndex.position(accountId);
+    return position < 0 ? 0 : (world.finance.accounts.balance[position] ?? 0);
+  };
   const professionById = new Map(definitions.professions.map((profession) => [profession.id, profession]));
   const year = daysInYear(dayIndexToCivilDate(world.dayIndex).year);
   const categorySpend = new Float64Array(system.categoryKeys.length);
@@ -85,7 +91,7 @@ export function countryHouseholdsSnapshot(
           adultEquivalents: adultEquivalents(block),
           persons: count,
           incomePerCapitaDay: block.incomeSmoothedRUSDPerCapitaDay,
-          cash: cashByAccount.get(block.financialAccountId) ?? 0,
+          cash: cashOf(block.financialAccountId),
           marginalPropensityToConsume: MARGINAL_PROPENSITY_TO_CONSUME[profession.stratum],
           urbanShare: block.urbanShare,
           prices,

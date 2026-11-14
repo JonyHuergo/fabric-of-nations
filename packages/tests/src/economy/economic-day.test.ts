@@ -12,6 +12,7 @@ import {
   type EconomyScenarioDef,
   type TickContext,
   type World,
+  listAccounts,
 } from "@century/sim";
 import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import {
@@ -29,6 +30,7 @@ import {
   TEXTILES_ID,
   marketScenario,
 } from "../fixtures/m3d.js";
+import { accountsTable } from "../fixtures/accounts.js";
 
 const FULL_LOTS = [
   { goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 1000 },
@@ -248,7 +250,7 @@ describe("M3f integrated economic day", () => {
       result.economy?.market.inventory.map((flow) => flow.openingStock),
     ).toEqual(openingStockByGood);
     expect(balance(world, millId)).toBeGreaterThanOrEqual(0);
-    for (const account of world.finance.accounts) {
+    for (const account of listAccounts(world.finance.accounts)) {
       expect(account.balanceRUSD).toBeGreaterThanOrEqual(0);
     }
     expect(totalCash(world)).toBeCloseTo(beforeCash, 9);
@@ -284,7 +286,7 @@ describe("M3f integrated economic day", () => {
     const scenario = fullScenario();
     const world = worldFor(scenario);
     for (const building of world.buildings) {
-      const account = world.finance.accounts.find(
+      const account = listAccounts(world.finance.accounts).find(
         (candidate) => candidate.id === building.operatingCashAccountId,
       );
       if (account !== undefined) setCashBalance(world, account.id, 0);
@@ -292,7 +294,7 @@ describe("M3f integrated economic day", () => {
     const result = tick(world, contextFor(scenario));
     expect(result.economy?.settlement.totals.unpaidWagesRUSD).toBeGreaterThan(0);
     expect(result.economy?.settlement.totals.unpaidUpkeepRUSD).toBeGreaterThan(0);
-    for (const account of world.finance.accounts) {
+    for (const account of listAccounts(world.finance.accounts)) {
       expect(account.balanceRUSD).toBeGreaterThanOrEqual(0);
     }
   });
@@ -305,11 +307,11 @@ describe("M3f integrated economic day", () => {
     expect(serializeWorld(clone)).toBe(serializeWorld(world));
     const originalSerialized = serializeWorld(world);
     const originalAgeCell = world.popBlocks[0]!.maleByAge[0] ?? 0;
-    const originalBalance = clone.finance.accounts[0]!.balanceRUSD;
+    const originalBalance = listAccounts(clone.finance.accounts)[0]!.balanceRUSD;
     const originalLot = clone.markets[0]!.stockLots[0]!.quantity;
 
     clone.popBlocks[0]!.maleByAge[0] = originalAgeCell + 1;
-    clone.finance.accounts[0]!.balanceRUSD += 1;
+    listAccounts(clone.finance.accounts)[0]!.balanceRUSD += 1;
     clone.markets[0]!.stockLots[0]!.quantity += 1;
     clone.diagnostics.recentWarnings.push("clone-only");
     const clonePosting = clone.finance.postings[0];
@@ -317,12 +319,12 @@ describe("M3f integrated economic day", () => {
 
     // The clone changed exactly where it was mutated...
     expect(clone.popBlocks[0]!.maleByAge[0]).toBe(originalAgeCell + 1);
-    expect(clone.finance.accounts[0]!.balanceRUSD).toBeCloseTo(originalBalance + 1, 9);
+    expect(listAccounts(clone.finance.accounts)[0]!.balanceRUSD).toBeCloseTo(originalBalance + 1, 9);
     expect(clone.markets[0]!.stockLots[0]!.quantity).toBeCloseTo(originalLot + 1, 9);
     // ...and the source world remains byte-identical.
     expect(serializeWorld(world)).toBe(originalSerialized);
     expect(clone.popBlocks[0]!.maleByAge).not.toBe(world.popBlocks[0]!.maleByAge);
-    expect(clone.finance.accounts[0]).not.toBe(world.finance.accounts[0]);
+    expect(listAccounts(clone.finance.accounts)[0]).not.toBe(listAccounts(world.finance.accounts)[0]);
     expect(clone.finance.postings).not.toBe(world.finance.postings);
     if (world.finance.postings[0] !== undefined) {
       expect(clone.finance.postings[0]!.lines[0]).not.toBe(
@@ -335,14 +337,14 @@ describe("M3f integrated economic day", () => {
   test("rolls the whole day back when settlement routing fails", () => {
     const scenario = fullScenario();
     const world = worldFor(scenario);
-    world.finance.accounts = world.finance.accounts.filter(
+    world.finance.accounts = accountsTable(listAccounts(world.finance.accounts).filter(
       (account) => account.id !== SYSTEM_ACCOUNT_ID,
-    );
+    ));
     const beforeHash = hashWorld(world);
     const beforeSerialized = serializeWorld(world);
     const beforeDay = world.dayIndex;
     const beforePostingId = world.finance.nextPostingId;
-    const beforeBalances = world.finance.accounts.map((account) => account.balanceRUSD);
+    const beforeBalances = listAccounts(world.finance.accounts).map((account) => account.balanceRUSD);
     const beforeLots = world.markets[0]?.stockLots.map((lot) => ({ ...lot }));
     const beforePrices = world.markets[0]?.priceRUSD.slice();
     const beforeMaleByAge = world.popBlocks.map((block) => block.maleByAge.slice());
@@ -359,7 +361,7 @@ describe("M3f integrated economic day", () => {
 
     expect(world.dayIndex).toBe(beforeDay);
     expect(world.finance.nextPostingId).toBe(beforePostingId);
-    expect(world.finance.accounts.map((account) => account.balanceRUSD)).toEqual(beforeBalances);
+    expect(listAccounts(world.finance.accounts).map((account) => account.balanceRUSD)).toEqual(beforeBalances);
     expect(world.markets[0]?.stockLots).toEqual(beforeLots);
     expect(world.markets[0]?.priceRUSD).toEqual(beforePrices);
     expect(world.popBlocks.map((block) => block.maleByAge)).toEqual(beforeMaleByAge);
@@ -556,14 +558,14 @@ describe("M3f integrated economic day", () => {
     );
     // Force a failure after the military phase. The day starts from this exact
     // state, so the comparison below measures only the failed tick's side effects.
-    world.finance.accounts = world.finance.accounts.filter(
+    world.finance.accounts = accountsTable(listAccounts(world.finance.accounts).filter(
       (account) =>
         !(
           account.ownerKind === "country" &&
           account.ownerId === 0 &&
           account.subtype === "education-expense"
         ),
-    );
+    ));
     const beforeHash = hashWorld(world);
     const beforeSerialized = serializeWorld(world);
     const beforeDay = world.dayIndex;

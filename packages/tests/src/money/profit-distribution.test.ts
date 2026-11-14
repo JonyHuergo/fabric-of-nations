@@ -11,6 +11,7 @@ import {
   postJournalEntry,
   runProfitDistributionPhase,
   serializeWorld,
+  listAccounts,
 } from "@century/sim";
 import {
   M5A_COUNTRY_B,
@@ -21,6 +22,7 @@ import {
   tickM5a,
 } from "../fixtures/m5a.js";
 import { m5Scenario } from "../fixtures/m5.js";
+import { accountsTable, insertAccount } from "../fixtures/accounts.js";
 
 function account(
   world: ReturnType<typeof createEconomyWorld>,
@@ -28,7 +30,7 @@ function account(
   ownerId: number,
   subtype: string,
 ) {
-  return world.finance.accounts.find(
+  return listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&
@@ -118,7 +120,7 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
     const close = closeFinancePeriod(world);
     // Set one building's state to a large retained profit with only 100 RUSD cash
     // while preserving the accounting identity: assets 100 = equity (1000 - 900).
-    const cash = world.finance.accounts.find(
+    const cash = listAccounts(world.finance.accounts).find(
       (candidate) =>
         candidate.ownerKind === "building" &&
         candidate.ownerId === 0 &&
@@ -151,9 +153,9 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
     world.dayIndex = 30;
     const close = closeFinancePeriod(world);
     const financeBefore = JSON.stringify(world.finance);
-    world.finance.accounts = world.finance.accounts.filter(
+    world.finance.accounts = accountsTable(listAccounts(world.finance.accounts).filter(
       (candidate) => !(candidate.ownerKind === "building" && candidate.subtype === "retained-profit"),
-    );
+    ));
     const broken = JSON.stringify(world.finance);
     expect(() => runProfitDistributionPhase(world, 30, close)).toThrow();
     expect(JSON.stringify(world.finance)).toBe(broken);
@@ -228,7 +230,7 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
     const { world, last } = runM5aMonth(scenario);
     expect(last.economy?.profitDistribution?.applied).toBe(false);
     expect(
-      world.finance.accounts.some((candidate) => candidate.subtype === "retained-profit"),
+      listAccounts(world.finance.accounts).some((candidate) => candidate.subtype === "retained-profit"),
     ).toBe(false);
   });
 
@@ -347,7 +349,7 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
   test("creates retained-profit accounts only when enabled", () => {
     const enabled = createEconomyWorld(m5aScenario(), { seed: 1 });
     expect(
-      enabled.finance.accounts.filter((candidate) => candidate.subtype === "retained-profit"),
+      listAccounts(enabled.finance.accounts).filter((candidate) => candidate.subtype === "retained-profit"),
     ).toHaveLength(enabled.buildings.length);
     const scenario = m5aScenario();
     scenario.profitDistribution = {
@@ -362,7 +364,7 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
     );
     const disabled = createEconomyWorld(scenario, { seed: 1 });
     expect(
-      disabled.finance.accounts.filter((candidate) => candidate.subtype === "retained-profit"),
+      listAccounts(disabled.finance.accounts).filter((candidate) => candidate.subtype === "retained-profit"),
     ).toHaveLength(0);
   });
 
@@ -388,7 +390,7 @@ describe("M5a profit distribution and state-enterprise remittance", () => {
     const world = createEconomyWorld(m5Scenario(), { seed: 1 });
     const retainedId = world.finance.nextAccountId;
     world.finance.nextAccountId += 1;
-    world.finance.accounts.push({
+    insertAccount(world.finance, {
       id: retainedId,
       ownerKind: "building",
       ownerId: 0,

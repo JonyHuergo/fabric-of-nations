@@ -22,6 +22,7 @@ import {
   serializeWorld,
   transferProvincesToCountry,
   type World,
+  listAccounts,
 } from "@century/sim";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -46,7 +47,7 @@ function population(world: World): number {
 }
 
 function cashTotal(world: World): number {
-  return world.finance.accounts
+  return listAccounts(world.finance.accounts)
     .filter((account) => account.category === "asset")
     .reduce((total, account) => total + account.balanceRUSD, 0);
 }

@@ -31,6 +31,7 @@ import {
   type FinancialAccount,
   type TickContext,
   type World,
+  listAccounts,
 } from "@century/sim";
 import { loadM5Sample } from "../fixtures/smallWorlds.js";
 
@@ -61,7 +62,7 @@ function account(
   ownerId: number,
   subtype: FinancialAccount["subtype"],
 ): FinancialAccount {
-  const found = world.finance.accounts.find(
+  const found = listAccounts(world.finance.accounts).find(
     (candidate) =>
       candidate.ownerKind === ownerKind &&
       candidate.ownerId === ownerId &&

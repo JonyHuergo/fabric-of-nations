@@ -28,6 +28,7 @@ import {
   type CountryAction,
   type EconomyScenarioDef,
   type World,
+  listAccounts,
 } from "@century/sim";
 import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import { economyTickContext } from "../fixtures/m3e.js";
@@ -77,7 +78,7 @@ function account(
   ownerId: number,
   subtype: string,
 ) {
-  const found = world.finance.accounts.find(
+  const found = listAccounts(world.finance.accounts).find(
     (entry) =>
       entry.ownerKind === ownerKind && entry.ownerId === ownerId && entry.subtype === subtype,
   );
@@ -226,7 +227,7 @@ describe("E2 welfare allocation, affordability, and reserve floor", () => {
     expect(secondFiscal.treasuryCashEndRUSD).toBeCloseTo(95, 9);
     // No welfare payable or debt liability account exists; the shortfall is a memo.
     expect(
-      world.finance.accounts.some((entry) => entry.subtype === "debt-liability"),
+      listAccounts(world.finance.accounts).some((entry) => entry.subtype === "debt-liability"),
     ).toBe(false);
     expect(account(world, "country", 0, "treasury-cash").balanceRUSD).toBeCloseTo(95, 9);
     expect(() => assertAccountingIdentity(world.finance)).not.toThrow();
@@ -399,7 +400,7 @@ describe("E2 business-profit tax", () => {
     );
     // No receivable or liability was invented.
     expect(
-      world.finance.accounts.some(
+      listAccounts(world.finance.accounts).some(
         (entry) => entry.ownerKind === "country" && entry.category === "liability",
       ),
     ).toBe(false);
@@ -421,7 +422,7 @@ describe("E2 financing actions", () => {
 
     const world = createM5bWorld(scenario);
     runTicks(world, scenario, 30);
-    const before = world.finance.accounts.find(
+    const before = listAccounts(world.finance.accounts).find(
       (entry) =>
         entry.ownerKind === "country" &&
         entry.ownerId === M5B_COUNTRY_A &&

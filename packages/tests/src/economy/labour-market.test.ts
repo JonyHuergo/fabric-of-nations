@@ -34,6 +34,7 @@ import {
   updateLabourMarketMonth,
   WAGE_FALL_PER_GAP,
   type World,
+  listAccounts,
 } from "@century/sim";
 
 import { economyTickContext, totalCash } from "../fixtures/m3e.js";
@@ -160,7 +161,7 @@ describe("P7 reclassification (acceptance: people conserved)", () => {
     expect(totalCash(world)).toBeCloseTo(cash, 6);
     expect(literatePersons(world)).toBeCloseTo(literate, 6);
     // The retired block's accounts stay in the ledger; the world validates and saves.
-    expect(world.finance.accounts.some((account) => account.ownerKind === "popBlock" && account.ownerId === nextId)).toBe(true);
+    expect(listAccounts(world.finance.accounts).some((account) => account.ownerKind === "popBlock" && account.ownerId === nextId)).toBe(true);
     const restored = deserializeWorld(serializeWorld(world));
     expect(hashWorld(restored)).toBe(hashWorld(world));
   });

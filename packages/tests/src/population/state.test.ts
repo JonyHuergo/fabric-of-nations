@@ -12,6 +12,7 @@ import {
   populationTotal,
   workingAgePopulation,
   worldPopulation,
+  listAccounts,
 } from "@century/sim";
 import {
   aggregateScenario,
@@ -39,7 +40,7 @@ describe("M2.1 population state and validation", () => {
     expect(populationTotal(block)).toBe(1_621_287_278);
     expect(workingAgePopulation(block)).toBeGreaterThan(0);
     expect(worldPopulation(world)).toBe(1_621_287_278);
-    expect(world.finance.accounts[0]?.id).toBe(block.financialAccountId);
+    expect(listAccounts(world.finance.accounts)[0]?.id).toBe(block.financialAccountId);
     expect(() => assertValidWorld(world)).not.toThrow();
   });
 
@@ -182,9 +183,9 @@ describe("M2.1 population state and validation", () => {
 
   test("does not mutate financial accounts during a tick", () => {
     const { scenario, world } = aggregateWorld();
-    const before = world.finance.accounts.map((account) => account.balanceRUSD);
+    const before = listAccounts(world.finance.accounts).map((account) => account.balanceRUSD);
     const inputs = makeInputs([0]);
     tick(world, contextFor(scenario, inputs));
-    expect(world.finance.accounts.map((account) => account.balanceRUSD)).toEqual(before);
+    expect(listAccounts(world.finance.accounts).map((account) => account.balanceRUSD)).toEqual(before);
   });
 });

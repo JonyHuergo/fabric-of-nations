@@ -25,6 +25,7 @@ import {
   tick,
   type EconomyScenarioDef,
   type World,
+  listAccounts,
 } from "@century/sim";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -255,7 +256,7 @@ describe("P2b 1900 world", () => {
         const province = world.provinceEconomies.find((candidate) => candidate.id === id);
         expect(province?.wageRUSDPerYearByProfession.length).toBe(scenario.definitions.professions.length);
       }
-      const treasury = world.finance.accounts.find((account) => account.id === country?.treasuryAccountId);
+      const treasury = listAccounts(world.finance.accounts).find((account) => account.id === country?.treasuryAccountId);
       expect(treasury?.balanceRUSD).toBeGreaterThan(0);
     }
   });

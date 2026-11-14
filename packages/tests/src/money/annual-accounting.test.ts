@@ -19,6 +19,7 @@ import {
   type TickContext,
   type World,
   countryProvinceIds,
+  listAccounts,
 } from "@century/sim";
 import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import { PROTOCOL_VERSION } from "@century/sim-worker";
@@ -44,7 +45,7 @@ function worldAt(startDayIndex: number): { readonly scenario: EconomyScenarioDef
 
 function accountBalance(world: World, countryId: number, subtype: string): number {
   return (
-    world.finance.accounts.find(
+    listAccounts(world.finance.accounts).find(
       (account) =>
         account.ownerKind === "country" &&
         account.ownerId === countryId &&
@@ -203,10 +204,10 @@ describe("M7a annual accounting", () => {
     const { scenario, world } = worldAt(civilDateToDayIndex(1900, 12, 1));
     const country = world.countries[0]!;
     const block = world.popBlocks.find((entry) => entry.provinceId === countryProvinceIds(world, country.id)[0])!;
-    const cash = world.finance.accounts.find(
+    const cash = listAccounts(world.finance.accounts).find(
       (account) => account.ownerKind === "popBlock" && account.ownerId === block.id && account.subtype === "household-cash",
     )!;
-    const equity = world.finance.accounts.find(
+    const equity = listAccounts(world.finance.accounts).find(
       (account) => account.ownerKind === "popBlock" && account.ownerId === block.id && account.subtype === "owner-equity",
     )!;
     const beforeSummary = JSON.stringify(world.finance.periodSummaries);
