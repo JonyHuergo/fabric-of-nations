@@ -365,9 +365,11 @@ export function deriveTraining(
   definitions: EconomyDefinitions | undefined,
   /** Shared per-phase lookups (D-137); built from `world` when omitted. */
   populationIndex?: CountryPopulationIndex,
+  /** D-158: the phase's wage table for the education derivation (built there when omitted). */
+  wages?: () => LabourWageTable,
 ): TrainingDerived {
   const index = populationIndex ?? buildCountryPopulationIndex(world);
-  const education = deriveEducation(world, country, definitions, index);
+  const education = deriveEducation(world, country, definitions, index, wages);
   const eligible = trainingEligibleBlocks(world, country, index);
   const eligibleWorkingAge = eligible.reduce((total, entry) => total + entry.workingAge, 0);
   const instructors = Math.max(0, education.trainingStaff);
@@ -480,9 +482,12 @@ export function runTrainingPhase(
   // D-137: one set of country lookups for the phase; the payroll changes balances and
   // the qualification gains below change `qualification`, neither of which they read.
   const populationIndex = buildCountryPopulationIndex(world, options.blockTotals);
+  // D-157/D-158: the phase's one wage table (it reads ownership, the labour-law slot and
+  // administration quality, which the phase does not change), for the derivations too.
+  const labourWages = buildLabourWageTable(world, definitions);
   const derivedByCountry = new Map<Id, TrainingDerived>();
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
-    derivedByCountry.set(country.id, deriveTraining(world, country, definitions, populationIndex));
+    derivedByCountry.set(country.id, deriveTraining(world, country, definitions, populationIndex, () => labourWages));
   }
   const stagedFinance = phaseFinance(world.finance, options.financeInPlace);
   const index = buildFinanceIndex(stagedFinance);
@@ -501,7 +506,6 @@ export function runTrainingPhase(
   const academicProfessionKeys = new Set(
     definitions.technology?.academicProfessionKeys ?? [],
   );
-  const labourWages = buildLabourWageTable(world, definitions);
   const payrollBlocks = popBlocksById(world);
 
   for (const country of [...world.countries].sort((left, right) => left.id - right.id)) {
