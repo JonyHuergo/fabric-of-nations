@@ -1249,7 +1249,7 @@ export function runEconomicDay(
   try {
     // D-158: one check; blocks over their eligible workforce are trimmed (the D-126 repair's
     // result, without validating the repaired state a second time).
-    checkAndTrimEmploymentAfterDemography(world, economyDefinitions);
+    checkAndTrimEmploymentAfterDemography(world, economyDefinitions, blockTotals);
     employmentValidated = true;
   } catch {
     const repair = repairEmploymentAfterDemographyWithOutcome(world, economyDefinitions);

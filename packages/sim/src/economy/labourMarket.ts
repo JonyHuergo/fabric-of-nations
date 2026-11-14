@@ -21,7 +21,7 @@
 
 import { assertValidJobMix, buildingJobs } from "./buildingJobs.js";
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
-import { populationTotal, workingAgePopulation } from "../population/state.js";
+import { populationTotal, } from "../population/state.js";
 import { WORKING_AGE_END, WORKING_AGE_START } from "../population/constants.js";
 import { drawUint32 } from "../rng.js";
 import type { DayIndex, Id } from "../types.js";
@@ -60,6 +60,7 @@ import {
 } from "./types.js";
 
 import { ownerKindCode, subtypeCode, NO_ACCOUNT_OWNER } from "./accountTable.js";
+import { workingAgeOfBlock, type BlockTotals } from "../population/blockTotals.js";
 /** Relative tolerance of the differentials' weighted mean of 1 (validation). */
 export const DIFFERENTIAL_MEAN_TOLERANCE = 1e-6;
 
@@ -132,9 +133,14 @@ export function literateWorkingAge(block: World["popBlocks"][number]): number {
  * participation), counting only literate working-age persons for professions with the
  * literacy gate. Integer workers.
  */
-export function labourEligibleWorkforce(block: World["popBlocks"][number], profession: ProfessionDef): number {
+export function labourEligibleWorkforce(
+  block: World["popBlocks"][number],
+  profession: ProfessionDef,
+  /** D-158: the day's measured block totals (working-age persons; cells summed when absent). */
+  totals?: BlockTotals,
+): number {
   if (block.professionId !== profession.id) return 0;
-  const base = professionHasGate(profession, "literacy") ? literateWorkingAge(block) : workingAgePopulation(block);
+  const base = professionHasGate(profession, "literacy") ? literateWorkingAge(block) : workingAgeOfBlock(totals, block);
   const eligible = Math.floor(base * profession.participationRate + 1e-9);
   return eligible > 0 ? eligible : 0;
 }
@@ -1002,13 +1008,18 @@ export function assertValidLabourEmployment(world: World, definitions: EconomyDe
  * every other violation throws as before. Deaths cause only that one violation, which the
  * D-126 trim repairs, so the day checks once and trims (`trimLabourExcess`).
  */
-export function labourEmploymentExcess(world: World, definitions: EconomyDefinitions): Map<Id, number> {
+export function labourEmploymentExcess(world: World, definitions: EconomyDefinitions, totals?: BlockTotals): Map<Id, number> {
   const excess = new Map<Id, number>();
-  checkLabourEmployment(world, definitions, excess);
+  checkLabourEmployment(world, definitions, excess, totals);
   return excess;
 }
 
-function checkLabourEmployment(world: World, definitions: EconomyDefinitions, excess: Map<Id, number> | null): void {
+function checkLabourEmployment(
+  world: World,
+  definitions: EconomyDefinitions,
+  excess: Map<Id, number> | null,
+  totals?: BlockTotals,
+): void {
   const professionIdSet = new Set(definitions.professions.map((profession) => profession.id));
   // D-157: one definition lookup (the former `definitionOf` and `definitionById` were the same map).
   const definitionById = lookupById(definitions.buildings);
@@ -1093,7 +1104,7 @@ function checkLabourEmployment(world: World, definitions: EconomyDefinitions, ex
     const block = blockById.get(blockId);
     const profession = block === undefined ? undefined : professionById.get(block.professionId);
     if (block === undefined || profession === undefined) throw new RangeError(`unknown block ${String(blockId)}`);
-    const eligible = labourEligibleWorkforce(block, profession);
+    const eligible = labourEligibleWorkforce(block, profession, totals);
     if (assigned > eligible) {
       if (excess === null) throw new RangeError(`popBlock ${String(blockId)} exceeds its eligible workforce`);
       excess.set(blockId, assigned - eligible);

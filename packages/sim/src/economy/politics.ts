@@ -1869,7 +1869,7 @@ export function runUnrestPhase(
         if (block.unmetSubsistenceDays >= 7) unmetPopulation += count;
         employed += employedByBlock.get(block.id) ?? 0;
         const profession = professionById.get(block.professionId);
-        if (profession !== undefined) eligibleLabour += labourEligibleWorkforce(block, profession);
+        if (profession !== undefined) eligibleLabour += labourEligibleWorkforce(block, profession, totals);
       }
       if (!(provincePopulation > 0)) {
         province.unrest = roundTo(

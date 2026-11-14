@@ -31,6 +31,7 @@ import type {
   ProfessionDef,
 } from "./types.js";
 
+import { type BlockTotals } from "../population/blockTotals.js";
 export interface EmploymentRefreshOptions {
   /** Run even when the calendar/dirty check would not otherwise be due. */
   readonly force?: boolean;
@@ -208,9 +209,14 @@ export function repairEmploymentAfterDemography(
  * state and trims blocks whose assignments exceed their eligible workforce (deaths); any
  * other violation throws, as `assertValidEmploymentState` does.
  */
-export function checkAndTrimEmploymentAfterDemography(world: World, definitions: EconomyDefinitions): void {
+export function checkAndTrimEmploymentAfterDemography(
+  world: World,
+  definitions: EconomyDefinitions,
+  /** D-158: block totals measured after the day's demography (cells summed when absent). */
+  totals?: BlockTotals,
+): void {
   requireLabourMarket(world);
-  trimLabourExcess(world, labourEmploymentExcess(world, definitions));
+  trimLabourExcess(world, labourEmploymentExcess(world, definitions, totals));
 }
 
 /** D-157: `repairEmploymentAfterDemography`, also saying whether the repaired state was validated. */
