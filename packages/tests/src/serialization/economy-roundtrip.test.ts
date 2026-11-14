@@ -9,6 +9,7 @@ import {
   serializeWorld,
   type Market,
   type World,
+  accountRecords,
 } from "@century/sim";
 import {
   M3_BUILDING_ACCOUNT_FIRST_ID,
@@ -109,7 +110,7 @@ describe("M3a schema-25 serialization", () => {
     expect(restored.employment).toEqual(world.employment);
     expect(restored.markets[0]?.priceRUSD).toEqual(world.markets[0]?.priceRUSD);
     expect(restored.markets[0]?.stockLots).toEqual(world.markets[0]?.stockLots);
-    expect(restored.finance.accounts).toEqual(world.finance.accounts);
+    expect(accountRecords(restored.finance.accounts)).toEqual(accountRecords(world.finance.accounts));
     expect(restored.finance.postings).toEqual(world.finance.postings);
     expect(restored.popBlocks[0]?.maleByAge).toBeInstanceOf(Uint32Array);
     expect(restored.popBlocks[0]?.femaleByAge).toBeInstanceOf(Uint32Array);

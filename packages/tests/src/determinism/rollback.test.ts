@@ -47,6 +47,11 @@ function context(scenario: EconomyScenarioDef): TickContext {
  * not changed. On an ordinary day the employment check is now reads 2-3, and the former
  * reads 8 (the market's capacity index) and 9 (the production demands) are reads 4 and 5;
  * the tests that used 8 and 9 use 4 and 5, so each still fails at the same place.
+ * D-158: the employment check reads `buildings` once (reads 2-3 became read 2), so on an
+ * ordinary day read 3 is the capacity index, 4 the production demands, 5 the market's
+ * input validation and 6 settlement; the ordinary-day injections move down by one (7 to 6,
+ * 5 to 4, 4 to 3) and still fail at the same place. Day 0 (the labour-market day) keeps
+ * read 6, the employment check after the refresh.
  */
 function failingDefinitions(definitions: EconomyDefinitions): {
   readonly definitions: EconomyDefinitions;
@@ -140,7 +145,7 @@ describe("P1 rollback", () => {
     const before = hashWorld(world);
     expect(before).toBe(REFERENCE[12]);
 
-    injected.arm(7);
+    injected.arm(6);
     expect(() => runTicksWithRollback(runner, 1, ctx)).toThrow(DayRolledBackError);
     expect(injected.fired()).toBe(true);
     expect(runner.rollbacks).toBe(1);
@@ -160,7 +165,7 @@ describe("P1 rollback", () => {
     const world = createEconomyWorld(SCENARIO, { seed: SEED });
     const runner = createRollbackRunner(world);
     runTicksWithRollback(runner, 33, ctx);
-    injected.arm(5);
+    injected.arm(4);
     let caught: unknown;
     try {
       runTicksWithRollback(runner, 1, ctx);
@@ -202,7 +207,7 @@ describe("P1 rollback", () => {
     checkpointRollbackRunner(runner);
     runTicksWithRollback(runner, 3, ctx);
     const before = hashWorld(world);
-    injected.arm(4);
+    injected.arm(3);
     expect(() => runTicksWithRollback(runner, 1, ctx)).toThrow(DayRolledBackError);
     expect(hashWorld(world)).toBe(before);
   });
@@ -220,7 +225,7 @@ describe("P1 rollback", () => {
     if (market === undefined) throw new Error("fixture has no market");
     // Changed without a checkpoint: the replay cannot reproduce it.
     market.priceRUSD = market.priceRUSD.map((price) => price * 1.5);
-    injected.arm(4);
+    injected.arm(3);
     expect(() => runTicksWithRollback(runner, 1, ctx)).toThrow(IntegrityFailureError);
     // The live world is left at the last checkpoint, never at a partial day.
     expect(hashWorld(world)).toBe(REFERENCE[0]);
@@ -269,7 +274,8 @@ describe("P1 hot-path indexes", () => {
           account.subtype === "external-currency-holding" ||
           account.subtype === "external-equity");
       if (external) continue;
-      expect(index.get(account.ownerKind, account.ownerId, account.subtype)).toBe(account);
+      // D-158: index lookups return views of the table, so the found account is compared by id.
+      expect(index.get(account.ownerKind, account.ownerId, account.subtype).id).toBe(account.id);
       looked += 1;
     }
     expect(looked).toBeGreaterThan(0);

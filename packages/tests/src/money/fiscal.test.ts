@@ -31,6 +31,7 @@ import {
   type World,
   countryProvinceIds,
   listAccounts,
+  accountPosition,
 } from "@century/sim";
 import {
   __runFiscalPhaseWithHooks,
@@ -278,10 +279,10 @@ describe("M4c fiscal accounts, construction, and validation", () => {
     expect(() => assertValidWorld(mismatch)).toThrow(/does not reference its own treasury-cash/i);
 
     const wrongOwner = cloneWorld(world);
-    const treasury = listAccounts(wrongOwner.finance.accounts).find(
-      (candidate) => candidate.id === FISCAL_TREASURY_ACCOUNT_ID,
-    )!;
-    treasury.ownerId = 999;
+    // D-158: the owner column of the table is the stored state; corrupt it directly.
+    const treasuryPosition = accountPosition(wrongOwner.finance.accounts, FISCAL_TREASURY_ACCOUNT_ID);
+    expect(treasuryPosition).toBeGreaterThanOrEqual(0);
+    wrongOwner.finance.accounts.ownerId[treasuryPosition] = 999;
     expect(() => assertValidWorld(wrongOwner)).toThrow(/unknown country owner/i);
 
     const missingTaxRevenue = cloneWorld(world);

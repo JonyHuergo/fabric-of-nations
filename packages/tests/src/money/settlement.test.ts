@@ -6,6 +6,7 @@ import {
   settleMarketDay,
   type MarketDayResult,
   listAccounts,
+  accountRecords,
 } from "@century/sim";
 import {
   accountBalance,
@@ -473,7 +474,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
     expect(() => settleMarketDay(world, scenario.definitions, marketDay)).toThrow(
       /insufficient|overdraw/i,
     );
-    expect(world.finance.accounts).toEqual(before);
+    expect(accountRecords(world.finance.accounts)).toEqual(before);
     expect(world.finance.postings).toHaveLength(postings.length);
     expect(world.finance.nextPostingId).toBe(nextPostingId);
     expect(marketDay.settled).toBe(false);
@@ -496,7 +497,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
     expect(() => settleMarketDay(world, scenario.definitions, marketDay)).toThrow(
       /insufficient|overdraw/i,
     );
-    expect(world.finance.accounts).toEqual(balances);
+    expect(accountRecords(world.finance.accounts)).toEqual(balances);
     expect(world.finance.postings).toHaveLength(0);
     expect(marketDay.settled).toBe(false);
   });
@@ -526,7 +527,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
     expect(() => settleMarketDay(world, scenario.definitions, marketDay)).toThrow(
       /system-reserve/i,
     );
-    expect(world.finance.accounts).toEqual(balances);
+    expect(accountRecords(world.finance.accounts)).toEqual(balances);
     expect(world.finance.postings).toEqual(postings);
     expect(world.finance.nextPostingId).toBe(nextPostingId);
     expect(marketDay.settled).toBe(false);
@@ -547,7 +548,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
     const balances = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     const postingCount = world.finance.postings.length;
     expect(() => settleMarketDay(world, scenario.definitions, marketDay)).toThrow(/already been settled/i);
-    expect(world.finance.accounts).toEqual(balances);
+    expect(accountRecords(world.finance.accounts)).toEqual(balances);
     expect(world.finance.postings).toHaveLength(postingCount);
   });
 
@@ -572,7 +573,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
     };
     const balances = listAccounts(world.finance.accounts).map((account) => ({ ...account }));
     expect(() => settleMarketDay(world, scenario.definitions, duplicate)).toThrow(/duplicate pending/i);
-    expect(world.finance.accounts).toEqual(balances);
+    expect(accountRecords(world.finance.accounts)).toEqual(balances);
   });
 
   test("rejects invalid buyers, malformed amounts, and mismatched totals atomically", () => {
@@ -597,7 +598,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
     expect(() => settleMarketDay(world, scenario.definitions, invalidBuyer)).toThrow(
       /unknown popBlock|household account/i,
     );
-    expect(world.finance.accounts).toEqual(balances);
+    expect(accountRecords(world.finance.accounts)).toEqual(balances);
 
     const nonFinite: MarketDayResult = {
       ...marketDay,
@@ -605,7 +606,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
       pendingTransactions: [{ ...original, quantity: Number.NaN }],
     };
     expect(() => settleMarketDay(world, scenario.definitions, nonFinite)).toThrow(/quantity/i);
-    expect(world.finance.accounts).toEqual(balances);
+    expect(accountRecords(world.finance.accounts)).toEqual(balances);
 
     const badTotal: MarketDayResult = {
       ...marketDay,
@@ -613,7 +614,7 @@ describe("M3e validation, atomicity, and duplicate protection", () => {
       pendingTransactions: [{ ...original, totalRUSD: original.totalRUSD + 1 }],
     };
     expect(() => settleMarketDay(world, scenario.definitions, badTotal)).toThrow(/reconcile/i);
-    expect(world.finance.accounts).toEqual(balances);
+    expect(accountRecords(world.finance.accounts)).toEqual(balances);
   });
 });
 
@@ -674,7 +675,7 @@ describe("M3e conservation, determinism, and inventory separation", () => {
     });
     runSettlement(scenario, world);
     const restored = deserializeWorld(serializeWorld(world));
-    expect(restored.finance.accounts).toEqual(world.finance.accounts);
+    expect(accountRecords(restored.finance.accounts)).toEqual(accountRecords(world.finance.accounts));
     expect(restored.finance.postings).toEqual(world.finance.postings);
     expect(hashWorld(restored)).toBe(hashWorld(world));
   });

@@ -26,6 +26,10 @@ import {
   type PublicTransactionKind,
   type World,
   listAccounts,
+  accountRecords,
+  accountTableFromRecords,
+  createAccountTable,
+  appendAccount,
 } from "@century/sim";
 import {
   M3_BUILDING_ACCOUNT_FIRST_ID,
@@ -238,7 +242,7 @@ describe("M4a-1 account semantics", () => {
         amountRUSD: balanceOf(world.finance, householdId) + 1,
       }),
     ).toThrow(/insufficient|negative/i);
-    expect(world.finance.accounts).toEqual(before);
+    expect(accountRecords(world.finance.accounts)).toEqual(before);
     expect(world.finance.postings).toHaveLength(postingCount);
   });
 
@@ -428,7 +432,7 @@ describe("M4a-1 invariants", () => {
       ]),
     ).toThrow(/unbalanced/i);
 
-    expect(world.finance.accounts).toEqual(before);
+    expect(accountRecords(world.finance.accounts)).toEqual(before);
     expect(world.finance.postings).toHaveLength(postingCount);
     expect(world.finance.nextPostingId).toBe(nextPostingId);
   });
@@ -550,7 +554,7 @@ describe("M4a-1 persistence and compatibility", () => {
   test("save and load preserve accounts, categories, and the opening record", () => {
     const world = m3World().world;
     const restored = deserializeWorld(serializeWorld(world));
-    expect(restored.finance.accounts).toEqual(world.finance.accounts);
+    expect(accountRecords(restored.finance.accounts)).toEqual(accountRecords(world.finance.accounts));
     expect(restored.finance.opening).toEqual(world.finance.opening);
     expect(restored.finance.nextAccountId).toBe(world.finance.nextAccountId);
     expect(hashWorld(restored)).toBe(hashWorld(world));
@@ -571,7 +575,7 @@ describe("M4a-1 persistence and compatibility", () => {
 
   test("the M2-only population path keeps its accounts and creates no postings", () => {
     const { scenario, world } = aggregateWorld();
-    expect(world.finance.accounts).toHaveLength(4);
+    expect(world.finance.accounts.count).toBe(4);
     expect(world.finance.postings).toHaveLength(0);
     expect(world.finance.opening).not.toBeNull();
     const cashBefore = designatedCashTotal(world.finance);
@@ -598,10 +602,14 @@ describe("M4a-1 persistence and compatibility", () => {
   });
 
   test("rejects an account whose category does not match its subtype", () => {
+    // D-158: the table derives the category from the subtype (and saves store no category),
+    // so a contradicting category can only arrive as a record: building a table or appending.
     const world = m3World().world;
-    const account = listAccounts(world.finance.accounts)[0];
-    if (account === undefined) throw new Error("missing account");
-    (account as unknown as { category: string }).category = "revenue";
-    expect(() => assertValidWorld(world)).toThrow(/category|subtype/i);
+    const record = accountRecords(world.finance.accounts)[0];
+    if (record === undefined) throw new Error("missing account");
+    expect(() => accountTableFromRecords([{ ...record, category: "revenue" }])).toThrow(/category|subtype/i);
+    const table = createAccountTable();
+    expect(() => appendAccount(table, { ...record, category: "revenue" })).toThrow(/category|subtype/i);
+    expect(table.count).toBe(0);
   });
 });

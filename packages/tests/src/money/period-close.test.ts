@@ -33,6 +33,7 @@ import {
   type PublicTransactionKind,
   type World,
   listAccounts,
+  accountRecords,
 } from "@century/sim";
 import {
   economyTickContext,
@@ -181,7 +182,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
         { accountId: 3, balanceRUSD: 10 },
       ]),
     ).toThrow(/revenue and expense accounts start at zero/i);
-    expect(revenueFinance.accounts).toEqual(revenueBefore);
+    expect(accountRecords(revenueFinance.accounts)).toEqual(revenueBefore);
     expect(revenueFinance.opening).toBeNull();
 
     const expenseFinance = manualFinance([
@@ -197,7 +198,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
         { accountId: 3, balanceRUSD: 12 },
       ]),
     ).toThrow(/revenue and expense accounts start at zero/i);
-    expect(expenseFinance.accounts).toEqual(expenseBefore);
+    expect(accountRecords(expenseFinance.accounts)).toEqual(expenseBefore);
     expect(expenseFinance.opening).toBeNull();
   });
 
@@ -278,7 +279,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
       { accountId: equity.id, side: "debit", amountRUSD: 5 },
     ]);
 
-    expect(world.finance.accounts).toEqual(before);
+    expect(accountRecords(world.finance.accounts)).toEqual(before);
     expect(world.finance.postings).toHaveLength(postingCount);
     expect(world.finance.nextPostingId).toBe(nextPostingId);
   });
@@ -316,7 +317,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
       ]),
     ).toThrow(/semantic matrix|may not/i);
 
-    expect(world.finance.accounts).toEqual(before);
+    expect(accountRecords(world.finance.accounts)).toEqual(before);
     expect(world.finance.postings).toHaveLength(postingCount);
     expect(world.finance.nextPostingId).toBe(nextPostingId);
   });
@@ -364,7 +365,7 @@ describe("M4b opening balances and the semantic posting matrix", () => {
       toAccountId: buildingCash.id,
       amountRUSD: 1,
     })).toThrow(/internal to the period-close helper/i);
-    expect(world.finance.accounts).toEqual(before);
+    expect(accountRecords(world.finance.accounts)).toEqual(before);
     expect(world.finance.postings).toHaveLength(postingCount);
 
     expect(PUBLIC_TRANSACTION_KINDS).not.toContain("period-close");

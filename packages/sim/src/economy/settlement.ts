@@ -307,6 +307,42 @@ type TransactionChunk =
   | { readonly objects: readonly PendingTransaction[]; readonly columns?: undefined }
   | { readonly columns: PendingColumns; readonly objects?: undefined };
 
+/** D-158: the money flows of validated transactions, in their canonical order. */
+function flowsOfTransactions(prepared: PreparedColumns): MarketFlowColumns {
+  const householdBuyer: number[] = [];
+  const householdSpend: number[] = [];
+  const householdSellerId: number[] = [];
+  const householdSellerAmount: number[] = [];
+  const inputBuyer: number[] = [];
+  const inputSeller: number[] = [];
+  const inputAmount: number[] = [];
+  for (let item = 0; item < prepared.count; item += 1) {
+    const position = prepared.order[item] ?? 0;
+    const buyer = prepared.buyer[position] ?? 0;
+    const seller = prepared.seller[position] ?? 0;
+    const total = prepared.total[position] ?? 0;
+    if (prepared.kind[position] === 0) {
+      householdBuyer.push(buyer);
+      householdSpend.push(total);
+      householdSellerId.push(seller);
+      householdSellerAmount.push(total);
+    } else {
+      inputBuyer.push(buyer);
+      inputSeller.push(seller);
+      inputAmount.push(total);
+    }
+  }
+  return {
+    householdBuyer: Float64Array.from(householdBuyer),
+    householdSpend: Float64Array.from(householdSpend),
+    householdSellerId,
+    householdSellerAmount,
+    inputBuyer,
+    inputSeller,
+    inputAmount,
+  };
+}
+
 function transactionChunk(marketDay: MarketDayResult): TransactionChunk {
   const columns = marketDay.columns?.transactions;
   return columns !== undefined && columns.forTransactions === marketDay.pendingTransactions
@@ -1041,12 +1077,14 @@ function settleMarketDaysInternal(
   const marketId = marketIds[0];
   if (marketId === undefined) throw new RangeError("settlement requires a market-day result");
   const index = buildFinanceIndex(world.finance);
-  // D-158: settlement posts the markets' money flows; the validated transaction list is built
-  // only for full detail, where it is reported.
+  // D-158: settlement posts the money flows a market run attached to its result; the
+  // validated transaction list is built only for full detail, where it is reported. A result
+  // without them (a copy or a hand-built result: the flows are a non-enumerable companion)
+  // is settled from its own transaction list, validated first.
   const flows = marketDays.map((marketDay) => {
     const columns = marketDay.columns?.flows;
-    if (columns === undefined) throw new RangeError(`market ${String(marketDay.marketId)} returned no money flows`);
-    return columns;
+    if (columns !== undefined) return columns;
+    return flowsOfTransactions(prepareTransactions(world, definitions, index, [transactionChunk(marketDay)]));
   });
   const transactions =
     detail === "full" ? prepareTransactions(world, definitions, index, marketDays.map(transactionChunk)) : null;

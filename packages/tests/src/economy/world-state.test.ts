@@ -26,7 +26,7 @@ describe("M3a world state and relationships", () => {
     expect(world.markets).toHaveLength(1);
     expect(province.marketId).toBe(0);
     expect(province.buildingInstanceIds).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
-    expect(world.finance.accounts).toHaveLength(67);
+    expect(world.finance.accounts.count).toBe(67);
     expect(market.priceRUSD).toHaveLength(8);
     expect(market.stockLots.length).toBeGreaterThan(0);
 

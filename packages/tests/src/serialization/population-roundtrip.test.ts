@@ -8,6 +8,7 @@ import {
   tick,
   type World,
   listAccounts,
+  accountRecords,
 } from "@century/sim";
 import {
   aggregateWorld,
@@ -45,7 +46,7 @@ describe("M2.1 serialization and restoration", () => {
     expect(restored.popBlocks[0]?.maleByAge).toHaveLength(SINGLE_AGE_COUNT);
     expect(restored.popBlocks[0]?.femaleByAge).toHaveLength(SINGLE_AGE_COUNT);
     expect(hashWorld(restored)).toBe(hashWorld(world));
-    expect(restored.finance.accounts).toEqual(world.finance.accounts);
+    expect(accountRecords(restored.finance.accounts)).toEqual(accountRecords(world.finance.accounts));
   });
 
   test("continues deterministically after restoration", () => {
@@ -65,7 +66,7 @@ describe("M2.1 serialization and restoration", () => {
     const { world } = multiBlockWorld();
     const restored = deserializeWorld(serializeWorld(world));
     expect(restored.popBlocks).toHaveLength(3);
-    expect(restored.finance.accounts).toHaveLength(12);
+    expect(restored.finance.accounts.count).toBe(12);
     for (const block of restored.popBlocks) {
       expect(
         listAccounts(restored.finance.accounts).some((account) => account.id === block.financialAccountId),

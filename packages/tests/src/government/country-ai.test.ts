@@ -358,7 +358,7 @@ describe("M6 country AI and action validation", () => {
     const accountsAfterOne = world.finance.accounts.count;
     const countryKeysAfterOne = world.countries.map((country) => Object.keys(country).sort());
     for (let day = 1; day < 120; day += 1) tick(world, context);
-    expect(world.finance.accounts).toHaveLength(accountsAfterOne);
+    expect(world.finance.accounts.count).toBe(accountsAfterOne);
     expect(world.finance.postings.length).toBeLessThanOrEqual(256);
     expect(world.finance.periodSummaries.length).toBeLessThanOrEqual(5);
     for (let index = 0; index < world.countries.length; index += 1) {
