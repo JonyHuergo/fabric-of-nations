@@ -55,6 +55,7 @@ import { runCountryAIPhase, type CountryAIPhaseResult } from "./ai.js";
 import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accounts.js";
 import {
   applyDwellingPurchases,
+  NEED_TIER_CODE,
   buildLesHouseholdDemand,
   initialiseSmoothedPrices,
   type LesHouseholdDemand,
@@ -106,7 +107,6 @@ import {
   runMarketDay,
   type HouseholdDemandColumns,
   type HouseholdDemandRecord,
-  type HouseholdTier,
   type MarketDayInput,
   type MarketDayResult,
   type ProductionDemandRecord,
@@ -151,15 +151,17 @@ import type {
  */
 interface HouseholdDemandBuild {
   readonly count: number;
-  readonly popBlockId: number[];
-  readonly marketId: number[];
-  readonly tier: HouseholdTier[];
-  readonly needTier: NeedTier[];
-  readonly goodId: number[];
-  readonly desired: number[];
-  readonly funded: number[];
-  /** First row and end row of each block that has rows, by block id. */
-  readonly rowsOfBlock: ReadonlyMap<Id, { readonly start: number; readonly end: number }>;
+  readonly popBlockId: ArrayLike<number>;
+  readonly marketId: ArrayLike<number>;
+  readonly tier: ArrayLike<number>;
+  /** D-158: `NEED_TIER_CODE` of each row. */
+  readonly needTierCode: ArrayLike<number>;
+  readonly goodId: ArrayLike<number>;
+  readonly desired: ArrayLike<number>;
+  readonly funded: ArrayLike<number>;
+  /** First row and end row of each block by block id (-1: no rows). */
+  readonly rowStart: ArrayLike<number>;
+  readonly rowEnd: ArrayLike<number>;
   /** Record objects for the full-detail day result (D-137); empty in summary detail. */
   readonly records: HouseholdDemandRecord[];
 }
@@ -564,7 +566,8 @@ function buildNeedsResult(
 
   for (const block of inIdOrder(world.popBlocks)) {
     const population = populationTotal(block);
-    const range = household.rowsOfBlock.get(block.id);
+    const rangeStart = block.id < household.rowStart.length ? (household.rowStart[block.id] ?? -1) : -1;
+    const range = rangeStart < 0 ? undefined : { start: rangeStart, end: household.rowEnd[block.id] ?? rangeStart };
     const householdSettlement = householdByName.get(block.id);
     if (householdSettlement === undefined) {
       throw new RangeError(`missing household settlement for popBlock ${String(block.id)}`);
@@ -591,7 +594,7 @@ function buildNeedsResult(
       tierRows.length = 0;
       if (range !== undefined) {
         for (let row = range.start; row < range.end; row += 1) {
-          if (household.needTier[row] === tier) tierRows.push(row);
+          if (household.needTierCode[row] === NEED_TIER_CODE[tier]) tierRows.push(row);
         }
       }
       const active =

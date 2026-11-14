@@ -62,16 +62,26 @@ export interface HouseholdCountryDemand {
 }
 
 /** The LES day's household demand: rows in canonical (block, tier, good) order. */
+/** D-158: need tier codes of the typed demand rows. */
+export const NEED_TIER_CODE: Readonly<Record<NeedTier, number>> = { subsistence: 0, basic: 1, comfort: 2, luxury: 3 };
+
+/**
+ * D-158: the day's household demand rows in typed columns (rows of a block contiguous, blocks
+ * in id order); large typed buffers live outside the collected heap.
+ */
 export interface LesHouseholdDemand {
   readonly count: number;
-  readonly popBlockId: number[];
-  readonly marketId: number[];
-  readonly tier: HouseholdTier[];
-  readonly needTier: NeedTier[];
-  readonly goodId: number[];
-  readonly desired: number[];
-  readonly funded: number[];
-  readonly rowsOfBlock: ReadonlyMap<Id, { readonly start: number; readonly end: number }>;
+  readonly popBlockId: Float64Array;
+  readonly marketId: Int32Array;
+  readonly tier: Uint8Array;
+  /** `NEED_TIER_CODE` of each row's need tier. */
+  readonly needTierCode: Uint8Array;
+  readonly goodId: Int32Array;
+  readonly desired: Float64Array;
+  readonly funded: Float64Array;
+  /** First row and end row of each block by block id; -1 where the block has no rows. */
+  readonly rowStart: Int32Array;
+  readonly rowEnd: Int32Array;
   readonly records: HouseholdDemandRecord[];
   readonly categoryKeys: readonly string[];
   readonly byCountry: ReadonlyMap<Id, HouseholdCountryDemand>;
@@ -116,22 +126,37 @@ export function buildLesHouseholdDemand(
   const professionById = new Map(economyDefinitions.professions.map((profession) => [profession.id, profession]));
   const householdIds = index.ownerAccountIds("popBlock", "household-cash");
   const full = detail === "full";
-  const build: LesHouseholdDemand = {
-    count: 0,
-    popBlockId: [],
-    marketId: [],
-    tier: [],
-    needTier: [],
-    goodId: [],
-    desired: [],
-    funded: [],
-    rowsOfBlock: new Map(),
-    records: [],
-    categoryKeys: system.categoryKeys,
-    byCountry: new Map(),
+  // D-158: growable typed columns.
+  let capacity = Math.max(1024, world.popBlocks.length * 24);
+  let colBlock = new Float64Array(capacity);
+  let colMarket = new Int32Array(capacity);
+  let colTier = new Uint8Array(capacity);
+  let colNeed = new Uint8Array(capacity);
+  let colGood = new Int32Array(capacity);
+  let colDesired = new Float64Array(capacity);
+  let colFunded = new Float64Array(capacity);
+  let count = 0;
+  const grow = (): void => {
+    capacity *= 2;
+    const wider = <T extends Float64Array | Int32Array | Uint8Array>(column: T, make: (size: number) => T): T => {
+      const next = make(capacity);
+      next.set(column);
+      return next;
+    };
+    colBlock = wider(colBlock, (size) => new Float64Array(size));
+    colMarket = wider(colMarket, (size) => new Int32Array(size));
+    colTier = wider(colTier, (size) => new Uint8Array(size));
+    colNeed = wider(colNeed, (size) => new Uint8Array(size));
+    colGood = wider(colGood, (size) => new Int32Array(size));
+    colDesired = wider(colDesired, (size) => new Float64Array(size));
+    colFunded = wider(colFunded, (size) => new Float64Array(size));
   };
-  const rowsOfBlock = build.rowsOfBlock as Map<Id, { readonly start: number; readonly end: number }>;
-  const byCountry = build.byCountry as Map<Id, HouseholdCountryDemand>;
+  let maxBlockId = 0;
+  for (const block of world.popBlocks) if (block.id > maxBlockId) maxBlockId = block.id;
+  const rowStart = new Int32Array(maxBlockId + 1).fill(-1);
+  const rowEnd = new Int32Array(maxBlockId + 1).fill(-1);
+  const records: HouseholdDemandRecord[] = [];
+  const byCountry = new Map<Id, HouseholdCountryDemand>();
   const dwellingGoodId = system.dwellingGoodId;
   // D-158: retail prices and price terms per (market, urban share), computed once each.
   const powersByMarket = new Map<Id, Map<number, RetailPowers>>();
@@ -150,14 +175,16 @@ export function buildLesHouseholdDemand(
   };
 
   const push = (blockId: Id, marketId: Id, tier: HouseholdTier, label: NeedTier, goodId: number, desired: number, funded: number): void => {
-    build.popBlockId.push(blockId);
-    build.marketId.push(marketId);
-    build.tier.push(tier);
-    build.needTier.push(label);
-    build.goodId.push(goodId);
-    build.desired.push(desired);
-    build.funded.push(funded);
-    if (full) build.records.push({ popBlockId: blockId, tier, goodId, desiredQuantity: desired, fundedQuantity: funded });
+    if (count === capacity) grow();
+    colBlock[count] = blockId;
+    colMarket[count] = marketId;
+    colTier[count] = tier;
+    colNeed[count] = NEED_TIER_CODE[label];
+    colGood[count] = goodId;
+    colDesired[count] = desired;
+    colFunded[count] = funded;
+    count += 1;
+    if (full) records.push({ popBlockId: blockId, tier, goodId, desiredQuantity: desired, fundedQuantity: funded });
   };
 
   for (const block of inIdOrder(world.popBlocks)) {
@@ -276,7 +303,7 @@ export function buildLesHouseholdDemand(
     }
 
     // Fund tier by tier at today's prices.
-    const blockStart = build.popBlockId.length;
+    const blockStart = count;
     let remainingCash = cash;
     let stopped = false;
     for (let tierIndex = 0; tierIndex < 3 && !stopped; tierIndex += 1) {
@@ -327,11 +354,27 @@ export function buildLesHouseholdDemand(
       remainingCash = Math.max(0, remainingCash - fundedCost);
       if (ratio < 1) stopped = true;
     }
-    const blockEnd = build.popBlockId.length;
-    if (blockEnd > blockStart) rowsOfBlock.set(block.id, { start: blockStart, end: blockEnd });
+    const blockEnd = count;
+    if (blockEnd > blockStart) {
+      rowStart[block.id] = blockStart;
+      rowEnd[block.id] = blockEnd;
+    }
   }
-  (build as { count: number }).count = build.popBlockId.length;
-  return build;
+  return {
+    count,
+    popBlockId: colBlock.subarray(0, count),
+    marketId: colMarket.subarray(0, count),
+    tier: colTier.subarray(0, count),
+    needTierCode: colNeed.subarray(0, count),
+    goodId: colGood.subarray(0, count),
+    desired: colDesired.subarray(0, count),
+    funded: colFunded.subarray(0, count),
+    rowStart,
+    rowEnd,
+    records,
+    categoryKeys: system.categoryKeys,
+    byCountry,
+  };
 }
 
 /**

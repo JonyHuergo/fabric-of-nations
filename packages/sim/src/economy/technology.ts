@@ -14,7 +14,7 @@
  * plain data and is recomputed into derived values on demand.
  */
 
-import { buildLabourWageTable, institutionPayroll, institutionStaff, popBlocksById, type LabourWageTable } from "./labourMarket.js";
+import { buildLabourWageTable, institutionPayroll, popBlocksById, type LabourWageTable } from "./labourMarket.js";
 import { dayIndexToCivilDate, daysInYear } from "../calendar.js";
 import { CONTRACEPTION_MAX_REDUCTION, RATE_DECIMAL_PLACES } from "../population/constants.js";
 import { populationTotal, syncBlockLiteracy, workingAgePopulation } from "../population/state.js";
@@ -800,11 +800,13 @@ export function deriveEducation(
   let availableAcademicWorkers = 0;
   let literacyWeighted = 0;
   let schoolAgePopulation = 0;
-  const blockSchoolAge = new Map<Id, number>();
-  for (const block of blocks) {
+  // D-158: school-age persons by the block's position in `blocks`.
+  const blockSchoolAge = new Float64Array(blocks.length);
+  for (let position = 0; position < blocks.length; position += 1) {
+    const block = blocks[position] as World["popBlocks"][number];
     const population = populationTotal(block);
     const schoolAge = schoolAgeOf(block);
-    blockSchoolAge.set(block.id, schoolAge);
+    blockSchoolAge[position] = schoolAge;
     schoolAgePopulation += schoolAge;
     if (population <= 0) continue;
     const profession = professionById.get(block.professionId);
@@ -832,13 +834,24 @@ export function deriveEducation(
   // P7 (D-154, plan §3.4, Q4): teachers, researchers and instructors are the workers
   // the schools, research and training institutions employ (assignments).
   {
-    teacherStaff = institutionStaff(world, country.id, "education");
-    researchStaff = institutionStaff(world, country.id, "research");
-    trainingStaff = institutionStaff(world, country.id, "training");
-    const blockLiteracy = new Map(blocks.map((block) => [block.id, block.literacy]));
+    // D-158: the country's own institution assignments (the same order and sums as a scan
+    // of every assignment filtered by country).
+    const own = (populationIndex ?? buildCountryPopulationIndex(world)).institutionsByCountry?.get(country.id);
+    const assignments = own ?? world.labourMarket.institutionEmployment;
+    teacherStaff = 0;
+    researchStaff = 0;
+    trainingStaff = 0;
+    for (const assignment of assignments) {
+      if (assignment.countryId !== country.id) continue;
+      if (assignment.institution === "education") teacherStaff += assignment.workers;
+      else if (assignment.institution === "research") researchStaff += assignment.workers;
+      else if (assignment.institution === "training") trainingStaff += assignment.workers;
+    }
+    const blockLiteracy = new Map<Id, number>();
+    for (const block of blocks) blockLiteracy.set(block.id, block.literacy);
     let staff = 0;
     let weighted = 0;
-    for (const assignment of world.labourMarket.institutionEmployment) {
+    for (const assignment of assignments) {
       if (assignment.countryId !== country.id) continue;
       if (assignment.institution !== "education" && assignment.institution !== "research" && assignment.institution !== "training") continue;
       staff += assignment.workers;
@@ -854,8 +867,9 @@ export function deriveEducation(
       : 0;
   const lawPolicy = educationLawPolicy(country, definitions);
   let enrolledStudents = 0;
-  for (const block of blocks) {
-    const schoolAge = blockSchoolAge.get(block.id) ?? 0;
+  for (let position = 0; position < blocks.length; position += 1) {
+    const block = blocks[position] as World["popBlocks"][number];
+    const schoolAge = blockSchoolAge[position] ?? 0;
     if (schoolAge <= 0) continue;
     const familyAttendance = clamp(
       EDUCATION_ATTENDANCE_BASE +

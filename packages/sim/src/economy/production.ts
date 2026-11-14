@@ -479,7 +479,13 @@ export function computeBuildingCapacity(
       building.condition;
     if (requiredWorkers > 0) requiredWorkersByProfession.push({ professionId: job.professionId, requiredWorkers });
   }
-  requiredWorkersByProfession.sort((left, right) => left.professionId - right.professionId);
+  // D-158: sorted only when the jobs are not already in profession order (a job mix always is).
+  for (let item = 1; item < requiredWorkersByProfession.length; item += 1) {
+    if ((requiredWorkersByProfession[item - 1] as { professionId: number }).professionId > (requiredWorkersByProfession[item] as { professionId: number }).professionId) {
+      requiredWorkersByProfession.sort((left, right) => left.professionId - right.professionId);
+      break;
+    }
+  }
 
   const isProductionBuilding = definition.outputs.length > 0;
   if (!isProductionBuilding || !building.operational) {
@@ -1124,7 +1130,7 @@ export function runProductionCore(
     for (const item of definition.maintenanceInputs ?? []) {
       extraPurchases.push({ goodId: item.goodId, wanted: Number.POSITIVE_INFINITY, elasticity: 0 });
     }
-    extraPurchases.sort((left, right) => left.goodId - right.goodId);
+    if (extraPurchases.length > 1) extraPurchases.sort((left, right) => left.goodId - right.goodId);
     for (const purchase of extraPurchases) {
       const group = buyerIndex * goodCount + purchase.goodId;
       const reserved = reservedByBuyerGood[group] ?? 0;

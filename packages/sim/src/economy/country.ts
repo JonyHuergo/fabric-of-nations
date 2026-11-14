@@ -164,6 +164,8 @@ export function countryProvinceIds(world: World, countryId: Id): Id[] {
 export interface CountryPopulationIndex {
   readonly blocksByCountry: ReadonlyMap<Id, readonly World["popBlocks"][number][]>;
   readonly assignedByBlock: ReadonlyMap<Id, number>;
+  /** D-158: each country's institution assignments, in `institutionEmployment` order. */
+  readonly institutionsByCountry?: ReadonlyMap<Id, readonly World["labourMarket"]["institutionEmployment"][number][]>;
 }
 
 export function buildCountryPopulationIndex(world: World): CountryPopulationIndex {
@@ -190,7 +192,13 @@ export function buildCountryPopulationIndex(world: World): CountryPopulationInde
       (assignedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
     );
   }
-  return { blocksByCountry, assignedByBlock };
+  const institutionsByCountry = new Map<Id, World["labourMarket"]["institutionEmployment"][number][]>();
+  for (const assignment of world.labourMarket.institutionEmployment) {
+    const list = institutionsByCountry.get(assignment.countryId);
+    if (list === undefined) institutionsByCountry.set(assignment.countryId, [assignment]);
+    else list.push(assignment);
+  }
+  return { blocksByCountry, assignedByBlock, institutionsByCountry };
 }
 
 /** A country's blocks in `world.popBlocks` order, from the index when one is supplied. */

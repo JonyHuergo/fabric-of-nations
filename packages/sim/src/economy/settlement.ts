@@ -1149,15 +1149,29 @@ function settleMarketDaysInternal(
         let group = -1;
         for (let item = 0; item < gBlock.length; item += 1) if (gBlock[item] === block.id) group = item;
         if (group < 0) {
-          // Insert in block-id order.
+          // Insert in block-id order (shift the later groups up by one).
           let at = gBlock.length;
-          while (at > 0 && (gBlock[at - 1] ?? 0) > block.id) at -= 1;
-          gBlock.splice(at, 0, block.id);
-          gProfession.splice(at, 0, profession.id);
-          gWorkers.splice(at, 0, assignment.workers);
-          gAccount.splice(at, 0, accountIn(householdCashTable, block.id, "household-cash"));
-          gObligation.splice(at, 0, obligation);
-          gInKind.splice(at, 0, 0);
+          gBlock.push(0);
+          gProfession.push(0);
+          gWorkers.push(0);
+          gAccount.push(0);
+          gObligation.push(0);
+          gInKind.push(0);
+          while (at > 0 && (gBlock[at - 1] ?? 0) > block.id) {
+            gBlock[at] = gBlock[at - 1] ?? 0;
+            gProfession[at] = gProfession[at - 1] ?? 0;
+            gWorkers[at] = gWorkers[at - 1] ?? 0;
+            gAccount[at] = gAccount[at - 1] ?? 0;
+            gObligation[at] = gObligation[at - 1] ?? 0;
+            gInKind[at] = gInKind[at - 1] ?? 0;
+            at -= 1;
+          }
+          gBlock[at] = block.id;
+          gProfession[at] = profession.id;
+          gWorkers[at] = assignment.workers;
+          gAccount[at] = accountIn(householdCashTable, block.id, "household-cash");
+          gObligation[at] = obligation;
+          gInKind[at] = 0;
         } else {
           gWorkers[group] = (gWorkers[group] ?? 0) + assignment.workers;
           gObligation[group] = (gObligation[group] ?? 0) + obligation;
