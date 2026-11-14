@@ -593,8 +593,17 @@ function dispatchTrade(
 
         // Exportable surplus: domestic lots of this good left after today's clearing and
         // after any shipment already dispatched earlier in this phase.
-        const exportable = exportableLots(origin, goodId);
-        const availableQuantity = exportable.reduce((total, lot) => total + lot.quantity, 0);
+        // D-158: the available quantity is summed over the live candidates in the order the
+        // exportable list holds them; the list itself is built only once the margin allows a
+        // shipment (most route, direction and good combinations stop at the margin).
+        const goodCandidates = exportCandidates.get(origin.id)?.get(goodId);
+        let availableQuantity = 0;
+        if (goodCandidates !== undefined) {
+          for (let item = 0; item < goodCandidates.length; item += 1) {
+            const quantity = (goodCandidates[item] as (typeof goodCandidates)[number]).entry.quantity;
+            if (quantity > 0) availableQuantity += quantity;
+          }
+        }
         if (!(availableQuantity > 0)) {
           if (destinationPrice > originPrice) {
             noteBlock(origin.id, destination.id, goodId, "stock");
@@ -615,6 +624,7 @@ function dispatchTrade(
           continue;
         }
 
+        const exportable = exportableLots(origin, goodId);
         // A per-good export prohibition is a real policy constraint, not a price.
         const exportingCountries = new Set<Id>();
         for (const lot of exportable) {

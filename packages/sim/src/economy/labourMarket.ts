@@ -686,10 +686,6 @@ interface Employer {
   readonly orderKey: number;
 }
 
-function employerKey(kind: "building" | "institution", id: number): string {
-  return `${kind}:${String(id)}`;
-}
-
 /**
  * Labour-market employment refresh. Every block works only in its own province.
  * Existing assignments are retained (keyed order) up to the employer's offered slots
@@ -709,10 +705,14 @@ export function refreshLabourEmployment(
   const ceilings = ceilingMap(world);
   const owners = buildProvinceOwnerMap(world);
 
-  // Employers per (province, profession).
-  const employersByKey = new Map<string, Employer[]>();
+  // Employers per (province, profession). D-158: numeric keys (province × professions +
+  // profession) instead of text; a map keeps insertion order for either key type.
+  let professionStride = 1;
+  for (const profession of definitions.professions) if (profession.id + 1 > professionStride) professionStride = profession.id + 1;
+  const pairOf = (ownerId: number, professionId: number): number => ownerId * professionStride + professionId;
+  const employersByKey = new Map<number, Employer[]>();
   const employerList = (provinceId: Id, professionId: Id): Employer[] => {
-    const key = `${String(provinceId)}:${String(professionId)}`;
+    const key = pairOf(provinceId, professionId);
     let list = employersByKey.get(key);
     if (list === undefined) {
       list = [];
@@ -720,7 +720,7 @@ export function refreshLabourEmployment(
     }
     return list;
   };
-  const buildingEmployer = new Map<string, Employer>();
+  const buildingEmployer = new Map<number, Employer>();
   for (const building of [...world.buildings].sort((left, right) => left.id - right.id)) {
     const definition = definitionById.get(building.definitionId);
     if (definition === undefined) throw new RangeError(`building ${String(building.id)} references a missing definition`);
@@ -732,10 +732,10 @@ export function refreshLabourEmployment(
       if (offered <= 0) continue;
       const employer: Employer = { kind: "building", building, offered, used: 0, orderKey: building.id };
       employerList(building.provinceId, profession.id).push(employer);
-      buildingEmployer.set(`${employerKey("building", building.id)}:${String(profession.id)}`, employer);
+      buildingEmployer.set(pairOf(building.id, profession.id), employer);
     }
   }
-  const institutionEmployer = new Map<string, Employer>();
+  const institutionEmployer = new Map<number, Employer>();
   for (const [provinceId, kinds] of [...plan.byProvince].sort((left, right) => left[0] - right[0])) {
     const countryId = provinceOwnerCountry(owners, provinceId);
     if (countryId === null) continue;
@@ -746,7 +746,7 @@ export function refreshLabourEmployment(
       if (profession === undefined) return;
       const employer: Employer = { kind: "institution", institution, countryId, offered: slots, used: 0, orderKey: 2 ** 31 + kindIndex };
       employerList(provinceId, profession.id).push(employer);
-      institutionEmployer.set(`${String(provinceId)}:${institution}`, employer);
+      institutionEmployer.set(provinceId * INSTITUTION_KINDS.length + kindIndex, employer);
     });
   }
 
@@ -777,7 +777,7 @@ export function refreshLabourEmployment(
   let createdAssignments = 0;
   let assignedWorkers = 0;
   let unemployedEligible = 0;
-  const seenKeys = new Set<string>();
+  const seenKeys = new Set<number>();
   const unemployedByBlock = new Map<Id, number>();
   const eligibleByBlock = new Map<Id, number>();
 
@@ -796,7 +796,7 @@ export function refreshLabourEmployment(
       }
       continue;
     }
-    const key = `${String(block.provinceId)}:${String(profession.id)}`;
+    const key = pairOf(block.provinceId, profession.id);
     if (seenKeys.has(key)) {
       throw new RangeError(`labour market: more than one block of profession ${String(profession.id)} in province ${String(block.provinceId)}`);
     }
@@ -832,10 +832,11 @@ export function refreshLabourEmployment(
           building.provinceId === block.provinceId &&
           candidate.building.professionId === block.professionId
         ) {
-          employer = buildingEmployer.get(`${employerKey("building", building.id)}:${String(profession.id)}`);
+          employer = buildingEmployer.get(pairOf(building.id, profession.id));
         }
       } else if (candidate.institution !== undefined) {
-        const found = institutionEmployer.get(`${String(block.provinceId)}:${candidate.institution.institution}`);
+        const kindIndex = INSTITUTION_KINDS.indexOf(candidate.institution.institution);
+        const found = kindIndex < 0 ? undefined : institutionEmployer.get(block.provinceId * INSTITUTION_KINDS.length + kindIndex);
         if (
           found !== undefined &&
           found.countryId === candidate.institution.countryId &&

@@ -50,6 +50,8 @@ import {
   type OwnerEquityTally,
 } from "./accounts.js";
 import {
+  ACCOUNT_OWNER_KINDS,
+  CATEGORY_OF_SUBTYPE,
   NO_ACCOUNT_OWNER,
   accountRowScratch,
   ownerKindCode,
@@ -115,6 +117,8 @@ import {
   type Market,
   type StockLot,
   type TransactionKind,
+  ACCOUNT_SUBTYPES,
+  ACCOUNT_CATEGORIES,
 } from "./types.js";
 
 /**
@@ -164,6 +168,38 @@ function assertAccountOwnerKind(value: unknown, path: string): FinancialAccountO
     throw new RangeError(`${path} must be popBlock, building, country, or system`);
   }
   return value;
+}
+
+/** 1 where the subtype code may be owned by the owner-kind code (`subtypeAllowsOwnerKind`). */
+const OWNER_KIND_ALLOWED = (() => {
+  const allowed = new Uint8Array(ACCOUNT_SUBTYPES.length * ACCOUNT_OWNER_KINDS.length);
+  ACCOUNT_SUBTYPES.forEach((subtype, code) => {
+    ACCOUNT_OWNER_KINDS.forEach((kind, kindCode) => {
+      allowed[code * ACCOUNT_OWNER_KINDS.length + kindCode] = subtypeAllowsOwnerKind(subtype, kind) ? 1 : 0;
+    });
+  });
+  return allowed;
+})();
+const SYSTEM_OWNER_KIND_CODE = ACCOUNT_OWNER_KINDS.indexOf("system");
+const EQUITY_CATEGORY_CODE = ACCOUNT_CATEGORIES.indexOf("equity");
+
+/** D-158: whether a table row passes `assertValidFinancialAccount`, read from its codes. */
+function accountRowCodesValid(table: AccountTable, position: number): boolean {
+  const id = table.id[position] ?? Number.NaN;
+  if (!(Number.isInteger(id) && id >= 0 && id <= 0xffff_ffff)) return false;
+  const kind = table.ownerKind[position] ?? 255;
+  const subtype = table.subtype[position] ?? 255;
+  if (kind >= ACCOUNT_OWNER_KINDS.length || subtype >= ACCOUNT_SUBTYPES.length) return false;
+  if (OWNER_KIND_ALLOWED[subtype * ACCOUNT_OWNER_KINDS.length + kind] !== 1) return false;
+  const owner = table.ownerId[position] ?? Number.NaN;
+  if (kind === SYSTEM_OWNER_KIND_CODE) {
+    if (owner !== NO_ACCOUNT_OWNER) return false;
+  } else if (!(Number.isInteger(owner) && owner >= 0 && owner <= 0xffff_ffff)) {
+    return false;
+  }
+  const balance = table.balance[position] ?? Number.NaN;
+  if (!Number.isFinite(balance)) return false;
+  return !(balance < 0) || CATEGORY_OF_SUBTYPE[subtype] === EQUITY_CATEGORY_CODE;
 }
 
 export function assertValidFinancialAccount(account: FinancialAccount): void {
@@ -694,7 +730,9 @@ export function assertValidFinanceState(finance: FinanceState): void {
   const table = requireAccountTable(record.accounts);
   const row = accountRowScratch();
   for (let position = 0; position < table.count; position += 1) {
-    assertValidFinancialAccount(readAccountRow(table, position, row));
+    // D-158: the codes satisfy every rule of `assertValidFinancialAccount`; a row that does
+    // not is checked by it, which reports the first broken rule as before.
+    if (!accountRowCodesValid(table, position)) assertValidFinancialAccount(readAccountRow(table, position, row));
   }
   const accounts: AccountsById = financeIndexOfTable(table).byId;
   const maxAccountId = table.count > 0 ? (table.id[table.count - 1] ?? 0) : 0;
