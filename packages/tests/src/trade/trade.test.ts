@@ -26,6 +26,7 @@ import {
   type TradeRoute,
   type World,
   listAccounts,
+  lotRecords,
 } from "@century/sim";
 import {
   PROTOCOL_VERSION,
@@ -202,7 +203,7 @@ function accountBalance(
 function clothingLots(world: World, marketId: number): { ownerBuildingId: number; quantity: number }[] {
   const market = world.markets.find((candidate) => candidate.id === marketId);
   if (market === undefined) throw new Error(`missing market ${marketId}`);
-  return market.stockLots
+  return lotRecords(market.stockLots)
     .filter((lot) => lot.goodId === M5_CLOTHING && lot.quantity > 0)
     .map((lot) => ({ ownerBuildingId: lot.ownerBuildingId, quantity: lot.quantity }));
 }

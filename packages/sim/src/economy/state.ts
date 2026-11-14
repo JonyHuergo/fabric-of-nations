@@ -49,7 +49,6 @@ import {
   createCountryAIPolicy,
   createCountryAIState,
 } from "./aiState.js";
-import { canonicalizeStockLots } from "./inventory.js";
 import { assertValidBuildingDeposits, assertValidBuildingJobMixes, assertValidHydroBuildings } from "./validation.js";
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import {
@@ -95,6 +94,7 @@ import { MONETARY_STANDARDS } from "./types.js";
 
 import { accountRecords, accountTableFromRecords, type AccountRecord } from "./accountTable.js";
 import { sortPopBlocksById } from "../population/blockTable.js";
+import { lotListFromLots } from "./lotList.js";
 function professionIds(scenario: EconomyScenarioDef): Map<number, ProfessionDef> {
   return new Map(scenario.definitions.professions.map((profession) => [profession.id, profession]));
 }
@@ -1459,7 +1459,7 @@ export function createEconomyWorld(
     const built: Market = {
       id: market.id,
       priceRUSD: [...market.priceRUSD],
-      stockLots: canonicalizeStockLots(market.stockLots),
+      stockLots: lotListFromLots(market.stockLots),
       customsCountryId: customsCountryByMarket.get(market.id) ?? null,
       // P6 (D-153): filled from the day's prices on the first day a demand system runs.
       priceSmoothedRUSD: [],

@@ -51,6 +51,8 @@ import {
   type Month,
   type World,
   listAccounts,
+  lotListFromLots,
+  popBlockRecord,
 } from "@century/sim";
 
 const GRAIN = 0;
@@ -111,10 +113,10 @@ describe("P5 storage overflow never leaves dust lots (day-6,320 regression)", ()
   test("a lot that never sells is lost whole once it would fall below the tolerance", () => {
     // Two producers of good 0; storage holds 900 of the 1,000 + dust in stock.
     const table = lotTableFromLots(
-      [
+      lotListFromLots([
         { goodId: 0, ownerBuildingId: 1, quantity: 1_000 },
         { goodId: 0, ownerBuildingId: 2, quantity: 5e-10 },
-      ],
+      ]),
       [1, 2],
       1,
     );
@@ -133,10 +135,10 @@ describe("P5 storage overflow never leaves dust lots (day-6,320 regression)", ()
     // Producer 1 refills to 1,000 every day; producer 2's 10 kg never sells. On main the
     // daily proportional cut took such lots to 1.5e-323 kg by 1912 (price × quantity = 0).
     const table = lotTableFromLots(
-      [
+      lotListFromLots([
         { goodId: 0, ownerBuildingId: 1, quantity: 1_000 },
         { goodId: 0, ownerBuildingId: 2, quantity: 10 },
-      ],
+      ]),
       [1, 2],
       1,
     );
@@ -337,7 +339,7 @@ describe("P5 bad harvest in a low-access market (acceptance)", () => {
       // country (urbanisation, D-154), so the urban share may differ; the ratios below
       // hold every other cause at the hungry block's own values.
       if (badBlock.foodSufficiency < fairBlock.foodSufficiency - 0.05) hungry += 1;
-      const asFair = { ...badBlock, foodSufficiency: fairBlock.foodSufficiency };
+      const asFair = { ...popBlockRecord(badBlock), foodSufficiency: fairBlock.foodSufficiency };
       expect(
         effectiveAdultMortality(badBlock, NEUTRAL_DEMOGRAPHY_FACTORS) / effectiveAdultMortality(asFair, NEUTRAL_DEMOGRAPHY_FACTORS),
       ).toBeCloseTo(

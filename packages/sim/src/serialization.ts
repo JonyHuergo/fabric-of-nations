@@ -152,6 +152,7 @@ import {
 
 import { accountRecords, accountTableFromRecords, type AccountTable } from "./economy/accountTable.js";
 import { populationFields, populationTableFromRecords, type PopBlockRecord } from "./population/blockTable.js";
+import { lotListFromLots, lotRecords } from "./economy/lotList.js";
 /** Maximum accepted length of one encoded typed array. */
 export const MAX_TYPED_ARRAY_LENGTH = 10_000_000;
 
@@ -1622,7 +1623,7 @@ export function encodeWorld(world: World): SerializedWorld {
       .map((market) => ({
         id: market.id,
         priceRUSD: [...market.priceRUSD],
-        stockLots: canonicalizeStockLots(market.stockLots).map((lot) => ({
+        stockLots: canonicalizeStockLots(lotRecords(market.stockLots)).map((lot) => ({
           goodId: lot.goodId,
           ownerBuildingId: lot.ownerBuildingId,
           quantity: lot.quantity,
@@ -3832,7 +3833,7 @@ function decodeMarket(value: unknown, path: string): Market {
   return {
     id: requireUint32(record.id, `${path}.id`),
     priceRUSD: prices,
-    stockLots: canonicalizeStockLots(lots),
+    stockLots: lotListFromLots(lots),
     customsCountryId:
       record.customsCountryId === null || record.customsCountryId === undefined
         ? null

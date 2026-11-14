@@ -32,8 +32,9 @@ import { cancelConstruction } from "./construction.js";
 import { constructionProjectIsTerminal } from "./constructionModel.js";
 import { buildProvinceOwnerMap } from "./country.js";
 import { laborAccessAllowed } from "./employment.js";
-import { canonicalizeStockLots } from "./inventory.js";
 
+import { cloneLotList, filterLots, lotListFromLots, lotRecords } from "./lotList.js";
+import { type StockLot } from "./types.js";
 export interface ProvinceCountryTransferRequest {
   readonly provinceIds: readonly Id[];
   readonly toCountryId: Id;
@@ -144,7 +145,7 @@ function applyTransfer(
     provinceEconomies: world.provinceEconomies.map((province) =>
       moving.has(province.id) ? { ...province } : province,
     ),
-    markets: world.markets.map((market) => ({ ...market, stockLots: [...market.stockLots] })),
+    markets: world.markets.map((market) => ({ ...market, stockLots: cloneLotList(market.stockLots) })),
     employment: [...world.employment],
   };
 
@@ -173,19 +174,19 @@ function applyTransfer(
     province.marketId = targetMarketId;
   }
   if (target !== undefined) {
-    const carried = [];
+    const carried: StockLot[] = [];
     for (const market of staged.markets) {
       if (market.id === target.id) continue;
-      const kept = [];
-      for (const lot of market.stockLots) {
-        if (movingBuildings.has(lot.ownerBuildingId)) {
-          carried.push(lot);
-          movedLotCount += 1;
-        } else kept.push(lot);
-      }
-      market.stockLots = kept;
+      const lots = market.stockLots;
+      filterLots(lots, (index) => {
+        const owner = lots.owner[index] ?? 0;
+        if (!movingBuildings.has(owner)) return true;
+        carried.push({ goodId: lots.good[index] ?? 0, ownerBuildingId: owner, quantity: lots.quantity[index] ?? 0 });
+        movedLotCount += 1;
+        return false;
+      });
     }
-    if (carried.length > 0) target.stockLots = canonicalizeStockLots([...target.stockLots, ...carried]);
+    if (carried.length > 0) target.stockLots = lotListFromLots([...lotRecords(target.stockLots), ...carried]);
   }
 
   // 4. Employment the new border closes.

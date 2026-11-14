@@ -10,6 +10,8 @@ import {
   type Market,
   type World,
   accountRecords,
+  lotRecords,
+  lotListFromLots,
 } from "@century/sim";
 import {
   M3_BUILDING_ACCOUNT_FIRST_ID,
@@ -18,6 +20,7 @@ import {
   m3Scenario,
 } from "../fixtures/m3a.js";
 
+import { marketLots } from "../fixtures/lots.js";
 interface ParsedPayload {
   schemaVersion?: unknown;
   simVersion?: unknown;
@@ -109,7 +112,7 @@ describe("M3a schema-25 serialization", () => {
     expect(restored.buildings).toEqual(world.buildings);
     expect(restored.employment).toEqual(world.employment);
     expect(restored.markets[0]?.priceRUSD).toEqual(world.markets[0]?.priceRUSD);
-    expect(restored.markets[0]?.stockLots).toEqual(world.markets[0]?.stockLots);
+    expect(marketLots(restored.markets[0])).toEqual(marketLots(world.markets[0]));
     expect(accountRecords(restored.finance.accounts)).toEqual(accountRecords(world.finance.accounts));
     expect(restored.finance.postings).toEqual(world.finance.postings);
     expect(restored.popBlocks[0]?.maleByAge).toBeInstanceOf(Uint32Array);
@@ -120,7 +123,8 @@ describe("M3a schema-25 serialization", () => {
     const first = cloneWorld();
     const second = cloneWorld();
     const market = second.markets[0] as Market;
-    market.stockLots.reverse();
+    // D-159: a lot list is canonical by construction; lots listed in reverse build the same list.
+    market.stockLots = lotListFromLots(lotRecords(market.stockLots).reverse());
     expect(hashWorld(second)).toBe(hashWorld(first));
     expect(serializeWorld(second)).toBe(serializeWorld(first));
 
@@ -146,9 +150,9 @@ describe("M3a schema-25 serialization", () => {
   test("rejects duplicate lots before serialization", () => {
     const world = cloneWorld();
     const market = world.markets[0] as Market;
-    const first = market.stockLots[0];
+    const first = lotRecords(market.stockLots)[0];
     if (first === undefined) throw new Error("missing lot");
-    market.stockLots.push({ ...first });
+    market.stockLots = lotListFromLots([...lotRecords(market.stockLots), { ...first }]);
     expect(() => serializeWorld(world)).toThrow(/duplicate|lot/i);
     expect(deserializeWorld(serializeWorld(cloneWorld()))).toBeDefined();
   });

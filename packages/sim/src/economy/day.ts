@@ -146,6 +146,7 @@ import type {
 import { measureBlockTotals, personsOfBlock, workingAgeOfBlock, type BlockTotals } from "../population/blockTotals.js";
 import { createNeedsColumns, needsReader, NEED_TIER_COUNT } from "../population/needsColumns.js";
 import { populationFields, clonePopulationTable } from "../population/blockTable.js";
+import { cloneLotList } from "./lotList.js";
 /**
  * One day's household demand in columns (D-139): one row per (block, market tier,
  * good), in canonical (block, tier, good) order, so a block's rows are contiguous.
@@ -261,7 +262,7 @@ export function cloneWorld(
     markets: source.markets.map((market) => ({
       ...market,
       priceRUSD: [...market.priceRUSD],
-      stockLots: market.stockLots.map((lot) => ({ ...lot })),
+      stockLots: cloneLotList(market.stockLots),
       priceSmoothedRUSD: [...market.priceSmoothedRUSD],
     })),
     finance: cloneFinanceState(
@@ -374,7 +375,8 @@ function needGate(world: World): (provinceId: Id, marketId: Id, technologyId: Id
   const stockByMarket = new Map<Id, Set<number>>();
   for (const market of world.markets) {
     const goods = new Set<number>();
-    for (const lot of market.stockLots) if (lot.quantity > 0) goods.add(lot.goodId);
+    const lots = market.stockLots;
+    for (let index = 0; index < lots.count; index += 1) if ((lots.quantity[index] ?? 0) > 0) goods.add(lots.good[index] ?? 0);
     stockByMarket.set(market.id, goods);
   }
   return (provinceId, marketId, technologyId, goodId) => {

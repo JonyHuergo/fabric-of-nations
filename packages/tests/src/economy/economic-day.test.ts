@@ -13,6 +13,7 @@ import {
   type TickContext,
   type World,
   listAccounts,
+  lotRecords,
 } from "@century/sim";
 import { loadM5Sample } from "../fixtures/smallWorlds.js";
 import {
@@ -32,6 +33,7 @@ import {
 } from "../fixtures/m3d.js";
 import { accountsTable } from "../fixtures/accounts.js";
 
+import { marketLots } from "../fixtures/lots.js";
 const FULL_LOTS = [
   { goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 1000 },
   { goodId: 1, ownerBuildingId: 2, quantity: 100 },
@@ -169,7 +171,7 @@ describe("M3f integrated economic day", () => {
     const world = worldFor(scenario, [0, 5, 7]);
     const millId = buildingAccountId(world, 5);
     setCashBalance(world, millId, 0);
-    const grainFlowBefore = world.markets[0]?.stockLots
+    const grainFlowBefore = marketLots(world.markets[0])
       .filter((lot) => lot.goodId === GRAIN_ID)
       .reduce((total, lot) => total + lot.quantity, 0) ?? 0;
 
@@ -221,7 +223,7 @@ describe("M3f integrated economic day", () => {
     const market = world.markets[0];
     if (market === undefined) throw new Error("missing market");
     const openingPrices = [...market.priceRUSD];
-    const openingLots = market.stockLots.map((lot) => ({ ...lot }));
+    const openingLots = lotRecords(market.stockLots).map((lot) => ({ ...lot }));
     const openingStockByGood = scenario.definitions.goods.map((good) =>
       openingLots
         .filter((lot) => lot.goodId === good.id)
@@ -308,11 +310,11 @@ describe("M3f integrated economic day", () => {
     const originalSerialized = serializeWorld(world);
     const originalAgeCell = world.popBlocks[0]!.maleByAge[0] ?? 0;
     const originalBalance = listAccounts(clone.finance.accounts)[0]!.balanceRUSD;
-    const originalLot = clone.markets[0]!.stockLots[0]!.quantity;
+    const originalLot = lotRecords(clone.markets[0]!.stockLots)[0]!.quantity;
 
     clone.popBlocks[0]!.maleByAge[0] = originalAgeCell + 1;
     listAccounts(clone.finance.accounts)[0]!.balanceRUSD += 1;
-    clone.markets[0]!.stockLots[0]!.quantity += 1;
+    clone.markets[0]!.stockLots.quantity[0] = (clone.markets[0]!.stockLots.quantity[0] ?? 0) + 1;
     clone.diagnostics.recentWarnings.push("clone-only");
     const clonePosting = clone.finance.postings[0];
     if (clonePosting !== undefined) clonePosting.lines[0]!.amountRUSD += 1;
@@ -320,7 +322,7 @@ describe("M3f integrated economic day", () => {
     // The clone changed exactly where it was mutated...
     expect(clone.popBlocks[0]!.maleByAge[0]).toBe(originalAgeCell + 1);
     expect(listAccounts(clone.finance.accounts)[0]!.balanceRUSD).toBeCloseTo(originalBalance + 1, 9);
-    expect(clone.markets[0]!.stockLots[0]!.quantity).toBeCloseTo(originalLot + 1, 9);
+    expect(lotRecords(clone.markets[0]!.stockLots)[0]!.quantity).toBeCloseTo(originalLot + 1, 9);
     // ...and the source world remains byte-identical.
     expect(serializeWorld(world)).toBe(originalSerialized);
     expect(clone.popBlocks[0]!.maleByAge).not.toBe(world.popBlocks[0]!.maleByAge);
@@ -331,7 +333,8 @@ describe("M3f integrated economic day", () => {
         world.finance.postings[0]!.lines[0],
       );
     }
-    expect(clone.markets[0]!.stockLots[0]).not.toBe(world.markets[0]!.stockLots[0]);
+    // D-159: the clone owns its own lot columns.
+    expect(clone.markets[0]!.stockLots.quantity).not.toBe(world.markets[0]!.stockLots.quantity);
   });
 
   test("rolls the whole day back when settlement routing fails", () => {
@@ -345,7 +348,7 @@ describe("M3f integrated economic day", () => {
     const beforeDay = world.dayIndex;
     const beforePostingId = world.finance.nextPostingId;
     const beforeBalances = listAccounts(world.finance.accounts).map((account) => account.balanceRUSD);
-    const beforeLots = world.markets[0]?.stockLots.map((lot) => ({ ...lot }));
+    const beforeLots = marketLots(world.markets[0]).map((lot) => ({ ...lot }));
     const beforePrices = world.markets[0]?.priceRUSD.slice();
     const beforeMaleByAge = world.popBlocks.map((block) => block.maleByAge.slice());
     const beforeFemaleByAge = world.popBlocks.map((block) => block.femaleByAge.slice());
@@ -362,7 +365,7 @@ describe("M3f integrated economic day", () => {
     expect(world.dayIndex).toBe(beforeDay);
     expect(world.finance.nextPostingId).toBe(beforePostingId);
     expect(listAccounts(world.finance.accounts).map((account) => account.balanceRUSD)).toEqual(beforeBalances);
-    expect(world.markets[0]?.stockLots).toEqual(beforeLots);
+    expect(marketLots(world.markets[0])).toEqual(beforeLots);
     expect(world.markets[0]?.priceRUSD).toEqual(beforePrices);
     expect(world.popBlocks.map((block) => block.maleByAge)).toEqual(beforeMaleByAge);
     expect(world.popBlocks.map((block) => block.femaleByAge)).toEqual(beforeFemaleByAge);

@@ -760,6 +760,20 @@ export class PopBlockView implements PopBlock {
   }
 }
 
+/**
+ * A block as plain data: a view's values (cells copied), or a copy of a plain block. Use it
+ * where code spreads a block (`{ ...block }` copies only a view's own fields).
+ */
+export function popBlockRecord(block: PopBlock): PopBlock {
+  if (block instanceof PopBlockView) return block.toJSON();
+  return {
+    ...block,
+    maleByAge: block.maleByAge.slice(),
+    femaleByAge: block.femaleByAge.slice(),
+    literacyByAge: Float64Array.from(block.literacyByAge),
+  };
+}
+
 /** The world's two population fields for `table`: the table and its view list. */
 export function populationFields(table: PopulationTable): { population: PopulationTable; popBlocks: readonly PopBlock[] } {
   return { population: table, popBlocks: popBlockViews(table) };

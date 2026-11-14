@@ -7,6 +7,7 @@ import {
   type MarketDayResult,
   listAccounts,
   accountRecords,
+  lotRecords,
 } from "@century/sim";
 import {
   accountBalance,
@@ -25,6 +26,7 @@ import {
 } from "../fixtures/m3d.js";
 import { accountsTable } from "../fixtures/accounts.js";
 
+import { marketLots } from "../fixtures/lots.js";
 const DAILY_PEASANT_WAGE = 180 / 365;
 const DAILY_LABORER_WAGE = 250 / 365;
 const FARM_WAGE = 45 * DAILY_PEASANT_WAGE;
@@ -635,13 +637,13 @@ describe("M3e conservation, determinism, and inventory separation", () => {
         [productionDemand(4, 2, GRAIN_ID, 5)],
       ),
     );
-    const lotsBefore = world.markets[0]!.stockLots.map((lot) => ({ ...lot }));
+    const lotsBefore = lotRecords(world.markets[0]!.stockLots).map((lot) => ({ ...lot }));
     const pricesBefore = [...world.markets[0]!.priceRUSD];
     const before = totalCash(world);
     const systemBefore = accountBalance(world, SYSTEM_ACCOUNT_ID);
     const settlement = settleMarketDay(world, scenario.definitions, marketDay);
 
-    expect(world.markets[0]!.stockLots).toEqual(lotsBefore);
+    expect(marketLots(world.markets[0])).toEqual(lotsBefore);
     expect(world.markets[0]!.priceRUSD).toEqual(pricesBefore);
     expect(totalCash(world)).toBeCloseTo(before, 9);
     expect(settlement.totals.initialCashRUSD).toBeCloseTo(before, 9);

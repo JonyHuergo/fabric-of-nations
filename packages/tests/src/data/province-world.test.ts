@@ -23,8 +23,10 @@ import {
   transferProvincesToCountry,
   type World,
   listAccounts,
+  lotRecords,
 } from "@century/sim";
 
+import { marketLots } from "../fixtures/lots.js";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
 
@@ -55,7 +57,7 @@ function cashTotal(world: World): number {
 function stockByGood(world: World): Map<number, number> {
   const totals = new Map<number, number>();
   for (const market of world.markets) {
-    for (const lot of market.stockLots) totals.set(lot.goodId, (totals.get(lot.goodId) ?? 0) + lot.quantity);
+    for (const lot of lotRecords(market.stockLots)) totals.set(lot.goodId, (totals.get(lot.goodId) ?? 0) + lot.quantity);
   }
   return totals;
 }
@@ -109,7 +111,7 @@ describe("P2 conserving province transfer (D-118 §4)", () => {
     const germanMarket = world.provinceEconomies.find((province) => province.id === PRUSSIA)?.marketId;
     expect(russianMarket).not.toBe(germanMarket);
     const prussianLots = world.markets
-      .flatMap((market) => market.stockLots)
+      .flatMap((market) => lotRecords(market.stockLots))
       .filter((lot) => before.buildings.includes(lot.ownerBuildingId));
     expect(prussianLots.length).toBeGreaterThan(0);
 
@@ -133,7 +135,7 @@ describe("P2 conserving province transfer (D-118 §4)", () => {
     expect(world.popBlocks.filter((block) => block.provinceId === PRUSSIA).map((block) => block.id)).toEqual(before.blocks);
     const russian = world.markets.find((market) => market.id === russianMarket);
     for (const lot of prussianLots) {
-      expect(russian?.stockLots.some((entry) => entry.ownerBuildingId === lot.ownerBuildingId && entry.goodId === lot.goodId)).toBe(true);
+      expect(marketLots(russian).some((entry) => entry.ownerBuildingId === lot.ownerBuildingId && entry.goodId === lot.goodId)).toBe(true);
     }
     const record = world.provinces.ownership.find((entry) => entry.provinceId === PRUSSIA);
     expect(record?.ownerPolityId).toBe(RUSSIA);

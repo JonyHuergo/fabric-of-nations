@@ -8,6 +8,8 @@ import {
   type Market,
   type World,
   listAccounts,
+  lotRecords,
+  lotListFromLots,
 } from "@century/sim";
 import { cloneM3Scenario, m3World } from "../fixtures/m3a.js";
 import { insertAccount, pushAccountUnchecked } from "../fixtures/accounts.js";
@@ -28,11 +30,11 @@ describe("M3a world state and relationships", () => {
     expect(province.buildingInstanceIds).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
     expect(world.finance.accounts.count).toBe(67);
     expect(market.priceRUSD).toHaveLength(8);
-    expect(market.stockLots.length).toBeGreaterThan(0);
+    expect(lotRecords(market.stockLots).length).toBeGreaterThan(0);
 
     const stock = deriveStockByGood(market, 8);
     expect(stock).toHaveLength(8);
-    for (const lot of market.stockLots) {
+    for (const lot of lotRecords(market.stockLots)) {
       expect(stock[lot.goodId] ?? 0).toBeGreaterThanOrEqual(lot.quantity);
     }
     expect(() => assertValidWorld(world)).not.toThrow();
@@ -130,9 +132,9 @@ describe("M3a world state and relationships", () => {
   test("rejects duplicate inventory lots", () => {
     const { world } = m3World();
     const market = world.markets[0] as Market;
-    const first = market.stockLots[0];
+    const first = lotRecords(market.stockLots)[0];
     if (first === undefined) throw new Error("missing stock lot");
-    market.stockLots.push({ ...first });
+    market.stockLots = lotListFromLots([...lotRecords(market.stockLots), { ...first }]);
     expect(() => assertValidWorld(world)).toThrow(/duplicate|lot/i);
   });
 
@@ -156,11 +158,11 @@ describe("M3a world state and relationships", () => {
     expect(() => assertValidWorld(badPrice)).toThrow(/price/i);
 
     const zeroLot = m3World().world;
-    zeroLot.markets[0]!.stockLots[0]!.quantity = 0;
+    zeroLot.markets[0]!.stockLots.quantity[0] = 0;
     expect(() => assertValidWorld(zeroLot)).toThrow(/quantity|lot/i);
 
     const badOwner = m3World().world;
-    badOwner.markets[0]!.stockLots[0]!.ownerBuildingId = 999;
+    badOwner.markets[0]!.stockLots.owner[0] = 999;
     expect(() => assertValidWorld(badOwner)).toThrow(/owner|building/i);
 
     const stateOwned = m3World().world;

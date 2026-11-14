@@ -6,6 +6,7 @@ import {
   type EconomyScenarioDef,
   type InputReservation,
   type World,
+  lotRecords,
 } from "@century/sim";
 import {
   setBlockWorkforce,
@@ -156,7 +157,7 @@ export function stockOf(world: World, goodId: number): number {
 export function lotQuantity(world: World, goodId: number, ownerBuildingId: number): number {
   const market = world.markets[0];
   if (market === undefined) throw new Error("missing market");
-  const lot = market.stockLots.find(
+  const lot = lotRecords(market.stockLots).find(
     (candidate) =>
       candidate.goodId === goodId && candidate.ownerBuildingId === ownerBuildingId,
   );

@@ -38,11 +38,11 @@ export function assertDailyWorldInvariants(world: World): void {
       }
     }
     const lots = market.stockLots;
-    for (let index = 0; index < lots.length; index += 1) {
-      const lot = lots[index] as (typeof lots)[number];
-      if (!Number.isFinite(lot.quantity) || lot.quantity < 0) {
+    for (let index = 0; index < lots.count; index += 1) {
+      const quantity = lots.quantity[index] ?? Number.NaN;
+      if (!Number.isFinite(quantity) || quantity < 0) {
         throw new RangeError(
-          `market ${String(market.id)} has an invalid lot for good ${String(lot.goodId)}`,
+          `market ${String(market.id)} has an invalid lot for good ${String(lots.good[index])}`,
         );
       }
     }
@@ -79,7 +79,7 @@ export function worldDayFingerprint(world: World): string {
   let prices = 0;
   for (const market of world.markets) {
     const lots = market.stockLots;
-    for (let index = 0; index < lots.length; index += 1) stock += (lots[index] as (typeof lots)[number]).quantity;
+    for (let index = 0; index < lots.count; index += 1) stock += lots.quantity[index] ?? 0;
     const priceList = market.priceRUSD;
     for (let index = 0; index < priceList.length; index += 1) prices += priceList[index] as number;
   }

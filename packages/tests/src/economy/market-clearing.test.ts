@@ -4,6 +4,8 @@ import {
   hashWorld,
   runMarketDay,
   type MarketDayInput,
+  lotListFromLots,
+  lotRecords,
 } from "@century/sim";
 import {
   CLOTHING_ID,
@@ -545,7 +547,7 @@ describe("M3d price updates", () => {
     expect(day0.updatedPrices[GRAIN_ID]).toBeCloseTo(0.0525, 12);
 
     world.dayIndex = 1;
-    world.markets[0]!.stockLots = [{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 5 }];
+    world.markets[0]!.stockLots = lotListFromLots([{ goodId: GRAIN_ID, ownerBuildingId: 0, quantity: 5 }]);
     const day1 = runMarketDay(
       world,
       scenario.definitions,
@@ -590,7 +592,8 @@ describe("M3d determinism, validation, and boundaries", () => {
     const firstWorld = createEconomyWorld(firstScenario, { seed: 77 });
     const secondWorld = createEconomyWorld(secondScenario, { seed: 77 });
     secondWorld.buildings.reverse();
-    secondWorld.markets[0]!.stockLots.reverse();
+    // D-159: a lot list is canonical by construction; lots listed in reverse build the same list.
+    secondWorld.markets[0]!.stockLots = lotListFromLots(lotRecords(secondWorld.markets[0]!.stockLots).reverse());
     const demands = [
       household(0, 1, GRAIN_ID, 4),
       household(1, 1, GRAIN_ID, 4),

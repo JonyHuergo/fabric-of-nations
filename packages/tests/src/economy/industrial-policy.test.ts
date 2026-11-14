@@ -24,6 +24,8 @@ import {
   type TickContext,
   type World,
   listAccounts,
+  lotRecords,
+  lotListFromLots,
 } from "@century/sim";
 import { loadM3SmallEconomy } from "../fixtures/smallWorlds.js";
 import {
@@ -237,7 +239,7 @@ describe("E4 sector classification and construction materials", () => {
   test("replaying the same construction day cannot duplicate a material delivery", () => {
     const f = fixture();
     const projectId = startFarm(f);
-    const grainBefore = f.world.markets[0]!.stockLots
+    const grainBefore = lotRecords(f.world.markets[0]!.stockLots)
       .filter((lot) => lot.goodId === 0)
       .reduce((total, lot) => total + lot.quantity, 0);
     const sellerRevenueBefore = listAccounts(f.world.finance.accounts)
@@ -254,7 +256,7 @@ describe("E4 sector classification and construction materials", () => {
     const delivered = first.materials.map((material) => material.deliveredQuantity);
     const spent = first.materialsSpentRUSD;
     expect(spent).toBeGreaterThan(0);
-    const grainAfter = f.world.markets[0]!.stockLots
+    const grainAfter = lotRecords(f.world.markets[0]!.stockLots)
       .filter((lot) => lot.goodId === 0)
       .reduce((total, lot) => total + lot.quantity, 0);
     expect(grainBefore - grainAfter).toBeCloseTo(
@@ -275,7 +277,7 @@ describe("E4 sector classification and construction materials", () => {
     expect(second.materials.map((material) => material.deliveredQuantity)).toEqual(delivered);
     expect(second.materialsSpentRUSD).toBeCloseTo(spent, 6);
     expect(
-      f.world.markets[0]!.stockLots
+      lotRecords(f.world.markets[0]!.stockLots)
         .filter((lot) => lot.goodId === 0)
         .reduce((total, lot) => total + lot.quantity, 0),
     ).toBeCloseTo(grainAfter, 6);
@@ -286,10 +288,10 @@ describe("E4 sector classification and construction materials", () => {
     // Remove the farm's grain material from the market. This is a shortage of
     // actual goods, not a fake order or a negative stock.
     const market = f.world.markets[0]!;
-    const grainBefore = market.stockLots
+    const grainBefore = lotRecords(market.stockLots)
       .filter((lot) => lot.goodId === 0)
       .reduce((total, lot) => total + lot.quantity, 0);
-    market.stockLots = market.stockLots.filter((lot) => lot.goodId !== 0);
+    market.stockLots = lotListFromLots(lotRecords(market.stockLots).filter((lot) => lot.goodId !== 0));
     const projectId = startFarm(f);
 
     // Run construction directly at a synthetic next day so market clearing cannot
@@ -305,11 +307,14 @@ describe("E4 sector classification and construction materials", () => {
     expect(waiting.materialsSpentRUSD).toBe(0);
 
     // Deliver actual grain stock through an existing operational warehouse seller.
-    f.world.markets[0]!.stockLots.push({
+    f.world.markets[0]!.stockLots = lotListFromLots([
+      ...lotRecords(f.world.markets[0]!.stockLots),
+      {
       goodId: 0,
       ownerBuildingId: 7,
       quantity: 1_000_000,
-    });
+    },
+    ]);
     f.world.dayIndex = 2;
     runConstructionPhase(f.world, f.scenario.definitions, 2, undefined, {
       validateWorld: false,

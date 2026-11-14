@@ -34,6 +34,8 @@ import {
   tick,
   type EconomyScenarioDef,
   type World,
+  lotRecords,
+  lotListFromLots,
 } from "@century/sim";
 import { loadM3SmallEconomy } from "../fixtures/smallWorlds.js";
 import { economyTickContext, totalCash } from "../fixtures/m3e.js";
@@ -170,7 +172,7 @@ describe("P5b production waves: goods that cannot be stored (D-146 A4)", () => {
     );
     expect(purchase.reduce((total, entry) => total + entry.quantity, 0)).toBeCloseTo(livestockUsed, 9);
     // No livestock is carried into tomorrow: what nobody bought was lost.
-    expect(world.markets[0]!.stockLots.some((lot) => lot.goodId === LIVESTOCK_ID)).toBe(false);
+    expect(lotRecords(world.markets[0]!.stockLots).some((lot) => lot.goodId === LIVESTOCK_ID)).toBe(false);
     const flow = economy.markets[0]!.production.inventory.find((entry) => entry.goodId === LIVESTOCK_ID);
     expect(flow?.openingStock).toBe(0);
     // Money is conserved.
@@ -341,19 +343,19 @@ describe("P5b regressions found by the 1900 world (D-148)", () => {
     // A remainder below the float tolerance had survived the day and was reserved twice
     // (Pass A from stock, Pass A2 from the same seller's output) the next day.
     const table = lotTableFromLots(
-      [
+      lotListFromLots([
         { goodId: 0, ownerBuildingId: 1, quantity: 1e-12 },
         { goodId: 0, ownerBuildingId: 2, quantity: 3.5 },
         { goodId: 1, ownerBuildingId: 1, quantity: 1e-12 },
-      ],
+      ]),
       [],
       2,
     );
     const losses = applyOverflowToTable(table, [0, 0], 2, new Set([0]));
-    expect(lotTableToLots(table).filter((lot) => lot.goodId === 0)).toEqual([]);
+    expect(lotRecords(lotTableToLots(table)).filter((lot) => lot.goodId === 0)).toEqual([]);
     expect(losses.filter((loss) => loss.goodId === 0).reduce((total, loss) => total + loss.quantity, 0)).toBe(3.5 + 1e-12);
     // A storable good keeps the former rule: a remainder inside the tolerance stays.
-    expect(lotTableToLots(table).filter((lot) => lot.goodId === 1)).toHaveLength(1);
+    expect(lotRecords(lotTableToLots(table)).filter((lot) => lot.goodId === 1)).toHaveLength(1);
   });
 });
 

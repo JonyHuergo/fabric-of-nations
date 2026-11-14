@@ -15,6 +15,7 @@ import {
   type TickContext,
   countryProvinceIds,
   listAccounts,
+  lotRecords,
 } from "@century/sim";
 import {
   M5_REGION_A1,
@@ -25,6 +26,7 @@ import {
 } from "../fixtures/m5.js";
 import { accountsTable } from "../fixtures/accounts.js";
 
+import { marketLots } from "../fixtures/lots.js";
 function context(scenario: ReturnType<typeof m5Scenario>): TickContext {
   return {
     population: { definitions: scenario.population.definitions },
@@ -71,7 +73,7 @@ describe("M5 multi-market clearing and conservation", () => {
         expect(flow.closingStock).toBeCloseTo(expected, 6);
         expect(flow.closingStock).toBeGreaterThanOrEqual(0);
       }
-      const lots = source.stockLots.reduce((total, lot) => total + lot.quantity, 0);
+      const lots = lotRecords(source.stockLots).reduce((total, lot) => total + lot.quantity, 0);
       const closing = market.inventory.reduce((total, flow) => total + flow.closingStock, 0);
       expect(lots).toBeCloseTo(closing, 6);
     }
@@ -132,12 +134,12 @@ describe("M5 multi-market clearing and conservation", () => {
     const market0 = world.markets.find((market) => market.id === 0);
     expect(market0).toBeDefined();
     if (market0 === undefined) return;
-    const lotTotal = market0.stockLots.reduce((total, lot) => total + lot.quantity, 0);
+    const lotTotal = lotRecords(market0.stockLots).reduce((total, lot) => total + lot.quantity, 0);
     expect(Number.isFinite(lotTotal)).toBe(true);
-    expect(market0.stockLots.every((lot) => lot.quantity > 0)).toBe(true);
+    expect(lotRecords(market0.stockLots).every((lot) => lot.quantity > 0)).toBe(true);
     // Only the three provinces in market 0 own those lots.
     const buildingProvince = new Map(world.buildings.map((building) => [building.id, building.provinceId]));
-    for (const lot of market0.stockLots) {
+    for (const lot of lotRecords(market0.stockLots)) {
       const provinceId = buildingProvince.get(lot.ownerBuildingId);
       expect([M5_REGION_A1, M5_REGION_A2, M5_REGION_C1]).toContain(provinceId);
     }
@@ -219,7 +221,7 @@ describe("M5 multi-market clearing and conservation", () => {
       );
     });
     expect(crossProvince).toBe(true);
-    expect(world.markets[0]?.stockLots.length ?? 0).toBeGreaterThan(0);
+    expect(marketLots(world.markets[0]).length ?? 0).toBeGreaterThan(0);
     assertAccountingIdentity(world.finance);
   });
 

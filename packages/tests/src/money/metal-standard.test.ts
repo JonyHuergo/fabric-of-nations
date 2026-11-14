@@ -31,6 +31,8 @@ import {
   type MonetaryCurrencyState,
   type World,
   listAccounts,
+  lotRecords,
+  lotListFromLots,
 } from "@century/sim";
 
 const SEED = 20_261_023;
@@ -58,7 +60,7 @@ function valuation(world: World, currencyId: number): number {
   return entry.rusdPerUnit;
 }
 function goldInMarket(world: World, marketId: number): number {
-  return world.markets.find((market) => market.id === marketId)!.stockLots.filter((lot) => lot.goodId === goldId).reduce((acc, lot) => acc + lot.quantity, 0);
+  return lotRecords(world.markets.find((market) => market.id === marketId)!.stockLots).filter((lot) => lot.goodId === goldId).reduce((acc, lot) => acc + lot.quantity, 0);
 }
 function goldInTransit(world: World): number {
   return world.trade.shipments.filter((shipment) => shipment.goodId === goldId).reduce((acc, shipment) => acc + shipment.quantity, 0);
@@ -125,8 +127,10 @@ describe("D-140 mint window (D-149)", () => {
     // Just under the buy point: below it by less than any freight, so no trader exports it.
     market.priceRUSD[goldId] = mint * (1 - MINT_CHARGE) * (1 - 1e-6);
     const seller = world.buildings.find((building) => world.provinceEconomies.find((province) => province.id === building.provinceId)?.marketId === marketId && building.operational)!;
-    market.stockLots.push({ goodId: goldId, ownerBuildingId: seller.id, quantity: 500 });
-    market.stockLots.sort((left, right) => left.goodId - right.goodId || left.ownerBuildingId - right.ownerBuildingId);
+    market.stockLots = lotListFromLots([
+      ...lotRecords(market.stockLots),
+      { goodId: goldId, ownerBuildingId: seller.id, quantity: 500 },
+    ]);
     const goldBefore = worldGold(world);
     const cashBefore = designatedCashTotal(world.finance);
     const kgBefore = usa.metalReserveKg;

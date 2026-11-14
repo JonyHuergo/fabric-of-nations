@@ -84,6 +84,7 @@ import {
 } from "../population/constants.js";
 
 import { clonePopulationTable, restorePopulationTable } from "../population/blockTable.js";
+import { cloneLotList } from "./lotList.js";
 /** Minimum working age for recruitment. */
 const RECRUIT_MIN_AGE = 18;
 /** Maximum working age for recruitment. */
@@ -1373,7 +1374,7 @@ function snapshotForAction(world: World): {
     markets: world.markets.map((market) => ({
       ...market,
       priceRUSD: [...market.priceRUSD],
-      stockLots: market.stockLots.map((lot) => ({ ...lot })),
+      stockLots: cloneLotList(market.stockLots),
     })),
     construction: world.construction,
     finance: cloneFinanceState(world.finance),

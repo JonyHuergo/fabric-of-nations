@@ -46,6 +46,7 @@ import {
 } from "./types.js";
 import { findAccountById, findAccountByOwner, findAccountsBySubtype } from "./accounts.js";
 
+import { cloneLotList, filterLots, lotListFromLots, type LotList } from "./lotList.js";
 export {
   assertValidTradePolicyState,
   assertValidTradeState,
@@ -164,13 +165,15 @@ export function runTradeArrivals(
     let entry = lotsByMarket.get(market.id);
     if (entry === undefined) {
       const lots = new Map<Id, Map<Id, number>>();
-      for (const lot of market.stockLots) {
-        let byOwner = lots.get(lot.goodId);
+      const stock = market.stockLots;
+      for (let index = 0; index < stock.count; index += 1) {
+        const goodId = stock.good[index] ?? 0;
+        let byOwner = lots.get(goodId);
         if (byOwner === undefined) {
           byOwner = new Map();
-          lots.set(lot.goodId, byOwner);
+          lots.set(goodId, byOwner);
         }
-        byOwner.set(lot.ownerBuildingId, lot.quantity);
+        byOwner.set(stock.owner[index] ?? 0, stock.quantity[index] ?? 0);
       }
       entry = { market, lots };
       lotsByMarket.set(market.id, entry);
@@ -187,7 +190,7 @@ export function runTradeArrivals(
     for (const [goodId, byOwner] of lots) {
       for (const [ownerBuildingId, quantity] of byOwner) flat.push({ goodId, ownerBuildingId, quantity });
     }
-    market.stockLots = canonicalLots(flat);
+    market.stockLots = lotListFromLots(canonicalLots(flat));
   }
 
   world.trade.shipments = remaining;
@@ -264,13 +267,8 @@ export function runTradeDispatchPhase(
   for (const country of world.countries) {
     openingCountryTrade.set(country.id, cloneTradePolicy(country.trade));
   }
-  const openingLots = new Map<Id, { goodId: Id; ownerBuildingId: Id; quantity: number }[]>();
-  for (const market of world.markets) {
-    openingLots.set(
-      market.id,
-      market.stockLots.map((lot) => ({ ...lot })),
-    );
-  }
+  const openingLots = new Map<Id, LotList>();
+  for (const market of world.markets) openingLots.set(market.id, cloneLotList(market.stockLots));
   try {
     return dispatchTrade(world, definitions, dayIndex, options);
   } catch (error) {
@@ -448,26 +446,18 @@ function dispatchTrade(
   let ownerFundedRUSD = 0;
 
   // Uncommitted lot quantity for the whole dispatch. A lot may be offered to several
-  // destinations on different routes; this map is decremented by every shipment so the
-  // same stock can never be sold twice (a market's lot is only mutated after the loop).
-  const remainingByLot = new Map<
-    string,
-    { readonly marketId: Id; readonly goodId: Id; readonly ownerBuildingId: Id; quantity: number }
-  >();
+  // destinations on different routes; these quantities are decremented by every shipment so
+  // the same stock can never be sold twice (a market's lots are only changed after the loop).
+  // D-159: one array per market, indexed like the market's lot list.
+  const remainingByMarket = new Map<Id, Float64Array>();
   for (const market of world.markets) {
-    for (const lot of market.stockLots) {
-      remainingByLot.set(`${String(market.id)}:${String(lot.goodId)}:${String(lot.ownerBuildingId)}`, {
-        marketId: market.id,
-        goodId: lot.goodId,
-        ownerBuildingId: lot.ownerBuildingId,
-        quantity: lot.quantity,
-      });
-    }
+    remainingByMarket.set(market.id, market.stockLots.quantity.slice(0, market.stockLots.count));
   }
   // D-137: the static half of exportability (the owner is operational and located in
   // the market) cannot change during dispatch, so each (market, good) candidate list is
-  // built once, in ascending owner order, instead of scanning every lot of every market
-  // for every route, direction and good. Quantities stay live in `remainingByLot`.
+  // built once, in ascending owner order (a good's lots are one owner-ordered run of the
+  // list), instead of scanning every lot of every market for every route, direction and
+  // good. Quantities stay live in `remainingByMarket`.
   const provincesByMarket = new Map<Id, Set<Id>>();
   for (const province of world.provinceEconomies) {
     if (province.marketId === null) continue;
@@ -478,29 +468,27 @@ function dispatchTrade(
     }
     set.add(province.id);
   }
-  const exportCandidates = new Map<
-    Id,
-    Map<Id, { readonly key: string; readonly entry: { readonly ownerBuildingId: Id; quantity: number } }[]>
-  >();
-  for (const [key, entry] of remainingByLot) {
-    const building = buildingById.get(entry.ownerBuildingId);
-    if (building === undefined || !building.operational) continue;
-    // Only a building located inside the market may export from it. Imported lots
-    // (owned by a foreign building) are sold locally; re-export/entrepôt trade is not
-    // modeled in E6a.
-    if (provincesByMarket.get(entry.marketId)?.has(building.provinceId) !== true) continue;
-    let byGood = exportCandidates.get(entry.marketId);
-    if (byGood === undefined) {
-      byGood = new Map();
-      exportCandidates.set(entry.marketId, byGood);
-    }
-    const list = byGood.get(entry.goodId);
-    if (list === undefined) byGood.set(entry.goodId, [{ key, entry }]);
-    else list.push({ key, entry });
-  }
-  for (const byGood of exportCandidates.values()) {
-    for (const list of byGood.values()) {
-      list.sort((left, right) => left.entry.ownerBuildingId - right.entry.ownerBuildingId);
+  /** Candidate lot indices by market and good. */
+  const exportCandidates = new Map<Id, Map<Id, number[]>>();
+  for (const market of world.markets) {
+    const lots = market.stockLots;
+    const provinces = provincesByMarket.get(market.id);
+    for (let index = 0; index < lots.count; index += 1) {
+      const building = buildingById.get(lots.owner[index] ?? 0);
+      if (building === undefined || !building.operational) continue;
+      // Only a building located inside the market may export from it. Imported lots
+      // (owned by a foreign building) are sold locally; re-export/entrepôt trade is not
+      // modeled in E6a.
+      if (provinces?.has(building.provinceId) !== true) continue;
+      let byGood = exportCandidates.get(market.id);
+      if (byGood === undefined) {
+        byGood = new Map();
+        exportCandidates.set(market.id, byGood);
+      }
+      const goodId = lots.good[index] ?? 0;
+      const list = byGood.get(goodId);
+      if (list === undefined) byGood.set(goodId, [index]);
+      else list.push(index);
     }
   }
 
@@ -517,15 +505,14 @@ function dispatchTrade(
   const exportableLots = (
     market: Market,
     goodId: Id,
-  ): { key: string; ownerBuildingId: Id; quantity: number }[] => {
-    const lots: { key: string; ownerBuildingId: Id; quantity: number }[] = [];
-    for (const candidate of exportCandidates.get(market.id)?.get(goodId) ?? []) {
-      if (!(candidate.entry.quantity > 0)) continue;
-      lots.push({
-        key: candidate.key,
-        ownerBuildingId: candidate.entry.ownerBuildingId,
-        quantity: candidate.entry.quantity,
-      });
+  ): { index: number; ownerBuildingId: Id; quantity: number }[] => {
+    const lots: { index: number; ownerBuildingId: Id; quantity: number }[] = [];
+    const remaining = remainingByMarket.get(market.id);
+    if (remaining === undefined) return lots;
+    for (const index of exportCandidates.get(market.id)?.get(goodId) ?? []) {
+      const quantity = remaining[index] ?? 0;
+      if (!(quantity > 0)) continue;
+      lots.push({ index, ownerBuildingId: market.stockLots.owner[index] ?? 0, quantity });
     }
     return lots;
   };
@@ -597,10 +584,11 @@ function dispatchTrade(
         // exportable list holds them; the list itself is built only once the margin allows a
         // shipment (most route, direction and good combinations stop at the margin).
         const goodCandidates = exportCandidates.get(origin.id)?.get(goodId);
+        const originRemaining = remainingByMarket.get(origin.id);
         let availableQuantity = 0;
-        if (goodCandidates !== undefined) {
+        if (goodCandidates !== undefined && originRemaining !== undefined) {
           for (let item = 0; item < goodCandidates.length; item += 1) {
-            const quantity = (goodCandidates[item] as (typeof goodCandidates)[number]).entry.quantity;
+            const quantity = originRemaining[goodCandidates[item] ?? 0] ?? 0;
             if (quantity > 0) availableQuantity += quantity;
           }
         }
@@ -779,11 +767,9 @@ function dispatchTrade(
           shipments.push(shipment);
           shippedQuantity += lotQuantity;
           usedRUSD += cargoValue;
-          const remainingLot = remainingByLot.get(lot.key);
-          if (remainingLot === undefined) {
-            throw new RangeError(`trade dispatch lost lot ${lot.key}`);
-          }
-          remainingLot.quantity -= lotQuantity;
+          const remaining = remainingByMarket.get(origin.id);
+          if (remaining === undefined) throw new RangeError(`trade dispatch lost market ${String(origin.id)}`);
+          remaining[lot.index] = (remaining[lot.index] ?? 0) - lotQuantity;
           cashByBuilding.set(building.id, buildingCash - buildingPortion);
           freightPaidRUSD += freightCost;
           dutyPaidRUSD += dutyCost;
@@ -879,22 +865,17 @@ function dispatchTrade(
     }
   }
 
-  // Apply the committed quantities to the origin markets. `remainingByLot` is the
+  // Apply the committed quantities to the origin markets. `remainingByMarket` is the
   // single place that was decremented, so a lot can never be over-sold even when several
-  // routes offer it to different destinations in the same phase.
+  // routes offer it to different destinations in the same phase. Lots left empty (or
+  // non-positive) are removed from every market, as before.
   if (shipments.length > 0) {
     for (const market of world.markets) {
-      const nextLots: { goodId: Id; ownerBuildingId: Id; quantity: number }[] = [];
-      for (const entry of remainingByLot.values()) {
-        if (entry.marketId !== market.id) continue;
-        if (!(entry.quantity > 0)) continue;
-        nextLots.push({
-          goodId: entry.goodId,
-          ownerBuildingId: entry.ownerBuildingId,
-          quantity: entry.quantity,
-        });
-      }
-      market.stockLots = canonicalLots(nextLots);
+      const remaining = remainingByMarket.get(market.id);
+      if (remaining === undefined) continue;
+      const lots = market.stockLots;
+      lots.quantity.set(remaining);
+      filterLots(lots, (index) => (lots.quantity[index] ?? 0) > 0);
     }
   }
 

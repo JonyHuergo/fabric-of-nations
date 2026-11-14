@@ -2109,8 +2109,10 @@ function marketSnapshots(
     .sort((left, right) => left.id - right.id)
     .map((market) => {
       const stockByGood = new Map<number, number>();
-      for (const lot of market.stockLots) {
-        stockByGood.set(lot.goodId, (stockByGood.get(lot.goodId) ?? 0) + lot.quantity);
+      const lots = market.stockLots;
+      for (let index = 0; index < lots.count; index += 1) {
+        const goodId = lots.good[index] ?? 0;
+        stockByGood.set(goodId, (stockByGood.get(goodId) ?? 0) + (lots.quantity[index] ?? 0));
       }
       const capacity = capacityByMarket.get(market.id);
       const memberCountryIds = new Set<number>();

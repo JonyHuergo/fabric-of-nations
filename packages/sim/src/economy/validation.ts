@@ -121,6 +121,7 @@ import {
   ACCOUNT_CATEGORIES,
 } from "./types.js";
 
+import { isLotList, lotListCapacity, lotRecords } from "./lotList.js";
 /**
  * MONEY_TOLERANCE_RUSD scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
  * former rest parameter allocated an array on every call; a missing value is 0,
@@ -1474,18 +1475,47 @@ function assertValidMarket(
     if (!(price > 0)) throw new RangeError(`${path}.priceRUSD[${String(index)}] must be positive`);
   }
 
-  const rawLots = requireArray(record.stockLots, `${path}.stockLots`);
-  const lots = new Set<string>();
-  for (let index = 0; index < rawLots.length; index += 1) {
-    const lot = rawLots[index] as StockLot;
-    assertValidLot(lot, `${path}.stockLots[${String(index)}]`, buildingIds, rawPrices.length);
-    const key = `${String(lot.goodId)}:${String(lot.ownerBuildingId)}`;
-    if (lots.has(key)) {
+  assertValidLotList(record.stockLots, `${path}.stockLots`, buildingIds, rawPrices.length);
+}
+
+/**
+ * D-159: a market's lot list: its shape, every lot (as `assertValidLot`), and canonical
+ * order (ascending good, then owner; a repeated pair is a duplicate lot).
+ */
+function assertValidLotList(value: unknown, path: string, buildingIds: ReadonlySet<number>, goodCount: number): void {
+  if (!isLotList(value)) throw new TypeError(`${path} must be a lot list`);
+  const lots = value;
+  const capacity = lotListCapacity(lots);
+  if (!Number.isInteger(lots.count) || lots.count < 0 || lots.count > capacity) {
+    throw new RangeError(`${path}.count is outside its capacity`);
+  }
+  if (lots.owner.length !== capacity || lots.quantity.length !== capacity) {
+    throw new RangeError(`${path} columns have different lengths`);
+  }
+  for (let index = 0; index < lots.count; index += 1) {
+    const goodId = lots.good[index] ?? Number.NaN;
+    const ownerBuildingId = lots.owner[index] ?? Number.NaN;
+    const quantity = lots.quantity[index] ?? Number.NaN;
+    const valid =
+      Number.isInteger(goodId) &&
+      goodId >= 0 &&
+      goodId < goodCount &&
+      Number.isInteger(ownerBuildingId) &&
+      buildingIds.has(ownerBuildingId) &&
+      Number.isFinite(quantity) &&
+      quantity > 0;
+    if (!valid) assertValidLot({ goodId, ownerBuildingId, quantity }, `${path}[${String(index)}]`, buildingIds, goodCount);
+    if (index === 0) continue;
+    const previousGood = lots.good[index - 1] ?? 0;
+    const previousOwner = lots.owner[index - 1] ?? 0;
+    if (previousGood === goodId && previousOwner === ownerBuildingId) {
       throw new RangeError(
-        `${path}.stockLots contains duplicate lot for good ${String(lot.goodId)} owner ${String(lot.ownerBuildingId)}`,
+        `${path} contains duplicate lot for good ${String(goodId)} owner ${String(ownerBuildingId)}`,
       );
     }
-    lots.add(key);
+    if (previousGood > goodId || (previousGood === goodId && previousOwner > ownerBuildingId)) {
+      throw new RangeError(`${path}[${String(index)}] is not in canonical (good, owner) order`);
+    }
   }
 }
 
@@ -1780,7 +1810,7 @@ export function assertValidEconomyState(
       throw new RangeError(`market ${String(market.id)} must contain at least one province`);
     }
     {
-      for (const lot of market.stockLots) {
+      for (const lot of lotRecords(market.stockLots)) {
         const owner = buildingById.get(lot.ownerBuildingId);
         if (owner === undefined) {
           throw new RangeError(

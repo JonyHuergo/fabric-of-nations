@@ -69,7 +69,6 @@ import { assertValidEconomyDefinitions } from "./definitions.js";
 import { constructionProgressFactor } from "./politics.js";
 import { hasResearchedTechnology } from "./technology.js";
 import { depositForNewBuilding, hydroCapacityPerDay } from "./resources.js";
-import { canonicalizeStockLots } from "./inventory.js";
 import type { MarketSettlementResult } from "./settlement.js";
 import { assertValidFinanceState } from "./validation.js";
 import type {
@@ -85,6 +84,7 @@ import type {
 import { buildProvinceOwnerMap, countryProvinceIds } from "./country.js";
 
 import { appendAccount, accountView } from "./accountTable.js";
+import { cloneLotList, filterLots, firstLotOfGood } from "./lotList.js";
 /**
  * MONEY_TOLERANCE_RUSD scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
  * former rest parameter allocated an array on every call; a missing value is 0,
@@ -211,6 +211,8 @@ function procureProjectMaterials(
   let blockedReason: "funds" | "materials" | null = null;
   const countryTreasury = index.get("country", project.countryId, "treasury-cash");
   const wip = index.get("country", project.countryId, "construction-in-progress");
+  // D-159: lots used up here, removed from the list at the end (indices stay valid until then).
+  const removedLots = new Set<number>();
   for (const material of materials) {
     let remaining = constructionMaterialRemaining(material);
     if (!(remaining > toleranceMoney(remaining))) continue;
@@ -223,14 +225,21 @@ function procureProjectMaterials(
     let progressed = true;
     while (remaining > toleranceMoney(remaining) && progressed) {
       progressed = false;
-      const lots = market.stockLots
-        .filter((lot) => lot.goodId === material.goodId && lot.quantity > toleranceMoney(lot.quantity))
-        .sort((left, right) => left.ownerBuildingId - right.ownerBuildingId);
+      // D-159: the good's lots are one run of the canonical list, in ascending owner order.
+      const stock = market.stockLots;
+      const lots: number[] = [];
+      for (let index = firstLotOfGood(stock, material.goodId); index < stock.count; index += 1) {
+        if (stock.good[index] !== material.goodId) break;
+        const quantity = stock.quantity[index] ?? 0;
+        if (removedLots.has(index) || !(quantity > toleranceMoney(quantity))) continue;
+        lots.push(index);
+      }
       if (lots.length === 0) {
         blockedReason = "materials";
         break;
       }
-      for (const lot of lots) {
+      for (const lotIndex of lots) {
+        const lot = { quantity: stock.quantity[lotIndex] ?? 0, ownerBuildingId: stock.owner[lotIndex] ?? 0 };
         if (remaining <= toleranceMoney(remaining)) break;
         if (remainingCash <= toleranceMoney(remainingCash)) {
           blockedReason = "funds";
@@ -256,9 +265,8 @@ function procureProjectMaterials(
         const sellerCash = index.get("building", seller.id, "operating-cash");
         const sellerRevenue = index.get("building", seller.id, "sales-revenue");
         lot.quantity -= quantity;
-        if (lot.quantity <= toleranceMoney(lot.quantity)) {
-          market.stockLots = market.stockLots.filter((candidate) => candidate !== lot);
-        }
+        stock.quantity[lotIndex] = lot.quantity;
+        if (lot.quantity <= toleranceMoney(lot.quantity)) removedLots.add(lotIndex);
         material.deliveredQuantity = Math.min(
           material.requiredQuantity,
           material.deliveredQuantity + quantity,
@@ -284,7 +292,8 @@ function procureProjectMaterials(
     }
     if (blockedReason !== null) break;
   }
-  market.stockLots = canonicalizeStockLots(market.stockLots);
+  // A lot used up is removed (the list stays in canonical order).
+  if (removedLots.size > 0) filterLots(market.stockLots, (index) => !removedLots.has(index));
   return { cash: remainingCash, spentRUSD, blockedReason };
 }
 
@@ -487,7 +496,7 @@ export function runConstructionPhase(
   const stagedMarkets = world.markets.map((market) => ({
     ...market,
     priceRUSD: [...market.priceRUSD],
-    stockLots: market.stockLots.map((lot) => ({ ...lot })),
+    stockLots: cloneLotList(market.stockLots),
   }));
   const staged: World = {
     ...world,

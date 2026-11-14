@@ -18,6 +18,7 @@ import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
 import type { PopulationScenarioDef } from "../population/types.js";
 import type { ProvinceScenarioInput } from "../provinces/types.js";
 
+import type { LotList } from "./lotList.js";
 export const GOOD_CATEGORIES = ["food", "raw", "industrial", "luxury", "service"] as const;
 export type GoodCategory = (typeof GOOD_CATEGORIES)[number];
 
@@ -412,8 +413,11 @@ export interface Market {
   id: Id;
   /** RUSD per physical unit, indexed by good id. */
   priceRUSD: number[];
-  /** Sole authoritative inventory representation. */
-  stockLots: StockLot[];
+  /**
+   * Sole authoritative inventory representation: D-159, a typed list in canonical
+   * (good, owner) order (`economy/lotList.ts`).
+   */
+  stockLots: LotList;
   /**
    * P6 (D-153): market prices smoothed over DEMAND_PRICE_SMOOTHING_DAYS, RUSD per unit,
    * indexed by good id; what households read (plan Q15). Empty in worlds without a

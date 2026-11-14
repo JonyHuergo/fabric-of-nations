@@ -33,6 +33,7 @@ import {
   type Month,
   type World,
   listAccounts,
+  lotRecords,
 } from "@century/sim";
 import {
   PROTOCOL_VERSION,
@@ -346,7 +347,7 @@ describe("E6b monetary authority accounting", () => {
     const record = authority(world);
     const cashBefore = designatedCash(world);
     const goodsBefore = world.markets.reduce(
-      (total, market) => total + market.stockLots.reduce((sum, lot) => sum + lot.quantity, 0),
+      (total, market) => total + lotRecords(market.stockLots).reduce((sum, lot) => sum + lot.quantity, 0),
       0,
     );
     const result = applyCountryAction(
@@ -360,7 +361,7 @@ describe("E6b monetary authority accounting", () => {
     expect(designatedCash(world)).toBeCloseTo(cashBefore, 6);
     expect(
       world.markets.reduce(
-        (total, market) => total + market.stockLots.reduce((sum, lot) => sum + lot.quantity, 0),
+        (total, market) => total + lotRecords(market.stockLots).reduce((sum, lot) => sum + lot.quantity, 0),
         0,
       ),
     ).toBeCloseTo(goodsBefore, 6);
@@ -619,14 +620,14 @@ describe("E6b convertibility and E6a integration", () => {
   test("monetary operations never create or destroy goods", () => {
     const { scenario, world } = buildMonetary({ reserves: 2_000, units: 1_000, parity: 0.5 });
     const goodsBefore = world.markets.reduce(
-      (total, market) => total + market.stockLots.reduce((sum, lot) => sum + lot.quantity, 0),
+      (total, market) => total + lotRecords(market.stockLots).reduce((sum, lot) => sum + lot.quantity, 0),
       0,
     );
     applyCountryAction(world, monetaryAction({ parityRusdPerUnit: 0.45 }), scenario.definitions);
     applyCountryAction(world, monetaryAction({ currencyConversionRUSD: 100 }), scenario.definitions);
     expect(
       world.markets.reduce(
-        (total, market) => total + market.stockLots.reduce((sum, lot) => sum + lot.quantity, 0),
+        (total, market) => total + lotRecords(market.stockLots).reduce((sum, lot) => sum + lot.quantity, 0),
         0,
       ),
     ).toBeCloseTo(goodsBefore, 6);

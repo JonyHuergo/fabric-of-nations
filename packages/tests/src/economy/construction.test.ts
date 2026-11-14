@@ -30,6 +30,8 @@ import {
   type TickContext,
   type World,
   listAccounts,
+  lotRecords,
+  lotListFromLots,
 } from "@century/sim";
 import { loadM3SmallEconomy } from "../fixtures/smallWorlds.js";
 import {
@@ -365,9 +367,11 @@ describe("E3 construction progress and completion", () => {
     // Ensure the farm's authored construction material can be bought, so this
     // test isolates the labor constraint from the material constraint.
     const market = f.world.markets[0]!;
-    const grainLot = market.stockLots.find((lot) => lot.goodId === 0);
+    const lots = lotRecords(market.stockLots);
+    const grainLot = lots.find((lot) => lot.goodId === 0);
     if (grainLot !== undefined) grainLot.quantity = Math.max(grainLot.quantity, 1_000_000);
-    else market.stockLots.push({ goodId: 0, ownerBuildingId: 0, quantity: 1_000_000 });
+    else lots.push({ goodId: 0, ownerBuildingId: 0, quantity: 1_000_000 });
+    market.stockLots = lotListFromLots(lots);
     assertValidWorld(f.world);
     const projectId = start(f);
     run(f, 2); // day 0 authorization, day 1 blocked

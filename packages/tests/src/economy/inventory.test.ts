@@ -5,6 +5,8 @@ import {
   hashWorld,
   runProductionPhase,
   serializeWorld,
+  lotRecords,
+  lotListFromLots,
 } from "@century/sim";
 import {
   FOOD_PRODUCTS_ID,
@@ -21,6 +23,7 @@ import {
 } from "../fixtures/m3c.js";
 import { createEconomyWorld } from "@century/sim";
 
+import { marketLots } from "../fixtures/lots.js";
 describe("M3c inventory movement and storage", () => {
   test("outputs are producer-owned lots and unsold goods retain their owners", () => {
     const { scenario, world } = productionWorld();
@@ -126,11 +129,11 @@ describe("M3c inventory movement and storage", () => {
       );
       expect(stock[flow.goodId]).toBeCloseTo(flow.closingStock, 9);
     }
-    for (const lot of market.stockLots) {
+    for (const lot of lotRecords(market.stockLots)) {
       expect(Number.isFinite(lot.quantity)).toBe(true);
       expect(lot.quantity).toBeGreaterThan(0);
     }
-    const total = market.stockLots.reduce((sum, lot) => sum + lot.quantity, 0);
+    const total = lotRecords(market.stockLots).reduce((sum, lot) => sum + lot.quantity, 0);
     expect(total).toBeCloseTo(stock.reduce((sum, quantity) => sum + quantity, 0), 9);
   });
 
@@ -142,7 +145,8 @@ describe("M3c inventory movement and storage", () => {
       reservation(5, GRAIN_ID, 0, 4),
     ];
     const firstResult = runProductionPhase(first.world, first.scenario.definitions, reservations);
-    second.world.markets[0]!.stockLots.reverse();
+    // D-159: a lot list is canonical by construction; lots listed in reverse build the same list.
+    second.world.markets[0]!.stockLots = lotListFromLots(lotRecords(second.world.markets[0]!.stockLots).reverse());
     const secondResult = runProductionPhase(
       second.world,
       second.scenario.definitions,
@@ -150,7 +154,7 @@ describe("M3c inventory movement and storage", () => {
     );
     expect(secondResult).toEqual(firstResult);
     expect(hashWorld(second.world)).toBe(hashWorld(first.world));
-    const lots = second.world.markets[0]!.stockLots;
+    const lots = lotRecords(second.world.markets[0]!.stockLots);
     for (let index = 1; index < lots.length; index += 1) {
       const previous = lots[index - 1]!;
       const current = lots[index]!;
@@ -181,7 +185,7 @@ describe("M3c inventory movement and storage", () => {
       reservation(4, GRAIN_ID, 0, 10),
     ]);
     const restored = deserializeWorld(serializeWorld(world));
-    expect(restored.markets[0]?.stockLots).toEqual(world.markets[0]?.stockLots);
+    expect(marketLots(restored.markets[0])).toEqual(marketLots(world.markets[0]));
     expect(hashWorld(restored)).toBe(hashWorld(world));
   });
 
