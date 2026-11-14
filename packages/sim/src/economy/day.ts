@@ -447,10 +447,37 @@ function buildProductionDemands(
   const critical = criticalGoodIds(definitions, populationDefinitions.needs);
   const definitionById = new Map(definitions.buildings.map((definition) => [definition.id, definition]));
   const marketById = new Map(world.markets.map((market) => [market.id, market]));
-  // D-137: each definition's inputs in ascending good order once, not a copy and
-  // sort per building and per day.
-  const sortedInputsByDefinition = new Map<Id, readonly BuildingDef["inputs"][number][]>();
+  // D-137/D-158: each definition's purchases once: recipe inputs in ascending good order,
+  // then (when it has any) optional and maintenance inputs merged in by a stable sort on
+  // the good, exactly the order the per-building list and sort produced.
+  interface PurchaseSpec {
+    readonly goodId: number;
+    /** 0 = recipe input (per TU), 1 = optional input (per TU), 2 = maintenance (per level). */
+    readonly kind: 0 | 1 | 2;
+    readonly perUnit: number;
+  }
+  const specsByDefinition = new Map<Id, readonly PurchaseSpec[]>();
+  const specsOf = (definition: BuildingDef): readonly PurchaseSpec[] => {
+    let specs = specsByDefinition.get(definition.id);
+    if (specs !== undefined) return specs;
+    const list: PurchaseSpec[] = [...definition.inputs]
+      .sort((left, right) => left.goodId - right.goodId)
+      .map((input) => ({ goodId: input.goodId, kind: 0, perUnit: input.quantityPerThroughputUnit }));
+    const hasExtras =
+      (definition.optionalInputs?.length ?? 0) > 0 || (definition.maintenanceInputs?.length ?? 0) > 0;
+    if (hasExtras) {
+      for (const item of definition.optionalInputs ?? []) list.push({ goodId: item.goodId, kind: 1, perUnit: item.quantityPerThroughputUnit });
+      for (const item of definition.maintenanceInputs ?? []) list.push({ goodId: item.goodId, kind: 2, perUnit: item.quantityPerLevelPerDay });
+      list.sort((left, right) => left.goodId - right.goodId);
+    }
+    specs = list;
+    specsByDefinition.set(definition.id, specs);
+    return specs;
+  };
+  const operatingCashTable = index.ownerAccountIds("building", "operating-cash");
+  const balances = index.accounts.balance;
   const records: ProductionDemandRecord[] = [];
+  const quantities: number[] = [];
 
   for (const building of inIdOrder(world.buildings)) {
     if (!building.operational) continue;
@@ -464,59 +491,38 @@ function buildProductionDemands(
     if (market === undefined) throw new RangeError(`missing market ${String(marketId)}`);
     const capacity = capacityOf(building.id);
     if (!capacity.isProductionBuilding || capacity.capacityTU <= 0) continue;
-    let inputs = sortedInputsByDefinition.get(definition.id);
-    if (inputs === undefined) {
-      inputs = [...definition.inputs].sort((left, right) => left.goodId - right.goodId);
-      sortedInputsByDefinition.set(definition.id, inputs);
-    }
-    const hasExtras =
-      (definition.optionalInputs?.length ?? 0) > 0 || (definition.maintenanceInputs?.length ?? 0) > 0;
-    if (inputs.length === 0 && !hasExtras) continue;
-    const desired: { goodId: number; quantity: number; price: number; tier: 2 | 5 | null }[] = inputs.map((input) => ({
-      goodId: input.goodId,
-      quantity: input.quantityPerThroughputUnit * capacity.capacityTU,
-      price: market.priceRUSD[input.goodId] ?? 0,
-      tier: null,
-    }));
-    if (hasExtras) {
-      // P5b (D-146): optional inputs (fertiliser) for today's capacity and maintenance
-      // goods for the building's levels, both at the non-critical producer tier 5.
-      for (const item of definition.optionalInputs ?? []) {
-        desired.push({
-          goodId: item.goodId,
-          quantity: item.quantityPerThroughputUnit * capacity.capacityTU,
-          price: market.priceRUSD[item.goodId] ?? 0,
-          tier: 5,
-        });
-      }
-      for (const item of definition.maintenanceInputs ?? []) {
-        desired.push({
-          goodId: item.goodId,
-          quantity: item.quantityPerLevelPerDay * building.level,
-          price: market.priceRUSD[item.goodId] ?? 0,
-          tier: 5,
-        });
-      }
-      desired.sort((left, right) => left.goodId - right.goodId);
-    }
+    const specs = specsOf(definition);
+    if (specs.length === 0) continue;
+    // P5b (D-146): optional inputs (fertiliser) for today's capacity and maintenance goods
+    // for the building's levels, both at the non-critical producer tier 5.
+    quantities.length = specs.length;
     let desiredCost = 0;
-    for (const input of desired) desiredCost += input.quantity * input.price;
+    for (let item = 0; item < specs.length; item += 1) {
+      const spec = specs[item] as PurchaseSpec;
+      const quantity = spec.kind === 2 ? spec.perUnit * building.level : spec.perUnit * capacity.capacityTU;
+      quantities[item] = quantity;
+      desiredCost += quantity * (market.priceRUSD[spec.goodId] ?? 0);
+    }
     let ratio = 1;
     if (mode === "cash") {
-      const account = accountByOwner(index, "building", building.id);
-      const available = Math.max(0, account.balanceRUSD - MONEY_TOLERANCE_RUSD);
+      const accountId = building.id >= 0 && building.id < operatingCashTable.length ? (operatingCashTable[building.id] ?? -1) : -1;
+      const position = accountId < 0 ? -1 : index.position(accountId);
+      const balance = position < 0 ? accountByOwner(index, "building", building.id).balanceRUSD : (balances[position] ?? 0);
+      const available = Math.max(0, balance - MONEY_TOLERANCE_RUSD);
       ratio = desiredCost > 0 ? Math.min(1, available / desiredCost) : 1;
       if (ratio < 1) cap.cappedBuildings += 1;
     }
     const tier = productionTier(definition, critical);
-    for (const input of desired) {
-      const funded = input.quantity * ratio;
+    for (let item = 0; item < specs.length; item += 1) {
+      const spec = specs[item] as PurchaseSpec;
+      const quantity = quantities[item] ?? 0;
+      const funded = quantity * ratio;
       if (!(funded > 0)) continue;
       records.push({
         buyerBuildingId: building.id,
-        tier: input.tier ?? tier,
-        goodId: input.goodId,
-        desiredQuantity: input.quantity,
+        tier: spec.kind === 0 ? tier : 5,
+        goodId: spec.goodId,
+        desiredQuantity: quantity,
         fundedQuantity: funded,
       });
     }
