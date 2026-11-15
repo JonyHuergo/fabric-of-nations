@@ -49,6 +49,16 @@ import type {
   StockLot,
 } from "./types.js";
 import { buildProvinceOwnerMap, marketProvinceIds } from "./country.js";
+import {
+  attachProductionColumns,
+  createProductionColumns,
+  finishProductionColumns,
+  productionBuildingObjects,
+  pushProductionInput,
+  pushProductionOutput,
+  pushProductionRow,
+  type ProductionBuildingColumns,
+} from "./productionColumns.js";
 
 export interface InputReservation {
   readonly buyerBuildingId: number;
@@ -841,10 +851,11 @@ export function applyOverflowLosses(
  * these to production without building one object per reservation.
  */
 export interface ReservationColumns {
-  readonly buyer: readonly number[];
-  readonly good: readonly number[];
-  readonly seller: readonly number[];
-  readonly quantity: readonly number[];
+  /** D-160: arrays or typed arrays (the market day passes typed columns). */
+  readonly buyer: ArrayLike<number>;
+  readonly good: ArrayLike<number>;
+  readonly seller: ArrayLike<number>;
+  readonly quantity: ArrayLike<number>;
 }
 
 /** Reservation uses in columns, in (buyer, good, seller) order. */
@@ -858,7 +869,10 @@ export interface ReservationUseColumns {
 
 /** What `runProductionCore` returns besides the market's new lots. */
 export interface ProductionCoreResult {
+  /** Full detail (D-160: empty when the call does not build objects). */
   readonly buildings: BuildingProductionResult[];
+  /** D-160: every building's result in typed columns. */
+  readonly columns: ProductionBuildingColumns;
   readonly uses: ReservationUseColumns;
   readonly inventory: InventoryFlow[];
   readonly overflowLosses: OverflowLoss[];
@@ -890,6 +904,11 @@ export function runProductionCore(
    * reference and lot checks are skipped (the over-reservation check stays).
    */
   trustedReservations = false,
+  /**
+   * D-160: build the per-building result objects (`buildings`); the typed `columns` are always
+   * written. The market day passes false outside full detail.
+   */
+  buildObjects = true,
 ): ProductionCoreResult {
   const marketProvinceIdSet: ReadonlySet<number> =
     lookups.provinceIdsByMarket.get(market.id) ?? new Set(marketProvinceIds(world, market.id));
@@ -1014,7 +1033,8 @@ export function runProductionCore(
 
   const productionByGood = new Array<number>(goodCount).fill(0);
   const usedByGood = new Array<number>(goodCount).fill(0);
-  const buildingResults: BuildingProductionResult[] = [];
+  // D-160: per-building results in typed columns (objects from them in full detail only).
+  const resultColumns = createProductionColumns(buildingIds.length);
   const uses: ReservationUseColumns = { buyer: [], good: [], seller: [], reserved: [], used: [] };
   const next = copyLotTable(opening);
   // P5b (plan §4.2): stock left in each deposit for today's extraction, in building
@@ -1036,7 +1056,6 @@ export function runProductionCore(
     if (!capacity.isProductionBuilding) continue;
 
     let executedTU = capacity.capacityTU;
-    const inputResults: BuildingProductionResult["inputs"][number][] = [];
     const sortedInputs = sortedByGood(definition.inputs);
     for (const input of sortedInputs) {
       const reserved = reservedByBuyerGood[buyerIndex * goodCount + input.goodId] ?? 0;
@@ -1134,12 +1153,7 @@ export function runProductionCore(
         }
       }
       const actualReleased = Math.max(0, reserved - actualUsed);
-      inputResults.push({
-        goodId: input.goodId,
-        reserved,
-        used: actualUsed,
-        released: actualReleased,
-      });
+      pushProductionInput(resultColumns, input.goodId, reserved, actualUsed, actualReleased);
       usedByGood[input.goodId] = (usedByGood[input.goodId] ?? 0) + actualUsed;
     }
 
@@ -1192,11 +1206,10 @@ export function runProductionCore(
           }
         }
       }
-      inputResults.push({ goodId: purchase.goodId, reserved, used: actualUsed, released: Math.max(0, reserved - actualUsed) });
+      pushProductionInput(resultColumns, purchase.goodId, reserved, actualUsed, Math.max(0, reserved - actualUsed));
       usedByGood[purchase.goodId] = (usedByGood[purchase.goodId] ?? 0) + actualUsed;
     }
 
-    const outputResults: BuildingProductionResult["outputs"][number][] = [];
     const sortedOutputs = sortedByGood(definition.outputs);
     // M9 technology: researched sector productivity increases physical output from
     // the same executed throughput (and therefore the same inputs). It does not
@@ -1219,9 +1232,9 @@ export function runProductionCore(
         throw new RangeError(`building ${String(building.id)} keeps more than it produced`);
       }
       const quantity = kept > 0 ? Math.max(0, produced - kept) : produced;
-      if (kept > 0) outputResults.push({ goodId: output.goodId, quantity, ownConsumption: kept });
+      if (kept > 0) pushProductionOutput(resultColumns, output.goodId, quantity, kept);
       if (quantity > 0) {
-        if (!(kept > 0)) outputResults.push({ goodId: output.goodId, quantity });
+        if (!(kept > 0)) pushProductionOutput(resultColumns, output.goodId, quantity, 0);
         productionByGood[output.goodId] = (productionByGood[output.goodId] ?? 0) + quantity;
         if (producerSlot < 0) throw new RangeError(`building ${String(building.id)} has no lot slot`);
         const cell = output.goodId * ownerCount + producerSlot;
@@ -1234,28 +1247,15 @@ export function runProductionCore(
       }
     }
 
-    // D-160: the same fields without an object spread per building.
-    buildingResults.push(
-      extraction === undefined
-        ? {
-            buildingId: building.id,
-            capacityTU: capacity.capacityTU,
-            executedTU,
-            staffingRatio: capacity.staffingRatio,
-            productivityFactor: capacity.productivityFactor,
-            inputs: inputResults,
-            outputs: outputResults,
-          }
-        : {
-            buildingId: building.id,
-            capacityTU: capacity.capacityTU,
-            executedTU,
-            staffingRatio: capacity.staffingRatio,
-            productivityFactor: capacity.productivityFactor,
-            inputs: inputResults,
-            outputs: outputResults,
-            extraction,
-          },
+    pushProductionRow(
+      resultColumns,
+      building.id,
+      capacity.capacityTU,
+      executedTU,
+      capacity.staffingRatio,
+      capacity.productivityFactor,
+      extraction === undefined ? -1 : extraction.depositId,
+      extraction === undefined ? 0 : extraction.quantity,
     );
   }
 
@@ -1308,7 +1308,15 @@ export function runProductionCore(
     };
   });
 
-  return { buildings: buildingResults, uses, inventory, overflowLosses, lots: next };
+  const columns = finishProductionColumns(resultColumns);
+  return {
+    buildings: buildObjects ? productionBuildingObjects(columns) : [],
+    columns,
+    uses,
+    inventory,
+    overflowLosses,
+    lots: next,
+  };
 }
 
 /** D-160: the message path of reservation `index`. */
@@ -1436,13 +1444,15 @@ export function runProductionPhase(
     assertValidWorldForTick(candidateWorld);
   }
   market.stockLots = canonicalLots;
-  return {
+  const result: ProductionPhaseResult = {
     marketId: market.id,
     buildings: core.buildings,
     reservationUses: reservationUseObjects(market.id, core.uses),
     inventory: core.inventory,
     overflowLosses: core.overflowLosses,
   };
+  attachProductionColumns(result, core.columns);
+  return result;
 }
 
 /** Reservation uses as objects in (buyer, good, seller) order. */

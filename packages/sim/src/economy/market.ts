@@ -45,6 +45,7 @@ import {
   type ReservationUse,
   type ReservationUseColumns,
 } from "./production.js";
+import { attachProductionColumns, mergeProductionColumns, productionBuildingObjects } from "./productionColumns.js";
 import type { BuildingDef, EconomyDefinitions } from "./types.js";
 import { marketProvinceIds } from "./country.js";
 
@@ -827,11 +828,14 @@ export function runMarketDay(
   let slotCount = 0;
   const slotOfBlock = (id: number): number =>
     slotById !== null ? (slotById[id] ?? -1) : ((slotMap as Map<number, number>).get(id) ?? -1);
-  const tierOneThree: number[] = [];
+  // D-160: typed with a fill count (was an array grown by push in every market).
+  const tierOneThree = new Int32Array(householdCount);
+  let tierOneThreeCount = 0;
   for (let index = 0; index < householdCount; index += 1) {
     const tier = tierOf[index];
     if (tier !== 1 && tier !== 3) continue;
-    tierOneThree.push(index);
+    tierOneThree[tierOneThreeCount] = index;
+    tierOneThreeCount += 1;
     const id = buyer[index] ?? 0;
     if (slotOfBlock(id) < 0) {
       if (slotById !== null) slotById[id] = slotCount;
@@ -856,7 +860,7 @@ export function runMarketDay(
   // D-139: desired totals never change; fulfilled totals are re-summed (in the same
   // demand order, from zero) only after an allocation changed a tier-1/3 household
   // fulfilment, which is when the former per-pass recomputation could differ.
-  for (let item = 0; item < tierOneThree.length; item += 1) {
+  for (let item = 0; item < tierOneThreeCount; item += 1) {
     const index = tierOneThree[item] as number;
     const slot = slotOfDemand[index] ?? 0;
     if (tierOf[index] === 1) desired1[slot] = (desired1[slot] ?? 0) + (desired[index] ?? 0);
@@ -868,7 +872,7 @@ export function runMarketDay(
     totalsStale = false;
     fulfilled1.fill(0);
     fulfilled3.fill(0);
-    for (let item = 0; item < tierOneThree.length; item += 1) {
+    for (let item = 0; item < tierOneThreeCount; item += 1) {
       const index = tierOneThree[item] as number;
       const slot = slotOfDemand[index] ?? 0;
       if (tierOf[index] === 1) fulfilled1[slot] = (fulfilled1[slot] ?? 0) + (fulfilled[index] ?? 0);
@@ -892,15 +896,59 @@ export function runMarketDay(
   // Reservations in columns, in creation order. D-158: household pieces are kept only in full
   // detail; their quantities and money go straight into the totals declared with the lots.
   const storeHouseholdPieces = detail === "full";
-  const resKind: number[] = [];
-  const resBuyer: number[] = [];
-  const resTier: number[] = [];
-  const resGood: number[] = [];
-  const resSeller: number[] = [];
-  /** Lot-table slot of each reservation's seller (same slots in every table). */
-  const resSellerSlot: number[] = [];
-  const resQuantity: number[] = [];
-  const resPhase: number[] = [];
+  // D-160: typed columns with a fill count `resCount`, doubled when full (were arrays grown by
+  // push); the unread seller-slot column is gone.
+  let resCapacity = Math.max(64, 2 * (demandCount - householdCount) + (storeHouseholdPieces ? householdCount : 0));
+  let resKind = new Uint8Array(resCapacity);
+  let resBuyer = new Float64Array(resCapacity);
+  let resTier = new Uint8Array(resCapacity);
+  let resGood = new Int32Array(resCapacity);
+  let resSeller = new Float64Array(resCapacity);
+  let resQuantity = new Float64Array(resCapacity);
+  let resPhase = new Uint8Array(resCapacity);
+  let resCount = 0;
+  const pushPiece = (
+    pieceKind: number,
+    pieceBuyer: number,
+    pieceTier: number,
+    pieceGood: number,
+    pieceSeller: number,
+    pieceQuantity: number,
+    piecePhase: number,
+  ): void => {
+    if (resCount === resCapacity) {
+      resCapacity *= 2;
+      const kinds = new Uint8Array(resCapacity);
+      kinds.set(resKind);
+      resKind = kinds;
+      const buyers = new Float64Array(resCapacity);
+      buyers.set(resBuyer);
+      resBuyer = buyers;
+      const tiers = new Uint8Array(resCapacity);
+      tiers.set(resTier);
+      resTier = tiers;
+      const goods = new Int32Array(resCapacity);
+      goods.set(resGood);
+      resGood = goods;
+      const sellers = new Float64Array(resCapacity);
+      sellers.set(resSeller);
+      resSeller = sellers;
+      const quantities = new Float64Array(resCapacity);
+      quantities.set(resQuantity);
+      resQuantity = quantities;
+      const phases = new Uint8Array(resCapacity);
+      phases.set(resPhase);
+      resPhase = phases;
+    }
+    resKind[resCount] = pieceKind;
+    resBuyer[resCount] = pieceBuyer;
+    resTier[resCount] = pieceTier;
+    resGood[resCount] = pieceGood;
+    resSeller[resCount] = pieceSeller;
+    resQuantity[resCount] = pieceQuantity;
+    resPhase[resCount] = piecePhase;
+    resCount += 1;
+  };
 
   // Allocation of one (tier, good) group from a lot table (`allocateTierGood`).
   // D-160: typed scratch of the market day with fill counts (the former arrays were cleared
@@ -909,14 +957,13 @@ export function runMarketDay(
   const relevant = new Int32Array(demandCount);
   const plannedQuantity = new Float64Array(demandCount);
   const buyerEnd = new Float64Array(demandCount);
-  // D-158: the amount a candidate is allocated: funded (Pass A), funded less Pass A (Pass B),
-  // or funded less fulfilled (Pass A2).
-  const fundedFor = (index: number, mode: 0 | 1 | 2): number =>
-    mode === 0
-      ? (funded[index] ?? 0)
-      : mode === 1
-        ? (funded[index] ?? 0) - (passA[index] ?? 0)
-        : (funded[index] ?? 0) - (fulfilled[index] ?? 0);
+  /**
+   * D-158: the amount a candidate is allocated: funded (Pass A), funded less Pass A (Pass B),
+   * or funded less fulfilled (Pass A2). D-160: computed once per candidate into this scratch
+   * (by demand row) before pairing changes Pass A or fulfilment, as the three former calls
+   * per candidate all ran before it.
+   */
+  const amountOf = new Float64Array(demandCount);
   const allocate = (
     count: number,
     mode: 0 | 1 | 2,
@@ -924,18 +971,24 @@ export function runMarketDay(
     lots: LotTable,
     phase: 0 | 1,
   ): { readonly totalFunded: number; readonly fulfilled: number } => {
-    const fundedOf = (index: number): number => fundedFor(index, mode);
     let relevantCount = 0;
     for (let item = 0; item < count; item += 1) {
       const index = candidates[item] as number;
-      if (fundedOf(index) > 0) {
+      const amount =
+        mode === 0
+          ? (funded[index] ?? 0)
+          : mode === 1
+            ? (funded[index] ?? 0) - (passA[index] ?? 0)
+            : (funded[index] ?? 0) - (fulfilled[index] ?? 0);
+      if (amount > 0) {
         relevant[relevantCount] = index;
+        amountOf[index] = amount;
         relevantCount += 1;
       }
     }
     allocationOrderSorted(relevant, relevantCount, kind, buyer, tierOf);
     let totalFunded = 0;
-    for (let item = 0; item < relevantCount; item += 1) totalFunded += fundedOf(relevant[item] as number);
+    for (let item = 0; item < relevantCount; item += 1) totalFunded += amountOf[relevant[item] as number] ?? 0;
     if (totalFunded <= tolerance(totalFunded)) return { totalFunded: 0, fulfilled: 0 };
 
     const ownerCount = lots.owners.length;
@@ -961,7 +1014,7 @@ export function runMarketDay(
     let plannedTotal = 0;
     for (let item = 0; item < relevantCount; item += 1) {
       const index = relevant[item] as number;
-      const quantity = totalFunded <= available ? fundedOf(index) : fundedOf(index) * scale;
+      const quantity = totalFunded <= available ? (amountOf[index] ?? 0) : (amountOf[index] ?? 0) * scale;
       plannedQuantity[item] = quantity;
       plannedTotal += quantity;
     }
@@ -1009,14 +1062,7 @@ export function runMarketDay(
             householdSpend[demand] = (householdSpend[demand] ?? 0) + amount;
           }
           if (!household || storeHouseholdPieces) {
-            resKind.push(kind[demand] ?? 0);
-            resBuyer.push(buyer[demand] ?? 0);
-            resTier.push(tierOf[demand] ?? 0);
-            resGood.push(goodId);
-            resSeller.push(sellerId);
-            resSellerSlot.push(lotSlots[lotIndex] ?? 0);
-            resQuantity.push(quantity);
-            resPhase.push(phase);
+            pushPiece(kind[demand] ?? 0, buyer[demand] ?? 0, tierOf[demand] ?? 0, goodId, sellerId, quantity, phase);
           }
           reservedByLot[lotIndex] = (reservedByLot[lotIndex] ?? 0) + quantity;
         }
@@ -1109,18 +1155,27 @@ export function runMarketDay(
         }
       }
     }
-    const primaryCount = resKind.length;
+    const primaryCount = resCount;
     const householdPassATakenByCell = householdTakenByCell.slice();
     const householdPassATakenByGood = householdTakenByGood.slice();
 
     // M3c production from the building reservations of Pass A.
-    const inputColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
-    for (let index = 0; index < primaryCount; index += 1) {
+    // D-160: typed columns of exactly the building pieces.
+    let buildingPieces = 0;
+    for (let index = 0; index < primaryCount; index += 1) if (resKind[index] === 1) buildingPieces += 1;
+    const inputColumns = {
+      buyer: new Float64Array(buildingPieces),
+      good: new Float64Array(buildingPieces),
+      seller: new Float64Array(buildingPieces),
+      quantity: new Float64Array(buildingPieces),
+    } satisfies ReservationColumns;
+    for (let index = 0, at = 0; index < primaryCount; index += 1) {
       if (resKind[index] !== 1) continue;
-      (inputColumns.buyer as number[]).push(resBuyer[index] ?? 0);
-      (inputColumns.good as number[]).push(resGood[index] ?? 0);
-      (inputColumns.seller as number[]).push(resSeller[index] ?? 0);
-      (inputColumns.quantity as number[]).push(resQuantity[index] ?? 0);
+      inputColumns.buyer[at] = resBuyer[index] ?? 0;
+      inputColumns.good[at] = resGood[index] ?? 0;
+      inputColumns.seller[at] = resSeller[index] ?? 0;
+      inputColumns.quantity[at] = resQuantity[index] ?? 0;
+      at += 1;
     }
     if (options.validateWorld !== false) {
       // `runProductionPhase` checks for direct callers (validated above as well).
@@ -1136,7 +1191,7 @@ export function runMarketDay(
     const waves = productionWaves(definitions, market.id, lookups, kind, goodOf, funded, householdCount, demandCount);
     let productionCore: ReturnType<typeof runProductionCore>;
     if (waves === null) {
-      productionCore = runProductionCore(world, definitions, market, lookups.production, opening, inputColumns, false, undefined, trusted);
+      productionCore = runProductionCore(world, definitions, market, lookups.production, opening, inputColumns, false, undefined, trusted, detail === "full");
     } else {
       const firstColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
       const secondColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
@@ -1147,10 +1202,10 @@ export function runMarketDay(
         (target.seller as number[]).push(inputColumns.seller[index] ?? 0);
         (target.quantity as number[]).push(inputColumns.quantity[index] ?? 0);
       }
-      const first = runProductionCore(world, definitions, market, lookups.production, opening, firstColumns, false, waves.first, trusted);
+      const first = runProductionCore(world, definitions, market, lookups.production, opening, firstColumns, false, waves.first, trusted, false);
       // Pass A2: same-day output of non-storable goods to producers, tiers 2 then 5.
       const sameDay = copyLotTable(first.lots);
-      const beforeA2 = resKind.length;
+      const beforeA2 = resCount;
       for (const tier of [2, 5] as const) {
         for (const goodId of waves.goods) {
           const group = groupOf(tier, goodId);
@@ -1167,15 +1222,18 @@ export function runMarketDay(
           allocate(count, 2, goodId, sameDay, 0);
         }
       }
-      for (let index = beforeA2; index < resKind.length; index += 1) {
+      for (let index = beforeA2; index < resCount; index += 1) {
         (secondColumns.buyer as number[]).push(resBuyer[index] ?? 0);
         (secondColumns.good as number[]).push(resGood[index] ?? 0);
         (secondColumns.seller as number[]).push(resSeller[index] ?? 0);
         (secondColumns.quantity as number[]).push(resQuantity[index] ?? 0);
       }
-      const second = runProductionCore(world, definitions, market, lookups.production, first.lots, secondColumns, false, waves.second, trusted);
+      const second = runProductionCore(world, definitions, market, lookups.production, first.lots, secondColumns, false, waves.second, trusted, false);
+      // D-160: the waves' rows merged in building-id order (the former sorted objects).
+      const mergedColumns = mergeProductionColumns(first.columns, second.columns);
       productionCore = {
-        buildings: [...first.buildings, ...second.buildings].sort((left, right) => left.buildingId - right.buildingId),
+        buildings: detail === "full" ? productionBuildingObjects(mergedColumns) : [],
+        columns: mergedColumns,
         uses: {
           buyer: [...first.uses.buyer, ...second.uses.buyer],
           good: [...first.uses.good, ...second.uses.good],
@@ -1381,7 +1439,7 @@ export function runMarketDay(
       transactions.unitPrice.push(unitPrice);
       transactions.total.push(quantity * unitPrice);
     };
-    for (let index = 0; index < resKind.length; index += 1) {
+    for (let index = 0; index < resCount; index += 1) {
       if (resKind[index] !== 0 || !storeHouseholdPieces) continue;
       pushTransaction(
         0,
@@ -1505,6 +1563,7 @@ export function runMarketDay(
       inventory: productionInventory,
       overflowLosses: [],
     };
+    attachProductionColumns(production, productionCore.columns);
     const result: MarketDayResult = {
       marketId: market.id,
       dayIndex: input.dayIndex,
@@ -1561,7 +1620,15 @@ export function runMarketDay(
         passB,
         fulfilled,
         uses,
-        reservations: { resKind, resBuyer, resTier, resGood, resSeller, resQuantity, resPhase },
+        reservations: {
+          resKind: resKind.subarray(0, resCount),
+          resBuyer: resBuyer.subarray(0, resCount),
+          resTier: resTier.subarray(0, resCount),
+          resGood: resGood.subarray(0, resCount),
+          resSeller: resSeller.subarray(0, resCount),
+          resQuantity: resQuantity.subarray(0, resCount),
+          resPhase: resPhase.subarray(0, resCount),
+        },
       });
     }
     return result;
@@ -1592,13 +1659,13 @@ function fillFullDetail(
     readonly fulfilled: Float64Array;
     readonly uses: ReservationUseColumns;
     readonly reservations: {
-      readonly resKind: readonly number[];
-      readonly resBuyer: readonly number[];
-      readonly resTier: readonly number[];
-      readonly resGood: readonly number[];
-      readonly resSeller: readonly number[];
-      readonly resQuantity: readonly number[];
-      readonly resPhase: readonly number[];
+      readonly resKind: ArrayLike<number>;
+      readonly resBuyer: ArrayLike<number>;
+      readonly resTier: ArrayLike<number>;
+      readonly resGood: ArrayLike<number>;
+      readonly resSeller: ArrayLike<number>;
+      readonly resQuantity: ArrayLike<number>;
+      readonly resPhase: ArrayLike<number>;
     };
   },
 ): void {

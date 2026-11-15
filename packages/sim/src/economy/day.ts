@@ -111,6 +111,7 @@ import {
   type ProductionDemandRecord,
 } from "./market.js";
 import { settleMarketDays, settledHouseholds, type MarketSettlementResult } from "./settlement.js";
+import { productionBuildingColumns } from "./productionColumns.js";
 import {
   EMPTY_OWN_CONSUMPTION,
   planOwnConsumption,
@@ -417,13 +418,16 @@ function productionTier(definition: BuildingDef, critical: ReadonlySet<Id>): 2 |
  */
 function commitExtraction(world: World, results: readonly MarketDayResult[]): void {
   for (const result of results) {
-    for (const building of result.production.buildings) {
-      const extraction = building.extraction;
-      if (extraction === undefined || !(extraction.quantity > 0)) continue;
-      const taken = extractFromDeposit(world, extraction.depositId, extraction.quantity);
-      if (Math.abs(taken - extraction.quantity) > quantityTolerance(extraction.quantity)) {
+    // D-160: the building results through their typed columns (every detail).
+    const produced = productionBuildingColumns(result.production);
+    for (let row = 0; row < produced.rows; row += 1) {
+      const depositId = produced.extractionDeposit[row] ?? -1;
+      const quantity = produced.extractionQuantity[row] ?? 0;
+      if (depositId < 0 || !(quantity > 0)) continue;
+      const taken = extractFromDeposit(world, depositId, quantity);
+      if (Math.abs(taken - quantity) > quantityTolerance(quantity)) {
         throw new RangeError(
-          `building ${String(building.buildingId)} extracted ${String(extraction.quantity)} but its deposit had ${String(taken)}`,
+          `building ${String(produced.buildingId[row] ?? 0)} extracted ${String(quantity)} but its deposit had ${String(taken)}`,
         );
       }
     }

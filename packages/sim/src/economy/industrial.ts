@@ -43,6 +43,7 @@ import { assertValidFinanceState } from "./validation.js";
 import type { BuildingDef, EconomyDefinitions } from "./types.js";
 import { BUILDING_SECTORS } from "./types.js";
 import { buildProvinceOwnerMap } from "./country.js";
+import { productionBuildingColumns } from "./productionColumns.js";
 
 /**
  * MONEY_TOLERANCE_RUSD scaled by the largest magnitude, at least 1. Fixed arity (D-139): the
@@ -147,8 +148,10 @@ export function runIndustrialSubsidyPhase(
     rate: number;
   }[] = [];
   for (const market of [...markets].sort((left, right) => left.marketId - right.marketId)) {
-    for (const production of market.production.buildings) {
-      const building = buildingById.get(production.buildingId);
+    // D-160: the market's building results through their typed columns (every detail).
+    const produced = productionBuildingColumns(market.production);
+    for (let row = 0; row < produced.rows; row += 1) {
+      const building = buildingById.get(produced.buildingId[row] ?? 0);
       if (building === undefined) continue;
       const definition = definitionById.get(building.definitionId);
       if (definition === undefined) continue;
@@ -160,14 +163,15 @@ export function runIndustrialSubsidyPhase(
       const rate = country.industrial.sectorSubsidyRates[sectorIndex] ?? 0;
       if (!(rate > 0)) continue;
       let outputValue = 0;
-      for (const output of production.outputs) {
-        const price = market.updatedPrices[output.goodId];
+      for (let item = produced.outputStart[row] ?? 0; item < (produced.outputStart[row + 1] ?? 0); item += 1) {
+        const goodId = produced.outputGood[item] ?? 0;
+        const price = market.updatedPrices[goodId];
         if (price === undefined || !Number.isFinite(price) || price < 0) {
           throw new RangeError(
-            `market ${String(market.marketId)} has no valid price for subsidized output ${String(output.goodId)}`,
+            `market ${String(market.marketId)} has no valid price for subsidized output ${String(goodId)}`,
           );
         }
-        outputValue += output.quantity * price;
+        outputValue += (produced.outputQuantity[item] ?? 0) * price;
       }
       if (!Number.isFinite(outputValue) || outputValue < 0) {
         throw new RangeError(`building ${String(building.id)} output value is invalid`);

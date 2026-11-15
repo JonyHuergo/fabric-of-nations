@@ -1224,9 +1224,8 @@ function settleMarketDaysInternal(
     const wageObligationOfBuilding = new Float64Array(maxWageBuilding + 1);
     const wageUnpaidByBuilding = new Float64Array(maxWageBuilding + 1);
     const wagePaidByBlock = new Float64Array(maxWageBlock + 1);
-    let wageObligationTotal = 0;
-    let wagePaidTotal = 0;
-    let wageUnpaidTotal = 0;
+    // D-160: obligation, paid and unpaid totals in building order (typed, see `producerSums`).
+    const wageSums = new Float64Array(3);
     const householdCashTable = index.ownerAccountIds("popBlock", "household-cash");
     const wageIncomeTable = index.ownerAccountIds("popBlock", "wage-income");
     const operatingTable = index.ownerAccountIds("building", "operating-cash");
@@ -1263,8 +1262,11 @@ function settleMarketDaysInternal(
       if (id < 0) throw new RangeError(`missing ${what} account for ${String(ownerId)}`);
       return id;
     };
-    for (const building of inIdOrder(world.buildings)) {
-      if (!building.operational) continue;
+    // D-160: the per-building wage body is a function of its own so it runs optimised (a
+    // once-a-day loop body otherwise runs in on-stack-replacement code that de-optimises at
+    // each loop exit and boxes its numbers); likewise domestic service and upkeep below.
+    const settleBuildingWages = (building: World["buildings"][number]): void => {
+      if (!building.operational) return;
       const definition = buildingDefinitions.get(building.definitionId);
       if (definition === undefined) {
         throw new RangeError(`building ${String(building.id)} has no definition`);
@@ -1352,7 +1354,7 @@ function settleMarketDaysInternal(
         }
       }
       const groupCount = gCount;
-      if (groupCount === 0) continue;
+      if (groupCount === 0) return;
       // P5 (D-143 §2): the owner block's kept food is a wage in kind, up to its cash wage here.
       const inKind = inKindWages?.get(building.id);
       if (inKind !== undefined && inKind.valueRUSD > 0) {
@@ -1465,9 +1467,9 @@ function settleMarketDaysInternal(
       wagePaidByBuilding[building.id] = paidTotal;
       wageObligationOfBuilding[building.id] = obligation;
       wageUnpaidByBuilding[building.id] = Math.max(0, obligation - paidTotal);
-      wageObligationTotal += obligation;
-      wagePaidTotal += paidTotal;
-      wageUnpaidTotal += Math.max(0, obligation - paidTotal);
+      wageSums[0] = (wageSums[0] ?? 0) + obligation;
+      wageSums[1] = (wageSums[1] ?? 0) + paidTotal;
+      wageSums[2] = (wageSums[2] ?? 0) + Math.max(0, obligation - paidTotal);
       if (detail === "full") {
         const payments: WagePayment[] = [];
         for (let item = 0; item < groupCount; item += 1) {
@@ -1493,7 +1495,11 @@ function settleMarketDaysInternal(
           payments,
         });
       }
-    }
+    };
+    for (const building of inIdOrder(world.buildings)) settleBuildingWages(building);
+    const wageObligationTotal = wageSums[0] ?? 0;
+    const wagePaidTotal = wageSums[1] ?? 0;
+    const wageUnpaidTotal = wageSums[2] ?? 0;
     let wagePostings: DeferredPostings | null = null;
     if (wageEntries.length > 0) {
       wagePostings = postJournalColumns(world.finance, dayIndex, wageEntries, wageLines);
@@ -1512,10 +1518,10 @@ function settleMarketDaysInternal(
     const spent = new Map<Id, number>();
     const domesticReceived = new Map<Id, number>();
     if (labourWages !== undefined && world.labourMarket.householdEmployment.length > 0) {
-      for (const assignment of world.labourMarket.householdEmployment) {
+      const payDomestic = (assignment: World["labourMarket"]["householdEmployment"][number]): void => {
         const servant = wageLookup.blockById.get(assignment.popBlockId);
         const employer = wageLookup.blockById.get(assignment.employerBlockId);
-        if (servant === undefined || employer === undefined) continue;
+        if (servant === undefined || employer === undefined) return;
         const covered = labourWages.coverage(servant.provinceId).domesticService;
         const annual = labourWages.paid(servant.provinceId, servant.professionId, covered) * DOMESTIC_WAGE_RATIO;
         const obligation = (annual * assignment.workers) / yearDays;
@@ -1533,7 +1539,7 @@ function settleMarketDaysInternal(
           paid = Math.max(0, paid - Math.max(prior + paid - limit, Math.abs(paid) * Number.EPSILON * 2));
           roundingGuard += 1;
         }
-        if (!Number.isFinite(paid) || !(paid > 0) || prior + paid > limit) continue;
+        if (!Number.isFinite(paid) || !(paid > 0) || prior + paid > limit) return;
         spent.set(employer.id, prior + paid);
         domesticReceived.set(servant.id, (domesticReceived.get(servant.id) ?? 0) + paid);
         const start = householdLines.count;
@@ -1551,7 +1557,8 @@ function settleMarketDaysInternal(
           sourceEntityId: employer.id,
           targetEntityId: servant.id,
         });
-      }
+      };
+      for (const assignment of world.labourMarket.householdEmployment) payDomestic(assignment);
     }
     let householdPostings: DeferredPostings | null = null;
     if (householdEntries.length > 0) {
@@ -1568,13 +1575,12 @@ function settleMarketDaysInternal(
     const upkeepPaidByBuilding = new Float64Array(maxBuildingId + 1);
     const upkeepObligationByBuilding = new Float64Array(maxBuildingId + 1);
     const unpaidUpkeepByBuilding = new Float64Array(maxBuildingId + 1);
-    let upkeepObligationTotal = 0;
-    let upkeepPaidTotal = 0;
-    let upkeepUnpaidTotal = 0;
+    // D-160: obligation, paid and unpaid totals in settlement order (typed, see `producerSums`).
+    const upkeepSums = new Float64Array(3);
     let systemAccount: FinancialAccount | undefined;
     let systemIncome: FinancialAccount | undefined;
-    for (const building of inIdOrder(world.buildings)) {
-      if (!building.operational) continue;
+    const settleUpkeep = (building: World["buildings"][number]): void => {
+      if (!building.operational) return;
       const definition = buildingDefinitions.get(building.definitionId);
       if (definition === undefined) {
         throw new RangeError(`building ${String(building.id)} has no definition`);
@@ -1583,7 +1589,7 @@ function settleMarketDaysInternal(
       if (!Number.isFinite(obligation) || obligation < 0) {
         throw new RangeError(`invalid upkeep obligation for building ${String(building.id)}`);
       }
-      if (obligation <= 0) continue;
+      if (obligation <= 0) return;
       if (systemAccount === undefined) {
         const systemAccounts = findAccountsBySubtype(world.finance.accounts, "system-reserve-cash");
         if (systemAccounts.length !== 1) {
@@ -1624,13 +1630,17 @@ function settleMarketDaysInternal(
           unpaidRUSD: unpaid,
         });
       }
-      upkeepObligationTotal += obligation;
-      upkeepPaidTotal += paid;
-      upkeepUnpaidTotal += unpaid;
+      upkeepSums[0] = (upkeepSums[0] ?? 0) + obligation;
+      upkeepSums[1] = (upkeepSums[1] ?? 0) + paid;
+      upkeepSums[2] = (upkeepSums[2] ?? 0) + unpaid;
       upkeepPaidByBuilding[building.id] = paid;
       upkeepObligationByBuilding[building.id] = obligation;
       unpaidUpkeepByBuilding[building.id] = unpaid;
-    }
+    };
+    for (const building of inIdOrder(world.buildings)) settleUpkeep(building);
+    const upkeepObligationTotal = upkeepSums[0] ?? 0;
+    const upkeepPaidTotal = upkeepSums[1] ?? 0;
+    const upkeepUnpaidTotal = upkeepSums[2] ?? 0;
     let upkeepPostings: DeferredPostings | null = null;
     if (upkeepEntries.length > 0) {
       upkeepPostings = postJournalColumns(world.finance, dayIndex, upkeepEntries, upkeepLines);
