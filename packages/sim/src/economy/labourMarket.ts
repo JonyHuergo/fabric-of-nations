@@ -1024,7 +1024,8 @@ function checkLabourEmployment(
   // D-157: one definition lookup (the former `definitionOf` and `definitionById` were the same map).
   const definitionById = lookupById(definitions.buildings);
   const definitionOf = { get: definitionById };
-  for (const building of world.buildings) {
+  for (let buildingIndex = 0; buildingIndex < world.buildings.length; buildingIndex += 1) {
+    const building = world.buildings[buildingIndex]!;
     if (building.jobMix === undefined || building.jobMix === null) continue;
     const definition = definitionOf.get(building.definitionId);
     if (definition === undefined) throw new RangeError(`building ${String(building.id)} references a missing definition`);
@@ -1044,7 +1045,8 @@ function checkLabourEmployment(
   for (const profession of definitions.professions) if (profession.id + 1 > stride) stride = profession.id + 1;
   const usedBySlot = new Map<number, number>();
   const ids = new Set<Id>();
-  for (const assignment of world.employment) {
+  for (let assignmentIndex = 0; assignmentIndex < world.employment.length; assignmentIndex += 1) {
+    const assignment = world.employment[assignmentIndex]!;
     const block = blockById.get(assignment.popBlockId);
     const building = buildingById.get(assignment.buildingInstanceId);
     const profession = professionById.get(assignment.professionId);
@@ -1071,7 +1073,8 @@ function checkLabourEmployment(
       throw new RangeError(`building ${String(building.id)} profession ${String(profession.id)} exceeds its offered slots`);
     }
   }
-  for (const assignment of world.labourMarket.institutionEmployment) {
+  for (let assignmentIndex = 0; assignmentIndex < world.labourMarket.institutionEmployment.length; assignmentIndex += 1) {
+    const assignment = world.labourMarket.institutionEmployment[assignmentIndex]!;
     if (ids.has(assignment.id)) throw new RangeError(`duplicate institution assignment id ${String(assignment.id)}`);
     ids.add(assignment.id);
     if (!(assignment.id < world.labourMarket.nextInstitutionAssignmentId)) {
@@ -1091,7 +1094,8 @@ function checkLabourEmployment(
     assignedByBlock.set(block.id, (assignedByBlock.get(block.id) ?? 0) + assignment.workers);
   }
   const householdIds = new Set<Id>();
-  for (const assignment of world.labourMarket.householdEmployment) {
+  for (let assignmentIndex = 0; assignmentIndex < world.labourMarket.householdEmployment.length; assignmentIndex += 1) {
+    const assignment = world.labourMarket.householdEmployment[assignmentIndex]!;
     if (householdIds.has(assignment.id)) throw new RangeError(`duplicate household assignment id ${String(assignment.id)}`);
     householdIds.add(assignment.id);
     const block = blockById.get(assignment.popBlockId);

@@ -288,7 +288,9 @@ function executeFiscalPhase(
   }));
   const groupByCountry = new Map(groups.map((group) => [group.country.id, group]));
   const unowned: Id[] = [];
-  for (const block of inIdOrder(world.popBlocks)) {
+  const blockList = inIdOrder(world.popBlocks);
+  for (let blockIndex = 0; blockIndex < blockList.length; blockIndex += 1) {
+    const block = blockList[blockIndex]!;
     const countryId = owners.get(block.provinceId);
     if (countryId === undefined) {
       unowned.push(block.id);
@@ -368,7 +370,8 @@ function executeFiscalPhase(
     let taxTotal = 0;
     const collectionEfficiency = taxCollectionEfficiency(country);
     if (rate > 0) {
-      for (const block of group.blocks) {
+      for (let blockIndex = 0; blockIndex < group.blocks.length; blockIndex += 1) {
+        const block = group.blocks[blockIndex]!;
         const wages = settledWages.wagesReceivedRUSD(block.popBlockId);
         if (!Number.isFinite(wages) || wages < 0) {
           throw new RangeError(`invalid settled wages for popBlock ${String(block.popBlockId)}`);
@@ -449,7 +452,8 @@ function executeFiscalPhase(
       payable > 0 ? allocateProportionally(payable, eligible) : new Map<Id, number>();
     const paid = payable;
     const welfareLines: JournalLine[] = [];
-    for (const block of eligible) {
+    for (let blockIndex = 0; blockIndex < eligible.length; blockIndex += 1) {
+      const block = eligible[blockIndex]!;
       const amount = allocations.get(block.popBlockId) ?? 0;
       if (!(amount > 0)) continue;
       const cash = index.get("popBlock", block.popBlockId, "household-cash");
@@ -475,7 +479,8 @@ function executeFiscalPhase(
       });
     }
     const shortfall = Math.max(0, requested - paid);
-    for (const block of plan.group.blocks) {
+    for (let blockIndex = 0; blockIndex < plan.group.blocks.length; blockIndex += 1) {
+      const block = plan.group.blocks[blockIndex]!;
       blockDrafts.push({
         popBlockId: block.popBlockId,
         countryId: country.id,
@@ -534,7 +539,8 @@ function executeFiscalPhase(
         payable > 0 ? allocateProportionally(payable, eligible) : new Map<Id, number>();
       if (payable > 0) {
         const lines: JournalLine[] = [];
-        for (const block of eligible) {
+        for (let blockIndex = 0; blockIndex < eligible.length; blockIndex += 1) {
+          const block = eligible[blockIndex]!;
           const amount = allocations.get(block.popBlockId) ?? 0;
           if (!(amount > 0)) continue;
           const cash = index.get("popBlock", block.popBlockId, "household-cash");

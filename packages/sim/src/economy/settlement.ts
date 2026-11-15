@@ -838,14 +838,16 @@ function idTable<T>(entries: readonly T[], idOf: (entry: T) => Id, keepFirst: bo
 function idTable<T>(entries: readonly T[], idOf: (entry: T) => Id, keepFirst: boolean, group: boolean): { get(id: Id): unknown } {
   let maxId = -1;
   let dense = true;
-  for (const entry of entries) {
+  for (let entryIndex = 0; entryIndex < entries.length; entryIndex += 1) {
+    const entry = entries[entryIndex]!;
     const id = idOf(entry);
     if (!(Number.isInteger(id) && id >= 0)) dense = false;
     else if (id > maxId) maxId = id;
   }
   if (dense && maxId <= entries.length * 4 + 1024) {
     const table: unknown[] = new Array<unknown>(maxId + 1);
-    for (const entry of entries) {
+    for (let entryIndex = 0; entryIndex < entries.length; entryIndex += 1) {
+      const entry = entries[entryIndex]!;
       const id = idOf(entry);
       if (group) {
         const list = table[id] as T[] | undefined;
@@ -858,7 +860,8 @@ function idTable<T>(entries: readonly T[], idOf: (entry: T) => Id, keepFirst: bo
     return { get: (id) => (Number.isInteger(id) && id >= 0 && id <= maxId ? table[id] : undefined) };
   }
   const map = new Map<Id, unknown>();
-  for (const entry of entries) {
+  for (let entryIndex = 0; entryIndex < entries.length; entryIndex += 1) {
+    const entry = entries[entryIndex]!;
     const id = idOf(entry);
     if (group) {
       const list = map.get(id) as T[] | undefined;
@@ -1034,7 +1037,10 @@ function marketFlowEntries(
     return id;
   };
   let maxBuilding = 0;
-  for (const building of world.buildings) if (building.id > maxBuilding) maxBuilding = building.id;
+  for (let buildingIndex = 0; buildingIndex < world.buildings.length; buildingIndex += 1) {
+    const building = world.buildings[buildingIndex]!;
+    if (building.id > maxBuilding) maxBuilding = building.id;
+  }
   const sellerAmount = new Float64Array(maxBuilding + 1);
   const buyerAmount = new Float64Array(maxBuilding + 1);
   const entries: JournalColumnEntry[] = [];
@@ -1167,16 +1173,24 @@ function settleMarketDaysInternal(
   // D-160: opening cash by building id and block id (the former map keyed each by its cash
   // account id, one account per building and block); an absent account reads 0 as before.
   let maxBuildingId = 0;
-  for (const building of world.buildings) if (building.id > maxBuildingId) maxBuildingId = building.id;
+  for (let buildingIndex = 0; buildingIndex < world.buildings.length; buildingIndex += 1) {
+    const building = world.buildings[buildingIndex]!;
+    if (building.id > maxBuildingId) maxBuildingId = building.id;
+  }
   let maxBlockId = 0;
-  for (const block of world.popBlocks) if (block.id > maxBlockId) maxBlockId = block.id;
+  for (let blockIndex = 0; blockIndex < world.popBlocks.length; blockIndex += 1) {
+    const block = world.popBlocks[blockIndex]!;
+    if (block.id > maxBlockId) maxBlockId = block.id;
+  }
   const openingBuildingCash = new Float64Array(maxBuildingId + 1);
-  for (const building of world.buildings) {
+  for (let buildingIndex = 0; buildingIndex < world.buildings.length; buildingIndex += 1) {
+    const building = world.buildings[buildingIndex]!;
     openingBuildingCash[building.id] = balanceOfId(building.operatingCashAccountId);
   }
   const householdCashIds = index.ownerAccountIds("popBlock", "household-cash");
   const openingBlockCash = new Float64Array(maxBlockId + 1);
-  for (const block of world.popBlocks) {
+  for (let blockIndex = 0; blockIndex < world.popBlocks.length; blockIndex += 1) {
+    const block = world.popBlocks[blockIndex]!;
     const accountId = tableAccount(householdCashIds, block.id);
     if (accountId >= 0) openingBlockCash[block.id] = balanceOfId(accountId);
   }
@@ -1217,9 +1231,15 @@ function settleMarketDaysInternal(
     // journal columns: the same rules as the former object path. Per-building and per-block
     // totals go into id-indexed tables; the per-building objects are built in full detail only.
     let maxWageBuilding = 0;
-    for (const building of world.buildings) if (building.id > maxWageBuilding) maxWageBuilding = building.id;
+    for (let buildingIndex = 0; buildingIndex < world.buildings.length; buildingIndex += 1) {
+      const building = world.buildings[buildingIndex]!;
+      if (building.id > maxWageBuilding) maxWageBuilding = building.id;
+    }
     let maxWageBlock = 0;
-    for (const block of world.popBlocks) if (block.id > maxWageBlock) maxWageBlock = block.id;
+    for (let blockIndex = 0; blockIndex < world.popBlocks.length; blockIndex += 1) {
+      const block = world.popBlocks[blockIndex]!;
+      if (block.id > maxWageBlock) maxWageBlock = block.id;
+    }
     const wagePaidByBuilding = new Float64Array(maxWageBuilding + 1);
     const wageObligationOfBuilding = new Float64Array(maxWageBuilding + 1);
     const wageUnpaidByBuilding = new Float64Array(maxWageBuilding + 1);
@@ -1290,7 +1310,9 @@ function settleMarketDaysInternal(
           ? accountOwnerIdAt(accounts, ownerPosition)
           : null;
       const coverage = labourWages.coverage(building.provinceId);
-      for (const assignment of wageLookup.assignmentsByBuilding.get(building.id) ?? NO_WAGE_ASSIGNMENTS) {
+      const assignmentList = wageLookup.assignmentsByBuilding.get(building.id) ?? NO_WAGE_ASSIGNMENTS;
+      for (let assignmentIndex = 0; assignmentIndex < assignmentList.length; assignmentIndex += 1) {
+        const assignment = assignmentList[assignmentIndex]!;
         const block = wageLookup.blockById.get(assignment.popBlockId);
         if (block === undefined) throw new RangeError("employment assignment references an unknown block");
         if (ownerBlockId !== null && ownerBlockId === block.id) continue;
@@ -1496,7 +1518,11 @@ function settleMarketDaysInternal(
         });
       }
     };
-    for (const building of inIdOrder(world.buildings)) settleBuildingWages(building);
+    const wageBuildings = inIdOrder(world.buildings);
+    for (let buildingIndex = 0; buildingIndex < wageBuildings.length; buildingIndex += 1) {
+      const building = wageBuildings[buildingIndex]!;
+      settleBuildingWages(building);
+    }
     const wageObligationTotal = wageSums[0] ?? 0;
     const wagePaidTotal = wageSums[1] ?? 0;
     const wageUnpaidTotal = wageSums[2] ?? 0;
@@ -1558,7 +1584,10 @@ function settleMarketDaysInternal(
           targetEntityId: servant.id,
         });
       };
-      for (const assignment of world.labourMarket.householdEmployment) payDomestic(assignment);
+      for (let assignmentIndex = 0; assignmentIndex < world.labourMarket.householdEmployment.length; assignmentIndex += 1) {
+        const assignment = world.labourMarket.householdEmployment[assignmentIndex]!;
+        payDomestic(assignment);
+      }
     }
     let householdPostings: DeferredPostings | null = null;
     if (householdEntries.length > 0) {
@@ -1637,7 +1666,11 @@ function settleMarketDaysInternal(
       upkeepObligationByBuilding[building.id] = obligation;
       unpaidUpkeepByBuilding[building.id] = unpaid;
     };
-    for (const building of inIdOrder(world.buildings)) settleUpkeep(building);
+    const upkeepBuildings = inIdOrder(world.buildings);
+    for (let buildingIndex = 0; buildingIndex < upkeepBuildings.length; buildingIndex += 1) {
+      const building = upkeepBuildings[buildingIndex]!;
+      settleUpkeep(building);
+    }
     const upkeepObligationTotal = upkeepSums[0] ?? 0;
     const upkeepPaidTotal = upkeepSums[1] ?? 0;
     const upkeepUnpaidTotal = upkeepSums[2] ?? 0;
@@ -1664,7 +1697,8 @@ function settleMarketDaysInternal(
     const purchasesByBlock = new Float64Array(maxBlockId + 1);
     let householdPurchasesTotal = 0;
     let inputPurchasesTotal = 0;
-    for (const flow of flows) {
+    for (let flowIndex = 0; flowIndex < flows.length; flowIndex += 1) {
+      const flow = flows[flowIndex]!;
       for (let row = 0; row < flow.householdSpend.length; row += 1) {
         const amount = flow.householdSpend[row] ?? 0;
         if (!(amount > 0)) continue;
@@ -1726,7 +1760,11 @@ function settleMarketDaysInternal(
         endingCashAfterSettlementRUSD: currentBalance,
       });
     };
-    for (const building of inIdOrder(world.buildings)) settleProducer(building);
+    const producerBuildings = inIdOrder(world.buildings);
+    for (let buildingIndex = 0; buildingIndex < producerBuildings.length; buildingIndex += 1) {
+      const building = producerBuildings[buildingIndex]!;
+      settleProducer(building);
+    }
     const producerRevenueTotal = producerSums[0] ?? 0;
     const producerInputCostsTotal = producerSums[1] ?? 0;
     const producerWagesTotal = producerSums[2] ?? 0;
@@ -1768,7 +1806,11 @@ function settleMarketDaysInternal(
         endingCashAfterSettlementRUSD: balance,
       });
     };
-    for (const block of inIdOrder(world.popBlocks)) settleHousehold(block);
+    const blockList = inIdOrder(world.popBlocks);
+    for (let blockIndex = 0; blockIndex < blockList.length; blockIndex += 1) {
+      const block = blockList[blockIndex]!;
+      settleHousehold(block);
+    }
 
     const endingCash = designatedCashTotal(world.finance);
     if (Math.abs(initialCash - endingCash) > toleranceMoney(initialCash, endingCash)) {

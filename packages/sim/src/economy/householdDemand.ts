@@ -154,7 +154,10 @@ export function buildLesHouseholdDemand(
     colFunded = wider(colFunded, (size) => new Float64Array(size));
   };
   let maxBlockId = 0;
-  for (const block of world.popBlocks) if (block.id > maxBlockId) maxBlockId = block.id;
+  for (let blockIndex = 0; blockIndex < world.popBlocks.length; blockIndex += 1) {
+    const block = world.popBlocks[blockIndex]!;
+    if (block.id > maxBlockId) maxBlockId = block.id;
+  }
   const rowStart = new Int32Array(maxBlockId + 1).fill(-1);
   const rowEnd = new Int32Array(maxBlockId + 1).fill(-1);
   const records: HouseholdDemandRecord[] = [];
@@ -189,7 +192,9 @@ export function buildLesHouseholdDemand(
     if (full) records.push({ popBlockId: blockId, tier, goodId, desiredQuantity: desired, fundedQuantity: funded });
   };
 
-  for (const block of inIdOrder(world.popBlocks)) {
+  const blockList = inIdOrder(world.popBlocks);
+  for (let blockIndex = 0; blockIndex < blockList.length; blockIndex += 1) {
+    const block = blockList[blockIndex]!;
     const persons = personsOfBlock(totals, block);
     if (persons <= 0) continue;
     const marketId = marketOfProvince.get(block.provinceId) ?? null;

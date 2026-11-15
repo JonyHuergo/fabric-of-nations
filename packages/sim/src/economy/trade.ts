@@ -152,7 +152,8 @@ export function runTradeArrivals(
   // sort of the market's lots per shipment). The additions are the same, in the same
   // order, so every lot quantity is identical.
   const lotsByMarket = new Map<Id, { market: Market; lots: Map<Id, Map<Id, number>> }>();
-  for (const shipment of due) {
+  for (let shipmentIndex = 0; shipmentIndex < due.length; shipmentIndex += 1) {
+    const shipment = due[shipmentIndex]!;
     const market = marketById.get(shipment.destinationMarketId);
     if (market === undefined) {
       throw new RangeError(

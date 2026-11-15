@@ -811,8 +811,14 @@ export function runMarketDay(
   const tierRangeStart = (tier: number): number => groupStart[(tierPosition[tier] ?? 0) * goodCount] ?? 0;
   const tierRangeEnd = (tier: number): number => groupStart[((tierPosition[tier] ?? 0) + 1) * goodCount] ?? 0;
   const groupOf = (tier: number, goodId: number): number => (tierPosition[tier] ?? 0) * goodCount + goodId;
+  // D-160: a group's candidates (and below, its relevant rows) never exceed the largest group.
+  let largestGroup = 0;
+  for (let group = 0; group < groupCount; group += 1) {
+    const size = (groupStart[group + 1] ?? 0) - (groupStart[group] ?? 0);
+    if (size > largestGroup) largestGroup = size;
+  }
   /** Candidate scratch for one (tier, good) allocation. */
-  const candidates = new Int32Array(demandCount);
+  const candidates = new Int32Array(largestGroup);
   // Household blocks with tier 1/3 demands get a slot for the eligibility totals.
   // D-158: slots by block id in a typed table (first-use order, as the former map); a buyer id
   // the table cannot address (not a small non-negative integer) falls back to the map.
@@ -953,10 +959,10 @@ export function runMarketDay(
   // Allocation of one (tier, good) group from a lot table (`allocateTierGood`).
   // D-160: typed scratch of the market day with fill counts (the former arrays were cleared
   // with `length = 0`, which drops their storage, and regrown on every call). Candidates:
-  // at most `demandCount`; lots: at most one per owner slot (`lotScratchFor`, below).
-  const relevant = new Int32Array(demandCount);
-  const plannedQuantity = new Float64Array(demandCount);
-  const buyerEnd = new Float64Array(demandCount);
+  // at most the largest group; lots: at most one per owner slot (`lotScratchFor`, below).
+  const relevant = new Int32Array(largestGroup);
+  const plannedQuantity = new Float64Array(largestGroup);
+  const buyerEnd = new Float64Array(largestGroup);
   /**
    * D-158: the amount a candidate is allocated: funded (Pass A), funded less Pass A (Pass B),
    * or funded less fulfilled (Pass A2). D-160: computed once per candidate into this scratch

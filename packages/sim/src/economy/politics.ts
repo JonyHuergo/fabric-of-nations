@@ -1832,7 +1832,8 @@ export function runUnrestPhase(
   // P1: employed workers per block, summed in `world.employment` order exactly as the
   // per-block scan this replaces.
   const employedByBlock = new Map<Id, number>();
-  for (const assignment of world.employment) {
+  for (let assignmentIndex = 0; assignmentIndex < world.employment.length; assignmentIndex += 1) {
+    const assignment = world.employment[assignmentIndex]!;
     employedByBlock.set(
       assignment.popBlockId,
       (employedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
@@ -1841,7 +1842,8 @@ export function runUnrestPhase(
   // P7 (D-154, plan §13 item 13): institution staff count as employed and unemployment
   // is measured against the eligible labour force (D-155: the working-age measure of
   // worlds without a labour market was removed).
-  for (const assignment of world.labourMarket.institutionEmployment) {
+  for (let assignmentIndex = 0; assignmentIndex < world.labourMarket.institutionEmployment.length; assignmentIndex += 1) {
+    const assignment = world.labourMarket.institutionEmployment[assignmentIndex]!;
     employedByBlock.set(
       assignment.popBlockId,
       (employedByBlock.get(assignment.popBlockId) ?? 0) + assignment.workers,
@@ -1862,7 +1864,9 @@ export function runUnrestPhase(
       let unmetPopulation = 0;
       let employed = 0;
       let eligibleLabour = 0;
-      for (const block of lookups.blocksByProvince.get(provinceId) ?? []) {
+      const blockList = lookups.blocksByProvince.get(provinceId) ?? [];
+      for (let blockIndex = 0; blockIndex < blockList.length; blockIndex += 1) {
+        const block = blockList[blockIndex]!;
         const count = personsOfBlock(totals, block);
         provincePopulation += count;
         weightedMilitancy += block.militancy * count;

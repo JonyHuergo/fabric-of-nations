@@ -2251,11 +2251,25 @@ export function designatedCashTotal(finance: FinanceState): MoneyRUSD {
 }
 
 /** Transient owner/subtype lookup. Never serialized, never authoritative. */
+/**
+ * D-160: reusable scratch of journal batches over one index's accounts: a delta per position
+ * and the generation of the batch that last wrote it. A batch takes a new generation, so a
+ * position whose stamp differs holds nothing of that batch (no clearing, nothing read from an
+ * earlier or failed batch). It holds no authoritative state.
+ */
+export interface BatchScratch {
+  readonly stamp: Uint32Array;
+  readonly delta: Float64Array;
+  generation: number;
+}
+
 export interface FinanceIndex {
   /** The account table this index answers for (D-158). */
   readonly accounts: AccountTable;
   /** Number of accounts the index was built with; later appends are not part of it. */
   readonly count: number;
+  /** D-160: the journal-batch scratch over this index's accounts (see `BatchScratch`). */
+  batchScratch(): BatchScratch;
   /** Accounts by id, as live views (D-158: no map of every account). */
   readonly byId: AccountsById;
   /** The account with this id as a live view (`byId.get`). */
@@ -2388,6 +2402,8 @@ interface OwnerTables {
  * gets a new core, and an index handed out earlier keeps answering for its own count.
  */
 interface FinanceIndexCore {
+  /** D-160: the batch scratch of this index's accounts, created on first use. */
+  batchScratch: BatchScratch | null;
   readonly count: number;
   readonly generation: number;
   /** Position by id (-1 = none), length max id + 1; null when ids are too sparse. */
@@ -2501,6 +2517,7 @@ function buildFinanceIndexCore(table: AccountTable, generation: number): Finance
     cashViews: null,
     bySubtype: null,
     index: null,
+    batchScratch: null,
   };
 }
 
@@ -2576,6 +2593,7 @@ function extendFinanceIndexCore(table: AccountTable, core: FinanceIndexCore): Fi
     cashViews: null,
     bySubtype: null,
     index: null,
+    batchScratch: null,
   };
 }
 
@@ -2635,6 +2653,12 @@ function financeIndexView(table: AccountTable, core: FinanceIndexCore): FinanceI
     cash() {
       core.cashViews ??= Array.from(core.cash, (cashPosition) => accountView(table, cashPosition));
       return core.cashViews;
+    },
+    batchScratch() {
+      if (core.batchScratch === null || core.batchScratch.delta.length < count) {
+        core.batchScratch = { stamp: new Uint32Array(count), delta: new Float64Array(count), generation: 0 };
+      }
+      return core.batchScratch;
     },
     cashPositions() {
       return core.cash;

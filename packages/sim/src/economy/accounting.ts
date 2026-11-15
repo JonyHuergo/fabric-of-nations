@@ -49,6 +49,7 @@ import {
   requireAccountTable,
   semanticMaskOf,
   type AccountsById,
+  type BatchScratch,
 } from "./accounts.js";
 import { CATEGORY_OF_SUBTYPE, accountCategoryAt, type AccountTable } from "./accountTable.js";
 import { MAX_AUDIT_POSTINGS } from "./constants.js";
@@ -84,9 +85,13 @@ export interface JournalEntryInput {
  */
 interface BatchDeltas {
   readonly positionOf: (id: number) => number;
-  /** Typed scratch over all account positions, for large batches. */
+  /**
+   * Typed scratch over all account positions, for large batches. D-160: the index's reusable
+   * `BatchScratch`; a position belongs to this batch when its stamp is `generation`.
+   */
   readonly delta: Float64Array | null;
-  readonly seen: Uint8Array | null;
+  readonly stamp: Uint32Array | null;
+  readonly generation: number;
   /** Map by position for small batches (no 100k-account scratch per call). */
   readonly small: Map<number, number> | null;
   readonly touched: number[];
@@ -95,15 +100,24 @@ interface BatchDeltas {
 /** Lines at or above which a batch uses typed scratch over every account. */
 const TYPED_BATCH_LINES = 4096;
 
-function createBatchDeltas(positionOf: (id: number) => number, accountCount: number, lineCount: number): BatchDeltas {
+function createBatchDeltas(
+  positionOf: (id: number) => number,
+  accountCount: number,
+  lineCount: number,
+  scratch: BatchScratch,
+): BatchDeltas {
   const typed = lineCount >= TYPED_BATCH_LINES;
-  return {
-    positionOf,
-    delta: typed ? new Float64Array(accountCount) : null,
-    seen: typed ? new Uint8Array(accountCount) : null,
-    small: typed ? null : new Map<number, number>(),
-    touched: [],
-  };
+  if (!typed) return { positionOf, delta: null, stamp: null, generation: 0, small: new Map<number, number>(), touched: [] };
+  if (scratch.delta.length < accountCount || scratch.stamp.length < accountCount) {
+    throw new RangeError("journal batch scratch is smaller than the account table");
+  }
+  // A new generation per batch; on wrap-around the stamps are cleared once.
+  if (scratch.generation >= 0xffff_fffe) {
+    scratch.stamp.fill(0);
+    scratch.generation = 0;
+  }
+  scratch.generation += 1;
+  return { positionOf, delta: scratch.delta, stamp: scratch.stamp, generation: scratch.generation, small: null, touched: [] };
 }
 
 /** Add one signed line amount; the first amount is taken as `0 + signed` either way. */
@@ -118,10 +132,10 @@ function addBatchDelta(batch: BatchDeltas, position: number, signed: number): vo
     }
     return;
   }
-  const seen = batch.seen as Uint8Array;
+  const stamp = batch.stamp as Uint32Array;
   const delta = batch.delta as Float64Array;
-  if (seen[position] === 0) {
-    seen[position] = 1;
+  if (stamp[position] !== batch.generation) {
+    stamp[position] = batch.generation;
     delta[position] = 0 + signed;
     batch.touched.push(position);
   } else {
@@ -130,7 +144,8 @@ function addBatchDelta(batch: BatchDeltas, position: number, signed: number): vo
 }
 
 function batchDelta(batch: BatchDeltas, position: number): number {
-  return batch.small !== null ? (batch.small.get(position) ?? 0) : ((batch.delta as Float64Array)[position] ?? 0);
+  if (batch.small !== null) return batch.small.get(position) ?? 0;
+  return (batch.stamp as Uint32Array)[position] === batch.generation ? ((batch.delta as Float64Array)[position] ?? 0) : 0;
 }
 
 interface ValidatedLines {
@@ -519,7 +534,7 @@ export function postJournalBatch(
   const table = finance.accounts;
   let lineCount = 0;
   for (const entry of entries) lineCount += entry?.lines.length ?? 0;
-  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lineCount);
+  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lineCount, financeIndex.batchScratch());
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
@@ -749,7 +764,7 @@ export function postJournalColumns(
     lineCount <= lines.debit.length && lineCount <= lines.amount.length)) {
     throw new RangeError("journal line columns have an invalid count");
   }
-  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lineCount);
+  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lineCount, financeIndex.batchScratch());
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);

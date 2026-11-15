@@ -25,10 +25,14 @@ export interface BlockTotals {
 /** Measure every block's totals (a block id beyond the record's range is measured on demand). */
 export function measureBlockTotals(blocks: readonly PopBlock[]): BlockTotals {
   let maxId = -1;
-  for (const block of blocks) if (block.id > maxId) maxId = block.id;
+  for (let blockIndex = 0; blockIndex < blocks.length; blockIndex += 1) {
+    const block = blocks[blockIndex]!;
+    if (block.id > maxId) maxId = block.id;
+  }
   const population = new Float64Array(maxId + 1).fill(Number.NaN);
   const workingAge = new Float64Array(maxId + 1).fill(Number.NaN);
-  for (const block of blocks) {
+  for (let blockIndex = 0; blockIndex < blocks.length; blockIndex += 1) {
+    const block = blocks[blockIndex]!;
     population[block.id] = populationTotal(block);
     workingAge[block.id] = workingAgePopulation(block);
   }
