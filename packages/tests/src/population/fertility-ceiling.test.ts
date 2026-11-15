@@ -26,6 +26,7 @@ import {
   hashWorld,
   NEUTRAL_DEMOGRAPHY_FACTORS,
   naturalFertilitySaturation,
+  popBlockRecord,
   tick,
 } from "@century/sim";
 import { contextFor, makeInputs, oneBlockScenario } from "../fixtures/m2.js";
@@ -145,7 +146,7 @@ describe("inverse saturation and residual fitting (D-144)", () => {
     const target = block();
     calibrateBlockDemography(target, { fertilityLevel: 1, childMortality: 1, adultMortality: 1 }, NEUTRAL_DEMOGRAPHY_FACTORS, "test");
     for (const multiple of [4.009, 10, 1000]) {
-      const scaled = { ...target, fertilityResidual: target.fertilityResidual * multiple };
+      const scaled = { ...popBlockRecord(target), fertilityResidual: target.fertilityResidual * multiple };
       const level = fertilityLevel(scaled, NEUTRAL_DEMOGRAPHY_FACTORS);
       expect(level).toBeGreaterThan(FERTILITY_NATURAL_KNEE);
       expect(level).toBeLessThanOrEqual(FERTILITY_NATURAL_CAP);

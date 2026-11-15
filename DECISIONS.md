@@ -10352,3 +10352,158 @@ replaced, for the designer's acceptance, by about 1.15× this entry's figures:
   account table gives it (it is taken monthly; 1.9 ms per day over the month); no threads.
 - **`pnpm map:atlas:check`** still fails on `main` for its own reason; not run or changed here.
 - **Index heading:** headed like D-154 to D-157 so the index check passes.
+
+## D-159 (performance) — Columnar population and stock lots: the population table, block views, typed lot lists
+
+**Status:** designer's decision of 2026-11-14, branch `perf/day-5x`, after D-158. The designer chose
+the phone route: the simulation stays in the WebView, the state becomes columnar (this entry), then
+worker threads with transferable buffers (route A of D-158, next). The designer's instructions for
+this step: "we don't care about older saves, legacy code and the like … no migration of saves".
+**Amends:** D-158 (consequences: population cells and lots columnar), P5b A11 (figures below).
+
+### Decision
+
+1. **Population table (`population/blockTable.ts`).** `World.population` is the authoritative store
+   of every block: 24 typed columns (`Float64Array`, one per scalar field) and the age cells of all
+   blocks in three packed arrays (`male`, `female`: `Uint32Array`; `literacyByAge`: `Float64Array`),
+   block `p` owning cells `p·81 … p·81+80`. Capacity grows by doubling; positions follow the former
+   block order. `World.popBlocks` is the table's view list (`popBlockViews`), derived and never
+   serialised; validation checks it is the same array.
+2. **Block views.** One `PopBlockView` per block, created when the block enters the table. Its `id`
+   and its three cell arrays are plain fields (the id copied, the cell arrays subarrays of the packed
+   arrays), so the hot loops that read them pay no call; the other 23 fields are prototype accessors
+   reading and writing the block's position. The table refreshes a view's fields whenever it moves
+   the block (growth, retirement compaction, reordering, snapshot restore), a retired block's view
+   throws, and `assertValidPopulationState` checks every view is bound to its own position (an
+   assigned cell array is caught there instead of silently detaching). No simulation code assigned
+   cell arrays or ids; cells are written in place as before.
+3. **Table operations.** `appendPopBlock` (world creation, save decoding, migration's new blocks),
+   `removePopBlocks` (retirement), `reorderPopBlocks`/`sortPopBlocksById` (the economy setup sort,
+   tests of iteration-order independence), `clonePopulationTable` (`cloneWorld`, the rollback
+   checkpoint: three cell arrays and 24 columns copied, no per-block objects),
+   `restorePopulationTable` (the military action snapshot, restored in place so views stay valid),
+   `popBlockRecord`/`popBlockRecords` (plain copies for diagnostics and tests).
+4. **Stock lots (`economy/lotList.ts`).** `Market.stockLots` is a `LotList`: good, owner and quantity
+   columns in canonical order (ascending good, then owner; at most one lot per pair), which every
+   phase already kept; validation now checks the order strictly (a repeated pair is reported as the
+   duplicate lot it was). The per-day dense lot tables (`lotTableFromLots`, `lotTableToLots`) convert
+   from and to the list without objects; trade dispatch keeps the uncommitted quantities in one array
+   per market instead of a map keyed by `market:good:owner` strings (12,385 entries a day), with the
+   same candidate order (a good's lots are one owner-ordered run); construction removes used-up lots
+   by index after the purchase loop; province transfer filters and merges lists.
+5. **Encoded worlds unchanged.** `encodeWorld` lists the same block and lot records as before, so
+   saves, `hashWorld` and every pinned digest are unchanged, and no save schema change was needed
+   (`WORLD_SCHEMA_VERSION` stays 35). Older saves load as they did; nothing was written to migrate
+   them.
+
+### Equivalence
+
+Bit-identical: `pinhashes` (the perf-hash-equality procedure) gives the D-158 hashes at 0, 1, 31, 52
+and 53 ticks and the same day-53 failure after each stage (population table; views with field
+cells; lot lists). Day 31 includes migration's block creation and retirement.
+
+### Measurements (desktop; not a device measurement)
+
+Environment as D-158: AMD Ryzen 5 2600 (6 cores, 12 threads), 7.9 GB RAM, Windows 11 Pro
+10.0.26200, Node v24.22.1, `--max-old-space-size=4096`; nothing else running; medians of 3 runs.
+Columns: `4bec918` (D-157's baseline figures), D-158 (its entry), after (this entry's commit).
+
+**Ordinary days 2–11 (perfPhases `2 12`, ms per day)**
+
+| Phase | 4bec918 | D-158 | After |
+|---|---:|---:|---:|
+| market-clearing | 506.3 | 403.8 | 359.2 |
+| settlement | 561.4 | 238.3 | 233.3 |
+| market-household-demand | 306.7 | 160.7 | 156.1 |
+| demography | 146.2 | 123.9 | 116.3 |
+| fiscal | 69.6 | 58.3 | 53.3 |
+| needs | 92.2 | 48.4 | 49.4 |
+| education | 86.3 | 51.0 | 43.1 |
+| employment | 147.5 | 45.4 | 42.9 |
+| market-production-demand | 64.3 | 42.1 | 42.1 |
+| trade-dispatch | 72.8 | 93.1 | 32.9 |
+| training | 98.6 | 28.9 | 25.7 |
+| unrest | 30.8 | 23.3 | 21.6 |
+| politics | 25.4 | 24.2 | 21.5 |
+| others (each < 14 after) | 196.6 | 68.9 | 67.9 |
+| **Mean day** | **2,405.6** | **1,402.3** | **1,271.7** |
+
+Runs after: 1,249.7 / 1,272.0 / 1,271.7 (1.10× D-158, 1.89× `4bec918`); worst day of the
+window 1,395 ms. Trade dispatch lost its string-keyed map of uncommitted lots (93 → 33 ms, now
+below `4bec918`). The other phases' smaller gains are probably mostly the collector: in one traced run
+(`--trace-gc`), mark-compact time fell from 757 to 594 ms and the heap after a full
+collection from about 216 to 175 MB, because the long-lived population and lots are now a few
+large arrays instead of about 20,800 block objects with 5 M age cells and an object per lot;
+scavenges (short-lived garbage) are unchanged.
+
+**Whole month, days 0–31 (perfPhases `0 32`, ms per day):** mean 3,027.2 → 1,562.6 → 1,455.0
+(runs 1,461.3 / 1,454.5 / 1,455.0; 2.08× `4bec918`). Market clearing 422.4 → 396.2, trade
+dispatch 94.7 → 50.1, migration 76.5 → 76.3. Day 31 (the first monthly labour phase): 18,654 →
+4,687 → 4,460 ms (runs 4,447 / 4,460 / 4,497; 4.18×). The rollback checkpoint costs 0.8 ms a day
+(D-158: 1.9): it copies three cell arrays and 24 columns instead of every block.
+
+**perfBench** (`node --max-old-space-size=4096 dist/perfBench.js 52`; `4bec918` → D-158 →
+after): host STEP day mean 3,268 → 1,892 → 1,768 ms (1.85×); its tick 2,744 → 1,581 → 1,471
+(1.87×); snapshot build 517 → 303 → 289; ordinary host days 2,878 → 1,781 → 1,661 (1.73×); day 31
+18,733 → 5,134 → 4,996 (3.75×); day 30 5,426 → 2,819 → 2,694 (2.01×); staged-mode tick 5,848 →
+2,811 → 2,673; new game 3,592 → 1,895 → 1,795; SAVE 3,856 → 2,948 → 2,965; LOAD 4,083 → 2,538 →
+2,457; heap used p50 360 → 287 MiB, max 504 → 395 MiB (D-158 → after). Every run: the hashes
+at days 1, 31, 32, 52 are `4d77f5a066875b02`, `c9d106dbe6dbed6d`, `0828e7ffda61a1b5`,
+`5b100c8146d94453` (unchanged), "two independent runs identical", "staged mode equals phase
+mode" and the save round trip PASS; the throughput stage then stops on the known day-53 failure
+(account 1303), unchanged.
+
+**Host throughput at the fastest speed** (`scratch/throughput.mjs 30`, days 0–32): 0.345 →
+0.650 → 0.682 days/s (runs 0.682 / 0.684 / 0.680; 1.98×).
+
+**Web app at its top speed (30×)**: `scripts/p7/playtest-labour.mjs` at 844 × 390 on the web
+export, seconds from 1 January to February 1900: 82 → 37 → 36 / 36 / 36 s (0.86 days/s, 2.3×).
+29/29 checks in each run; the in-game figures are unchanged (unemployment 3.9 %, 7.58 M changed
+profession, 2.64 M moved province, 13 blocks created). `docs/images/p7` was restored afterwards.
+Not a device measurement.
+
+**Snapshot build** (Germany, first call and the median of 7 repeats; D-158 → after): day 0
+478 → 452 ms first, 291 → 275 repeat; day 33 486 → 458 first, 286 → 274 repeat.
+
+**`pnpm bench`** (3 invocations, all PASS; p95 ms of each invocation's first run, median;
+D-158 → after): M1 0.010 → 0.010; M2 aggregate 0.069 → 0.071; stress 200 blocks 2.62 → 2.75,
+1,000 blocks 12.7 → 11.8, 3,000 blocks 39.3 → 39.1, 6,000 blocks 82.0 → 78.8. The small worlds
+gain nothing (their blocks fitted in cache before); the differences at 200 and fewer blocks are
+noise of the size seen between invocations.
+
+### Tests
+
+- **Full `pnpm test`** (112 suites, 5,625 s): 11 failures are the known failures of `main`
+  with the same received values as D-158's run. Four other suites failed and were fixed, and each
+  was rerun alone and passes:
+  - three tests copied a block with `{ ...block, field }`, which on a view copies only its own
+    fields (the table binding), giving `NaN`; they now copy `popBlockRecord(block)`
+    (`demography-causes`, `fertility-ceiling`), and the literacy round trip compares the cells as
+    an array (`education`);
+  - `local-currency-display` ran out of its 900 MB heap in `simulatedQuantitiesDigest`
+    (`packages/bench/src/p3Equivalence.ts`), whose generic walk followed each view's table
+    binding and copied the whole table once per block (and would have missed the 23 accessor
+    fields); it now digests `popBlockRecords` and each market's `lotRecords` (24/24 pass, 398 s as
+    before).
+  So 1,459 of 1,470 tests pass, and the 11 that fail are the known ones.
+- **Tests moved to the table API, not weakened:** iteration-order tests reorder blocks with
+  `reorderPopBlocks` and lots by rebuilding the list from reversed records (canonical order is
+  now an invariant, and validation rejects a list out of order); corruption tests write the
+  columns; the state test expects the new "not the view of its position" error.
+- **Hashes:** `perf-hash-equality` and `pinhashes` give the D-158 hashes at 0, 1, 31, 52 and 53
+  ticks and the same day-53 message.
+- **Static checks:** `pnpm typecheck`, `pnpm lint`, both naming audits, `check:worker` (bundle
+  regenerated), `check:sim-deps` and `pnpm app:export` (web, iOS, Android) pass.
+- **`pnpm map:atlas:check`** still fails on `main` for its own reason; not run or changed here.
+
+### Consequences and open items
+
+- **Next (route A, D-158):** split market clearing, household demand, demography and the
+  month-start search into workers that receive typed slices of these tables and return typed
+  results, merged in a fixed order. Buildings, employment and the labour market's assignments are
+  still objects; the phases that send them to a worker need them as typed inputs first.
+- **Transient allocation** is now the largest cost the collector sees: the ordinary day allocates
+  about 840 MiB of short-lived objects (production results, market allocation, settlement and trade
+  bookkeeping), and full collections still run two to three times a day. Exact cuts there are the
+  next single-thread gains.
+- **Index heading:** headed like D-154 to D-158 so the index check passes.

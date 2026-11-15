@@ -300,7 +300,7 @@ describe("M9 age-specific literacy", () => {
     const block = academicsBlock(world);
     const expected = [...block.literacyByAge];
     const restored = deserializeWorld(serializeWorld(world));
-    expect(academicsBlock(restored).literacyByAge).toEqual(expected);
+    expect([...academicsBlock(restored).literacyByAge]).toEqual(expected);
     expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(scenario.definitions.technology).toBeDefined();
   });

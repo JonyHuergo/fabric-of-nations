@@ -28,6 +28,8 @@ import {
   type TickContext,
   type World,
   accountRecords,
+  lotRecords,
+  popBlockRecords,
 } from "@century/sim";
 
 export const P3_PROBE_SEED = 20_261_023;
@@ -129,11 +131,13 @@ export function simulatedQuantitiesDigest(world: World): string {
       dayIndex: world.dayIndex,
       balances,
       countries,
-      popBlocks: world.popBlocks,
+      // D-159: blocks and lots as plain records (a block view's own fields are its table
+      // binding, and a lot list's columns carry capacity past its count).
+      popBlocks: popBlockRecords(world.population),
       provinceEconomies: world.provinceEconomies,
       buildings: world.buildings,
       employment: world.employment,
-      markets: world.markets,
+      markets: world.markets.map((market) => ({ ...market, stockLots: lotRecords(market.stockLots) })),
       construction: world.construction,
       trade: world.trade,
       priceIndex: world.priceIndex,

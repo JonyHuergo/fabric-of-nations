@@ -47,6 +47,7 @@ import {
   refreshEmployment,
   runTicks,
   serializeWorld,
+  popBlockRecord,
   tick,
   updateBlockDemographicLevels,
   type DemographyCountryFactors,
@@ -330,7 +331,7 @@ describe("P4 famine raises mortality only through food shortfall (D-142)", () =>
     expect(famineBlock.urbanShare).toBe(fedBlock.urbanShare);
     const expectedAdult = 1 + FOOD_MORTALITY_WEIGHT_ADULT * (1 - famineBlock.foodSufficiency);
     const expectedChild = 1 + FOOD_MORTALITY_WEIGHT_CHILD * (1 - famineBlock.foodSufficiency);
-    const fedFood = { ...famineBlock, foodSufficiency: 1 };
+    const fedFood = { ...popBlockRecord(famineBlock), foodSufficiency: 1 };
     expect(adult(famineBlock) / adult(fedFood)).toBeCloseTo(expectedAdult, 12);
     expect(child(famineBlock) / child(fedFood)).toBeCloseTo(expectedChild, 12);
     // Famine also lowers births (D-142): fertility falls with the same shortfall.
