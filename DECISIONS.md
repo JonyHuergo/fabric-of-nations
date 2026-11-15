@@ -10507,3 +10507,258 @@ noise of the size seen between invocations.
   bookkeeping), and full collections still run two to three times a day. Exact cuts there are the
   next single-thread gains.
 - **Index heading:** headed like D-154 to D-158 so the index check passes.
+
+## D-160 (performance) — Transient allocation of the 1900-world day: typed scratch and results, per-item bodies, batch scratch
+
+**Status:** designer's task of 2026-11-14, branch `perf/day-5x`, after D-159 (the single-thread step
+before route A of D-158). Exact: the world is bit-identical after every stage (see "Equivalence").
+No save change: `WORLD_SCHEMA_VERSION` stays 35 and `SIM_VERSION` 0.31.0.
+**Amends:** D-137 (summary detail), D-139 (journal columns), D-158 (settlement, market day), D-159
+(open item "transient allocation"), P5b A11 (figures below).
+
+### Where the short-lived objects came from
+
+Measured, not guessed: V8's sampling heap profiler (16 KiB interval, objects collected by minor and
+major collections included) over days 2–11 of the 1900 world (rollback runner, summary detail, the
+host's path; `packages/bench/scratch/alloc4.mjs`, `subtree.mjs`, not committed), `--trace-gc`,
+`--trace-deopt`/`--trace-opt` and `--trace-incremental-marking`, and a probe counting typed-array
+storage by allocating function (`scratch/extprobe.mjs`). At D-159 the day allocated **707 MiB** of
+sampled heap objects (inclusive: settlement 153, market day 161 of which production 70 and the
+allocation pass 49, fiscal 45, production demands 43, household demand 39, the employment check 37,
+building capacity 35). Four mechanisms explained most of it:
+
+1. **`array.length = 0` reuse.** V8 drops the storage of an array cut to length 0, so a scratch array
+   cleared that way and refilled with `push` is reallocated (and its double elements re-transitioned)
+   on every reuse. The allocation pass did this for five arrays per (tier, good) group, settlement for
+   seven arrays per building, overflow for two per good. A micro-benchmark (2 M reuses of 12
+   doubles) ran 4.6× slower with 38× the collections than a typed buffer with a count.
+2. **Per-item result objects** with their own arrays and boxed numbers: settlement's producer,
+   household and upkeep records (≈ 59,000 a day), production's building results (≈ 19,000 a day with
+   input and output lists), building capacity's scratch arrays and closures, and journal lines and
+   reservation columns grown by `push`.
+3. **`Array.prototype.sort` on tiny arrays:** every call allocates its sort state (about 1.4 KiB in
+   this V8), whatever the length; production sorted two or three extra purchases per building
+   (13 MiB a day).
+4. **Once-a-day loops running unoptimised.** A long loop in a function called once a day runs in
+   the interpreter, baseline or on-stack-replacement code (which de-optimises at the loop's exit, e.g.
+   `marketFlowEntries` 20 times a day). There every `for…of` step allocates an iterator result
+   (46 MiB a day in all) and doubles are boxed.
+
+A fifth finding concerns the full collections: every incremental marking of the ordinary day was
+started by **external memory pressure** (typed-array backing stores), not by heap growth (the V8
+heap stood at 20–30 % of its limit), at D-159 and after this entry alike (29 and 30 starts over
+days 2–11). The day allocates about 250 MiB of typed-array storage: lot tables per market (about
+85 MiB: `copyLotTable`, `lotTableFromLots`, household cells, Pass-B and final tables), per-market
+demand-row columns, and at D-159 a 4.3 MB delta array per large journal batch (29 MiB). Replacing
+heap objects with typed columns therefore moves work from the scavenger to this trigger; the
+cuts below keep the typed storage level (D-159 251.0 → after 245.5 MiB a day).
+
+### Decision
+
+1. **Settlement (`settlement.ts`).** Opening cash, upkeep and their totals by building and block id
+   in typed tables (were maps keyed by account id and reductions over the lists); the household
+   settlement of every block in typed columns by block id (`SettlementHouseholdColumns`, a
+   non-enumerable companion of the result like the market day's columns) read through
+   `settledHouseholds` by needs, wealth, housing, fiscal and construction (a copied or hand-built
+   result is read from its `households` list as before). Producer, household and upkeep records are
+   built in full detail only, as transactions and wage records already were (D-137, D-158); summary
+   results list them empty, with the same totals. Posting ids are built in one list; the audit buffer
+   is copied only by an atomic call. The wage, domestic-service, upkeep, producer and household bodies
+   are functions of their own (called per item, so they are optimised) with their totals in typed
+   arrays; their loops index arrays instead of `for…of`.
+2. **Journal lines as typed columns (`accounting.ts`).** `JournalLineColumns` holds `Float64Array`
+   columns and a `count`, written with `pushJournalLine` (doubling when full) into buffers sized from
+   their exact bound (wages: two lines per assignment and two per building; upkeep four per building;
+   domestic service four per assignment). Float columns keep the exact number each caller gave, so the
+   integer, side and amount checks see what they saw before; `postJournalColumns` also rejects a
+   count beyond the columns and an entry whose lines lie outside the batch.
+3. **Journal batch scratch (`accounts.ts`, `accounting.ts`).** A large batch (≥ 4,096 lines) used a
+   fresh delta and flag array over all 481,000 accounts (4.3 MB). The finance index now owns one
+   `BatchScratch` per index (created on first use): a delta per position and the generation of the
+   batch that wrote it. Each batch takes a new generation, so a position stamped by an earlier or
+   failed batch reads as untouched; nothing is cleared between batches. Only a large batch asks for
+   it (a small batch keeps its map and never allocates the scratch). It holds no authoritative
+   state.
+4. **Market allocation (`market.ts`).** The allocation pass keeps its candidates, planned quantities,
+   buyer and lot interval ends, lot slots and per-lot reservations in typed scratch with counts (sized
+   to the market's largest (tier, good) group and owner count); each candidate's amount is computed
+   once (the three former calls all ran before pairing changes Pass A or fulfilment); an unsorted run
+   is sorted through an array with the same stable comparator. Reservation pieces and tier-1/3
+   household rows are typed columns with counts; production receives the building pieces as exact
+   typed columns (`ReservationColumns` accepts typed arrays). In full detail the pending
+   transactions are appended where they arise, read from the piece and use columns (a call per
+   piece with seven numbers boxed them once the market day had grown past the compiler's inlining
+   budget).
+5. **Production results as typed columns (`productionColumns.ts`).** `runProductionCore` writes one
+   row per building it ran (capacity, executed throughput, staffing, productivity, extraction,
+   inputs and outputs as ranges) and builds the `buildings` objects from them in full detail only;
+   the two production waves merge their rows in building-id order (the former stable sort of the
+   concatenated objects). The rows are a non-enumerable companion of `ProductionPhaseResult`, read by
+   the extraction commit and the industrial subsidy through `productionBuildingColumns` (objects of a
+   copied or hand-built result as before). A definition's optional and maintenance purchases are
+   sorted once a day (`extraPurchaseSpecs`, memoised in the production lookups) instead of a list and
+   a sort per building; the reservation message path is built only when a check fails (was a
+   closure per reservation); overflow uses typed scratch.
+6. **Building capacity.** Workers by profession are summed by scanning the building's few
+   assignments in first-assignment order (the same sums from 0, the same order) instead of two arrays
+   and two closures per building.
+7. **Indexed loops** instead of `for…of` over arrays in the heaviest once-a-day functions
+   (settlement, fiscal, the employment check, unrest, household demand, trade arrivals, block totals).
+   The expression is evaluated once and the length re-read each step, as `for…of` does.
+
+Results meant for a worker thread later (route A) are now typed columns: household settlement,
+production rows, journal lines and reservation pieces can be returned as transferable buffers.
+
+### Save schema
+
+**No save change.** None of the new columns is authoritative state or reaches the encoded world;
+`WORLD_SCHEMA_VERSION` stays 35 and saves load as before. `SIM_VERSION` stays 0.31.0 (D-158's open
+item; the results are bit-identical, so this entry gives no reason to bump it).
+
+### Equivalence
+
+Bit-identical. After each of the eight stages (settlement tables and journal lines; typed allocation
+scratch; production specs and capacity; per-item settlement bodies; market pieces and candidates;
+production columns; indexed loops, batch scratch and group-sized buffers; the final two changes),
+`pinhashes` (the perf-hash-equality procedure, full detail) and the same procedure in summary
+detail (`scratch/pinsummary.mjs`, the host's path) give the D-158/D-159 hashes at 0, 1, 31, 52 and
+53 ticks (`685bf3c4ccf4f842`, `4d77f5a066875b02`, `c9d106dbe6dbed6d`, `5b100c8146d94453`,
+`2fa36b1df11debff`) and the same day-53 failure; perfBench's host run gives `4d77f5a066875b02`,
+`c9d106dbe6dbed6d`, `0828e7ffda61a1b5`, `5b100c8146d94453` at days 1, 31, 32, 52 in every run.
+Every changed sum keeps its operands and order (running sums from 0 in the former reduction order;
+typed columns store the same doubles; sorts keep their comparators and stability).
+
+### Measurements (desktop; not a device measurement)
+
+Environment as D-158/D-159 (AMD Ryzen 5 2600, 7.9 GB, Windows 11 Pro 10.0.26200, Node v24.22.1,
+`--max-old-space-size=4096`); medians of 3 runs. **The computer restarted during the measurements:**
+perfPhases and perfBench run 1 ran before it with nothing else running; the other figures ran
+after it, with the designer's applications open (Spotify, Steam, OneDrive), and are noisier (see
+perfBench). Where noted, the D-159 build (5875ff0's `packages/sim/dist`, run from a copy) was
+measured interleaved with this build in the same session.
+
+**Ordinary days 2–11 (perfPhases `2 12`, ms per day)**
+
+| Phase | 4bec918 | D-158 | D-159 | After |
+|---|---:|---:|---:|---:|
+| market-clearing | 506.3 | 403.8 | 359.2 | 342.5 |
+| settlement | 561.4 | 238.3 | 233.3 | 169.6 |
+| market-household-demand | 306.7 | 160.7 | 156.1 | 152.1 |
+| demography | 146.2 | 123.9 | 116.3 | 116.5 |
+| needs | 92.2 | 48.4 | 49.4 | 50.1 |
+| fiscal | 69.6 | 58.3 | 53.3 | 45.3 |
+| education | 86.3 | 51.0 | 43.1 | 43.0 |
+| employment | 147.5 | 45.4 | 42.9 | 40.4 |
+| market-production-demand | 64.3 | 42.1 | 42.1 | 37.9 |
+| trade-dispatch | 72.8 | 93.1 | 32.9 | 34.4 |
+| training | 98.6 | 28.9 | 25.7 | 24.0 |
+| politics | 25.4 | 24.2 | 21.5 | 22.4 |
+| unrest | 30.8 | 23.3 | 21.6 | 20.8 |
+| others | 196.6 | 68.9 | 67.9 | 66.9 |
+| **Mean day** | **2,405.6** | **1,402.3** | **1,271.7** | **1,165.9** |
+
+Runs after: 1,165.9 / 1,178.6 / 1,161.3 (1.09× D-159, 2.06× `4bec918`); worst day of the window
+1,369 ms (D-159 1,395).
+
+**Whole month, days 0–31 (perfPhases `0 32`):** mean 3,027.2 → 1,562.6 → 1,455.0 → 1,359.2 ms
+(runs 1,401.5 / 1,359.2 / 1,358.3; 1.07× D-159, 2.23× `4bec918`); market clearing 396.2 → 364.9,
+trade dispatch 50.1 → 49.5, migration 76.3 → 77.5. Day 31 18,654 → 4,687 → 4,460 → 4,387 ms (runs
+4,446 / 4,360 / 4,387).
+
+**Garbage collection, days 2–11** (`scratch/gctrace.mjs` under `--trace-gc`, rollback runner,
+summary detail; D-159 interleaved with an intermediate build of this entry before the restart, the
+final build after it; medians of 3): pause time per day 140.6 → 115.8 ms (runs 116.7 / 113.3 /
+115.8); scavenges 8.3 → 6.1 a day, 48.4 → 29.4 ms; mark-compacts about 2.6 → 2.9 a day, 94.4 → 86.9
+ms; heap used after the 10 days 252–265 → 178–196 MiB. Every incremental marking was started by
+external memory pressure in both builds.
+
+**Allocation** (sampling heap profiler, days 2–11, single runs): 707.3 → 501.5 MiB of heap objects a
+day (−29 %): settlement 153 → 72, market day 161 → 80 (production 70 → 31, the allocation pass 49 →
+15), building capacity 35 → 20, production demands 43 → 30, fiscal 45 → 38, household demand 39 →
+35, iterator results (`for…of`) 46 → 26. Typed-array storage 251.0 → 245.5
+MiB a day (`scratch/extprobe.mjs`).
+
+**perfBench** (`dist/perfBench.js 52`; D-159 entry → the D-159 build in this session before the
+restart → after, run 1 before the restart / runs 2, 3 after it): host STEP day 1,768 → 1,756 →
+1,716 / 1,842, 1,779; tick 1,471 → 1,460 → 1,404 / 1,503, 1,457; snapshot build mean 289 → 288 →
+304 / 331, 314; ordinary host days 1,661 → 1,646 → 1,612 / 1,720, 1,667; day 31 4,996 → 5,059 →
+4,876 / 5,367, 5,121; day 30 2,694 → 2,738 → 2,570 / 3,080, 2,688; staged-mode tick 2,673 → 2,658 →
+3,030 / 3,187, 3,224; new game 1,795 → 1,774 → 1,813 / 2,035, 2,046; SAVE 2,965 → 3,013 → 2,901 /
+3,197, 3,003; LOAD 2,457 → 2,587 → 2,500 / 2,643, 2,610; heap used p50 287 → 271 → 237 / 242, 215
+MiB, max 395 → 397 → 368 / 378, 393 MiB. The like-for-like pair (both before the restart) shows the
+tick 4 % faster, ordinary host days 2 % faster, day 30 6 % faster and the heap 13 % smaller; the runs
+after the restart are slower throughout, which the phase and GC figures (each taken under the same
+conditions as its baseline) do not show, so they are read as machine load. Every run: the hashes
+above, "two independent runs identical", "staged mode equals phase mode" and the save round trip
+PASS; the throughput stage then stops on the known day-53 failure (account 1303).
+
+**Staged mode is slower** (full detail, `tick`; `scratch/staged.mjs 7`, the two builds interleaved
+after the restart): D-159 2,727 / 2,541 / 2,460 ms → after 2,770 / 2,767 / 2,795 ms (median +9 %).
+A CPU profile puts the difference in the collector and in the market day's and production's own
+time; it is not the batch scratch (a build allocating fresh batch arrays timed the same). In full
+detail the result objects are still built, now beside the typed columns. Staged mode is the
+verification path (tests, perfBench's equality check); the app's host runs the rollback runner in
+summary detail. The rollback runner in full detail was not slower (single runs before the restart,
+days 2–6: 2,015 → 1,948 ms; market clearing 678 → 853, settlement 445 → 293, the collector's work
+landing in another phase).
+
+**Host throughput at the fastest speed** (`scratch/throughput.mjs 30`, days 0–32): 0.682 → 0.745
+days/s (runs 0.735 / 0.745 / 0.748, after the restart; an intermediate build before it gave 0.698 /
+0.712 / 0.697).
+
+**Web app at its top speed (30×)** (`scripts/p7/playtest-labour.mjs`, 844 × 390, web export, after
+the restart): 1 January to February 1900 in 82 → 37 → 36 → 33 / 33 / 33 s (0.94 days/s, 2.5×
+`4bec918`). 29/29 checks and 0 errors in each run; the in-game figures are unchanged (unemployment
+3.9 %, 7.58 M changed profession, 2.64 M moved province, 13 blocks created). `docs/images/p7` was
+restored afterwards. Not a device measurement.
+
+**Snapshot build** (Germany, first call and the median of 7 repeats, after the restart; D-159 entry
+/ the D-159 build before the restart → after): day 0 first 452 / 447, 462 → 460 (runs 460 / 521 /
+446), repeat 275 / 278, 277 → 267; day 33 first 458 / 459, 464 → 455, repeat 274 / 285, 276 → 297
+(runs 308 / 284 / 297). The worker's snapshot code is unchanged; the day-33 repeat is about 15 ms
+slower (not investigated).
+
+**`pnpm bench`** (`dist/bench.js` ×3, all PASS, after the restart; p95 ms of each invocation's
+first run, median; D-159 → after): M1 0.010 → 0.010; M2 aggregate 0.071 → 0.071; stress 200 blocks
+2.75 → 2.71, 1,000 blocks 11.8 → 11.9, 3,000 blocks 39.1 → 38.4, 6,000 blocks 78.8 → 83.0. The
+6,000-block figure is 5 % higher in these post-restart runs (not compared interleaved).
+
+### Tests
+
+- **Full `pnpm test`** (this entry's code, 112 suites, 1,470 tests, 5,829 s): 1,459 pass; the 11
+  failures are the eleven known failures of `main` with the received values of D-158/D-159: replay
+  empty-world digest `6aef674f9648abdd`; WPP 1950 `9aaedfa0cfabe4f6`; tick-validation 22 ticks
+  `9dfd323500a31f87`; economy-roundtrip M3a `c7f29aa27a231428`; naming-audits 1900-world hash
+  `685bf3c4ccf4f842`; the four P2b money-calibration tests (`historical/p7/employment_1900.json`,
+  0, 0, 0.06354578421472346); demography-causes urban rows 5,687 of 20,739; world-1900 cotton
+  1.3558462628762207. No test was changed; no digest was re-pinned.
+- **Suites closest to the change**, run alone before the measurements (rollback injections,
+  perf-hash-equality, performance-invariants, production, market clearing, multi-market, economic
+  day, integration, land resources, inventory, industrial policy, settlement, accounts, fiscal,
+  ledger, period close, account table, construction): 18 of 18 suites, 283 of 283 tests pass. The
+  rollback injections count reads of `definitions.buildings`; this entry adds none.
+- **Static checks:** `pnpm typecheck`, `pnpm lint`, `pnpm audit:branding`, `pnpm audit:monetary`,
+  `check:sim-deps` and `check:worker` (bundle regenerated) pass; `pnpm app:export` (web, iOS,
+  Android) passes; `node scripts/docs/decisions-index.mjs` then `--check` pass.
+- **Not added:** no new test file. The changes are exact reorganisations checked by the existing
+  equality, conservation and hash tests and by the per-stage hashes above; the new code paths (typed
+  columns and their object fallbacks, the batch scratch's generations, the wave merge) run in every
+  day of those tests. A dedicated unit test of the batch scratch's wrap-around (generation 2^32 − 1)
+  is not there.
+
+### Consequences and open items
+
+- **Next single-thread cut: the lot tables.** Full collections are started by typed-array storage,
+  not by the heap; the market day allocates about 85 MiB of lot tables a day (goods × owners per
+  market, several per market). Reusable cell buffers owned by the day's market lookups, zero-filled
+  per market, would remove most of it. The same applies to route A: transferable buffers moved per
+  phase count as external memory too, so a worker design should reuse them.
+- **Staged mode (full detail) is about 9 % slower** (see above); the app does not use it; left for
+  the designer's call (it could be recovered by building full-detail objects without the columns,
+  at the cost of two code paths).
+- **Rules found** (for later code too): `array.length = 0` drops an array's storage; a builtin
+  `sort` costs about 1.4 KiB per call; a once-a-day loop runs unoptimised (index arrays, put
+  per-item work in functions); a call that is not inlined boxes its number arguments.
+- **Day 53 still fails** as before (account 1303, −1.7e-15 RUSD); not fixed (designer's call).
+- **`pnpm map:atlas:check`** still fails on `main` for its own reason; not run or changed here.
+- **Index heading:** headed like D-154 to D-159 so the index check passes.
