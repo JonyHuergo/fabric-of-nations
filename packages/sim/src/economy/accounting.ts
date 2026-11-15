@@ -104,10 +104,12 @@ function createBatchDeltas(
   positionOf: (id: number) => number,
   accountCount: number,
   lineCount: number,
-  scratch: BatchScratch,
+  /** The index's scratch, requested only by a large batch (a small one never allocates it). */
+  scratchOf: () => BatchScratch,
 ): BatchDeltas {
   const typed = lineCount >= TYPED_BATCH_LINES;
   if (!typed) return { positionOf, delta: null, stamp: null, generation: 0, small: new Map<number, number>(), touched: [] };
+  const scratch = scratchOf();
   if (scratch.delta.length < accountCount || scratch.stamp.length < accountCount) {
     throw new RangeError("journal batch scratch is smaller than the account table");
   }
@@ -534,7 +536,7 @@ export function postJournalBatch(
   const table = finance.accounts;
   let lineCount = 0;
   for (const entry of entries) lineCount += entry?.lines.length ?? 0;
-  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lineCount, financeIndex.batchScratch());
+  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lineCount, () => financeIndex.batchScratch());
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
@@ -764,7 +766,7 @@ export function postJournalColumns(
     lineCount <= lines.debit.length && lineCount <= lines.amount.length)) {
     throw new RangeError("journal line columns have an invalid count");
   }
-  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lineCount, financeIndex.batchScratch());
+  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lineCount, () => financeIndex.batchScratch());
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);

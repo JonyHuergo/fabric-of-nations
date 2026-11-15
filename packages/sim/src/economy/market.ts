@@ -1425,37 +1425,25 @@ export function runMarketDay(
       unitPrice: [],
       total: [],
     };
-    const pushTransaction = (
-      transactionKind: 0 | 1,
-      buyerId: number,
-      sellerId: number,
-      goodId: number,
-      tier: number,
-      phase: number,
-      quantity: number,
-    ): void => {
-      const unitPrice = openingPrices[goodId] ?? 0;
-      transactions.kind.push(transactionKind);
-      transactions.buyer.push(buyerId);
-      transactions.seller.push(sellerId);
-      transactions.good.push(goodId);
-      transactions.tier.push(tier);
-      transactions.phase.push(phase);
-      transactions.quantity.push(quantity);
-      transactions.unitPrice.push(unitPrice);
-      transactions.total.push(quantity * unitPrice);
-    };
-    for (let index = 0; index < resCount; index += 1) {
-      if (resKind[index] !== 0 || !storeHouseholdPieces) continue;
-      pushTransaction(
-        0,
-        resBuyer[index] ?? 0,
-        resSeller[index] ?? 0,
-        resGood[index] ?? 0,
-        resTier[index] ?? 0,
-        resPhase[index] ?? 0,
-        resQuantity[index] ?? 0,
-      );
+    // D-160: the transactions are appended where they arise, read from the piece and use
+    // columns (a call per piece with seven numbers boxed them once this function grew past
+    // the compiler's inlining budget). The same values, in the same order.
+    if (storeHouseholdPieces) {
+      for (let index = 0; index < resCount; index += 1) {
+        if (resKind[index] !== 0) continue;
+        const goodId = resGood[index] ?? 0;
+        const quantity = resQuantity[index] ?? 0;
+        const unitPrice = openingPrices[goodId] ?? 0;
+        transactions.kind.push(0);
+        transactions.buyer.push(resBuyer[index] ?? 0);
+        transactions.seller.push(resSeller[index] ?? 0);
+        transactions.good.push(goodId);
+        transactions.tier.push(resTier[index] ?? 0);
+        transactions.phase.push(resPhase[index] ?? 0);
+        transactions.quantity.push(quantity);
+        transactions.unitPrice.push(unitPrice);
+        transactions.total.push(quantity * unitPrice);
+      }
     }
     const uses = productionCore.uses;
     const inputBuyer: number[] = [];
@@ -1472,7 +1460,18 @@ export function runMarketDay(
       inputBuyer.push(buyerId);
       inputSeller.push(sellerId);
       inputAmount.push(used * (openingPrices[goodId] ?? 0));
-      if (storeHouseholdPieces) pushTransaction(1, buyerId, sellerId, goodId, tier, 0, used);
+      if (storeHouseholdPieces) {
+        const unitPrice = openingPrices[goodId] ?? 0;
+        transactions.kind.push(1);
+        transactions.buyer.push(buyerId);
+        transactions.seller.push(sellerId);
+        transactions.good.push(goodId);
+        transactions.tier.push(tier);
+        transactions.phase.push(0);
+        transactions.quantity.push(used);
+        transactions.unitPrice.push(unitPrice);
+        transactions.total.push(used * unitPrice);
+      }
     }
 
     // D-136 (amends D-040): sellable supply is the opening stock plus same-day output,
