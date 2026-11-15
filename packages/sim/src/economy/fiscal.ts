@@ -53,7 +53,7 @@ import { buildFinanceIndex, phaseFinance } from "./accounts.js";
 import { accumulateBudgetMemo } from "./budget.js";
 import { buildProvinceOwnerMap, fiscalPolicyIsActive } from "./country.js";
 import { inIdOrder } from "../ordering.js";
-import type { MarketSettlementResult } from "./settlement.js";
+import { settledHouseholds, type MarketSettlementResult } from "./settlement.js";
 import type { Country, EconomyDefinitions, FinanceState, JournalLine } from "./types.js";
 import { taxCollectionEfficiency } from "./politics.js";
 
@@ -277,9 +277,7 @@ function executeFiscalPhase(
   const stagedFinance = phaseFinance(world.finance, options.financeInPlace);
   const index = buildFinanceIndex(stagedFinance);
   const yearDays = daysInYear(dayIndexToCivilDate(dayIndex).year);
-  const wagesByBlock = new Map(
-    settlement.households.map((household) => [household.popBlockId, household.wagesReceivedRUSD]),
-  );
+  const settledWages = settledHouseholds(settlement);
   const owners = buildProvinceOwnerMap(world);
   const countries = inIdOrder(world.countries);
   const politics = options.economyDefinitions?.politics;
@@ -371,7 +369,7 @@ function executeFiscalPhase(
     const collectionEfficiency = taxCollectionEfficiency(country);
     if (rate > 0) {
       for (const block of group.blocks) {
-        const wages = wagesByBlock.get(block.popBlockId) ?? 0;
+        const wages = settledWages.wagesReceivedRUSD(block.popBlockId);
         if (!Number.isFinite(wages) || wages < 0) {
           throw new RangeError(`invalid settled wages for popBlock ${String(block.popBlockId)}`);
         }

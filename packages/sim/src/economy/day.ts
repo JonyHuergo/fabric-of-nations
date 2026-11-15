@@ -110,7 +110,7 @@ import {
   type MarketDayResult,
   type ProductionDemandRecord,
 } from "./market.js";
-import { settleMarketDays, type MarketSettlementResult } from "./settlement.js";
+import { settleMarketDays, settledHouseholds, type MarketSettlementResult } from "./settlement.js";
 import {
   EMPTY_OWN_CONSUMPTION,
   planOwnConsumption,
@@ -564,16 +564,8 @@ function buildNeedsResult(
   totals?: BlockTotals,
 ): PopulationNeedsDayResult {
   const full = detail === "full";
-  // Settlement lists households in ascending block id, the order of this loop (D-158: read by
-  // position, with the former map as the fallback for another order).
-  const settledHouseholds = settlement.households;
-  let householdByName: Map<number, MarketSettlementResult["households"][number]> | null = null;
-  const settledFor = (position: number, blockId: number): MarketSettlementResult["households"][number] | undefined => {
-    const atPosition = settledHouseholds[position];
-    if (atPosition !== undefined && atPosition.popBlockId === blockId) return atPosition;
-    householdByName ??= new Map(settledHouseholds.map((entry) => [entry.popBlockId, entry]));
-    return householdByName.get(blockId);
-  };
+  // D-160: each block's household settlement through the result's columns (every detail).
+  const settled = settledHouseholds(settlement);
   // D-158: opening prices by market id in one table (no map lookup per row).
   let maxMarketId = 0;
   for (const market of markets) if (market.marketId > maxMarketId) maxMarketId = market.marketId;
@@ -589,8 +581,7 @@ function buildNeedsResult(
     const rangeStart = block.id < household.rowStart.length ? (household.rowStart[block.id] ?? -1) : -1;
     const start = rangeStart < 0 ? 0 : rangeStart;
     const end = rangeStart < 0 ? 0 : (household.rowEnd[block.id] ?? rangeStart);
-    const householdSettlement = settledFor(position, block.id);
-    if (householdSettlement === undefined) {
+    if (!settled.has(block.id)) {
       throw new RangeError(`missing household settlement for popBlock ${String(block.id)}`);
     }
     const tierResults: NeedTierResult[] = [];
@@ -683,12 +674,13 @@ function buildNeedsResult(
     columns.population[position] = population;
     columns.kcalConsumed[position] = kcalConsumed;
     if (full) {
-      const spent = householdSettlement.marketPurchasesRUSD;
+      const spent = settled.marketPurchasesRUSD(block.id);
+      const budgetStart = settled.initialCashRUSD(block.id);
       blocks.push({
         popBlockId: block.id,
         population,
-        budgetStartBeforeNeedsRUSD: householdSettlement.initialCashRUSD,
-        budgetEndAfterNeedsRUSD: householdSettlement.initialCashRUSD - spent,
+        budgetStartBeforeNeedsRUSD: budgetStart,
+        budgetEndAfterNeedsRUSD: budgetStart - spent,
         spentRUSD: spent,
         kcalConsumed,
         tiers: tierResults,
@@ -798,9 +790,7 @@ function economicWealthInputs(
   dayIndex: DayIndex,
 ): PopulationInputs {
   const year = dayIndexToCivilDate(dayIndex).year;
-  const householdByBlock = new Map(
-    settlement.households.map((entry) => [entry.popBlockId, entry]),
-  );
+  const settled = settledHouseholds(settlement);
   const fiscalByBlock = new Map(
     fiscal.blocks.map((entry) => [entry.popBlockId, entry]),
   );
@@ -825,8 +815,7 @@ function economicWealthInputs(
   });
   const income = world.popBlocks.map((block) => {
     const population = populationTotal(block);
-    const household = householdByBlock.get(block.id);
-    if (household === undefined) {
+    if (!settled.has(block.id)) {
       throw new RangeError(`missing household settlement for popBlock ${String(block.id)}`);
     }
     const fiscalBlock = fiscalByBlock.get(block.id);
@@ -836,7 +825,7 @@ function economicWealthInputs(
       popBlockId: block.id,
       annualSettledIncomePerCapitaRUSD:
         population > 0
-          ? ((household.wagesReceivedRUSD + welfareReceived) / population) * daysInYear(year)
+          ? ((settled.wagesReceivedRUSD(block.id) + welfareReceived) / population) * daysInYear(year)
           : 0,
       annualMandatoryPaymentsPerCapitaRUSD:
         population > 0 ? (incomeTax / population) * daysInYear(year) : 0,

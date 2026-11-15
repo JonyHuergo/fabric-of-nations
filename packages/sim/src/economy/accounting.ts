@@ -613,12 +613,45 @@ export function postCashTransfer(
 
 /**
  * Journal lines of several entries in columns (D-139). Entry `e` owns lines
- * `[entryStart[e], entryStart[e + 1])`; `debit` is 1 for a debit line, 0 for a credit.
+ * `[start, end)`; `debit` is 1 for a debit line, 0 for a credit.
+ *
+ * D-160: typed columns with a fill count (`count`, the lines written so far; capacity is the
+ * columns' length), transient scratch of one batch, written through `pushJournalLine`. Every
+ * column is a `Float64Array`, so a line keeps the exact number its caller gave it and the
+ * integer, side and amount checks of `postJournalColumns` see that number as before.
  */
 export interface JournalLineColumns {
-  readonly accountId: number[];
-  readonly debit: number[];
-  readonly amount: number[];
+  accountId: Float64Array;
+  debit: Float64Array;
+  amount: Float64Array;
+  count: number;
+}
+
+/** D-160: empty journal line columns with room for `capacity` lines (they grow when full). */
+export function createJournalLines(capacity: number): JournalLineColumns {
+  const size = Math.max(16, Math.ceil(capacity));
+  return { accountId: new Float64Array(size), debit: new Float64Array(size), amount: new Float64Array(size), count: 0 };
+}
+
+/** D-160: append one line, doubling the columns when they are full. */
+export function pushJournalLine(lines: JournalLineColumns, accountId: number, debit: number, amount: number): void {
+  const at = lines.count;
+  if (at === lines.accountId.length) {
+    const grown = Math.max(16, at * 2);
+    const accountIds = new Float64Array(grown);
+    accountIds.set(lines.accountId);
+    const debits = new Float64Array(grown);
+    debits.set(lines.debit);
+    const amounts = new Float64Array(grown);
+    amounts.set(lines.amount);
+    lines.accountId = accountIds;
+    lines.debit = debits;
+    lines.amount = amounts;
+  }
+  lines.accountId[at] = accountId;
+  lines.debit[at] = debit;
+  lines.amount[at] = amount;
+  lines.count = at + 1;
 }
 
 export interface JournalColumnEntry {
@@ -711,11 +744,20 @@ export function postJournalColumns(
     throw new RangeError("finance posting id overflow");
   }
   const table = finance.accounts;
-  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lines.accountId.length);
+  const lineCount = lines.count;
+  if (!(Number.isInteger(lineCount) && lineCount >= 0 && lineCount <= lines.accountId.length &&
+    lineCount <= lines.debit.length && lineCount <= lines.amount.length)) {
+    throw new RangeError("journal line columns have an invalid count");
+  }
+  const batch = createBatchDeltas((id) => financeIndex.position(id), table.count, lineCount);
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     if (entry === undefined) throw new RangeError(`journal batch entry ${String(index)} is missing`);
     assertPublicTransactionKind(entry.transactionKind);
+    // D-160: an entry reads only written lines (the columns' spare capacity holds zeros).
+    if (!(Number.isInteger(entry.start) && Number.isInteger(entry.end) && entry.start >= 0 && entry.end <= lineCount)) {
+      throw new RangeError(`journal batch entry ${String(index)} has lines outside the batch`);
+    }
     if (needsLineObjects(entry.transactionKind)) {
       const validated = validatePostingLines(
         lineObjects(entry),

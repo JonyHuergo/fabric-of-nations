@@ -33,7 +33,9 @@ import { drawUint32 } from "../rng.js";
 import type { DayIndex, Id, Seed } from "../types.js";
 import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
 import {
+  createJournalLines,
   postJournalColumns,
+  pushJournalLine,
   retainDeferredPostings,
   type DeferredPostings,
   type JournalColumnEntry,
@@ -194,6 +196,61 @@ export interface MarketSettlementResult {
   readonly households: readonly HouseholdSettlement[];
   readonly totals: SettlementTotals;
   readonly postingIds: readonly number[];
+}
+
+/**
+ * D-160: the household settlement of every block as typed columns indexed by block id (a
+ * transient, non-enumerable companion of a settlement result, like the market day's columns).
+ * `settled` is 1 for each settled block; the amounts are those of `HouseholdSettlement`.
+ * `households` lists the same values as objects in full detail only.
+ */
+export interface SettlementHouseholdColumns {
+  readonly settled: Uint8Array;
+  readonly initialCashRUSD: Float64Array;
+  readonly marketPurchasesRUSD: Float64Array;
+  readonly wagesReceivedRUSD: Float64Array;
+  readonly endingCashAfterSettlementRUSD: Float64Array;
+}
+
+/** D-160: a block's household settlement, from the columns or the result's objects. */
+export interface SettledHouseholdReader {
+  has(popBlockId: Id): boolean;
+  initialCashRUSD(popBlockId: Id): number;
+  marketPurchasesRUSD(popBlockId: Id): number;
+  wagesReceivedRUSD(popBlockId: Id): number;
+}
+
+const SETTLEMENT_COLUMNS = "householdColumns";
+
+/** D-160: the household columns a settlement attached to its result, if any. */
+export function settlementHouseholdColumns(settlement: MarketSettlementResult): SettlementHouseholdColumns | undefined {
+  return (settlement as { readonly [SETTLEMENT_COLUMNS]?: SettlementHouseholdColumns })[SETTLEMENT_COLUMNS];
+}
+
+/**
+ * D-160: read the household settlement of a result. A result from `settleMarketDays`
+ * carries columns; a copy or hand-built result is read from its `households` list (the
+ * last entry of a block, as the maps built from that list kept). Absent blocks read 0.
+ */
+export function settledHouseholds(settlement: MarketSettlementResult): SettledHouseholdReader {
+  const columns = settlementHouseholdColumns(settlement);
+  if (columns !== undefined) {
+    const at = (values: Float64Array, id: Id): number =>
+      Number.isInteger(id) && id >= 0 && id < values.length && columns.settled[id] === 1 ? (values[id] ?? 0) : 0;
+    return {
+      has: (id) => Number.isInteger(id) && id >= 0 && id < columns.settled.length && columns.settled[id] === 1,
+      initialCashRUSD: (id) => at(columns.initialCashRUSD, id),
+      marketPurchasesRUSD: (id) => at(columns.marketPurchasesRUSD, id),
+      wagesReceivedRUSD: (id) => at(columns.wagesReceivedRUSD, id),
+    };
+  }
+  const byBlock = new Map(settlement.households.map((entry) => [entry.popBlockId, entry]));
+  return {
+    has: (id) => byBlock.has(id),
+    initialCashRUSD: (id) => byBlock.get(id)?.initialCashRUSD ?? 0,
+    marketPurchasesRUSD: (id) => byBlock.get(id)?.marketPurchasesRUSD ?? 0,
+    wagesReceivedRUSD: (id) => byBlock.get(id)?.wagesReceivedRUSD ?? 0,
+  };
 }
 
 /**
@@ -979,15 +1036,14 @@ function marketFlowEntries(
   const sellerAmount = new Float64Array(maxBuilding + 1);
   const buyerAmount = new Float64Array(maxBuilding + 1);
   const entries: JournalColumnEntry[] = [];
-  const lines: JournalLineColumns = { accountId: [], debit: [], amount: [] };
+  // D-160: typed line columns (they double when this estimate is short).
+  const lines = createJournalLines(2 * (world.popBlocks.length + 2 * world.buildings.length));
   const push = (accountId: number, debit: number, amount: number): void => {
-    lines.accountId.push(accountId);
-    lines.debit.push(debit);
-    lines.amount.push(amount);
+    pushJournalLine(lines, accountId, debit, amount);
   };
   const close = (kind: "goods-purchase" | "input-purchase", start: number): void => {
-    if (lines.accountId.length > start) {
-      entries.push({ transactionKind: kind, start, end: lines.accountId.length, sourceEntityId: null, targetEntityId: null });
+    if (lines.count > start) {
+      entries.push({ transactionKind: kind, start, end: lines.count, sourceEntityId: null, targetEntityId: null });
     }
   };
   const sellerList: number[] = [];
@@ -1011,7 +1067,7 @@ function marketFlowEntries(
   for (let market = 0; market < marketDays.length; market += 1) {
     const flow = flows[market] as MarketFlowColumns;
     // Households: rows of a block are contiguous.
-    let start = lines.accountId.length;
+    let start = lines.count;
     let runBlock = -1;
     let runAmount = 0;
     const flushBlock = (): void => {
@@ -1036,7 +1092,7 @@ function marketFlowEntries(
     flushSellers();
     close("goods-purchase", start);
     // Producers' inputs.
-    start = lines.accountId.length;
+    start = lines.count;
     const buyerList: number[] = [];
     for (let item = 0; item < flow.inputBuyer.length; item += 1) {
       const amount = flow.inputAmount[item] ?? 0;
@@ -1096,21 +1152,29 @@ function settleMarketDaysInternal(
   // producer and household is read before any posting either way.
   const accounts = world.finance.accounts;
   const openingBalanceArray: Float64Array | null = atomic ? accounts.balance.slice(0, accounts.count) : null;
-  const openingCashByAccount = new Map<Id, number>();
   const balanceOfId = (accountId: Id): number => {
     const position = index.position(accountId);
     return position < 0 ? 0 : (accounts.balance[position] ?? 0);
   };
+  // D-160: opening cash by building id and block id (the former map keyed each by its cash
+  // account id, one account per building and block); an absent account reads 0 as before.
+  let maxBuildingId = 0;
+  for (const building of world.buildings) if (building.id > maxBuildingId) maxBuildingId = building.id;
+  let maxBlockId = 0;
+  for (const block of world.popBlocks) if (block.id > maxBlockId) maxBlockId = block.id;
+  const openingBuildingCash = new Float64Array(maxBuildingId + 1);
   for (const building of world.buildings) {
-    openingCashByAccount.set(building.operatingCashAccountId, balanceOfId(building.operatingCashAccountId));
+    openingBuildingCash[building.id] = balanceOfId(building.operatingCashAccountId);
   }
   const householdCashIds = index.ownerAccountIds("popBlock", "household-cash");
+  const openingBlockCash = new Float64Array(maxBlockId + 1);
   for (const block of world.popBlocks) {
     const accountId = tableAccount(householdCashIds, block.id);
-    if (accountId >= 0) openingCashByAccount.set(accountId, balanceOfId(accountId));
+    if (accountId >= 0) openingBlockCash[block.id] = balanceOfId(accountId);
   }
   const initialCash = designatedCashTotal(world.finance);
-  const openingPostings = [...world.finance.postings];
+  // The audit buffer is restored only by an atomic call (D-139: the day owns atomicity).
+  const openingPostings = atomic ? [...world.finance.postings] : world.finance.postings;
   const openingNextPostingId = world.finance.nextPostingId;
 
   // D-125/D-137: the aggregated market postings are also the batch affordability
@@ -1167,7 +1231,9 @@ function settleMarketDaysInternal(
     const paidWage = new Map<number, number>();
     const coveredJob = new Map<MinimumWageCoverage, Map<number, boolean>>();
     const wageEntries: JournalColumnEntry[] = [];
-    const wageLines: JournalLineColumns = { accountId: [], debit: [], amount: [] };
+    // D-160: typed line columns; a building's wage entry has at most two lines per assignment
+    // and two more, so this capacity is never exceeded.
+    const wageLines = createJournalLines(2 * world.employment.length + 2 * world.buildings.length);
     // Groups of the current building (scratch).
     const gBlock: number[] = [];
     const gProfession: number[] = [];
@@ -1358,31 +1424,23 @@ function settleMarketDaysInternal(
         throw new RangeError(`wage payment exceeds employer cash for building ${String(building.id)}`);
       }
       if (paidTotal > 0) {
-        const start = wageLines.accountId.length;
+        const start = wageLines.count;
         for (let item = 0; item < groupCount; item += 1) {
           const amount = gPaid[item] ?? 0;
           if (amount <= 0) continue;
-          wageLines.accountId.push(gAccount[item] ?? 0);
-          wageLines.debit.push(1);
-          wageLines.amount.push(amount);
+          pushJournalLine(wageLines, gAccount[item] ?? 0, 1, amount);
         }
-        wageLines.accountId.push(accountIn(wageExpenseTable, building.id, "wage-expense"));
-        wageLines.debit.push(1);
-        wageLines.amount.push(paidTotal);
-        wageLines.accountId.push(employer.id);
-        wageLines.debit.push(0);
-        wageLines.amount.push(paidTotal);
+        pushJournalLine(wageLines, accountIn(wageExpenseTable, building.id, "wage-expense"), 1, paidTotal);
+        pushJournalLine(wageLines, employer.id, 0, paidTotal);
         for (let item = 0; item < groupCount; item += 1) {
           const amount = gPaid[item] ?? 0;
           if (amount <= 0) continue;
-          wageLines.accountId.push(accountIn(wageIncomeTable, gBlock[item] ?? 0, "wage-income"));
-          wageLines.debit.push(0);
-          wageLines.amount.push(amount);
+          pushJournalLine(wageLines, accountIn(wageIncomeTable, gBlock[item] ?? 0, "wage-income"), 0, amount);
         }
         wageEntries.push({
           transactionKind: "wages",
           start,
-          end: wageLines.accountId.length,
+          end: wageLines.count,
           sourceEntityId: building.id,
           targetEntityId: null,
         });
@@ -1436,7 +1494,7 @@ function settleMarketDaysInternal(
     // D-158: the domestic-service entries in journal columns (the same lines, in the same
     // order, posted as one batch with the same checks as the former entry objects).
     const householdEntries: JournalColumnEntry[] = [];
-    const householdLines: JournalLineColumns = { accountId: [], debit: [], amount: [] };
+    const householdLines = createJournalLines(4 * world.labourMarket.householdEmployment.length);
     const consumptionTable = index.ownerAccountIds("popBlock", "consumption-expense");
     const spent = new Map<Id, number>();
     const domesticReceived = new Map<Id, number>();
@@ -1465,19 +1523,18 @@ function settleMarketDaysInternal(
         if (!Number.isFinite(paid) || !(paid > 0) || prior + paid > limit) continue;
         spent.set(employer.id, prior + paid);
         domesticReceived.set(servant.id, (domesticReceived.get(servant.id) ?? 0) + paid);
-        const start = householdLines.accountId.length;
-        householdLines.accountId.push(
-          ownerAccountOrThrow(consumptionTable, employer.id, "consumption-expense", "popBlock"),
-          employerCash.id,
-          householdCashId(index, householdCashTable, servant.id),
-          ownerAccountOrThrow(wageIncomeTable, servant.id, "wage-income", "popBlock"),
-        );
-        householdLines.debit.push(1, 0, 1, 0);
-        householdLines.amount.push(paid, paid, paid, paid);
+        const start = householdLines.count;
+        const consumptionId = ownerAccountOrThrow(consumptionTable, employer.id, "consumption-expense", "popBlock");
+        const servantCashId = householdCashId(index, householdCashTable, servant.id);
+        const servantIncomeId = ownerAccountOrThrow(wageIncomeTable, servant.id, "wage-income", "popBlock");
+        pushJournalLine(householdLines, consumptionId, 1, paid);
+        pushJournalLine(householdLines, employerCash.id, 0, paid);
+        pushJournalLine(householdLines, servantCashId, 1, paid);
+        pushJournalLine(householdLines, servantIncomeId, 0, paid);
         householdEntries.push({
           transactionKind: "domestic-service",
           start,
-          end: householdLines.accountId.length,
+          end: householdLines.count,
           sourceEntityId: employer.id,
           targetEntityId: servant.id,
         });
@@ -1491,11 +1548,16 @@ function settleMarketDaysInternal(
     const upkeepSettlements: UpkeepSettlement[] = [];
     // D-158: upkeep entries in journal columns (same lines and order, one batch as before).
     const upkeepEntries: JournalColumnEntry[] = [];
-    const upkeepLines: JournalLineColumns = { accountId: [], debit: [], amount: [] };
+    const upkeepLines = createJournalLines(4 * world.buildings.length);
     const upkeepExpenseTable = index.ownerAccountIds("building", "upkeep-expense");
-    const upkeepPaidByBuilding = new Map<Id, number>();
-    const upkeepObligationByBuilding = new Map<Id, number>();
-    const unpaidUpkeepByBuilding = new Map<Id, number>();
+    // D-160: per-building upkeep by id (0 for a building without upkeep, as the maps' `?? 0`)
+    // and the totals summed in settlement order; the objects are built in full detail only.
+    const upkeepPaidByBuilding = new Float64Array(maxBuildingId + 1);
+    const upkeepObligationByBuilding = new Float64Array(maxBuildingId + 1);
+    const unpaidUpkeepByBuilding = new Float64Array(maxBuildingId + 1);
+    let upkeepObligationTotal = 0;
+    let upkeepPaidTotal = 0;
+    let upkeepUnpaidTotal = 0;
     let systemAccount: FinancialAccount | undefined;
     let systemIncome: FinancialAccount | undefined;
     for (const building of inIdOrder(world.buildings)) {
@@ -1525,34 +1587,36 @@ function settleMarketDaysInternal(
       const paid = Math.min(employer.balanceRUSD, obligation);
       const unpaid = Math.max(0, obligation - paid);
       if (paid > 0) {
-        const start = upkeepLines.accountId.length;
-        upkeepLines.accountId.push(
-          systemAccount.id,
-          ownerAccountOrThrow(upkeepExpenseTable, building.id, "upkeep-expense", "building"),
-          employer.id,
-          systemIncome!.id,
-        );
-        upkeepLines.debit.push(1, 1, 0, 0);
-        upkeepLines.amount.push(paid, paid, paid, paid);
+        const start = upkeepLines.count;
+        const upkeepExpenseId = ownerAccountOrThrow(upkeepExpenseTable, building.id, "upkeep-expense", "building");
+        pushJournalLine(upkeepLines, systemAccount.id, 1, paid);
+        pushJournalLine(upkeepLines, upkeepExpenseId, 1, paid);
+        pushJournalLine(upkeepLines, employer.id, 0, paid);
+        pushJournalLine(upkeepLines, systemIncome!.id, 0, paid);
         upkeepEntries.push({
           transactionKind: "upkeep",
           start,
-          end: upkeepLines.accountId.length,
+          end: upkeepLines.count,
           sourceEntityId: building.id,
           targetEntityId: systemAccount.id,
         });
       }
-      upkeepSettlements.push({
-        buildingId: building.id,
-        operatingAccountId: employer.id,
-        systemAccountId: systemAccount.id,
-        obligationRUSD: obligation,
-        paidRUSD: paid,
-        unpaidRUSD: unpaid,
-      });
-      upkeepPaidByBuilding.set(building.id, paid);
-      upkeepObligationByBuilding.set(building.id, obligation);
-      unpaidUpkeepByBuilding.set(building.id, unpaid);
+      if (detail === "full") {
+        upkeepSettlements.push({
+          buildingId: building.id,
+          operatingAccountId: employer.id,
+          systemAccountId: systemAccount.id,
+          obligationRUSD: obligation,
+          paidRUSD: paid,
+          unpaidRUSD: unpaid,
+        });
+      }
+      upkeepObligationTotal += obligation;
+      upkeepPaidTotal += paid;
+      upkeepUnpaidTotal += unpaid;
+      upkeepPaidByBuilding[building.id] = paid;
+      upkeepObligationByBuilding[building.id] = obligation;
+      unpaidUpkeepByBuilding[building.id] = unpaid;
     }
     let upkeepPostings: DeferredPostings | null = null;
     if (upkeepEntries.length > 0) {
@@ -1571,10 +1635,6 @@ function settleMarketDaysInternal(
 
     // D-139: per-owner sums in canonical transaction order, in id-indexed tables. A
     // table entry starts at 0 and adds each amount, as the former `get ?? 0` maps did.
-    let maxBuildingId = 0;
-    for (const building of world.buildings) if (building.id > maxBuildingId) maxBuildingId = building.id;
-    let maxBlockId = 0;
-    for (const block of world.popBlocks) if (block.id > maxBlockId) maxBlockId = block.id;
     // D-158: the same per-owner sums from the markets' flows, in market and flow order.
     const revenueByBuilding = new Float64Array(maxBuildingId + 1);
     const inputCostsByBuilding = new Float64Array(maxBuildingId + 1);
@@ -1604,63 +1664,88 @@ function settleMarketDaysInternal(
     }
     const marketPurchasesTotal = householdPurchasesTotal + inputPurchasesTotal;
 
-    const producers: ProducerSettlement[] = inIdOrder(world.buildings)
-      .map((building) => {
-        const initialCash =
-          openingCashByAccount.get(building.operatingCashAccountId) ?? 0;
-        const currentId = operatingCashId(index, operatingTable, building.id);
-        const current = { balanceRUSD: balanceOfId(currentId) };
-        const revenue = revenueByBuilding[building.id] ?? 0;
-        const inputCosts = inputCostsByBuilding[building.id] ?? 0;
-        const wagesPaid = wagePaidByBuilding[building.id] ?? 0;
-        const upkeepPaid = upkeepPaidByBuilding.get(building.id) ?? 0;
-        return {
-          buildingId: building.id,
-          ownerAccountId: building.ownerAccountId,
-          operatingAccountId: building.operatingCashAccountId,
-          initialCashRUSD: initialCash,
-          revenueRUSD: revenue,
-          inputCostsRUSD: inputCosts,
-          wagesPaidRUSD: wagesPaid,
-          wageObligationRUSD: wageObligationOfBuilding[building.id] ?? 0,
-          unpaidWagesRUSD: wageUnpaidByBuilding[building.id] ?? 0,
-          upkeepPaidRUSD: upkeepPaid,
-          upkeepObligationRUSD: upkeepObligationByBuilding.get(building.id) ?? 0,
-          unpaidUpkeepRUSD: unpaidUpkeepByBuilding.get(building.id) ?? 0,
-          profitRUSD: producerProfit(
-            initialCash,
-            current.balanceRUSD,
-            revenue,
-            inputCosts,
-            wagesPaid,
-            upkeepPaid,
-          ),
-          endingCashAfterSettlementRUSD: current.balanceRUSD,
-        };
+    // D-160: each producer's reconciliation and the producer totals (summed in id order, as the
+    // former reductions over the list); the objects are built in full detail only.
+    // The per-building and per-block bodies are functions of their own, so they run optimised
+    // (a once-a-day loop body otherwise runs in on-stack-replacement code that de-optimises at
+    // each loop exit and boxes its numbers); the totals accumulate in a typed array for the same
+    // reason. Sums: revenue, input costs, wages, profit.
+    const producers: ProducerSettlement[] = [];
+    const producerSums = new Float64Array(4);
+    const settleProducer = (building: World["buildings"][number]): void => {
+      const initialCash = openingBuildingCash[building.id] ?? 0;
+      const currentId = operatingCashId(index, operatingTable, building.id);
+      const currentBalance = balanceOfId(currentId);
+      const revenue = revenueByBuilding[building.id] ?? 0;
+      const inputCosts = inputCostsByBuilding[building.id] ?? 0;
+      const wagesPaid = wagePaidByBuilding[building.id] ?? 0;
+      const upkeepPaid = upkeepPaidByBuilding[building.id] ?? 0;
+      const profit = producerProfit(initialCash, currentBalance, revenue, inputCosts, wagesPaid, upkeepPaid);
+      producerSums[0] = (producerSums[0] ?? 0) + revenue;
+      producerSums[1] = (producerSums[1] ?? 0) + inputCosts;
+      producerSums[2] = (producerSums[2] ?? 0) + wagesPaid;
+      producerSums[3] = (producerSums[3] ?? 0) + profit;
+      if (detail !== "full") return;
+      producers.push({
+        buildingId: building.id,
+        ownerAccountId: building.ownerAccountId,
+        operatingAccountId: building.operatingCashAccountId,
+        initialCashRUSD: initialCash,
+        revenueRUSD: revenue,
+        inputCostsRUSD: inputCosts,
+        wagesPaidRUSD: wagesPaid,
+        wageObligationRUSD: wageObligationOfBuilding[building.id] ?? 0,
+        unpaidWagesRUSD: wageUnpaidByBuilding[building.id] ?? 0,
+        upkeepPaidRUSD: upkeepPaid,
+        upkeepObligationRUSD: upkeepObligationByBuilding[building.id] ?? 0,
+        unpaidUpkeepRUSD: unpaidUpkeepByBuilding[building.id] ?? 0,
+        profitRUSD: profit,
+        endingCashAfterSettlementRUSD: currentBalance,
       });
+    };
+    for (const building of inIdOrder(world.buildings)) settleProducer(building);
+    const producerRevenueTotal = producerSums[0] ?? 0;
+    const producerInputCostsTotal = producerSums[1] ?? 0;
+    const producerWagesTotal = producerSums[2] ?? 0;
+    const producerProfitTotal = producerSums[3] ?? 0;
 
-    const households: HouseholdSettlement[] = inIdOrder(world.popBlocks)
-      .map((block) => {
-        const accountId = householdCashId(index, householdCashTable, block.id);
-        const account = { id: accountId, balanceRUSD: balanceOfId(accountId) };
-        const initialCash =
-          openingCashByAccount.get(account.id) ?? 0;
-        const purchases = purchasesByBlock[block.id] ?? 0;
-        // §4.1: a servant's pay is wage income; an employer's is household spending outside the market.
-        const wages = (wagePaidByBlock[block.id] ?? 0) + (domesticReceived.get(block.id) ?? 0);
-        const expected = initialCash - purchases - (spent.get(block.id) ?? 0) + wages;
-        if (Math.abs(expected - account.balanceRUSD) > toleranceMoney(expected, account.balanceRUSD)) {
-          throw new RangeError(`household cash does not reconcile for popBlock ${String(block.id)}`);
-        }
-        return {
-          popBlockId: block.id,
-          financialAccountId: account.id,
-          initialCashRUSD: initialCash,
-          marketPurchasesRUSD: purchases,
-          wagesReceivedRUSD: wages,
-          endingCashAfterSettlementRUSD: account.balanceRUSD,
-        };
+    // D-160: the household settlement in columns by block id (every detail); the objects in
+    // full detail only.
+    const householdColumns: SettlementHouseholdColumns = {
+      settled: new Uint8Array(maxBlockId + 1),
+      initialCashRUSD: new Float64Array(maxBlockId + 1),
+      marketPurchasesRUSD: new Float64Array(maxBlockId + 1),
+      wagesReceivedRUSD: new Float64Array(maxBlockId + 1),
+      endingCashAfterSettlementRUSD: new Float64Array(maxBlockId + 1),
+    };
+    const households: HouseholdSettlement[] = [];
+    const settleHousehold = (block: World["popBlocks"][number]): void => {
+      const accountId = householdCashId(index, householdCashTable, block.id);
+      const balance = balanceOfId(accountId);
+      const initialCash = openingBlockCash[block.id] ?? 0;
+      const purchases = purchasesByBlock[block.id] ?? 0;
+      // §4.1: a servant's pay is wage income; an employer's is household spending outside the market.
+      const wages = (wagePaidByBlock[block.id] ?? 0) + (domesticReceived.get(block.id) ?? 0);
+      const expected = initialCash - purchases - (spent.get(block.id) ?? 0) + wages;
+      if (Math.abs(expected - balance) > toleranceMoney(expected, balance)) {
+        throw new RangeError(`household cash does not reconcile for popBlock ${String(block.id)}`);
+      }
+      householdColumns.settled[block.id] = 1;
+      householdColumns.initialCashRUSD[block.id] = initialCash;
+      householdColumns.marketPurchasesRUSD[block.id] = purchases;
+      householdColumns.wagesReceivedRUSD[block.id] = wages;
+      householdColumns.endingCashAfterSettlementRUSD[block.id] = balance;
+      if (detail !== "full") return;
+      households.push({
+        popBlockId: block.id,
+        financialAccountId: accountId,
+        initialCashRUSD: initialCash,
+        marketPurchasesRUSD: purchases,
+        wagesReceivedRUSD: wages,
+        endingCashAfterSettlementRUSD: balance,
       });
+    };
+    for (const block of inIdOrder(world.popBlocks)) settleHousehold(block);
 
     const endingCash = designatedCashTotal(world.finance);
     if (Math.abs(initialCash - endingCash) > toleranceMoney(initialCash, endingCash)) {
@@ -1674,24 +1759,26 @@ function settleMarketDaysInternal(
       wageObligationRUSD: wageObligationTotal,
       wagesPaidRUSD: wagePaidTotal,
       unpaidWagesRUSD: wageUnpaidTotal,
-      upkeepObligationRUSD: upkeepSettlements.reduce(
-        (total, settlement) => total + settlement.obligationRUSD,
-        0,
-      ),
-      upkeepPaidRUSD: upkeepSettlements.reduce((total, settlement) => total + settlement.paidRUSD, 0),
-      unpaidUpkeepRUSD: upkeepSettlements.reduce(
-        (total, settlement) => total + settlement.unpaidRUSD,
-        0,
-      ),
-      producerRevenueRUSD: producers.reduce((total, producer) => total + producer.revenueRUSD, 0),
-      producerInputCostsRUSD: producers.reduce((total, producer) => total + producer.inputCostsRUSD, 0),
-      producerWagesRUSD: producers.reduce((total, producer) => total + producer.wagesPaidRUSD, 0),
-      producerProfitRUSD: producers.reduce((total, producer) => total + producer.profitRUSD, 0),
+      upkeepObligationRUSD: upkeepObligationTotal,
+      upkeepPaidRUSD: upkeepPaidTotal,
+      unpaidUpkeepRUSD: upkeepUnpaidTotal,
+      producerRevenueRUSD: producerRevenueTotal,
+      producerInputCostsRUSD: producerInputCostsTotal,
+      producerWagesRUSD: producerWagesTotal,
+      producerProfitRUSD: producerProfitTotal,
       initialCashRUSD: initialCash,
       endingCashAfterSettlementRUSD: endingCash,
     };
 
-    return {
+    // D-160: the posting ids in one list (the same ids, in batch order).
+    const postingIds: number[] = [];
+    for (const batch of [marketPostings, wagePostings, householdPostings, upkeepPostings]) {
+      if (batch === null) continue;
+      for (let offset = 0; offset < batch.count; offset += 1) postingIds.push(batch.firstId + offset);
+    }
+    for (const posting of postings) postingIds.push(posting.id);
+
+    const settlementResult: MarketSettlementResult = {
       dayIndex,
       marketId,
       marketIds,
@@ -1706,22 +1793,14 @@ function settleMarketDaysInternal(
       producers,
       households,
       totals,
-      postingIds: [
-        ...(marketPostings === null
-          ? []
-          : Array.from({ length: marketPostings.count }, (_, offset) => marketPostings.firstId + offset)),
-        ...(wagePostings === null
-          ? []
-          : Array.from({ length: wagePostings.count }, (_, offset) => wagePostings.firstId + offset)),
-        ...(householdPostings === null
-          ? []
-          : Array.from({ length: householdPostings.count }, (_, offset) => householdPostings.firstId + offset)),
-        ...(upkeepPostings === null
-          ? []
-          : Array.from({ length: upkeepPostings.count }, (_, offset) => upkeepPostings.firstId + offset)),
-        ...postings.map((posting) => posting.id),
-      ],
+      postingIds,
     };
+    Object.defineProperty(settlementResult, SETTLEMENT_COLUMNS, {
+      value: householdColumns,
+      enumerable: false,
+      writable: false,
+    });
+    return settlementResult;
   } catch (error) {
     if (openingBalanceArray === null) throw error;
     if (accounts.count !== openingBalanceArray.length) {

@@ -23,7 +23,7 @@ import type { World } from "../world.js";
 import { buildFinanceIndex } from "./accounts.js";
 import type { OwnConsumptionPlan } from "./agriculture.js";
 import type { MarketDayResult } from "./market.js";
-import type { MarketSettlementResult } from "./settlement.js";
+import { settledHouseholds, type MarketSettlementResult } from "./settlement.js";
 import type { EconomyDefinitions } from "./types.js";
 
 import { personsOfBlock, type BlockTotals } from "../population/blockTotals.js";
@@ -88,7 +88,7 @@ export function updateHouseholdIncomeAndHousing(
   const year = daysInYear(dayIndexToCivilDate(dayIndex).year);
   const index = buildFinanceIndex(world.finance);
   const householdIds = index.ownerAccountIds("popBlock", "household-cash");
-  const purchases = new Map(settlement.households.map((entry) => [entry.popBlockId, entry.marketPurchasesRUSD]));
+  const settled = settledHouseholds(settlement);
   // Kept food at the market's opening prices.
   const keptValue = new Map<number, number>();
   if (ownConsumption.entries.length > 0) {
@@ -111,7 +111,7 @@ export function updateHouseholdIncomeAndHousing(
       const accountId = householdIds[block.id] ?? -1;
       const cashAfter = accountId >= 0 ? (index.account(accountId)?.balanceRUSD ?? 0) : 0;
       const income =
-        cashAfter - (cashBeforeMarket[position] ?? 0) + (purchases.get(block.id) ?? 0) + (keptValue.get(block.id) ?? 0);
+        cashAfter - (cashBeforeMarket[position] ?? 0) + settled.marketPurchasesRUSD(block.id) + (keptValue.get(block.id) ?? 0);
       const perCapita = income / persons;
       block.incomeSmoothedRUSDPerCapitaDay = Math.max(
         0,

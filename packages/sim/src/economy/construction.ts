@@ -69,7 +69,7 @@ import { assertValidEconomyDefinitions } from "./definitions.js";
 import { constructionProgressFactor } from "./politics.js";
 import { hasResearchedTechnology } from "./technology.js";
 import { depositForNewBuilding, hydroCapacityPerDay } from "./resources.js";
-import type { MarketSettlementResult } from "./settlement.js";
+import { settledHouseholds, type MarketSettlementResult } from "./settlement.js";
 import { assertValidFinanceState } from "./validation.js";
 import type {
   BuildingDef,
@@ -508,12 +508,7 @@ export function runConstructionPhase(
   };
   const index = buildFinanceIndex(stagedFinance);
   const yearDays = daysInYear(dayIndexToCivilDate(dayIndex).year);
-  const wagesByBlock = new Map<Id, number>();
-  if (settlement !== undefined) {
-    for (const household of settlement.households) {
-      wagesByBlock.set(household.popBlockId, household.wagesReceivedRUSD);
-    }
-  }
+  const settledWages = settlement === undefined ? undefined : settledHouseholds(settlement);
   const idleCache = new Map<Id, Map<Id, number>>();
   const claimed = new Map<Id, number>();
   const cashByCountry = new Map<Id, number>();
@@ -690,7 +685,7 @@ export function runConstructionPhase(
       for (const [popBlockId, amount] of [...groupGross.entries()].sort(
         (left, right) => left[0] - right[0],
       )) {
-        const marketWage = wagesByBlock.get(popBlockId) ?? 0;
+        const marketWage = settledWages?.wagesReceivedRUSD(popBlockId) ?? 0;
         const remainingAllowance = Math.max(0, dailyAllowance - marketWage);
         const taxable = Math.max(0, amount - remainingAllowance);
         const tax = country.fiscal.incomeTaxRate * taxable;
