@@ -266,6 +266,8 @@ function toleranceMoney(a: number, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h =
 }
 
 const POP_BLOCK_KIND = ownerKindCode("popBlock");
+/** D-160: the shared empty assignment list of a building without workers (never written). */
+const NO_WAGE_ASSIGNMENTS: readonly World["employment"][number][] = [];
 
 /** An owner's account id from an owner table, or the lookup's error (D-158). */
 function ownerAccountOrThrow(table: Int32Array, ownerId: number, subtype: AccountSubtype, ownerKind: "popBlock" | "building"): number {
@@ -1046,23 +1048,29 @@ function marketFlowEntries(
       entries.push({ transactionKind: kind, start, end: lines.count, sourceEntityId: null, targetEntityId: null });
     }
   };
-  const sellerList: number[] = [];
+  // D-160: sellers of the current entry with a fill count (was cleared with `length = 0`).
+  const sellerList = new Int32Array(maxBuilding + 1);
+  let sellerCount = 0;
   const addSeller = (sellerId: number, amount: number): void => {
     if (!(amount > 0)) return;
     if (!(Number.isInteger(sellerId) && sellerId >= 0 && sellerId <= maxBuilding)) {
       throw new RangeError(`market receipt for unknown building ${String(sellerId)}`);
     }
-    if (sellerAmount[sellerId] === 0) sellerList.push(sellerId);
+    if (sellerAmount[sellerId] === 0) {
+      sellerList[sellerCount] = sellerId;
+      sellerCount += 1;
+    }
     sellerAmount[sellerId] = (sellerAmount[sellerId] ?? 0) + amount;
   };
   const flushSellers = (): void => {
-    for (const sellerId of sellerList) {
+    for (let item = 0; item < sellerCount; item += 1) {
+      const sellerId = sellerList[item] ?? 0;
       const amount = sellerAmount[sellerId] ?? 0;
       push(accountOf(operatingIds, sellerId, "operating-cash"), 1, amount);
       push(accountOf(revenueIds, sellerId, "sales-revenue"), 0, amount);
       sellerAmount[sellerId] = 0;
     }
-    sellerList.length = 0;
+    sellerCount = 0;
   };
   for (let market = 0; market < marketDays.length; market += 1) {
     const flow = flows[market] as MarketFlowColumns;
@@ -1234,14 +1242,22 @@ function settleMarketDaysInternal(
     // D-160: typed line columns; a building's wage entry has at most two lines per assignment
     // and two more, so this capacity is never exceeded.
     const wageLines = createJournalLines(2 * world.employment.length + 2 * world.buildings.length);
-    // Groups of the current building (scratch).
-    const gBlock: number[] = [];
-    const gProfession: number[] = [];
-    const gWorkers: number[] = [];
-    const gAccount: number[] = [];
-    const gObligation: number[] = [];
-    const gInKind: number[] = [];
-    const gPaid: number[] = [];
+    // Groups of the current building (scratch). D-160: typed columns with a fill count `gCount`
+    // (they were cleared with `length = 0` per building, which drops their storage); they double
+    // when a building has more groups than they hold.
+    let gBlock: Float64Array = new Float64Array(16);
+    let gProfession: Float64Array = new Float64Array(16);
+    let gWorkers: Float64Array = new Float64Array(16);
+    let gAccount: Float64Array = new Float64Array(16);
+    let gObligation: Float64Array = new Float64Array(16);
+    let gInKind: Float64Array = new Float64Array(16);
+    let gPaid: Float64Array = new Float64Array(16);
+    let gCount = 0;
+    const grownGroups = (column: Float64Array): Float64Array => {
+      const grown = new Float64Array(column.length * 2);
+      grown.set(column);
+      return grown;
+    };
     const accountIn = (table: Int32Array, ownerId: number, what: string): number => {
       const id = tableAccount(table, ownerId);
       if (id < 0) throw new RangeError(`missing ${what} account for ${String(ownerId)}`);
@@ -1264,12 +1280,7 @@ function settleMarketDaysInternal(
           hoursFactor = known;
         }
       }
-      gBlock.length = 0;
-      gProfession.length = 0;
-      gWorkers.length = 0;
-      gAccount.length = 0;
-      gObligation.length = 0;
-      gInKind.length = 0;
+      gCount = 0;
       // P7 (D-154, R2): a block working in a building it owns is paid the building's residual.
       const ownerPosition = index.position(building.ownerAccountId);
       const ownerBlockId =
@@ -1277,7 +1288,7 @@ function settleMarketDaysInternal(
           ? accountOwnerIdAt(accounts, ownerPosition)
           : null;
       const coverage = labourWages.coverage(building.provinceId);
-      for (const assignment of wageLookup.assignmentsByBuilding.get(building.id) ?? []) {
+      for (const assignment of wageLookup.assignmentsByBuilding.get(building.id) ?? NO_WAGE_ASSIGNMENTS) {
         const block = wageLookup.blockById.get(assignment.popBlockId);
         if (block === undefined) throw new RangeError("employment assignment references an unknown block");
         if (ownerBlockId !== null && ownerBlockId === block.id) continue;
@@ -1306,16 +1317,20 @@ function settleMarketDaysInternal(
         }
         const obligation = dailyWage * assignment.workers;
         let group = -1;
-        for (let item = 0; item < gBlock.length; item += 1) if (gBlock[item] === block.id) group = item;
+        for (let item = 0; item < gCount; item += 1) if (gBlock[item] === block.id) group = item;
         if (group < 0) {
           // Insert in block-id order (shift the later groups up by one).
-          let at = gBlock.length;
-          gBlock.push(0);
-          gProfession.push(0);
-          gWorkers.push(0);
-          gAccount.push(0);
-          gObligation.push(0);
-          gInKind.push(0);
+          let at = gCount;
+          if (gCount === gBlock.length) {
+            gBlock = grownGroups(gBlock);
+            gProfession = grownGroups(gProfession);
+            gWorkers = grownGroups(gWorkers);
+            gAccount = grownGroups(gAccount);
+            gObligation = grownGroups(gObligation);
+            gInKind = grownGroups(gInKind);
+            gPaid = grownGroups(gPaid);
+          }
+          gCount += 1;
           while (at > 0 && (gBlock[at - 1] ?? 0) > block.id) {
             gBlock[at] = gBlock[at - 1] ?? 0;
             gProfession[at] = gProfession[at - 1] ?? 0;
@@ -1336,7 +1351,7 @@ function settleMarketDaysInternal(
           gObligation[group] = (gObligation[group] ?? 0) + obligation;
         }
       }
-      const groupCount = gBlock.length;
+      const groupCount = gCount;
       if (groupCount === 0) continue;
       // P5 (D-143 §2): the owner block's kept food is a wage in kind, up to its cash wage here.
       const inKind = inKindWages?.get(building.id);
@@ -1356,7 +1371,6 @@ function settleMarketDaysInternal(
       const employer = { id: employerId, balanceRUSD: balanceOfId(employerId) };
       const paid = Math.min(employer.balanceRUSD, obligation);
       // Proportional allocation with the keyed residual (allocateMoney).
-      gPaid.length = groupCount;
       for (let item = 0; item < groupCount; item += 1) gPaid[item] = 0;
       if (paid > 0 && obligation > 0) {
         let allocated = 0;
@@ -1367,8 +1381,7 @@ function settleMarketDaysInternal(
         }
         let residual = paid - allocated;
         if (Math.abs(residual) > toleranceMoney(residual)) {
-          const order = gBlock
-            .map((blockId, item) => ({
+          const order = Array.from(gBlock.subarray(0, groupCount), (blockId, item) => ({
               item,
               blockId,
               key: drawUint32({ seed: world.seed, day: dayIndex, entityId: blockId, purpose: M3E_WAGE_RESIDUAL_PURPOSE, drawIndex: 0 }),

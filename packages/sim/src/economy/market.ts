@@ -620,9 +620,14 @@ export interface MarketDayColumns {
   readonly flows: MarketFlowColumns;
 }
 
-/** Ascending (household before building, buyer id, tier), the allocation order (D-133). */
+/**
+ * Ascending (household before building, buyer id, tier), the allocation order (D-133), of
+ * the first `count` indices. D-160: typed scratch with a count; an unsorted run is sorted
+ * through an array with the same stable sort and comparator as before.
+ */
 function allocationOrderSorted(
-  indices: number[],
+  indices: Int32Array,
+  count: number,
   kind: Uint8Array,
   buyer: Float64Array,
   tier: Uint8Array,
@@ -631,9 +636,10 @@ function allocationOrderSorted(
     (kind[left] ?? 0) - (kind[right] ?? 0) ||
     (buyer[left] ?? 0) - (buyer[right] ?? 0) ||
     (tier[left] ?? 0) - (tier[right] ?? 0);
-  for (let index = 1; index < indices.length; index += 1) {
+  for (let index = 1; index < count; index += 1) {
     if (before(indices[index - 1] ?? 0, indices[index] ?? 0) > 0) {
-      indices.sort(before);
+      const sorted = Array.from(indices.subarray(0, count)).sort(before);
+      indices.set(sorted);
       return;
     }
   }
@@ -897,11 +903,12 @@ export function runMarketDay(
   const resPhase: number[] = [];
 
   // Allocation of one (tier, good) group from a lot table (`allocateTierGood`).
-  const relevant: number[] = [];
-  const plannedQuantity: number[] = [];
-  const buyerEnd: number[] = [];
-  const lotSlots: number[] = [];
-  const lotEnd: number[] = [];
+  // D-160: typed scratch of the market day with fill counts (the former arrays were cleared
+  // with `length = 0`, which drops their storage, and regrown on every call). Candidates:
+  // at most `demandCount`; lots: at most one per owner slot (`lotScratchFor`, below).
+  const relevant = new Int32Array(demandCount);
+  const plannedQuantity = new Float64Array(demandCount);
+  const buyerEnd = new Float64Array(demandCount);
   // D-158: the amount a candidate is allocated: funded (Pass A), funded less Pass A (Pass B),
   // or funded less fulfilled (Pass A2).
   const fundedFor = (index: number, mode: 0 | 1 | 2): number =>
@@ -918,24 +925,32 @@ export function runMarketDay(
     phase: 0 | 1,
   ): { readonly totalFunded: number; readonly fulfilled: number } => {
     const fundedOf = (index: number): number => fundedFor(index, mode);
-    relevant.length = 0;
+    let relevantCount = 0;
     for (let item = 0; item < count; item += 1) {
       const index = candidates[item] as number;
-      if (fundedOf(index) > 0) relevant.push(index);
+      if (fundedOf(index) > 0) {
+        relevant[relevantCount] = index;
+        relevantCount += 1;
+      }
     }
-    allocationOrderSorted(relevant, kind, buyer, tierOf);
+    allocationOrderSorted(relevant, relevantCount, kind, buyer, tierOf);
     let totalFunded = 0;
-    for (let item = 0; item < relevant.length; item += 1) totalFunded += fundedOf(relevant[item] as number);
+    for (let item = 0; item < relevantCount; item += 1) totalFunded += fundedOf(relevant[item] as number);
     if (totalFunded <= tolerance(totalFunded)) return { totalFunded: 0, fulfilled: 0 };
 
     const ownerCount = lots.owners.length;
     const base = goodId * ownerCount;
-    lotSlots.length = 0;
+    const scratch = lotScratchFor(ownerCount);
+    const lotSlots = scratch.slots;
+    const lotEnd = scratch.end;
+    const reservedByLot = scratch.reserved;
+    let lotCount = 0;
     let available = 0;
     for (let slot = 0; slot < ownerCount; slot += 1) {
       const quantity = lots.quantity[base + slot] ?? 0;
       if (lots.present[base + slot] === 1 && quantity > 0) {
-        lotSlots.push(slot);
+        lotSlots[lotCount] = slot;
+        lotCount += 1;
         available += quantity;
       }
     }
@@ -943,12 +958,11 @@ export function runMarketDay(
 
     const fulfilledTotal = Math.min(totalFunded, available);
     const scale = fulfilledTotal / totalFunded;
-    plannedQuantity.length = 0;
     let plannedTotal = 0;
-    for (let item = 0; item < relevant.length; item += 1) {
+    for (let item = 0; item < relevantCount; item += 1) {
       const index = relevant[item] as number;
       const quantity = totalFunded <= available ? fundedOf(index) : fundedOf(index) * scale;
-      plannedQuantity.push(quantity);
+      plannedQuantity[item] = quantity;
       plannedTotal += quantity;
     }
     if (Math.abs(plannedTotal - fulfilledTotal) > tolerance(plannedTotal, fulfilledTotal)) {
@@ -956,28 +970,26 @@ export function runMarketDay(
     }
 
     // D-133 sequential pairing over the cumulative lot and buyer intervals.
-    lotEnd.length = 0;
     let cumulative = 0;
-    for (let item = 0; item < lotSlots.length; item += 1) {
+    for (let item = 0; item < lotCount; item += 1) {
       const slot = lotSlots[item] as number;
       cumulative += ((lots.quantity[base + slot] ?? 0) / available) * fulfilledTotal;
-      lotEnd.push(cumulative);
+      lotEnd[item] = cumulative;
     }
-    lotEnd[lotEnd.length - 1] = fulfilledTotal;
-    buyerEnd.length = 0;
+    lotEnd[lotCount - 1] = fulfilledTotal;
     cumulative = 0;
-    for (let item = 0; item < plannedQuantity.length; item += 1) {
+    for (let item = 0; item < relevantCount; item += 1) {
       cumulative += plannedQuantity[item] as number;
-      buyerEnd.push(cumulative);
+      buyerEnd[item] = cumulative;
     }
-    if (buyerEnd.length > 0) buyerEnd[buyerEnd.length - 1] = fulfilledTotal;
-    const reservedByLot = new Array<number>(lotSlots.length).fill(0);
+    if (relevantCount > 0) buyerEnd[relevantCount - 1] = fulfilledTotal;
+    reservedByLot.fill(0, 0, lotCount);
     let buyerIndex = 0;
     let lotStart = 0;
-    for (let lotIndex = 0; lotIndex < lotSlots.length; lotIndex += 1) {
+    for (let lotIndex = 0; lotIndex < lotCount; lotIndex += 1) {
       const lotStop = lotEnd[lotIndex] ?? lotStart;
       const sellerId = lots.owners[lotSlots[lotIndex] ?? 0] ?? 0;
-      while (buyerIndex < relevant.length) {
+      while (buyerIndex < relevantCount) {
         const buyerStart = buyerIndex === 0 ? 0 : (buyerEnd[buyerIndex - 1] ?? 0);
         const buyerStop = buyerEnd[buyerIndex] ?? buyerStart;
         const quantity = Math.min(lotStop, buyerStop) - Math.max(lotStart, buyerStart);
@@ -1014,7 +1026,7 @@ export function runMarketDay(
       lotStart = lotStop;
     }
     let actualFulfilled = 0;
-    for (let lotIndex = 0; lotIndex < lotSlots.length; lotIndex += 1) {
+    for (let lotIndex = 0; lotIndex < lotCount; lotIndex += 1) {
       const cell = base + (lotSlots[lotIndex] ?? 0);
       const quantity = lots.quantity[cell] ?? 0;
       const reservedFromLot = reservedByLot[lotIndex] ?? 0;
@@ -1045,6 +1057,14 @@ export function runMarketDay(
   const buildingIds = lookups.production.buildingIdsByMarket.get(market.id) ?? [];
   const opening = lotTableFromLots(market.stockLots, buildingIds, goodCount);
   const ownerCount = opening.owners.length;
+  /** D-160: lot scratch of `allocate`, one entry per owner slot (the day's tables share the owners). */
+  let lotScratch = { slots: new Int32Array(ownerCount), end: new Float64Array(ownerCount), reserved: new Float64Array(ownerCount) };
+  const lotScratchFor = (owners: number): typeof lotScratch => {
+    if (lotScratch.slots.length < owners) {
+      lotScratch = { slots: new Int32Array(owners), end: new Float64Array(owners), reserved: new Float64Array(owners) };
+    }
+    return lotScratch;
+  };
   /** D-158: household takings by lot cell (good × owner slot) and by good, in piece order. */
   const householdTakenByCell = new Float64Array(goodCount * ownerCount);
   const householdTakenByGood = new Float64Array(goodCount);

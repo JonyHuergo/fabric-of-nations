@@ -195,6 +195,8 @@ export interface ProductionLookups {
    * (a country's researched technologies do not change during the market phase).
    */
   readonly technologyFactor?: (country: World["countries"][number], sector: BuildingDef["sector"]) => number;
+  /** D-160: `extraPurchaseSpecs` of a definition, derived once per day. */
+  readonly extraPurchasesOf?: (definition: BuildingDef) => readonly ExtraPurchaseSpec[];
 }
 
 export function buildProductionLookups(
@@ -242,7 +244,16 @@ export function buildProductionLookups(
   const storage = new Map<number, number[]>();
   const definitionsById = capacityIndex.definitionById;
   const technologyFactors = new Map<number, Map<string, number>>();
+  const extraPurchases = new Map<BuildingDef, readonly ExtraPurchaseSpec[]>();
   return {
+    extraPurchasesOf(definition) {
+      let specs = extraPurchases.get(definition);
+      if (specs === undefined) {
+        specs = extraPurchaseSpecs(definition);
+        extraPurchases.set(definition, specs);
+      }
+      return specs;
+    },
     technologyFactor(country, sector) {
       let bySector = technologyFactors.get(country.id);
       if (bySector === undefined) {
@@ -432,6 +443,31 @@ function farmFactor(
 const NO_ASSIGNMENTS: readonly EmploymentAssignment[] = [];
 
 /**
+ * D-160: the workers of `professionId` among `assignments`, summed from 0 in assignment order
+ * (the former per-profession running sums).
+ */
+function assignedWorkersOf(assignments: readonly EmploymentAssignment[], professionId: number): number {
+  let workers = 0;
+  let found = false;
+  for (let item = 0; item < assignments.length; item += 1) {
+    const assignment = assignments[item] as EmploymentAssignment;
+    if (assignment.professionId !== professionId) continue;
+    workers = found ? workers + assignment.workers : 0 + assignment.workers;
+    found = true;
+  }
+  return workers;
+}
+
+/** D-160: whether assignment `item` is the first of its profession (first-assignment order). */
+function firstOfProfession(assignments: readonly EmploymentAssignment[], item: number): boolean {
+  const professionId = (assignments[item] as EmploymentAssignment).professionId;
+  for (let earlier = 0; earlier < item; earlier += 1) {
+    if ((assignments[earlier] as EmploymentAssignment).professionId === professionId) return false;
+  }
+  return true;
+}
+
+/**
  * Compute a building's capacity and desired inputs from current staffing.
  *
  * Callers evaluating many buildings against one unchanged state pass an `index`
@@ -451,25 +487,15 @@ export function computeBuildingCapacity(
   }
   const professions = index.professionById;
   const assignments = index.assignmentsByBuilding.get(building.id) ?? NO_ASSIGNMENTS;
-  // D-158: workers by profession in first-assignment order (the former map's order), in
-  // small arrays; the same sums.
-  const assignedProfession: number[] = [];
-  const assignedCount: number[] = [];
-  for (const assignment of assignments) {
-    const at = assignedProfession.indexOf(assignment.professionId);
-    if (at < 0) {
-      assignedProfession.push(assignment.professionId);
-      assignedCount.push(0 + assignment.workers);
-    } else {
-      assignedCount[at] = (assignedCount[at] ?? 0) + assignment.workers;
+  // D-158: workers by profession in first-assignment order (the former map's order); the same
+  // sums. D-160: computed by scanning the building's few assignments (`assignedWorkersOf`,
+  // `firstOfProfession`) instead of building two arrays and a closure per building.
+  let assignedWorkers = 0;
+  for (let item = 0; item < assignments.length; item += 1) {
+    if (firstOfProfession(assignments, item)) {
+      assignedWorkers += assignedWorkersOf(assignments, (assignments[item] as EmploymentAssignment).professionId);
     }
   }
-  const assignedOf = (professionId: number): number => {
-    const at = assignedProfession.indexOf(professionId);
-    return at < 0 ? 0 : (assignedCount[at] ?? 0);
-  };
-  let assignedWorkers = 0;
-  for (const workers of assignedCount) assignedWorkers += workers;
   const requiredWorkersByProfession: { professionId: number; requiredWorkers: number }[] = [];
   for (const job of buildingJobs(definition, building)) {
     const requiredWorkers =
@@ -508,7 +534,7 @@ export function computeBuildingCapacity(
 
   let staffingRatio = 1;
   for (const job of requiredWorkersByProfession) {
-    const workers = assignedOf(job.professionId);
+    const workers = assignedWorkersOf(assignments, job.professionId);
     const ratio = workers / job.requiredWorkers;
     if (ratio < staffingRatio) staffingRatio = ratio;
   }
@@ -517,9 +543,10 @@ export function computeBuildingCapacity(
   let productivityFactor = 1;
   if (assignedWorkers > 0) {
     let weighted = 0;
-    for (let item = 0; item < assignedProfession.length; item += 1) {
-      const professionId = assignedProfession[item] ?? 0;
-      const workers = assignedCount[item] ?? 0;
+    for (let item = 0; item < assignments.length; item += 1) {
+      if (!firstOfProfession(assignments, item)) continue;
+      const professionId = (assignments[item] as EmploymentAssignment).professionId;
+      const workers = assignedWorkersOf(assignments, professionId);
       const profession = professions.get(professionId);
       if (profession === undefined) {
         throw new RangeError(
@@ -565,11 +592,7 @@ export function computeBuildingCapacity(
     productivityFactor *
     e5LaborFactor *
     hoursFactor *
-    (() => {
-      return owner === undefined
-        ? 1
-        : productionStrikeFactor(world, owner.id, building.provinceId);
-    })();
+    (owner === undefined ? 1 : productionStrikeFactor(world, owner.id, building.provinceId));
   if (!Number.isFinite(capacityTU) || capacityTU < 0) {
     throw new RangeError(`building ${String(building.id)} has invalid capacity`);
   }
@@ -694,16 +717,18 @@ export function applyOverflowToTable(
 ): OverflowLoss[] {
   const overflowLosses: OverflowLoss[] = [];
   const ownerCount = table.owners.length;
-  const slots: number[] = [];
-  const amounts: number[] = [];
+  // D-160: typed scratch with a fill count (was cleared with `length = 0` per good).
+  const slots = new Int32Array(ownerCount);
+  const amounts = new Float64Array(ownerCount);
   for (let goodId = 0; goodId < goodCount && goodId < table.goodCount; goodId += 1) {
     const base = goodId * ownerCount;
-    slots.length = 0;
+    let slotCount = 0;
     let total = 0;
     for (let slot = 0; slot < ownerCount; slot += 1) {
       const quantity = table.quantity[base + slot] ?? 0;
       if (table.present[base + slot] === 1 && quantity > 0) {
-        slots.push(slot);
+        slots[slotCount] = slot;
+        slotCount += 1;
         total += quantity;
       }
     }
@@ -711,16 +736,16 @@ export function applyOverflowToTable(
     const capacity = clearAll ? 0 : (capacityByGood[goodId] ?? 0);
     if (!clearAll && total <= capacity + tolerance(total, capacity)) continue;
     const overflow = total - capacity;
-    amounts.length = 0;
     let lost = 0;
-    for (const slot of slots) {
+    for (let index = 0; index < slotCount; index += 1) {
+      const slot = slots[index] ?? 0;
       // A non-storable good loses every lot whole (no proportional rounding).
       const amount = clearAll ? (table.quantity[base + slot] ?? 0) : ((table.quantity[base + slot] ?? 0) * overflow) / total;
-      amounts.push(amount);
+      amounts[index] = amount;
       lost += amount;
     }
     let residual = clearAll ? 0 : overflow - lost;
-    for (let index = slots.length - 1; index >= 0 && residual > tolerance(residual); index -= 1) {
+    for (let index = slotCount - 1; index >= 0 && residual > tolerance(residual); index -= 1) {
       const quantity = table.quantity[base + (slots[index] ?? 0)] ?? 0;
       const headroom = quantity - (amounts[index] ?? 0);
       if (headroom <= 0) continue;
@@ -731,7 +756,7 @@ export function applyOverflowToTable(
     if (residual > tolerance(residual)) {
       throw new RangeError(`unable to allocate overflow loss for good ${String(goodId)}`);
     }
-    for (let index = 0; index < slots.length; index += 1) {
+    for (let index = 0; index < slotCount; index += 1) {
       let amount = amounts[index] ?? 0;
       if (!(amount > 0)) continue;
       const slot = slots[index] ?? 0;
@@ -902,7 +927,6 @@ export function runProductionCore(
   const groupNext = new Int32Array(count).fill(-1);
   const reservationKeys = new Set<number>();
   for (let index = 0; index < count; index += 1) {
-    const path = (): string => `inputReservations[${String(index)}]`;
     const buyerId = reservations.buyer[index] ?? 0;
     const goodId = reservations.good[index] ?? 0;
     const sellerId = reservations.seller[index] ?? 0;
@@ -911,11 +935,11 @@ export function runProductionCore(
       const sellerSlot = opening.slotOf.get(sellerId);
       const cell = sellerSlot === undefined ? -1 : goodId * ownerCount + sellerSlot;
       const slot = buyerSlot.get(buyerId) ?? -1;
-      if (cell < 0 || slot < 0) throw new RangeError(`${path()} references an unknown lot or buyer`);
+      if (cell < 0 || slot < 0) throw new RangeError(`${reservationPath(index)} references an unknown lot or buyer`);
       const lotQuantity = opening.quantity[cell] ?? 0;
       const reserved = (reservedByLot[cell] ?? 0) + quantity;
       if (reserved > lotQuantity + tolerance(lotQuantity, reserved, reservedByGood[goodId] ?? 0)) {
-        throw new RangeError(`${path()} over-reserves seller lot ${lotKey(goodId, sellerId)}`);
+        throw new RangeError(`${reservationPath(index)} over-reserves seller lot ${lotKey(goodId, sellerId)}`);
       }
       reservedByLot[cell] = reserved;
       const group = slot * goodCount + goodId;
@@ -926,59 +950,59 @@ export function runProductionCore(
       continue;
     }
     if (!(goodId >= 0 && goodId < goodCount && goodKnown[goodId] === 1)) {
-      throw new RangeError(`${path()}.goodId references an unknown good`);
+      throw new RangeError(`${reservationPath(index)}.goodId references an unknown good`);
     }
     const buyer = buildingById.get(buyerId);
     if (buyer === undefined) {
-      throw new RangeError(`${path()} references an unknown buyer building`);
+      throw new RangeError(`${reservationPath(index)} references an unknown buyer building`);
     }
     if (!buyer.operational) {
-      throw new RangeError(`${path()} references a non-operational buyer building`);
+      throw new RangeError(`${reservationPath(index)} references a non-operational buyer building`);
     }
     const buyerDefinition = definitionsById.get(buyer.definitionId);
     if (buyerDefinition === undefined) {
-      throw new RangeError(`${path()} buyer has no definition`);
+      throw new RangeError(`${reservationPath(index)} buyer has no definition`);
     }
     if (buyerDefinition.outputs.length === 0) {
-      throw new RangeError(`${path()} buyer has no production recipe`);
+      throw new RangeError(`${reservationPath(index)} buyer has no production recipe`);
     }
     if (purchaseRole(buyerDefinition, goodId) === null) {
-      throw new RangeError(`${path()}.goodId is not an input of the buyer recipe`);
+      throw new RangeError(`${reservationPath(index)}.goodId is not an input of the buyer recipe`);
     }
     if (!marketProvinceIdSet.has(buyer.provinceId)) {
-      throw new RangeError(`${path()} buyer building is outside the market`);
+      throw new RangeError(`${reservationPath(index)} buyer building is outside the market`);
     }
     const seller = buildingById.get(sellerId);
     if (seller === undefined) {
-      throw new RangeError(`${path()} references an unknown seller building`);
+      throw new RangeError(`${reservationPath(index)} references an unknown seller building`);
     }
     if (!marketProvinceIdSet.has(seller.provinceId)) {
       // E6a: an imported lot is owned by a building in another market. The opening
       // lot existence check below is the real guard; a foreign owner is legitimate
       // only when trade is enabled (D-079 §8).
       if (!world.trade.enabled) {
-        throw new RangeError(`${path()} seller building is outside the market`);
+        throw new RangeError(`${reservationPath(index)} seller building is outside the market`);
       }
       if (!seller.operational) {
-        throw new RangeError(`${path()} seller building is not operational`);
+        throw new RangeError(`${reservationPath(index)} seller building is not operational`);
       }
     }
     const sellerSlot = opening.slotOf.get(sellerId);
     const cell = sellerSlot === undefined ? -1 : goodId * ownerCount + sellerSlot;
     if (cell < 0 || opening.present[cell] !== 1) {
-      throw new RangeError(`${path()} references a seller lot that does not exist on opening inventory`);
+      throw new RangeError(`${reservationPath(index)} references a seller lot that does not exist on opening inventory`);
     }
     const lotQuantity = opening.quantity[cell] ?? 0;
     const slot = buyerSlot.get(buyerId) ?? -1;
-    if (slot < 0) throw new RangeError(`${path()} buyer building is outside the market`);
+    if (slot < 0) throw new RangeError(`${reservationPath(index)} buyer building is outside the market`);
     const duplicateKey = (slot * goodCount + goodId) * ownerCount + (sellerSlot ?? 0);
     if (reservationKeys.has(duplicateKey)) {
-      throw new RangeError(`${path()} duplicates a buyer/good/seller reservation`);
+      throw new RangeError(`${reservationPath(index)} duplicates a buyer/good/seller reservation`);
     }
     reservationKeys.add(duplicateKey);
     const reserved = (reservedByLot[cell] ?? 0) + quantity;
     if (reserved > lotQuantity + tolerance(lotQuantity, reserved, reservedByGood[goodId] ?? 0)) {
-      throw new RangeError(`${path()} over-reserves seller lot ${lotKey(goodId, sellerId)}`);
+      throw new RangeError(`${reservationPath(index)} over-reserves seller lot ${lotKey(goodId, sellerId)}`);
     }
     reservedByLot[cell] = reserved;
     const group = slot * goodCount + goodId;
@@ -1122,21 +1146,16 @@ export function runProductionCore(
     // P5b (D-146): optional inputs raise output with their fill; maintenance goods are
     // consumed whole. Both are paid for as used, like recipe inputs.
     let optionalFactor = 1;
-    const extraPurchases: { goodId: number; wanted: number; elasticity: number }[] =
-      (definition.optionalInputs?.length ?? 0) + (definition.maintenanceInputs?.length ?? 0) === 0 ? NO_EXTRA_PURCHASES : [];
-    for (const item of definition.optionalInputs ?? []) {
-      extraPurchases.push({ goodId: item.goodId, wanted: item.quantityPerThroughputUnit * executedTU, elasticity: item.outputElasticity });
-    }
-    for (const item of definition.maintenanceInputs ?? []) {
-      extraPurchases.push({ goodId: item.goodId, wanted: Number.POSITIVE_INFINITY, elasticity: 0 });
-    }
-    if (extraPurchases.length > 1) extraPurchases.sort((left, right) => left.goodId - right.goodId);
+    // D-160: the definition's specs, sorted once per day (were a list sorted per building).
+    const extraPurchases = lookups.extraPurchasesOf?.(definition) ?? extraPurchaseSpecs(definition);
     for (const purchase of extraPurchases) {
+      const wanted =
+        purchase.perThroughputUnit === null ? Number.POSITIVE_INFINITY : purchase.perThroughputUnit * executedTU;
       const group = buyerIndex * goodCount + purchase.goodId;
       const reserved = reservedByBuyerGood[group] ?? 0;
-      const used = Math.min(reserved, purchase.wanted);
+      const used = Math.min(reserved, wanted);
       if (purchase.elasticity > 0) {
-        const fill = purchase.wanted > 0 ? Math.min(1, used / purchase.wanted) : 1;
+        const fill = wanted > 0 ? Math.min(1, used / wanted) : 1;
         optionalFactor *= 1 - purchase.elasticity + purchase.elasticity * fill;
       }
       let actualUsed = 0;
@@ -1215,16 +1234,29 @@ export function runProductionCore(
       }
     }
 
-    buildingResults.push({
-      buildingId: building.id,
-      capacityTU: capacity.capacityTU,
-      executedTU,
-      staffingRatio: capacity.staffingRatio,
-      productivityFactor: capacity.productivityFactor,
-      inputs: inputResults,
-      outputs: outputResults,
-      ...(extraction === undefined ? {} : { extraction }),
-    });
+    // D-160: the same fields without an object spread per building.
+    buildingResults.push(
+      extraction === undefined
+        ? {
+            buildingId: building.id,
+            capacityTU: capacity.capacityTU,
+            executedTU,
+            staffingRatio: capacity.staffingRatio,
+            productivityFactor: capacity.productivityFactor,
+            inputs: inputResults,
+            outputs: outputResults,
+          }
+        : {
+            buildingId: building.id,
+            capacityTU: capacity.capacityTU,
+            executedTU,
+            staffingRatio: capacity.staffingRatio,
+            productivityFactor: capacity.productivityFactor,
+            inputs: inputResults,
+            outputs: outputResults,
+            extraction,
+          },
+    );
   }
 
   const capacityByGood = applyOverflow
@@ -1279,6 +1311,40 @@ export function runProductionCore(
   return { buildings: buildingResults, uses, inventory, overflowLosses, lots: next };
 }
 
+/** D-160: the message path of reservation `index`. */
+function reservationPath(index: number): string {
+  return `inputReservations[${String(index)}]`;
+}
+
+/**
+ * D-160: a building definition's optional inputs then maintenance goods, stably sorted by good
+ * (the order the former per-building list was sorted in). `perThroughputUnit` is null for a
+ * maintenance good, which is wanted whole.
+ */
+export interface ExtraPurchaseSpec {
+  readonly goodId: number;
+  readonly perThroughputUnit: number | null;
+  readonly elasticity: number;
+}
+
+const NO_EXTRA_PURCHASE_SPECS: readonly ExtraPurchaseSpec[] = [];
+
+/** D-160: `ExtraPurchaseSpec`s of a definition (empty when it has neither kind). */
+export function extraPurchaseSpecs(definition: BuildingDef): readonly ExtraPurchaseSpec[] {
+  if ((definition.optionalInputs?.length ?? 0) + (definition.maintenanceInputs?.length ?? 0) === 0) {
+    return NO_EXTRA_PURCHASE_SPECS;
+  }
+  const specs: ExtraPurchaseSpec[] = [];
+  for (const item of definition.optionalInputs ?? []) {
+    specs.push({ goodId: item.goodId, perThroughputUnit: item.quantityPerThroughputUnit, elasticity: item.outputElasticity });
+  }
+  for (const item of definition.maintenanceInputs ?? []) {
+    specs.push({ goodId: item.goodId, perThroughputUnit: null, elasticity: 0 });
+  }
+  if (specs.length > 1) specs.sort((left, right) => left.goodId - right.goodId);
+  return specs;
+}
+
 /** Stock by good of a lot table, summed in slot order. */
 function stockByGoodOfTable(table: LotTable, goodCount: number): number[] {
   const ownerCount = table.owners.length;
@@ -1296,9 +1362,6 @@ function stockByGoodOfTable(table: LotTable, goodCount: number): number[] {
 
 /** A recipe's items in ascending good order, memoised per item array (D-139). */
 const sortedRecipeCache = new WeakMap<readonly GoodQuantityDef[], readonly GoodQuantityDef[]>();
-
-/** D-158: the shared empty list of a building without optional or maintenance inputs (never written). */
-const NO_EXTRA_PURCHASES: { goodId: number; wanted: number; elasticity: number }[] = [];
 
 function sortedByGood(items: readonly GoodQuantityDef[]): readonly GoodQuantityDef[] {
   let sorted = sortedRecipeCache.get(items);
