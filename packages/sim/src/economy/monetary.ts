@@ -55,6 +55,7 @@ import {
   MONETARY_REGIMES,
   type AccountSubtype,
 } from "./types.js";
+import type { DayScratch } from "./dayScratch.js";
 import { runMintWindow, type MintFlow } from "./mint.js";
 import { runDemonetisation } from "./currencyActions.js";
 import { findAccountByOwner } from "./accounts.js";
@@ -469,7 +470,11 @@ export function runMonetaryPhase(
   world: World,
   economyDefinitions: EconomyDefinitions,
   dayIndex: DayIndex,
-  options: PhaseValidationOptions & { readonly blockTotals?: BlockTotals } = {},
+  options: PhaseValidationOptions & {
+    readonly blockTotals?: BlockTotals;
+    /** D-161: reusable buffers for the mint windows (see `DayScratch`). */
+    readonly scratch?: DayScratch;
+  } = {},
 ): MonetaryPhaseResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
   // Staged mode: the integrated day validated the definitions once at its start.
@@ -510,7 +515,7 @@ export function runMonetaryPhase(
     // D-149: the mint window, the reserve measured at the day's metal price, then a
     // convertible metal currency is worth its fine content at that price.
     if (record.standard !== "paper") {
-      const flow = runMintWindow(world, economyDefinitions, record, entries, dealerSpent);
+      const flow = runMintWindow(world, economyDefinitions, record, entries, dealerSpent, options.scratch);
       if (flow !== null) {
         mintFlows.push(flow);
         const price = flow.marketPriceRUSDPerKg;

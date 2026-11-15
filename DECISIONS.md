@@ -10762,3 +10762,214 @@ first run, median; D-159 → after): M1 0.010 → 0.010; M2 aggregate 0.071 → 
 - **Day 53 still fails** as before (account 1303, −1.7e-15 RUSD); not fixed (designer's call).
 - **`pnpm map:atlas:check`** still fails on `main` for its own reason; not run or changed here.
 - **Index heading:** headed like D-154 to D-159 so the index check passes.
+
+## D-161 (performance) — Reusable typed buffers of the simulated day: lot tables, demand rows, journal lines
+
+**Status:** designer's task of 2026-11-15, branch `perf/day-5x`, after D-160 (step 1 of 2; D-162, worker
+threads, follows). Exact: the world is bit-identical (see "Equivalence"). No save change:
+`WORLD_SCHEMA_VERSION` stays 35 and `SIM_VERSION` 0.31.0.
+**Amends:** D-160 (open items "the lot tables", "a unit test of the batch scratch's wrap-around", and the
+day-33 snapshot and 6,000-block figures), D-139 (lot tables), P5b A11 (figures below).
+
+### What the day allocated (profile first)
+
+`scratch/extprobe.mjs` (typed-array constructors wrapped before the simulation loads; storage of at
+least 256 bytes counted by allocating function; views on an existing buffer not counted), rollback
+runner, summary detail, days 2–11 of the 1900 world, grouped by function and caller: **251.8 MiB of
+typed-array storage a day**, of which the market day 96 (its demand-row columns, group tables,
+household cell tables, Pass-B and final lot tables), production 33 (reservation tables and its copy of
+the opening lots), `copyLotTable` 27, slices in the market day 17, the household demand system 16,
+`lotTableFromLots` 17 (market 11.5, mint 5.1), the per-market household columns 13, settlement's
+journal lines 9, own consumption 3.5, the fulfilment array 3.5. `--trace-gc` and
+`--trace-incremental-marking` confirmed D-160's finding: every incremental marking of these days was
+started by external memory pressure (2.9 full collections a day). Almost all of it is allocated
+zero-filled per market (63 a day) and dropped before the market returns.
+
+### Decision
+
+1. **`DayScratch` (`economy/dayScratch.ts`).** Plain data owned by the caller: one buffer per named
+   slot (`Float64Array`, `Int32Array`, `Uint8Array` maps). `scratchF64`/`scratchI32`/`scratchU8` return
+   a view of exactly the requested length, **filled before it is handed out** (0, or the value the
+   former code filled, e.g. −1 or NaN); `scratchCopyF64`/`scratchCopyU8` return a copy (the former
+   `slice`/`from`). A view is valid until the next request of its slot. A buffer grows to at least the
+   request and at least a quarter more than before, and never shrinks. Without a scratch (`undefined`)
+   every request allocates a fresh array, exactly the former code, so tests and direct callers of the
+   phases are unchanged. `heldBytes` is a diagnostic, never read by the simulation.
+2. **Ownership.** The rollback runner holds one (`RollbackRunner.scratch`, created with the runner);
+   `TickContext.scratch` lets any caller pass its own (the runner uses the caller's when given);
+   `runEconomicDay` makes one for the day when neither is given (so even `tick` and `tickPhaseMode`
+   callers share one across the day's 63 markets). No module-level state; the scratch is never part
+   of the world, never serialised, cloned, hashed or validated, and no result refers to it.
+3. **What uses it — only buffers that die before their slot is requested again:**
+   - the market day (`runMarketDay`): the ten demand-row columns, the group tables (start, order,
+     fill, candidates), the tier-1/3 slot tables, the reservation columns (until they must grow), the
+     allocation scratch, the opening, remaining, same-day, Pass-B and final lot tables, the household
+     cell tables and the Pass-A copy, and the building pieces handed to production;
+   - production (`runProductionCore`): its reservation tables (by lot, by buyer and good, the linked
+     lists) and the lot table it returns, in a slot named by the caller (one per production wave, so
+     wave 1's lots survive wave 2);
+   - overflow (`applyOverflowToTable`), the mint window's two lot tables (`runMintWindow`, through the
+     monetary phase's options), the per-market household columns (`runMarketAttempt`), the day's
+     fulfilment array (read by the dwelling purchases and the needs result of the same day only);
+   - the household demand system's row columns and block ranges (`buildLesHouseholdDemand`): the day
+     reads them before its next market attempt, and the day result carries the record objects, not
+     the columns;
+   - settlement's four journal-line batches (market flows, wages, domestic service, upkeep): their
+     postings are materialised (`retainDeferredPostings`) before settlement returns.
+
+   **Not taken from it:** anything a result or the world keeps — the market day's `householdSpend`,
+   buyer and fulfilment copies (its flow columns, read by settlement and returned in the day result),
+   production's building columns, the needs columns, settlement's household columns, and the new
+   authoritative lot lists (`lotTableToLots`).
+4. **Tests (`economy/day-scratch.test.ts`, new).** The scratch's views (filled, exact length, one
+   buffer per slot, growth without shrinking, fresh arrays without a scratch, invalid lengths
+   rejected); the same six days of the M3 world, staged and phase mode, with no scratch, a shared
+   scratch, and a shared scratch **poisoned before every day** (every buffer filled with NaN, −123,456
+   or 77): identical hashes. And the missing D-160 test: journal batches across the generation
+   wrap-around at 2^32 − 1, with stale stamps equal to the post-wrap generation and garbage deltas
+   planted before the wrapping batch, post exactly as batches far from the wrap (balances, posting
+   counter, world hash; generations 0xffff_fffe, 1, 2, 3). Checked by mutation: with the wrap's
+   `stamp.fill(0)` removed from the source, that test fails.
+
+### Equivalence
+
+Bit-identical. `pinhashes` (the perf-hash-equality procedure, full detail) and `pinsummary` (summary
+detail), each with a per-day scratch and with one scratch shared across all 53 days (`SHARED=1`), give
+the D-158–D-160 hashes at 0, 1, 31, 52 and 53 ticks (`685bf3c4ccf4f842`, `4d77f5a066875b02`,
+`c9d106dbe6dbed6d`, `5b100c8146d94453`, `2fa36b1df11debff`) and the same day-53 failure (account 1303,
+−1.7014044923219608e-15). After the final growth rule (a quarter, not double) `pinhashes` with a shared
+scratch and `pinsummary` with per-day scratch were run again, with the same result. perfBench's host run (the runner's
+scratch across the window) gives `4d77f5a066875b02`, `c9d106dbe6dbed6d`, `0828e7ffda61a1b5`,
+`5b100c8146d94453` at days 1, 31, 32, 52 in every run, with the same day-53 message.
+`determinism/perf-hash-equality.test.ts` passes.
+
+### Measurements (desktop; not a device measurement)
+
+Environment: AMD Ryzen 5 2600 (6 cores, 12 threads), 7.9 GB RAM, Windows 11 Pro 10.0.26200, Node
+v24.22.1, `--max-old-space-size=4096`; **quiet machine** (no other applications; checked before each
+batch). D-160 was rebuilt from `5f6c6cb` in a separate worktree and **measured again, interleaved with
+this build** (D-160 run 1, after run 1, D-160 run 2, …), so the D-160 column replaces the figures
+D-160 took after its restart with other applications open. Medians of 3 runs. `4bec918` column:
+D-157's baseline figures.
+
+**Ordinary days 2–11 (perfPhases `2 12`, ms per day)**
+
+| Phase | 4bec918 | D-160 | After |
+|---|---:|---:|---:|
+| market-clearing | 506.3 | 337.0 | 199.1 |
+| market-household-demand | 306.7 | 147.3 | 141.4 |
+| settlement | 561.4 | 166.0 | 108.5 |
+| demography | 146.2 | 112.3 | 103.0 |
+| needs | 92.2 | 48.5 | 44.0 |
+| employment | 147.5 | 43.0 | 39.9 |
+| fiscal | 69.6 | 43.6 | 37.6 |
+| education | 86.3 | 42.2 | 36.3 |
+| market-production-demand | 64.3 | 35.7 | 36.1 |
+| trade-dispatch | 72.8 | 32.5 | 29.8 |
+| training | 98.6 | 23.8 | 25.1 |
+| politics | 25.4 | 21.3 | 21.3 |
+| unrest | 30.8 | 20.1 | 19.8 |
+| others | 196.6 | 69.5 | 48.0 |
+| **Mean day** | **2,405.6** | **1,142.8** | **889.9** |
+
+Runs: D-160 1,166.5 / 1,126.0 / 1,142.8; after 900.3 / 889.9 / 880.0 (1.28× D-160, 2.70× `4bec918`);
+worst day of the window 1,397 → 1,032 ms. Market clearing and settlement, which allocated the tables
+and journal lines, gain most; the other phases gain the collector's work they no longer absorb.
+
+**Whole month, days 0–31 (perfPhases `0 32`):** mean 3,027.2 → 1,322.8 → 1,042.3 ms (runs after
+1,041.7 / 1,067.8 / 1,042.3; 1.27× D-160, 2.90× `4bec918`); market clearing 351.8 → 215.3; day 31 (the
+first monthly labour phase) 18,654 → 4,280 → 4,174 ms (runs after 4,174 / 4,225 / 4,109).
+
+**Garbage collection, days 2–11** (`scratch/gctrace.mjs` under `--trace-gc`, rollback runner, summary
+detail; D-160 → after): pause per day 108.9 → 53.9 ms (runs after 38.1 / 55.3 / 53.9); mark-compacts
+2.9 → 0.5 a day, 79.5 → 17.4 ms; scavenges 6.3 → 7.3 a day, 29.2 → 36.5 ms. The full collections
+that remain are still started by external memory pressure. Typed-array storage allocated per day
+(`extprobe`, single runs): 251.8 → 29.9 MiB; what is left is result columns (flows, production,
+needs, settlement households), own consumption and the new lot lists.
+
+**Memory held (the cost).** The scratch holds 54.5 MiB after day 3 (the largest market's lot tables,
+13 slots of 1.3 MiB; the 460,000 household demand rows, 7 columns; the fulfilment array; journal
+lines). Live memory after a forced full collection (`scratch/livemem.mjs`, `--expose-gc`, days 1–12):
+JS heap 86–88 MiB in both builds; array-buffer storage 134–152 → 172–195 MiB, external 151–159 →
+179–221 MiB (+30 to +60 MiB). perfBench's sampled heap (which includes garbage not yet collected,
+now collected less often) p50 231 → 294 MiB, max 349 → 606 MiB. Phone memory was not measured;
+see the open items.
+
+**perfBench** (`dist/perfBench.js 52`; `4bec918` → D-160 → after): host STEP day mean 3,268 → 1,669 →
+1,335 ms (runs 1,336 / 1,322 / 1,335; 2.45× `4bec918`); its tick 2,744 → 1,364 → 1,041; snapshot build
+517 → 298 → 285; ordinary host days 2,878 → 1,564 → 1,222; day 31 18,733 → 4,835 → 4,645; day 30
+5,426 → 2,553 → 2,276; staged-mode tick 5,848 → 2,980 → 2,724; new game 3,592 → 1,803 → 1,793; SAVE
+3,856 → 2,867 → 3,003; LOAD 4,083 → 2,429 → 2,397. Every run: the hashes above, "two independent runs
+identical", "staged mode equals phase mode" and the save round trip PASS; the throughput stage then
+stops on the known day-53 failure (account 1303). SAVE is about 5 % slower in all three runs (2,860–
+3,050 → 2,970–3,011); save encoding was not changed, and the larger uncollected heap at that point is
+the likely cause (not investigated further).
+
+**Host throughput at the fastest speed** (`scratch/throughput.mjs 30`, days 0–32): 0.345 → 0.775 →
+0.962 days/s (runs 0.962 / 0.966 / 0.951; 2.79× `4bec918`).
+
+**Web app at its top speed (30×)** (`scripts/p7/playtest-labour.mjs`, 844 × 390, web export of each
+build, interleaved): 1 January to February 1900 in 82 → 35 → 32 s (runs D-160 34 / 35 / 35, after
+32 / 33 / 32; 0.97 days/s, 2.6× `4bec918`). 29/29 checks and 0 errors in all six runs; the in-game
+figures are unchanged (7.58 M changed profession, 2.64 M moved province, 13 blocks created).
+`docs/images/p7` restored after each run. Not a device measurement.
+
+**Snapshot build** (`scratch/snapshot.mjs 33 7`, Germany, first call and median of 7 repeats;
+`4bec918` → D-160 → after): day 0 first 665 → 442 → 441, repeat 491 → 270 → 269; day 33 first 824 →
+455 → 439, repeat 503 → 295 → 281.
+
+**`pnpm bench`** (`dist/bench.js` ×3 per build, interleaved, all PASS; p95 ms of each invocation's
+first run, median; `4bec918` → D-160 → after): M1 0.008 → 0.0099 → 0.0101; M2 aggregate 0.070 →
+0.069 → 0.068; stress 200 blocks 2.98 → 2.61 → 2.72, 1,000 blocks 14.3 → 11.6 → 12.9, 3,000 blocks
+49.8 → 37.4 → 36.4, 6,000 blocks 105.5 → 77.7 → 78.3. These M2 paths have no economy and do not reach
+the changed code; the differences are noise of the size seen between invocations.
+
+### The two D-160 slowdowns
+
+- **6,000-block stress (+5 % in D-160):** machine load. Measured again on the quiet machine, D-160 gives
+  77.7 ms (runs 77.7 / 78.7 / 76.6), below D-159's 78.8; nothing in D-160 reaches that path.
+- **Day-33 snapshot repeat (+15 ms in D-160):** the collector, not the snapshot. On the quiet machine
+  D-160's day-0 repeat (270 ms) matches D-159 (275) but its day-33 repeat is 295 ms. Under
+  `--trace-gc` (`scratch/snapshot2.mjs`, markers around the day-33 measurement, 2 runs each), D-160
+  ran 2 and 3 mark-compacts during the eight day-33 snapshot builds against 2 and 1 after this entry:
+  the typed-array garbage of the days just simulated raises external memory, and the full collections
+  it starts land inside the snapshot timings (day 0 follows world creation, with no simulated day
+  before it). With this entry the day-33 repeat is 281 ms. The snapshot code is unchanged since D-158.
+
+### Tests
+
+- **Full `pnpm test`:** only the 11 known failures (see "Full test run" below).
+- **Suites closest to the change**, run alone (day-scratch, perf-hash-equality, metal-standard,
+  rollback, land resources, construction, integration, worker host, fiscal, period close,
+  performance-invariants, industrial policy, trade, economic day, monetary authority, accounts, demand
+  system, multi-market, market clearing, settlement, production, inventory, ledger, account table):
+  24 of 24 suites, 367 of 367 tests pass (1,642 s).
+- **Static checks:** `pnpm typecheck`, `pnpm lint`, `pnpm audit:branding`, `pnpm audit:monetary`,
+  `check:sim-deps` and `check:worker` (bundle regenerated) pass; `pnpm app:export` (web, iOS, Android)
+  passes; `node scripts/docs/decisions-index.mjs` then `--check` pass.
+- **`pnpm map:atlas:check`** still fails on `main` for its own reason; not run or changed here.
+- **`pnpm bench`** (run through pnpm once after the measurements): PASS; M1 p95 0.005–0.010 ms, M2
+  aggregate p95 0.064–0.068 ms, 200-block stress p95 2.73 ms, 6,000-block stress avg 71.5 ms.
+
+### Full test run
+
+`pnpm test`: 113 suites, 1,474 tests, 94 min 42 s; 105 suites and 1,463 tests pass. The 11 failures
+are the known failures of `main`, each with the received value D-160 lists: replay
+`6aef674f9648abdd`, WPP 1950 `9aaedfa0cfabe4f6`, tick-validation 22 ticks `9dfd323500a31f87`,
+economy-roundtrip M3a `c7f29aa27a231428`, naming-audits 1900 hash `685bf3c4ccf4f842`, the four P2b
+money-calibration tests (`historical/p7/employment_1900.json`, 0, 0, 0.06354578421472346),
+demography-causes urban rows 5,687 of 20,739 and world-1900 cotton 1.3558462628762207. No other test
+fails.
+
+### Consequences and open items
+
+- **Memory for speed.** About 55 MiB of buffers stay allocated between days (live array-buffer memory
+  +30 to +60 MiB on the desktop). On a phone the WebView's memory limit is the designer's to test; if
+  it matters, slots whose lifetimes do not overlap could share storage (not analysed here), or the
+  runner could drop its scratch when the game pauses.
+- **Remaining typed-array allocation** (29.9 MiB a day) is result columns that the day result keeps;
+  making them reusable would need the results to be consumed before the next day, a contract change.
+- **For D-162:** the same rule applies to buffers moved between threads (transfer there and back, keep
+  a pool); slot names make the buffers' lifetimes explicit, which a worker's job inputs can reuse.
+- **Day 53 still fails** as before (account 1303, −1.7e-15 RUSD); not fixed (designer's call).
+- **Index heading:** headed like D-154 to D-160 so the index check passes.

@@ -4,6 +4,7 @@
  */
 
 import { requireInteger } from "../validation.js";
+import { scratchCopyF64, scratchCopyU8, scratchF64, scratchU8, type DayScratch } from "./dayScratch.js";
 import { appendLot, createLotList, type LotList } from "./lotList.js";
 import type { Market, StockLot } from "./types.js";
 
@@ -42,9 +43,16 @@ export interface LotTable {
 
 /**
  * Build a lot table holding `lots` (a later duplicate replaces an earlier one, as a
- * map would), with slots for `owners` and for every lot owner.
+ * map would), with slots for `owners` and for every lot owner. D-161: with a scratch,
+ * the cells are views of its slot `slot` (valid until that slot is requested again).
  */
-export function lotTableFromLots(lots: LotList, owners: Iterable<number>, goodCount: number): LotTable {
+export function lotTableFromLots(
+  lots: LotList,
+  owners: Iterable<number>,
+  goodCount: number,
+  scratch?: DayScratch,
+  slot = "lots",
+): LotTable {
   const ownerSet = new Set<number>(owners);
   for (let index = 0; index < lots.count; index += 1) ownerSet.add(lots.owner[index] ?? 0);
   const sorted = [...ownerSet].sort((left, right) => left - right);
@@ -55,8 +63,8 @@ export function lotTableFromLots(lots: LotList, owners: Iterable<number>, goodCo
     goodCount,
     owners: sorted,
     slotOf,
-    quantity: new Float64Array(size),
-    present: new Uint8Array(size),
+    quantity: scratchF64(scratch, `${slot}.quantity`, size),
+    present: scratchU8(scratch, `${slot}.present`, size),
   };
   for (let index = 0; index < lots.count; index += 1) {
     const goodId = lots.good[index] ?? Number.NaN;
@@ -70,14 +78,29 @@ export function lotTableFromLots(lots: LotList, owners: Iterable<number>, goodCo
   return table;
 }
 
-/** An independent copy of a lot table (same slots). */
-export function copyLotTable(table: LotTable): LotTable {
+/**
+ * An independent copy of a lot table (same slots). D-161: with a scratch, the cells are
+ * views of its slot `slot`.
+ */
+export function copyLotTable(table: LotTable, scratch?: DayScratch, slot = "lots.copy"): LotTable {
   return {
     goodCount: table.goodCount,
     owners: table.owners,
     slotOf: table.slotOf,
-    quantity: Float64Array.from(table.quantity),
-    present: Uint8Array.from(table.present),
+    quantity: scratch === undefined ? Float64Array.from(table.quantity) : scratchCopyF64(scratch, `${slot}.quantity`, table.quantity),
+    present: scratch === undefined ? Uint8Array.from(table.present) : scratchCopyU8(scratch, `${slot}.present`, table.present),
+  };
+}
+
+/** D-161: an empty lot table with the slots of `like` (cells from the scratch slot `slot`). */
+export function emptyLotTableLike(like: LotTable, scratch: DayScratch | undefined, slot: string): LotTable {
+  const size = like.goodCount * like.owners.length;
+  return {
+    goodCount: like.goodCount,
+    owners: like.owners,
+    slotOf: like.slotOf,
+    quantity: scratchF64(scratch, `${slot}.quantity`, size),
+    present: scratchU8(scratch, `${slot}.present`, size),
   };
 }
 

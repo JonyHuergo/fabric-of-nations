@@ -27,6 +27,7 @@ import {
   qualificationProductivityFactor,
 } from "./labor.js";
 import { technologyProductivityFactor } from "./technology.js";
+import { scratchF64, scratchI32, type DayScratch } from "./dayScratch.js";
 import {
   type OwnConsumptionPlan,
   farmLandFactor,
@@ -724,12 +725,14 @@ export function applyOverflowToTable(
    * non-storable good survives the day.
    */
   nonStorableGoods?: ReadonlySet<number>,
+  /** D-161: reusable buffers for the per-good slot scratch. */
+  scratch?: DayScratch,
 ): OverflowLoss[] {
   const overflowLosses: OverflowLoss[] = [];
   const ownerCount = table.owners.length;
   // D-160: typed scratch with a fill count (was cleared with `length = 0` per good).
-  const slots = new Int32Array(ownerCount);
-  const amounts = new Float64Array(ownerCount);
+  const slots = scratchI32(scratch, "overflow.slots", ownerCount);
+  const amounts = scratchF64(scratch, "overflow.amounts", ownerCount);
   for (let goodId = 0; goodId < goodCount && goodId < table.goodCount; goodId += 1) {
     const base = goodId * ownerCount;
     let slotCount = 0;
@@ -909,6 +912,13 @@ export function runProductionCore(
    * written. The market day passes false outside full detail.
    */
   buildObjects = true,
+  /**
+   * D-161: reusable buffers for the reservation tables and the returned lot table, whose
+   * cells are a view of the slot `lotsSlot` (valid until that slot is requested again; the
+   * market day gives each production wave its own). Absent, everything is allocated.
+   */
+  scratch?: DayScratch,
+  lotsSlot = "production.lots",
 ): ProductionCoreResult {
   const marketProvinceIdSet: ReadonlySet<number> =
     lookups.provinceIdsByMarket.get(market.id) ?? new Set(marketProvinceIds(world, market.id));
@@ -938,12 +948,12 @@ export function runProductionCore(
       reservedByGood[goodId] = (reservedByGood[goodId] ?? 0) + (reservations.quantity[index] ?? 0);
     }
   }
-  const reservedByLot = new Float64Array(goodCount * ownerCount);
-  const reservedByBuyerGood = new Float64Array(buildingIds.length * goodCount);
+  const reservedByLot = scratchF64(scratch, "production.reservedByLot", goodCount * ownerCount);
+  const reservedByBuyerGood = scratchF64(scratch, "production.reservedByBuyerGood", buildingIds.length * goodCount);
   // Reservations of each (buyer, good) as a linked list in reservation order.
-  const groupHead = new Int32Array(buildingIds.length * goodCount).fill(-1);
-  const groupTail = new Int32Array(buildingIds.length * goodCount).fill(-1);
-  const groupNext = new Int32Array(count).fill(-1);
+  const groupHead = scratchI32(scratch, "production.groupHead", buildingIds.length * goodCount, -1);
+  const groupTail = scratchI32(scratch, "production.groupTail", buildingIds.length * goodCount, -1);
+  const groupNext = scratchI32(scratch, "production.groupNext", count, -1);
   const reservationKeys = new Set<number>();
   for (let index = 0; index < count; index += 1) {
     const buyerId = reservations.buyer[index] ?? 0;
@@ -1036,7 +1046,7 @@ export function runProductionCore(
   // D-160: per-building results in typed columns (objects from them in full detail only).
   const resultColumns = createProductionColumns(buildingIds.length);
   const uses: ReservationUseColumns = { buyer: [], good: [], seller: [], reserved: [], used: [] };
-  const next = copyLotTable(opening);
+  const next = copyLotTable(opening, scratch, lotsSlot);
   // P5b (plan §4.2): stock left in each deposit for today's extraction, in building
   // order; the day commits the takings through `extractFromDeposit`.
   const depositLeft = new Map<number, number>();

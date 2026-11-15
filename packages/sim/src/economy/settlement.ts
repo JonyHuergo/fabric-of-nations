@@ -21,6 +21,7 @@
  */
 
 import { DOMESTIC_WAGE_RATIO } from "./constants.js";
+import type { DayScratch } from "./dayScratch.js";
 import { buildLabourWageTable, jobIsCovered, type MinimumWageCoverage } from "./labourMarket.js";
 import {
   assertValidDayIndex,
@@ -941,6 +942,11 @@ export function settleMarketDays(
      * that block falls by it (never below zero); any remainder was the owner's draw.
      */
     readonly inKindWages?: ReadonlyMap<Id, { readonly popBlockId: Id; readonly valueRUSD: number }>;
+    /**
+     * D-161: reusable buffers for the journal-line columns of the market, wage, domestic
+     * and upkeep batches (their postings are materialised before this call returns).
+     */
+    readonly scratch?: DayScratch;
   } = {},
 ): MarketSettlementResult {
   if (options.validateWorld !== false) assertValidWorldForTick(world);
@@ -987,6 +993,7 @@ export function settleMarketDays(
     options.detail ?? "full",
     options.atomic !== false,
     options.inKindWages,
+    options.scratch,
   );
   for (const marketDay of marketDays) marketDay.settled = true;
   return result;
@@ -1025,6 +1032,7 @@ function marketFlowEntries(
   index: FinanceIndex,
   marketDays: readonly MarketDayResult[],
   flows: readonly MarketFlowColumns[],
+  scratch?: DayScratch,
 ): { readonly entries: JournalColumnEntry[]; readonly lines: JournalLineColumns } {
   const householdIds = index.ownerAccountIds("popBlock", "household-cash");
   const consumptionIds = index.ownerAccountIds("popBlock", "consumption-expense");
@@ -1045,7 +1053,7 @@ function marketFlowEntries(
   const buyerAmount = new Float64Array(maxBuilding + 1);
   const entries: JournalColumnEntry[] = [];
   // D-160: typed line columns (they double when this estimate is short).
-  const lines = createJournalLines(2 * (world.popBlocks.length + 2 * world.buildings.length));
+  const lines = createJournalLines(2 * (world.popBlocks.length + 2 * world.buildings.length), scratch, "settlement.marketLines");
   const push = (accountId: number, debit: number, amount: number): void => {
     pushJournalLine(lines, accountId, debit, amount);
   };
@@ -1140,6 +1148,7 @@ function settleMarketDaysInternal(
   detail: "full" | "summary",
   atomic: boolean,
   inKindWages?: ReadonlyMap<Id, { readonly popBlockId: Id; readonly valueRUSD: number }>,
+  scratch?: DayScratch,
 ): MarketSettlementResult {
   const dayIndex = marketDays[0]?.dayIndex;
   if (dayIndex === undefined) throw new RangeError("settlement requires a market-day result");
@@ -1212,7 +1221,7 @@ function settleMarketDaysInternal(
     // below only if they can still be among the newest postings.
     let marketPostings: DeferredPostings | null = null;
     void goodCount;
-    const market = marketFlowEntries(world, index, marketDays, flows);
+    const market = marketFlowEntries(world, index, marketDays, flows, scratch);
     if (market.entries.length > 0) {
       marketPostings = postJournalColumns(world.finance, dayIndex, market.entries, market.lines);
     }
@@ -1260,7 +1269,7 @@ function settleMarketDaysInternal(
     const wageEntries: JournalColumnEntry[] = [];
     // D-160: typed line columns; a building's wage entry has at most two lines per assignment
     // and two more, so this capacity is never exceeded.
-    const wageLines = createJournalLines(2 * world.employment.length + 2 * world.buildings.length);
+    const wageLines = createJournalLines(2 * world.employment.length + 2 * world.buildings.length, scratch, "settlement.wageLines");
     // Groups of the current building (scratch). D-160: typed columns with a fill count `gCount`
     // (they were cleared with `length = 0` per building, which drops their storage); they double
     // when a building has more groups than they hold.
@@ -1539,7 +1548,7 @@ function settleMarketDaysInternal(
     // D-158: the domestic-service entries in journal columns (the same lines, in the same
     // order, posted as one batch with the same checks as the former entry objects).
     const householdEntries: JournalColumnEntry[] = [];
-    const householdLines = createJournalLines(4 * world.labourMarket.householdEmployment.length);
+    const householdLines = createJournalLines(4 * world.labourMarket.householdEmployment.length, scratch, "settlement.householdLines");
     const consumptionTable = index.ownerAccountIds("popBlock", "consumption-expense");
     const spent = new Map<Id, number>();
     const domesticReceived = new Map<Id, number>();
@@ -1597,7 +1606,7 @@ function settleMarketDaysInternal(
     const upkeepSettlements: UpkeepSettlement[] = [];
     // D-158: upkeep entries in journal columns (same lines and order, one batch as before).
     const upkeepEntries: JournalColumnEntry[] = [];
-    const upkeepLines = createJournalLines(4 * world.buildings.length);
+    const upkeepLines = createJournalLines(4 * world.buildings.length, scratch, "settlement.upkeepLines");
     const upkeepExpenseTable = index.ownerAccountIds("building", "upkeep-expense");
     // D-160: per-building upkeep by id (0 for a building without upkeep, as the maps' `?? 0`)
     // and the totals summed in settlement order; the objects are built in full detail only.

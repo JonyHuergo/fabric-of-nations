@@ -8,6 +8,7 @@
  */
 
 import type { Day, Id, MoneyRUSD, Rate } from "../types.js";
+import type { DayScratch } from "../economy/dayScratch.js";
 import type { EconomyDefinitions } from "../economy/types.js";
 import type { NeedTier } from "./constants.js";
 
@@ -435,6 +436,13 @@ export interface TickContext {
    * state after the day is identical at both levels.
    */
   detail?: DayResultDetail;
+  /**
+   * D-161: caller-owned reusable buffers of the economic day (`createDayScratch`). The
+   * simulation fills every buffer before reading it, so outcomes never depend on it; it is
+   * not authoritative, not serialised and not hashed. The rollback runner holds one; when
+   * neither is given, each day makes its own.
+   */
+  scratch?: DayScratch;
 }
 
 /** See `TickContext.detail`. */

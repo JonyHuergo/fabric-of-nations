@@ -16,6 +16,7 @@
  */
 
 import { daysInYear, dayIndexToCivilDate } from "../calendar.js";
+import { scratchF64, scratchI32, scratchU8, type DayScratch } from "./dayScratch.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import {
   CASH_RESERVE_DAYS,
@@ -112,6 +113,11 @@ export function buildLesHouseholdDemand(
   gate: NeedGate | null,
   /** D-158: the day's measured block totals (the cells summed when absent). */
   totals?: BlockTotals,
+  /**
+   * D-161: reusable buffers for the row columns and block ranges, which the day reads only
+   * before its next market attempt (the day result carries the record objects, not these).
+   */
+  scratch?: DayScratch,
 ): LesHouseholdDemand {
   const year = daysInYear(dayIndexToCivilDate(world.dayIndex).year);
   const goodCount = system.goodCount;
@@ -130,13 +136,13 @@ export function buildLesHouseholdDemand(
   const full = detail === "full";
   // D-158: growable typed columns.
   let capacity = Math.max(1024, world.popBlocks.length * 24);
-  let colBlock = new Float64Array(capacity);
-  let colMarket = new Int32Array(capacity);
-  let colTier = new Uint8Array(capacity);
-  let colNeed = new Uint8Array(capacity);
-  let colGood = new Int32Array(capacity);
-  let colDesired = new Float64Array(capacity);
-  let colFunded = new Float64Array(capacity);
+  let colBlock = scratchF64(scratch, "les.block", capacity);
+  let colMarket = scratchI32(scratch, "les.market", capacity);
+  let colTier = scratchU8(scratch, "les.tier", capacity);
+  let colNeed = scratchU8(scratch, "les.need", capacity);
+  let colGood = scratchI32(scratch, "les.good", capacity);
+  let colDesired = scratchF64(scratch, "les.desired", capacity);
+  let colFunded = scratchF64(scratch, "les.funded", capacity);
   let count = 0;
   const grow = (): void => {
     capacity *= 2;
@@ -158,8 +164,8 @@ export function buildLesHouseholdDemand(
     const block = world.popBlocks[blockIndex]!;
     if (block.id > maxBlockId) maxBlockId = block.id;
   }
-  const rowStart = new Int32Array(maxBlockId + 1).fill(-1);
-  const rowEnd = new Int32Array(maxBlockId + 1).fill(-1);
+  const rowStart = scratchI32(scratch, "les.rowStart", maxBlockId + 1, -1);
+  const rowEnd = scratchI32(scratch, "les.rowEnd", maxBlockId + 1, -1);
   const records: HouseholdDemandRecord[] = [];
   const byCountry = new Map<Id, HouseholdCountryDemand>();
   const dwellingGoodId = system.dwellingGoodId;

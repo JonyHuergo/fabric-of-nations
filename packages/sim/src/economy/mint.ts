@@ -33,6 +33,7 @@ import {
 } from "./constants.js";
 import { buildFinanceIndex } from "./accounts.js";
 import type { JournalEntryInput } from "./accounting.js";
+import type { DayScratch } from "./dayScratch.js";
 import { lotTableFromLots, lotTableToLots } from "./inventory.js";
 import { accountBalanceRUSD } from "./monetaryState.js";
 import type { EconomyDefinitions, MonetaryCurrencyState } from "./types.js";
@@ -173,6 +174,8 @@ export function runMintWindow(
   record: MonetaryCurrencyState,
   entries: JournalEntryInput[],
   spentByBuilding: Map<Id, number>,
+  /** D-161: reusable buffers for the window's lot tables (they die with the call). */
+  scratch?: DayScratch,
 ): MintFlow | null {
   const authority = metalAuthorities(world, definitions).find((entry) => entry.record.currencyId === record.currencyId);
   if (authority === undefined || record.issuerCountryId === null || record.reserveAccountId === null || record.metalReserveAccountId === null) return null;
@@ -193,7 +196,7 @@ export function runMintWindow(
   let suspended = false;
   let resumed = false;
 
-  const table = lotTableFromLots(market.stockLots, [], definitions.goods.length);
+  const table = lotTableFromLots(market.stockLots, [], definitions.goods.length, scratch, "mint.table");
   const ownerCount = table.owners.length;
   // Buy: every lot of the metal in seller order, while the reserve's cash lasts.
   if (price <= buyPrice && buyPrice > 0) {
@@ -257,7 +260,7 @@ export function runMintWindow(
             targetEntityId: dealer,
           });
           spentByBuilding.set(dealer, (spentByBuilding.get(dealer) ?? 0) + amount);
-          const merged = lotTableFromLots(lotTableToLots(table), [dealer], definitions.goods.length);
+          const merged = lotTableFromLots(lotTableToLots(table), [dealer], definitions.goods.length, scratch, "mint.merged");
           const cell = goodId * merged.owners.length + (merged.slotOf.get(dealer) ?? 0);
           merged.quantity[cell] = (merged.quantity[cell] ?? 0) + quantity;
           merged.present[cell] = 1;

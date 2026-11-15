@@ -23,6 +23,7 @@
 import { dayIndexToCivilDate } from "./calendar.js";
 import { CAMPAIGN_TERMINAL_DAY_INDEX } from "./constants.js";
 import { cloneWorld } from "./economy/day.js";
+import { createDayScratch, type DayScratch } from "./economy/dayScratch.js";
 import { worldDayFingerprint } from "./integrity.js";
 import type { TickContext } from "./population/types.js";
 import { tickPhaseMode, type TickResult } from "./tick.js";
@@ -39,6 +40,11 @@ export interface RollbackRunner {
   /** Diagnostics; they never affect simulation outcomes. */
   checkpointsTaken: number;
   rollbacks: number;
+  /**
+   * D-161: reusable buffers of the runner's days (`TickContext.scratch` when the caller
+   * passes none). Never authoritative, never serialised, never read for values.
+   */
+  readonly scratch: DayScratch;
 }
 
 /** A day failed; the world was restored to the start of that day. */
@@ -76,8 +82,8 @@ export interface RollbackRunSummary {
   readonly lastResult: TickResult | null;
 }
 
-function phaseContext(context: TickContext): TickContext {
-  return { ...context, integrity: "phase" };
+function phaseContext(context: TickContext, scratch: DayScratch): TickContext {
+  return { ...context, integrity: "phase", scratch: context.scratch ?? scratch };
 }
 
 /**
@@ -95,6 +101,7 @@ export function createRollbackRunner(
     checkpoint: cloneWorld(world, { validate: options.worldJustValidated !== true }),
     checkpointsTaken: 1,
     rollbacks: 0,
+    scratch: createDayScratch(),
   };
 }
 
@@ -169,7 +176,7 @@ export function runTicksWithRollback(
   context: TickContext,
 ): RollbackRunSummary {
   requireInteger(count, "count", 0, Number.MAX_SAFE_INTEGER);
-  const phase = phaseContext(context);
+  const phase = phaseContext(context, runner.scratch);
   const startDayIndex = runner.world.dayIndex;
   let ticksProcessed = 0;
   let lastResult: TickResult | null = null;

@@ -148,6 +148,7 @@ import { measureBlockTotals, personsOfBlock, workingAgeOfBlock, type BlockTotals
 import { createNeedsColumns, needsReader, NEED_TIER_COUNT } from "../population/needsColumns.js";
 import { populationFields, clonePopulationTable } from "../population/blockTable.js";
 import { cloneLotList } from "./lotList.js";
+import { createDayScratch, scratchF64, scratchI32, scratchU8, type DayScratch } from "./dayScratch.js";
 /**
  * One day's household demand in columns (D-139): one row per (block, market tier,
  * good), in canonical (block, tier, good) order, so a block's rows are contiguous.
@@ -947,6 +948,7 @@ function runMarketAttempt(
   observe?: DayPhaseObserver,
   detail: DayResultDetail = "full",
   totals?: BlockTotals,
+  scratch?: DayScratch,
 ): MarketAttempt {
   observe?.("market-household-demand");
   // D-137: one set of day-level lookups (capacity index and per-building capacity)
@@ -979,6 +981,7 @@ function runMarketAttempt(
     ownConsumption,
     gated ? needGate(world) : null,
     totals,
+    scratch,
   );
   const household: HouseholdDemandBuild = les;
   const cap = { cappedBuildings: 0 };
@@ -1014,11 +1017,12 @@ function runMarketAttempt(
   const householdColumnsOf = (marketId: Id): HouseholdDemandColumns => {
     const rows = recordIndexByMarket.get(marketId) ?? [];
     // D-158: typed columns, which the market copies in bulk.
-    const popBlockId = new Float64Array(rows.length);
-    const tier = new Uint8Array(rows.length);
-    const goodId = new Int32Array(rows.length);
-    const desired = new Float64Array(rows.length);
-    const funded = new Float64Array(rows.length);
+    // D-161: scratch views; the market copies them and keeps no reference.
+    const popBlockId = scratchF64(scratch, "attempt.popBlockId", rows.length);
+    const tier = scratchU8(scratch, "attempt.tier", rows.length);
+    const goodId = scratchI32(scratch, "attempt.goodId", rows.length);
+    const desired = scratchF64(scratch, "attempt.desired", rows.length);
+    const funded = scratchF64(scratch, "attempt.funded", rows.length);
     for (let local = 0; local < rows.length; local += 1) {
       const row = rows[local] ?? 0;
       popBlockId[local] = household.popBlockId[row] ?? 0;
@@ -1039,7 +1043,9 @@ function runMarketAttempt(
     else list.push(record);
   }
   const results: MarketDayResult[] = [];
-  const fulfilledByRecord = new Float64Array(household.count).fill(Number.NaN);
+  // D-161: read by the dwelling purchases and the needs result of this day only (never part of
+  // the day result), so a scratch view.
+  const fulfilledByRecord = scratchF64(scratch, "attempt.fulfilledByRecord", household.count, Number.NaN);
   // D-149: the mints' standing offers enter their home markets' price formation.
   const mintOffers = mintStandingOffers(world, definitions);
   for (const market of [...world.markets].sort((left, right) => left.id - right.id)) {
@@ -1058,7 +1064,7 @@ function runMarketAttempt(
         householdColumns: householdColumnsOf(market.id),
         ...(offers === undefined ? {} : { mintOffers: offers }),
       },
-      { validateWorld: false, lookups, detail, trustedInput: true },
+      { validateWorld: false, lookups, detail, trustedInput: true, ...(scratch === undefined ? {} : { scratch }) },
     );
     const fulfilled = result.columns?.householdFulfilled;
     const recordIndices = recordIndexByMarket.get(market.id) ?? [];
@@ -1082,6 +1088,7 @@ function runMarketAttempt(
     atomic: false,
     detail,
     inKindWages: inKindWageValues(world, ownConsumption, results),
+    ...(scratch === undefined ? {} : { scratch }),
   });
   return {
     household,
@@ -1138,9 +1145,15 @@ export function runEconomicDay(
     readonly phaseObserver?: DayPhaseObserver;
     /** Result detail (D-137, `TickContext.detail`); the world outcome is the same. */
     readonly detail?: DayResultDetail;
+    /**
+     * D-161: caller-owned reusable buffers (`TickContext.scratch`); one is made for the day
+     * when absent. Never authoritative and never read for values.
+     */
+    readonly scratch?: DayScratch;
   } = {},
 ): EconomyDayResult {
   const observe = options.phaseObserver;
+  const scratch = options.scratch ?? createDayScratch();
   observe?.("day-preconditions");
   if (options.validateWorld !== false) assertValidWorldForTick(world);
   assertValidPopulationDefinitions(populationDefinitions);
@@ -1303,6 +1316,7 @@ export function runEconomicDay(
     observe,
     options.detail ?? "full",
     blockTotals,
+    scratch,
   );
   // P6 (D-153): bought dwellings join the buyers' stock; households read smoothed prices.
   const dwellingsBought = applyDwellingPurchases(world, demandSystem, attempt.les, attempt.fulfilledByRecord);
@@ -1342,6 +1356,7 @@ export function runEconomicDay(
   const monetary = runMonetaryPhase(world, economyDefinitions, dayIndex, {
     validateWorld: false,
     blockTotals,
+    scratch,
   });
 
   // M10 military phase: movement arrivals, battles, occupation/liberation, garrison and

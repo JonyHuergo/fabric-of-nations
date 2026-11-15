@@ -18,6 +18,7 @@
  * issuance can create an asset against a liability without moving cash.
  */
 
+import { scratchF64, type DayScratch } from "./dayScratch.js";
 import { assertValidDayIndex } from "../calendar.js";
 import { MONEY_TOLERANCE_RUSD } from "../population/constants.js";
 import type { Day, Id } from "../types.js";
@@ -644,10 +645,22 @@ export interface JournalLineColumns {
   count: number;
 }
 
-/** D-160: empty journal line columns with room for `capacity` lines (they grow when full). */
-export function createJournalLines(capacity: number): JournalLineColumns {
+/**
+ * D-160: empty journal line columns with room for `capacity` lines (they grow when full).
+ * D-161: with a scratch, the columns are views of its slot `slot` until they grow; the caller
+ * must be done with them (postings materialised) before that slot is requested again.
+ */
+export function createJournalLines(capacity: number, scratch?: DayScratch, slot = "journal"): JournalLineColumns {
   const size = Math.max(16, Math.ceil(capacity));
-  return { accountId: new Float64Array(size), debit: new Float64Array(size), amount: new Float64Array(size), count: 0 };
+  if (scratch === undefined) {
+    return { accountId: new Float64Array(size), debit: new Float64Array(size), amount: new Float64Array(size), count: 0 };
+  }
+  return {
+    accountId: scratchF64(scratch, `${slot}.accountId`, size),
+    debit: scratchF64(scratch, `${slot}.debit`, size),
+    amount: scratchF64(scratch, `${slot}.amount`, size),
+    count: 0,
+  };
 }
 
 /** D-160: append one line, doubling the columns when they are full. */

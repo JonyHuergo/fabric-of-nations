@@ -5,6 +5,7 @@ export * from "./constants.js";
 export * from "./accounts.js";
 export * from "./accountTable.js";
 export * from "./lotList.js";
+export * from "./dayScratch.js";
 export * from "./currency.js";
 export * from "./country.js";
 export * from "./definitions.js";

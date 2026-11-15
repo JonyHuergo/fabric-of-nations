@@ -25,6 +25,7 @@ import {
 import { assertValidEconomyDefinitions } from "./definitions.js";
 import {
   copyLotTable,
+  emptyLotTableLike,
   deriveStockByGood,
   lotTableFromLots,
   lotTableToLots,
@@ -46,6 +47,7 @@ import {
   type ReservationUseColumns,
 } from "./production.js";
 import { attachProductionColumns, mergeProductionColumns, productionBuildingObjects } from "./productionColumns.js";
+import { scratchCopyF64, scratchF64, scratchI32, scratchU8, type DayScratch } from "./dayScratch.js";
 import type { BuildingDef, EconomyDefinitions } from "./types.js";
 import { marketProvinceIds } from "./country.js";
 
@@ -311,6 +313,12 @@ export interface MarketDayOptions extends PhaseValidationOptions {
    * Direct callers keep every check.
    */
   readonly trustedInput?: boolean;
+  /**
+   * D-161: reusable buffers for the market's tables (lot tables, demand-row columns,
+   * production's reservation tables). Nothing that reaches the result or the world is
+   * taken from it; absent, every table is allocated as before.
+   */
+  readonly scratch?: DayScratch;
 }
 
 /**
@@ -738,22 +746,24 @@ export function runMarketDay(
   const goodCount = definitions.goods.length;
   const detail = options.detail ?? "full";
   const trusted = options.trustedInput === true;
+  const scratch = options.scratch;
 
   // Demand columns: household records first, then production records (input order).
   const householdColumns = input.householdColumns;
   const householdCount =
     householdColumns !== undefined ? householdColumns.popBlockId.length : input.householdDemands.length;
   const demandCount = householdCount + input.productionDemands.length;
-  const kind = new Uint8Array(demandCount);
-  const buyer = new Float64Array(demandCount);
-  const tierOf = new Uint8Array(demandCount);
-  const goodOf = new Int32Array(demandCount);
-  const desired = new Float64Array(demandCount);
-  const funded = new Float64Array(demandCount);
-  const eligible = new Uint8Array(demandCount);
-  const passA = new Float64Array(demandCount);
-  const passB = new Float64Array(demandCount);
-  const fulfilled = new Float64Array(demandCount);
+  // D-161: every table of this function that dies with the call is a view of the scratch.
+  const kind = scratchU8(scratch, "market.kind", demandCount);
+  const buyer = scratchF64(scratch, "market.buyer", demandCount);
+  const tierOf = scratchU8(scratch, "market.tier", demandCount);
+  const goodOf = scratchI32(scratch, "market.good", demandCount);
+  const desired = scratchF64(scratch, "market.desired", demandCount);
+  const funded = scratchF64(scratch, "market.funded", demandCount);
+  const eligible = scratchU8(scratch, "market.eligible", demandCount);
+  const passA = scratchF64(scratch, "market.passA", demandCount);
+  const passB = scratchF64(scratch, "market.passB", demandCount);
+  const fulfilled = scratchF64(scratch, "market.fulfilled", demandCount);
   if (householdColumns !== undefined) {
     // D-158: typed columns are copied in bulk.
     buyer.set(householdColumns.popBlockId);
@@ -788,8 +798,8 @@ export function runMarketDay(
     tierPosition[tier] = position;
   });
   const groupCount = M3_MARKET_TIERS.length * goodCount;
-  const groupStart = new Int32Array(groupCount + 1);
-  const groupOfDemand = new Int32Array(demandCount);
+  const groupStart = scratchI32(scratch, "market.groupStart", groupCount + 1);
+  const groupOfDemand = scratchI32(scratch, "market.groupOfDemand", demandCount);
   for (let index = 0; index < demandCount; index += 1) {
     const position = tierPosition[tierOf[index] ?? 0] ?? -1;
     const goodId = goodOf[index] ?? 0;
@@ -798,9 +808,10 @@ export function runMarketDay(
     if (group >= 0) groupStart[group + 1] = (groupStart[group + 1] ?? 0) + 1;
   }
   for (let group = 0; group < groupCount; group += 1) groupStart[group + 1] = (groupStart[group + 1] ?? 0) + (groupStart[group] ?? 0);
-  const groupOrder = new Int32Array(groupStart[groupCount] ?? 0);
+  const groupOrder = scratchI32(scratch, "market.groupOrder", groupStart[groupCount] ?? 0);
   {
-    const fill = groupStart.slice(0, groupCount);
+    const fill = scratchI32(scratch, "market.groupFill", groupCount);
+    fill.set(groupStart.subarray(0, groupCount));
     for (let index = 0; index < demandCount; index += 1) {
       const group = groupOfDemand[index] ?? -1;
       if (group < 0) continue;
@@ -818,7 +829,7 @@ export function runMarketDay(
     if (size > largestGroup) largestGroup = size;
   }
   /** Candidate scratch for one (tier, good) allocation. */
-  const candidates = new Int32Array(largestGroup);
+  const candidates = scratchI32(scratch, "market.candidates", largestGroup);
   // Household blocks with tier 1/3 demands get a slot for the eligibility totals.
   // D-158: slots by block id in a typed table (first-use order, as the former map); a buyer id
   // the table cannot address (not a small non-negative integer) falls back to the map.
@@ -829,13 +840,13 @@ export function runMarketDay(
     if (!(Number.isInteger(id) && id >= 0 && id < 2 ** 24)) denseBuyers = false;
     else if (id > maxBuyerId) maxBuyerId = id;
   }
-  const slotById = denseBuyers ? new Int32Array(maxBuyerId + 1).fill(-1) : null;
+  const slotById = denseBuyers ? scratchI32(scratch, "market.slotById", maxBuyerId + 1, -1) : null;
   const slotMap = denseBuyers ? null : new Map<number, number>();
   let slotCount = 0;
   const slotOfBlock = (id: number): number =>
     slotById !== null ? (slotById[id] ?? -1) : ((slotMap as Map<number, number>).get(id) ?? -1);
   // D-160: typed with a fill count (was an array grown by push in every market).
-  const tierOneThree = new Int32Array(householdCount);
+  const tierOneThree = scratchI32(scratch, "market.tierOneThree", householdCount);
   let tierOneThreeCount = 0;
   for (let index = 0; index < householdCount; index += 1) {
     const tier = tierOf[index];
@@ -850,17 +861,17 @@ export function runMarketDay(
     }
   }
   const blockSlot = { size: slotCount };
-  const desired1 = new Float64Array(blockSlot.size);
-  const fulfilled1 = new Float64Array(blockSlot.size);
-  const desired3 = new Float64Array(blockSlot.size);
-  const fulfilled3 = new Float64Array(blockSlot.size);
+  const desired1 = scratchF64(scratch, "market.desired1", blockSlot.size);
+  const fulfilled1 = scratchF64(scratch, "market.fulfilled1", blockSlot.size);
+  const desired3 = scratchF64(scratch, "market.desired3", blockSlot.size);
+  const fulfilled3 = scratchF64(scratch, "market.fulfilled3", blockSlot.size);
   /**
    * D-158: `tierMet` of each slot's tier-1 and tier-3 totals, computed when the totals are
    * refreshed (its only inputs), instead of once per demand row that asks.
    */
-  const met1 = new Uint8Array(blockSlot.size);
-  const met3 = new Uint8Array(blockSlot.size);
-  const slotOfDemand = new Int32Array(householdCount).fill(-1);
+  const met1 = scratchU8(scratch, "market.met1", blockSlot.size);
+  const met3 = scratchU8(scratch, "market.met3", blockSlot.size);
+  const slotOfDemand = scratchI32(scratch, "market.slotOfDemand", householdCount, -1);
   for (let index = 0; index < householdCount; index += 1) slotOfDemand[index] = slotOfBlock(buyer[index] ?? 0);
   // `householdTierTotals` over the current fulfilment, summed in demand order.
   // D-139: desired totals never change; fulfilled totals are re-summed (in the same
@@ -905,13 +916,14 @@ export function runMarketDay(
   // D-160: typed columns with a fill count `resCount`, doubled when full (were arrays grown by
   // push); the unread seller-slot column is gone.
   let resCapacity = Math.max(64, 2 * (demandCount - householdCount) + (storeHouseholdPieces ? householdCount : 0));
-  let resKind = new Uint8Array(resCapacity);
-  let resBuyer = new Float64Array(resCapacity);
-  let resTier = new Uint8Array(resCapacity);
-  let resGood = new Int32Array(resCapacity);
-  let resSeller = new Float64Array(resCapacity);
-  let resQuantity = new Float64Array(resCapacity);
-  let resPhase = new Uint8Array(resCapacity);
+  // D-161: from the scratch; a column that must grow is copied into a fresh array.
+  let resKind = scratchU8(scratch, "market.resKind", resCapacity);
+  let resBuyer = scratchF64(scratch, "market.resBuyer", resCapacity);
+  let resTier = scratchU8(scratch, "market.resTier", resCapacity);
+  let resGood = scratchI32(scratch, "market.resGood", resCapacity);
+  let resSeller = scratchF64(scratch, "market.resSeller", resCapacity);
+  let resQuantity = scratchF64(scratch, "market.resQuantity", resCapacity);
+  let resPhase = scratchU8(scratch, "market.resPhase", resCapacity);
   let resCount = 0;
   const pushPiece = (
     pieceKind: number,
@@ -960,16 +972,16 @@ export function runMarketDay(
   // D-160: typed scratch of the market day with fill counts (the former arrays were cleared
   // with `length = 0`, which drops their storage, and regrown on every call). Candidates:
   // at most the largest group; lots: at most one per owner slot (`lotScratchFor`, below).
-  const relevant = new Int32Array(largestGroup);
-  const plannedQuantity = new Float64Array(largestGroup);
-  const buyerEnd = new Float64Array(largestGroup);
+  const relevant = scratchI32(scratch, "market.relevant", largestGroup);
+  const plannedQuantity = scratchF64(scratch, "market.plannedQuantity", largestGroup);
+  const buyerEnd = scratchF64(scratch, "market.buyerEnd", largestGroup);
   /**
    * D-158: the amount a candidate is allocated: funded (Pass A), funded less Pass A (Pass B),
    * or funded less fulfilled (Pass A2). D-160: computed once per candidate into this scratch
    * (by demand row) before pairing changes Pass A or fulfilment, as the three former calls
    * per candidate all ran before it.
    */
-  const amountOf = new Float64Array(demandCount);
+  const amountOf = scratchF64(scratch, "market.amountOf", demandCount);
   const allocate = (
     count: number,
     mode: 0 | 1 | 2,
@@ -1107,10 +1119,14 @@ export function runMarketDay(
 
   const priceFundedByGood = new Array<number>(goodCount).fill(0);
   const buildingIds = lookups.production.buildingIdsByMarket.get(market.id) ?? [];
-  const opening = lotTableFromLots(market.stockLots, buildingIds, goodCount);
+  const opening = lotTableFromLots(market.stockLots, buildingIds, goodCount, scratch, "market.opening");
   const ownerCount = opening.owners.length;
   /** D-160: lot scratch of `allocate`, one entry per owner slot (the day's tables share the owners). */
-  let lotScratch = { slots: new Int32Array(ownerCount), end: new Float64Array(ownerCount), reserved: new Float64Array(ownerCount) };
+  let lotScratch = {
+    slots: scratchI32(scratch, "market.lotSlots", ownerCount),
+    end: scratchF64(scratch, "market.lotEnd", ownerCount),
+    reserved: scratchF64(scratch, "market.lotReserved", ownerCount),
+  };
   const lotScratchFor = (owners: number): typeof lotScratch => {
     if (lotScratch.slots.length < owners) {
       lotScratch = { slots: new Int32Array(owners), end: new Float64Array(owners), reserved: new Float64Array(owners) };
@@ -1118,15 +1134,16 @@ export function runMarketDay(
     return lotScratch;
   };
   /** D-158: household takings by lot cell (good × owner slot) and by good, in piece order. */
-  const householdTakenByCell = new Float64Array(goodCount * ownerCount);
+  const householdTakenByCell = scratchF64(scratch, "market.householdTakenByCell", goodCount * ownerCount);
   const householdTakenByGood = new Float64Array(goodCount);
   /** D-158: household receipts by lot cell and spend by demand row, RUSD at opening prices. */
-  const householdReceiptByCell = new Float64Array(goodCount * ownerCount);
+  const householdReceiptByCell = scratchF64(scratch, "market.householdReceiptByCell", goodCount * ownerCount);
+  // Part of the result's flow columns, so never a scratch view.
   const householdSpend = new Float64Array(householdCount);
 
   try {
     // Pass A: opening stock, tiers 1, 2, 3, 5, 6.
-    const remaining = copyLotTable(opening);
+    const remaining = copyLotTable(opening, scratch, "market.remaining");
     const blockedGoods = new Uint8Array(goodCount);
     for (const tier of M3_MARKET_TIERS) {
       refreshTotals();
@@ -1162,7 +1179,7 @@ export function runMarketDay(
       }
     }
     const primaryCount = resCount;
-    const householdPassATakenByCell = householdTakenByCell.slice();
+    const householdPassATakenByCell = scratchCopyF64(scratch, "market.passATakenByCell", householdTakenByCell);
     const householdPassATakenByGood = householdTakenByGood.slice();
 
     // M3c production from the building reservations of Pass A.
@@ -1170,10 +1187,10 @@ export function runMarketDay(
     let buildingPieces = 0;
     for (let index = 0; index < primaryCount; index += 1) if (resKind[index] === 1) buildingPieces += 1;
     const inputColumns = {
-      buyer: new Float64Array(buildingPieces),
-      good: new Float64Array(buildingPieces),
-      seller: new Float64Array(buildingPieces),
-      quantity: new Float64Array(buildingPieces),
+      buyer: scratchF64(scratch, "market.inputBuyer", buildingPieces),
+      good: scratchF64(scratch, "market.inputGood", buildingPieces),
+      seller: scratchF64(scratch, "market.inputSeller", buildingPieces),
+      quantity: scratchF64(scratch, "market.inputQuantity", buildingPieces),
     } satisfies ReservationColumns;
     for (let index = 0, at = 0; index < primaryCount; index += 1) {
       if (resKind[index] !== 1) continue;
@@ -1197,7 +1214,7 @@ export function runMarketDay(
     const waves = productionWaves(definitions, market.id, lookups, kind, goodOf, funded, householdCount, demandCount);
     let productionCore: ReturnType<typeof runProductionCore>;
     if (waves === null) {
-      productionCore = runProductionCore(world, definitions, market, lookups.production, opening, inputColumns, false, undefined, trusted, detail === "full");
+      productionCore = runProductionCore(world, definitions, market, lookups.production, opening, inputColumns, false, undefined, trusted, detail === "full", scratch, "production.lots");
     } else {
       const firstColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
       const secondColumns: ReservationColumns = { buyer: [], good: [], seller: [], quantity: [] };
@@ -1208,9 +1225,9 @@ export function runMarketDay(
         (target.seller as number[]).push(inputColumns.seller[index] ?? 0);
         (target.quantity as number[]).push(inputColumns.quantity[index] ?? 0);
       }
-      const first = runProductionCore(world, definitions, market, lookups.production, opening, firstColumns, false, waves.first, trusted, false);
+      const first = runProductionCore(world, definitions, market, lookups.production, opening, firstColumns, false, waves.first, trusted, false, scratch, "production.wave1");
       // Pass A2: same-day output of non-storable goods to producers, tiers 2 then 5.
-      const sameDay = copyLotTable(first.lots);
+      const sameDay = copyLotTable(first.lots, scratch, "market.sameDay");
       const beforeA2 = resCount;
       for (const tier of [2, 5] as const) {
         for (const goodId of waves.goods) {
@@ -1234,7 +1251,7 @@ export function runMarketDay(
         (secondColumns.seller as number[]).push(resSeller[index] ?? 0);
         (secondColumns.quantity as number[]).push(resQuantity[index] ?? 0);
       }
-      const second = runProductionCore(world, definitions, market, lookups.production, first.lots, secondColumns, false, waves.second, trusted, false);
+      const second = runProductionCore(world, definitions, market, lookups.production, first.lots, secondColumns, false, waves.second, trusted, false, scratch, "production.wave2");
       // D-160: the waves' rows merged in building-id order (the former sorted objects).
       const mergedColumns = mergeProductionColumns(first.columns, second.columns);
       productionCore = {
@@ -1278,13 +1295,7 @@ export function runMarketDay(
     // the stored pieces summed them; Pass A2 takes no household pieces.
     const householdReservedByLot = householdPassATakenByCell;
     const householdPassAByGood = householdPassATakenByGood;
-    const passBLots: LotTable = {
-      goodCount,
-      owners: opening.owners,
-      slotOf: opening.slotOf,
-      quantity: new Float64Array(goodCount * ownerCount),
-      present: new Uint8Array(goodCount * ownerCount),
-    };
+    const passBLots: LotTable = emptyLotTableLike(opening, scratch, "market.passBLots");
     for (let cell = 0; cell < goodCount * ownerCount; cell += 1) {
       if (produced.present[cell] !== 1) continue;
       const quantity = produced.quantity[cell] ?? 0;
@@ -1365,13 +1376,7 @@ export function runMarketDay(
     // Final lots: the produced lots less every household reservation (A then B).
     const householdByLot = householdTakenByCell;
     const householdByGood = householdTakenByGood;
-    const finalLots: LotTable = {
-      goodCount,
-      owners: opening.owners,
-      slotOf: opening.slotOf,
-      quantity: new Float64Array(goodCount * ownerCount),
-      present: new Uint8Array(goodCount * ownerCount),
-    };
+    const finalLots: LotTable = emptyLotTableLike(opening, scratch, "market.finalLots");
     for (let cell = 0; cell < goodCount * ownerCount; cell += 1) {
       if (produced.present[cell] !== 1) continue;
       const quantity = produced.quantity[cell] ?? 0;
@@ -1395,6 +1400,7 @@ export function runMarketDay(
       storageCapacityOf(world, definitions, market.id, lookups.production),
       goodCount,
       lookups.nonStorableGoods,
+      scratch,
     );
     const closingLots = lotTableToLots(finalLots);
     if (options.validateWorld !== false) {
