@@ -55,7 +55,12 @@ describe("determinism", () => {
     // P6 schema 34 (D-153): encoding only — restoring schema 33, simulation 0.29.0 and
     // data m3-economy-v13 reproduces the P5b digest; this world has no demand system.
     // P7 schema 35 (D-154): encoding only — restoring schema 34 and simulation 0.30.0 reproduces the P6 digest; this world has no labour market.
-    expect(hashWorld(world)).toBe("1ae35968cf7255ce");
+    // D-167 (P7 close, re-pinned with the designer's approval, 2026-11-16): encoding only.
+    // The pin above went stale when D-155 removed the legacy-unit hash view (received since then:
+    // `6aef674f9648abdd`); D-165 (simulation 0.32.0) and D-166 (data m3-economy-v16) change only
+    // the version strings here: restoring simulation 0.31.0 and data m3-economy-v15 in the
+    // encoded world reproduces `6aef674f9648abdd` (checked 2026-11-16).
+    expect(hashWorld(world)).toBe("a0cf17e148be0b67");
   });
 
   test("a one-year economic simulation is deterministic and save/resume safe", () => {

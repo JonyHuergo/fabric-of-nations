@@ -26,6 +26,7 @@ import {
   type EconomyScenarioDef,
   type World,
   listAccounts,
+  buildLabourWageTable,
 } from "@century/sim";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -220,12 +221,19 @@ describe("P2b traceability of every money value", () => {
 describe("P2b 1900 world", () => {
   it("reads the calibrated tables and the 1900-world definitions", () => {
     const meta = readJson<{ meta: { files: Record<string, string>; definitions: Record<string, string> } }>("scenarios/m11_world_1900.json").meta;
-    for (const key of ["employment", "calibration", "moneyCoefficients"]) {
+    for (const key of ["calibration", "moneyCoefficients"]) {
       expect(meta.files[key]).toMatch(/^historical\/p2b\//);
     }
-    // P6 (D-153): the populations are the P2b blocks with their expected 1900 income,
-    // written by scripts/p5b/build-goods-1900.mjs; the demand system replaces the tiers.
-    expect(meta.files.populations).toBe("historical/p6/pops_1900.json");
+    // D-167 (P7 close, restated with the designer's approval, 2026-11-16): P7 (D-154) writes
+    // the 1900 occupation distribution, so the employment, populations (blocks by profession),
+    // demography, professions, labour-market and politics files are P7's
+    // (scripts/p7/labour-build.mjs); before, this test expected P2b employment and P6
+    // populations and failed from D-154 on. The money tables stay P2b.
+    expect(meta.files.employment).toBe("historical/p7/employment_1900.json");
+    expect(meta.files.populations).toBe("historical/p7/pops_1900.json");
+    expect(meta.files.demography).toBe("historical/p7/demography_1900.json");
+    expect(meta.definitions.labourMarket).toBe("historical/p7/labour_1900.json");
+    expect(meta.definitions.politics).toBe("historical/p7/politics_1900.json");
     expect(meta.definitions.demandSystem).toBe("historical/p6/demand_1900.json");
     // P5b (D-148): the markets (opening stock of every good), routes (capacity from the
     // new coverage), buildings (57-good placement), provinces (P5 land plus latitude),
@@ -237,7 +245,7 @@ describe("P2b 1900 world", () => {
     }
     expect(meta.definitions.goods).toBe("historical/p5b/goods_1900.json");
     expect(meta.definitions.buildings).toBe("historical/p5b/buildings_definitions_1900.json");
-    expect(meta.definitions.professions).toBe("historical_1900_professions.json");
+    expect(meta.definitions.professions).toBe("historical/p7/professions_1900.json");
     expect(meta.definitions.needs).toBe("historical/p5b/needs_1900.json");
   });
 
@@ -245,6 +253,10 @@ describe("P2b 1900 world", () => {
     const selectable = (scenario.countryMeta ?? []).filter((meta) => meta.selectable);
     expect(selectable.length).toBe(66);
     const owners = buildProvinceOwnerMap(world);
+    // D-167: since P7 (D-154) the labour market holds the wages; the province tables are
+    // cleared once it starts (`initialiseLabourMarket`), so each province is checked for a
+    // positive labour-market wage of every profession instead of a full table.
+    const wages = buildLabourWageTable(world, scenario.definitions);
     for (const meta of selectable) {
       const country = world.countries.find((candidate) => candidate.id === meta.countryId);
       expect(country).toBeDefined();
@@ -253,57 +265,83 @@ describe("P2b 1900 world", () => {
       const people = world.popBlocks.filter((block) => owners.get(block.provinceId) === meta.countryId).length;
       expect(people).toBeGreaterThan(0);
       for (const id of provinces) {
-        const province = world.provinceEconomies.find((candidate) => candidate.id === id);
-        expect(province?.wageRUSDPerYearByProfession.length).toBe(scenario.definitions.professions.length);
+        for (const profession of scenario.definitions.professions) expect(wages.base(id, profession.id)).toBeGreaterThan(0);
       }
       const treasury = listAccounts(world.finance.accounts).find((account) => account.id === country?.treasuryAccountId);
       expect(treasury?.balanceRUSD).toBeGreaterThan(0);
     }
   });
 
-  it("pays each worker the wage of the province's table", () => {
-    const probe = createEconomyWorld(scenario, { seed: 20_261_023 });
-    // D-155: summary detail (D-137) keeps the wage settlements and gives the same world.
-    const result = tick(probe, { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions }, detail: "summary" });
-    const professions = new Map(scenario.definitions.professions.map((profession) => [profession.id, profession]));
-    const blocks = new Map(probe.popBlocks.map((block) => [block.id, block]));
-    const provinces = new Map(probe.provinceEconomies.map((province) => [province.id, province]));
+  // D-167 (P7 close, restated with the designer's approval, 2026-11-16). This test summed the
+  // day-1 wage settlements per worker against the province table. Two changes left it with
+  // nothing to check: P7 (D-154) pays the labour market's wage (W·d, plan §4.1) and clears the
+  // province tables at world creation, and D-160 builds the per-building wage objects in full
+  // detail only (summary detail keeps the totals by block). What P2b requires still holds and
+  // is checked here: every province starts at the wage of its table (the profession's
+  // reference wage where the table has none), which the labour market reproduces exactly on
+  // day 0 and which settlement pays through `LabourWageTable.paid` (covered at fixture scale
+  // in `economy/labour-market.test.ts` and `economy/integration.test.ts`).
+  it("starts every province at the wage of its table (the labour market's day-0 wage)", () => {
+    const tables = readJson<{ id: number; wageRUSDPerYearByProfession: Record<string, number> }[]>("historical/p5b/provinces_1900.json");
+    const wages = buildLabourWageTable(world, scenario.definitions);
+    const marketOf = new Map(world.provinceEconomies.map((province) => [province.id, province.marketId]));
     let checked = 0;
-    for (const settlement of result.economy?.settlement.wages ?? []) {
-      for (const payment of settlement.payments) {
-        const block = blocks.get(payment.popBlockId);
-        const profession = professions.get(payment.professionId);
-        if (block === undefined || profession === undefined || payment.workers <= 0) continue;
-        if (block.qualification !== 0) continue;
-        // D-155: the province table's wage, or the profession's reference wage where the
-        // table has none (the rule of the removed provinceWageRUSDPerYear).
-        const wage = provinces.get(block.provinceId)?.wageRUSDPerYearByProfession[profession.id] ?? profession.baseWage1900RUSDPerYear;
-        // P5 (D-143 §2): an owner block's wage at its own farm is partly paid in kind
-        // (its kept food at opening prices); cash + in kind is the table wage.
-        close((payment.obligationRUSD + (payment.paidInKindRUSD ?? 0)) / payment.workers, wage / 365, 6);
+    for (const table of tables) {
+      if ((marketOf.get(table.id) ?? null) === null) continue;
+      for (const profession of scenario.definitions.professions) {
+        const tabled = table.wageRUSDPerYearByProfession[profession.key];
+        const expected = tabled !== undefined && tabled > 0 ? tabled : profession.baseWage1900RUSDPerYear;
+        close(wages.base(table.id, profession.id), expected, 6);
+        // No 1900 country has a statutory floor above the market wage on day 0.
+        if (!(wages.minimumWage(table.id) > expected)) close(wages.paid(table.id, profession.id, true), expected, 6);
         checked += 1;
       }
     }
-    expect(checked).toBeGreaterThan(100);
+    expect(checked).toBeGreaterThan(10_000);
   });
 
   // D-136 regressions: before the fixes this world aborted within a week (cash-neutral
   // tolerance at 1e9-RUSD postings, lot-pairing tolerance, trade cap per lot), and every
   // price fell 5% a day although supply and demand balanced.
-  it("runs a week and balanced goods hold their price (D-136)", () => {
+  //
+  // D-167 (P7 close, restated with the designer's approval, 2026-11-16). This test used US
+  // livestock as its balanced good and required its price within 2% after a week. Since P6
+  // and P7 the US market does not stay balanced through the first week: livestock opens at an
+  // imbalance of -2.5% and reaches -15% by day 7 (price -6.2%), grain goes from +1.8% to +40%;
+  // that drift is a calibration item for P8 (D-167, P7 completion report), not a price-rule
+  // fault. The test now checks what D-136 fixed, on every US good and every day of the week:
+  // the week runs; a day's price change follows that day's recorded imbalance of funded demand
+  // and sellable supply (falls only in excess supply, rises only in excess demand, within the
+  // daily bound); a good balanced within 1% on a day moves less than 0.1% that day; and the
+  // prices do not all move one way.
+  it("runs a week and prices follow their goods' balance (D-136)", () => {
     const probe = createEconomyWorld(scenario, { seed: 20_261_023 });
     // D-155: summary detail (D-137): the same world without the per-record diagnostics.
     const context = { population: { definitions: scenario.population.definitions }, economy: { definitions: scenario.definitions }, detail: "summary" as const };
     const us = probe.markets.find((market) => market.customsCountryId === probe.countries.find((country) => country.tag === "USA")?.id);
     if (us === undefined) throw new Error("fixture");
-    const livestock = scenario.definitions.goods.find((good) => good.key === "livestock")?.id ?? -1;
-    const opening = us.priceRUSD[livestock] ?? 0;
+    const opening = [...us.priceRUSD];
+    let balancedDays = 0;
     for (let day = 0; day < 7; day += 1) {
       const result = tick(probe, context);
       expect(result.advanced).toBe(true);
+      const market = result.economy?.markets.find((entry) => entry.marketId === us.id);
+      expect(market?.priceUpdates.length).toBe(scenario.definitions.goods.length);
+      for (const update of market?.priceUpdates ?? []) {
+        expect(Math.abs(update.dailyChange)).toBeLessThanOrEqual(0.05 + 1e-12);
+        if (update.dailyChange < -1e-12) expect(update.imbalance).toBeLessThan(0);
+        if (update.dailyChange > 1e-12) expect(update.imbalance).toBeGreaterThan(0);
+        if (Math.abs(update.imbalance) <= 0.01 && (update.fundedDemand > 0 || update.sellableSupply > 0)) {
+          expect(Math.abs(update.dailyChange)).toBeLessThan(0.001 + 1e-12);
+          balancedDays += 1;
+        }
+      }
     }
-    const closing = probe.markets.find((market) => market.id === us.id)?.priceRUSD[livestock] ?? 0;
-    expect(Math.abs(closing / opening - 1)).toBeLessThan(0.02);
+    expect(balancedDays).toBeGreaterThan(0);
+    const closing = probe.markets.find((market) => market.id === us.id)?.priceRUSD ?? [];
+    const changes = opening.map((price, goodId) => (closing[goodId] ?? 0) / price - 1);
+    expect(changes.filter((change) => change < -0.001).length).toBeGreaterThan(5);
+    expect(changes.filter((change) => change > 0.001).length).toBeGreaterThan(5);
   });
 
   it("serializes the wage tables, techniques and money coefficients (schema 29, kept in 34)", () => {

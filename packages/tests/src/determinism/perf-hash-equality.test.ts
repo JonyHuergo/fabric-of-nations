@@ -23,7 +23,13 @@
  *   31 and 8 on day 52 (largest relative change 4.3e-15), with every population cell equal.
  * - The income tax is checked against the household's cash exactly, as the posting is.
  *
- * The hashes below were recorded with the D-165 build by running the 1900 world (seed
+ * D-167 (P7 close, step 4; re-recorded with the designer's approval, 2026-11-16): D-166 adds
+ * good 60 (bast fibre) with 654 farms and mills (data m3-economy-v16), which moves every hash
+ * from day 0. The D-165 values were 0 `8b8c7aa759a00f19`, 1 `7019f830ce479f0a`, 31
+ * `d70a7d753a15ec9b`, 52 `95a1381fa4e6520d`, 53 `bd2b43374da4240d`, 54 `8a741ea03938994e`
+ * and 60 `f47e9a8d0ad83ceb`; the run still reaches day 60 without a failure.
+ *
+ * The hashes below were recorded with the D-166 build by running the 1900 world (seed
  * 20261023, default player) in phase mode (`tickPhaseMode`, the rollback runner's day) with
  * the default result detail. Memory (D-155): one 1900 world, ticked in place.
  */
@@ -33,17 +39,17 @@ import { createEconomyWorld, hashWorld, tickPhaseMode, type TickContext, type Wo
 
 const SEED = 20_261_023;
 
-const HASHES_D165: Readonly<Record<number, string>> = {
-  0: "8b8c7aa759a00f19",
-  1: "7019f830ce479f0a",
-  31: "d70a7d753a15ec9b",
-  52: "95a1381fa4e6520d",
-  53: "bd2b43374da4240d",
-  54: "8a741ea03938994e",
-  60: "f47e9a8d0ad83ceb",
+const HASHES_D166: Readonly<Record<number, string>> = {
+  0: "94529a4173fbb997",
+  1: "230ff89e621a1e40",
+  31: "2d73a856201d4a04",
+  52: "87e3e78780eb7ed1",
+  53: "11ae0ce6ca7d7814",
+  54: "32a5caa8697f4312",
+  60: "3d24daeda0b71ea7",
 };
 
-describe("D-165 1900-world hash pin and the first 60 days", () => {
+describe("D-165/D-166 1900-world hash pin and the first 60 days", () => {
   test("hashes after 0, 1, 31, 52, 53, 54 and 60 ticks are pinned; no day fails", () => {
     const scenario = loadM11World();
     const world: World = createEconomyWorld(scenario, { seed: SEED });
@@ -54,9 +60,9 @@ describe("D-165 1900-world hash pin and the first 60 days", () => {
     const observed: Record<number, string> = { 0: hashWorld(world) };
     while (world.dayIndex < 60) {
       tickPhaseMode(world, context);
-      if (HASHES_D165[world.dayIndex] !== undefined) observed[world.dayIndex] = hashWorld(world);
+      if (HASHES_D166[world.dayIndex] !== undefined) observed[world.dayIndex] = hashWorld(world);
     }
-    expect(observed).toEqual(HASHES_D165);
+    expect(observed).toEqual(HASHES_D166);
     expect(world.dayIndex).toBe(60);
   }, 3_600_000);
 });

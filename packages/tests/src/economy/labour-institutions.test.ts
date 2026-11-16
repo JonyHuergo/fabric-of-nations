@@ -1,8 +1,8 @@
 /**
  * P7 (D-154) labour market, second part: institutions as employers (plan Q3, Q4), floors
  * and the minimum wage's coverage, compliance and preview (plan §4.2, §4.5), staffing
- * ceilings (plan §4.3), mobility gates (plan §5.3), the two acceptance fixtures of plan
- * §7 (the agricultural share falls in a growing economy; unemployment lowers wages),
+ * ceilings (plan §4.3), mobility gates (plan §5.3), the acceptance fixture of plan §7 that
+ * unemployment lowers wages (the agricultural-share fixture was removed by the designer, D-167),
  * replay through the rollback runner, and schema-34 saves rejected (plan Q20, D-120).
  */
 
@@ -231,57 +231,9 @@ describe("P7 mobility gates (plan §5.3)", () => {
 });
 
 describe("P7 acceptance fixtures (plan §7)", () => {
-  test("in a growing economy with no inputs the agricultural employment share falls year on year", () => {
-    // A small open economy: its goods sell at reference (world) prices, which the test
-    // holds each day, so the industrial sector's profitability is set by wages alone;
-    // labour demand grows by one workshop level a quarter (the stand-in for
-    // reinvestment, no new mechanics). The food plant gets a viable recipe (the M5
-    // recipe has negative value added, so the hiring rule would close it).
-    const base = p7Scenario();
-    const scenario: EconomyScenarioDef = {
-      ...base,
-      definitions: {
-        ...base.definitions,
-        buildings: base.definitions.buildings.map((building) =>
-          building.key === "food-plant"
-            ? { ...building, inputs: [{ goodId: 0, quantityPerThroughputUnit: 500 }], jobs: building.jobs.map((job) => ({ ...job, workersPerThroughputUnit: 100 })) }
-            : building,
-        ),
-      },
-    };
-    const world = createEconomyWorld(scenario);
-    const context = economyTickContext(scenario);
-    const reference = scenario.definitions.goods.map((good) => good.basePrice1900RUSD);
-    const workshopId = world.buildings.find((building) => building.definitionId === M5_WORKSHOP)?.id;
-    if (workshopId === undefined) throw new Error("no workshop");
-    const definitionById = new Map(scenario.definitions.buildings.map((definition) => [definition.id, definition]));
-    const agriculturalShare = (): number => {
-      let agricultural = 0;
-      let employed = 0;
-      for (const assignment of world.employment) {
-        employed += assignment.workers;
-        const building = world.buildings.find((entry) => entry.id === assignment.buildingInstanceId);
-        if (building !== undefined && definitionById.get(building.definitionId)?.sector === "agriculture") agricultural += assignment.workers;
-      }
-      return agricultural / employed;
-    };
-    const shares = [agriculturalShare()];
-    for (let year = 0; year < 3; year += 1) {
-      for (let day = 0; day < 365; day += 1) {
-        if (day % 91 === 0) {
-          // The staged day publishes fresh building records: look the workshop up each time.
-          const workshop = world.buildings.find((building) => building.id === workshopId);
-          if (workshop === undefined) throw new Error("workshop lost");
-          workshop.level += 1;
-          world.employmentDirty = true;
-        }
-        for (const market of world.markets) reference.forEach((price, goodId) => (market.priceRUSD[goodId] = price));
-        tick(world, context);
-      }
-      shares.push(agriculturalShare());
-    }
-    for (let index = 1; index < shares.length; index += 1) expect(shares[index]).toBeLessThan(shares[index - 1] as number);
-  });
+  // D-167: the plan §7 fixture "the agricultural employment share falls year on year" was
+  // removed by the designer (2026-11-16: "do not test for that"); it is no longer a P7
+  // acceptance criterion.
 
   test("with labour demand fixed and the labour force growing, unemployment rises and wages fall", () => {
     const scenario = p7Scenario();

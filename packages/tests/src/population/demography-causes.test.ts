@@ -95,7 +95,11 @@ describe("P4 1900 calibration (D-142)", () => {
   beforeAll(() => {
     scenario = loadM11World();
     world = createEconomyWorld(scenario, { seed: 20_261_023 });
-    sources = loadDemography1900("historical/p4/demography_1900.json");
+    // D-167 (restated with the designer's approval, 2026-11-16): the scenario's own demography
+    // file. P7 (D-154) split the P4 blocks by profession and the 1900 scenario reads
+    // `historical/p7/demography_1900.json` (20,741 blocks, the same provinces and tolerances);
+    // the P4 file kept 5,687 blocks, so the per-block urban shares no longer lined up.
+    sources = loadDemography1900("historical/p7/demography_1900.json");
     tolerance = sources.meta.acceptanceTolerances;
     factorsOf = demographyFactorsOfBlock(world, demographyFactorsByCountry(world, scenario.definitions));
     owner = new Map(world.provinces.ownership.map((row) => [row.provinceId, row.ownerPolityId]));

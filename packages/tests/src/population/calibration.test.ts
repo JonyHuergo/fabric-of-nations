@@ -266,7 +266,12 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // above restores m3-economy-v12 and still gives the P5 digest.
     // P6 schema 34 (D-153): encoding only; restoring the three version strings gives the P5b digest.
     // P7 schema 35 (D-154): encoding only — restoring schema 34 and simulation 0.30.0 reproduces the P6 digest; this world has no labour market.
-    expect(hashWorld(world)).toBe("47a6009fd9a82dd1");
+    // D-167 (P7 close, re-pinned with the designer's approval, 2026-11-16): encoding only.
+    // The pin above went stale when D-155 removed the legacy-unit hash view (received since then:
+    // `9aaedfa0cfabe4f6`); D-165 (simulation 0.32.0) and D-166 (data m3-economy-v16) change only
+    // the version strings here: restoring simulation 0.31.0 and data m3-economy-v15 in the
+    // encoded world reproduces `9aaedfa0cfabe4f6` (checked 2026-11-16).
+    expect(hashWorld(world)).toBe("2737881e5e308d9c");
   });
 });
 

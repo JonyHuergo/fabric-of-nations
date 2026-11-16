@@ -87,7 +87,14 @@ const SEED = 20_261_023;
 // strings); restoring them gives the P5b hash (asserted). The world has no demand system.
 // P7 schema 35 (D-154) re-pins it: encoding only (schema and simulation version strings);
 // restoring them gives the P6 hash (asserted). The world has no labour market.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "74795cbc041b566a";
+// D-167 (P7 close, re-pinned with the designer's approval, 2026-11-16). The pin went stale
+// with D-155 (the legacy-unit hash view removed) and moved again with D-158's summation order
+// (received `9dfd323500a31f87` through D-164). D-165 changes behaviour here, not only the
+// encoding: the one lot rule drops dust lots and servants are paid from the cash held before
+// today's wages, so restoring simulation 0.31.0 and data m3-economy-v15 gives
+// `19407d3a5c927030`, not `9dfd323500a31f87`. The test's other assertions (cash conserved,
+// the validation boundary) are unchanged and pass.
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "da3fccec5554e7f2";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

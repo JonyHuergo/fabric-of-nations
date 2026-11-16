@@ -78,7 +78,8 @@ P7 (program P7, GDD §17J.3) delivers:
    crowding and the desired dwelling stock.
 6. **From P6:** blocks without covered jobs; measured 1900 incomes; a long run. The fibre good
    (cotton back to 0.85–1.15 of the 1900 crop) is **deferred by the designer** (Q15, Q16).
-7. **Acceptance:** in a growing no-input economy the agricultural employment share falls;
+7. **Acceptance:** ~~in a growing no-input economy the agricultural employment share falls;~~
+   (removed by the designer, 2026-11-16, D-167: not a P7 criterion and not tested)
    unemployment lowers wages; people are conserved through mobility and block creation and
    retirement; determinism; save round trip. The P5b cotton test ("cotton and wool follow the 1900
    world fibre supply") stays failing while the fibre good is deferred; it is kept and not weakened,
@@ -485,7 +486,8 @@ capitalist sector whose owners reinvest through E3 construction of the existing 
 mechanics): as industrial buildings are added and peasant marginal product falls with population,
 wages in town exceed the peasant alternative, vacancies pull peasants into laborers and
 attendants, and the agricultural employment share (peasants, farmers and farm laborers ÷
-employed) falls year on year. A second fixture holds labour demand fixed while the labour force
+employed) falls year on year. **Removed by the designer (2026-11-16, D-167): the agricultural share
+is not a P7 criterion and is not tested.** A second fixture holds labour demand fixed while the labour force
 grows: unemployment rises and wages fall. Both are deterministic and run in the test suite.
 
 ---
@@ -646,7 +648,8 @@ Tests first where practical; every coefficient has a unit test of its formula.
    for every block, province and the world; ids unique; retired blocks empty; ownership passed.
 5. **Urbanisation:** settlement of movers; province urban share from counts; housing factor lowers
    inflow; dwellings follow §6.4.
-6. **Agricultural share (acceptance):** §7 first fixture, falling year on year.
+6. ~~**Agricultural share (acceptance):** §7 first fixture, falling year on year.~~ Removed by the
+   designer (2026-11-16, D-167).
 7. **Determinism and replay:** identical hashes for two runs and through the rollback runner,
    with mobility and creation months inside the replay window.
 8. **Save round trip (acceptance):** schema 35 encode → decode → identical hash, including created

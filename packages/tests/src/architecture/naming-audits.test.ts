@@ -192,8 +192,13 @@ describe("M14 monetary equivalence and determinism", () => {
   // D-155: the pre-P7 encoding proof is removed (designer, 2026-11-11). The pin below is
   // the last one the designer accepted; the world has changed since (P7 step 3 and the
   // D-155 digest without the SUSD view), so this test fails until the designer re-pins it.
+  // D-167 (P7 close, re-pinned with the designer's approval, 2026-11-16): the 1900 world of
+  // data m3-economy-v16 (D-166: good 60 bast fibre, its farms and mills) and simulation
+  // 0.32.0 (D-165). At 8cac864 (data v15) this hash was `8b8c7aa759a00f19`, and restoring
+  // simulation 0.31.0 there gave `685bf3c4ccf4f842`, the value received since D-155. It is
+  // day 0 of `determinism/perf-hash-equality.test.ts`.
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("bfd55c27e7ef866d");
+    expect(hashWorld(world)).toBe("94529a4173fbb997");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {
