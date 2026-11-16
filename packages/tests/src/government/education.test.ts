@@ -18,6 +18,8 @@ import {
   type World,
   countryProvinceIds,
   listAccounts,
+  readBudgetMemo,
+  runEducationPhase,
 } from "@century/sim";
 
 import {
@@ -159,6 +161,32 @@ describe("M9 education payroll accounting", () => {
       (account) => account.ownerKind === "country" && account.category === "liability",
     );
     expect(liabilities).toHaveLength(0);
+  });
+
+  test("a payroll above the budget share that the treasury cannot pay keeps the memo consistent (D-165)", () => {
+    // Late November 1900: country 56's teachers cost more than its education budget's daily
+    // share (wages had risen since the posts were planned) and the treasury could not pay;
+    // the memo recorded a shortfall above its request and validation threw. Here the posts
+    // are assigned at the full budget, the budget is then cut far below their payroll, and
+    // the reserve target leaves the treasury nothing payable.
+    const { scenario, world, country } = fixture();
+    runEconomicDay(world, scenario.population.definitions, scenario.definitions, world.dayIndex);
+    const treasuryCash = buildFinanceIndex(world.finance).get("country", M5_COUNTRY_A, "treasury-cash").balanceRUSD;
+    country.education = { ...country.education, fundedAnnualRUSD: 1, fundingRequestedMonthToDateRUSD: 0, fundingShortfallMonthToDateRUSD: 0 };
+    country.fiscal = { ...country.fiscal, reserveTargetRUSD: treasuryCash + 1_000_000 };
+    const owedBefore = readBudgetMemo(world.finance, M5_COUNTRY_A).educationRequestedRUSD ?? 0;
+    // The education phase alone: the posts assigned at the full budget are still filled
+    // (the next employment refresh would re-plan them from the cut budget).
+    runEducationPhase(world, scenario.definitions, world.dayIndex);
+    const owed = (readBudgetMemo(world.finance, M5_COUNTRY_A).educationRequestedRUSD ?? 0) - owedBefore;
+    // The staff were still owed their wages, far above the cut budget's daily share.
+    expect(owed).toBeGreaterThan(1 / 365);
+    const memo = country.education;
+    expect(memo.fundingShortfallMonthToDateRUSD).toBeGreaterThan(0);
+    expect(memo.fundingShortfallMonthToDateRUSD).toBeLessThanOrEqual(memo.fundingRequestedMonthToDateRUSD);
+    // The request is the payroll owed when it exceeds the budget share; nothing was paid.
+    expect(memo.fundingRequestedMonthToDateRUSD).toBeCloseTo(owed, 9);
+    expect(memo.fundingShortfallMonthToDateRUSD).toBeCloseTo(owed, 9);
   });
 
   test("the month-to-date memo resets at the next civil month", () => {

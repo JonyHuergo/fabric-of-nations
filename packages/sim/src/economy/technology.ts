@@ -1091,7 +1091,13 @@ export function runEducationPhase(
     });
     countryDrafts.push({
       countryId: country.id,
-      requested,
+      // D-165: the memo's request is the budget's daily share, or the payroll owed when the
+      // staff cost more than that share (wages rose since the posts were planned at the
+      // month's start); the shortfall is the unpaid part of the payroll, so request ≥ paid +
+      // shortfall always holds. Before, a payroll above the budget share that the treasury
+      // could not pay recorded a shortfall above the request, which the memo's validator
+      // rejected (country 56, late November 1900).
+      requested: Math.max(requested, owedTotal),
       paid: payable,
       shortfall,
       blocks: eligible,

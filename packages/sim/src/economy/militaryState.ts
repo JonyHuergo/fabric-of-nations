@@ -115,6 +115,9 @@ export function isWarPair(war: WarState, firstCountryId: Id, secondCountryId: Id
 function assertMilitaryAccounts(world: World, path: string): void {
   const countryIds = new Set<Id>(world.countries.map((country) => country.id));
   const blockIds = new Set<Id>(world.popBlocks.map((block) => block.id));
+  // D-165: a retired block (P7 plan §5.4 item 7) keeps its accounts in the ledger, as the finance
+  // and population validators already accept; its military-income account is one of them.
+  const retiredBlockIds = new Set<Id>(world.labourMarket.retiredPopBlockIds);
   const expenseCounts = new Map<Id, number>();
   const incomeCounts = new Map<Id, number>();
   const table = world.finance.accounts;
@@ -136,7 +139,7 @@ function assertMilitaryAccounts(world: World, path: string): void {
       if (account.ownerKind !== "popBlock" || account.ownerId === null) {
         throw new RangeError(`${path} military-income account must be owned by a pop block`);
       }
-      if (!blockIds.has(account.ownerId)) {
+      if (!blockIds.has(account.ownerId) && !retiredBlockIds.has(account.ownerId)) {
         throw new RangeError(`${path} military-income account references an unknown pop block`);
       }
       if (account.category !== "revenue") {
@@ -157,6 +160,11 @@ function assertMilitaryAccounts(world: World, path: string): void {
       throw new RangeError(
         `${path} requires exactly one military-income account for pop block ${String(block.id)}`,
       );
+    }
+  }
+  for (const id of retiredBlockIds) {
+    if ((incomeCounts.get(id) ?? 0) > 1) {
+      throw new RangeError(`${path} retired pop block ${String(id)} has more than one military-income account`);
     }
   }
 }

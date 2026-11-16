@@ -641,10 +641,34 @@ function hireHouseholdServants(
     // apportionment takes integer weights); a province whose employers round to zero hires none.
     const weights = employers.map((block) => Math.round(populationTotal(block) * block.incomeSmoothedRUSDPerCapitaDay * 100));
     if (!weights.some((weight) => weight > 0)) continue;
+    // D-165: the weights are proportions, but the apportionment bounds each share by its
+    // weight, so whole cents cannot carry more servants than the employers' income has
+    // cents (1 September 1900: "apportionment total cannot exceed the sum of weights").
+    // Such a split uses a finer unit of the same incomes (tenths of a cent and so on, up to
+    // 1e-12 RUSD); the split is unchanged whenever whole cents suffice.
+    const finer = new Map<number, number[]>([[100, weights]]);
+    const weightsFor = (count: number): number[] | null => {
+      for (let resolution = 100; resolution <= 1e12; resolution *= 10) {
+        let list = finer.get(resolution);
+        if (list === undefined) {
+          list = employers.map((block) => Math.round(populationTotal(block) * block.incomeSmoothedRUSDPerCapitaDay * resolution));
+          finer.set(resolution, list);
+        }
+        let sum = 0;
+        for (const weight of list) sum += weight;
+        if (sum >= count) return list;
+      }
+      return null;
+    };
     servants.forEach((servant, servantIndex) => {
       const count = fromServant[servantIndex] ?? 0;
       if (count <= 0) return;
-      const split = apportionLargestRemainder(count, weights, employers.map((_, index) => index));
+      const split = (() => {
+        const list = weightsFor(count);
+        // Incomes too small to carry the count even at 1e-12 RUSD: these employers hire none.
+        return list === null ? null : apportionLargestRemainder(count, list, employers.map((_, index) => index));
+      })();
+      if (split === null) return;
       employers.forEach((employer, employerIndex) => {
         const workers = split[employerIndex] ?? 0;
         if (workers <= 0) return;

@@ -34,8 +34,11 @@
  * differentials and floors, staffing ceilings, institutions as employers, own-province
  * work, mobility and migration through a conserving reclassification with block
  * creation and retirement, urbanisation and the minimum wage's coverage and compliance.
+ * The P7 close (0.32.0, D-165) adds one rule for lot remainders (no dust lots), servants
+ * paid from the cash held before today's wages exactly, and an exact income-tax check;
+ * later steps of that stage (the fibre good, data v16) keep this version.
  */
-export const SIM_VERSION = "0.31.0";
+export const SIM_VERSION = "0.32.0";
 
 /**
  * Version of the serialized world schema. M5 added `Country.immigrationOpen`;

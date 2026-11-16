@@ -527,10 +527,24 @@ export function runTrainingPhase(
     if (!(requested > 0)) continue;
     const treasury = index.get("country", country.id, "treasury-cash");
     const ceiling = Math.max(0, treasury.balanceRUSD - country.fiscal.reserveTargetRUSD);
-    const paid = Math.min(requested, ceiling);
-    const scale = requested > 0 ? paid / requested : 0;
-    const payrollPaid = requestedPayroll * scale;
-    const stipendPaid = requestedStipend * scale;
+    const payable = Math.min(requested, ceiling);
+    const scale = requested > 0 ? payable / requested : 0;
+    let payrollPaid = requestedPayroll * scale;
+    let stipendPaid = requestedStipend * scale;
+    // D-165: the payroll and the stipends are posted against the treasury in one batch, whose
+    // debit is the floating sum of the two (`(0 − payroll) − stipend`). Scaled separately they
+    // can sum to an ulp more than was payable, which overdrew a treasury paying out its whole
+    // balance (May 1902: 13.572884782449137 − 13.572884782449139). The larger part steps down
+    // by at least one ulp until the sum is affordable; the difference stays unpaid.
+    let roundingGuard = 0;
+    while (payrollPaid + stipendPaid > payable && roundingGuard < 32) {
+      const step = Math.max(payrollPaid + stipendPaid - payable, Math.max(payrollPaid, stipendPaid) * Number.EPSILON * 2);
+      if (payrollPaid >= stipendPaid) payrollPaid = Math.max(0, payrollPaid - step);
+      else stipendPaid = Math.max(0, stipendPaid - step);
+      roundingGuard += 1;
+    }
+    if (payrollPaid + stipendPaid > payable) throw new RangeError(`training payment exceeds the payable treasury cash for country ${String(country.id)}`);
+    const paid = payrollPaid + stipendPaid;
 
     if (payrollPaid > 0) {
       const academicBlocks = owedInstructors;

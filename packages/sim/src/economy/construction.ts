@@ -81,6 +81,7 @@ import type {
   FinancialAccount,
   Market,
 } from "./types.js";
+import { lotRemainder } from "./lotQuantity.js";
 import { buildProvinceOwnerMap, countryProvinceIds } from "./country.js";
 
 import { appendAccount, accountView } from "./accountTable.js";
@@ -183,6 +184,44 @@ function projectMarket(world: World, project: ConstructionProject): Market {
 }
 
 /**
+ * D-165: a country's treasury in the construction phase's posting batch. Every treasury line
+ * of the batch adds to one running delta in entry order, and the batch posts only if
+ * `balance + delta` is not negative (`assertBatchAffordable`). The phase keeps that delta
+ * itself, line by line, and sizes every debit against it, so a purchase or payroll that spends
+ * the treasury's last cash can never make the batch fail by a rounding residue (it formerly
+ * kept the cash by repeated subtraction and allowed a debit up to the money tolerance above it).
+ */
+interface TreasuryInBatch {
+  /** The treasury's balance before the batch (the staged finance is unchanged until it posts). */
+  readonly balance: number;
+  /** The sum of the batch's treasury lines so far, debits positive, in line order. */
+  delta: number;
+}
+
+/** Cash left for further debits, as the batch will see it. */
+function cashLeft(treasury: TreasuryInBatch): number {
+  return treasury.balance + treasury.delta;
+}
+
+/** Whether a further debit of `amount` keeps the batch affordable, in the batch's arithmetic. */
+function canDebit(treasury: TreasuryInBatch, amount: number): boolean {
+  return treasury.balance + (treasury.delta - amount) >= 0;
+}
+
+/**
+ * The largest debit not above `wanted` that keeps the batch affordable: `wanted` itself, or
+ * `wanted` stepped down by at least one ulp at a time (0 when nothing is left).
+ */
+function affordableDebit(treasury: TreasuryInBatch, wanted: number): number {
+  let debit = wanted;
+  for (let guard = 0; debit > 0 && !canDebit(treasury, debit) && guard < 64; guard += 1) {
+    const over = -(treasury.balance + (treasury.delta - debit));
+    debit = Math.max(0, debit - Math.max(over, debit * Number.EPSILON * 2));
+  }
+  return debit > 0 && canDebit(treasury, debit) ? debit : 0;
+}
+
+/**
  * Buy missing project materials from actual market stock and immediately deliver
  * them to the project. Each purchase is a real seller sale: the seller's market
  * lot shrinks, the seller receives operating cash and sales revenue, and the
@@ -198,15 +237,13 @@ function procureProjectMaterials(
   project: ConstructionProject,
   market: Market,
   index: ReturnType<typeof buildFinanceIndex>,
-  cash: number,
+  treasury: TreasuryInBatch,
   entries: JournalEntryInput[],
 ): {
-  readonly cash: number;
   readonly spentRUSD: number;
   readonly blockedReason: "funds" | "materials" | null;
 } {
   const materials = [...project.materials].sort((left, right) => left.goodId - right.goodId);
-  let remainingCash = cash;
   let spentRUSD = 0;
   let blockedReason: "funds" | "materials" | null = null;
   const countryTreasury = index.get("country", project.countryId, "treasury-cash");
@@ -241,21 +278,24 @@ function procureProjectMaterials(
       for (const lotIndex of lots) {
         const lot = { quantity: stock.quantity[lotIndex] ?? 0, ownerBuildingId: stock.owner[lotIndex] ?? 0 };
         if (remaining <= toleranceMoney(remaining)) break;
+        const remainingCash = cashLeft(treasury);
         if (remainingCash <= toleranceMoney(remainingCash)) {
           blockedReason = "funds";
           break;
         }
         const affordable = remainingCash / price;
-        const quantity = Math.min(remaining, lot.quantity, affordable);
+        let quantity = Math.min(remaining, lot.quantity, affordable);
         if (!(quantity > toleranceMoney(quantity))) {
           blockedReason = remainingCash < price ? "funds" : "materials";
           break;
         }
-        const cost = quantity * price;
-        if (cost > remainingCash + toleranceMoney(cost, remainingCash)) {
+        // D-165: the cost the batch can still debit (the last purchase may step down by an ulp).
+        const cost = affordableDebit(treasury, quantity * price);
+        if (!(cost > 0)) {
           blockedReason = "funds";
           break;
         }
+        if (cost < quantity * price) quantity = cost / price;
         const seller = world.buildings.find((building) => building.id === lot.ownerBuildingId);
         if (seller === undefined) {
           throw new RangeError(
@@ -264,15 +304,16 @@ function procureProjectMaterials(
         }
         const sellerCash = index.get("building", seller.id, "operating-cash");
         const sellerRevenue = index.get("building", seller.id, "sales-revenue");
-        lot.quantity -= quantity;
+        // D-165: the shared lot rule (was the money tolerance applied to a quantity).
+        lot.quantity = lotRemainder(lot.quantity, quantity);
         stock.quantity[lotIndex] = lot.quantity;
-        if (lot.quantity <= toleranceMoney(lot.quantity)) removedLots.add(lotIndex);
+        if (lot.quantity === 0) removedLots.add(lotIndex);
         material.deliveredQuantity = Math.min(
           material.requiredQuantity,
           material.deliveredQuantity + quantity,
         );
         remaining = constructionMaterialRemaining(material);
-        remainingCash -= cost;
+        treasury.delta -= cost;
         spentRUSD += cost;
         entries.push({
           transactionKind: "construction-material-purchase",
@@ -294,7 +335,7 @@ function procureProjectMaterials(
   }
   // A lot used up is removed (the list stays in canonical order).
   if (removedLots.size > 0) filterLots(market.stockLots, (index) => !removedLots.has(index));
-  return { cash: remainingCash, spentRUSD, blockedReason };
+  return { spentRUSD, blockedReason };
 }
 
 /**
@@ -511,7 +552,7 @@ export function runConstructionPhase(
   const settledWages = settlement === undefined ? undefined : settledHouseholds(settlement);
   const idleCache = new Map<Id, Map<Id, number>>();
   const claimed = new Map<Id, number>();
-  const cashByCountry = new Map<Id, number>();
+  const treasuryByCountry = new Map<Id, TreasuryInBatch>();
   const entries: JournalEntryInput[] = [];
   const results: ConstructionProjectResult[] = [];
   const completions: ConstructionProject[] = [];
@@ -543,10 +584,11 @@ export function runConstructionPhase(
       );
     }
     const treasury = index.get("country", country.id, "treasury-cash");
-    if (!cashByCountry.has(country.id)) {
-      cashByCountry.set(country.id, treasury.balanceRUSD);
+    let inBatch = treasuryByCountry.get(country.id);
+    if (inBatch === undefined) {
+      inBatch = { balance: treasury.balanceRUSD, delta: 0 };
+      treasuryByCountry.set(country.id, inBatch);
     }
-    let cash = cashByCountry.get(country.id) ?? 0;
     const market = projectMarket(staged, project);
     if (!constructionMaterialsReady(project)) {
       const procurement = procureProjectMaterials(
@@ -554,10 +596,9 @@ export function runConstructionPhase(
         project,
         market,
         index,
-        cash,
+        inBatch,
         entries,
       );
-      cash = procurement.cash;
       totalMaterialsSpent += procurement.spentRUSD;
       project.materialsSpentRUSD += procurement.spentRUSD;
       if (procurement.spentRUSD > 0) {
@@ -567,7 +608,6 @@ export function runConstructionPhase(
         });
       }
       if (!constructionMaterialsReady(project)) {
-        cashByCountry.set(country.id, cash);
         project.status = "waiting";
         project.lastWorkers = 0;
         project.blockedReason = procurement.blockedReason ?? "materials";
@@ -637,12 +677,13 @@ export function runConstructionPhase(
         const left = remaining - gross;
         if (left <= toleranceMoney(left, remaining)) break;
         const pay = Math.min(wage, left);
-        if (pay > cash + toleranceMoney(pay, cash)) {
+        // D-165: the wage line debits the whole gross once; this worker is hired only if the
+        // batch can still debit the gross with their pay.
+        if (!canDebit(inBatch, gross + pay)) {
           blocked = "funds";
           break;
         }
         gross += pay;
-        cash -= pay;
         hired += 1;
         claimed.set(block.id, (claimed.get(block.id) ?? 0) + 1);
         groupGross.set(block.id, (groupGross.get(block.id) ?? 0) + pay);
@@ -720,13 +761,13 @@ export function runConstructionPhase(
           targetEntityId: null,
         });
       }
-      cash += taxTotal;
+      inBatch.delta -= gross;
+      if (taxTotal > 0) inBatch.delta += taxTotal;
       totalSpent += gross;
       accumulateBudgetMemo(stagedFinance, country.id, {
         constructionSpentRUSD: gross,
       });
     }
-    cashByCountry.set(country.id, cash);
     project.spentRUSD += gross;
     if (project.spentRUSD >= project.totalCostRUSD - toleranceMoney(project.spentRUSD)) {
       project.spentRUSD = project.totalCostRUSD;
@@ -744,7 +785,7 @@ export function runConstructionPhase(
       project.status = "waiting";
       project.lastWorkers = 0;
       project.blockedReason =
-        Number.isFinite(minimumWage) && cash + toleranceMoney(cash) < minimumWage
+        Number.isFinite(minimumWage) && !canDebit(inBatch, minimumWage)
           ? "funds"
           : "labor";
     }

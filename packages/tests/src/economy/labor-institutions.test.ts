@@ -21,6 +21,7 @@ import {
   type TickContext,
   type World,
   countryProvinceIds,
+  listAccounts,
 } from "@century/sim";
 
 import { e5Scenario } from "../fixtures/e5.js";
@@ -188,6 +189,39 @@ describe("E5 training and qualification", () => {
     );
     expect(country.labor.trainingShortfallMonthToDateRUSD).toBeGreaterThan(0);
     assertValidWorld(world);
+  });
+});
+
+describe("D-165 a treasury that pays out its whole balance for training", () => {
+  test("payroll and stipends together never exceed the treasury, at every short balance", () => {
+    // May 1902 in the 1900 world: payroll and stipends, each scaled to what the treasury could
+    // pay, summed to an ulp above its whole balance and the posting failed (13.572884782449137
+    // + -13.572884782449139 < 0). Under the pre-D-165 rule 8 of the first 97 balances of this
+    // sweep failed the same way (the first: 0.3 + -0.30000000000000004 < 0).
+    for (let step = 0; step < 120; step += 1) {
+      const { scenario, world, country } = worldFixture({
+        trainingBudgetA: 10_000_000,
+        trainingStipendA: 1_000,
+        trainingStaffShareA: 0.2,
+        healthStaffShareA: 0,
+      });
+      country.fiscal = { ...country.fiscal, reserveTargetRUSD: 0 };
+      runLaborMonthStart(world, scenario.definitions, world.dayIndex);
+      const treasury = buildFinanceIndex(world.finance).get("country", country.id, "treasury-cash");
+      const equity = listAccounts(world.finance.accounts).find(
+        (account) => account.ownerKind === "country" && account.ownerId === country.id && account.subtype === "owner-equity",
+      );
+      if (equity === undefined) throw new Error("country A has no owner equity");
+      const balance = 0.3 + step * 0.0371 + Math.sin(step) * 1e-4;
+      equity.balanceRUSD += balance - treasury.balanceRUSD;
+      treasury.balanceRUSD = balance;
+      const phase = runTrainingPhase(world, scenario.definitions, world.dayIndex);
+      const after = buildFinanceIndex(world.finance).get("country", country.id, "treasury-cash").balanceRUSD;
+      expect(after).toBeGreaterThanOrEqual(0);
+      // The treasury was short: it paid at most its balance and recorded a shortfall.
+      expect(phase.totalPaidRUSD).toBeLessThanOrEqual(balance + 1e-6); // the result rounds to 1e-6
+      expect(country.labor.trainingShortfallMonthToDateRUSD).toBeGreaterThan(0);
+    }
   });
 });
 

@@ -378,6 +378,32 @@ describe("AUDIT-011 zero-recipient military payments", () => {
   });
 });
 
+describe("D-165 a short treasury paying its army", () => {
+  test("soldiers' pay and equipment together never exceed the treasury, at every short balance", () => {
+    // Found by the D-165 audit of scaled payments: pay and equipment, each scaled by the paid
+    // ratio and posted one after the other, summed to an ulp above the cash paid, so the
+    // procurement posting overdrew the treasury. Under the pre-D-165 rule 5 of the first 6
+    // balances of this sweep failed (the first: 0.0023809523809523725 + -0.002380952380952381 < 0).
+    for (let step = 0; step < 40; step += 1) {
+      const world = buildWorld();
+      recruit(world, M5_COUNTRY_A, M5_REGION_A1, 500);
+      const treasury = listAccounts(world.finance.accounts).find(
+        (account) => account.ownerKind === "country" && account.ownerId === M5_COUNTRY_A && account.subtype === "treasury-cash",
+      );
+      const equity = listAccounts(world.finance.accounts).find(
+        (account) => account.ownerKind === "country" && account.ownerId === M5_COUNTRY_A && account.subtype === "owner-equity",
+      );
+      if (treasury === undefined || equity === undefined) throw new Error("country A has no treasury");
+      const balance = 0.3 + step * 0.0371 + Math.sin(step) * 1e-4;
+      equity.balanceRUSD += balance - treasury.balanceRUSD;
+      treasury.balanceRUSD = balance;
+      const result = runMilitaryPhase(world, world.dayIndex, { validateWorld: false });
+      expect(accountBalance(world, "country", M5_COUNTRY_A, "treasury-cash")).toBeGreaterThanOrEqual(0);
+      expect(result.shortfallRUSD).toBeGreaterThan(0);
+    }
+  });
+});
+
 describe("AUDIT-012 truce duration boundary", () => {
   test("a peace on day P prohibits P and P+365 and permits P+366", () => {
     const world = buildWorld();

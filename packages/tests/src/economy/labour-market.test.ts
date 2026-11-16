@@ -167,6 +167,39 @@ describe("P7 reclassification (acceptance: people conserved)", () => {
   });
 });
 
+describe("D-165 a retired block in a world with an army ledger", () => {
+  test("the retired block's military-income account stays in the ledger and the world validates and saves", () => {
+    // November 1901 in the 1900 world: a block retired by the monthly labour phase kept its
+    // military-income account (as every retired block keeps its accounts), and the military
+    // validator, unlike the finance and population validators, rejected it: the world could
+    // not be encoded, so it could not be saved or hashed.
+    const scenario = p7Scenario();
+    scenario.military = {};
+    const world = createEconomyWorld(scenario);
+    const context = createReclassifyContext(world, scenario.definitions, world.dayIndex);
+    const peasantsA2 = world.popBlocks.find((block) => block.provinceId === M5_REGION_A2 && block.professionId === M5_PEASANTS);
+    if (peasantsA2 === undefined) throw new Error("no peasants");
+    const created = moveBlockPeople(context, peasantsA2, M5_REGION_A2, P7_CLERKS, 50, {
+      selectiveLiterate: true,
+      destinationUrbanFraction: 1,
+      carriedDwellingShare: 0,
+    });
+    const retiredId = created.destination.id;
+    expect(listAccounts(world.finance.accounts).some((account) => account.ownerId === retiredId && account.subtype === "military-income")).toBe(true);
+    moveBlockPeople(context, created.destination, M5_REGION_A2, M5_PEASANTS, 50, {
+      selectiveLiterate: false,
+      destinationUrbanFraction: 0,
+      carriedDwellingShare: 0,
+    });
+    refreshEmployment(world, scenario.definitions, world.dayIndex, { force: true });
+    expect(retireEmptyBlocks(context)).toBe(1);
+    expect(world.labourMarket.retiredPopBlockIds).toEqual([retiredId]);
+    expect(listAccounts(world.finance.accounts).some((account) => account.ownerId === retiredId && account.subtype === "military-income")).toBe(true);
+    const restored = deserializeWorld(serializeWorld(world));
+    expect(hashWorld(restored)).toBe(hashWorld(world));
+  });
+});
+
 describe("P7 integrated months", () => {
   test("three months run deterministically, with mobility, and the save round-trips (acceptance)", () => {
     const scenario = p7Scenario();

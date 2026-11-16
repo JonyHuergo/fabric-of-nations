@@ -20,6 +20,7 @@ export * from "./agriculture.js";
 export * from "./resourceState.js";
 export * from "./resources.js";
 export * from "./market.js";
+export * from "./lotQuantity.js";
 export * from "./settlement.js";
 export * from "./migrationResult.js";
 export * from "./aiState.js";

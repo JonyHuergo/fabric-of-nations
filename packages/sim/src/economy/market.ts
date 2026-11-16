@@ -12,6 +12,7 @@
 import type { MintStandingOffer } from "./mint.js";
 import { assertValidDayIndex, isTerminalDayIndex } from "../calendar.js";
 import { QUANTITY_TOLERANCE } from "../population/constants.js";
+import { lotRemainder, settledRemainder } from "./lotQuantity.js";
 import type { NeedTierDef } from "../population/types.js";
 import type { DayIndex } from "../types.js";
 import { assertValidWorldForTick, type PhaseValidationOptions, type World } from "../world.js";
@@ -1095,16 +1096,16 @@ export function runMarketDay(
       const quantity = lots.quantity[cell] ?? 0;
       const reservedFromLot = reservedByLot[lotIndex] ?? 0;
       actualFulfilled += reservedFromLot;
-      const remaining = quantity - reservedFromLot;
       // A lot's reservation is the difference of two cumulative interval ends, so its
       // rounding error scales with the cumulative total, not with the lot (P2b).
-      const lotTolerance = tolerance(quantity, reservedFromLot, fulfilledTotal);
-      if (remaining < -lotTolerance) {
+      if (quantity - reservedFromLot < -tolerance(quantity, reservedFromLot, fulfilledTotal)) {
         throw new RangeError(
           `market reservation exceeds seller lot ${String(goodId)}:${String(lots.owners[lotSlots[lotIndex] ?? 0] ?? 0)}`,
         );
       }
-      if (remaining <= lotTolerance) {
+      // D-165: the one lot rule, shared with the Pass-B and final lots and production.
+      const remaining = lotRemainder(quantity, reservedFromLot, fulfilledTotal);
+      if (remaining === 0) {
         lots.present[cell] = 0;
         lots.quantity[cell] = 0;
       } else {
@@ -1300,9 +1301,10 @@ export function runMarketDay(
       if (produced.present[cell] !== 1) continue;
       const quantity = produced.quantity[cell] ?? 0;
       const reserved = householdReservedByLot[cell] ?? 0;
-      const available = quantity - reserved;
       const goodId = Math.floor(cell / ownerCount);
-      if (available < -tolerance(quantity, reserved, householdPassAByGood[goodId] ?? 0)) {
+      // D-165: a lot the Pass-A allocator sold out is not offered again as dust.
+      const available = lotRemainder(quantity, reserved, householdPassAByGood[goodId] ?? 0);
+      if (quantity - reserved < -tolerance(quantity, reserved, householdPassAByGood[goodId] ?? 0)) {
         throw new RangeError(
           `household reservation exceeds current seller lot ${String(goodId)}:${String(opening.owners[cell % ownerCount] ?? 0)}`,
         );
@@ -1377,15 +1379,41 @@ export function runMarketDay(
     const householdByLot = householdTakenByCell;
     const householdByGood = householdTakenByGood;
     const finalLots: LotTable = emptyLotTableLike(opening, scratch, "market.finalLots");
+    const finalDustByGood = new Float64Array(goodCount);
+    // D-165: what production's input uses took from each lot today, and per good.
+    const inputTakenByCell = new Float64Array(goodCount * ownerCount);
+    const inputUsedByGood = new Float64Array(goodCount);
+    {
+      const uses = productionCore.uses;
+      for (let item = 0; item < uses.used.length; item += 1) {
+        const used = uses.used[item] ?? 0;
+        if (!(used > 0)) continue;
+        const goodId = uses.good[item] ?? 0;
+        const slot = produced.slotOf.get(uses.seller[item] ?? 0);
+        if (slot === undefined) continue;
+        inputTakenByCell[goodId * ownerCount + slot] = (inputTakenByCell[goodId * ownerCount + slot] ?? 0) + used;
+        inputUsedByGood[goodId] = (inputUsedByGood[goodId] ?? 0) + used;
+      }
+    }
     for (let cell = 0; cell < goodCount * ownerCount; cell += 1) {
       if (produced.present[cell] !== 1) continue;
       const quantity = produced.quantity[cell] ?? 0;
       const consumed = householdByLot[cell] ?? 0;
-      const remainingQuantity = quantity - consumed;
       const goodId = Math.floor(cell / ownerCount);
       // D-136: reservations are differences of cumulative interval ends, so the
       // rounding error scales with the good's household total, not with one lot.
-      if (remainingQuantity < -tolerance(quantity, consumed, householdByGood[goodId] ?? 0)) {
+      // D-165: the shared lot rule, applied here, once every reservation and use of the day
+      // is done (production's two waves may still draw a small remainder reserved for the
+      // second, so no earlier step may drop it). A lot something was taken from today, by
+      // households or as an input, whose remainder is within the tolerance of the day's lot
+      // arithmetic is sold out (exact zero); the residue is recorded as loss so the
+      // inventory identity stays exact. The allocator already treated such a lot as empty.
+      const inputTaken = inputTakenByCell[cell] ?? 0;
+      const scale = Math.max(householdByGood[goodId] ?? 0, inputUsedByGood[goodId] ?? 0);
+      const unsettled = quantity - consumed;
+      const remainingQuantity = settledRemainder(unsettled, quantity + inputTaken, consumed + inputTaken, scale);
+      if (unsettled > 0 && remainingQuantity === 0) finalDustByGood[goodId] = (finalDustByGood[goodId] ?? 0) + unsettled;
+      if (quantity - consumed < -tolerance(quantity, consumed, householdByGood[goodId] ?? 0)) {
         throw new RangeError(
           `fulfilled household demand exceeds seller lot ${String(goodId)}:${String(opening.owners[cell % ownerCount] ?? 0)}`,
         );
@@ -1532,6 +1560,11 @@ export function runMarketDay(
     const lossByGood = new Array<number>(goodCount).fill(0);
     for (const loss of overflowLosses) {
       lossByGood[loss.goodId] = (lossByGood[loss.goodId] ?? 0) + loss.quantity;
+    }
+    // D-165: lot residues dropped by the lot rule in the final lots are recorded loss.
+    for (let goodId = 0; goodId < goodCount; goodId += 1) {
+      const dust = finalDustByGood[goodId] ?? 0;
+      if (dust > 0) lossByGood[goodId] = (lossByGood[goodId] ?? 0) + dust;
     }
     const finalStock = deriveStockByGood(market, goodCount);
     const inventory: MarketInventoryFlow[] = definitions.goods.map((good) => {

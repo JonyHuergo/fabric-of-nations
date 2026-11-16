@@ -389,9 +389,13 @@ function executeFiscalPhase(
         if (!(tax > 0)) continue;
         const expense = index.get("popBlock", block.popBlockId, "income-tax-expense");
         const cash = index.get("popBlock", block.popBlockId, "household-cash");
-        if (tax > cash.balanceRUSD + toleranceMoney(tax, cash.balanceRUSD)) {
+        // D-165: exact, as the posting is (an asset account may not go below zero by any
+        // amount). Settlement keeps today's wages in the household's cash (the domestic-
+        // service guard), and the tax is a share of them, so this holds by construction;
+        // the former money tolerance here let a sub-ulp excess through to a posting failure.
+        if (tax > cash.balanceRUSD) {
           throw new RangeError(
-            `income tax ${String(tax)} exceeds available cash ${String(cash.balanceRUSD)} for popBlock ${String(block.popBlockId)}`,
+            `income tax ${String(tax)} exceeds available cash ${String(cash.balanceRUSD)} for popBlock ${String(block.popBlockId)} (today's wages ${String(wages)})`,
           );
         }
         taxLines.push({ accountId: expense.id, side: "debit", amountRUSD: tax });

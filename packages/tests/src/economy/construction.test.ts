@@ -431,6 +431,30 @@ describe("E3 construction progress and completion", () => {
   });
 });
 
+describe("D-165 construction never overdraws its treasury's batch", () => {
+  test("a project paid from a short treasury posts at every balance and leaves no negative cash", () => {
+    // D-165 (preventive): the phase sizes every material purchase and wage against the
+    // treasury as its posting batch will see it (balance + the batch's running delta), instead
+    // of cash kept by repeated subtraction with a money tolerance. This sweep did not fail under
+    // the former rule either (the fixture's stock limits purchases first); it guards the rule.
+    for (let step = 0; step < 40; step += 1) {
+      const f = fixture();
+      start(f);
+      const treasury = listAccounts(f.world.finance.accounts).find(
+        (entry) => entry.ownerKind === "country" && entry.ownerId === COUNTRY && entry.subtype === "treasury-cash",
+      )!;
+      const equity = listAccounts(f.world.finance.accounts).find(
+        (entry) => entry.ownerKind === "country" && entry.ownerId === COUNTRY && entry.subtype === "owner-equity",
+      )!;
+      const balance = 0.3 + step * 18.55 + Math.sin(step) * 1e-4;
+      equity.balanceRUSD += balance - treasury.balanceRUSD;
+      treasury.balanceRUSD = balance;
+      runConstructionPhase(f.world, f.scenario.definitions, f.world.dayIndex);
+      expect(accountBalance(f.world, "country", COUNTRY, "treasury-cash")).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
 describe("E3 cancellation, suspension, and reporting", () => {
   test("cancellation writes off spent work in progress and never creates a building", () => {
     const f = fixture();

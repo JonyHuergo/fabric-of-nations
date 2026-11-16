@@ -1563,18 +1563,27 @@ function settleMarketDaysInternal(
         const employerCashId = householdCashId(index, householdCashTable, employer.id);
         const employerCash = { id: employerCashId, balanceRUSD: balanceOfId(employerCashId) };
         const prior = spent.get(employer.id) ?? 0;
-        const limit = Math.max(0, employerCash.balanceRUSD - (wagePaidByBlock[employer.id] ?? 0));
+        const wagesToday = wagePaidByBlock[employer.id] ?? 0;
+        const limit = Math.max(0, employerCash.balanceRUSD - wagesToday);
         let paid = Math.min(obligation, Math.max(0, limit - prior));
         // The batch debits the employer's cash by the running sum of its payments; when the
         // employer pays out its last spendable cash, `prior + paid` can exceed the limit by an
         // ulp. As for wages above, step down by at least one ulp until the sum is affordable;
         // the difference stays unpaid.
+        // D-165: the limit `cash − today's wages` is meant to be the cash held before the
+        // wages, but the subtraction does not cancel exactly when a wage smaller than half an
+        // ulp of the balance was absorbed by rounding (cash + w = cash): the employer could
+        // then pay out its whole balance, today's wages included, and the fiscal phase's
+        // income tax on them would overdraw the account. The guard therefore also checks
+        // the rule itself, in the arithmetic the batch applies (balance − running sum): the
+        // cash left after the payments is at least today's wages.
+        const balance = employerCash.balanceRUSD;
         let roundingGuard = 0;
-        while (paid > 0 && prior + paid > limit && roundingGuard < 32) {
+        while (paid > 0 && (prior + paid > limit || balance - (prior + paid) < wagesToday) && roundingGuard < 32) {
           paid = Math.max(0, paid - Math.max(prior + paid - limit, Math.abs(paid) * Number.EPSILON * 2));
           roundingGuard += 1;
         }
-        if (!Number.isFinite(paid) || !(paid > 0) || prior + paid > limit) return;
+        if (!Number.isFinite(paid) || !(paid > 0) || prior + paid > limit || balance - (prior + paid) < wagesToday) return;
         spent.set(employer.id, prior + paid);
         domesticReceived.set(servant.id, (domesticReceived.get(servant.id) ?? 0) + paid);
         const start = householdLines.count;

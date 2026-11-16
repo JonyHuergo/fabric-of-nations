@@ -731,8 +731,24 @@ function postMilitaryPay(
   dayIndex: Day,
   countryId: Id,
   shares: readonly MilitaryPayShare[],
-): void {
-  const ordered = [...shares].sort((left, right) => left.popBlockId - right.popBlockId);
+): number {
+  const ordered = [...shares].sort((left, right) => left.popBlockId - right.popBlockId).map((share) => ({ ...share }));
+  // D-165: every share is its own treasury line in one batch, debited as the floating sum
+  // of the shares in this order. Shares of a payment that is the treasury's whole balance
+  // can sum to an ulp above it; the largest share steps down by at least one ulp until the
+  // sum is affordable (the difference stays unpaid). Returns what is posted.
+  const balance = treasuryCash(world, countryId);
+  const postedSum = (): number => {
+    let total = 0;
+    for (const share of ordered) if (share.amountRUSD > 0) total += share.amountRUSD;
+    return total;
+  };
+  let sum = postedSum();
+  for (let guard = 0; sum > balance && guard < 32; guard += 1) {
+    const largest = ordered.reduce((best, share) => (share.amountRUSD > best.amountRUSD ? share : best), ordered[0]!);
+    largest.amountRUSD = Math.max(0, largest.amountRUSD - Math.max(sum - balance, largest.amountRUSD * Number.EPSILON * 2));
+    sum = postedSum();
+  }
   const entries: JournalEntryInput[] = [];
   for (const share of ordered) {
     if (!(share.amountRUSD > 0)) continue;
@@ -764,8 +780,9 @@ function postMilitaryPay(
       ],
     });
   }
-  if (entries.length === 0) return;
+  if (entries.length === 0) return 0;
   postJournalBatch(world.finance, dayIndex, entries);
+  return sum;
 }
 
 function postMilitaryProcurement(
@@ -1801,7 +1818,7 @@ function payUpkeep(
     paidPay = payRequired * paidRatio;
     paidEquipment = equipmentRequired * paidRatio;
     if (paidPay > 0) {
-      postMilitaryPay(
+      paidPay = postMilitaryPay(
         world,
         dayIndex,
         army.countryId,
@@ -1811,8 +1828,13 @@ function payUpkeep(
   } else {
     paidEquipment = paid;
   }
+  // D-165: the two parts, each scaled by the paid ratio, can sum to an ulp above the cash
+  // paid (the treasury's whole balance when it is short), so the procurement posting takes
+  // at most what the pay posting left; the difference stays in the shortfall.
+  paidEquipment = Math.min(paidEquipment, Math.max(0, treasuryCash(world, army.countryId)));
   postMilitaryProcurement(world, dayIndex, army.countryId, paidEquipment);
-  return { paid, shortfall: required - paid };
+  const paidTotal = paidPay + paidEquipment;
+  return { paid: paidTotal, shortfall: required - paidTotal };
 }
 
 function shouldAiAccept(
@@ -1975,9 +1997,9 @@ export function runMilitaryPhase(
       continue;
     }
     const available = treasuryCash(world, controller);
-    const paid = Math.min(requested, Math.max(0, available));
+    let paid = Math.min(requested, Math.max(0, available));
     if (paid > 0) {
-      postMilitaryPay(
+      paid = postMilitaryPay(
         world,
         dayIndex,
         controller,

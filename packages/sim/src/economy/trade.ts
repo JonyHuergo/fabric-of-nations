@@ -44,6 +44,7 @@ import {
   type TradeShipment,
   type TradeState,
 } from "./types.js";
+import { lotRemainder } from "./lotQuantity.js";
 import { findAccountById, findAccountByOwner, findAccountsBySubtype } from "./accounts.js";
 
 import { cloneLotList, filterLots, lotListFromLots, type LotList } from "./lotList.js";
@@ -770,7 +771,8 @@ function dispatchTrade(
           usedRUSD += cargoValue;
           const remaining = remainingByMarket.get(origin.id);
           if (remaining === undefined) throw new RangeError(`trade dispatch lost market ${String(origin.id)}`);
-          remaining[lot.index] = (remaining[lot.index] ?? 0) - lotQuantity;
+          // D-165: the shared lot rule, so a lot shipped whole leaves no dust behind.
+          remaining[lot.index] = lotRemainder(remaining[lot.index] ?? 0, lotQuantity);
           cashByBuilding.set(building.id, buildingCash - buildingPortion);
           freightPaidRUSD += freightCost;
           dutyPaidRUSD += dutyCost;

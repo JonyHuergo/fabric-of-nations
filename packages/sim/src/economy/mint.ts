@@ -25,6 +25,7 @@
  */
 
 import { QUANTITY_TOLERANCE } from "../population/constants.js";
+import { lotRemainder } from "./lotQuantity.js";
 import {
   MINT_CHARGE,
   MINT_EXPORT_POINT,
@@ -221,8 +222,9 @@ export function runMintWindow(
         sourceEntityId: record.issuerCountryId,
         targetEntityId: sellerId,
       });
-      const remaining = available - take;
-      if (remaining > QUANTITY_TOLERANCE) table.quantity[cell] = remaining;
+      // D-165: the shared lot rule (was an absolute 1e-9 kg).
+      const remaining = lotRemainder(available, take);
+      if (remaining > 0) table.quantity[cell] = remaining;
       else {
         table.present[cell] = 0;
         table.quantity[cell] = 0;
