@@ -3,8 +3,9 @@
  * Decision register index (D-145).
  *
  * Regenerates the index table at the top of `DECISIONS.md` from the entry headings
- * (`## D-NNN — Title` or `### D-NNN — Title`). Only the text between the two index
- * markers is written; every entry stays byte for byte as it is.
+ * (`## D-NNN — Title` or `### D-NNN — Title`; from D-154 on also `## D-NNN (qualifier) — Title`).
+ * Only the text between the two index markers is written; every entry stays byte for byte as
+ * it is.
  *
  *   node scripts/docs/decisions-index.mjs           rewrite the index
  *   node scripts/docs/decisions-index.mjs --check   fail if the index is stale
@@ -24,10 +25,19 @@ const END = "<!-- decisions-index:end -->";
 function entries(text) {
   const out = [];
   for (const line of text.split("\n")) {
-    // Headings read "## D-NNN — Title". A heading with another separator is not indexed,
-    // so `--check` then reports that number as missing.
-    const match = /^#{2,3} (D-(\d{3})) — (.+)$/.exec(line);
-    if (match) out.push({ id: match[1], number: Number(match[2]), title: match[3].trim() });
+    // Headings read "## D-NNN — Title" or, from D-154 on, "## D-NNN (qualifier) — Title"
+    // (the plan step or the kind of work, e.g. "(step 3)", "(performance)"); the qualifier is
+    // listed after the title. A heading with another separator is not indexed, so `--check`
+    // then reports that number as missing.
+    const match = /^#{2,3} (D-(\d{3}))(?: \(([^()]+)\))? — (.+)$/.exec(line);
+    if (match) {
+      const title = match[4].trim();
+      out.push({
+        id: match[1],
+        number: Number(match[2]),
+        title: match[3] === undefined ? title : `${title} (${match[3].trim()})`,
+      });
+    }
   }
   return out;
 }
