@@ -6675,6 +6675,13 @@ equivalents, national tastes), adds saving by profession stratum and an owner-oc
 stock built by residential builders, whose crowding above the 1900 level raises mortality and
 unrest; schema 34, protocol 23. Legacy worlds keep the tiers of §6.4. P6 was merged into
 `main` on 2026-11-08; its open items are in `P6_COMPLETION_REPORT.md` §7.
+P7 (D-154 to D-168, plan `docs/P7_PLAN.md`) adds the labour market: sixteen professions from
+sourced 1900 occupations, monthly wages per customs territory and profession with provincial
+differentials, hiring by staffing ceilings, a minimum wage with coverage and compliance, monthly
+social mobility with block creation and retirement, migration toward jobs and housing, and the
+flax, hemp and jute fibre good; schema 35, simulation 0.32.0, data v16. Its acceptance tests pass;
+its ten-year run and open items are in `docs/P7_COMPLETION_REPORT.md`. The designer removed the
+agricultural-share criterion (2026-11-16, D-167).
 P1 is implemented with a documented
 performance shortfall: phase validation and checkpoint rollback (D-116), aggregated
 market postings and one cash-capped market attempt (D-125), minimal employment repair
@@ -6743,7 +6750,7 @@ history. §2 (no gameplay pools) binds every stage.
 | P4 | Cause-driven demography, urban/rural split | Country-specific 1900 levels; transition caused by literacy/urbanisation in isolating fixtures; WPP comparison report |
 | P5 | Land, diminishing returns, own consumption, harvest variance, deposits and discovery | Falling marginal product; famine only through food shortfall; deposit conservation |
 | P6 | Engel/LES demand with substitution, saving, housing (the goods catalogue was built in P5b) | Food share falls with income; housing conservation |
-| P7 | Labour market, wages, nine professions, mobility, urbanisation | Agricultural share falls in a growing no-input economy; people conserved |
+| P7 | Labour market, wages, sixteen professions, mobility, urbanisation | Unemployment lowers wages; people conserved through mobility, block creation and retirement (the agricultural-share criterion removed by the designer, D-167) |
 | P8 | Railways, roads, ports; provincial transport wedge on the national price | Railway raises farm-gate prices in its province; wedge is real freight cost |
 | P9 | Companies and company finance | Consolidation equals building sum; dividends conserve cash |
 | P10 | Private investment, expansion, contraction, closure, bankruptcy | Tariff fixture raises protected-sector investment; bankruptcy conserves assets |

@@ -13,7 +13,12 @@ by the designer and some source transcriptions remain provisional; the monetary 
 moves to P11 (D-152). P5b was merged into `main` on 2026-11-08; its unresolved items are
 listed in `P5B_COMPLETION_REPORT.md` §11. P6 (Engel demand, saving and housing; D-153) was
 implemented and merged into `main` on 2026-11-08; its unresolved items are listed in
-`P6_COMPLETION_REPORT.md` §7, and the flax, hemp and jute fibre good moves to P7.\
+`P6_COMPLETION_REPORT.md` §7, and the flax, hemp and jute fibre good moves to P7. P7 (labour
+market, wages, sixteen professions, mobility, urbanisation; D-154 to D-156, the performance stages
+D-157 to D-163 and the close D-164 to D-168) is implemented on `main` and the branch `p7/close`
+(2026-11-16; `docs/P7_COMPLETION_REPORT.md`): its acceptance tests pass and the fibre good brings
+cotton to 0.89 of the 1900 crop, but the ten-year run shows the lower stratum below subsistence
+and a falling population, to be diagnosed before P8 (report §7).\
 **Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\
 **Goal:** a country that never goes to war and never engages in diplomacy must still be
@@ -350,8 +355,18 @@ has been made.
   carrying age structure, driven by vacancies and wage gaps, gated by literacy and
   training; rural-to-urban migration toward jobs and housing.
 
-Acceptance: in a growing no-input economy the agricultural employment share falls;
-unemployment lowers wages; conservation of people through mobility; determinism.
+Acceptance: ~~in a growing no-input economy the agricultural employment share falls;~~ (removed
+by the designer, 2026-11-16, D-167) unemployment lowers wages; conservation of people through
+mobility; determinism.
+
+**Status (2026-11-16, D-154 to D-168).** Implemented: sixteen professions from sourced 1900
+occupations, monthly wages per territory and profession with provincial differentials, hiring by
+staffing ceilings, the minimum wage with coverage and compliance, monthly mobility with block
+creation and retirement, migration toward jobs and housing; the fibre good (good 60, D-166);
+schema 35, simulation 0.32.0, data v16, protocol 24. The acceptance tests pass. The ten-year run
+(Q22) completes without a failure, but unemployment reaches 25 %, 99 % of the lower stratum is
+below subsistence from 1905 and the population falls 8.4 % (`docs/P7_COMPLETION_REPORT.md` §4.2);
+that diagnosis comes before P8. Step 6 of the close adds per-country mobility (schema 36).
 
 ### P7b — Save storage backend (scheduled by D-146)
 
