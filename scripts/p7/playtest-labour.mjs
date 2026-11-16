@@ -15,6 +15,10 @@
  * panel's labour rows and wage index; the Unemployment lens (44-pt chip, legend, map
  * drawn); the Markets screen's 60 goods; every visible button at least 44 pt; no console
  * errors, exceptions or failed loads. Not a substitute for the designer's device test.
+ *
+ * D-162: `PLAYTEST_SIM_WORKERS=N` (or `auto`) loads the build with `?simWorkers=N`, the
+ * simulation's kernel worker threads; the campaign panel's thread count is recorded
+ * (`figures.simulationThreads`) and, with workers asked for, checked to be above one.
  */
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -24,7 +28,8 @@ process.env.PLAYTEST_SHOT_DIR = "docs/images/p7";
 const { boot, sleep, writeJson, ROOT } = await import("../m11d/lib/harness.mjs");
 
 const PORT = 8889;
-const URL = `http://127.0.0.1:${PORT}/`;
+const SIM_WORKERS = process.env.PLAYTEST_SIM_WORKERS;
+const URL = `http://127.0.0.1:${PORT}/${SIM_WORKERS === undefined ? "" : `?simWorkers=${encodeURIComponent(SIM_WORKERS)}`}`;
 const VIEWPORT = "844,390";
 const evidence = { startedAt: new Date().toISOString(), viewport: VIEWPORT, checks: [], errors: [], screenshots: [], figures: {} };
 
@@ -328,6 +333,25 @@ try {
   check("home market counts the goods traded of 60", /\d+ of 60 goods traded/u.test(body), body.match(/\d+ of 60 goods traded/u)?.[0] ?? null);
   await press(app, "Close sheet", false);
   await sleep(500);
+
+  await app.step("simulation threads (D-162)");
+  const opened = await app.evaluate(`(() => {
+    const node = Array.from(document.querySelectorAll('[role="button"]')).find((candidate) => (candidate.getAttribute('aria-label') ?? '').endsWith(', open campaign'));
+    if (node === undefined) return false;
+    node.click();
+    return true;
+  })()`);
+  if (opened) {
+    body = await waitForText(app, "best effort", 30_000);
+    const line = body.split("\n").find((text) => text.includes("best effort")) ?? null;
+    const threads = Number(line?.match(/(\d+) threads/u)?.[1] ?? 1);
+    evidence.figures.simWorkers = SIM_WORKERS ?? null;
+    evidence.figures.simulationThreads = threads;
+    evidence.figures.speedLine = line;
+    if (SIM_WORKERS !== undefined && SIM_WORKERS !== "0") check("kernel worker threads ran", threads > 1, line);
+    await press(app, "Close sheet", false);
+    await sleep(500);
+  }
 
   const report = await app.dumpReport();
   const consoleErrors = report.events.console.filter((entry) => entry.type === "error");

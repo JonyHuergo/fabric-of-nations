@@ -26,6 +26,10 @@
     "./node": {
       "types": "./dist/nodeWorkerEntry.d.ts",
       "import": "./dist/nodeWorkerEntry.js"
+    },
+    "./node-kernels": {
+      "types": "./dist/nodeKernelPool.d.ts",
+      "import": "./dist/nodeKernelPool.js"
     }
   },
   "files": [

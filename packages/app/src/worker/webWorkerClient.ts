@@ -6,6 +6,7 @@ import {
 } from "@century/sim-worker";
 
 import { SIM_WORKER_SCRIPT } from "../generated/simWorker";
+import { simKernelWorkersSetting, simKernelWorkersStatement } from "./simThreads";
 
 export type EventListener = (event: WorkerEvent) => void;
 export type ErrorListener = (message: string) => void;
@@ -26,7 +27,10 @@ export class WebWorkerClient implements WorkerClient {
   private closed = false;
 
   public constructor() {
-    const blob = new Blob([SIM_WORKER_SCRIPT], { type: "text/javascript" });
+    // D-162: the kernel worker setting goes in front of the script.
+    const search = (globalThis as { readonly location?: { readonly search?: string } }).location?.search;
+    const setting = simKernelWorkersStatement(simKernelWorkersSetting(search));
+    const blob = new Blob([setting, SIM_WORKER_SCRIPT], { type: "text/javascript" });
     this.url = URL.createObjectURL(blob);
     this.worker = new Worker(this.url);
     this.worker.onmessage = (event: MessageEvent<unknown>) => {

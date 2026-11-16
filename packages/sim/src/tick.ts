@@ -36,9 +36,11 @@ import { workingAgePopulation, worldPopulation } from "./population/state.js";
 import { updateDailyMilitancy, updateMonthlyWealth } from "./population/wealth.js";
 import {
   cloneWorldForTick,
+  economicDaySteps,
   runEconomicDay,
   type EconomyDayResult,
 } from "./economy/day.js";
+import { runStepsInline, type DaySteps } from "./parallel.js";
 import { assertDailyWorldInvariants } from "./integrity.js";
 import type {
   PopulationDefinitions,
@@ -238,6 +240,14 @@ function isEconomicWorld(world: World): boolean {
  * `runTicksWithRollback` must use the default staged mode.
  */
 export function tickPhaseMode(world: World, context: TickContext): TickResult {
+  return runStepsInline(tickPhaseModeSteps(world, context));
+}
+
+/**
+ * D-162: `tickPhaseMode` as steps that pause where the day may run on worker threads
+ * (`economicDaySteps`); `tickPhaseMode` runs every step inline.
+ */
+export function* tickPhaseModeSteps(world: World, context: TickContext): DaySteps<TickResult> {
   const observe = context.phaseObserver;
   observe?.("invariants-start");
   assertDailyWorldInvariants(world);
@@ -258,7 +268,7 @@ export function tickPhaseMode(world: World, context: TickContext): TickResult {
     throw new RangeError("a population context is required for an economic world");
   }
   const processedDay = world.dayIndex;
-  const day = runEconomicDay(
+  const day = yield* economicDaySteps(
     world,
     population.definitions,
     economy.definitions,

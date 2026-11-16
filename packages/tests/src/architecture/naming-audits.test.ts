@@ -236,7 +236,8 @@ describe("M14 current documentation and protocol", () => {
     // 23: households section, province dwellings and crowding columns (P6, D-153).
     // 24: labour-market section, profession groups, province unemployment column, focused
     //     province labour rows and the monthly mobility report (P7, D-156).
-    expect(PROTOCOL_VERSION).toBe(24);
+    // 25: simulationThreads, the threads of the last day's split phases (D-162).
+    expect(PROTOCOL_VERSION).toBe(25);
   });
 
   test("the monetary terminology audit passes", () => {

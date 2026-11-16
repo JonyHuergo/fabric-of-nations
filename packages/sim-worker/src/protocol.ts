@@ -20,7 +20,11 @@
  * profession groups, the province unemployment column, the focused province's labour rows
  * and the world's last monthly mobility report.
  */
-export const PROTOCOL_VERSION = 24 as const;
+/**
+ * 25 (D-162): `simulationThreads`, the threads that computed the last day's split phases
+ * (presentation-only; 1 when no kernel worker ran).
+ */
+export const PROTOCOL_VERSION = 25 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -1866,6 +1870,11 @@ export interface SimulationSnapshot {
   readonly achievedDaysPerSecond: number;
   /** True because the selected speed is a target, not a guaranteed rate. */
   readonly speedIsBestEffort: boolean;
+  /**
+   * Protocol 25 (D-162): threads that computed the last day's split phases (1: the sim thread
+   * alone; more when kernel workers ran). Presentation-only diagnostics.
+   */
+  readonly simulationThreads: number;
   readonly campaignComplete: boolean;
   readonly scenarioId: string;
   readonly dataVersion: string;
@@ -3584,6 +3593,7 @@ function isSnapshot(value: unknown): value is SimulationSnapshot {
     return false;
   }
   if (typeof value.speedIsBestEffort !== "boolean") return false;
+  if (!isIntegerIn(value.simulationThreads, 1, 64)) return false;
   if (typeof value.campaignComplete !== "boolean") return false;
   if (!isString(value.scenarioId, 128)) return false;
   if (!isString(value.dataVersion, 128)) return false;

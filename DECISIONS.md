@@ -10973,3 +10973,346 @@ fails.
   a pool); slot names make the buffers' lifetimes explicit, which a worker's job inputs can reuse.
 - **Day 53 still fails** as before (account 1303, −1.7e-15 RUSD); not fixed (designer's call).
 - **Index heading:** headed like D-154 to D-160 so the index check passes.
+
+## D-162 (performance) — Worker threads for the simulated day: block-range kernels, a fixed-order merge, a pool on web, phone and Node
+
+**Status:** designer's task of 2026-11-15, branch `perf/day-5x`, after D-161 (step 2 of 2; route A of
+D-158). Exact: the world is bit-identical at every worker count (see "Equivalence"). No save change:
+`WORLD_SCHEMA_VERSION` stays 35 and `SIM_VERSION` 0.31.0. Worker protocol 24 → 25 (one presentation
+field, below). **Shipped with 0 workers:** on the reference desktop the threads do not make the day
+faster (see "Measurements"); the designer's device test decides whether to switch them on.
+**Amends:** D-158 ("Threads": route A is built for the two phases below), D-161 (open item "for D-162").
+
+### Design (written before the implementation)
+
+**Which phases split.** The ordinary 1900-world day after D-161 (perfPhases 2–12, 900 ms) spends,
+measured as inclusive CPU time over days 2–5:
+
+| Phase | ms/day | Splits? |
+|---|---:|---|
+| market clearing (`runMarketDay` × 63 markets, production inside) | 140 | not in this entry |
+| household demand, per-block plan loop (`buildLesHouseholdDemand`) | 100 | **yes, by block range** |
+| demography, per-block births and deaths (`applyDailyDemography`) | 75 | **yes, by block range** |
+| month-start labour search (`runLabourMonthPhase`, day 31 only) | ≈2,400 on its day | not in this entry |
+
+- **Demography** is independent per block: a block's births, deaths and remainders read only that
+  block's cells and columns and its country's factors; the world totals are integer sums.
+- **Household demand** is independent per block once the day's prices, cash and kept food are
+  read: each block's rows and plan depend on that block, its market's prices and its owner's taste
+  and technology gate. The only cross-block quantities are the per-country summaries
+  (floating-point sums, order-dependent), which the merge forms on the sim thread in block order.
+- **Market clearing is not split here.** Each market reads buildings, their employment, the
+  production lookups (capacity, recipes, reservations) and its lots; shipping them needs those as
+  typed columns first (the prerequisite of D-158/D-160), a change larger than the two phases above
+  together. It is the next step (see "Consequences").
+- **The month-start labour search is not split.** Mobility and migration visit sources in draw
+  order and each move changes what later sources see (destination room, inflow caps, cached
+  incomes, destination persons), so a parallel search would have to speculate and repair; it runs
+  once a month. Left on the sim thread.
+- **Prerequisite.** The two phases read only the population table (columnar since D-159), the
+  account table (columnar since D-158) and per-market prices, so no new typed columns of buildings,
+  employment or labour assignments are needed for them; none are built.
+
+**Partitioning.** By block range: demography by table position (`world.popBlocks` order), household
+demand by the id-ordered block list it already walks. A request names its unit count; the pool cuts
+it into `lanes` contiguous ranges, range `k` = [⌊k·n/lanes⌋, ⌊(k+1)·n/lanes⌋), with
+`lanes = min(workers + 1, ⌊n / minUnitsPerLane⌋)` (the sim thread computes the last range itself
+while the workers compute theirs; with fewer than two lanes the phase runs inline).
+
+**What workers receive and return.** A job is `{ kernel, params, arrays }`: small structured-clone
+parameters and typed arrays whose buffers are transferred, never copied twice.
+
+- *Demography:* the block columns of the range (the 24 scalar columns and the male, female and
+  literacy-by-age cells, as a population table of the range) and three factor columns (health,
+  sanitation, contraception), plus the day's constants (days in year, band mortality rates, maternal
+  fertility rates, the profession multipliers, the sex ratio at birth). The worker builds block
+  views on its table and runs the same per-block code; it returns the male and female cells, the
+  literacy column, the three remainders and per-block births, male births, female births and deaths.
+- *Household demand:* per-block inputs as columns (id, market, persons, adult equivalents, smoothed
+  income, cash, propensity to consume, stratum, urban share, dwellings and desired dwellings, the
+  indices of its availability row, taste row and kept-food row), the day's price table (smoothed and
+  spot, per market), the availability, taste and kept-food tables, the resolved demand system and
+  days in year. It returns the range's rows (block, market, tier, need tier, good, desired, funded)
+  and per block its row count and plan figures (income, consumption, committed cost, spending by
+  category, dwellings desired).
+
+**Merge rule (fixed order, independent of worker count and finish order).** Results are collected
+by range index, never by arrival (`Promise.all` over the lanes). The merge walks ranges in
+ascending order and, within each, units in order — the single-thread order — and does all the
+cross-unit work there: copying the changed columns back, assembling the per-block results and
+totals (demography), appending rows and setting each block's row range, and adding each block's
+plan figures to its country's summary in block order (household demand). A kernel computes per-unit
+values only; no floating-point sum crosses a range. The world is therefore bit-identical at any
+worker count, including 0.
+
+**The single-thread path is the reference.** With no pool, 0 workers, a world too small to split, or
+any failure, the phase runs inline on the sim thread over the whole range: the same kernel function
+on the world's own columns, no copies. A worker that fails (error event, unreadable message, wrong
+kernel version) disables the pool for the rest of the run; a job whose kernel throws makes the whole
+phase re-run inline, so a failing day fails with the single-thread error and rolls back as before.
+Nothing is applied to the world until every lane has returned.
+
+**Suspending the day.** There is no shared memory on the phone (D-158), so the sim thread cannot
+block on a worker. The economic day becomes a generator that yields a request at each split phase
+and resumes with the lanes' results (`economicDaySteps`); `runEconomicDay`, `tickPhaseMode` and
+`runTicksWithRollback` drive it synchronously with every request inline (unchanged callers), and
+`runTicksWithRollbackParallel` drives it with a pool (`await` between requests). A rollback replay
+runs inline. The worker host keeps its synchronous path with no pool; with one, a day in flight
+holds the commands that arrive (applied in order once the day ends, so commands still apply only
+between days) and the pump does not start another day.
+
+**Spawning and feature detection.** The kernels are pure ES2022 functions in `packages/sim`. One
+kernel-worker script (`kernelWorkerEntry`, bundled once by `build-worker.mjs` and embedded in the sim
+worker bundle) runs everywhere:
+
+- *web:* the sim Web Worker starts nested workers from a blob URL of that script;
+- *iOS/Android:* the hidden WebView page that runs the sim starts the same blob-URL workers;
+- *desktop Node (bench, tests):* `worker_threads` with the same script (`eval`), through a small port
+  adapter; the pool, messages and merge are the same code.
+
+Detection: `Worker`, `Blob` and `URL.createObjectURL` must exist and every worker must answer a
+hello with the kernel version; until then and on any failure the day runs single-threaded.
+Worker count is a runtime choice: the host option `workers` (0 = single thread); on web and phone the
+default is `clamp(hardwareConcurrency − 2, 0, 3)` (provisional; the designer tunes it on devices),
+and the web build accepts `?simWorkers=N` for testing. Snapshot field `simulationThreads` (protocol
+25) reports the threads the last day used (1 = sim thread only); the campaign panel's speed line
+shows it, so a phone shows whether workers started.
+
+**Buffers.** Each lane has a pool of typed buffers by slot name (grows, never shrinks). A job's input
+and output buffers come from it, are transferred to the worker and transferred back with the result,
+and return to the pool; nothing is allocated per day once the pool has grown. Pools are owned by the
+pool object the host holds; nothing is module state, authoritative or serialised.
+
+### Implementation
+
+- **Contract (`packages/sim/src/parallel.ts`, ES2022 only).** `ParallelRequest` (kernel, unit count,
+  `splittable`, `job(from, to, allocator)`), `ParallelResponse` (ranges and outputs in range order),
+  `DaySteps<T>` (a generator yielding requests), `runStepsInline` (every request inline: the
+  single-thread path) and `runStepsParallel(steps, executor)` (a declined or failed request runs
+  inline), `partitionUnits`, and realm-independent array checks (`isKernelArrayOf`: arrays from
+  another thread are of another realm's constructor, so `instanceof` would reject them).
+- **Kernels.** `runDemographyRange` and `runLesRange` are the former per-block loops, unchanged in
+  arithmetic and order, over a range of units; the inline path runs them over all units on the
+  world's own data. `runDemographyKernel` and `runHouseholdDemandKernel` run them on a job (a
+  population table of the range with its own block views; household-demand unit columns and the
+  day's price, availability, taste and kept-food tables); `runKernel` dispatches by name
+  (`parallelKernels.ts`). Merges: `mergeDemography` (changed cells, literacy and remainders back
+  into the world's table, then the day's result assembled in position order) and the household
+  merge (rows appended by range, each row's block and market from the unit row ends, the row
+  ranges by block id, the country summaries added unit by unit in id order).
+- **Steps.** `economicDaySteps` (with `runEconomicDay` its inline driver), `tickPhaseModeSteps`
+  (`tickPhaseMode`), `dailyDemographySteps` (`applyDailyDemography`), `lesHouseholdDemandSteps`
+  (`buildLesHouseholdDemand`); `runTicksWithRollbackParallel` beside `runTicksWithRollback` (the
+  rollback replay of a failed day runs inline). Every existing synchronous entry point keeps its
+  signature and behaviour.
+- **Pool (`packages/sim-worker/src/kernelPool.ts`).** `createKernelPool({ workers, spawn,
+  minUnitsPerLane = 1024, mainLane = true, timeoutMs = 60 s })` over abstract `KernelPort`s:
+  handshake (hello / ready with `KERNEL_PROTOCOL_VERSION`), one job per worker per request, the
+  sim thread computing the last lane, outputs collected by lane index, and `undefined` (run inline)
+  when not ready, too few units, a kernel error in any lane, or a failed worker (which disables the
+  pool for the run). Adapters: `browserKernelPool.ts` (blob-URL `Worker`, feature detection),
+  `nodeKernelPool.ts` (`worker_threads`, `eval` of the same script with a two-line message shim).
+  `kernelWorkerEntry.ts` is the worker; `build-worker.mjs` bundles it into
+  `packages/sim-worker/src/generated/kernelWorkerScript.ts` (36.6 KiB) and embeds it in the sim worker
+  bundle; `check:worker` verifies both files.
+- **Host.** `SimulationHostOptions.parallel`: with a pool, `advance` runs days through
+  `runTicksWithRollbackParallel`, commands arriving meanwhile are queued and drained in order after
+  the day, the pump skips while a day is in flight, and SHUTDOWN closes the pool. Without one, the
+  host is the synchronous host of before. Snapshot `simulationThreads` (protocol 25).
+- **App.** `packages/app/src/worker/simThreads.ts`: `SIM_KERNEL_WORKERS` (shipped 0), the web
+  override `?simWorkers=N|auto`, and the statement that hands the setting to the worker script
+  (prepended to the web worker blob; put before the script in the WebView page). The campaign
+  panel's speed line adds "· N threads" when the last day used more than one.
+
+### What the measurements changed (after the design above)
+
+1. **Nothing is transferred.** The first build transferred job and result buffers. Every phase of
+   the sim thread then ran slower, including those that never touch a worker (market clearing
+   +25 ms, settlement +30 ms): moving a buffer away detaches it, and the first detached
+   `ArrayBuffer` of a V8 thread turns off the fast typed-array access path for the rest of that
+   thread's life (the detaching protector). Measured alone: detaching one 8-byte buffer before
+   days 2–11 of the single-thread runner made the mean day 928 → 976 ms and 904 → 989 ms (two
+   interleaved pairs). Jobs and results are therefore copied by structured clone, and no thread of
+   the pool ever detaches a buffer. "Reuse the buffers passed between threads" holds on the
+   sending side: the sim thread keeps one buffer set per lane (exact-size slots for worker lanes,
+   so a clone copies no slack; growing slots for its own lane, which also take its kernel's
+   outputs) and reuses it every day. A copied result always arrives in new buffers (there is no
+   shared memory on the phone, D-158), so results are kept small: demography returns only the
+   changed cells (about 87,000 of 3.4 million a day, 1.5 MB) instead of 13 MB of cells, and the
+   household rows come back without their block and market columns (rebuilt from the unit row
+   ends), 8.2 MB a day.
+2. **The sim thread takes a lane** (as designed), now allocating nothing for it.
+3. **Shipped off.** On the reference desktop the threads do not make the day faster (see
+   "Measurements"), so `SIM_KERNEL_WORKERS` ships as 0 and the worker entry's default without a
+   setting is 0; the pool, the messages and the merge are in the build on every platform and are
+   switched on by the setting.
+
+### Equivalence
+
+- The single-thread path after the refactor reproduces the D-158 pins bit for bit (pinhashes with a
+  per-day and a shared scratch; pinsummary): days 0/1/31/52/53 `685bf3c4ccf4f842`,
+  `4d77f5a066875b02`, `c9d106dbe6dbed6d`, `5b100c8146d94453`, `2fa36b1df11debff`, and the day-53
+  message unchanged.
+- With workers, the same hashes and day-53 message at 1, 2 and 4 Node workers (the new
+  `parallel-pins.test.ts`, the pin test's procedure on worker threads, default detail), and per-day
+  hashes equal to the single-thread runner over days 1–4 at 2 workers (summary detail, scratch
+  `parhashes.mjs`).
+- Why exact: a kernel writes per-unit values only; every quantity that crosses units (integer
+  totals, the per-country floating-point sums, row offsets, the day's result arrays) is formed in
+  the merge in unit order, which is the single-thread order; the cut, the worker count and the
+  finish order decide only where a unit is computed.
+
+### Measurements (desktop; not a device measurement)
+
+Environment as D-161: AMD Ryzen 5 2600 (6 cores, 12 threads), 7.9 GB RAM, Windows 11 Pro 10.0.26200,
+Node v24.22.1, `--max-old-space-size=4096`, quiet machine. Medians of 3 interleaved runs. The
+`4bec918`, D-160 and D-161 columns are D-161's quiet-machine figures; "D-162" is this build as it
+ships (0 workers); the worker columns are this build with N Node `worker_threads` workers (the
+sim thread computes one more lane, so N workers are N + 1 threads).
+
+**The shipped path (0 workers): unchanged.** The generator day, the per-block preparation and the
+range kernels cost nothing measurable.
+
+| Measure | 4bec918 | D-160 | D-161 | D-162 |
+|---|---:|---:|---:|---:|
+| ordinary day, days 2–11 (perfPhases `2 12`) | 2,405.6 | 1,142.8 | 889.9 | 895.6 |
+| month mean, days 0–31 (perfPhases `0 32`) | 3,027.2 | 1,322.8 | 1,042.3 | 1,050.7 |
+| day 31, the first monthly labour phase | 18,654 | 4,280 | 4,174 | 4,129 |
+| perfBench host STEP day mean | 3,268 | 1,669 | 1,335 | 1,333 |
+| perfBench tick mean | 2,744 | 1,364 | 1,041 | 1,035 |
+| host throughput, days/s (`throughput.mjs 30`) | 0.345 | 0.775 | 0.962 | 0.955 |
+| web 1 January → February 1900, s | 82 | 35 | 32 | 30 |
+
+Runs (D-162): ordinary day 902.3 / 876.5 / 895.6; month 1,060.4 / 1,050.7 / 1,044.3; throughput
+0.952 / 0.956 / 0.955; web 30 / 30 / 30 s. perfBench (D-161 → D-162): snapshot build 285 → 289,
+ordinary host days 1,222 → 1,225, day 31 4,645 → 4,651, day 30 2,276 → 2,158, staged tick 2,724 →
+2,746, new game 1,793 → 1,841, SAVE 3,003 → 2,962, LOAD 2,397 → 2,452 ms; heap p50 294 → 305 MiB,
+max 606 → 477 MiB. Snapshot repeats (`snapshot.mjs 33 7`): day 0 269 → 270, day 33 281 → 289 ms. GC
+(`gctrace.mjs`, days 2–11): pause 53.9 → 60.2 ms a day (runs 60.2 / 63.1 / 54.3), mark-compacts 0.5 →
+0.5 a day. `pnpm bench` (`dist/bench.js` ×3, p95 of each invocation's first run; D-161 → D-162; all
+PASS): M1 0.0101 → 0.0100, M2 aggregate 0.068 → 0.069, stress 200 blocks 2.72 → 2.63, 1,000 12.9 →
+11.4, 3,000 36.4 → 35.9, 6,000 78.3 → 80.5 (these paths do not reach the change; noise). perfBench's
+hashes at days 1/31/32/52 are `4d77f5a066875b02`, `c9d106dbe6dbed6d`, `0828e7ffda61a1b5`,
+`5b100c8146d94453` in every run, with the same day-53 message (account 1303, −1.7014044923219608e-15);
+"two independent runs identical", "staged mode equals phase mode" and the save round trip PASS.
+
+**With workers: no gain on this desktop.**
+
+| perfPhases, ms per day | 0 | 1 worker | 2 workers | 4 workers |
+|---|---:|---:|---:|---:|
+| ordinary day, days 2–11 (workers start cold at day 2) | 895.6 | 982.5 | 972.0 | 994.9 |
+| — household demand | 143.6 | 142.8 | 133.7 | 128.4 |
+| — demography | 91.5 | 118.4 | 115.1 | 121.3 |
+| — market clearing | 199.6 | 224.2 | 222.7 | 225.8 |
+| — settlement | 119.0 | 142.5 | 142.1 | 144.2 |
+| worst day of the window (day 2, the workers' first) | 1,058 | 1,393 | 1,398 | 1,458 |
+| month mean, days 0–31 | 1,050.7 | 1,083.7 | 1,060.8 | 1,060.7 |
+| day 31 | 4,129 | 4,073 | 3,977 | 4,195 |
+| warm workers: days 12–21 after 10 days on the pool (`parprobe.mjs`) | 854.7 | — | 862.4 | 846.1 |
+| — household demand (warm) | 134.0 | — | 110.5 | 99.0 |
+| — demography (warm) | 87.7 | — | 90.0 | 82.7 |
+
+- **Household demand** gains 24–35 ms once the workers are warm (its jobs are small: about 100
+  bytes of inputs per block for a plan of every good).
+- **Demography** does not gain: a block's job is about 1.5 KB of cells and columns for about 3.5 µs
+  of work, so copying the jobs out and the changed cells back costs about as much as the work.
+- **The sim thread pays elsewhere.** Market clearing and settlement, which never touch a worker,
+  run 10–25 ms slower while the pool works (more so in the workers' first days): results arrive in
+  new buffers (about 10 MB a day), which the collector has to deal with; the sim thread waits
+  idle for the slowest lane and comes back on a cooler core (measured alone: two 30-ms idle waits
+  a day cost about 10 ms of later work); the workers warm up over their first few days (their
+  kernels took 70–140 ms on their first day, 15–30 ms by day 10).
+- **Host throughput with the same work** (`throughput.mjs 30` with a fixed simulated clock: one day
+  per pump and 13 snapshots in every run; days 0–29 from a new game): 0 workers 0.995, 1 worker
+  0.957, 2 workers 0.969, 4 workers 0.971 days/s. (Run with the wall clock, the worker host stops
+  at day 30 while the synchronous one runs on to day 32, through the month end and the monthly
+  labour phase; those figures, 1.03–1.07 days/s, are not comparable and are not used.)
+- **Web app (Chrome, the web export, 844 × 390, `PLAYTEST_SIM_WORKERS=3`, 3 nested workers):** 30 /
+  30 / 30 s to February with workers, 30 / 30 / 30 s without (interleaved); the campaign panel
+  showed "30 days/s · best effort · 4 threads" with workers and no thread count without; 30/30
+  checks with workers (the 29 and "kernel worker threads ran"), 29/29 without, 0 errors, the same
+  in-game figures (7.58 M changed profession, 2.64 M moved province, 13 blocks created).
+- **The A11c 5× aim is not reached** by this route on this desktop: the phases that split are
+  about a quarter of the day and the copies eat their gain. Market clearing and settlement (about
+  35 % of the day) do not split.
+
+### Platforms checked and not checked
+
+- **Checked (desktop only):** Node 24 `worker_threads` running the bundled kernel script (tests,
+  benchmarks); Chrome (headless, Windows) running the web export with nested blob-URL workers from
+  the sim Web Worker (playtest with `?simWorkers=N`, see "Measurements").
+- **Not checked:** iOS (WKWebView) and Android (Android WebView) blob-URL workers started by the
+  hidden WebView page; Safari and Firefox nested workers. Not claimed. The feature detection and
+  handshake fall back to a single thread when workers cannot start there, but whether they start,
+  and how fast they are, is the designer's device test.
+
+### What to test on phones (designer)
+
+1. Build with `SIM_KERNEL_WORKERS = "auto"` (or 1–3) in `packages/app/src/worker/simThreads.ts`.
+2. Start a campaign, run at 30×, open the campaign panel: the speed line shows "· N threads" once a
+   day used workers (no "threads" means they did not start: single thread, as shipped).
+3. Compare the achieved days per second (same line) and the time to 1 February 1900 with the
+   setting at 0 and at "auto"; watch memory (each worker holds its job while it runs: 8–15 MB of
+   copies per lane during demography, depending on the lane count) and heat.
+4. The world must not differ: a save made at the same day with threads on and off loads to the
+   same state (the tests prove it on desktop; the phone's engine is the same for the sim thread and
+   its workers).
+
+### Tests
+
+- **New:** `determinism/parallel-day.test.ts` (9 tests): lane cutting; the in-process executor at
+  1–4 lanes (M3a world, 4 blocks) and 1, 2, 3, 4 and 7 lanes (M5 sample, 80 blocks) from poisoned
+  buffers, both phases split every day, six days equal to the single-thread runner; the pool over
+  in-process ports at 1, 2 and 4 workers with lanes finishing in reverse order; a worker of another
+  kernel version (pool unavailable, every day single-threaded); a worker that crashes mid-run (pool
+  disabled, phase re-run on the sim thread); a kernel error in a worker (phase re-run, pool kept);
+  a failing day failing with the single-thread error; and Node `worker_threads` running the bundled
+  kernel script at 0, 1, 2 and 4 workers. `determinism/parallel-pins.test.ts` (3 tests, one 1900
+  world each): the D-158 pins and the day-53 message at 1, 2 and 4 workers (13–14 min each).
+  `worker/host-parallel.test.ts`: a STEP on the pool, a command arriving mid-day answered after it
+  in order, the same snapshot as the synchronous host, the thread count, SHUTDOWN closing the pool.
+  `fixtures/kernelPorts.ts`: the in-process port.
+- **Updated:** protocol 25 in `architecture/naming-audits.test.ts` and `worker/labour-snapshot.test.ts`
+  and the hand-made snapshot of `worker/supervisor.test.ts`; the monetary audit's protocol pin.
+- **Suites closest to the change**, run alone (births and deaths, death allocation, expected deaths,
+  fertility ceiling, ageing, demand system, economic day, day scratch, integration, multi-market,
+  household labour, every worker suite, rollback, tick driver, performance invariants, parallel
+  day): 25 of 25 suites, 184 of 184 tests (19.5 min).
+- **Static checks:** `pnpm typecheck`, `pnpm lint`, `pnpm audit:branding`, `pnpm audit:monetary`,
+  `check:sim-deps` (103 source modules, no cycles) and `check:worker` (bundle and kernel script
+  regenerated, both current) pass; `pnpm app:export` (web, iOS, Android) passes; `pnpm bench` PASS.
+- **`pnpm map:atlas:check`** still fails on `main` for its own reason; not run or changed here.
+
+### Full test run
+
+`pnpm test`: 116 suites, 1,487 tests, 136 min 37 s; 108 suites and 1,476 tests pass, including the
+new `parallel-pins` (2,409 s), `parallel-day` and `host-parallel` suites. The 11 failures are the
+known failures of `main`, each with the received value D-160 lists: replay `6aef674f9648abdd`, WPP 1950
+`9aaedfa0cfabe4f6`, tick-validation 22 ticks `9dfd323500a31f87`, economy-roundtrip M3a
+`c7f29aa27a231428`, naming-audits 1900 hash `685bf3c4ccf4f842`, the four P2b money-calibration tests
+(`historical/p7/employment_1900.json`, 0, 0, 0.06354578421472346), demography-causes urban rows 5,687
+of 20,739 and world-1900 cotton 1.3558462628762207. No other test fails.
+
+### Consequences and open items
+
+- **Shipped off.** `SIM_KERNEL_WORKERS = 0`: the game runs as before on every platform. The pool,
+  the messages and the merge are in the build on web, iOS and Android and are switched on by that
+  setting (web: also `?simWorkers=N`). Whether to ship them on is the designer's call after the
+  device test above; on this desktop they do not pay.
+- **Never transfer from the sim thread.** One detached `ArrayBuffer` slows every later typed-array
+  access of that thread for the rest of the run (here 5–9 % of the whole day). This applies to any
+  future code of the sim thread, worker or not (`postMessage` transfer lists, `ArrayBuffer`
+  `transfer()`, `structuredClone` with `transfer`).
+- **Market clearing, the largest phase, is the next candidate,** with the prerequisite of D-158:
+  buildings, employment and lots as typed per-market inputs. With copies per day its jobs would be
+  large as well; a worker that keeps its markets' state between days (updated by the merge) would
+  avoid that, at the cost of a second copy of that state per worker. A design question for the
+  designer, not started.
+- **Demography could leave the split** (it does not gain) or ship less: its literacy-by-age cells
+  (a third of its job) are read only for the reproductive female literacy and the adult literacy,
+  which the sim thread could compute and send as two numbers per block. Not done.
+- **Worker warm-up** (their first days are slow) could be hidden by a small job at start. Not done.
+- **Web figure:** 30 s against D-161's 32 s is run-to-run variation between batches; the 0-worker
+  path is unchanged (the other figures above).
+- **Day 53 still fails** as before (account 1303, −1.7e-15 RUSD); not fixed (designer's call).
+- **Index heading:** headed like D-154 to D-161 so the index check passes.

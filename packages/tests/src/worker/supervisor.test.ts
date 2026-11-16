@@ -64,6 +64,7 @@ function validSnapshot(sequence = 1): SimulationSnapshot {
     speedDaysPerSecond: 1,
     achievedDaysPerSecond: 0,
     speedIsBestEffort: true,
+    simulationThreads: 1,
     campaignComplete: false,
     scenarioId: "test",
     dataVersion: "test",

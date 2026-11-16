@@ -51,11 +51,12 @@ describe("P7 protocol 24 labour-market snapshot (D-156)", () => {
     world = createEconomyWorld(scenario);
   });
 
-  test("the snapshot is protocol 24, passes the event validator and leaves the world unchanged", () => {
+  test("the snapshot is protocol 25, passes the event validator and leaves the world unchanged", () => {
     const before = hashWorld(world);
     const snapshot = snapshotOf(world, scenario, countryProvinceIds(world, M5_COUNTRY_A)[0] ?? null);
-    expect(PROTOCOL_VERSION).toBe(24);
-    expect(snapshot.protocolVersion).toBe(24);
+    // Protocol 24 brought these fields (D-156); 25 (D-162) added simulationThreads.
+    expect(PROTOCOL_VERSION).toBe(25);
+    expect(snapshot.protocolVersion).toBe(25);
     expect(() => parseWorkerEvent(JSON.parse(JSON.stringify({ protocolVersion: PROTOCOL_VERSION, type: "SNAPSHOT", commandId: null, snapshot })))).not.toThrow();
     expect(hashWorld(world)).toBe(before);
   });
