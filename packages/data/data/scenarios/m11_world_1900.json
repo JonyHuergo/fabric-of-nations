@@ -1,7 +1,7 @@
 {
   "meta": {
     "scenarioId": "m11-world-1900",
-    "dataVersion": "m3-economy-v15",
+    "dataVersion": "m3-economy-v16",
     "status": "provisional",
     "description": "Authored 1900 world for M11/M11b country selection: 67 polities (66 selectable), 66 dependent territories, and 20 documented markets. Population totals are rounded historical estimates; occupation composition, market grouping, building levels, fiscal and technology starts are provisional authored inputs; map geometry is Natural Earth 1:50m aggregated with an explicit 1900 crosswalk. Polities without reliable 1900 polygon data use marker-only map approximations. Not a full historical reconstruction.",
     "startDayIndex": 0,
@@ -134,6 +134,14 @@
         "accessDate": "2026-11-09",
         "license": "Project data",
         "notes": "Sixteen professions, occupation shares (census or proxy), the job, owner and institution remaps and the measured opening incomes; trace in calibration_1900.json p7 (D-154)."
+      },
+      {
+        "id": "p7-close-fibre",
+        "title": "Flax, hemp and jute around 1900: fibre output and mill spinning by country (P7 close, D-166)",
+        "url": "internal:packages/data/data/historical/p5b/sources_1900.json",
+        "accessDate": "2026-11-16",
+        "license": "Project data from public-domain sources",
+        "notes": "bastFibre1900 rows: Webb, New Dictionary of Statistics (1911) pp. 272, 296, 357-358; Mulhall, Dictionary of Statistics (1899) p. 280; Statistical Abstract relating to British India (c. 1904) pp. 163, 190; Board of Trade foreign abstract no. 29 (1903) table 20; US Statistical Abstract 1901 table 157 and BLS Bulletin 39 (prices). Places the fibre farms and the bast-fibre mills."
       }
     ],
     "ageStructures": {

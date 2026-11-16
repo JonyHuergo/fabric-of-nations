@@ -8,7 +8,8 @@
  * Goods 0-7 keep the ids, keys and P2b prices of the existing catalogue (C-18); only
  * their names change. Goods 8-56 follow the plan's catalogue order; good 57, jewellery and
  * plate, was added by the designer's decision of 2026-11-08 (D-152), and good 58, raw silk, by
- * the designer's request of the same day (D-148 additions, item 12).
+ * the designer's request of the same day (D-148 additions, item 12). Good 60, bast fibre, is the
+ * P7 close's fibre good (D-166).
  */
 
 /** Goods: [id, key, name, unit, category, group, storable, tradeable]. */
@@ -79,6 +80,10 @@ export const GOODS = [
   // P6 (D-153, plan §4.3): one standard dwelling, built by residential builders and bought
   // by households with their saving; storable (a builder's unsold houses), never shipped.
   [59, "dwelling", "Dwelling", "dwelling", "industrial", "capital-equipment", true, false],
+  // P7 close (D-166; P7 plan §8, option Q16a, designer 2026-11-15): flax, hemp and jute fibre,
+  // retted and scutched (flax, hemp) or baled (jute), as the mills bought it; spun and woven
+  // into the existing textiles good by the bast-fibre mill.
+  [60, "bast-fibre", "Bast fibre (flax, hemp, jute)", "kg", "raw", "fibres-forest"],
 ];
 
 /**
@@ -205,6 +210,16 @@ export const BUILDINGS = [
   // service here). The P7 job remap converts part of each territory's personal-services
   // levels into it, sized to the medics without a post (scripts/p7).
   { key: "medical-practice", name: "Medical Practice", sector: "services", output: "personal-services", inputs: {}, jobs: { academics: 0.8, laborers: 0.2 } },
+  // P7 close (D-166; P7 plan §8.1, option Q16a; appended so earlier definition ids stay).
+  // The fibre farm grows flax, hemp or jute and retts, scutches or bales the fibre: a peasant
+  // and farm-labour crop in 1900 (Russia, Austria-Hungary, Italy, Bengal), with the cotton
+  // farm's labour mix; no crop band (flax and hemp are temperate, jute tropical). Placed by
+  // the bast mills' demand at the sourced 1900 output shares (BAST_FIBRE_1900 in the P5b
+  // sources). The bast-fibre mill spins and weaves it into the textiles good with the
+  // textile mill's mass balance (316.667 kg of fibre per 275.362 kg of cloth, 1.15 kg per kg)
+  // and labour; placed at the sourced 1900 bast spinning by country, not by demand.
+  { key: "fibre-farm", name: "Flax, Hemp and Jute Farm", sector: "agriculture", output: "bast-fibre", inputs: {}, jobs: { peasants: 1 }, landUse: "cropland" },
+  { key: "bast-fibre-mill", name: "Linen, Hemp and Jute Mill", sector: "textiles", output: "textiles", inputs: { "bast-fibre": 316.666667 / 275.362319 }, jobs: { laborers: 1 } },
 ];
 
 /**

@@ -243,6 +243,22 @@ function build() {
       ["price-coffee-rio-7", "price-tea-formosa", "kg-per-lb"], "0.8 coffee (cocoa priced as coffee) + 0.2 tea per kg (weights by 1900 world output, provisional)", "provisional"),
     tobacco: () => usd1900("tobacco", perLbToPerKg(priceRow("price-tobacco-leaf-export")), ["price-tobacco-leaf-export", "kg-per-lb"], "leaf tobacco export price per kg"),
     silk: () => usd1900("silk", perLbToPerKg(priceRow("price-raw-silk-import")), ["price-raw-silk-import", "kg-per-lb"], "raw silk import value (year to June 1900) per kg"),
+    // P7 close (D-166): flax and hemp at their US import values (year to June 1900, foreign
+    // market values, the table that prices raw silk), jute at New York; weighted by the sourced
+    // world fibre output (bastFibre1900.production). The import table's "ton" is read as the
+    // long ton of US foreign commerce, so the price is provisional.
+    "bast-fibre": () => {
+      const kgOf = (fibre) => src.bastFibre1900.production.filter((row) => row.fibre === fibre).reduce((acc, row) => acc + row.kgPerYear, 0);
+      const perKg = {
+        flax: priceRow("price-flax-import") / unit("kg-per-long-ton"),
+        hemp: priceRow("price-hemp-import") / unit("kg-per-long-ton"),
+        jute: perLbToPerKg(priceRow("price-jute-raw")),
+      };
+      const total = kgOf("flax") + kgOf("hemp") + kgOf("jute");
+      const value = Object.entries(perKg).reduce((acc, [fibre, price]) => acc + (price * kgOf(fibre)) / total, 0);
+      return usd1900("bast-fibre", value, ["price-flax-import", "price-hemp-import", "price-jute-raw", "kg-per-long-ton", "kg-per-lb"],
+        "flax and hemp import values per long ton / 1,016.05 kg and New York jute per lb / 0.45359 kg, weighted by the sourced 1900 world output of each fibre (bastFibre1900.production)", "provisional");
+    },
     rubber: () => usd1900("rubber", perLbToPerKg(priceRow("price-rubber-para")), ["price-rubber-para", "kg-per-lb"], "Para rubber, fine, New York, per kg"),
     timber: () => usd1900("timber",
       ((priceRow("price-lumber-spruce") + priceRow("price-lumber-yellow-pine") + priceRow("price-lumber-hemlock")) / 3) / unit("m3-per-thousand-board-feet"),
@@ -1244,6 +1260,18 @@ function beforeAfterReport(calibration) {
     lines.push(`| ${key} | ${num(entry.sourcedPerYearSimUnits)} | ${num(entry.modelledPerYear)} | ${entry.modelledOverSourced === null ? "—" : entry.modelledOverSourced.toFixed(2)} | ${entry.conversion} |`);
   }
   lines.push("");
+  if (placement.bastMills !== undefined) {
+    lines.push("## Bast-fibre mills: the sourced 1900 spinning (P7 close, D-166)");
+    lines.push("");
+    lines.push("Fibre the mills of each territory worked (`sources_1900.json` `bastFibre1900.spinning`, kg a year) and the cloth placed (kg a day; 1.15 kg of fibre per kg). A mill makes at most its market's textile demand; a cut is shown.");
+    lines.push("");
+    lines.push("| Territory | Market | Sourced fibre per year | Cloth per day | Placed per day | Cut per day |");
+    lines.push("|---|---|---:|---:|---:|---:|");
+    for (const [territory, entry] of Object.entries(placement.bastMills)) {
+      lines.push(`| ${territory} | ${entry.market ?? "—"} | ${num(entry.sourcedFibreKgPerYear)} | ${num(entry.sourcedClothPerDay ?? 0)} | ${num(entry.placedClothPerDay)} | ${entry.cutClothPerDay === undefined ? "—" : num(entry.cutClothPerDay)} |`);
+    }
+    lines.push("");
+  }
   lines.push("## A12 crops: coverage and placement (D-148 additions, item 9)");
   lines.push("");
   lines.push("Recorded 1900 output (production, or exports and receipts as a provisional proxy) against each crop's world estimate, kg per year (`sources_1900.json` `crops1900`). \"Before\" is the first transcription set (batch 1); \"after\" adds batch 2. The world estimates are those of batch 2 in both columns (tea has no world total: its figure is the recorded sum).");

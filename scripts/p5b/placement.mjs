@@ -105,6 +105,14 @@ const MIN_LEVELS = 1;
  * that rounds to one level (a placed level is at least 1 and otherwise rounded).
  */
 const SELF_SUPPLY_MIN_LEVELS = 0.5;
+/**
+ * P7 close (D-166; P7 plan §8.1, option Q16a): the bast-fibre mill is placed at the sourced 1900
+ * bast spinning of each territory (`sources.bastFibre1900.spinning`, kg of fibre a year), not
+ * by demand. Its cloth is part of the market's textiles, so the P2b textile mills of the market
+ * make the rest. A mill never makes more than its market's textile demand (the placement meets
+ * each market's demand; trade between markets comes later): a cut is reported.
+ */
+const BAST_MILL = "bast-fibre-mill";
 const ITERATIONS = 60;
 const CONVERGENCE = 1e-10;
 
@@ -364,7 +372,7 @@ export function placeCatalogue(ctx) {
    */
   const firstNewDefinitionId = Math.min(...definitions.filter((definition) => !oldDefByKey.has(definition.key)).map((definition) => definition.id));
   const producersOf = (goodId) =>
-    definitions.filter((definition) => definition.jobs.length > 0 && definition.outputs[0]?.goodId === goodId && NOT_PLACED_1900[definition.key] === undefined && definition.id >= firstNewDefinitionId);
+    definitions.filter((definition) => definition.jobs.length > 0 && definition.outputs[0]?.goodId === goodId && NOT_PLACED_1900[definition.key] === undefined && definition.id >= firstNewDefinitionId && definition.key !== BAST_MILL);
   const hydroDefinition = definitions.find((definition) => definition.usesHydroPotential === true);
   const definitionFor = (territory, goodId) => {
     const province = territoryProvinces.get(territory)?.[0];
@@ -473,6 +481,12 @@ export function placeCatalogue(ctx) {
     return totals;
   };
   const oldMarketDemand = marketTotals(oldHouseholds, oldIntermediate);
+
+  // P7 close (D-166): the 1900 bast spinning by territory, kg of fibre a year.
+  const bastSpinning = new Map();
+  for (const row of sources.bastFibre1900?.spinning ?? []) bastSpinning.set(row.territory, (bastSpinning.get(row.territory) ?? 0) + row.kgPerYear);
+  const bastDefinition = defByKey.get(BAST_MILL);
+  if (bastSpinning.size > 0 && bastDefinition === undefined) throw new Error("bast spinning is sourced but no bast-fibre mill is defined");
 
   // 3. Iterate placement to a fixed point.
   /** entries: key -> { province, definition, market, capacityTU, deposit, origin } */
@@ -650,17 +664,56 @@ export function placeCatalogue(ctx) {
       return out;
     };
 
+    // 3. P7 close (D-166): the bast-fibre mills at the sourced 1900 spinning (fibre ÷ the mill's
+    // fibre per kg of cloth ÷ 365 = cloth a day), at most the market's textile demand.
+    const bastClothByMarket = new Map();
+    const bastReport = {};
+    if (bastDefinition !== undefined) {
+      const textilesId = gid("textiles");
+      const fibrePerCloth = bastDefinition.inputs.find((input) => input.goodId === gid("bast-fibre")).quantityPerThroughputUnit / bastDefinition.outputs[0].quantityPerThroughputUnit;
+      for (const [territory, kgPerYear] of [...bastSpinning].sort((left, right) => left[0].localeCompare(right[0]))) {
+        const first = territoryProvinces.get(territory)?.[0];
+        if (first === undefined) {
+          bastReport[territory] = { sourcedFibreKgPerYear: kgPerYear, placedClothPerDay: 0, reason: "territory not in the 1900 world" };
+          continue;
+        }
+        const market = marketOfProvince.get(first.id);
+        const cloth = kgPerYear / fibrePerCloth / 365;
+        const wanted = marketDemand.get(market.key)?.get(textilesId) ?? 0;
+        const placed = Math.min(cloth, Math.max(0, wanted - (bastClothByMarket.get(market.key) ?? 0)));
+        bastReport[territory] = {
+          market: market.key,
+          sourcedFibreKgPerYear: kgPerYear,
+          sourcedClothPerDay: cloth,
+          placedClothPerDay: placed,
+          ...(placed < cloth ? { cutClothPerDay: cloth - placed, reason: "the market's textile demand is smaller than the sourced spinning" } : {}),
+        };
+        if (!(placed > 0)) continue;
+        placeInTerritory(territory, bastDefinition, placed);
+        bastClothByMarket.set(market.key, (bastClothByMarket.get(market.key) ?? 0) + placed);
+      }
+    }
+    report.bastMills = bastReport;
+
     // 3a. The P2b producers.
+    const replacedMills = [];
     for (const producer of oldProducers) {
       const market = marketOfProvince.get(producer.row.provinceId);
       const goodKey = goodById.get(producer.mainGood).key;
       let output = producer.outputs.get(producer.mainGood);
       if (SCALED_P2B_GOODS.has(goodKey)) {
         const before = oldMarketDemand.get(market.key)?.get(producer.mainGood) ?? 0;
-        const after = marketDemand.get(market.key)?.get(producer.mainGood) ?? 0;
+        // D-166: the textile mills make the market's textiles less the bast mills' cloth.
+        const bastCloth = goodKey === "textiles" ? (bastClothByMarket.get(market.key) ?? 0) : 0;
+        const after = Math.max(0, (marketDemand.get(market.key)?.get(producer.mainGood) ?? 0) - bastCloth);
         if (before > 0) output *= after / before;
       } else if (!FIXED_P2B_OUTPUT.has(goodKey)) {
         throw new Error(`P2b producer of ${goodKey} has no placement rule`);
+      }
+      // D-166: a textile mill whose market the bast mills supply in full is not needed there.
+      if (goodKey === "textiles" && !(output > 0)) {
+        replacedMills.push({ provinceId: producer.row.provinceId, market: market.key });
+        continue;
       }
       const tf = techFactor(countryOf.get(producer.row.provinceId), producer.definition.sector);
       const capacity = Math.max(output, 0) / (producer.definition.outputs[0].quantityPerThroughputUnit * tf);
@@ -668,12 +721,14 @@ export function placeCatalogue(ctx) {
         key: entryKey(producer.row.provinceId, producer.row.definitionKey), province: producer.province, definition: producer.definition, market, capacityTU: capacity, origin: "p2b", row: producer.row,
       });
     }
+    report.textileMillsReplaced = replacedMills;
     // Markets with demand for a scaled P2b good and no producer get the basic producer.
     for (const [goodKey, definitionKey] of Object.entries(BASIC_PRODUCER)) {
       const goodId = gid(goodKey);
       const definition = defByKey.get(definitionKey);
       for (const market of markets) {
-        const wanted = marketDemand.get(market.key)?.get(goodId) ?? 0;
+        // D-166: a market's bast-fibre mills make part of its textiles.
+        const wanted = (marketDemand.get(market.key)?.get(goodId) ?? 0) - (goodKey === "textiles" ? (bastClothByMarket.get(market.key) ?? 0) : 0);
         if (!(wanted > 0)) continue;
         if (oldProducers.some((producer) => producer.mainGood === goodId && marketOfProvince.get(producer.row.provinceId) === market)) continue;
         const ranked = [...demand].filter(([key]) => key.startsWith(`${market.key}|`)).map(([key, row]) => [key.slice(market.key.length + 1), row.get(goodId) ?? 0]).filter(([, quantity]) => quantity > 0).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));

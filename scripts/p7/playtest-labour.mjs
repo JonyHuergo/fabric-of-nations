@@ -13,7 +13,7 @@
  * and the minimum-wage preview labelled a short-run estimate; the Population screen's
  * profession groups with persons and the "Mobility this month" disclosure; the province
  * panel's labour rows and wage index; the Unemployment lens (44-pt chip, legend, map
- * drawn); the Markets screen's 60 goods; every visible button at least 44 pt; no console
+ * drawn); the Markets screen's 61 goods; every visible button at least 44 pt; no console
  * errors, exceptions or failed loads. Not a substitute for the designer's device test.
  */
 import { mkdirSync } from "node:fs";
@@ -318,14 +318,14 @@ try {
     check("the Unemployment lens colours the map (distinct fills on the canvas)", typeof colours === "number" ? colours >= 6 : true, String(colours));
   }
 
-  await app.step("Markets screen: 60 goods");
+  await app.step("Markets screen: 61 goods");
   await press(app, "Map lens", false);
   await sleep(300);
   await press(app, "Economy");
   await sleep(800);
   await press(app, "Markets");
   body = await waitForText(app, "goods traded", 30_000);
-  check("home market counts the goods traded of 60", /\d+ of 60 goods traded/u.test(body), body.match(/\d+ of 60 goods traded/u)?.[0] ?? null);
+  check("home market counts the goods traded of 61", /\d+ of 61 goods traded/u.test(body), body.match(/\d+ of 61 goods traded/u)?.[0] ?? null);
   await press(app, "Close sheet", false);
   await sleep(500);
 

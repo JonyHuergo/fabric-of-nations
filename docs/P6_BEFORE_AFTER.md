@@ -133,9 +133,9 @@ A block spends above its income only below subsistence, when it dissaves to buy 
 
 ## Coverage
 
-Covered value added 493.4 bn RUSD a year, 47.6 % of world GDP (P2b before: 46.5 %; P5b close: 40.7 %).
+Covered value added 495.9 bn RUSD a year, 47.8 % of world GDP (P2b before: 46.5 %; P5b close: 40.7 %).
 
-Territories above 100 % of GDP: 20 (mco-home, lie-home, cos-home, bra-home, dom-home, cub-home, mal, bwi, fji, bpo, fca, gea, gng, gsa, sur, dgc, phl, pri, asm, dwi).
+Territories above 100 % of GDP: 19 (mco-home, cos-home, bra-home, dom-home, cub-home, mal, bwi, fji, bpo, fca, gea, gng, gsa, sur, dgc, phl, pri, asm, dwi).
 
 ## Modelled ÷ sourced 1900 output
 
@@ -143,19 +143,20 @@ Territories above 100 % of GDP: 20 (mco-home, lie-home, cos-home, bra-home, dom-
 |---|---:|
 | coal | 0.83 |
 | crude-oil | 0.84 |
-| iron-ore | 0.28 |
-| steel | 0.45 |
-| copper-ore | 0.51 |
-| tin | 0.53 |
+| iron-ore | 0.29 |
+| steel | 0.46 |
+| copper-ore | 0.52 |
+| tin | 0.54 |
 | gold | 0.50 |
 | silver | 0.19 |
 | bauxite | 0.39 |
 | aluminium | 1.22 |
 | nitrates | 0.38 |
 | sugar | 0.73 |
-| cotton | 1.36 |
+| cotton | 0.89 |
 | jewellery | 0.90 |
-| silk | 1.36 |
+| silk | 0.89 |
+| bast-fibre | 0.83 |
 | coffee-tea-cocoa | 1.16 |
 | tobacco | 0.99 |
 | rubber | 0.95 |

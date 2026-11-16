@@ -120,7 +120,7 @@ try {
   await sleep(800);
   await press(app, "Markets");
   let body = await waitForText(app, "goods traded", 30_000);
-  check("home market counts the goods traded of 60", /\d+ of 60 goods traded/.test(body), body.match(/\d+ of 60 goods traded/)?.[0] ?? null);
+  check("home market counts the goods traded of 61", /\d+ of 61 goods traded/.test(body), body.match(/\d+ of 61 goods traded/)?.[0] ?? null);
   const searchHeight = await heightOf(app, 'input[aria-label="Search goods"]');
   check("goods search field is at least 44 pt", searchHeight !== null && searchHeight >= 44, String(searchHeight));
   const chipHeight = await buttonHeight(app, "Capital and transport equipment");

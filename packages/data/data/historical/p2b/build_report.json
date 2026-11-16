@@ -15,8 +15,8 @@
   "buildingDefinitions": "30b978c0628c2be08a06ff2f898e684f7faa1156753dd214ee1ef2bad5f06fde",
   "professions": "da52e8a5b74b1b0e08547f0359e609d00ffb0a53ea5c265d7db8b31c7510a71f",
   "needs": "e6ccbfe89d66b3884e785bcf63008c65d8ddb5c5e1f288a104a848a99e6b3751",
-  "technology": "05488d406004531808d143fe3b9d774dd14af952a3efa967edab355c5cefbc26",
-  "scenario": "b7c03324ad51e1d551a3d36d82ae9e9e1e97f74ec729d87da7828dbb5e763f31"
+  "technology": "adc92db5cbeeafd5642078fa8fc7ecca1cd512ab3cc799115c53271b6548046c",
+  "scenario": "c56ca14872bc48efbd1591378e0674fa6a54693d32283dc5242123f58872ca36"
  },
  "outputs": {
   "calibration_targets_1900.json": "70006392f0e4d005b9f6957c0b790a8aa8fb3f8129ed2db3dabdb53e765539aa",

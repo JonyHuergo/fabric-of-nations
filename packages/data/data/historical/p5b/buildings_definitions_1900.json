@@ -474,7 +474,7 @@
    },
    {
     "goodId": 16,
-    "quantity": 76934
+    "quantity": 77109
    },
    {
     "goodId": 17,
@@ -486,11 +486,11 @@
    },
    {
     "goodId": 19,
-    "quantity": 1680
+    "quantity": 1705
    },
    {
     "goodId": 20,
-    "quantity": 95
+    "quantity": 97
    },
    {
     "goodId": 21,
@@ -506,7 +506,7 @@
    },
    {
     "goodId": 24,
-    "quantity": 75
+    "quantity": 76
    },
    {
     "goodId": 25,
@@ -530,11 +530,11 @@
    },
    {
     "goodId": 31,
-    "quantity": 1776
+    "quantity": 1802
    },
    {
     "goodId": 32,
-    "quantity": 98
+    "quantity": 100
    },
    {
     "goodId": 33,
@@ -554,11 +554,11 @@
    },
    {
     "goodId": 37,
-    "quantity": 27729
+    "quantity": 27612
    },
    {
     "goodId": 38,
-    "quantity": 1442
+    "quantity": 1468
    },
    {
     "goodId": 39,
@@ -618,11 +618,15 @@
    },
    {
     "goodId": 58,
-    "quantity": 6481
+    "quantity": 4268
    },
    {
     "goodId": 59,
     "quantity": 422
+   },
+   {
+    "goodId": 60,
+    "quantity": 432451
    }
   ],
   "resourceRequirements": [],
@@ -4901,6 +4905,118 @@
    {
     "goodId": 38,
     "quantityPerLevelPerDay": 0.0639727
+   }
+  ]
+ },
+ {
+  "id": 76,
+  "key": "fibre-farm",
+  "name": "Flax, Hemp and Jute Farm",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [],
+  "outputs": [
+   {
+    "goodId": 60,
+    "quantityPerThroughputUnit": 8522.95
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 400
+   },
+   {
+    "professionId": 5,
+    "workersPerThroughputUnit": 600
+   }
+  ],
+  "constructionCostRUSD": 3429750,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 140.95,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "agriculture",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 5744.65
+   },
+   {
+    "goodId": 38,
+    "quantity": 156.599
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 0.983674
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0402223
+   }
+  ],
+  "landUse": "cropland"
+ },
+ {
+  "id": 77,
+  "key": "bast-fibre-mill",
+  "name": "Linen, Hemp and Jute Mill",
+  "referenceThroughputPerDayAtLevelOne": 1,
+  "inputs": [
+   {
+    "goodId": 60,
+    "quantityPerThroughputUnit": 3217.84
+   }
+  ],
+  "outputs": [
+   {
+    "goodId": 5,
+    "quantityPerThroughputUnit": 2798.12
+   }
+  ],
+  "jobs": [
+   {
+    "professionId": 1,
+    "workersPerThroughputUnit": 1000
+   }
+  ],
+  "constructionCostRUSD": 6859510,
+  "constructionWorkers": 4,
+  "dailyUpkeepRUSDAtLevelOne": 281.9,
+  "storageCapacityByGood": [],
+  "resourceRequirements": [],
+  "requiredTechnologyId": null,
+  "ownershipAllowed": [
+   "private",
+   "state"
+  ],
+  "isEssentialInfrastructure": false,
+  "sector": "textiles",
+  "constructionMaterials": [
+   {
+    "goodId": 37,
+    "quantity": 11489.3
+   },
+   {
+    "goodId": 38,
+    "quantity": 313.198
+   }
+  ],
+  "maintenanceInputs": [
+   {
+    "goodId": 37,
+    "quantityPerLevelPerDay": 1.96735
+   },
+   {
+    "goodId": 38,
+    "quantityPerLevelPerDay": 0.0804447
    }
   ]
  }

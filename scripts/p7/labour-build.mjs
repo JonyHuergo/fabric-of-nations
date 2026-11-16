@@ -52,7 +52,7 @@ export function institutionFunctionShares(distributionRows) {
 }
 
 /** Job remap of the 1900 building definitions (plan §3.4). */
-const FAMILY_FARMS = new Set(["ranch", "fishery", "dairy-farm", "market-garden", "tobacco-farm", "cotton-farm", "silk-farm"]);
+const FAMILY_FARMS = new Set(["ranch", "fishery", "dairy-farm", "market-garden", "tobacco-farm", "cotton-farm", "silk-farm", "fibre-farm"]);
 const ESTATES = new Set(["plantation", "sugar-estate", "rubber-estate"]);
 const PEASANT_BUILDINGS = new Set(["subsistence-farm", "commercial-farm-peasant", "workshop-peasant"]);
 const OWNER_WORKSHOPS = new Set(["workshop", "jewellery-workshop"]);

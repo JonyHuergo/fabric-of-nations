@@ -492,6 +492,8 @@ grows: unemployment rises and wages fall. Both are deterministic and run in the 
 
 ## 8. The fibre good (Q15, Q16) — deferred
 
+**Taken up by the designer on 2026-11-15 (P7 close, step 3): option Q15a (a separate bast-fibre
+mill) with Q16a (flax, hemp and jute all become textiles); implemented as D-166 (data v16).**
 **Deferred by the designer on 2026-11-08: not resolved in this plan and not in the implementation
 order (§15).** The analysis below is kept for when the question is taken up. P7's measured incomes
 change clothing demand, so the cotton ratio of §8.3 is re-measured and reported at the close of P7.

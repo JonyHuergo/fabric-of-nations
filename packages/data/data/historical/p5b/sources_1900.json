@@ -280,6 +280,42 @@
    "accessDate": "2026-11-08",
    "license": "Public domain (U.S. government publication, 1902)",
    "notes": "pp. 29 and 759. Read from the page images (grayscale PDF)."
+  },
+  {
+   "id": "webb-1911",
+   "title": "The New Dictionary of Statistics: a complement to the fourth edition of Mulhall's Dictionary of Statistics",
+   "author": "Augustus Duncan Webb (London: G. Routledge; New York: E. P. Dutton, 1911)",
+   "url": "https://archive.org/details/newdictionaryofs00webb",
+   "accessDate": "2026-11-16",
+   "license": "Public domain (published 1911; Internet Archive status NOT_IN_COPYRIGHT)",
+   "notes": "Flax p. 272 (PDF 288), hemp p. 296 (PDF 312), jute pp. 357-358 (PDF 373-374). Read from the page images of the cached PDF (.cache-p6/webb-1911-pdf)."
+  },
+  {
+   "id": "mulhall-1899",
+   "title": "The Dictionary of Statistics, fourth edition",
+   "author": "Michael George Mulhall (London: G. Routledge and Sons, 1899)",
+   "url": "https://archive.org/details/cu31924032523270",
+   "accessDate": "2026-11-16",
+   "license": "Public domain (published 1899; the author died in 1900)",
+   "notes": "Flax and linen, p. 280 (PDF 302): linen manufacture, spindles, power-looms, tons of flax consumed. PDF downloaded to .cache-p7/mulhall-1899-pdf; read from the page image."
+  },
+  {
+   "id": "bot-foreign-abstract-29",
+   "title": "Statistical Abstract for the principal and other Foreign Countries in each year from 1891 to 1900-01, Twenty-ninth Number [Cd. 1796]",
+   "author": "Board of Trade, Commercial, Labour and Statistical Department (1903)",
+   "url": "https://archive.org/details/statisticalabstr2930grea",
+   "accessDate": "2026-11-16",
+   "license": "Public domain (UK Parliamentary paper of 1903, Crown copyright expired)",
+   "notes": "Bound with no. 30. Table 20, Russian Empire, principal articles exported, pp. 76-77 (PDF 86-87); weights and measures p. 6 (PDF 16). Read from the page images."
+  },
+  {
+   "id": "statabs-british-india-1903-04",
+   "title": "Statistical Abstract relating to British India (number with the trade to 1902-03), bound in the volume catalogued \"from 1893-94 to 1902-03\"",
+   "author": "India Office, London (His Majesty's Stationery Office, c. 1904)",
+   "url": "https://archive.org/details/india.history.resource.108758",
+   "accessDate": "2026-11-16",
+   "license": "Public domain (UK parliamentary paper, c. 1904; Crown copyright expired)",
+   "notes": "Exports by sea to foreign countries, p. 163 (PDF 175), raw jute in cwt; table 155, exports of jute raw and manufactured by country, p. 190 (PDF 202), in pounds sterling. Cached at .cache-p7/ind-statabs-1904; read from the page images."
   }
  ],
  "units": [
@@ -462,6 +498,22 @@
    "status": "sourced",
    "sourceId": "p5b-provisional",
    "note": "Japanese Weights and Measures Act of 1891: 1 kin = 160 monme = 600 g."
+  },
+  {
+   "id": "kg-per-cwt",
+   "value": 50.80234544,
+   "unit": "kg per hundredweight (112 lb)",
+   "status": "sourced",
+   "sourceId": "p5b-provisional",
+   "note": "Imperial hundredweight = 112 avoirdupois pounds x 0.45359237 kg."
+  },
+  {
+   "id": "lb-per-jute-bale",
+   "value": 400,
+   "unit": "lb per bale of jute",
+   "status": "sourced",
+   "sourceId": "webb-1911",
+   "note": "Webb p. 358: the Indian jute crop is stated in bales of 400 lb."
   }
  ],
  "prices1900": [
@@ -864,6 +916,59 @@
    "valueUSD": 3771862,
    "status": "sourced",
    "note": "1.52 cents per kWh; about half of the income was power ('all other electric service'). The reference price of electricity since the designer chose option (a) on 2026-11-08 (D-148 item 10)."
+  },
+  {
+   "id": "price-flax-import",
+   "goodKey": "bast-fibre",
+   "sourceId": "census-statab-1901",
+   "locator": "Table 157, p. 452 (part file 1901-06.pdf p. 133): annual import prices, year ending June 30, 1900: flax, $236.30 per ton",
+   "unit": "USD per long ton",
+   "value": 236.3,
+   "status": "sourced",
+   "note": "Value in the foreign markets whence exported to the United States (the heading of the table). The fibre statistics of US foreign commerce are in long tons of 2,240 lb (provisional reading of the table's \"ton\"; the monthly table 156 states the same unit)."
+  },
+  {
+   "id": "price-hemp-import",
+   "goodKey": "bast-fibre",
+   "sourceId": "census-statab-1901",
+   "locator": "Table 157, p. 452: annual import prices, year ending June 30, 1900: hemp, $132.43 per ton",
+   "unit": "USD per long ton",
+   "value": 132.43,
+   "status": "sourced",
+   "note": "Value in the foreign markets; ton read as the long ton, as for flax."
+  },
+  {
+   "id": "price-jute-raw",
+   "goodKey": "bast-fibre",
+   "sourceId": "bls-bulletin-39",
+   "locator": "Table II, p. 473: jute, raw, New York, average for 1900, $0.0435 per pound",
+   "unit": "USD per lb",
+   "value": 0.0435,
+   "status": "sourced"
+  },
+  {
+   "id": "price-flax-russia-export",
+   "goodKey": "bast-fibre",
+   "role": "cross-check",
+   "sourceId": "bot-foreign-abstract-29",
+   "locator": "Table 20, p. 77 (PDF 87): Russian Empire, exports of raw flax, 1900: 10,571,000 poods, 43,829,000 roubles",
+   "unit": "roubles per pood",
+   "quantity": 10571000,
+   "valueRoubles": 43829000,
+   "status": "sourced",
+   "note": "4.15 roubles a pood = $0.0593 a lb at the mint value of the rouble ($0.515, Mint 1901) and the pood of 36 lb of the abstract (p. 6): Russian frontier value, below the US import price of the better grades."
+  },
+  {
+   "id": "price-hemp-russia-export",
+   "goodKey": "bast-fibre",
+   "role": "cross-check",
+   "sourceId": "bot-foreign-abstract-29",
+   "locator": "Table 20, p. 77 (PDF 87): Russian Empire, exports of raw hemp, 1900: 2,422,000 poods, 8,147,000 roubles",
+   "unit": "roubles per pood",
+   "quantity": 2422000,
+   "valueRoubles": 8147000,
+   "status": "sourced",
+   "note": "3.36 roubles a pood = $0.0481 a lb (as for flax)."
   }
  ],
  "outputs1900": {
@@ -2360,6 +2465,70 @@
      617000,
      "sourced",
      "British India, exports from Calcutta 617,000"
+    ]
+   ]
+  },
+  "bast-fibre": {
+   "sourceId": "webb-1911",
+   "locator": "flax p. 272 (1904-1906; Ireland 1897-1906), hemp p. 296 (1895-1906), jute p. 358 (1900-01 to 1902-03): see bastFibre1900.production",
+   "unit": "kg",
+   "status": "sourced",
+   "total": 2445981494,
+   "note": "Fibre output by territory, flax, hemp and jute summed (bastFibre1900.production); the nearest years the sources give to 1900.",
+   "entries": [
+    [
+     "aut-home",
+     147360670,
+     "sourced",
+     "flax 69 M kg, hemp 78 M kg"
+    ],
+    [
+     "bel-home",
+     12023221.75,
+     "sourced",
+     "flax 12 M kg"
+    ],
+    [
+     "bin",
+     1242843094,
+     "sourced",
+     "jute 1,243 M kg"
+    ],
+    [
+     "fra-home",
+     38711387.23,
+     "sourced",
+     "flax 22 M kg, hemp 17 M kg"
+    ],
+    [
+     "gbr-home",
+     9825173.608,
+     "sourced",
+     "flax 10 M kg"
+    ],
+    [
+     "ita-home",
+     75695494.71,
+     "sourced",
+     "hemp 76 M kg"
+    ],
+    [
+     "nld-home",
+     9652445.634,
+     "sourced",
+     "flax 10 M kg"
+    ],
+    [
+     "rom-home",
+     3556164.181,
+     "sourced",
+     "flax 2 M kg, hemp 2 M kg"
+    ],
+    [
+     "rus-home",
+     906313842.6,
+     "sourced",
+     "flax 585 M kg, hemp 321 M kg"
     ]
    ]
   }
@@ -4341,6 +4510,364 @@
     "estimated",
     "Peru, West Indies etc. (aggregate)"
    ]
+  ]
+ },
+ "bastFibre1900": {
+  "description": "P7 close (D-166; P7 plan §8, option Q16a, designer 2026-11-15): flax, hemp and jute fibre around 1900. `production` gives the output of each fibre by territory (kg a year): the fibre farms' 1900 output shares. `spinning` gives the fibre the mills of each territory worked (kg a year): the bast-fibre mills are placed there, 1.15 kg of fibre per kg of cloth (the mass balance of the textile mill). Not covered (no figure in the sources read): flax in Germany, Italy, Sweden and Japan; hemp in the United States, Japan and China; the ramie of China. Hard fibres (manila, sisal) are cordage, not bast, and are left out.",
+  "production": [
+   {
+    "fibre": "flax",
+    "territory": "rus-home",
+    "kgPerYear": 585243019.5,
+    "sourceId": "webb-1911",
+    "locator": "p. 272: estimated production of flax fibre, cwt, 1904 / 1905 / 1906: Russia (with Poland) 10,400,000 / 9,800,000 / 13,000,000; Asiatic Russia 380,000 / 480,000 / 500,000",
+    "basis": "mean of 1904-1906 (the nearest years in the source)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "aut-home",
+    "kgPerYear": 69429872.1,
+    "sourceId": "webb-1911",
+    "locator": "p. 272: Austria-Hungary (including Bosnia and Herzegovina) 1,200,000 / 1,400,000 / 1,500,000 cwt",
+    "basis": "mean of 1904-1906",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "fra-home",
+    "kgPerYear": 21845008.54,
+    "sourceId": "webb-1911",
+    "locator": "p. 272: France 470,000 / 410,000 / 410,000 cwt",
+    "basis": "mean of 1904-1906",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "rom-home",
+    "kgPerYear": 2032093.818,
+    "sourceId": "webb-1911",
+    "locator": "p. 272: Roumania 30,000 / 30,000 / 60,000 cwt",
+    "basis": "mean of 1904-1906",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "nld-home",
+    "kgPerYear": 9652445.634,
+    "sourceId": "webb-1911",
+    "locator": "p. 272: Holland 200,000 / 170,000 / 200,000 cwt",
+    "basis": "mean of 1904-1906",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "bel-home",
+    "kgPerYear": 12023221.75,
+    "sourceId": "webb-1911",
+    "locator": "p. 272: Belgium 240,000 / 230,000 / 240,000 cwt",
+    "basis": "mean of 1904-1906",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "gbr-home",
+    "kgPerYear": 9825173.608,
+    "sourceId": "webb-1911",
+    "locator": "p. 272: the production of flax in Ireland averaged 9,670 tons during 1897-1906",
+    "basis": "mean of 1897-1906 (centred on 1901)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "hemp",
+    "territory": "rus-home",
+    "kgPerYear": 321070823.2,
+    "sourceId": "webb-1911",
+    "locator": "p. 296: hemp fibre, tons, 1902: Russia in Europe (exclusive of Poland) 300,600; Poland 5,500; Caucasia 9,900",
+    "basis": "1902",
+    "status": "sourced"
+   },
+   {
+    "fibre": "hemp",
+    "territory": "fra-home",
+    "kgPerYear": 16866378.69,
+    "sourceId": "webb-1911",
+    "locator": "p. 296: France (average 1903-5) 16,600 tons",
+    "basis": "mean of 1903-1905",
+    "status": "sourced"
+   },
+   {
+    "fibre": "hemp",
+    "territory": "ita-home",
+    "kgPerYear": 75695494.71,
+    "sourceId": "webb-1911",
+    "locator": "p. 296: Italy (1895) 74,500 tons",
+    "basis": "1895 (the only year given)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "hemp",
+    "territory": "aut-home",
+    "kgPerYear": 77930797.9,
+    "sourceId": "webb-1911",
+    "locator": "p. 296: Austria (average 1904-6) 18,700; Hungary (average 1903-5) 58,000 tons",
+    "basis": "means of 1904-1906 and 1903-1905",
+    "status": "sourced"
+   },
+   {
+    "fibre": "hemp",
+    "territory": "rom-home",
+    "kgPerYear": 1524070.363,
+    "sourceId": "webb-1911",
+    "locator": "p. 296: Roumania (average 1904-6) 1,500 tons",
+    "basis": "mean of 1904-1906",
+    "status": "sourced"
+   },
+   {
+    "fibre": "jute",
+    "territory": "bin",
+    "kgPerYear": 1242843094,
+    "sourceId": "webb-1911",
+    "locator": "p. 358: estimated yield in British India and certain native states, 1900-01 to 1902-03, 6,850,000 bales of 400 lb a year",
+    "basis": "mean of 1900-01 to 1902-03",
+    "status": "sourced"
+   }
+  ],
+  "spinning": [
+   {
+    "fibre": "flax",
+    "territory": "gbr-home",
+    "kgPerYear": 86363987.25,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: U. Kingdom 85,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "fra-home",
+    "kgPerYear": 91444221.79,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: France 90,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "deu-home",
+    "kgPerYear": 65027002.16,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: Germany 64,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "rus-home",
+    "kgPerYear": 121925629.1,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: Russia 120,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "aut-home",
+    "kgPerYear": 57914673.8,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: Austria 57,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "ita-home",
+    "kgPerYear": 27433266.54,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: Italy 27,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "esp-home",
+    "kgPerYear": 10160469.09,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: Spain 10,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "swe-home",
+    "kgPerYear": 3048140.726,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: Sweden 3,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "nld-home",
+    "kgPerYear": 5080234.544,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: Holland 5,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "bel-home",
+    "kgPerYear": 50802345.44,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: Belgium 50,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "che-home",
+    "kgPerYear": 3048140.726,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: Switzerland 3,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "flax",
+    "territory": "usa-home",
+    "kgPerYear": 42673970.17,
+    "sourceId": "mulhall-1899",
+    "locator": "p. 280: linen manufacture, tons of flax consumed: U. States 42,000",
+    "basis": "the latest figures of the fourth edition (1899)",
+    "status": "sourced"
+   },
+   {
+    "fibre": "jute",
+    "territory": "bin",
+    "kgPerYear": 561987469.3,
+    "sourceId": "statabs-british-india-1903-04",
+    "locator": "Webb p. 358 yield (6,850,000 bales of 400 lb, 1900-01 to 1902-03) less the mean raw jute exports by sea of the same years (Statistical Abstract p. 163: 12,414,552 / 14,755,115 / 13,036,486 cwt)",
+    "basis": "production less exports: the Bengal mills and hand spinning",
+    "status": "sourced"
+   },
+   {
+    "fibre": "jute",
+    "territory": "gbr-home",
+    "kgPerYear": 223123901.2,
+    "sourceId": "webb-1911",
+    "locator": "p. 357: imports of jute into the United Kingdom less re-exports, 1898-1902: 219,600 tons a year for home consumption",
+    "basis": "mean of 1898-1902",
+    "status": "sourced"
+   },
+   {
+    "fibre": "jute",
+    "territory": "deu-home",
+    "kgPerYear": 166656738.3,
+    "sourceId": "statabs-british-india-1903-04",
+    "locator": "table 155, p. 190: raw jute exported from British India, 1900-01 / 1901-02 / 1902-03, £1,465,199 / 1,527,425 / 1,478,876",
+    "basis": "India's mean raw exports (p. 163) less the home consumption of the United Kingdom (Webb p. 357; the UK re-exported the rest, to the continent and the United States), shared by each importer's raw jute from India in value; \"other countries\" (£159,180, 0.7 %) are left out",
+    "status": "sourced"
+   },
+   {
+    "fibre": "jute",
+    "territory": "fra-home",
+    "kgPerYear": 101618978.8,
+    "sourceId": "statabs-british-india-1903-04",
+    "locator": "table 155, p. 190: raw jute exported from British India, 1900-01 / 1901-02 / 1902-03, £736,430 / 999,458 / 990,610",
+    "basis": "India's mean raw exports (p. 163) less the home consumption of the United Kingdom (Webb p. 357; the UK re-exported the rest, to the continent and the United States), shared by each importer's raw jute from India in value; \"other countries\" (£159,180, 0.7 %) are left out",
+    "status": "sourced"
+   },
+   {
+    "fibre": "jute",
+    "territory": "usa-home",
+    "kgPerYear": 91385252.47,
+    "sourceId": "statabs-british-india-1903-04",
+    "locator": "table 155, p. 190: raw jute exported from British India, 1900-01 / 1901-02 / 1902-03, £781,907 / 938,512 / 731,502",
+    "basis": "India's mean raw exports (p. 163) less the home consumption of the United Kingdom (Webb p. 357; the UK re-exported the rest, to the continent and the United States), shared by each importer's raw jute from India in value; \"other countries\" (£159,180, 0.7 %) are left out",
+    "status": "sourced"
+   },
+   {
+    "fibre": "jute",
+    "territory": "aut-home",
+    "kgPerYear": 45702670.74,
+    "sourceId": "statabs-british-india-1903-04",
+    "locator": "table 155, p. 190: raw jute exported from British India, 1900-01 / 1901-02 / 1902-03, £422,529 / 396,161 / 407,540",
+    "basis": "India's mean raw exports (p. 163) less the home consumption of the United Kingdom (Webb p. 357; the UK re-exported the rest, to the continent and the United States), shared by each importer's raw jute from India in value; \"other countries\" (£159,180, 0.7 %) are left out",
+    "status": "sourced"
+   },
+   {
+    "fibre": "jute",
+    "territory": "ita-home",
+    "kgPerYear": 33593138.32,
+    "sourceId": "statabs-british-india-1903-04",
+    "locator": "table 155, p. 190: raw jute exported from British India, 1900-01 / 1901-02 / 1902-03, £303,334 / 258,521 / 339,469",
+    "basis": "India's mean raw exports (p. 163) less the home consumption of the United Kingdom (Webb p. 357; the UK re-exported the rest, to the continent and the United States), shared by each importer's raw jute from India in value; \"other countries\" (£159,180, 0.7 %) are left out",
+    "status": "sourced"
+   },
+   {
+    "fibre": "jute",
+    "territory": "esp-home",
+    "kgPerYear": 13728840.33,
+    "sourceId": "statabs-british-india-1903-04",
+    "locator": "table 155, p. 190: raw jute exported from British India, 1900-01 / 1901-02 / 1902-03, £161,025 / 123,690 / 83,638",
+    "basis": "India's mean raw exports (p. 163) less the home consumption of the United Kingdom (Webb p. 357; the UK re-exported the rest, to the continent and the United States), shared by each importer's raw jute from India in value; \"other countries\" (£159,180, 0.7 %) are left out",
+    "status": "sourced"
+   },
+   {
+    "fibre": "jute",
+    "territory": "rus-home",
+    "kgPerYear": 5046104.394,
+    "sourceId": "statabs-british-india-1903-04",
+    "locator": "table 155, p. 190: raw jute exported from British India, 1900-01 / 1901-02 / 1902-03, £43,865 / 30,423 / 61,102",
+    "basis": "India's mean raw exports (p. 163) less the home consumption of the United Kingdom (Webb p. 357; the UK re-exported the rest, to the continent and the United States), shared by each importer's raw jute from India in value; \"other countries\" (£159,180, 0.7 %) are left out",
+    "status": "sourced"
+   },
+   {
+    "fibre": "hemp",
+    "territory": "rus-home",
+    "kgPerYear": 281521197.3,
+    "sourceId": "webb-1911",
+    "locator": "p. 296: hemp fibre, tons, 1902: Russia in Europe (exclusive of Poland) 300,600; Poland 5,500; Caucasia 9,900; less the raw hemp exported in 1900, 2,422,000 poods of 36 lb (Board of Trade, foreign abstract no. 29, table 20, p. 77; pood p. 6)",
+    "basis": "provisional: the country's own hemp crop (Russia: less its sourced 1900 exports) stands for its spinning (no 1900 mill consumption by country found; Russian, Italian and Hungarian hemp was mostly worked where it grew; the exports are not followed)",
+    "status": "provisional"
+   },
+   {
+    "fibre": "hemp",
+    "territory": "fra-home",
+    "kgPerYear": 16866378.69,
+    "sourceId": "webb-1911",
+    "locator": "p. 296: France (average 1903-5) 16,600 tons",
+    "basis": "provisional: the country's own hemp crop (Russia: less its sourced 1900 exports) stands for its spinning (no 1900 mill consumption by country found; Russian, Italian and Hungarian hemp was mostly worked where it grew; the exports are not followed)",
+    "status": "provisional"
+   },
+   {
+    "fibre": "hemp",
+    "territory": "ita-home",
+    "kgPerYear": 75695494.71,
+    "sourceId": "webb-1911",
+    "locator": "p. 296: Italy (1895) 74,500 tons",
+    "basis": "provisional: the country's own hemp crop (Russia: less its sourced 1900 exports) stands for its spinning (no 1900 mill consumption by country found; Russian, Italian and Hungarian hemp was mostly worked where it grew; the exports are not followed)",
+    "status": "provisional"
+   },
+   {
+    "fibre": "hemp",
+    "territory": "aut-home",
+    "kgPerYear": 77930797.9,
+    "sourceId": "webb-1911",
+    "locator": "p. 296: Austria (average 1904-6) 18,700; Hungary (average 1903-5) 58,000 tons",
+    "basis": "provisional: the country's own hemp crop (Russia: less its sourced 1900 exports) stands for its spinning (no 1900 mill consumption by country found; Russian, Italian and Hungarian hemp was mostly worked where it grew; the exports are not followed)",
+    "status": "provisional"
+   },
+   {
+    "fibre": "hemp",
+    "territory": "rom-home",
+    "kgPerYear": 1524070.363,
+    "sourceId": "webb-1911",
+    "locator": "p. 296: Roumania (average 1904-6) 1,500 tons",
+    "basis": "provisional: the country's own hemp crop (Russia: less its sourced 1900 exports) stands for its spinning (no 1900 mill consumption by country found; Russian, Italian and Hungarian hemp was mostly worked where it grew; the exports are not followed)",
+    "status": "provisional"
+   }
   ]
  }
 }
