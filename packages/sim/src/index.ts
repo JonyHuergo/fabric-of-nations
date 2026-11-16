@@ -35,5 +35,3 @@ export * from "./serialization.js";
 export * from "./stateHash.js";
 export * from "./integrity.js";
 export * from "./rollback.js";
-export * from "./parallel.js";
-export * from "./parallelKernels.js";

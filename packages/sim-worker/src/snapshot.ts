@@ -209,8 +209,6 @@ export interface SnapshotRuntimeState {
   readonly speedDaysPerSecond: number;
   /** Presentation-only measured throughput; never feeds simulation state. */
   readonly achievedDaysPerSecond: number;
-  /** D-162: threads of the last day's split phases (presentation-only; 1 when absent). */
-  readonly simulationThreads?: number;
   /** Presentation-only focused country whose full record is included. */
   readonly focusCountryId?: number | null;
   /** P4 presentation-only focused province whose pyramid is included. */
@@ -2592,7 +2590,6 @@ export function buildSimulationSnapshot(
     speedDaysPerSecond: runtime.speedDaysPerSecond,
     achievedDaysPerSecond: runtime.achievedDaysPerSecond,
     speedIsBestEffort: true,
-    simulationThreads: runtime.simulationThreads ?? 1,
     campaignComplete: world.dayIndex >= 36_524,
     scenarioId: world.scenarioId,
     dataVersion: world.dataVersion,

@@ -24,8 +24,7 @@ import {
   NEED_TIER_ORDER,
   type NeedTier,
 } from "../population/constants.js";
-import { dailyDemographySteps } from "../population/demography.js";
-import { runStepsInline, type DaySteps } from "../parallel.js";
+import { applyDailyDemography } from "../population/demography.js";
 import {
   isDemographicLevelDay,
   updateBlockFoodSufficiency,
@@ -56,7 +55,7 @@ import { buildFinanceIndex, cloneFinanceState, type FinanceIndex } from "./accou
 import {
   applyDwellingPurchases,
   NEED_TIER_CODE,
-  lesHouseholdDemandSteps,
+  buildLesHouseholdDemand,
   initialiseSmoothedPrices,
   type LesHouseholdDemand,
 } from "./householdDemand.js";
@@ -939,7 +938,7 @@ function inKindWageValues(
   return result;
 }
 
-function* marketAttemptSteps(
+function runMarketAttempt(
   world: World,
   definitions: EconomyDefinitions,
   populationDefinitions: PopulationDefinitions,
@@ -950,7 +949,7 @@ function* marketAttemptSteps(
   detail: DayResultDetail = "full",
   totals?: BlockTotals,
   scratch?: DayScratch,
-): DaySteps<MarketAttempt> {
+): MarketAttempt {
   observe?.("market-household-demand");
   // D-137: one set of day-level lookups (capacity index and per-building capacity)
   // serves the input demand here and the production of every market below; the
@@ -973,8 +972,7 @@ function* marketAttemptSteps(
   const demandSystem = demandSystemOf(populationDefinitions, definitions);
   initialiseSmoothedPrices(world);
   const gated = demandSystem.requiredTechnologyId.some((id) => id >= 0);
-  // D-162: the blocks' plans may run on worker threads (`lesHouseholdDemandSteps`).
-  const les = yield* lesHouseholdDemandSteps(
+  const les = buildLesHouseholdDemand(
     world,
     definitions,
     demandSystem,
@@ -1119,6 +1117,7 @@ function closeMonthEndIfDue(world: World, dayIndex: DayIndex): FinanceCloseResul
   return closeFinancePeriod(world, { financeInPlace: true });
 }
 
+/** Run one integrated economic day on the supplied (already staged) world. */
 /** The day's migration summary in a labour-market world (flows are reported by the labour phase). */
 function labourMigrationResult(dayIndex: DayIndex, phase: LabourMonthPhaseResult | null): MigrationDayResult {
   return {
@@ -1133,8 +1132,12 @@ function labourMigrationResult(dayIndex: DayIndex, phase: LabourMonthPhaseResult
   };
 }
 
-/** D-162: options of `runEconomicDay` and `economicDaySteps`. */
-export interface EconomicDayOptions {
+export function runEconomicDay(
+  world: World,
+  populationDefinitions: PopulationDefinitions,
+  economyDefinitions: EconomyDefinitions,
+  dayIndex: DayIndex,
+  options: {
     readonly validateWorld?: boolean;
     /** D-116 mode of the calling tick; `phase` skips per-AI-action world validation. */
     readonly integrity?: "staged" | "phase";
@@ -1147,30 +1150,8 @@ export interface EconomicDayOptions {
      * when absent. Never authoritative and never read for values.
      */
     readonly scratch?: DayScratch;
-}
-
-/** Run one integrated economic day on the supplied (already staged) world, inline. */
-export function runEconomicDay(
-  world: World,
-  populationDefinitions: PopulationDefinitions,
-  economyDefinitions: EconomyDefinitions,
-  dayIndex: DayIndex,
-  options: EconomicDayOptions = {},
+  } = {},
 ): EconomyDayResult {
-  return runStepsInline(economicDaySteps(world, populationDefinitions, economyDefinitions, dayIndex, options));
-}
-
-/**
- * D-162: the economic day as steps that pause at the phases that may run on worker threads
- * (demography, household demand); `runEconomicDay` runs every step inline.
- */
-export function* economicDaySteps(
-  world: World,
-  populationDefinitions: PopulationDefinitions,
-  economyDefinitions: EconomyDefinitions,
-  dayIndex: DayIndex,
-  options: EconomicDayOptions = {},
-): DaySteps<EconomyDayResult> {
   const observe = options.phaseObserver;
   const scratch = options.scratch ?? createDayScratch();
   observe?.("day-preconditions");
@@ -1253,8 +1234,7 @@ export function* economicDaySteps(
 
   // P4: month-start levels from causes, before the day's births and deaths.
   if (isDemographicLevelDay(calendarDate.day)) updateDemographicLevels(world.popBlocks, blockFactors);
-  // D-162: the blocks may run on worker threads (`dailyDemographySteps`).
-  const demography = yield* dailyDemographySteps(
+  const demography = applyDailyDemography(
     world,
     populationDefinitions,
     dayIndex,
@@ -1326,7 +1306,7 @@ export function* economicDaySteps(
     const accountId = householdAccountIds[block.id] ?? -1;
     return accountId >= 0 ? (attemptIndex.account(accountId)?.balanceRUSD ?? 0) : 0;
   });
-  const attempt = yield* marketAttemptSteps(
+  const attempt = runMarketAttempt(
     world,
     economyDefinitions,
     populationDefinitions,

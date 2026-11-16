@@ -16,13 +16,6 @@ import {
 } from "@century/sim-worker";
 
 import { SIM_WORKER_HTML } from "../generated/simWorker";
-import { SIM_KERNEL_WORKERS, simKernelWorkersStatement } from "./simThreads";
-
-/** D-162: the worker page with the kernel worker setting before the worker script. */
-const SIM_WORKER_PAGE = SIM_WORKER_HTML.replace(
-  "<body><script>",
-  `<body><script>${simKernelWorkersStatement(SIM_KERNEL_WORKERS)}</script><script>`,
-);
 
 interface WebViewHandle {
   injectJavaScript(script: string): void;
@@ -121,7 +114,7 @@ export const NativeWorkerHost = forwardRef<NativeWorkerHandle, NativeWorkerHostP
           ref={(node) => {
             webViewRef.current = node as unknown as WebViewHandle | null;
           }}
-          source={{ html: SIM_WORKER_PAGE }}
+          source={{ html: SIM_WORKER_HTML }}
           originWhitelist={["*"]}
           javaScriptEnabled
           domStorageEnabled

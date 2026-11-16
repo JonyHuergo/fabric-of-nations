@@ -545,7 +545,7 @@ export function GameShell() {
                 : `${snapshot.date.label} · ${snapshot.scenarioId} · ${connection}`
             }
             netResult={latestClosedResult(snapshot)}
-            speedLine={`${formatSpeed(speedDaysPerSecond)}${running && achievedDaysPerSecond > 0 ? ` · ~${achievedDaysPerSecond.toFixed(1)}/s` : ""} · best effort${(snapshot?.simulationThreads ?? 1) > 1 ? ` · ${String(snapshot?.simulationThreads)} threads` : ""}`}
+            speedLine={`${formatSpeed(speedDaysPerSecond)}${running && achievedDaysPerSecond > 0 ? ` · ~${achievedDaysPerSecond.toFixed(1)}/s` : ""} · best effort`}
             saveStatus={saveStatus}
             dispatches={dispatches}
             medium={getActiveTheme().dispatchMedium}

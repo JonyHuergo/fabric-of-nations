@@ -10981,6 +10981,8 @@ D-158). Exact: the world is bit-identical at every worker count (see "Equivalenc
 `WORLD_SCHEMA_VERSION` stays 35 and `SIM_VERSION` 0.31.0. Worker protocol 24 → 25 (one presentation
 field, below). **Shipped with 0 workers:** on the reference desktop the threads do not make the day
 faster (see "Measurements"); the designer's device test decides whether to switch them on.
+**Superseded by D-163:** the designer decided not to use threads; the code of this entry was removed
+(commit `07a58b1` reverted). The entry is kept as the record of what was tried and measured.
 **Amends:** D-158 ("Threads": route A is built for the two phases below), D-161 (open item "for D-162").
 
 ### Design (written before the implementation)
@@ -11316,3 +11318,63 @@ of 20,739 and world-1900 cotton 1.3558462628762207. No other test fails.
   path is unchanged (the other figures above).
 - **Day 53 still fails** as before (account 1303, −1.7e-15 RUSD); not fixed (designer's call).
 - **Index heading:** headed like D-154 to D-161 so the index check passes.
+
+## D-163 (performance) — No worker threads: the D-162 code removed
+
+**Status:** designer's decision of 2026-11-15, branch `perf/day-5x`, after D-162. The simulation runs
+on one thread on every platform. Every file but this register is as at D-161 (`6728347`): no save
+change (`WORLD_SCHEMA_VERSION` 35, `SIM_VERSION` 0.31.0); worker protocol back to 24.
+**Supersedes:** D-162 (its code; its record stays). **Amends:** D-158 ("Threads": route A was built,
+measured and dropped).
+
+### Decision
+
+D-162 measured route A of D-158 on the reference desktop: with the day's demography and household
+demand on worker threads the day was not faster (break-even once the workers were warm, slower in
+their first days, host throughput 0.96–0.97 against 0.995 days/s over the first month), and the
+phases that would gain more (market clearing, settlement) cannot split without large new typed
+inputs. Shipped off, the code still cost upkeep: a generator day, the kernel pool with three
+platform adapters, a bundled kernel script, an asynchronous host path, protocol 25 and about 40
+minutes of 1900-world pin tests in every full test run. The designer decided not to use threads,
+so all of it was removed rather than kept switched off.
+
+### What was removed
+
+The revert of `07a58b1`: `parallel.ts` and `parallelKernels.ts` (sim); the range kernels and steps
+of demography and household demand, `economicDaySteps`, `tickPhaseModeSteps` and
+`runTicksWithRollbackParallel`, back to the D-161 loops; `kernelPool.ts`, `browserKernelPool.ts`,
+`nodeKernelPool.ts`, `kernelWorkerEntry.ts` and the generated `kernelWorkerScript.ts`
+(sim-worker); the host's pool option and command queue; the snapshot field `simulationThreads` and
+protocol 25; the kernel bundle step of `build-worker.mjs`; `simThreads.ts`, the worker setting of the
+web and WebView clients and the speed line's thread count (app); the worker argument of
+`perfPhases`; the playtest's `PLAYTEST_SIM_WORKERS`; the monetary audit's protocol pin back to 24;
+the tests `parallel-day`, `parallel-pins`, `host-parallel` and their port fixture, and the protocol
+25 test edits.
+
+### Kept
+
+- D-162's entry, as the record of the design, the measurements and the findings.
+- **The rule it found, for all sim-thread code:** never transfer (detach) an `ArrayBuffer` on the sim
+  thread (`postMessage` transfer lists, `ArrayBuffer.prototype.transfer`, `structuredClone` with
+  `transfer`). One detached buffer slows every later typed-array access of that thread for the rest
+  of the run (V8's detaching protector; measured +5 to +9 % of the whole single-thread day).
+
+### Verification
+
+- `git diff 6728347 -- . ':!DECISIONS.md'` is empty: the code, tests, scripts and generated bundle are
+  byte for byte those of D-161, whose full test run (only the 11 known failures of `main`, with
+  D-160's received values), pins and measurements therefore apply unchanged; they were not repeated.
+- Run on this tree: `pnpm typecheck`, `pnpm lint`, `pnpm audit:branding`, `pnpm audit:monetary`,
+  `check:sim-deps` and `check:worker` (bundle current without regeneration) pass; the pin procedure
+  (`scratch/pinhashes.mjs`) gives `4d77f5a066875b02`, `c9d106dbe6dbed6d`, `5b100c8146d94453` at days
+  1, 31 and 52 and the known day-53 message (account 1303, −1.7014044923219608e-15).
+
+### Consequences and open items
+
+- **Performance from here is single-thread work.** The A11c 5× aim stays open; D-161's figures
+  (ordinary day 890 ms, month mean 1,042 ms on the reference desktop) are the current ones.
+- **If threads are reconsidered,** D-162 is the starting point: the copy-only messages, the
+  fixed-order merge and the tests can be restored from `07a58b1`; market clearing would need its
+  inputs typed per market first.
+- **Day 53 still fails** as before (account 1303, −1.7e-15 RUSD); not fixed (designer's call).
+- **Index heading:** headed like D-154 to D-162 so the index check passes.

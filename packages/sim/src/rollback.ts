@@ -26,8 +26,7 @@ import { cloneWorld } from "./economy/day.js";
 import { createDayScratch, type DayScratch } from "./economy/dayScratch.js";
 import { worldDayFingerprint } from "./integrity.js";
 import type { TickContext } from "./population/types.js";
-import { runStepsParallel, type ParallelExecutor } from "./parallel.js";
-import { tickPhaseMode, tickPhaseModeSteps, type TickResult } from "./tick.js";
+import { tickPhaseMode, type TickResult } from "./tick.js";
 import type { Day } from "./types.js";
 import { requireInteger } from "./validation.js";
 import type { World } from "./world.js";
@@ -146,8 +145,8 @@ function restoreStartOfDay(
   Object.assign(runner.world, restored);
 }
 
-/** The month-start checkpoint and the start-of-day fingerprint of a day about to run. */
-function prepareDay(runner: RollbackRunner, context: TickContext): string {
+/** Run one day in phase mode with rollback. */
+function runOneDay(runner: RollbackRunner, context: TickContext): TickResult {
   const world = runner.world;
   const dayIndex = world.dayIndex;
   if (isFirstDayOfMonth(dayIndex) && runner.checkpoint.dayIndex !== dayIndex) {
@@ -157,14 +156,7 @@ function prepareDay(runner: RollbackRunner, context: TickContext): string {
     runner.checkpointsTaken += 1;
   }
   context.phaseObserver?.("fingerprint");
-  return worldDayFingerprint(world);
-}
-
-/** Run one day in phase mode with rollback. */
-function runOneDay(runner: RollbackRunner, context: TickContext): TickResult {
-  const world = runner.world;
-  const dayIndex = world.dayIndex;
-  const fingerprint = prepareDay(runner, context);
+  const fingerprint = worldDayFingerprint(world);
   try {
     return tickPhaseMode(world, context);
   } catch (error) {
@@ -190,48 +182,6 @@ export function runTicksWithRollback(
   let lastResult: TickResult | null = null;
   while (ticksProcessed < count && runner.world.dayIndex < CAMPAIGN_TERMINAL_DAY_INDEX) {
     const result = runOneDay(runner, phase);
-    if (!result.advanced) break;
-    lastResult = result;
-    ticksProcessed += 1;
-  }
-  return {
-    requestedTicks: count,
-    startDayIndex,
-    endDayIndex: runner.world.dayIndex,
-    ticksProcessed,
-    terminalReached: runner.world.dayIndex >= CAMPAIGN_TERMINAL_DAY_INDEX,
-    lastResult,
-  };
-}
-
-/**
- * D-162: `runTicksWithRollback` with the day's split phases offered to `executor` (a pool of
- * worker threads). The world after every day is the same as with the synchronous runner at any
- * worker count; a failed day is restored by the same replay (run inline) and rethrown as
- * `DayRolledBackError`. The caller must not touch the world until the promise settles.
- */
-export async function runTicksWithRollbackParallel(
-  runner: RollbackRunner,
-  count: number,
-  context: TickContext,
-  executor: ParallelExecutor,
-): Promise<RollbackRunSummary> {
-  requireInteger(count, "count", 0, Number.MAX_SAFE_INTEGER);
-  const phase = phaseContext(context, runner.scratch);
-  const startDayIndex = runner.world.dayIndex;
-  let ticksProcessed = 0;
-  let lastResult: TickResult | null = null;
-  while (ticksProcessed < count && runner.world.dayIndex < CAMPAIGN_TERMINAL_DAY_INDEX) {
-    const world = runner.world;
-    const dayIndex = world.dayIndex;
-    const fingerprint = prepareDay(runner, phase);
-    let result: TickResult;
-    try {
-      result = await runStepsParallel(tickPhaseModeSteps(world, phase), executor);
-    } catch (error) {
-      restoreStartOfDay(runner, dayIndex, fingerprint, phase);
-      throw new DayRolledBackError(dayIndex, error);
-    }
     if (!result.advanced) break;
     lastResult = result;
     ticksProcessed += 1;

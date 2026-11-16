@@ -15,7 +15,6 @@ import {
   deserializeWorld,
   isCampaignComplete,
   runTicksWithRollback,
-  runTicksWithRollbackParallel,
   serializeWorld,
   validateCountryAction,
 } from "@century/sim";
@@ -40,7 +39,6 @@ import {
 } from "./protocol.js";
 import { buildSimulationSnapshot, createSnapshotCache, type SnapshotCache } from "./snapshot.js";
 import { canonicalSaveOf, compressSaveForStorage } from "./persistence.js";
-import type { KernelPool } from "./kernelPool.js";
 
 const PUMP_INTERVAL_MS = 100;
 const SNAPSHOT_INTERVAL_MS = 100;
@@ -63,12 +61,6 @@ export interface SimulationHostOptions {
   readonly clock?: () => number;
   /** Tests disable the wall-clock pump and call `pump`/`step` explicitly. */
   readonly autoPump?: boolean;
-  /**
-   * D-162: kernel worker threads for the day's split phases. Absent: every day runs
-   * synchronously, as before. Present: a day runs asynchronously and the commands that arrive
-   * meanwhile wait for it (they still apply only between days). The world is the same either way.
-   */
-  readonly parallel?: KernelPool;
 }
 
 function commandIdOf(value: unknown): string | null {
@@ -124,17 +116,11 @@ export class SimulationHost {
   private closed = false;
   /** Presentation cache for snapshot builds (D-137); never simulation state. */
   private readonly snapshotCache: SnapshotCache = createSnapshotCache();
-  /** D-162: the kernel pool, when the host has one. */
-  private readonly parallel: KernelPool | undefined;
-  /** D-162: a day is running on the pool; commands wait in `queued`. */
-  private busy = false;
-  private readonly queued: unknown[] = [];
 
   public constructor(options: SimulationHostOptions) {
     this.emitEvent = options.emit;
     this.clock = options.clock ?? (() => Date.now());
     this.autoPump = options.autoPump !== false;
-    this.parallel = options.parallel;
     this.seed = options.seed;
     this.baseScenario = options.scenario;
     this.scenario = options.scenario;
@@ -167,7 +153,6 @@ export class SimulationHost {
       running: this.running,
       speedDaysPerSecond: this.speed,
       achievedDaysPerSecond: this.achievedDaysPerSecond,
-      simulationThreads: this.parallel?.status().lastThreads ?? 1,
       focusCountryId: this.focusCountryId,
       focusProvinceId: this.focusProvinceId,
       focusMarketId: this.focusMarketId,
@@ -198,11 +183,6 @@ export class SimulationHost {
 
   /** Apply one untrusted command. Invalid input never mutates the world. */
   public handleCommand(raw: unknown): void {
-    if (this.busy) {
-      // D-162: a day is in flight; the command applies once it ends.
-      this.queued.push(raw);
-      return;
-    }
     if (this.closed) {
       this.emitError(commandIdOf(raw), "closed", "simulation host is shut down");
       return;
@@ -233,11 +213,9 @@ export class SimulationHost {
         return;
       case "STEP": {
         this.pause();
-        this.advance(command.ticks, (ok) => {
-          if (!ok) return;
-          this.emitState(command.commandId);
-          this.emitSnapshot("SNAPSHOT");
-        });
+        if (!this.advanceTicks(command.ticks)) return;
+        this.emitState(command.commandId);
+        this.emitSnapshot("SNAPSHOT");
         return;
       }
       case "SET_SPEED":
@@ -326,8 +304,7 @@ export class SimulationHost {
    * tick computes.
    */
   public pump(nowMs: number): void {
-    // D-162: while a day runs on the pool the clock keeps counting; the next pump takes it.
-    if (!this.running || this.closed || this.busy) return;
+    if (!this.running || this.closed) return;
     const elapsed = Math.max(0, nowMs - this.lastClockMs);
     this.lastClockMs = nowMs;
     // Drop time beyond the bounded catch-up window and cap the retained debt.
@@ -341,76 +318,15 @@ export class SimulationHost {
       Math.floor((this.accumulatorMs / 1000) * this.speed),
       MAX_TICKS_PER_PUMP,
     );
-    const after = (): void => {
-      if (nowMs - this.lastSnapshotMs >= SNAPSHOT_INTERVAL_MS) {
-        this.lastSnapshotMs = nowMs;
-        this.emitSnapshot("SNAPSHOT");
-      }
-    };
     if (ticks > 0) {
       this.accumulatorMs -= (ticks / this.speed) * 1000;
-      this.advance(ticks, (ok) => {
-        if (!ok) return;
-        this.recordAchieved(ticks, elapsed);
-        after();
-      });
-      return;
+      if (!this.advanceTicks(ticks)) return;
+      this.recordAchieved(ticks, elapsed);
     }
-    after();
-  }
-
-  /**
-   * Run `count` ticks, then `done`: synchronously without a pool; with one, asynchronously,
-   * holding the commands that arrive until the ticks end (D-162).
-   */
-  private advance(count: number, done: (ok: boolean) => void): void {
-    if (this.parallel === undefined) {
-      done(this.advanceTicks(count));
-      return;
+    if (nowMs - this.lastSnapshotMs >= SNAPSHOT_INTERVAL_MS) {
+      this.lastSnapshotMs = nowMs;
+      this.emitSnapshot("SNAPSHOT");
     }
-    this.busy = true;
-    void this.advanceTicksParallel(count, this.parallel).then((ok) => {
-      this.busy = false;
-      done(ok);
-      this.drainQueued();
-    });
-  }
-
-  /** Apply the commands that waited for a day, in order, until one starts another day. */
-  private drainQueued(): void {
-    while (!this.busy && this.queued.length > 0) {
-      this.handleCommand(this.queued.shift());
-    }
-  }
-
-  /** `advanceTicks` with the day's split phases offered to the pool (D-162). */
-  private async advanceTicksParallel(count: number, pool: KernelPool): Promise<boolean> {
-    if (count > 0) this.pristine = false;
-    for (let index = 0; index < count; index += 1) {
-      if (isCampaignComplete(this.world)) {
-        this.pause();
-        this.emitSnapshot("SNAPSHOT");
-        return true;
-      }
-      try {
-        const result = await runTicksWithRollbackParallel(this.runner, 1, this.context, pool);
-        if (result.ticksProcessed === 0) {
-          this.pause();
-          this.emitSnapshot("SNAPSHOT");
-          return true;
-        }
-      } catch (error) {
-        this.pause();
-        this.emitEvent({
-          protocolVersion: PROTOCOL_VERSION,
-          type: "FATAL",
-          message: `simulation tick failed: ${errorMessage(error)}`,
-        });
-        return false;
-      }
-    }
-    if (isCampaignComplete(this.world)) this.pause();
-    return true;
   }
 
   /** Run exactly `count` complete ticks. Returns false after a fatal tick error. */
@@ -732,7 +648,6 @@ export class SimulationHost {
     this.running = false;
     this.stopTimer();
     this.closed = true;
-    this.parallel?.close();
     this.emitEvent({ protocolVersion: PROTOCOL_VERSION, type: "SHUTDOWN", commandId });
   }
 
