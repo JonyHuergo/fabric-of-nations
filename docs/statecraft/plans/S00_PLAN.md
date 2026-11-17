@@ -30,7 +30,7 @@ as recommended:
 **Progress (2026-11-17):** all steps of §7 done on the branch: answers (`6625a75`), D-172
 (`bafeb4c`), baseline (§6 checks on the branch: lint, both audits, index check, naming suite 13 of
 13), the bible and the archive (`30084c9`), the pointers (`70fc711`), the close (report, D-173,
-status table). Waiting for the designer before any merge or push.
+status table). Merged into `main` and pushed on 2026-11-17 at the designer's instruction.
 
 ---
 
