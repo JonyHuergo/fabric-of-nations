@@ -6,6 +6,7 @@
 - The official game name is **Fabric of Nations**. The game was formerly *Century*; historical GDD versions, change reports, milestone reports and the historical decision register retain that name as a historical record. Do not introduce the former name into current player-facing UI, current application or web metadata, or current documentation.
 - The official unit of account is **RUSD — Reference US Dollars**. One RUSD has the purchasing power of one real-world US dollar of 1990; it is the simulation’s stable internal reference and measurement unit (D-122). It is not a national currency, legal tender, an adoptable currency or an issuer, and it is not the simulated US dollar, whose value moves in the simulation. Actual national currencies, including USD, remain distinct. RUSD is for the simulation; players see money in their own (or a chosen) currency, converted only at display time. The unit was formerly **SUSD (Simulated US Dollars)**; historical reports and legacy save aliases retain that spelling.
 - The Fabric of Nations Game Design Document (`Fabric_of_Nations_GDD.md`) defines game mechanics, simulation behavior, scope, and milestone acceptance criteria.
+- The **Statecraft Program** (`docs/STATECRAFT_PROGRAM.md`, approved by the designer on 2026-11-16) is the plan for all work after P7. Where it amends the GDD (the program's §3 lists the amendments), the program applies until its stage S0 revises the GDD. `docs/statecraft/` holds the agent handbook, the shared contracts and the brief of every stage (see §8).
 - Implement only the milestone explicitly assigned in the current task.
 - Do not silently change the GDD or invent major mechanics. Record unresolved decisions and substantive deviations in `DECISIONS.md`, including the rationale and consequences.
 - For material ambiguities or contradictions, report the issue and propose a resolution before proceeding with affected implementation. For minor, reversible details, choose the simplest compatible behavior and document the assumption.
@@ -122,3 +123,12 @@ Every completion report must include:
 - Assumptions, deviations from the GDD, known limitations, and uncompleted acceptance criteria.
 
 Do not claim an acceptance criterion is satisfied when it has not been verified. Do not start the next milestone until the current milestone's acceptance criteria pass or the designer explicitly accepts an exception.
+
+## 8. Statecraft Program (all work after P7)
+
+- Before any Statecraft stage, read in this order: `docs/statecraft/README.md`, `docs/statecraft/HANDBOOK.md`, `docs/statecraft/CONTRACTS.md`, then the brief of the assigned stage. The handbook says what else to read.
+- Work on one stage or sub-stage per task. Write the stage plan first and wait for the designer's approval before changing code (handbook §5).
+- A hypothesis, estimate or sketch in the program documents is not a fact. Verify it in the code and by measurement before relying on it, and report any that is wrong.
+- Every system ships with its Desk cards, lens, Gazette events, AI use, and "why" and forecast entries (handbook §8). A system the player can use and the AI cannot is not finished.
+- After stage S2, new simulation work is a scheduled job with a measured cost. Do not add a loop that visits every block, building or province on every simulated day.
+- Stop and ask the designer, rather than decide, when: the brief and the code disagree; an acceptance criterion cannot be met; a save-schema, dependency or data-licence question arises; a test, pin or tolerance would have to change; or the work would touch another stage.
