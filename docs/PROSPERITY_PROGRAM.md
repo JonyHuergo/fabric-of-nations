@@ -1,6 +1,26 @@
 # Prosperity Program — peacetime economy and demography
 
-**Status:** P0–P2b accepted; the performance stages (D-137, D-139) accepted as complete on
+**Status (2026-11-17):** **closed after P7.** The stages after P7 continue in the Statecraft
+Program (`docs/STATECRAFT_PROGRAM.md`, approved by the designer on 2026-11-16, D-172). Where each
+remaining item goes (program §5.2):
+
+| Prosperity item | Lands in | Change from the Prosperity plan |
+|---|---|---|
+| P7 long-run collapse, US first week, unplaced mills | S1 | — |
+| P7b save storage | Done (D-170) | Binary columnar saves in S2 |
+| Map-pipeline repair | P7 close (step 8) | — |
+| P8 infrastructure and market access | S9 | Adds merchant shipping as real tonnage; railways also set mobilisation speed and army supply |
+| P9 companies, P10 private investment, P12 state and mixed ownership | S10 | One stage |
+| P11 banks, credit, bonds, monetary gold and silver; P13 stock exchanges | S11 | The exchange is reduced to share prices of listed firms, an index and trust formation; no order book |
+| P14 story layer | S4 to S8 | Reports, news, goals and AI become first-class systems |
+| P15 century calibration | S3 onward, final pass in S27 | Continuous through the Observatory |
+
+The map-pipeline repair was done in D-171. This document stays as the record of P0 to P7 and of
+the plan the Statecraft stages start from. GDD section numbers below are those of GDD v2.19
+(archived as `docs/archive/gdd/Fabric_of_Nations_GDD_v2.19.md`); Part E of GDD v3.0 finds where
+each now is.
+
+**Status of P0 to P7:** P0–P2b accepted; the performance stages (D-137, D-139) accepted as complete on
 2026-11-04. P3 (D-141), P4 (D-142, with the natural-fertility ceiling of D-144) and P5a
 (D-143) accepted on 2026-11-06 (D-146). P5b (the goods catalogue and D-140) implemented
 for review on 2026-11-07 (D-147 to D-151, `P5B_COMPLETION_REPORT.md`) and extended on
@@ -19,7 +39,8 @@ D-157 to D-163 and the close D-164 to D-168) is implemented on `main` and the br
 (2026-11-16; `docs/P7_COMPLETION_REPORT.md`): its acceptance tests pass and the fibre good brings
 cotton to 0.89 of the 1900 crop, but the ten-year run shows the lower stratum below subsistence
 and a falling population, to be diagnosed before P8 (report §7).\
-**Authority:** GDD §17J (binding summary), decisions D-115 to D-124. This document is
+**Authority:** GDD v2.19 §17J (binding summary; its rules are now in GDD v3.0 Part B), decisions
+D-115 to D-124, and from P8 on the Statecraft Program. This document is
 the detailed implementation plan: stage scope, dependencies, tests and benchmarks.\
 **Goal:** a country that never goes to war and never engages in diplomacy must still be
 a rewarding game, because its population and economy are a realistic, legible,

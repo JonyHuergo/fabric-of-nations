@@ -25,14 +25,15 @@ their own (or a chosen) currency, converted only at display time (P3, D-141).
 
 | Document | What it is |
 |---|---|
-| [`Fabric_of_Nations_GDD.md`](./Fabric_of_Nations_GDD.md) | The game design document: mechanics, scope and milestone acceptance criteria. Authoritative. |
+| [`Fabric_of_Nations_GDD.md`](./Fabric_of_Nations_GDD.md) | The game design document (v3.0, the design bible): what the game is, the binding rules, the state of each system, the glossary, and where every section of earlier editions went. Authoritative below `AGENTS.md` and the Statecraft Program. |
 | [`AGENTS.md`](./AGENTS.md) | Persistent engineering rules (determinism, No-Mana Doctrine, numerical integrity, mobile-first). |
 | [`DECISIONS.md`](./DECISIONS.md) | The decision register, D-001 onward, with a generated index at the top. |
-| [`docs/PROSPERITY_PROGRAM.md`](./docs/PROSPERITY_PROGRAM.md) | The current programme (P0–P15): stages, dependencies, tests and status. |
+| [`docs/STATECRAFT_PROGRAM.md`](./docs/STATECRAFT_PROGRAM.md), [`docs/statecraft/`](./docs/statecraft/README.md) | The current programme (stages S0 to S27, approved 2026-11-16, D-172): the plan, the agent handbook, the shared contracts and the brief of every stage. |
+| [`docs/PROSPERITY_PROGRAM.md`](./docs/PROSPERITY_PROGRAM.md) | The programme of P0 to P7 (closed after P7; its later stages continue in the Statecraft Program). |
 | [`docs/randomness.md`](./docs/randomness.md) | The keyed deterministic random generator. |
 | [`docs/MAP_DATA.md`](./docs/MAP_DATA.md), [`docs/MAP_RENDERING.md`](./docs/MAP_RENDERING.md) | Map data pipeline and the renderer every platform runs. |
 | `docs/*_PROVENANCE.md`, [`docs/1900_CATALOG_COVERAGE.md`](./docs/1900_CATALOG_COVERAGE.md), `docs/*_PROVINCIALIZATION.md`, [`docs/PROVINCE_GEOGRAPHY.md`](./docs/PROVINCE_GEOGRAPHY.md) | Sources, licences and audits for the 1900 world, its flags, fonts, provinces, land and resources. |
-| [`docs/archive/`](./docs/archive/README.md) | Historical records: earlier GDD editions, change reports, completion reports, requirements maps, and the milestone history formerly in this README. |
+| [`docs/archive/`](./docs/archive/README.md) | Historical records: earlier GDD editions (v2.19, the last before the design bible, holds the implementation records), change reports, completion reports, requirements maps, and the milestone history formerly in this README. |
 
 The P4 and P5 completion reports stay at the repository root until those stages are
 accepted.
@@ -122,7 +123,7 @@ the save library can list them.
 
 ## Development workflow
 
-1. Read `AGENTS.md` and the relevant GDD milestone.
+1. Read `AGENTS.md`, then the documents `docs/statecraft/README.md` lists for the assigned stage.
 2. Inspect `git status`; preserve unrelated changes.
 3. Write/update tests before behavior.
 4. Keep tuning coefficients in constants/data with units and calibration status.
@@ -130,5 +131,5 @@ the save library can list them.
 6. Run `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, and `pnpm run bench`.
    Map changes also use `pnpm map:check`, and `pnpm map:verify` on a machine with a GPU
    (`docs/MAP_RENDERING.md`).
-7. Do not begin the next milestone until the current one is reviewed and the next
-   phase is explicitly authorized in the GDD and task assignment.
+7. Do not begin the next stage until the current one is reviewed and the next
+   stage is explicitly assigned by the designer (handbook §5).

@@ -2,7 +2,9 @@
 
 **Status:** **approved by the designer on 2026-11-16**, with all ten decisions of §18 as
 recommended. Nothing is implemented yet. Stage S0 records the approval in `DECISIONS.md` and revises
-the GDD; until then, where this program and the GDD disagree, this program applies (AGENTS.md §8).\
+the GDD; until then, where this program and the GDD disagree, this program applies (AGENTS.md §8).
+S0 did both on 2026-11-17 (D-172, D-173): GDD v3.0 records each amendment beside the rule it
+changes. GDD section numbers in this document are those of v2.19; Part E of v3.0 finds them.\
 **For implementing agents:** read `docs/statecraft/README.md` first. It leads to the handbook, the
 shared contracts and the brief of each stage.\
 **Scope:** everything after P7: military, politics, diplomacy, interface, technology, country AI,

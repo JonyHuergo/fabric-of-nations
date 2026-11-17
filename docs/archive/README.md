@@ -9,7 +9,7 @@ and are not maintained. Only relative links were updated when the files moved he
 
 | Folder | Contents | Superseded by |
 |---|---|---|
-| [`gdd/`](./gdd/) | The 18 GDD editions v2 to v2.17, written under the former name | `Fabric_of_Nations_GDD.md` (v2.18 onward) |
+| [`gdd/`](./gdd/) | The 18 GDD editions v2 to v2.17, written under the former name, and `Fabric_of_Nations_GDD_v2.19.md`, the last edition before the design bible (moved here unchanged in S0, D-173; v2.18 was revised in place into v2.19 and is in the git history of the file) | `Fabric_of_Nations_GDD.md` (v3.0 onward, the design bible) |
 | [`gdd-change-reports/`](./gdd-change-reports/) | The change report of every GDD edition from v2.2 to v2.19 | the GDD's own change notes and `DECISIONS.md` |
 | [`completion-reports/`](./completion-reports/) | Completion reports of M12a–M12e, M15, M16, P1, P2, P2b, P3 and the two performance stages | `DECISIONS.md` (one entry per stage) |
 | [`milestones/`](./milestones/) | Requirements maps (M8, M9, M11, E5, E6a, E6b), the M11 design record and playtest guide, the M11d playtest and M11e runtime-error reports, the M13 rebranding and M14 unit-renaming reports, and the P2b calibration plan | the GDD, `DECISIONS.md`, `docs/MAP_DATA.md`, `docs/MAP_RENDERING.md` |
@@ -17,3 +17,9 @@ and are not maintained. Only relative links were updated when the files moved he
 
 The P4 and P5 completion reports and `docs/P5_BEFORE_AFTER.md` are not here yet: they
 belong to stages still under review and move here when those stages are accepted.
+
+**Sections lost in v2.14.** The edition v2.14 dropped GDD §12.1 to §16 (country AI, presentation,
+architecture and persistence, historical data and calibration, determinism and tests) by an
+editing error, and v2.15 to v2.19 inherited the gap. `gdd/Century_GDD_v2.13.md` is the last
+edition with that text. GDD v3.0 restores its binding rules and lists every old section in its
+Part E (D-173).

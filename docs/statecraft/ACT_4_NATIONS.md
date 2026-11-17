@@ -195,7 +195,7 @@ every step, and when a state breaks, the pieces are valid states.
 
 Each rung is an action of an organised movement, possible only when its preconditions hold in the
 simulated state. A keyed draw may resolve an uncertain outcome only after the preconditions are
-met (GDD §9.4).
+met (GDD v2.19 §9.4).
 
 | Rung | Preconditions (derived) | Effect | The government's answers |
 |---|---|---|---|
