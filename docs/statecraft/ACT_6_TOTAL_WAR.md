@@ -10,7 +10,7 @@ Order: S19 → S20 → **part 2 of S18** (`ACT_5_CONCERT.md`) → S21 → S22 �
 Each stage begins with a stage plan approved by the designer (handbook §5). The definition of done
 of handbook §8 applies in full.
 
-Read first: `HANDBOOK.md`, `CONTRACTS.md` (all), program §9, GDD §17H (what M10 does today), the
+Read first: `HANDBOOK.md`, `CONTRACTS.md` (all), program §9, GDD v2.19 §17H (archived; what M10 does today), the
 briefs of S9 (railways, shipping), S12 (inventions and methods), S13 (composition), S14 and S15
 (support, mutiny), S16 and S17 (treaties, crises).
 

@@ -79,7 +79,7 @@ of the second, the rise of the third: GDD pillar 2), world product per head, wor
 - **Calibration** (the Prosperity Program's P15). No-input and AI-only runs of the full hundred
   years against Maddison's product per head, urbanisation, employment shares, life expectancy and
   fertility, with documented bands. A coefficient changes only after its structural cause is
-  diagnosed (GDD §6.6). Coefficients that hold are promoted from provisional to calibrated, with
+  diagnosed (GDD v2.19 §6.6). Coefficients that hold are promoted from provisional to calibrated, with
   the evidence.
 - **AI and difficulty.** The league of builds on fixed seeds; the difficulty levels tested by
   what they change (foresight and error only).

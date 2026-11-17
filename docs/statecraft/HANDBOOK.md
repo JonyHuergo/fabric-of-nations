@@ -48,7 +48,9 @@ demography and labour replace the daily rules of GDD §3.4; invariants and stati
 replace 1900-world hash pins as the main regression guard; journals are weekly per account class
 and cohort; subscribed views replace the full snapshot; P9 to P13 are two stages; the design bible
 replaces the GDD's implementation records; tests run in three tiers. These apply from the stage
-that implements each one, not before. Until S2 lands, the day is still fully daily.
+that implements each one, not before. Until S2 lands, the day is still fully daily. GDD v3.0
+(stage S0) records each amendment beside the rule it changes; GDD section numbers in these
+documents are those of v2.19, and Part E of v3.0 finds them.
 
 **Still binding, with no exception granted:** no legacy saves and no migrations (bump the schema,
 reject older saves); one thread (D-163); never detach an `ArrayBuffer` on the simulation thread;

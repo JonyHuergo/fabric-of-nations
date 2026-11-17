@@ -16,7 +16,11 @@ agent needs to implement one stage of it correctly.
 5. `docs/STATECRAFT_PROGRAM.md` — the whole plan. Read §2 (the game) and the section of your
    system. The rest is reference.
 
-Do not read the GDD's implementation records (§17 onward) unless your brief sends you there.
+The GDD (`Fabric_of_Nations_GDD.md`, v3.0 from S0) is the design bible; Part B holds the binding
+rules. The implementation records of earlier editions are archived in
+`docs/archive/gdd/Fabric_of_Nations_GDD_v2.19.md`; read them only when your brief sends you there.
+GDD section numbers in the Statecraft documents written before S0 ("GDD §3.4", "GDD §17H") are
+those of v2.19; Part E of GDD v3.0 says where each now is.
 
 ## Stage briefs
 
