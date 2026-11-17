@@ -12184,3 +12184,23 @@ of D-145 (`docs/MAP_DATA.md` §7, `docs/HISTORICAL_DATA_PROVENANCE.md` §6) to b
 ### What to test on phones (designer)
 
 Nothing: no app file changed.
+
+### Designer's decision and the regenerated outputs (2026-11-17)
+
+The designer answered "Yes, commit". The four steps were run in the main tree with the committed
+scripts: `boundaries_1900.json`, `world_map_1900.json`, `worldMap1900.ts` and
+`docs/HISTORICAL_MAP_PROVENANCE.md` came out byte for byte the files reviewed above (`cmp`), and
+`world_map_1900_audit.json` byte for byte the committed one. They are committed.
+`docs/MAP_DATA.md` §7, `docs/HISTORICAL_DATA_PROVENANCE.md` §6, the program and the P7 report say
+so. The province generators read only the map's geometry, which did not change, so their outputs
+were not rebuilt (D-145 records that some of them are stale for other reasons).
+
+Checks on this code: the suites that read these files, `data/world-1900`, `data/catalogue-coverage`,
+the thirteen `map/` suites and `architecture/naming-audits` (16 suites, 338 of 338 tests);
+`pnpm typecheck`, `pnpm lint`, both audits, `check:worker`, `pnpm map:atlas:check` (the atlas
+does not embed the map text and is unchanged) and `pnpm app:export` (web, iOS, Android) pass. The
+full `pnpm test` was not run again (D-170's run, 115 of 115 suites, is on the same code apart from
+these text changes).
+
+**What to test on phones:** the provenance text of a reconstructed country (Germany, Russia,
+Romania, Serbia) shows its place names correctly, for example "Klaipėda" and "Württemberg".

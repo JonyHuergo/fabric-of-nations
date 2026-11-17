@@ -225,10 +225,9 @@ outer/hole polygons so inland seas are not counted as unassigned land.
 > **Status (D-171, 2026-11-17).** The M11d dispute resolutions (commit `1a2a68a`) are back in
 > the pipeline: `boundaries-1900-source.mjs` holds them, `build-boundaries.mjs` writes
 > `m11d-1900-boundaries-v2` and `generate-provenance-doc.mjs` writes the resolved-zones section.
-> A rebuild reproduces the committed geometry, numbers and audit exactly; its only change is
-> the repair of the mis-encoded names the committed outputs still carry (for example
-> `KlaipÄ—da` → `Klaipėda`). Those outputs are regenerated only on the designer's decision
-> (D-171).
+> A rebuild reproduces the committed geometry, numbers and audit exactly. The outputs were
+> regenerated on the designer's decision (2026-11-17, D-171), which repaired their mis-encoded
+> names (for example `Klaipėda`, `Württemberg`); the steps below can be run again.
 
 1. Edit the catalog's `geometry` crosswalk or the authored transfers in
    `scripts/m11/boundaries-1900-source.mjs`.

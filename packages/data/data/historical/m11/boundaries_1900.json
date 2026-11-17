@@ -277,7 +277,7 @@
         "treaty-versailles-1919",
         "karte-deutsches-reich-1900"
       ],
-      "notes": "The northern limit follows the KongeÃƒÂ¥ (1864 frontier); the southern limit is the modern Danish-German border. The exact 1864-1920 line is generalized."
+      "notes": "The northern limit follows the Kongeå (1864 frontier); the southern limit is the modern Danish-German border. The exact 1864-1920 line is generalized."
     },
     {
       "id": "germany-eupen-malmedy",
@@ -341,7 +341,7 @@
     },
     {
       "id": "germany-memel",
-      "description": "Memel (KlaipÃ„â€”da) territory, German in 1900, Lithuanian from 1923.",
+      "description": "Memel (Klaipėda) territory, German in 1900, Lithuanian from 1923.",
       "to": "DEU",
       "from": [
         "RUS"
@@ -356,7 +356,7 @@
         "treaty-versailles-1919",
         "karte-deutsches-reich-1900"
       ],
-      "notes": "KlaipÃ„â€”da County closely matches the Memel Territory. The northern frontier along the Neman is a modern county boundary approximation."
+      "notes": "Klaipėda County closely matches the Memel Territory. The northern frontier along the Neman is a modern county boundary approximation."
     },
     {
       "id": "germany-prussian-east",
@@ -478,11 +478,11 @@
         "karte-deutsches-reich-1900",
         "historical-basemaps-1900"
       ],
-      "notes": "The modern voivodeships are clipped by the authored 1900 frontier. The line excludes Congress Poland (Kalisz, Konin, WÃ…â€šocÃ…â€šawek, CzÃ„â„¢stochowa) and Austrian Galicia, while keeping Thorn, Posen, Breslau and the East Prussian core. The frontier is generalized to about 10-20 km; LOW confidence applies to the immediate border strip."
+      "notes": "The modern voivodeships are clipped by the authored 1900 frontier. The line excludes Congress Poland (Kalisz, Konin, Włocławek, Częstochowa) and Austrian Galicia, while keeping Thorn, Posen, Breslau and the East Prussian core. The frontier is generalized to about 10-20 km; LOW confidence applies to the immediate border strip."
     },
     {
       "id": "austria-galicia",
-      "description": "Galicia and Lodomeria, the Austrian partition of Poland, including Lviv, Ternopil, Ivano-Frankivsk, KrakÃƒÂ³w and PrzemyÃ…â€ºl.",
+      "description": "Galicia and Lodomeria, the Austrian partition of Poland, including Lviv, Ternopil, Ivano-Frankivsk, Kraków and Przemyśl.",
       "to": "AUT",
       "from": [
         "RUS"
@@ -537,7 +537,7 @@
     },
     {
       "id": "austria-transylvania",
-      "description": "Transylvania, the Banat, CriÃˆâ„¢ana and MaramureÃˆâ„¢, Hungarian until 1918.",
+      "description": "Transylvania, the Banat, Crișana and Maramureș, Hungarian until 1918.",
       "to": "AUT",
       "from": [
         "ROM"
@@ -597,11 +597,11 @@
         "treaty-trianon-1920",
         "hammond-1912"
       ],
-      "notes": "The listed counties are the historical Transylvanian, Banat, CriÃˆâ„¢ana and MaramureÃˆâ„¢ counties. The 1900 Hungarian-Romanian border is approximated by the modern county boundaries."
+      "notes": "The listed counties are the historical Transylvanian, Banat, Crișana and Maramureș counties. The 1900 Hungarian-Romanian border is approximated by the modern county boundaries."
     },
     {
       "id": "austria-vojvodina",
-      "description": "Vojvodina (BÃƒÂ¡cska, Banat, Syrmia), Hungarian until 1918.",
+      "description": "Vojvodina (Bácska, Banat, Syrmia), Hungarian until 1918.",
       "to": "AUT",
       "from": [
         "SRB"
@@ -764,7 +764,7 @@
     },
     {
       "id": "serbia-sandzak",
-      "description": "The SandÃ…Â¾ak of Novi Pazar, Ottoman until 1912.",
+      "description": "The Sandžak of Novi Pazar, Ottoman until 1912.",
       "to": "OTT",
       "from": [
         "SRB"
@@ -805,7 +805,7 @@
     },
     {
       "id": "montenegro-sandzak",
-      "description": "Pljevlja, Bijelo Polje, Berane, Plav and RoÃ…Â¾aje, acquired by Montenegro only in 1912-13.",
+      "description": "Pljevlja, Bijelo Polje, Berane, Plav and Rožaje, acquired by Montenegro only in 1912-13.",
       "to": "OTT",
       "from": [
         "MNT"
@@ -832,7 +832,7 @@
         "treaty-lausanne-1923",
         "hammond-1912"
       ],
-      "notes": "The five municipalities were Ottoman SandÃ…Â¾ak territory in 1900; the 1912-13 Montenegrin acquisitions are removed."
+      "notes": "The five municipalities were Ottoman Sandžak territory in 1900; the 1912-13 Montenegrin acquisitions are removed."
     },
     {
       "id": "greece-ottoman-new-lands",
@@ -1153,7 +1153,7 @@
     },
     {
       "id": "french-india",
-      "description": "Puducherry, Karaikal, MahÃƒÂ© and Yanam, French India in 1900.",
+      "description": "Puducherry, Karaikal, Mahé and Yanam, French India in 1900.",
       "to": "FIC",
       "from": [
         "BIN"
@@ -1329,7 +1329,7 @@
       "sourceIds": [
         "hammond-1912"
       ],
-      "notes": "The khanate's irrigated core along the Amu Darya is approximated by Xorazm, Karakalpakstan and DaÃ…Å¸oguz. The desert frontier with Bukhara and Persia was not a hard line.",
+      "notes": "The khanate's irrigated core along the Amu Darya is approximated by Xorazm, Karakalpakstan and Daşoguz. The desert frontier with Bukhara and Persia was not a hard line.",
       "cleanup": true,
       "replaceBase": true
     },
@@ -1716,7 +1716,7 @@
         "eb1911-wadai",
         "hammond-1912"
       ],
-      "notes": "The sultanate's core in OuaddaÃƒÂ¯, Wadi Fira, Batha and the Borkou/Ennedi approaches is approximated by modern Chadian regions. The northern Tibesti and the southern tributary zones are excluded; the frontier was not surveyed.",
+      "notes": "The sultanate's core in Ouaddaï, Wadi Fira, Batha and the Borkou/Ennedi approaches is approximated by modern Chadian regions. The northern Tibesti and the southern tributary zones are excluded; the frontier was not surveyed.",
       "cleanup": true,
       "replaceBase": true
     },
@@ -1752,7 +1752,7 @@
     },
     {
       "id": "bolivia-acre",
-      "description": "Acre, Bolivian until the 1903 Treaty of PetrÃƒÂ³polis.",
+      "description": "Acre, Bolivian until the 1903 Treaty of Petrópolis.",
       "to": "BOL",
       "from": [
         "BRA"
@@ -1864,7 +1864,7 @@
   "disputedAreas": [
     {
       "id": "aouzou-tibesti",
-      "name": "Aouzouâ€“Tibesti frontier zone",
+      "name": "Aouzou–Tibesti frontier zone",
       "classification": "disputed-no-established-administration",
       "referenceDate": "1900-01-01",
       "confidence": "low",
@@ -1902,7 +1902,7 @@
         "eb1911-tripoli",
         "hammond-1912"
       ],
-      "notes": "A cartographic uncertainty zone, not a state. The 1899 declaration is a sphere-of-influence line, not a boundary survey. The 1935 Franco-Italian agreement and the 1955 Franco-Libyan treaty are post-1900 and are not applied retroactively. The rectangle approximates the Aouzou strip (15â€“16Â°E) plus the Tibesti massif (16â€“19Â°E) north of 19.5Â°N, including BardaÃ¯ and Gouro. It is not a precise historical border.",
+      "notes": "A cartographic uncertainty zone, not a state. The 1899 declaration is a sphere-of-influence line, not a boundary survey. The 1935 Franco-Italian agreement and the 1955 Franco-Libyan treaty are post-1900 and are not applied retroactively. The rectangle approximates the Aouzou strip (15–16°E) plus the Tibesti massif (16–19°E) north of 19.5°N, including Bardaï and Gouro. It is not a precise historical border.",
       "resolution": {
         "strategy": "split-by-current-borders",
         "dataset": "natural-earth-50m",
@@ -2129,9 +2129,9 @@
       "geometryClass": "reconstructed",
       "confidence": "medium",
       "underlyingBoundaryDate": "1900-01-01 (historical claim); modern units dated 2024",
-      "deviationsFromModern": "Reconstructed as the 1900 German Empire: modern Germany plus Alsace-Lorraine, northern Schleswig, Eupen-Malmedy, KlaipÃ„â€”da, Kaliningrad and the Prussian eastern provinces, clipped to the 1900 Russian/Austrian frontier. The eastern frontier strip is the least certain part.",
-      "knownUncertainties": "Reconstructed as the 1900 German Empire: modern Germany plus Alsace-Lorraine, northern Schleswig, Eupen-Malmedy, KlaipÃ„â€”da, Kaliningrad and the Prussian eastern provinces, clipped to the 1900 Russian/Austrian frontier. The eastern frontier strip is the least certain part.",
-      "notes": "Reconstructed as the 1900 German Empire: modern Germany plus Alsace-Lorraine, northern Schleswig, Eupen-Malmedy, KlaipÃ„â€”da, Kaliningrad and the Prussian eastern provinces, clipped to the 1900 Russian/Austrian frontier. The eastern frontier strip is the least certain part.",
+      "deviationsFromModern": "Reconstructed as the 1900 German Empire: modern Germany plus Alsace-Lorraine, northern Schleswig, Eupen-Malmedy, Klaipėda, Kaliningrad and the Prussian eastern provinces, clipped to the 1900 Russian/Austrian frontier. The eastern frontier strip is the least certain part.",
+      "knownUncertainties": "Reconstructed as the 1900 German Empire: modern Germany plus Alsace-Lorraine, northern Schleswig, Eupen-Malmedy, Klaipėda, Kaliningrad and the Prussian eastern provinces, clipped to the 1900 Russian/Austrian frontier. The eastern frontier strip is the least certain part.",
+      "notes": "Reconstructed as the 1900 German Empire: modern Germany plus Alsace-Lorraine, northern Schleswig, Eupen-Malmedy, Klaipėda, Kaliningrad and the Prussian eastern provinces, clipped to the 1900 Russian/Austrian frontier. The eastern frontier strip is the least certain part.",
       "transferIds": [
         "germany-alsace-lorraine",
         "germany-north-schleswig",
@@ -2154,7 +2154,7 @@
           "notes": "Annexed in 1871; included Bas-Rhin, Haut-Rhin and Moselle."
         },
         {
-          "name": "Bavaria, Saxony, WÃƒÂ¼rttemberg, Baden and the smaller states",
+          "name": "Bavaria, Saxony, Württemberg, Baden and the smaller states",
           "adminStatus": "Constituent monarchies and duchies",
           "confidence": "high",
           "notes": "Their external borders are those of the German Empire; internal state borders are not drawn on the political layer."
@@ -2314,9 +2314,9 @@
       "geometryClass": "reconstructed",
       "confidence": "medium",
       "underlyingBoundaryDate": "1900-01-01 (historical claim); modern units dated 2024",
-      "deviationsFromModern": "The Russian Empire in 1900 included the Baltic provinces, Belarus, most of Ukraine, Bessarabia, Congress Poland, Finland (separate grand duchy), the Caucasus, Central Asia and Kars/Ardahan/Artvin. German Poland, KlaipÃ„â€”da, Galicia, Khiva and Bukhara are removed; Kars is added.",
-      "knownUncertainties": "The Russian Empire in 1900 included the Baltic provinces, Belarus, most of Ukraine, Bessarabia, Congress Poland, Finland (separate grand duchy), the Caucasus, Central Asia and Kars/Ardahan/Artvin. German Poland, KlaipÃ„â€”da, Galicia, Khiva and Bukhara are removed; Kars is added.",
-      "notes": "The Russian Empire in 1900 included the Baltic provinces, Belarus, most of Ukraine, Bessarabia, Congress Poland, Finland (separate grand duchy), the Caucasus, Central Asia and Kars/Ardahan/Artvin. German Poland, KlaipÃ„â€”da, Galicia, Khiva and Bukhara are removed; Kars is added.",
+      "deviationsFromModern": "The Russian Empire in 1900 included the Baltic provinces, Belarus, most of Ukraine, Bessarabia, Congress Poland, Finland (separate grand duchy), the Caucasus, Central Asia and Kars/Ardahan/Artvin. German Poland, Klaipėda, Galicia, Khiva and Bukhara are removed; Kars is added.",
+      "knownUncertainties": "The Russian Empire in 1900 included the Baltic provinces, Belarus, most of Ukraine, Bessarabia, Congress Poland, Finland (separate grand duchy), the Caucasus, Central Asia and Kars/Ardahan/Artvin. German Poland, Klaipėda, Galicia, Khiva and Bukhara are removed; Kars is added.",
+      "notes": "The Russian Empire in 1900 included the Baltic provinces, Belarus, most of Ukraine, Bessarabia, Congress Poland, Finland (separate grand duchy), the Caucasus, Central Asia and Kars/Ardahan/Artvin. German Poland, Klaipėda, Galicia, Khiva and Bukhara are removed; Kars is added.",
       "transferIds": [
         "germany-east-prussia-kaliningrad",
         "germany-memel",
@@ -2920,9 +2920,9 @@
       "geometryClass": "reconstructed",
       "confidence": "high",
       "underlyingBoundaryDate": "1900-01-01 (historical claim); modern units dated 2024",
-      "deviationsFromModern": "The 1900 Kingdom of Serbia excluded Vojvodina (Austria-Hungary) and the SandÃ…Â¾ak (Ottoman). Both are removed.",
+      "deviationsFromModern": "The 1900 Kingdom of Serbia excluded Vojvodina (Austria-Hungary) and the Sandžak (Ottoman). Both are removed.",
       "knownUncertainties": "None beyond the generalization of the modern source units (1:50m base; 1:10m reconstruction blocks).",
-      "notes": "The 1900 Kingdom of Serbia excluded Vojvodina (Austria-Hungary) and the SandÃ…Â¾ak (Ottoman). Both are removed.",
+      "notes": "The 1900 Kingdom of Serbia excluded Vojvodina (Austria-Hungary) and the Sandžak (Ottoman). Both are removed.",
       "transferIds": [
         "austria-vojvodina",
         "serbia-sandzak"
@@ -2987,9 +2987,9 @@
       "geometryClass": "reconstructed",
       "confidence": "high",
       "underlyingBoundaryDate": "1900-01-01 (historical claim); modern units dated 2024",
-      "deviationsFromModern": "The 1900 Principality of Montenegro excluded the Bay of Kotor (Austrian) and the SandÃ…Â¾ak municipalities acquired in 1912-13.",
+      "deviationsFromModern": "The 1900 Principality of Montenegro excluded the Bay of Kotor (Austrian) and the Sandžak municipalities acquired in 1912-13.",
       "knownUncertainties": "None beyond the generalization of the modern source units (1:50m base; 1:10m reconstruction blocks).",
-      "notes": "The 1900 Principality of Montenegro excluded the Bay of Kotor (Austrian) and the SandÃ…Â¾ak municipalities acquired in 1912-13.",
+      "notes": "The 1900 Principality of Montenegro excluded the Bay of Kotor (Austrian) and the Sandžak municipalities acquired in 1912-13.",
       "transferIds": [
         "austria-kotor",
         "montenegro-sandzak"
@@ -3054,9 +3054,9 @@
       "geometryClass": "reconstructed",
       "confidence": "high",
       "underlyingBoundaryDate": "1900-01-01 (historical claim); modern units dated 2024",
-      "deviationsFromModern": "The 1900 Kingdom of Romania comprised Wallachia and Moldavia plus northern Dobruja. Transylvania, the Banat, CriÃˆâ„¢ana, MaramureÃˆâ„¢ and southern Bukovina are removed to Austria-Hungary; southern Dobruja is added from Bulgaria.",
+      "deviationsFromModern": "The 1900 Kingdom of Romania comprised Wallachia and Moldavia plus northern Dobruja. Transylvania, the Banat, Crișana, Maramureș and southern Bukovina are removed to Austria-Hungary; southern Dobruja is added from Bulgaria.",
       "knownUncertainties": "None beyond the generalization of the modern source units (1:50m base; 1:10m reconstruction blocks).",
-      "notes": "The 1900 Kingdom of Romania comprised Wallachia and Moldavia plus northern Dobruja. Transylvania, the Banat, CriÃˆâ„¢ana, MaramureÃˆâ„¢ and southern Bukovina are removed to Austria-Hungary; southern Dobruja is added from Bulgaria.",
+      "notes": "The 1900 Kingdom of Romania comprised Wallachia and Moldavia plus northern Dobruja. Transylvania, the Banat, Crișana, Maramureș and southern Bukovina are removed to Austria-Hungary; southern Dobruja is added from Bulgaria.",
       "transferIds": [
         "austria-bukovina",
         "austria-transylvania",
@@ -3892,8 +3892,8 @@
       "confidence": "low",
       "underlyingBoundaryDate": "1900-01-01 (verified against the modern external outline)",
       "deviationsFromModern": "No 1900-to-modern territorial difference is identified for the external border; the modern outline is retained as a verified match, not as a convenience default.",
-      "knownUncertainties": "Morocco's 1900 southern and south-eastern frontier was not delimited. The modern outline excludes the Tindouf/Colomb-BÃƒÂ©char claims and Western Sahara (separate Spanish territory); the modern border is a rough approximation.",
-      "notes": "Morocco's 1900 southern and south-eastern frontier was not delimited. The modern outline excludes the Tindouf/Colomb-BÃƒÂ©char claims and Western Sahara (separate Spanish territory); the modern border is a rough approximation.",
+      "knownUncertainties": "Morocco's 1900 southern and south-eastern frontier was not delimited. The modern outline excludes the Tindouf/Colomb-Béchar claims and Western Sahara (separate Spanish territory); the modern border is a rough approximation.",
+      "notes": "Morocco's 1900 southern and south-eastern frontier was not delimited. The modern outline excludes the Tindouf/Colomb-Béchar claims and Western Sahara (separate Spanish territory); the modern border is a rough approximation.",
       "transferIds": []
     },
     "ZAR": {
@@ -4022,7 +4022,7 @@
       "underlyingBoundaryDate": "1900-01-01 (verified against the modern external outline)",
       "deviationsFromModern": "No 1900-to-modern territorial difference is identified for the external border; the modern outline is retained as a verified match, not as a convenience default.",
       "knownUncertainties": "None beyond the generalization of the modern source units (1:50m base; 1:10m reconstruction blocks).",
-      "notes": "Mexico's external border was unchanged after 1853; Quintana Roo was administered as part of YucatÃƒÂ¡n in 1900 but is Mexican territory.",
+      "notes": "Mexico's external border was unchanged after 1853; Quintana Roo was administered as part of Yucatán in 1900 but is Mexican territory.",
       "transferIds": []
     },
     "GUA": {
@@ -6791,7 +6791,7 @@
       "underlyingBoundaryDate": "1900-01-01 (verified against the modern external outline)",
       "deviationsFromModern": "No 1900-to-modern territorial difference is identified for the external border; the modern outline is retained as a verified match, not as a convenience default.",
       "knownUncertainties": "None beyond the generalization of the modern source units (1:50m base; 1:10m reconstruction blocks).",
-      "notes": "The French Caribbean grouping (Guiana, Guadeloupe, Martinique, St Pierre and Miquelon, St BarthÃƒÂ©lemy, St Martin) was French in 1900.",
+      "notes": "The French Caribbean grouping (Guiana, Guadeloupe, Martinique, St Pierre and Miquelon, St Barthélemy, St Martin) was French in 1900.",
       "transferIds": []
     },
     "FPO": {
@@ -7381,9 +7381,9 @@
       "geometryClass": "reconstructed",
       "confidence": "medium",
       "underlyingBoundaryDate": "1900-01-01 (historical claim); modern units dated 2024",
-      "deviationsFromModern": "The Portuguese colonial grouping includes Cape Verde, SÃƒÂ£o TomÃƒÂ© and PrÃƒÂ­ncipe, Portuguese Guinea and Portuguese India (Goa, Daman, Diu). Portuguese India was a separate colony; grouping it here is a map aggregation.",
-      "knownUncertainties": "The Portuguese colonial grouping includes Cape Verde, SÃƒÂ£o TomÃƒÂ© and PrÃƒÂ­ncipe, Portuguese Guinea and Portuguese India (Goa, Daman, Diu). Portuguese India was a separate colony; grouping it here is a map aggregation.",
-      "notes": "The Portuguese colonial grouping includes Cape Verde, SÃƒÂ£o TomÃƒÂ© and PrÃƒÂ­ncipe, Portuguese Guinea and Portuguese India (Goa, Daman, Diu). Portuguese India was a separate colony; grouping it here is a map aggregation.",
+      "deviationsFromModern": "The Portuguese colonial grouping includes Cape Verde, São Tomé and Príncipe, Portuguese Guinea and Portuguese India (Goa, Daman, Diu). Portuguese India was a separate colony; grouping it here is a map aggregation.",
+      "knownUncertainties": "The Portuguese colonial grouping includes Cape Verde, São Tomé and Príncipe, Portuguese Guinea and Portuguese India (Goa, Daman, Diu). Portuguese India was a separate colony; grouping it here is a map aggregation.",
+      "notes": "The Portuguese colonial grouping includes Cape Verde, São Tomé and Príncipe, Portuguese Guinea and Portuguese India (Goa, Daman, Diu). Portuguese India was a separate colony; grouping it here is a map aggregation.",
       "transferIds": [
         "portuguese-india"
       ]
@@ -7703,7 +7703,7 @@
       "underlyingBoundaryDate": "1900-01-01 (verified against the modern external outline)",
       "deviationsFromModern": "No 1900-to-modern territorial difference is identified for the external border; the modern outline is retained as a verified match, not as a convenience default.",
       "knownUncertainties": "None beyond the generalization of the modern source units (1:50m base; 1:10m reconstruction blocks).",
-      "notes": "The Dutch Caribbean islands (Aruba, CuraÃƒÂ§ao, Sint Maarten, Bonaire, Saba, Sint Eustatius) were Dutch in 1900.",
+      "notes": "The Dutch Caribbean islands (Aruba, Curaçao, Sint Maarten, Bonaire, Saba, Sint Eustatius) were Dutch in 1900.",
       "transferIds": []
     },
     "SAH": {
@@ -7789,7 +7789,7 @@
       "underlyingBoundaryDate": "1900-01-01 (verified against the modern external outline)",
       "deviationsFromModern": "No 1900-to-modern territorial difference is identified for the external border; the modern outline is retained as a verified match, not as a convenience default.",
       "knownUncertainties": "None beyond the generalization of the modern source units (1:50m base; 1:10m reconstruction blocks).",
-      "notes": "Spanish Guinea (Rio Muni and Fernando PÃƒÂ³) matches the modern Equatorial Guinea mainland and Bioko; AnnobÃƒÂ³n was also Spanish.",
+      "notes": "Spanish Guinea (Rio Muni and Fernando Pó) matches the modern Equatorial Guinea mainland and Bioko; Annobón was also Spanish.",
       "transferIds": []
     },
     "PHL": {
@@ -8405,9 +8405,9 @@
       "geometryClass": "approximate",
       "confidence": "low",
       "underlyingBoundaryDate": "1900-01-01 (historical claim); modern units dated 2024",
-      "deviationsFromModern": "The Khanate of Khiva is approximated by Xorazm, Karakalpakstan and DaÃ…Å¸oguz. The desert frontier was not a hard line.",
-      "knownUncertainties": "The Khanate of Khiva is approximated by Xorazm, Karakalpakstan and DaÃ…Å¸oguz. The desert frontier was not a hard line.",
-      "notes": "The Khanate of Khiva is approximated by Xorazm, Karakalpakstan and DaÃ…Å¸oguz. The desert frontier was not a hard line.",
+      "deviationsFromModern": "The Khanate of Khiva is approximated by Xorazm, Karakalpakstan and Daşoguz. The desert frontier was not a hard line.",
+      "knownUncertainties": "The Khanate of Khiva is approximated by Xorazm, Karakalpakstan and Daşoguz. The desert frontier was not a hard line.",
+      "notes": "The Khanate of Khiva is approximated by Xorazm, Karakalpakstan and Daşoguz. The desert frontier was not a hard line.",
       "transferIds": [
         "khiva-from-russia"
       ]

@@ -31,7 +31,8 @@ agricultural-share criterion on 2026-11-16 (D-167). The open items are consolida
 | `4ffe3c9` | Close step 5 (D-168): this report, the ten-year run, status lines |
 | `71a3036` | Close step 6 (D-169): mobility by country, the minimum-wage estimate on Politics; schema 36, protocol 25 |
 | `5671b2f` | Close step 7 (D-170): P7b save storage, chunked values over IndexedDB and SQLite |
-| step 8 commit | Close step 8 (D-171): the M11d dispute resolutions restored to the map scripts |
+| `28c622c` | Close step 8 (D-171): the M11d dispute resolutions restored to the map scripts |
+| this commit | D-171: the map outputs regenerated on the designer's decision (encoding repair only) |
 
 ## 2. Files
 
@@ -233,8 +234,8 @@ included, without a failure (D-165).
 - **Before P8:** diagnose and fix the long-run collapse (§6.1 item 1); a ten-year run should end
   with the lower stratum mostly above subsistence and deaths below births in growing countries.
 - **P7b:** done in this close (D-170): saves of any size on web; the device test is the designer's.
-- **Map pipeline:** the scripts reproduce the committed map (D-171); regenerating the outputs to
-  repair their mis-encoded names waits for the designer.
+- **Map pipeline:** done in this close (D-171): the scripts reproduce the committed map, and the
+  outputs were regenerated on the designer's decision, repairing their mis-encoded names.
 - **P8:** the transport wedge will move farm-gate prices; it needs a stable 1900 world to measure.
 - **P10:** firm investment and closure (the staffing ceilings respond today only through revenue).
 - **P11:** household credit and relief through banks.
