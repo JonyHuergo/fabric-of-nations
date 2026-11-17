@@ -375,6 +375,13 @@ Android's AsyncStorage has a similar limit; P5b makes saves larger. After P7, a 
 stage moves saves to a storage backend without that limit, keeping save integrity and the
 D-120 compatibility rules (older saves listed, never deleted).
 
+**Status (2026-11-16, D-170).** Implemented on `p7/close`: saves go to their own database of the
+platform storage (`createAsyncStorage` of the installed async-storage package: IndexedDB on web,
+SQLite on iOS and Android), each value cut into 512 Ki-character chunks under a manifest written
+last. A 1900-world save (about 10.1 M characters) saves, autosaves and continues on web (playtest
+15/15); the device test is the designer's. Old saves are of earlier schemas and are rejected
+(D-155), not migrated.
+
 ### P8 — Infrastructure and market access
 
 - Railways, roads and ports as province capital stock built with steel, timber,

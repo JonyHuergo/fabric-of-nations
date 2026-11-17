@@ -431,7 +431,16 @@ export class SaveStore {
     let sawValue = false;
     let lastError: unknown = null;
     for (const candidate of candidates) {
-      const stored = await this.backend.getItem(candidate.key);
+      // D-170: a copy that cannot be read (a missing chunk, a backend error) is skipped like
+      // a corrupt one, so the next candidate is still tried.
+      let stored: string | null;
+      try {
+        stored = await this.backend.getItem(candidate.key);
+      } catch (error) {
+        sawValue = true;
+        lastError = error;
+        continue;
+      }
       if (stored === null) continue;
       sawValue = true;
       try {
@@ -765,5 +774,180 @@ export class SaveLibrary {
     if ((await this.backend.getItem(this.indexKey)) !== raw) {
       throw new Error("saved-game index verification failed");
     }
+  }
+}
+
+// ---- chunked storage (P7b, D-170) -------------------------------------------------
+
+/**
+ * A key/value store with optional batch operations, as the platform storage provides
+ * (`createAsyncStorage` of `@react-native-async-storage/async-storage`: IndexedDB on web,
+ * SQLite on iOS and Android). Batch calls, when present, read, write or remove many keys
+ * in one request; they are not assumed to be transactional.
+ */
+export interface ChunkStoreBackend extends SaveStorageBackend {
+  getMany?(keys: string[]): Promise<Record<string, string | null>>;
+  setMany?(entries: Record<string, string>): Promise<void>;
+  removeMany?(keys: string[]): Promise<void>;
+}
+
+/** Marks a value stored as chunks; the rest of the value is the manifest's JSON. */
+export const CHUNK_MANIFEST_PREFIX = "fon-chunked-v1:";
+
+/**
+ * Characters per chunk: 512 Ki. Stored values are ASCII (base64 saves, JSON indexes), so a
+ * chunk is at most 512 KiB, a quarter of Android's 2 MiB SQLite cursor window (the per-row
+ * read limit the platform storage may meet); a 1900-world save is a few dozen chunks.
+ */
+export const DEFAULT_CHUNK_LENGTH = 512 * 1024;
+
+interface ChunkManifest {
+  /** Generation of the chunk keys; one more than that of the value it replaced. */
+  readonly generation: number;
+  readonly chunks: number;
+  readonly length: number;
+}
+
+function chunkKey(key: string, generation: number, index: number): string {
+  return `${key}#chunk:${String(generation)}:${String(index)}`;
+}
+
+function chunkKeys(key: string, manifest: ChunkManifest): string[] {
+  const keys: string[] = [];
+  for (let index = 0; index < manifest.chunks; index += 1) keys.push(chunkKey(key, manifest.generation, index));
+  return keys;
+}
+
+function parseChunkManifest(raw: string, key: string, chunkLength: number): ChunkManifest {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw.slice(CHUNK_MANIFEST_PREFIX.length)) as unknown;
+  } catch {
+    throw new RangeError(`stored value ${JSON.stringify(key)} has an unreadable chunk manifest`);
+  }
+  if (
+    !isRecordValue(parsed) ||
+    !isCount(parsed.generation) ||
+    parsed.generation < 1 ||
+    !isCount(parsed.chunks) ||
+    !isCount(parsed.length) ||
+    parsed.length > MAX_STORED_SAVE_LENGTH ||
+    parsed.chunks !== Math.ceil(parsed.length / chunkLength)
+  ) {
+    throw new RangeError(`stored value ${JSON.stringify(key)} has a malformed chunk manifest`);
+  }
+  return { generation: parsed.generation, chunks: parsed.chunks, length: parsed.length };
+}
+
+/**
+ * P7b (D-170): values of any size over a store with a per-value or per-row limit.
+ *
+ * A value up to one chunk long is stored as it is. A longer value is cut into chunks of
+ * `chunkLength` characters under keys of a new generation, and only then is the key itself
+ * written with a manifest (generation, chunk count, length). A reader follows the manifest,
+ * so an interrupted write leaves the old value readable: its manifest and chunks are
+ * untouched until the new manifest replaces it, and the old chunks are removed after. A
+ * missing chunk or a wrong length is an error, never a shorter value. The generation counts
+ * up from the replaced manifest, so no clock or entropy is used. `SaveStore` keeps its
+ * staging, read-back and previous-copy guarantees on top of this.
+ */
+export class ChunkedSaveBackend implements SaveStorageBackend {
+  private readonly store: ChunkStoreBackend;
+  private readonly chunkLength: number;
+
+  public constructor(store: ChunkStoreBackend, options: { readonly chunkLength?: number } = {}) {
+    const chunkLength = options.chunkLength ?? DEFAULT_CHUNK_LENGTH;
+    if (!Number.isInteger(chunkLength) || chunkLength < 1) {
+      throw new RangeError("chunkLength must be a positive integer");
+    }
+    this.store = store;
+    this.chunkLength = chunkLength;
+  }
+
+  public async getItem(key: string): Promise<string | null> {
+    const head = await this.store.getItem(key);
+    if (head === null || !head.startsWith(CHUNK_MANIFEST_PREFIX)) return head;
+    const manifest = parseChunkManifest(head, key, this.chunkLength);
+    const keys = chunkKeys(key, manifest);
+    const values = await this.readMany(keys);
+    const parts: string[] = [];
+    for (const [index, chunk] of keys.entries()) {
+      const part = values[chunk];
+      if (typeof part !== "string") {
+        throw new RangeError(`stored value ${JSON.stringify(key)} is missing chunk ${String(index)} of ${String(manifest.chunks)}`);
+      }
+      parts.push(part);
+    }
+    const value = parts.join("");
+    if (value.length !== manifest.length) {
+      throw new RangeError(`stored value ${JSON.stringify(key)} has ${String(value.length)} characters; its manifest says ${String(manifest.length)}`);
+    }
+    return value;
+  }
+
+  public async setItem(key: string, value: string): Promise<void> {
+    if (value.length > MAX_STORED_SAVE_LENGTH) {
+      throw new RangeError(`stored value ${JSON.stringify(key)} is longer than ${String(MAX_STORED_SAVE_LENGTH)} characters`);
+    }
+    const previous = await this.manifestOf(key);
+    const small = value.length <= this.chunkLength && !value.startsWith(CHUNK_MANIFEST_PREFIX);
+    if (small) {
+      await this.store.setItem(key, value);
+    } else {
+      const manifest: ChunkManifest = {
+        generation: (previous?.generation ?? 0) + 1,
+        chunks: Math.ceil(value.length / this.chunkLength),
+        length: value.length,
+      };
+      const entries: Record<string, string> = {};
+      for (const [index, chunk] of chunkKeys(key, manifest).entries()) {
+        entries[chunk] = value.slice(index * this.chunkLength, (index + 1) * this.chunkLength);
+      }
+      await this.writeMany(entries);
+      await this.store.setItem(key, `${CHUNK_MANIFEST_PREFIX}${JSON.stringify(manifest)}`);
+    }
+    if (previous !== null) await this.removeMany(chunkKeys(key, previous));
+  }
+
+  public async removeItem(key: string): Promise<void> {
+    const previous = await this.manifestOf(key);
+    await this.store.removeItem(key);
+    if (previous !== null) await this.removeMany(chunkKeys(key, previous));
+  }
+
+  /** The manifest of a chunked value; null for a plain or absent value or an unreadable manifest. */
+  private async manifestOf(key: string): Promise<ChunkManifest | null> {
+    const head = await this.store.getItem(key);
+    if (head === null || !head.startsWith(CHUNK_MANIFEST_PREFIX)) return null;
+    try {
+      return parseChunkManifest(head, key, this.chunkLength);
+    } catch {
+      // A damaged manifest names no chunks to clean up; the new value replaces it.
+      return null;
+    }
+  }
+
+  private async readMany(keys: string[]): Promise<Record<string, string | null>> {
+    if (this.store.getMany !== undefined) return this.store.getMany(keys);
+    const values: Record<string, string | null> = {};
+    for (const key of keys) values[key] = await this.store.getItem(key);
+    return values;
+  }
+
+  private async writeMany(entries: Record<string, string>): Promise<void> {
+    if (this.store.setMany !== undefined) {
+      await this.store.setMany(entries);
+      return;
+    }
+    for (const [key, value] of Object.entries(entries)) await this.store.setItem(key, value);
+  }
+
+  private async removeMany(keys: string[]): Promise<void> {
+    if (keys.length === 0) return;
+    if (this.store.removeMany !== undefined) {
+      await this.store.removeMany(keys);
+      return;
+    }
+    for (const key of keys) await this.store.removeItem(key);
   }
 }

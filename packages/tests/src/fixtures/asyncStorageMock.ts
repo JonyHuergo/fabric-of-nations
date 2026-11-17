@@ -3,8 +3,10 @@
  *
  * The app's storage adapter imports the React Native AsyncStorage package at
  * module scope. Jest maps that package to this file so the adapter can be
- * exercised in Node without a device or native module. The implementation is
- * deliberately limited to the methods `SaveStore` needs.
+ * exercised in Node without a device or native module. The default export is
+ * the legacy store; `createAsyncStorage` (P7b, D-170: IndexedDB on web, SQLite on
+ * iOS and Android) returns a store with the batch calls. All of them share one
+ * map, so a test reads and writes raw values by key whichever store wrote them.
  */
 
 const values = new Map<string, string>();
@@ -21,6 +23,22 @@ const AsyncStorageMock = {
   },
 };
 
+/** The mock of `createAsyncStorage(databaseName)`: the same map, with the batch calls. */
+export function createAsyncStorage(_databaseName: string) {
+  return {
+    ...AsyncStorageMock,
+    async getMany(keys: string[]): Promise<Record<string, string | null>> {
+      return Object.fromEntries(keys.map((key) => [key, values.get(key) ?? null]));
+    },
+    async setMany(entries: Record<string, string>): Promise<void> {
+      for (const [key, value] of Object.entries(entries)) values.set(key, value);
+    },
+    async removeMany(keys: string[]): Promise<void> {
+      for (const key of keys) values.delete(key);
+    },
+  };
+}
+
 /** Clear the backing map between tests. */
 export function resetAsyncStorageMock(): void {
   values.clear();
@@ -34,6 +52,11 @@ export function readStoredValue(key: string): string | null {
 /** Write a raw stored value for assertions or old-save simulation. */
 export function writeStoredValue(key: string, value: string): void {
   values.set(key, value);
+}
+
+/** Every stored key, for assertions. */
+export function storedKeys(): string[] {
+  return [...values.keys()];
 }
 
 export default AsyncStorageMock;

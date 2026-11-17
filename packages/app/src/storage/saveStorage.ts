@@ -1,6 +1,7 @@
-﻿import AsyncStorage from "@react-native-async-storage/async-storage";
+﻿import { createAsyncStorage } from "@react-native-async-storage/async-storage";
 
 import {
+  ChunkedSaveBackend,
   SaveLibrary,
   type SaveMetadata,
   type SaveSlot,
@@ -15,8 +16,19 @@ import {
  */
 export const SUPPORTED_SAVE_SCHEMA_VERSION = 36;
 
+/**
+ * P7b (D-170): saves live in their own database of the platform storage, IndexedDB on web
+ * and SQLite on iOS and Android (`createAsyncStorage`, the same call on every platform),
+ * without the legacy store's size limit (about 5 M characters of localStorage on web). Each
+ * stored value is cut into chunks under a manifest written last, so no row exceeds the
+ * platform's per-row read limit and an interrupted write leaves the previous save readable.
+ * Saves in the legacy store are not read: they are of earlier schemas, which this build
+ * rejects (D-155).
+ */
+export const SAVE_DATABASE_NAME = "fabric-of-nations-saves";
+
 /** One slot per campaign, each a replace-safe SaveStore; see D-114. */
-const library = new SaveLibrary(AsyncStorage, {
+const library = new SaveLibrary(new ChunkedSaveBackend(createAsyncStorage(SAVE_DATABASE_NAME)), {
   expectedSchemaVersion: SUPPORTED_SAVE_SCHEMA_VERSION,
 });
 
