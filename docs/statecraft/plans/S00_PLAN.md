@@ -2,12 +2,30 @@
 
 **Stage:** S0 (Act I, `docs/statecraft/ACT_1_GROUND.md`).
 **Branch:** `statecraft/s0-design-bible`, from `main` at `105c3bb`.
-**Status:** plan written 2026-11-17; **waiting for the designer's answers** (§8). No file other
-than this plan has changed.
+**Status:** plan written 2026-11-17 and **approved by the designer on 2026-11-17** ("I approve"),
+with every question of §8 answered as recommended.
 
 ## 0. Answers
 
-*(To be recorded here when the designer answers §8.)*
+The designer approved the plan on 2026-11-17 in the words "I approve". Each question is answered
+as recommended:
+
+| Q | Answer |
+|---|---|
+| Q1 | Yes: the v2.13 text of §12.1 to §16 counts as part of the old GDD; its still-binding rules go into Part B and the loss is recorded |
+| Q2 | (a): the whole v2.19 file archived as `docs/archive/gdd/Fabric_of_Nations_GDD_v2.19.md` by `git mv` |
+| Q3 | Yes: current form of each rule with the decision that changed it; (i) glossary per D-122, D-117, D-118; (ii) §19 non-goals marked as amended by D-172; (iii) §20.2 #4 marked as amended by program §2.5 and decision 7 |
+| Q4 | Yes: §3.4 binding today, program §4 the approved replacement, effective by stage in S2a to S2c |
+| Q5 | Yes: keep the rule, name `runEconomicDay` as the authoritative order until S2a, archive the step list |
+| Q6 | Yes: Part E, the concordance |
+| Q7 | Yes: C1 world and map |
+| Q8 | Yes: verbatim rules keep their original spelling |
+| Q9 | Keep the four device targets (60 fps, cold start, memory, battery); mark the 8 ms tick target as superseded by program §4.5 and decision 1 |
+| Q10 | Yes: GDD v3.0, dated the day of its commit; title line unchanged; no change report |
+| Q11 | Yes: about 1,000 to 1,200 lines |
+| Q12 | Two entries: D-172 (approval) and D-173 (the design bible) |
+| Q13 | Yes: the two stale phrases of `AGENTS.md` §1 only |
+| Q14 | Yes: the checks of §6; no full `pnpm test`, bench, `check:worker`, `map:atlas:check` or `app:export` |
 
 ---
 
