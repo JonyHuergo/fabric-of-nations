@@ -88,6 +88,54 @@ const overlapResolutionLines = (map.overlapResolutions ?? [])
   )
   .join("\n");
 
+// D-171: the zones M11d (commit 1a2a68a) split along current borders, listed from their
+// authored rectangles (area by the shoelace formula, rounded to 0.01 deg²).
+const resolvedIds = new Set((map.resolvedDisputes ?? []).map((entry) => entry.id));
+const resolvedZones = (boundaries.disputedAreas ?? []).filter((area) => resolvedIds.has(area.id));
+const ringArea = (ring) => {
+  let twice = 0;
+  for (let index = 0; index < ring.length; index += 1) {
+    const [x1, y1] = ring[index];
+    const [x2, y2] = ring[(index + 1) % ring.length];
+    twice += x1 * y2 - x2 * y1;
+  }
+  return Math.round((Math.abs(twice) / 2) * 100) / 100;
+};
+const ringBbox = (ring) => [
+  Math.min(...ring.map((point) => point[0])),
+  Math.min(...ring.map((point) => point[1])),
+  Math.max(...ring.map((point) => point[0])),
+  Math.max(...ring.map((point) => point[1])),
+];
+// A sentence saying the zone "is represented as a disputed frontier" describes the rendering
+// before M11d; it is left out for a resolved zone.
+const currentAdministration = (text) =>
+  text
+    .split(/(?<=\.)\s+/u)
+    .filter((sentence) => !/is represented as a disputed frontier/u.test(sentence))
+    .join(" ");
+const resolvedLines = resolvedZones
+  .map(
+    (area) =>
+      `- **${area.name}** (\`${area.id}\`, ${area.classification}, ${area.confidence}) — ${ringArea(area.polygon)} deg² at bbox ${ringBbox(area.polygon).join(", ")}. ${currentAdministration(area.administration)}`,
+  )
+  .join("\n");
+const disputedSection =
+  resolvedZones.length > 0 && (map.disputedAreas ?? []).length === 0
+    ? `## 5b. Former disputed map-only zones (resolved)
+
+${resolvedLines}
+
+M11d follow-up (DECISIONS D-100) resolves both zones into ordinary territory:
+the rectangles are split along current Natural Earth admin-0 borders and assigned
+to the 1900 polities. Aouzou–Tibesti becomes Ottoman Libya (northern edge),
+French Equatorial Africa (Chad/Aouzou/Tibesti) and French West Africa (Niger
+edge); Karakoram–Siachen becomes British India (Siachen/India/Pakistan) and Qing
+China. The split lines are a cartographic choice for a definite border, not a
+surveyed 1900 frontier. \`disputedAreas\` is empty and \`resolvedDisputes\` records
+the modern-to-1900 mapping; there is no disputed overlay, label or legend row.`
+    : null;
+
 const disputedLines = (map.disputedAreas ?? [])
   .map(
     (area) =>
@@ -154,7 +202,7 @@ The map is built offline by \`scripts/m11/build-map.mjs\` from:
 | Catalogued polities | ${all.length} |
 | Map polities with provenance | ${audit.summary.provenanceCount} |
 | Marker-only polities | ${audit.summary.markerOnly} |
-| Disputed map-only zones | ${audit.summary.disputedAreas} |
+| Disputed map-only zones | ${audit.summary.disputedAreas}${disputedSection === null ? "" : " (resolved by current borders)"} |
 | Disputed area (deg²) | ${audit.summary.disputedAreaDegreesSquared} |
 | Invalid rings | ${audit.summary.invalidRings} |
 | Overlaps above 0.001 deg² | ${audit.summary.overlaps} |
@@ -351,13 +399,13 @@ Treaty of Petrópolis and the 1903–04 demarcation are not applied retroactivel
 The residual components are sub-0.01 deg² and recorded by the audit; no
 post-1903 cession or 1927 adjudication is silently applied.
 
-## 5b. Disputed map-only zones
+${disputedSection ?? `## 5b. Disputed map-only zones
 
 ${disputedLines}
 
 These zones are not polities and have no simulation ids. Clicking them does not
 select a country; they are rendered as dashed amber overlays over the neutral
-land layer.
+land layer.`}
 
 ## 6. Residual generalization artefacts
 

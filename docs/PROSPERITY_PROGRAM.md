@@ -430,6 +430,11 @@ regress corrected geography (`docs/MAP_DATA.md` §7). A dedicated stage restores
 steps to the pipeline so that a rebuild reproduces the committed data, then regenerates
 the stale generated map documents. Until it is done the map steps are not run.
 
+**Status (2026-11-17, D-171).** The resolutions are restored to the scripts; a rebuild reproduces
+the committed geometry, numbers and audit exactly and changes only mis-encoded text (42 strings in
+the boundary data, 28 in the map, 12 lines of the provenance document). Regenerating the outputs
+waits for the designer's decision.
+
 ## 5. Rollback guarantee (P1, D-116)
 
 - A day is either fully published or not at all. Every phase validates its

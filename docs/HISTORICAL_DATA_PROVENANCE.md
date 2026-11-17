@@ -157,9 +157,9 @@ derived map in this project, so no CShapes geometry is included.
 2. Run `node scripts/m11/build-world-data.mjs`.
 3. If geography changed, run `node scripts/m11/build-boundaries.mjs`,
    `node scripts/m11/build-map.mjs`, `node scripts/m11/audit-map.mjs` and
-   `node scripts/m11/generate-provenance-doc.mjs`. **Known issue:** these steps no
-   longer reproduce the committed map data. They drop the M11d dispute resolutions;
-   see `docs/MAP_DATA.md` §7 and the D-145 follow-up.
+   `node scripts/m11/generate-provenance-doc.mjs`. Since D-171 these steps reproduce the
+   committed map data, the M11d dispute resolutions included, except the repair of mis-encoded
+   names in the committed outputs; see `docs/MAP_DATA.md` §7.
 4. Rebuild the libraries and the worker bundle:
    `pnpm -F @century/sim build && pnpm -F @century/data build && pnpm -F @century/sim-worker build && pnpm -F @century/app build:worker`.
 5. Run `pnpm -F @century/tests test -- data/world-1900 data/catalogue-coverage map/polity-geography`

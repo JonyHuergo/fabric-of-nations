@@ -7,10 +7,9 @@
  *
  * The output is deterministic. Run: node scripts/m11/build-boundaries.mjs
  *
- * KNOWN ISSUE (D-145 follow-up): this script writes m11c-1900-boundaries-v1 without the
- * two "split-by-current-borders" dispute resolutions that commit 1a2a68a added to the
- * committed m11d-1900-boundaries-v2 file, so running it regresses the map. Restore that
- * step here before regenerating. See docs/MAP_DATA.md §7.
+ * D-171 (P7 close, step 8): the two "split-by-current-borders" dispute resolutions that
+ * commit 1a2a68a added to the committed data (m11d-1900-boundaries-v2) are now authored in
+ * boundaries-1900-source.mjs and written here, so the rebuild no longer drops them.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -231,11 +230,11 @@ for (const tag of Object.keys(provenance)) {
 
 const output = {
   meta: {
-    version: "m11c-1900-boundaries-v1",
+    version: "m11d-1900-boundaries-v2",
     referenceDate: REFERENCE_DATE,
     title: "Fabric of Nations M11c historical boundary reconstruction and audit, 1 January 1900",
     method:
-      "Modern Natural Earth units are used only as geometric building blocks. Every territorial difference from the modern map is an explicit transfer in `patches`, with dated sources, a confidence class and a note. The map build applies the transfers with polygon-clipping, simplifies to 0.02 degrees and records the resulting provenance on every polity.",
+      "Modern Natural Earth units are used only as geometric building blocks. Every territorial difference from the modern map is an explicit transfer in `patches`, with dated sources, a confidence class and a note. The map build applies the transfers with polygon-clipping, simplifies to 0.02 degrees and records the resulting provenance on every polity. M11d resolves the two former uncertainty rectangles by splitting them along current Natural Earth admin-0 borders: the Aouzou-Tibesti zone is divided between the Ottoman Empire, French Equatorial Africa and French West Africa; the Karakoram-Siachen zone between British India and Qing China. The split lines are a cartographic choice for a definite border, not a surveyed 1900 boundary.",
     confidenceDefinitions: {
       high: "Supported by strong historical cartographic, administrative or treaty evidence, with only modern generalization uncertainty.",
       medium: "Reconstructed from reliable sources; the frontier line or the exact extent has some unresolved uncertainty.",
@@ -276,6 +275,7 @@ const output = {
     administration: area.administration,
     sources: area.sources,
     notes: area.notes,
+    ...(area.resolution === undefined ? {} : { resolution: area.resolution }),
   })),
   provenance,
 };

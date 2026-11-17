@@ -222,15 +222,13 @@ outer/hole polygons so inland seas are not counted as unassigned land.
 
 ## 7. Updating
 
-> **Known issue (D-145 follow-up, 2026-11-06).** These steps no longer reproduce the
-> committed map data. `build-boundaries.mjs` writes `m11c-1900-boundaries-v1` and
-> omits the two `split-by-current-borders` dispute resolutions (Aouzou–Tibesti,
-> Karakoram–Siachen). Commit `1a2a68a` added those resolutions to the committed
-> `m11d-1900-boundaries-v2` data, and no script produces them.
-> `generate-provenance-doc.mjs` likewise omits the resolved-zones section. Running
-> the steps would regress the map, so do not run them until that step is back in the
-> pipeline. The committed outputs also keep some mis-encoded names (for example
-> `KlaipÄ—da`) until they can be regenerated.
+> **Status (D-171, 2026-11-17).** The M11d dispute resolutions (commit `1a2a68a`) are back in
+> the pipeline: `boundaries-1900-source.mjs` holds them, `build-boundaries.mjs` writes
+> `m11d-1900-boundaries-v2` and `generate-provenance-doc.mjs` writes the resolved-zones section.
+> A rebuild reproduces the committed geometry, numbers and audit exactly; its only change is
+> the repair of the mis-encoded names the committed outputs still carry (for example
+> `KlaipÄ—da` → `Klaipėda`). Those outputs are regenerated only on the designer's decision
+> (D-171).
 
 1. Edit the catalog's `geometry` crosswalk or the authored transfers in
    `scripts/m11/boundaries-1900-source.mjs`.

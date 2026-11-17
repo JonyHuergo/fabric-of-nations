@@ -6,9 +6,8 @@ close on `p7/close` from `9fc2514` (local commits only; nothing pushed or merged
 D-157 to D-163 (performance), D-164 to D-168 (the close). **Plan:** `docs/P7_PLAN.md` (approved by
 the designer; Q1–Q23 as recorded in its §0; the fibre good taken back into P7 by the designer's
 task of 2026-11-15).
-**Versions at this report:** world schema 35, simulation 0.32.0, data `m3-economy-v16`, worker
-protocol 24, map bridge protocol 5. Step 6 of the close (per-country mobility) raises the schema
-to 36 and the protocol to 25 (D-169).
+**Versions at the close:** world schema 36, simulation 0.32.0, data `m3-economy-v16`, worker
+protocol 25, map bridge protocol 5 (schema 35 and protocol 24 until step 6, D-169).
 **Status:** P7 implemented. Its acceptance tests pass; the ten-year run (Q22) completes without a
 failed day but shows a world in which almost every lower-stratum household falls below subsistence
 within five years and the population falls by 8.4 % (§4.2). The designer removed the
@@ -29,7 +28,10 @@ agricultural-share criterion on 2026-11-16 (D-167). The open items are consolida
 | `8cac864` | Close step 2 (D-165): the day-53 failure fixed at its causes; one lot rule; simulation 0.32.0 |
 | `9effa1c` | Close step 3 (D-166): the fibre good (flax, hemp and jute), data v16 |
 | `9cdff3a` | Close step 4 (D-167): stale pins and expectations restated; agricultural-share criterion removed |
-| this commit | Close step 5 (D-168): this report, the ten-year run, status lines |
+| `4ffe3c9` | Close step 5 (D-168): this report, the ten-year run, status lines |
+| `71a3036` | Close step 6 (D-169): mobility by country, the minimum-wage estimate on Politics; schema 36, protocol 25 |
+| `5671b2f` | Close step 7 (D-170): P7b save storage, chunked values over IndexedDB and SQLite |
+| step 8 commit | Close step 8 (D-171): the M11d dispute resolutions restored to the map scripts |
 
 ## 2. Files
 
@@ -230,7 +232,9 @@ included, without a failure (D-165).
 
 - **Before P8:** diagnose and fix the long-run collapse (§6.1 item 1); a ten-year run should end
   with the lower stratum mostly above subsistence and deaths below births in growing countries.
-- **P7b:** save storage without the web quota (D-146), next in this close.
+- **P7b:** done in this close (D-170): saves of any size on web; the device test is the designer's.
+- **Map pipeline:** the scripts reproduce the committed map (D-171); regenerating the outputs to
+  repair their mis-encoded names waits for the designer.
 - **P8:** the transport wedge will move farm-gate prices; it needs a stable 1900 world to measure.
 - **P10:** firm investment and closure (the staffing ceilings respond today only through revenue).
 - **P11:** household credit and relief through banks.
