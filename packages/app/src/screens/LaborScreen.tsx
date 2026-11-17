@@ -12,6 +12,7 @@ import {
 } from "@century/sim-worker";
 
 import { LabourRows, mergeTerritoryRows } from "../components/Labour";
+import { MinimumWageEstimate } from "../components/MinimumWageEstimate";
 import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, DataRow, Disclosure, Headline, Notice, Section, StatRow } from "../components/ui";
 import type { MoneyFormat } from "../format/money";
@@ -417,38 +418,7 @@ export function LaborScreen({
       />
       {country.labourMarket === null
         ? null
-        : country.labourMarket.minimumWage.map((preview) => (
-            <View key={preview.lawId} style={styles.estimate}>
-              <Text style={styles.estimateTitle}>
-                {`${preview.lawName} at ${money.format(preview.floorRUSDPerYear)}/year${preview.enacted ? " (in force)" : ""} · short-run estimate`}
-              </Text>
-              <StatRow
-                label="Covered workers"
-                value={formatCount(preview.coveredWorkers)}
-                detail="Employees of firms and public institutions; never the self-employed, peasants or owners."
-              />
-              <StatRow
-                label="Paid below the floor today"
-                value={formatCount(preview.workersBelowFloor)}
-              />
-              <StatRow
-                label="Jobs at risk"
-                value={formatCount(preview.jobsAtRisk)}
-                detail="Filled jobs in covered buildings that could not pay their staff at this floor."
-                tone={preview.jobsAtRisk > 0 ? "negative" : "default"}
-              />
-              <StatRow
-                label="Compliance"
-                value={formatRate(preview.compliance)}
-                detail="Share of the gap employers pay; it rises with administration quality."
-              />
-              <Text style={styles.help}>
-                Prices and people are held at today's levels; in time shed output raises prices
-                and people move toward work. Monopsony, efficiency wages and pay rises spreading
-                up the wage scale are not modelled.
-              </Text>
-            </View>
-          ))}
+        : country.labourMarket.minimumWage.map((preview) => <MinimumWageEstimate key={preview.lawId} preview={preview} money={money} />)}
       <StatRow
         label="Statutory working week"
         value={

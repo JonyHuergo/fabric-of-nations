@@ -8,6 +8,7 @@ import {
   type SimulationSnapshot,
 } from "@century/sim-worker";
 
+import { MinimumWageEstimate } from "../components/MinimumWageEstimate";
 import { SliderField, useDeferredCommit } from "../components/Slider";
 import { ActionButton, Headline, Notice, Section, StatRow } from "../components/ui";
 import { colors, fonts, spacing, themedSheet } from "../theme";
@@ -292,8 +293,12 @@ export function PoliticsScreen({
                 No law options are defined for this slot in the current scenario.
               </Text>
             ) : (
-              slot.options.map((option) => (
-                <View key={option.lawId} style={styles.option}>
+              slot.options.map((option) => {
+                // D-169: the same short-run estimate the Labor screen shows, next to the law.
+                const estimate = country.labourMarket?.minimumWage.find((preview) => preview.lawId === option.lawId) ?? null;
+                return (
+                <View key={option.lawId}>
+                <View style={styles.option}>
                   <View style={styles.rowText}>
                     <Text style={styles.label}>{option.name}</Text>
                     <Text style={styles.detail}>
@@ -309,7 +314,10 @@ export function PoliticsScreen({
                     disabled={!canAct || option.alreadyEnacted}
                   />
                 </View>
-              ))
+                {estimate === null ? null : <MinimumWageEstimate preview={estimate} money={money} />}
+                </View>
+                );
+              })
             )}
           </View>
         ))}

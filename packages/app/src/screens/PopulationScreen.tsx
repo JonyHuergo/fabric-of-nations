@@ -268,13 +268,19 @@ function ProfessionsSection({
   );
 }
 
-/** P7 (D-156): the last month's social mobility (a world-wide report). */
+/**
+ * P7 (D-156): the last month's social mobility. D-169: the player's country first, the world
+ * total as a second row.
+ */
 function MobilitySection({ snapshot }: { readonly snapshot: SimulationSnapshot }) {
   const report = snapshot.labourMobility;
   const nameOf = new Map(snapshot.professions.map((profession) => [profession.id, profession.name]));
+  const country = report?.country ?? null;
+  const countryName = country === null ? null : (snapshot.countries.find((entry) => entry.id === country.countryId)?.name ?? null);
+  const title = report === null ? "Mobility this month · none yet" : `Mobility this month · ${countryName ?? "world"}`;
   return (
     <Section title="Mobility" subtitle="People change profession and province on the first day of each month.">
-      <Disclosure title={report === null ? "Mobility this month · none yet" : "Mobility this month · world"}>
+      <Disclosure title={title}>
         {report === null ? (
           <Notice title="No month has closed yet">
             The first month's mobility runs on the first day of the next month: people move
@@ -282,24 +288,40 @@ function MobilitySection({ snapshot }: { readonly snapshot: SimulationSnapshot }
           </Notice>
         ) : (
           <>
-            <StatRow label="Changed profession" value={formatCount(report.mobilityPeople)} detail="Inside their province" />
-            <StatRow label="Moved province" value={formatCount(report.migrationPeople)} detail="Toward work, wages and housing" />
+            {country === null ? null : (
+              <>
+                <StatRow label="Changed profession" value={formatCount(country.mobilityPeople)} detail="Inside their province" />
+                <StatRow label="Moved province" value={formatCount(country.migrationOutPeople)} detail="Left a province, for work, wages and housing" />
+                <StatRow label="Arrived from abroad" value={formatCount(country.immigrationPeople)} />
+                <StatRow
+                  label="Population blocks"
+                  value={`${String(country.blocksCreated)} created · ${String(country.blocksRetired)} retired`}
+                />
+                {country.net.map((entry) => (
+                  <DataRow
+                    key={entry.professionId}
+                    title={nameOf.get(entry.professionId) ?? `Profession ${String(entry.professionId)}`}
+                    value={`${entry.net > 0 ? "+" : "−"}${formatCount(Math.abs(entry.net))}`}
+                    valueTone={entry.net > 0 ? "accent" : "muted"}
+                  />
+                ))}
+              </>
+            )}
             <StatRow
-              label="Population blocks"
-              value={`${String(report.blocksCreated)} created · ${String(report.blocksRetired)} retired`}
-              detail={`${formatCount(report.liveBlocks)} blocks now`}
+              label="World"
+              value={`${formatCount(report.mobilityPeople)} changed profession · ${formatCount(report.migrationPeople)} moved province`}
+              detail={`${String(report.blocksCreated)} blocks created · ${String(report.blocksRetired)} retired · ${formatCount(report.liveBlocks)} blocks now`}
             />
-            {report.net.map((entry) => (
-              <DataRow
-                key={entry.professionId}
-                title={nameOf.get(entry.professionId) ?? `Profession ${String(entry.professionId)}`}
-                value={`${entry.net > 0 ? "+" : "−"}${formatCount(Math.abs(entry.net))}`}
-                valueTone={entry.net > 0 ? "accent" : "muted"}
-              />
-            ))}
-            <Text style={styles.headerText}>
-              The monthly report covers the whole world; the simulation does not yet keep one per country.
-            </Text>
+            {country === null
+              ? report.net.map((entry) => (
+                  <DataRow
+                    key={entry.professionId}
+                    title={nameOf.get(entry.professionId) ?? `Profession ${String(entry.professionId)}`}
+                    value={`${entry.net > 0 ? "+" : "−"}${formatCount(Math.abs(entry.net))}`}
+                    valueTone={entry.net > 0 ? "accent" : "muted"}
+                  />
+                ))
+              : null}
           </>
         )}
       </Disclosure>

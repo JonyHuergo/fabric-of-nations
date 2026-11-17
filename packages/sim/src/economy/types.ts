@@ -2411,6 +2411,24 @@ export interface StaffingCeiling {
   ceiling: number;
 }
 
+/**
+ * D-169 (P7 close, step 6): one country's part of a month's mobility and migration, by the
+ * owner of the province where it happened when the phase ran (reporting only).
+ */
+export interface LabourCountryMonthReport {
+  countryId: Id;
+  /** People who changed profession inside a province of the country. */
+  mobilityPeople: number;
+  /** People who left a province of the country for another province, at home or abroad. */
+  migrationOutPeople: number;
+  /** People who arrived in a province of the country from another country. */
+  immigrationPeople: number;
+  blocksCreated: number;
+  blocksRetired: number;
+  /** Net people gained (positive) or lost per profession id in the country. */
+  netByProfession: number[];
+}
+
 /** P7: one month's mobility and migration totals (bounded history, reporting only). */
 export interface LabourMonthReport {
   dayIndex: Day;
@@ -2422,6 +2440,8 @@ export interface LabourMonthReport {
   blocksRetired: number;
   /** Net people gained (positive) or lost per profession id, mobility and migration. */
   netByProfession: number[];
+  /** D-169: the same month by country, ascending country id; a country with no movement is left out. */
+  countries: LabourCountryMonthReport[];
 }
 
 /** P7 (D-154): the labour market. Disabled and empty only in worlds without an economy. */

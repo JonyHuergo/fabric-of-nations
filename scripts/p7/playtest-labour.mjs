@@ -11,7 +11,9 @@
  * the farm and urban shares, one row per profession with workers, unemployment, unfilled
  * posts and the wage with last month's change, owners' residual income, household service)
  * and the minimum-wage preview labelled a short-run estimate; the Population screen's
- * profession groups with persons and the "Mobility this month" disclosure; the province
+ * profession groups with persons and the "Mobility this month" disclosure (the player's
+ * country, then the world, D-169); the minimum-wage estimate on the Politics screen next to
+ * the law (D-169); the province
  * panel's labour rows and wage index; the Unemployment lens (44-pt chip, legend, map
  * drawn); the Markets screen's 61 goods; every visible button at least 44 pt; no console
  * errors, exceptions or failed loads. Not a substitute for the designer's device test.
@@ -221,12 +223,34 @@ try {
   await sleep(800);
   body = await app.text();
   check("mobility this month shows people moved and blocks", body.includes("Changed profession") && body.includes("Moved province") && /[0-9]+ created · [0-9]+ retired/u.test(body), figure(body, "Changed profession", 200));
+  // D-169: the player's country first, the world total as a second row.
+  check("mobility this month is the player's country", body.includes("Mobility this month · German Empire") && body.includes("Arrived from abroad"), figure(body, "Mobility this month", 120));
+  check("the world total is the second row", /World[\s\S]{0,40}changed profession · [\s\S]{0,20}moved province/u.test(body), figure(body, "World", 160));
   evidence.figures.mobility = figure(body, "Changed profession", 200);
   await reveal(app, "Mobility this month");
   await sleep(400);
   await shot(app, "p7-844x390-mobility");
   small = await smallButtons(app);
   check("every visible button on the Population screen is at least 44 pt", small.length === 0, JSON.stringify(small));
+  await press(app, "Close sheet", false);
+  await sleep(800);
+
+  // D-169: the minimum-wage estimate next to the law on the Politics screen.
+  await app.step("Politics screen: minimum-wage estimate next to the law");
+  await press(app, "Realm");
+  await sleep(600);
+  await press(app, "Politics");
+  body = await waitForText(app, "Laws", 30_000);
+  await press(app, "Laws", false);
+  await sleep(800);
+  await reveal(app, "short-run estimate");
+  await sleep(400);
+  body = await app.text();
+  check("Politics screen shows the minimum-wage short-run estimate next to the law", body.includes("short-run estimate") && body.includes("Covered workers") && body.includes("Jobs at risk") && body.includes("Compliance"), figure(body, "short-run estimate", 200));
+  evidence.figures.politicsMinimumWage = figure(body, "short-run estimate", 200);
+  await shot(app, "p7-844x390-politics-minimum-wage");
+  small = await smallButtons(app);
+  check("every visible button on the Politics screen is at least 44 pt", small.length === 0, JSON.stringify(small));
   await press(app, "Close sheet", false);
   await sleep(800);
 

@@ -197,8 +197,10 @@ describe("M14 monetary equivalence and determinism", () => {
   // 0.32.0 (D-165). At 8cac864 (data v15) this hash was `8b8c7aa759a00f19`, and restoring
   // simulation 0.31.0 there gave `685bf3c4ccf4f842`, the value received since D-155. It is
   // day 0 of `determinism/perf-hash-equality.test.ts`.
+  // D-169 (schema 36): encoding only; restoring schema 35 reproduces the D-167 pin
+  // `94529a4173fbb997` (checked 2026-11-16).
   test("the 1900 world hash is pinned", () => {
-    expect(hashWorld(world)).toBe("94529a4173fbb997");
+    expect(hashWorld(world)).toBe("d5ff5c1cdfd51d46");
   });
 
   test("canonical saves use RUSD field names and round-trip deterministically", () => {
@@ -210,7 +212,8 @@ describe("M14 monetary equivalence and determinism", () => {
     // P4 (D-142): schema 31 adds the block demography and the annual record.
     // P5 (D-143): schema 32 adds the deposits and the monthly closing balances.
     // P5b (D-146): schema 33 adds the deposit link, province latitude and three sectors.
-    expect(envelope.schemaVersion).toBe(35);
+    // P6 (D-153) 34, P7 (D-154) 35; the P7 close (D-169) 36: the monthly labour report by country.
+    expect(envelope.schemaVersion).toBe(36);
     expect(hasLegacyMonetaryKey(envelope.payload)).toBe(false);
     expect(save).toContain("balanceRUSD");
     expect(save).not.toMatch(/SUSD|Susd|susd/);
@@ -241,7 +244,8 @@ describe("M14 current documentation and protocol", () => {
     // 23: households section, province dwellings and crowding columns (P6, D-153).
     // 24: labour-market section, profession groups, province unemployment column, focused
     //     province labour rows and the monthly mobility report (P7, D-156).
-    expect(PROTOCOL_VERSION).toBe(24);
+    // 25: the player's country in the monthly mobility report (P7 close, D-169).
+    expect(PROTOCOL_VERSION).toBe(25);
   });
 
   test("the monetary terminology audit passes", () => {

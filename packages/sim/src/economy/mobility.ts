@@ -88,7 +88,7 @@ import {
   type ReclassifyContext,
   householdCashPosition,
 } from "./reclassify.js";
-import type { EconomyDefinitions, ProfessionDef } from "./types.js";
+import type { EconomyDefinitions, LabourCountryMonthReport, LabourMonthReport, ProfessionDef } from "./types.js";
 
 export interface LabourMonthPhaseResult {
   readonly ran: boolean;
@@ -371,13 +371,30 @@ interface FlowTally {
   people: number;
   flows: number;
   readonly net: number[];
+  /** D-169: the month by country (province owner when the phase ran). */
+  readonly countries: Map<Id, LabourCountryMonthReport>;
 }
 
-function recordMove(tally: FlowTally, fromProfession: Id, toProfession: Id, people: number): void {
+/** D-169: a country's tally, created on its first movement. */
+function countryTally(tally: FlowTally, countryId: Id, professionCount: number): LabourCountryMonthReport {
+  let entry = tally.countries.get(countryId);
+  if (entry === undefined) {
+    entry = { countryId, mobilityPeople: 0, migrationOutPeople: 0, immigrationPeople: 0, blocksCreated: 0, blocksRetired: 0, netByProfession: new Array<number>(professionCount).fill(0) };
+    tally.countries.set(countryId, entry);
+  }
+  return entry;
+}
+
+function recordMove(tally: FlowTally, fromProfession: Id, toProfession: Id, people: number, countryId: Id | undefined): void {
   tally.people += people;
   tally.flows += 1;
   tally.net[fromProfession] = (tally.net[fromProfession] ?? 0) - people;
   tally.net[toProfession] = (tally.net[toProfession] ?? 0) + people;
+  if (countryId === undefined) return;
+  const country = countryTally(tally, countryId, tally.net.length);
+  country.mobilityPeople += people;
+  country.netByProfession[fromProfession] = (country.netByProfession[fromProfession] ?? 0) - people;
+  country.netByProfession[toProfession] = (country.netByProfession[toProfession] ?? 0) + people;
 }
 
 function runMobility(index: PhaseIndex, context: ReclassifyContext, dayIndex: DayIndex, tally: FlowTally): void {
@@ -446,7 +463,7 @@ function runMobility(index: PhaseIndex, context: ReclassifyContext, dayIndex: Da
       roomUsed.set(key, (roomUsed.get(key) ?? 0) + count * workerPerMover);
       if (countryPlaces !== undefined) countryPlaces.set(profession.id, (countryPlaces.get(profession.id) ?? 0) - count);
       left -= count;
-      recordMove(tally, source.professionId, profession.id, count);
+      recordMove(tally, source.professionId, profession.id, count, countryId);
     }
   }
 }
@@ -548,6 +565,20 @@ function runLabourMigration(index: PhaseIndex, context: ReclassifyContext, dayIn
     roomUsed.set(key, (roomUsed.get(key) ?? 0) + best.people * workerPerMover);
     tally.people += best.people;
     tally.flows += 1;
+    // D-169: the origin country loses the movers; a destination abroad gains them.
+    const destinationOwner = owners.get(best.provinceId) ?? null;
+    if (sourceOwner !== null) countryTally(tally, sourceOwner, tally.net.length).migrationOutPeople += best.people;
+    if (sourceOwner !== destinationOwner) {
+      if (sourceOwner !== null) {
+        const origin = countryTally(tally, sourceOwner, tally.net.length);
+        origin.netByProfession[profession.id] = (origin.netByProfession[profession.id] ?? 0) - best.people;
+      }
+      if (destinationOwner !== null) {
+        const arrival = countryTally(tally, destinationOwner, tally.net.length);
+        arrival.immigrationPeople += best.people;
+        arrival.netByProfession[profession.id] = (arrival.netByProfession[profession.id] ?? 0) + best.people;
+      }
+    }
   }
 }
 
@@ -585,21 +616,35 @@ export function runLabourMonthPhase(world: World, definitions: EconomyDefinition
   const index = buildPhaseIndex(world, definitions, dayIndex);
   const context = createReclassifyContext(world, definitions, dayIndex);
   const size = index.measured.professionCount;
-  const mobility: FlowTally = { people: 0, flows: 0, net: new Array<number>(size).fill(0) };
+  // D-169: the month by country, by the owners of the provinces when the phase ran.
+  const owners = buildProvinceOwnerMap(world);
+  const firstNewBlockId = world.labourMarket.nextPopBlockId;
+  const countries = new Map<Id, LabourCountryMonthReport>();
+  const mobility: FlowTally = { people: 0, flows: 0, net: new Array<number>(size).fill(0), countries };
   runMobility(index, context, dayIndex, mobility);
-  const migration: FlowTally = { people: 0, flows: 0, net: new Array<number>(size).fill(0) };
+  const migration: FlowTally = { people: 0, flows: 0, net: new Array<number>(size).fill(0), countries };
   runLabourMigration(index, context, dayIndex, migration);
   updateProvinceUrbanShares(world);
   world.employmentDirty = true;
   const employmentRefresh = refreshEmployment(world, definitions, dayIndex, { force: true });
+  const provinceOfBlock = new Map(world.popBlocks.map((block) => [block.id, block.provinceId]));
+  const retiredBefore = new Set(world.labourMarket.retiredPopBlockIds);
   const blocksRetired = retireEmptyBlocks(context);
-  const report = {
+  const retiredAfter = new Set(world.labourMarket.retiredPopBlockIds);
+  for (const [blockId, provinceId] of provinceOfBlock) {
+    const owner = owners.get(provinceId);
+    if (owner === undefined) continue;
+    if (blockId >= firstNewBlockId) countryTally(mobility, owner, size).blocksCreated += 1;
+    if (!retiredBefore.has(blockId) && retiredAfter.has(blockId)) countryTally(mobility, owner, size).blocksRetired += 1;
+  }
+  const report: LabourMonthReport = {
     dayIndex,
     mobilityPeople: mobility.people,
     migrationPeople: migration.people,
     blocksCreated: context.blocksCreated,
     blocksRetired,
     netByProfession: mobility.net.map((value, professionId) => value + (migration.net[professionId] ?? 0)),
+    countries: [...countries.values()].sort((left, right) => left.countryId - right.countryId),
   };
   world.labourMarket.history = [...world.labourMarket.history, report].slice(-LABOUR_HISTORY_MONTHS);
   return {

@@ -51,11 +51,12 @@ describe("P7 protocol 24 labour-market snapshot (D-156)", () => {
     world = createEconomyWorld(scenario);
   });
 
-  test("the snapshot is protocol 24, passes the event validator and leaves the world unchanged", () => {
+  // D-169: protocol 25 adds the player's country to the mobility report; the protocol-24 fields are unchanged.
+  test("the snapshot is protocol 25, passes the event validator and leaves the world unchanged", () => {
     const before = hashWorld(world);
     const snapshot = snapshotOf(world, scenario, countryProvinceIds(world, M5_COUNTRY_A)[0] ?? null);
-    expect(PROTOCOL_VERSION).toBe(24);
-    expect(snapshot.protocolVersion).toBe(24);
+    expect(PROTOCOL_VERSION).toBe(25);
+    expect(snapshot.protocolVersion).toBe(25);
     expect(() => parseWorkerEvent(JSON.parse(JSON.stringify({ protocolVersion: PROTOCOL_VERSION, type: "SNAPSHOT", commandId: null, snapshot })))).not.toThrow();
     expect(hashWorld(world)).toBe(before);
   });
@@ -166,5 +167,22 @@ describe("P7 protocol 24 labour-market snapshot (D-156)", () => {
     });
     const net = new Map(mobility?.net.map((entry) => [entry.professionId, entry.net]));
     report.netByProfession.forEach((value, professionId) => expect(net.get(professionId) ?? 0).toBe(value));
+    // D-169: the player's country row repeats its part of the report (zeros where nothing moved).
+    const player = local.playerCountryId;
+    if (player === null) {
+      expect(mobility?.country).toBeNull();
+    } else {
+      const row = report.countries.find((entry) => entry.countryId === player);
+      expect(mobility?.country).toMatchObject({
+        countryId: player,
+        mobilityPeople: row?.mobilityPeople ?? 0,
+        migrationOutPeople: row?.migrationOutPeople ?? 0,
+        immigrationPeople: row?.immigrationPeople ?? 0,
+        blocksCreated: row?.blocksCreated ?? 0,
+        blocksRetired: row?.blocksRetired ?? 0,
+      });
+      const countryNet = new Map(mobility?.country?.net.map((entry) => [entry.professionId, entry.net]));
+      (row?.netByProfession ?? []).forEach((value, professionId) => expect(countryNet.get(professionId) ?? 0).toBe(value));
+    }
   });
 });

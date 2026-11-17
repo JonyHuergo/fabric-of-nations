@@ -29,7 +29,11 @@
  * `d70a7d753a15ec9b`, 52 `95a1381fa4e6520d`, 53 `bd2b43374da4240d`, 54 `8a741ea03938994e`
  * and 60 `f47e9a8d0ad83ceb`; the run still reaches day 60 without a failure.
  *
- * The hashes below were recorded with the D-166 build by running the 1900 world (seed
+ * D-169 (P7 close, step 6, schema 36): encoding only. The monthly labour report gains its
+ * country rows (from day 31) and the schema number changes; restoring schema 35 and removing
+ * the country rows reproduces every D-167 value above (checked on 2026-11-16 for all seven days).
+ *
+ * The hashes below were recorded with the D-169 build by running the 1900 world (seed
  * 20261023, default player) in phase mode (`tickPhaseMode`, the rollback runner's day) with
  * the default result detail. Memory (D-155): one 1900 world, ticked in place.
  */
@@ -39,14 +43,16 @@ import { createEconomyWorld, hashWorld, tickPhaseMode, type TickContext, type Wo
 
 const SEED = 20_261_023;
 
-const HASHES_D166: Readonly<Record<number, string>> = {
-  0: "94529a4173fbb997",
-  1: "230ff89e621a1e40",
-  31: "2d73a856201d4a04",
-  52: "87e3e78780eb7ed1",
-  53: "11ae0ce6ca7d7814",
-  54: "32a5caa8697f4312",
-  60: "3d24daeda0b71ea7",
+// D-167 (data v16, schema 35): 0 94529a4173fbb997, 1 230ff89e621a1e40, 31 2d73a856201d4a04,
+// 52 87e3e78780eb7ed1, 53 11ae0ce6ca7d7814, 54 32a5caa8697f4312, 60 3d24daeda0b71ea7.
+const HASHES_D169: Readonly<Record<number, string>> = {
+  0: "d5ff5c1cdfd51d46",
+  1: "7676d6b3d3e07a81",
+  31: "fb88c761e024a893",
+  52: "c0ceeff9ab3bbe9f",
+  53: "7774a146939ab1b0",
+  54: "4b7a291c25890d8a",
+  60: "7c53910371a46b7d",
 };
 
 describe("D-165/D-166 1900-world hash pin and the first 60 days", () => {
@@ -60,9 +66,9 @@ describe("D-165/D-166 1900-world hash pin and the first 60 days", () => {
     const observed: Record<number, string> = { 0: hashWorld(world) };
     while (world.dayIndex < 60) {
       tickPhaseMode(world, context);
-      if (HASHES_D166[world.dayIndex] !== undefined) observed[world.dayIndex] = hashWorld(world);
+      if (HASHES_D169[world.dayIndex] !== undefined) observed[world.dayIndex] = hashWorld(world);
     }
-    expect(observed).toEqual(HASHES_D166);
+    expect(observed).toEqual(HASHES_D169);
     expect(world.dayIndex).toBe(60);
   }, 3_600_000);
 });

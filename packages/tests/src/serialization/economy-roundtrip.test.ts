@@ -83,7 +83,10 @@ describe("M3a schema-25 serialization", () => {
     // `c7f29aa27a231428`); D-165 (simulation 0.32.0) and D-166 (data m3-economy-v16) change only
     // the version strings here: restoring simulation 0.31.0 and data m3-economy-v15 in the
     // encoded world reproduces `c7f29aa27a231428` (checked 2026-11-16).
-    expect(hashWorld(cloneWorld())).toBe("516e7bb85478fdde");
+    // D-169 (schema 36, re-pinned with the designer's approval of the close's restatements):
+    // encoding only. Restoring schema 35 (and removing the monthly reports' country rows, none
+    // in this world) reproduces the D-167 pin `516e7bb85478fdde` (checked 2026-11-16).
+    expect(hashWorld(cloneWorld())).toBe("c41c8f55205c57c7");
   });
 
   test("round-trips buildings, assignments, markets, lots, accounts, and postings", () => {

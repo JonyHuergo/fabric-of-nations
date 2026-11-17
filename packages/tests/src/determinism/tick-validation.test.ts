@@ -94,7 +94,9 @@ const SEED = 20_261_023;
 // today's wages, so restoring simulation 0.31.0 and data m3-economy-v15 gives
 // `19407d3a5c927030`, not `9dfd323500a31f87`. The test's other assertions (cash conserved,
 // the validation boundary) are unchanged and pass.
-const PRE_BATCH5_HASH_AFTER_22_TICKS = "da3fccec5554e7f2";
+// D-169 (schema 36): encoding only; restoring schema 35 and removing the monthly reports'
+// country rows reproduces the D-167 pin `da3fccec5554e7f2` (checked 2026-11-16).
+const PRE_BATCH5_HASH_AFTER_22_TICKS = "178318150b72f867";
 
 function contextFor(scenario: EconomyScenarioDef): TickContext {
   return {

@@ -2615,7 +2615,7 @@ export function buildSimulationSnapshot(
     markets: marketSnapshots(world, definitions, capacities.byMarket, marketMetaById, fullMarketIds),
     goods: staticSections.goods,
     professions: staticSections.professions,
-    labourMobility: labourMobilitySnapshot(world),
+    labourMobility: labourMobilitySnapshot(world, playerCountryId),
     needTiers: staticSections.needTiers,
     projectTypes: staticSections.projectTypes,
     technologyEraNames: staticSections.technologyEraNames,

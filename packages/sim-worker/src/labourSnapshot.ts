@@ -387,10 +387,23 @@ export function provinceLabourSnapshot(context: LabourSnapshotContext | null, wo
   };
 }
 
-/** P7 (D-156): the world's last monthly mobility report. */
-export function labourMobilitySnapshot(world: World): LabourMobilitySnapshot | null {
+/** P7 (D-156): the world's last monthly mobility report; D-169: with the player's country. */
+export function labourMobilitySnapshot(world: World, playerCountryId: number | null = world.playerCountryId ?? null): LabourMobilitySnapshot | null {
   const report = world.labourMarket.history[world.labourMarket.history.length - 1];
   if (report === undefined) return null;
+  const row = playerCountryId === null ? undefined : report.countries.find((entry) => entry.countryId === playerCountryId);
+  const country =
+    playerCountryId === null
+      ? null
+      : {
+          countryId: playerCountryId,
+          mobilityPeople: row?.mobilityPeople ?? 0,
+          migrationOutPeople: row?.migrationOutPeople ?? 0,
+          immigrationPeople: row?.immigrationPeople ?? 0,
+          blocksCreated: row?.blocksCreated ?? 0,
+          blocksRetired: row?.blocksRetired ?? 0,
+          net: (row?.netByProfession ?? []).flatMap((net, professionId) => (net === 0 ? [] : [{ professionId, net }])),
+        };
   return {
     dayIndex: report.dayIndex,
     mobilityPeople: report.mobilityPeople,
@@ -399,5 +412,6 @@ export function labourMobilitySnapshot(world: World): LabourMobilitySnapshot | n
     blocksRetired: report.blocksRetired,
     net: report.netByProfession.flatMap((net, professionId) => (net === 0 ? [] : [{ professionId, net }])),
     liveBlocks: world.popBlocks.length,
+    country,
   };
 }

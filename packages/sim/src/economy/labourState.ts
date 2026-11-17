@@ -66,7 +66,7 @@ export function cloneLabourMarketState(state: LabourMarketState): LabourMarketSt
     staffingCeilings: state.staffingCeilings.map((entry) => ({ ...entry })),
     nextPopBlockId: state.nextPopBlockId,
     retiredPopBlockIds: [...state.retiredPopBlockIds],
-    history: state.history.map((entry) => ({ ...entry, netByProfession: [...entry.netByProfession] })),
+    history: state.history.map((entry) => ({ ...entry, netByProfession: [...entry.netByProfession], countries: entry.countries.map((country) => ({ ...country, netByProfession: [...country.netByProfession] })) })),
   };
 }
 
@@ -181,6 +181,19 @@ export function assertValidLabourMarketState(state: LabourMarketState, context: 
       requireInteger(report[field], `${path}.${field}`, 0, Number.MAX_SAFE_INTEGER);
     }
     report.netByProfession.forEach((value, professionId) => requireInteger(value, `${path}.netByProfession[${String(professionId)}]`, -Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER));
+    // D-169: the month by country, ascending unique country ids, counts non-negative integers.
+    let previousCountry = -1;
+    for (const [countryIndex, country] of report.countries.entries()) {
+      const countryPath = `${path}.countries[${String(countryIndex)}]`;
+      requireInteger(country.countryId, `${countryPath}.countryId`, 0, 0xffff_ffff);
+      if (!(country.countryId > previousCountry)) throw new RangeError(`${path}.countries must be ascending by country id and unique`);
+      previousCountry = country.countryId;
+      for (const field of ["mobilityPeople", "migrationOutPeople", "immigrationPeople", "blocksCreated", "blocksRetired"] as const) {
+        requireInteger(country[field], `${countryPath}.${field}`, 0, Number.MAX_SAFE_INTEGER);
+      }
+      if (country.netByProfession.length !== report.netByProfession.length) throw new RangeError(`${countryPath}.netByProfession must have one entry per profession`);
+      country.netByProfession.forEach((value, professionId) => requireInteger(value, `${countryPath}.netByProfession[${String(professionId)}]`, -Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER));
+    }
   }
 }
 
@@ -226,7 +239,7 @@ export function encodeLabourMarket(state: LabourMarketState): SerializedLabourMa
     staffingCeilings: state.staffingCeilings.map((entry) => [entry.buildingId, entry.ceiling]),
     nextPopBlockId: state.nextPopBlockId,
     retiredPopBlockIds: [...state.retiredPopBlockIds],
-    history: state.history.map((entry) => ({ ...entry, netByProfession: [...entry.netByProfession] })),
+    history: state.history.map((entry) => ({ ...entry, netByProfession: [...entry.netByProfession], countries: entry.countries.map((country) => ({ ...country, netByProfession: [...country.netByProfession] })) })),
   };
 }
 
@@ -285,6 +298,19 @@ export function decodeLabourMarket(value: unknown, path: string): LabourMarketSt
       blocksCreated: requireInteger(entry.blocksCreated, `${path}.history[${String(index)}].blocksCreated`, 0, Number.MAX_SAFE_INTEGER),
       blocksRetired: requireInteger(entry.blocksRetired, `${path}.history[${String(index)}].blocksRetired`, 0, Number.MAX_SAFE_INTEGER),
       netByProfession: numberArray(entry.netByProfession, `${path}.history[${String(index)}].netByProfession`),
+      countries: requireArray(entry.countries, `${path}.history[${String(index)}].countries`).map((rawCountry, countryIndex) => {
+        const countryPath = `${path}.history[${String(index)}].countries[${String(countryIndex)}]`;
+        const country = requireRecord(rawCountry, countryPath);
+        return {
+          countryId: requireInteger(country.countryId, `${countryPath}.countryId`, 0, 0xffff_ffff),
+          mobilityPeople: requireInteger(country.mobilityPeople, `${countryPath}.mobilityPeople`, 0, Number.MAX_SAFE_INTEGER),
+          migrationOutPeople: requireInteger(country.migrationOutPeople, `${countryPath}.migrationOutPeople`, 0, Number.MAX_SAFE_INTEGER),
+          immigrationPeople: requireInteger(country.immigrationPeople, `${countryPath}.immigrationPeople`, 0, Number.MAX_SAFE_INTEGER),
+          blocksCreated: requireInteger(country.blocksCreated, `${countryPath}.blocksCreated`, 0, Number.MAX_SAFE_INTEGER),
+          blocksRetired: requireInteger(country.blocksRetired, `${countryPath}.blocksRetired`, 0, Number.MAX_SAFE_INTEGER),
+          netByProfession: numberArray(country.netByProfession, `${countryPath}.netByProfession`),
+        };
+      }),
     };
   });
   return {

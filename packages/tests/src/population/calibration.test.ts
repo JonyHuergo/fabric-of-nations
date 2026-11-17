@@ -271,7 +271,10 @@ describe("M2.1 source-backed total-population and age-structure calibration", ()
     // `9aaedfa0cfabe4f6`); D-165 (simulation 0.32.0) and D-166 (data m3-economy-v16) change only
     // the version strings here: restoring simulation 0.31.0 and data m3-economy-v15 in the
     // encoded world reproduces `9aaedfa0cfabe4f6` (checked 2026-11-16).
-    expect(hashWorld(world)).toBe("2737881e5e308d9c");
+    // D-169 (schema 36, re-pinned with the designer's approval of the close's restatements):
+    // encoding only. Restoring schema 35 (and removing the monthly reports' country rows, none
+    // in this world) reproduces the D-167 pin `2737881e5e308d9c` (checked 2026-11-16).
+    expect(hashWorld(world)).toBe("ef0172ebc10f2ead");
   });
 });
 

@@ -103,8 +103,11 @@ export const SIM_VERSION = "0.32.0";
  * block-id allocator, retired blocks and the monthly history). It is encoded only when
  * the labour market is enabled; legacy worlds encode as before. Schema-34 worlds are
  * reported as incompatible (D-120).
+ * The P7 close (schema 36, D-169) adds each country's part of the monthly labour report
+ * (`LabourMonthReport.countries`). Saves of earlier schemas are rejected, never migrated
+ * (D-155).
  */
-export const WORLD_SCHEMA_VERSION = 35;
+export const WORLD_SCHEMA_VERSION = 36;
 
 /** Version of the save envelope itself. */
 export const SAVE_FORMAT_VERSION = 2;

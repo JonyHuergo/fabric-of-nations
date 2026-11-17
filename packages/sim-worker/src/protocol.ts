@@ -20,7 +20,11 @@
  * profession groups, the province unemployment column, the focused province's labour rows
  * and the world's last monthly mobility report.
  */
-export const PROTOCOL_VERSION = 24 as const;
+/**
+ * 25 (D-169, P7 close): the monthly mobility report gains the player's country
+ * (`LabourMobilitySnapshot.country`), shown above the world total.
+ */
+export const PROTOCOL_VERSION = 25 as const;
 export const MAX_PROTOCOL_ID_LENGTH = 128;
 export const MAX_STEP_TICKS = 1_000;
 export const MAX_LOAD_SAVE_LENGTH = 64 * 1024 * 1024;
@@ -1783,6 +1787,19 @@ export interface ProvinceLabourSnapshot {
 }
 
 /** P7 (D-156): the world's last monthly mobility report (the history is world-wide). */
+/** D-169: one country's part of the month's mobility report. */
+export interface LabourCountryMobilitySnapshot {
+  readonly countryId: number;
+  readonly mobilityPeople: number;
+  /** People who left a province of the country (for another province, at home or abroad). */
+  readonly migrationOutPeople: number;
+  /** People who arrived from another country. */
+  readonly immigrationPeople: number;
+  readonly blocksCreated: number;
+  readonly blocksRetired: number;
+  readonly net: readonly { readonly professionId: number; readonly net: number }[];
+}
+
 export interface LabourMobilitySnapshot {
   /** Day the month's mobility ran (the first civil day of the month). */
   readonly dayIndex: number;
@@ -1793,6 +1810,11 @@ export interface LabourMobilitySnapshot {
   /** Net people gained (positive) or lost per profession; professions without a change are left out. */
   readonly net: readonly { readonly professionId: number; readonly net: number }[];
   readonly liveBlocks: number;
+  /**
+   * D-169: the player's country this month (all zeros when nothing moved there), or null
+   * without a player country.
+   */
+  readonly country: LabourCountryMobilitySnapshot | null;
 }
 
 export interface GoodSnapshot {
@@ -3345,15 +3367,26 @@ function isProvinceLabour(value: unknown): value is ProvinceLabourSnapshot {
 }
 
 /** P7 (D-156): the world's last monthly mobility report. */
+function isMobilityNet(value: unknown): boolean {
+  return Array.isArray(value) && value.every((entry) => isRecord(entry) && isIntegerIn(entry.professionId, 0, 0xffff) && Number.isInteger(entry.net));
+}
+
+/** D-169: the player's country row of the mobility report. */
+function isLabourCountryMobility(value: unknown): value is LabourCountryMobilitySnapshot {
+  if (!isRecord(value) || !isIntegerIn(value.countryId, 0, 0xffff_ffff)) return false;
+  for (const key of ["mobilityPeople", "migrationOutPeople", "immigrationPeople", "blocksCreated", "blocksRetired"] as const) {
+    if (!isIntegerIn(value[key], 0, Number.MAX_SAFE_INTEGER)) return false;
+  }
+  return isMobilityNet(value.net);
+}
+
 function isLabourMobility(value: unknown): value is LabourMobilitySnapshot {
   if (!isRecord(value) || !isIntegerIn(value.dayIndex, 0, 36_524)) return false;
   for (const key of ["mobilityPeople", "migrationPeople", "blocksCreated", "blocksRetired", "liveBlocks"] as const) {
     if (!isIntegerIn(value[key], 0, Number.MAX_SAFE_INTEGER)) return false;
   }
-  return (
-    Array.isArray(value.net) &&
-    value.net.every((entry) => isRecord(entry) && isIntegerIn(entry.professionId, 0, 0xffff) && Number.isInteger(entry.net))
-  );
+  if (value.country !== null && !isLabourCountryMobility(value.country)) return false;
+  return isMobilityNet(value.net);
 }
 
 /** P6 (D-153): the households section. */

@@ -200,6 +200,40 @@ describe("D-165 a retired block in a world with an army ledger", () => {
   });
 });
 
+describe("D-169 the monthly labour report by country", () => {
+  test("each month's country rows add up to the world totals and survive a save", () => {
+    const scenario = p7Scenario();
+    const context = economyTickContext(scenario);
+    const world = createEconomyWorld(scenario);
+    for (let day = 0; day < 95; day += 1) tick(world, context);
+    expect(world.labourMarket.history.length).toBe(3);
+    let moved = 0;
+    for (const report of world.labourMarket.history) {
+      const ids = report.countries.map((entry) => entry.countryId);
+      expect(ids).toEqual([...ids].sort((left, right) => left - right));
+      const sum = (field: "mobilityPeople" | "migrationOutPeople" | "blocksCreated" | "blocksRetired"): number =>
+        report.countries.reduce((total, entry) => total + entry[field], 0);
+      // Every move happens in a province with an owner in this fixture.
+      expect(sum("mobilityPeople")).toBe(report.mobilityPeople);
+      expect(sum("migrationOutPeople")).toBe(report.migrationPeople);
+      expect(sum("blocksCreated")).toBe(report.blocksCreated);
+      expect(sum("blocksRetired")).toBe(report.blocksRetired);
+      // People arriving from abroad are people who left another country.
+      const immigrants = report.countries.reduce((total, entry) => total + entry.immigrationPeople, 0);
+      expect(immigrants).toBeLessThanOrEqual(report.migrationPeople);
+      // Net by profession: the countries' rows add up to the world row.
+      report.netByProfession.forEach((net, professionId) => {
+        expect(report.countries.reduce((total, entry) => total + (entry.netByProfession[professionId] ?? 0), 0)).toBe(net);
+      });
+      moved += report.mobilityPeople + report.migrationPeople;
+    }
+    expect(moved).toBeGreaterThan(0);
+    const restored = deserializeWorld(serializeWorld(world));
+    expect(restored.labourMarket.history).toEqual(world.labourMarket.history);
+    expect(hashWorld(restored)).toBe(hashWorld(world));
+  });
+});
+
 describe("P7 integrated months", () => {
   test("three months run deterministically, with mobility, and the save round-trips (acceptance)", () => {
     const scenario = p7Scenario();

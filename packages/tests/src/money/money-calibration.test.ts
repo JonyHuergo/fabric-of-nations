@@ -351,7 +351,8 @@ describe("P2b 1900 world", () => {
     // P5b (D-146) raised it to 33 (deposit link, province latitude, three sectors).
     // P6 (D-153) raised it to 34 (demand and housing state); the P2b fields are unchanged.
     // P7 (D-154) raised it to 35 (labour market); legacy worlds keep the P2b fields.
-    expect(WORLD_SCHEMA_VERSION).toBe(35);
+    // The P7 close (D-169) raised it to 36 (the monthly labour report by country).
+    expect(WORLD_SCHEMA_VERSION).toBe(36);
     const restored = deserializeWorld(serializeWorld(world));
     expect(hashWorld(restored)).toBe(hashWorld(world));
     expect(restored.moneyCoefficients).toEqual(world.moneyCoefficients);

@@ -60,7 +60,10 @@ describe("determinism", () => {
     // `6aef674f9648abdd`); D-165 (simulation 0.32.0) and D-166 (data m3-economy-v16) change only
     // the version strings here: restoring simulation 0.31.0 and data m3-economy-v15 in the
     // encoded world reproduces `6aef674f9648abdd` (checked 2026-11-16).
-    expect(hashWorld(world)).toBe("a0cf17e148be0b67");
+    // D-169 (schema 36, re-pinned with the designer's approval of the close's restatements):
+    // encoding only. Restoring schema 35 (and removing the monthly reports' country rows, none
+    // in this world) reproduces the D-167 pin `a0cf17e148be0b67` (checked 2026-11-16).
+    expect(hashWorld(world)).toBe("e2b92d2e2b425748");
   });
 
   test("a one-year economic simulation is deterministic and save/resume safe", () => {
